@@ -6,6 +6,7 @@ import 'package:nowssb/features/rewards_newui/rewards_data.dart';
 import 'package:nowssb/features/rewards_newui/rewards_flag.dart';
 import 'package:nowssb/features/rewards_newui/rewards_page.dart';
 import 'package:nowssb/features/rewards_newui/lotus_coin.dart';
+import 'package:nowssb/nowssb_ui/nowssb_ui.dart';
 
 final _now = DateTime(2026, 10, 13);
 RewardsData _full() => RewardsData.fromSummary({
@@ -33,6 +34,8 @@ Future<void> _pump(WidgetTester t, RewardsLoader l, {void Function(String)? onOp
   addTearDown(t.view.reset);
   await t.pumpWidget(MaterialApp(home: MediaQuery(data: const MediaQueryData(disableAnimations: true), child: RewardsNewUiPage(loader: l, onOpen: onOpen))));
 }
+
+Finder _chip(String l) => find.descendant(of: find.byType(FilterChipRow), matching: find.text(l));
 
 void main() {
   test('flag: off for users, on for admins or when flag set', () {
@@ -96,17 +99,21 @@ void main() {
     expect(find.text('24 hour deal'), findsOneWidget);
     expect(find.text('Unlocks tomorrow'), findsOneWidget);
     await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.c1')), 200, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
-    await t.ensureVisible(find.byKey(const Key('rewards.filter.Expired')));
+    await t.ensureVisible(find.byType(FilterChipRow));
     await t.pump();
-    await t.tap(find.byKey(const Key('rewards.filter.Expired')));
+    await t.scrollUntilVisible(_chip('Expired'), 80, scrollable: find.descendant(of: find.byType(FilterChipRow), matching: find.byType(Scrollable)).first);
+    await t.pump();
+    await t.tap(_chip('Expired'));
     await t.pump();
     await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.x1')), 200, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
     expect(find.byKey(const Key('rewards.tile.x1')), findsOneWidget);
     expect(find.byKey(const Key('rewards.tile.c1')), findsNothing);
     expect(find.text('Expired'), findsWidgets);
-    await t.ensureVisible(find.byKey(const Key('rewards.filter.Gifts')));
+    await t.ensureVisible(find.byType(FilterChipRow));
     await t.pump();
-    await t.tap(find.byKey(const Key('rewards.filter.Gifts')));
+    await t.scrollUntilVisible(_chip('Gifts'), 80, scrollable: find.descendant(of: find.byType(FilterChipRow), matching: find.byType(Scrollable)).first);
+    await t.pump();
+    await t.tap(_chip('Gifts'));
     await t.pump();
     await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.g1')), 200, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
     expect(find.byKey(const Key('rewards.tile.g1')), findsOneWidget);

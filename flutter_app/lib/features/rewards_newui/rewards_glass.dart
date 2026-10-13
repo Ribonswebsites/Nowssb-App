@@ -4,10 +4,10 @@
 library;
 
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../../nowssb_ui/nowssb_ui.dart';
 import 'lotus_coin.dart';
 import 'rewards_data.dart';
 
@@ -18,29 +18,17 @@ abstract final class RGlass {
   static const gold = Color(0xFFFFD27A);
 }
 
-/// Frosted glass panel (stand-in for GlassWrapper).
+/// Thin adapter over the shared kit's [NGlass]. Lite glass by default;
+/// pass [blur] only for hero/bars (kit rule: max 4 blurred on screen).
 class RGlassBox extends StatelessWidget {
-  const RGlassBox({super.key, required this.child, this.padding = const EdgeInsets.all(12), this.radius = 20, this.tint});
+  const RGlassBox({super.key, required this.child, this.padding = const EdgeInsets.all(12), this.radius = 20, this.tint, this.blur = 0});
   final Widget child;
   final EdgeInsets padding;
   final double radius;
   final Color? tint;
+  final double blur;
   @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: (tint ?? Colors.white).withValues(alpha: .10),
-              borderRadius: BorderRadius.circular(radius),
-              border: Border.all(color: Colors.white.withValues(alpha: .22)),
-            ),
-            child: child,
-          ),
-        ),
-      );
+  Widget build(BuildContext context) => NGlass(radius: radius, padding: padding, tint: tint, accent: tint ?? NTokens.violet, blur: blur, child: child);
 }
 
 /// Procedural floating orbs + slow breathing glow (spec 16). Respects
@@ -114,7 +102,7 @@ class RCoinChip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             radius: 30,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              const Icon(Icons.spa_rounded, color: RGlass.gold, size: 18),
+              const CoinDot(size: 18),
               const SizedBox(width: 6),
               CountUpText(coins, key: const Key('rewards.coins'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             ]),
@@ -144,6 +132,7 @@ class _RHeroCarouselState extends State<RHeroCarousel> {
                   padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: RGlassBox(
                     tint: RGlass.violet,
+                    blur: NTokens.blurLarge,
                     padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                     child: Row(children: [
                       Expanded(
@@ -270,26 +259,8 @@ class RFilterChips extends StatelessWidget {
   final String selected;
   final ValueChanged<String> onSelect;
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(children: [
-          for (final o in options)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ChoiceChip(
-                key: Key('rewards.filter.$o'),
-                label: Text(o),
-                selected: o == selected,
-                onSelected: (_) => onSelect(o),
-                labelStyle: TextStyle(color: o == selected ? RGlass.bgBottom : Colors.white),
-                selectedColor: RGlass.violet,
-                backgroundColor: Colors.white.withValues(alpha: .08),
-                side: BorderSide(color: Colors.white.withValues(alpha: .3)),
-                showCheckmark: false,
-              ),
-            ),
-        ]),
-      );
+  Widget build(BuildContext context) =>
+      FilterChipRow(labels: options, selected: {options.indexOf(selected)}, onSelect: (i) => onSelect(options[i]));
 }
 
 class RGiftTile extends StatelessWidget {
@@ -357,21 +328,7 @@ class RStateMessage extends StatelessWidget {
   Widget build(BuildContext context) => Center(
         child: Padding(
           padding: EdgeInsets.all(compact ? 16 : 32),
-          child: RGlassBox(
-            padding: const EdgeInsets.all(24),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Icon(icon, color: RGlass.violet, size: 44),
-              const SizedBox(height: 12),
-              Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 6),
-              Text(body, textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withValues(alpha: .75))),
-              if (action != null) ...[
-                const SizedBox(height: 14),
-                FilledButton(
-                    onPressed: onAction, style: FilledButton.styleFrom(backgroundColor: RGlass.violet, foregroundColor: RGlass.bgBottom), child: Text(action!)),
-              ],
-            ]),
-          ),
+          child: GlassStateCard(icon: icon, title: title, message: body, action: action, onAction: onAction),
         ),
       );
 }
