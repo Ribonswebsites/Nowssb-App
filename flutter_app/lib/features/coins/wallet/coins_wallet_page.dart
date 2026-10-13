@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:io' show SocketException;
 import 'package:flutter/material.dart';
-import 'coins_video_bg.dart';
+import '../../../widgets/app_backdrop.dart';
 import 'coins_wallet_data.dart';
 import '../../../nowssb_ui/nowssb_ui.dart';
 import '../../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 
 const _gold = Color(0xFFE0A526);
 const _violet = Color(0xFFB39DFF);
-const kCoinsBgVideo = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4';
-const _kCoinsBgPoster = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b-poster.webp';
 
 /// Lighter inner frosted panel (reference card's lower text card).
 class _InnerPanel extends StatelessWidget {
@@ -30,11 +28,11 @@ class _InnerPanel extends StatelessWidget {
 
 /// NowssB Coins wallet (spec §18.1). Behind `newui_coins` (see coins_flag.dart).
 class CoinsWalletPage extends StatefulWidget {
-  const CoinsWalletPage({super.key, required this.source, this.onOpenBoost, this.videoAsset = kCoinsBgVideo});
+  const CoinsWalletPage({super.key, required this.source, this.onOpenBoost, this.backdrop});
   final CoinsWalletSource source;
   final VoidCallback? onOpenBoost;
-  /// The app's original background video (null = poster only, used in tests).
-  final String? videoAsset;
+  /// Background override for tests only; the app always uses the shared [AppBackdrop].
+  final Widget? backdrop;
   @override
   State<CoinsWalletPage> createState() => _CoinsWalletPageState();
 }
@@ -71,7 +69,6 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
 
   @override
   Widget build(BuildContext context) {
-    final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
@@ -87,8 +84,10 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
               onPressed: _s == null ? null : () => _openHistory(context)),
         ],
       ),
-      body: CoinsVideoBackground(video: reduce ? null : widget.videoAsset, poster: _kCoinsBgPoster,
-          child: SafeArea(child: _body(context))),
+      body: Stack(fit: StackFit.expand, children: [
+        Positioned.fill(child: widget.backdrop ?? const AppBackdrop()),
+        SafeArea(child: _body(context)),
+      ]),
     );
   }
 
