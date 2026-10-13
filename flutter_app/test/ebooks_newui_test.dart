@@ -42,7 +42,8 @@ void main() {
     await t.pump(const Duration(milliseconds: 60));
     await t.pump(const Duration(milliseconds: 5));
     await t.pump();
-    expect(find.text('Library'), findsOneWidget);
+    expect(find.text('BOOK LIST'), findsOneWidget);
+    expect(find.byKey(Key('eb-row-${kEbBooks.first.key}')), findsOneWidget);
     expect(find.byKey(Key('eb-card-${kEbBooks.first.key}')), findsOneWidget);
   });
 
@@ -122,7 +123,7 @@ void main() {
     await t.tap(find.text('Next'));
     await t.pump(const Duration(milliseconds: 5));
     await t.pump();
-    expect(find.text('Preview'), findsOneWidget);
+    expect(find.text('Read the description and a sample first.'), findsOneWidget);
     await t.tap(find.text('Next'));
     await t.pump(const Duration(milliseconds: 5));
     await t.pump();
@@ -131,10 +132,10 @@ void main() {
     expect(find.text('Read anywhere'), findsNothing);
   });
 
-  test('newui_ebooks: off for users, on for admins, remote switch wins', () {
-    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isFalse);
+  test('newui_ebooks: on for everyone by default, remote false is the kill switch', () {
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
     expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
-    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
   });
 
   test('storeEbooks route uses the ebooks flag', () {

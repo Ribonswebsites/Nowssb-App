@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/store.dart';
@@ -27,6 +28,9 @@ void main() {
   });
 
   setUpAll(() async {
+    // These cases check the legacy eBooks Store layout; the rebuilt E-books
+    // page (newui_ebooks, default ON) has its own tests and goldens.
+    await NewUi.setDebugOverride('ebooks', false);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
             const MethodChannel('plugins.flutter.io/path_provider'),
