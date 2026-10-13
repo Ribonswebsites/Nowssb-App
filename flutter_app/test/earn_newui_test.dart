@@ -21,6 +21,7 @@ const _team = [
 ];
 
 void main() {
+  earnVideoOff = true;
   group('EarnViewData', () {
     test('targets follow 100/500/1000/2000', () {
       expect(const EarnViewData(wordsSold: 0).nextTarget, 100);
@@ -104,7 +105,7 @@ void main() {
     expect(find.text('20%'), findsOneWidget);
     expect(find.text('380 more words to 500'), findsOneWidget);
     await t.ensureVisible(find.byKey(const Key('earn-task-earnings')));
-    await t.pumpAndSettle();
+    await t.pump(const Duration(seconds: 1));
     await t.tap(find.byKey(const Key('earn-task-earnings')));
     expect(earnings, 1);
   });
@@ -117,9 +118,11 @@ void main() {
       ),
     )));
     await t.tap(find.byKey(const Key('earn-help')));
-    await t.pumpAndSettle();
-    expect(find.text('How it works'), findsOneWidget);
-    expect(find.textContaining('Join as an agent'), findsOneWidget);
+    await t.pump(const Duration(seconds: 1));
+    expect(find.text('Join as an agent'), findsOneWidget);
+    await t.tap(find.text('Next'));
+    await t.pump(const Duration(seconds: 1));
+    expect(find.text('Sell words and plans'), findsWidgets);
   });
 
   testWidgets('screen loads through EarnRepository result', (t) async {
@@ -138,7 +141,7 @@ void main() {
     await t.pump();
     expect(find.text('2 direct · 1 through your team'), findsOneWidget);
     await t.tap(find.byKey(const Key('earn-node-a')));
-    await t.pumpAndSettle();
+    await t.pump(const Duration(seconds: 1));
     expect(find.text('Asha'), findsOneWidget);
     expect(find.text('12'), findsOneWidget);
   });

@@ -44,3 +44,4 @@
   (+ its poster) through the shared `GlassVideoScaffold`. Earlier code-drawn coin/orbs/ripples/sparkle were removed.
 ## Menu & Settings (newui_menu_settings)
 - No third-party assets. Backdrop is a procedural CustomPainter (original work).
+- Correction round: Earn now uses the app's original video background (kit GlassVideoScaffold + its poster) and Ribon's circle images (assets/images/circles) via the kit MeditationCard. No new coin art; the rank medal is procedural code and is not a coin.

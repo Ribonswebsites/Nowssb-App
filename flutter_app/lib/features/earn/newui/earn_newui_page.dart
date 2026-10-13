@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../nowssb_ui/nowssb_ui.dart';
 
-import 'earn_backdrop.dart';
 import 'earn_motion.dart';
 import 'earn_view_data.dart';
 
@@ -33,6 +32,13 @@ const _big = TextStyle(color: _ink, fontSize: 24, fontWeight: FontWeight.w700);
 const _medals = [Color(0xFFD9A066), Color(0xFFCBD3E1), Color(0xFFF2C94C), Color(0xFF9EE7FF)];
 const _medalNames = ['Bronze', 'Silver', 'Gold', 'Diamond'];
 
+/// The kit's default video; tests set [earnVideoOff] (no video plugin there).
+bool earnVideoOff = false;
+
+/// First frame of the kit's default video, shown until it plays.
+const kEarnVideoPoster = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b-poster.webp';
+String? earnVideoAsset() => earnVideoOff ? null : const GlassVideoScaffold(body: SizedBox()).videoAsset;
+
 /// Glass card from the shared kit (spec 14.2).
 class EarnGlass extends StatelessWidget {
   const EarnGlass({super.key, required this.child, this.padding = const EdgeInsets.all(18)});
@@ -50,16 +56,14 @@ class EarnNewUiPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1B1433),
-      body: EarnBackdrop(
-        child: SafeArea(
-          child: Column(children: [
-            _TopBar(onHelp: actions.onHelp),
-            Expanded(child: _body()),
-          ]),
-        ),
-      ),
+    // The app's original video background behind see-through glass (rules).
+    return GlassVideoScaffold(
+      videoAsset: earnVideoAsset(),
+      posterAsset: kEarnVideoPoster,
+      body: Column(children: [
+        _TopBar(onHelp: actions.onHelp),
+        Expanded(child: _body()),
+      ]),
     );
   }
 
@@ -333,17 +337,58 @@ const kEarnHowItWorks = <String>[
   'Move up ranks',
 ];
 
+const _howImages = ['yoga_deck', 'mudra_hands', 'lotus', 'milky_way'];
+const _howBodies = [
+  'Sign up in the app. It is free to start.',
+  'Share words and plans. You earn on real sales.',
+  'Invite people to join. Your team grows.',
+  'Sell more words to reach the next rank.',
+];
+
+/// "How it works" as the reference meditation cards: round photo, inner
+/// glass panel, bold title, small body, Skip left, Next pill right, dots.
 Future<void> showEarnHowItWorks(BuildContext context) {
-  return showGlassSheet<void>(
-    context,
-    builder: (_) => Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Text('How it works', style: TextStyle(color: _ink, fontSize: 18, fontWeight: FontWeight.w700)),
-      const SizedBox(height: 12),
-      for (var i = 0; i < kEarnHowItWorks.length; i++)
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Text('${i + 1}. ${kEarnHowItWorks[i]}', style: const TextStyle(color: _ink, fontSize: 15)),
-        ),
-    ]),
+  return showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'close',
+    barrierColor: Colors.black54,
+    pageBuilder: (ctx, _, __) => const _HowItWorks(),
   );
+}
+
+class _HowItWorks extends StatefulWidget {
+  const _HowItWorks();
+  @override
+  State<_HowItWorks> createState() => _HowItWorksState();
+}
+
+class _HowItWorksState extends State<_HowItWorks> {
+  int _i = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final last = _i == kEarnHowItWorks.length - 1;
+    return SafeArea(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 28),
+          child: Material(
+            type: MaterialType.transparency,
+            child: MeditationCard(
+              key: Key('earn-how-$_i'),
+              image: NCircles.of(_howImages[_i]),
+              title: kEarnHowItWorks[_i],
+              subtitle: _howBodies[_i],
+              secondary: last ? null : 'Skip',
+              cta: last ? 'Done' : 'Next',
+              dots: kEarnHowItWorks.length,
+              dotIndex: _i,
+              onCta: () => last ? Navigator.of(context).pop() : setState(() => _i++),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

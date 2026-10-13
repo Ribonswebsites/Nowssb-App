@@ -33,6 +33,7 @@ const _ready = EarnViewData(
     load: EarnLoad.ready, signedIn: true, rank: 'Officer', metal: 'Silver', ratePct: 22, wordsSold: 240, team: _team, code: 'ASHA22');
 
 void main() {
+  earnVideoOff = true;
   final key = GlobalKey();
 
   Future<void> shot(WidgetTester t, String name, Widget page, {Future<void> Function()? then}) async {
@@ -50,6 +51,12 @@ void main() {
     ));
     await t.pump(const Duration(milliseconds: 50));
     if (then != null) await then();
+    await t.runAsync(() async {
+      final ctx = key.currentContext!;
+      await precacheImage(const AssetImage(kEarnVideoPoster), ctx);
+      await precacheImage(const AssetImage('assets/images/circles/yoga_deck.webp'), ctx);
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+    });
     await t.pump(const Duration(seconds: 1));
     await t.runAsync(() async {
       final b = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
@@ -74,12 +81,12 @@ void main() {
     await shot(t, 'earn-6', Builder(builder: (c) => EarnNewUiPage(data: _ready, actions: EarnActions(onHelp: () => showEarnHowItWorks(c)))),
         then: () async {
       await t.tap(find.byKey(const Key('earn-help')));
-      await t.pumpAndSettle();
+      await t.pump(const Duration(seconds: 1));
     });
     await shot(t, 'earn-7', const EarnDownlinePage(data: _ready));
     await shot(t, 'earn-8', const EarnDownlinePage(data: _ready), then: () async {
       await t.tap(find.byKey(const Key('earn-node-a')));
-      await t.pumpAndSettle();
+      await t.pump(const Duration(seconds: 1));
     });
     addTearDown(t.view.reset);
   }, skip: _out == null);
