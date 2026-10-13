@@ -83,8 +83,10 @@ void main() {
     await t.pump();
     expect(find.text('BANNER'), findsOneWidget);
     expect(find.textContaining('You have 1 new coupons'), findsOneWidget);
-    expect(find.text('New'), findsOneWidget);
+    expect(find.text('NEW'), findsOneWidget);
     await t.scrollUntilVisible(find.text('20% OFF A WORD'), 200, scrollable: find.byType(Scrollable).first);
+    await t.drag(find.byType(ListView), const Offset(0, -250));
+    await t.pumpAndSettle();
     await t.tap(find.text('20% OFF A WORD'));
     await t.pumpAndSettle();
     expect(find.text('Coupon details'), findsOneWidget);

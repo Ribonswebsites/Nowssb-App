@@ -10,6 +10,7 @@ import '../../widgets/app_backdrop.dart';
 import '../../widgets/sections/coupon_banner_section.dart';
 import 'coupon_models.dart';
 import 'coupon_popups.dart';
+import '../../nowssb_ui/nowssb_ui.dart';
 import 'coupons_glass.dart';
 import 'coupons_motion.dart';
 
@@ -117,37 +118,45 @@ class _CouponsHomePageState extends State<CouponsHomePage> {
     final newCount = _all.where((c) => c.isNew && c.status == CouponStatus.active).length;
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('My Coupons', style: TextStyle(fontWeight: FontWeight.w800)),
-        actions: [
-          IconButton(tooltip: 'How it works', icon: const Icon(Icons.help_outline), onPressed: () => showCouponTerms(context)),
-          IconButton(tooltip: 'History', icon: const Icon(Icons.history), onPressed: () {}),
-        ],
-      ),
-      bottomNavigationBar: _bottomBar(),
+      appBar: GlassTopBar(title: 'My Coupons', actions: [
+        IconButton(tooltip: 'How it works', icon: const Icon(Icons.help_outline, color: Colors.white), onPressed: () => showCouponTerms(context)),
+        IconButton(tooltip: 'History', icon: const Icon(Icons.history, color: Colors.white), onPressed: () {}),
+      ]),
+      extendBodyBehindAppBar: true,
+      extendBody: true,
+      bottomNavigationBar: GlassBottomBar(left: 'All rewards', right: 'Scratch cards', onLeft: _allRewards, onRight: _scratch),
       body: Stack(children: [
+        // The app's original background (video/still); nothing of our own.
         Positioned.fill(child: widget.background ?? const AppBackdrop()),
-        RefreshIndicator(
-          onRefresh: _load,
-          child: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 24), children: [
-            CouponGlass(radius: 22, padding: const EdgeInsets.all(6), child: widget.banner ?? const CouponBannerSection()),
-            const SizedBox(height: 14),
-            _Hero(newCount: newCount, animate: widget.animate),
-            const SizedBox(height: 14),
-            _codeField(),
-            const SizedBox(height: 18),
-            const Text('Save more with coupons', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 8),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              _chip('Categories', _cats, kCouponCategories, (s) => _cats = s),
-              _chip('Rarity', _rarity, [for (final r in CouponRarity.values) rarityName(r)], (s) => _rarity = s),
+        SafeArea(
+          bottom: false,
+          child: RefreshIndicator(
+            onRefresh: _load,
+            child: ListView(padding: const EdgeInsets.fromLTRB(16, 72, 16, 110), children: [
+              NGlass(radius: NTokens.rCard, padding: const EdgeInsets.all(6), child: widget.banner ?? const CouponBannerSection()),
+              const SizedBox(height: 16),
+              MeditationCard(
+                title: 'Coupons for you',
+                subtitle: 'You have $newCount new coupons. Every purchase earns a free one.',
+                image: NCircles.of('lotus'),
+                secondary: 'Level up your savings',
+                cta: 'How it works',
+                onCta: () => showCouponTerms(context),
+                dots: 3,
+              ),
+              const SizedBox(height: 16),
+              _codeField(),
+              const SizedBox(height: 20),
+              const Text('SAVE MORE WITH COUPONS', style: TextStyle(color: NTokens.mint, fontSize: 12, letterSpacing: 1.6, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                _chip('Categories', _cats, kCouponCategories, (s) => _cats = s),
+                _chip('Rarity', _rarity, [for (final r in CouponRarity.values) rarityName(r)], (s) => _rarity = s),
+              ]),
+              const SizedBox(height: 14),
+              ..._list(),
             ]),
-            const SizedBox(height: 12),
-            ..._list(),
-          ]),
+          ),
         ),
       ]),
     );
@@ -174,15 +183,15 @@ class _CouponsHomePageState extends State<CouponsHomePage> {
         }
         return [
           for (var i = 0; i < l.length; i++)
-            Padding(padding: const EdgeInsets.only(bottom: 12), child: CalmEntrance(index: i, animate: widget.animate, child: _Ticket(c: l[i], onTap: () => showCouponDetail(context, l[i])))),
+            Padding(padding: const EdgeInsets.only(bottom: 12), child: CalmEntrance(index: i, animate: widget.animate, child: _ticket(l[i], i))),
         ];
     }
   }
 
   Widget _codeField() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        CouponGlass(
-          radius: 16,
-          padding: const EdgeInsets.only(left: 14, right: 4),
+        NGlass(
+          radius: NTokens.rPill,
+          padding: const EdgeInsets.only(left: 18, right: 6, top: 4, bottom: 4),
           child: Row(children: [
             Expanded(
               child: TextField(
@@ -191,169 +200,42 @@ class _CouponsHomePageState extends State<CouponsHomePage> {
                 style: const TextStyle(color: Colors.white),
                 textCapitalization: TextCapitalization.characters,
                 onSubmitted: (_) => _add(),
-                decoration: const InputDecoration(border: InputBorder.none, hintText: 'Enter coupon code', hintStyle: TextStyle(color: Colors.white54)),
+                decoration: const InputDecoration(border: InputBorder.none, hintText: 'Enter coupon code', hintStyle: TextStyle(color: NTokens.textLo)),
               ),
             ),
-            TextButton(onPressed: _adding ? null : _add, child: Text(_adding ? 'Adding…' : 'Add coupon')),
+            GlassPill(label: _adding ? 'Adding…' : 'Add coupon', style: PillStyle.white, dense: true, onTap: _adding ? null : _add),
           ]),
         ),
         if (_codeMsg != null)
           Padding(
-            padding: const EdgeInsets.only(top: 6, left: 6),
-            child: Text(_codeMsg!, style: TextStyle(color: _codeOk ? const Color(0xFF7CE3A6) : const Color(0xFFFF8A8A), fontSize: 13)),
+            padding: const EdgeInsets.only(top: 6, left: 12),
+            child: Text(_codeMsg!, style: TextStyle(color: _codeOk ? NTokens.mint : NTokens.coral, fontSize: 13)),
           ),
       ]);
 
-  Widget _chip(String label, Set<String> sel, List<String> opts, void Function(Set<String>) assign) => CouponGlass(
-        radius: 20,
-        padding: EdgeInsets.zero,
-        child: InkWell(
-          onTap: () async {
-            final r = await showCouponFilter(context, label, opts, sel);
-            if (r != null) setState(() => assign(r));
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(sel.isEmpty ? label : '$label · ${sel.length}', style: const TextStyle(color: Colors.white)),
-              const Icon(Icons.keyboard_arrow_down, color: Colors.white70, size: 18),
-            ]),
-          ),
+  Widget _ticket(NwCoupon c, int i) => Semantics(
+        button: true,
+        label: '${c.offer}. ${c.scope}',
+        child: CouponListCard(
+          label: c.label,
+          offer: c.offer,
+          image: NCircles.at(i + 4),
+          isNew: c.isNew,
+          rarity: Rarity.values[c.rarity.index],
+          expired: c.status == CouponStatus.expired,
+          onTap: () => showCouponDetail(context, c),
         ),
       );
 
-  Widget _bottomBar() => SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-          child: CouponGlass(
-            lite: false,
-            radius: 24,
-            padding: const EdgeInsets.all(8),
-            child: Row(children: [
-              Expanded(child: _barBtn('All rewards', Icons.card_giftcard, _allRewards)),
-              const SizedBox(width: 8),
-              Expanded(child: _barBtn('Scratch cards', Icons.auto_awesome, _scratch)),
-            ]),
-          ),
-        ),
+  Widget _chip(String label, Set<String> sel, List<String> opts, void Function(Set<String>) assign) => GlassChip(
+        label: sel.isEmpty ? label : '$label · ${sel.length}',
+        selected: sel.isNotEmpty,
+        dropdown: true,
+        onTap: () async {
+          final r = await showCouponFilter(context, label, opts, sel);
+          if (r != null) setState(() => assign(r));
+        },
       );
-
-  Widget _barBtn(String t, IconData i, VoidCallback onTap) => CouponGlass(
-        radius: 18,
-        padding: EdgeInsets.zero,
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(i, color: Colors.white, size: 18),
-              const SizedBox(width: 6),
-              Flexible(child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))),
-            ]),
-          ),
-        ),
-      );
-}
-
-class _Hero extends StatefulWidget {
-  const _Hero({required this.newCount, this.animate = true});
-  final int newCount;
-  final bool animate;
-  @override
-  State<_Hero> createState() => _HeroState();
-}
-
-class _HeroState extends State<_Hero> with SingleTickerProviderStateMixin {
-  late final _a = AnimationController(vsync: this, duration: const Duration(seconds: 6));
-
-  @override
-  void initState() {
-    super.initState();
-    final reduce = WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations;
-    if (!reduce && widget.animate) _a.repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _a.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => CouponGlass(
-        padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
-        child: Column(children: [
-          const AppCoin(size: 84),
-          const SizedBox(height: 14),
-          CouponGlass(
-            inner: true,
-            radius: 20,
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('COUPONS FOR YOU', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 4),
-              Text('Level up your savings. You have ${widget.newCount} new coupons.', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13)),
-              const SizedBox(height: 12),
-              const Row(children: [PageDots(count: 3, active: 0)]),
-            ]),
-          ),
-        ]),
-      );
-}
-
-class _Ticket extends StatelessWidget {
-  const _Ticket({required this.c, required this.onTap});
-  final NwCoupon c;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: '${c.offer}. ${c.scope}',
-      child: PressScale(
-        onTap: onTap,
-        child: CouponGlass(
-          padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
-          child: Column(children: [
-            Stack(clipBehavior: Clip.none, children: [
-              const AppCoin(size: 64),
-              if (c.isNew)
-                Positioned(
-                  top: -4,
-                  right: -18,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                    child: const Text('New', style: TextStyle(color: Color(0xFF1C1830), fontSize: 10, fontWeight: FontWeight.w800)),
-                  ),
-                ),
-            ]),
-            const SizedBox(height: 12),
-            CouponGlass(
-              inner: true,
-              radius: 20,
-              padding: const EdgeInsets.fromLTRB(16, 14, 12, 12),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(c.label, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
-                const SizedBox(height: 2),
-                Text(c.offer, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 2),
-                Text(c.scope, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5)),
-                const SizedBox(height: 12),
-                Row(children: [
-                  Text(rarityName(c.rarity), style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13)),
-                  const Spacer(),
-                  WhitePill('View details', onTap: onTap),
-                ]),
-              ]),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
 }
 
 class _StateBox extends StatelessWidget {
@@ -363,14 +245,14 @@ class _StateBox extends StatelessWidget {
   final VoidCallback? onRetry;
 
   @override
-  Widget build(BuildContext context) => CouponGlass(
-        radius: 22,
+  Widget build(BuildContext context) => NGlass(
+        radius: NTokens.rCard,
         padding: const EdgeInsets.all(20),
         child: Column(children: [
-          Icon(icon, color: Colors.white70, size: 36),
+          Icon(icon, color: NTokens.textLo, size: 36),
           const SizedBox(height: 8),
           Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
-          if (onRetry != null) ...[const SizedBox(height: 10), primaryPill('Try again', onRetry!)],
+          if (onRetry != null) ...[const SizedBox(height: 12), GlassPill(label: 'Try again', style: PillStyle.white, onTap: onRetry)],
         ]),
       );
 }

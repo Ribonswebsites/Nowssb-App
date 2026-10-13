@@ -6,7 +6,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../../widgets/nwsb_coin_fly.dart';
 import 'coupon_models.dart';
 
 const kCouponViolet = Color(0xFF8B6CF0);
@@ -74,54 +73,6 @@ class CouponGlass extends StatelessWidget {
       child: RepaintBoundary(child: ClipRRect(borderRadius: r, child: box)),
     );
   }
-}
-
-/// Solid white rounded pill with dark text (reference "Next").
-class WhitePill extends StatelessWidget {
-  const WhitePill(this.label, {super.key, this.onTap});
-  final String label;
-  final VoidCallback? onTap;
-  @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.white,
-        shape: const StadiumBorder(),
-        child: InkWell(
-          customBorder: const StadiumBorder(),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-            child: Text(label, style: const TextStyle(color: Color(0xFF1C1830), fontWeight: FontWeight.w700, fontSize: 13)),
-          ),
-        ),
-      );
-}
-
-/// Small page-indicator dots.
-class PageDots extends StatelessWidget {
-  const PageDots({super.key, required this.count, required this.active});
-  final int count, active;
-  @override
-  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-        for (var i = 0; i < count; i++)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 2.5),
-            width: i == active ? 14 : 6,
-            height: 6,
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: i == active ? 0.95 : 0.45), borderRadius: BorderRadius.circular(3)),
-          ),
-      ]);
-}
-
-/// The app's existing coin disc (assets/icons/nwsb-coin.webp via NwsbCoinFly).
-class AppCoin extends StatelessWidget {
-  const AppCoin({super.key, this.size = 72});
-  final double size;
-  @override
-  Widget build(BuildContext context) => ClipOval(
-        child: Image.asset(NwsbCoinFly.disc, width: size, height: size, fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(width: size, height: size, color: Colors.white.withValues(alpha: 0.25),
-                child: Icon(Icons.confirmation_number_outlined, color: Colors.white, size: size * 0.45))),
-      );
 }
 
 /// Rounded 22px ticket with circular notches mid-left and mid-right.

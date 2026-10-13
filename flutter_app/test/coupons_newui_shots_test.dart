@@ -76,6 +76,8 @@ void main() {
   testWidgets('3 detail pop-up', (t) async {
     await setup(t, _Repo(_items));
     await t.scrollUntilVisible(find.text('20% OFF A WORD'), 200, scrollable: find.byType(Scrollable).first);
+    await t.drag(find.byType(ListView), const Offset(0, -250));
+    await t.pumpAndSettle();
     await t.tap(find.text('20% OFF A WORD'));
     await t.pumpAndSettle();
     await shot(t, '3');
@@ -84,6 +86,8 @@ void main() {
   testWidgets('4 filter sheet', (t) async {
     await setup(t, _Repo(_items));
     await t.scrollUntilVisible(find.text('Categories'), 150, scrollable: find.byType(Scrollable).first);
+    await t.drag(find.byType(ListView), const Offset(0, -200));
+    await t.pumpAndSettle();
     await t.tap(find.text('Categories'));
     await t.pumpAndSettle();
     await t.tap(find.text('Words'));
