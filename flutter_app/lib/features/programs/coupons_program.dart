@@ -558,7 +558,12 @@ class _CouponTicket extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(22, 18, 18, 14),
                 child: Row(children: [
                   Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                    // Scales the stack down only when the 62% band is too short
+                    // (it overflowed by 28px with the soon pill); 1:1 otherwise.
+                    child: LayoutBuilder(builder: (_, box) => FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: SizedBox(width: box.maxWidth, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                       Row(children: [
                         const EditableLabel('coupons_program.mine', 'PASS', style: TextStyle(color: _kSubAccent, fontSize: 10.5, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
                         const Spacer(),
@@ -567,7 +572,8 @@ class _CouponTicket extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text('$pct% OFF', style: const TextStyle(color: NwsbColors.goldLight, fontSize: 38, fontWeight: FontWeight.w200, height: 1)),
                       if (cap > 0) Text('up to ${inr(cap)}', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5)),
-                    ]),
+                    ])),
+                    )),
                   ),
                   const _ArtTile(icon: Icons.workspace_premium_outlined, accent: _kSubAccent, size: 60),
                 ]),
