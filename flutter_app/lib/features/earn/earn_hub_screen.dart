@@ -13,6 +13,7 @@ import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import 'earnings_screen.dart';
 import 'newui/earn_newui_screen.dart';
+import '../../kit/feature_flags.dart';
 import '../social/echo_wall_screen.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
@@ -43,7 +44,11 @@ class EarnHubScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      const EarnNewUiGate(legacy: EarnHubLegacyScreen(), newUi: EarnNewUiScreen());
+      NewUiGate(
+        page: kEarnNewUiPage,
+        legacy: (_) => const EarnHubLegacyScreen(),
+        rebuilt: (_) => const EarnNewUiScreen(),
+      );
 }
 
 class EarnHubLegacyScreen extends StatelessWidget {
