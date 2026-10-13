@@ -83,6 +83,35 @@ class _OrbPainter extends CustomPainter {
               .createShader(Rect.fromCircle(center: center, radius: radius)),
       );
     }
+    _paintSpheres(canvas, size);
+  }
+
+  /// Floating clay spheres with a key light top-left (Blender-style look).
+  static const _spheres = [(0.82, 0.16, 0.055), (0.12, 0.46, 0.04), (0.88, 0.62, 0.07), (0.22, 0.92, 0.05)];
+
+  void _paintSpheres(Canvas canvas, Size size) {
+    for (var i = 0; i < _spheres.length; i++) {
+      final (x, y, r) = _spheres[i];
+      final a = 2 * math.pi * (t + i * 0.27);
+      final center = Offset(size.width * x, size.height * y + 10 * math.sin(a));
+      final radius = size.shortestSide * r;
+      canvas.drawCircle(
+          center.translate(radius * 0.25, radius * 0.6),
+          radius * 0.9,
+          Paint()
+            ..color = const Color(0x40000000)
+            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10));
+      canvas.drawCircle(
+        center,
+        radius,
+        Paint()
+          ..shader = const RadialGradient(
+            center: Alignment(-0.45, -0.5),
+            colors: [Color(0xFFF1EBFF), Color(0xFFB9A4FF), Color(0xFF4B3A86)],
+            stops: [0, 0.45, 1],
+          ).createShader(Rect.fromCircle(center: center, radius: radius)),
+      );
+    }
   }
 
   @override

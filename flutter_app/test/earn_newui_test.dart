@@ -4,9 +4,12 @@ import 'package:nowssb/features/earn/newui/earn_newui_page.dart';
 import 'package:nowssb/features/earn/newui/earn_newui_screen.dart';
 import 'package:nowssb/features/earn/newui/earn_view_data.dart';
 
-Widget _wrap(Widget w) => MediaQuery(
-      data: const MediaQueryData(size: Size(400, 860), disableAnimations: true),
-      child: MaterialApp(home: w),
+Widget _wrap(Widget w) => MaterialApp(
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(size: const Size(400, 860), disableAnimations: true),
+        child: child!,
+      ),
+      home: w,
     );
 
 void main() {
@@ -91,5 +94,23 @@ void main() {
     expect(find.text('legacy'), findsOneWidget);
     await t.pumpWidget(_wrap(const EarnNewUiGate(legacy: Text('legacy'), newUi: Text('new'), debugOverride: true)));
     expect(find.text('new'), findsOneWidget);
+  });
+
+  testWidgets('honesty note shows on ready', (t) async {
+    await t.pumpWidget(_wrap(const EarnNewUiPage(data: EarnViewData(load: EarnLoad.ready, signedIn: true, wordsSold: 5))));
+    await t.scrollUntilVisible(find.byKey(const Key('earn-honesty-note')), 200);
+    expect(find.byKey(const Key('earn-honesty-note')), findsOneWidget);
+  });
+
+  testWidgets('with motion on, numbers count up to real values', (t) async {
+    await t.pumpWidget(const MaterialApp(
+      home: EarnNewUiPage(data: EarnViewData(load: EarnLoad.ready, signedIn: true, ratePct: 20, wordsSold: 120, teamSize: 3)),
+    ));
+    await t.pump(const Duration(milliseconds: 100));
+    expect(find.text('120'), findsNothing);
+    await t.pump(const Duration(seconds: 2));
+    expect(find.text('120'), findsOneWidget);
+    expect(find.text('20%'), findsOneWidget);
+    await t.pumpWidget(const SizedBox()); // dispose repeating controllers
   });
 }

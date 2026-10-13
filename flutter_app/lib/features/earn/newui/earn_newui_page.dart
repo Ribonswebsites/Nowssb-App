@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 import 'earn_backdrop.dart';
+import 'earn_motion.dart';
 import 'earn_view_data.dart';
 
 /// Taps the Earn hub hands back to its host, so routing stays in one place
@@ -28,6 +29,7 @@ class EarnActions {
 
 const _ink = Color(0xFFF4F0FF);
 const _soft = Color(0xB3F4F0FF);
+const _big = TextStyle(color: _ink, fontSize: 24, fontWeight: FontWeight.w700);
 const _medals = [Color(0xFFD9A066), Color(0xFFCBD3E1), Color(0xFFF2C94C), Color(0xFF9EE7FF)];
 const _medalNames = ['Bronze', 'Silver', 'Gold', 'Diamond'];
 
@@ -137,8 +139,7 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 48),
         const Expanded(
           child: Text('NowssB Earn',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: _ink, fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 0.4)),
+              textAlign: TextAlign.center, style: TextStyle(color: _ink, fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 0.4)),
         ),
         IconButton(
           key: const Key('earn-help'),
@@ -217,9 +218,8 @@ class _Pill extends StatelessWidget {
             constraints: const BoxConstraints(minHeight: 48, minWidth: 120),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-              child: Text(label,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF1B1433), fontWeight: FontWeight.w700)),
+              child:
+                  Text(label, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF1B1433), fontWeight: FontWeight.w700)),
             ),
           ),
         ),
@@ -240,21 +240,50 @@ class _Ready extends StatelessWidget {
       key: const Key('earn-ready'),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
       children: [
-        _RankHero(data: data),
+        EarnEntrance(index: 0, child: _RankHero(data: data)),
         const SizedBox(height: 14),
-        Row(children: [
-          Expanded(child: _Stat(label: 'Money you earn', value: data.ratePct > 0 ? '${data.ratePct}%' : '—', hint: 'of each sale')),
-          const SizedBox(width: 12),
-          Expanded(child: _Stat(label: 'Words sold', value: '${data.wordsSold}', hint: next == null ? 'All targets done' : 'Next: $next')),
-          const SizedBox(width: 12),
-          Expanded(child: _Stat(label: 'Your team', value: '${data.teamSize}', hint: 'people')),
-        ]),
+        EarnEntrance(
+            index: 1,
+            child: Row(children: [
+              Expanded(
+                  child: _Stat(label: 'Money you earn', value: data.ratePct > 0 ? data.ratePct : null, suffix: '%', hint: 'of each sale')),
+              const SizedBox(width: 12),
+              Expanded(child: _Stat(label: 'Words sold', value: data.wordsSold, hint: next == null ? 'All targets done' : 'Next: $next')),
+              const SizedBox(width: 12),
+              Expanded(child: _Stat(label: 'Your team', value: data.teamSize, hint: 'people')),
+            ])),
         const SizedBox(height: 22),
         const _Heading('Ways to earn'),
-        _Task(id: 'share', icon: Icons.ios_share_rounded, title: 'Share your link', cta: 'Share now', onTap: actions.onShareCode),
-        _Task(id: 'sell', icon: Icons.auto_awesome_rounded, title: 'Sell words and plans', cta: 'Earn now', onTap: () => actions.onTask?.call('sell')),
-        _Task(id: 'team', icon: Icons.account_tree_rounded, title: 'Grow your team', cta: 'See team', onTap: actions.onTeam),
-        _Task(id: 'earnings', icon: Icons.account_balance_wallet_rounded, title: 'See your money', cta: 'Open', onTap: actions.onEarnings),
+        EarnEntrance(
+            index: 2,
+            child:
+                _Task(id: 'share', icon: Icons.ios_share_rounded, title: 'Share your link', cta: 'Share now', onTap: actions.onShareCode)),
+        EarnEntrance(
+            index: 3,
+            child: _Task(
+                id: 'sell',
+                icon: Icons.auto_awesome_rounded,
+                title: 'Sell words and plans',
+                cta: 'Earn now',
+                onTap: () => actions.onTask?.call('sell'))),
+        EarnEntrance(
+            index: 4,
+            child: _Task(id: 'team', icon: Icons.account_tree_rounded, title: 'Grow your team', cta: 'See team', onTap: actions.onTeam)),
+        EarnEntrance(
+            index: 5,
+            child: _Task(
+                id: 'earnings',
+                icon: Icons.account_balance_wallet_rounded,
+                title: 'See your money',
+                cta: 'Open',
+                onTap: actions.onEarnings)),
+        const SizedBox(height: 18),
+        const Text(
+          'What you earn depends on real sales. Nothing is guaranteed.',
+          key: Key('earn-honesty-note'),
+          textAlign: TextAlign.center,
+          style: TextStyle(color: _soft, fontSize: 12),
+        ),
       ],
     );
   }
@@ -272,34 +301,15 @@ class _RankHero extends StatelessWidget {
       key: const Key('earn-rank-hero'),
       padding: const EdgeInsets.all(20),
       child: Row(children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(colors: [_medals[i], _medals[i].withValues(alpha: 0.35)]),
-            boxShadow: [BoxShadow(color: _medals[i].withValues(alpha: 0.5), blurRadius: 24)],
-          ),
-          child: const Icon(Icons.workspace_premium_rounded, color: Color(0xFF1B1433), size: 34),
-        ),
+        EarnMedal(color: _medals[i]),
         const SizedBox(width: 16),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('${_medalNames[i]} rank', style: const TextStyle(color: _soft, fontSize: 12, letterSpacing: 1.2)),
             const SizedBox(height: 2),
-            Text(data.rank.isEmpty ? 'Agent' : data.rank,
-                style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w700)),
+            Text(data.rank.isEmpty ? 'Agent' : data.rank, style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                key: const Key('earn-target-progress'),
-                value: data.targetProgress,
-                minHeight: 8,
-                backgroundColor: const Color(0x26FFFFFF),
-                valueColor: AlwaysStoppedAnimation(_medals[i]),
-              ),
-            ),
+            EarnBreathingBar(value: data.targetProgress, color: _medals[i]),
             const SizedBox(height: 6),
             Text(next == null ? 'You reached every target' : '${data.wordsToNext} more words to $next',
                 style: const TextStyle(color: _soft, fontSize: 13)),
@@ -311,9 +321,10 @@ class _RankHero extends StatelessWidget {
 }
 
 class _Stat extends StatelessWidget {
-  const _Stat({required this.label, required this.value, required this.hint});
+  const _Stat({required this.label, required this.value, this.suffix = '', required this.hint});
   final String label;
-  final String value;
+  final int? value;
+  final String suffix;
   final String hint;
 
   @override
@@ -326,7 +337,7 @@ class _Stat extends StatelessWidget {
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
-          child: Text(value, style: const TextStyle(color: _ink, fontSize: 24, fontWeight: FontWeight.w700)),
+          child: value == null ? const Text('—', style: _big) : EarnCountUp(value: value!, suffix: suffix, style: _big),
         ),
         Text(hint, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _soft, fontSize: 11)),
       ]),
