@@ -34,7 +34,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   String _country = 'IN';
 
   static const _countries = <(String, String)>[
-    ('IN', 'India — bank / UPI, INR'),
+    ('IN', 'India'),
     ('US', 'United States'),
     ('GB', 'United Kingdom'),
     ('CA', 'Canada'),
@@ -80,7 +80,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
         : rail == 'unsupported'
             ? 'This country is not supported yet. Your balance stays here.'
             : rail == 'upi_manual'
-                ? 'India payouts will settle in INR to your UPI.'
+                ? 'Paid to your payout account.'
                 : 'Payout account saved.';
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: EditableLabel('earnings_screen.EarningsScreen', text)));
   }
@@ -131,8 +131,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 unsupported
                     ? 'This country is not on a payout rail yet. Earnings stay in your balance and are not sent in the wrong currency.'
                     : india
-                        ? 'India settles in INR to your UPI id.'
-                        : 'Outside India payouts go to your Wise or PayPal account, sent by hand after a review.',
+                        ? 'Paid to your payout account in your local currency.'
+                        : 'Paid to your payout account in your local currency, after a review.',
               ),
               const SizedBox(height: 12),
               const EditableLabel('earnings_screen.EarningsScreen', 'Lifetime', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
@@ -161,7 +161,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   controller: _upi,
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    hintText: w.upi.isEmpty ? 'UPI id, name@bank' : w.upi,
+                    hintText: w.upi.isEmpty ? 'Payout account id' : w.upi,
                     hintStyle: const TextStyle(color: NwsbColors.mist),
                   ),
                 ),
@@ -169,14 +169,14 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 TextField(
                   controller: _legal,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(hintText: 'Legal name (as on bank / PAN)', hintStyle: TextStyle(color: NwsbColors.mist)),
+                  decoration: const InputDecoration(hintText: 'Legal name (as on your bank account)', hintStyle: TextStyle(color: NwsbColors.mist)),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _pan,
                   textCapitalization: TextCapitalization.characters,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(hintText: 'PAN (needed above the TDS limit)', hintStyle: TextStyle(color: NwsbColors.mist)),
+                  decoration: const InputDecoration(hintText: 'Tax id (needed above the tax limit)', hintStyle: TextStyle(color: NwsbColors.mist)),
                 ),
               ],
               if (!india && !unsupported) ...[
@@ -205,7 +205,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
               ],
               const SizedBox(height: 8),
               GoldButton(
-                label: india ? 'Save India payout account' : unsupported ? 'Save country' : 'Save Wise / PayPal account',
+                label: unsupported ? 'Save country' : 'Save payout account',
                 filled: false,
                 onTap: () => runPrivate(context, _saveAccount),
               ),

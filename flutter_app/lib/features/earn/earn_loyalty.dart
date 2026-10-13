@@ -210,7 +210,7 @@ class _BoardState extends State<_Board> {
       if (!_nextTab) ..._now(step) else ..._later(step, next, need),
       const SizedBox(height: 8),
       Text(
-        'Paid only on cleared sales, after tax and the store fee. Not guaranteed. A line under ${FxBook.instance.formatRupees(15)} is not paid. The chain stops at 55% of Net. Gifted passes do not raise a rank. 10 coins = ${FxBook.instance.formatRupees(1)} in the catalogue, not cash.',
+        'Paid only on cleared sales, after tax and the store fee. Not guaranteed. A line under about ${FxBook.instance.formatNice(BaseAmounts.minPaidLine)} is not paid. The chain stops at 55% of Net. Gifted passes do not raise a rank. ${BaseAmounts.coinExampleCoins} coins ≈ ${FxBook.instance.formatNice(BaseAmounts.coinExampleCoins / BaseAmounts.coinsPerUnit)} in the catalogue, not cash.',
         style: const TextStyle(color: NwsbColors.mist, fontSize: 11, height: 1.4),
       ),
       if (widget.yours) const SizedBox(height: 4) else const SizedBox(height: 8),

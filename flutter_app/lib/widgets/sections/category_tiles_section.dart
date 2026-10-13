@@ -54,7 +54,7 @@ List<SectionMediaItem> get _kDefaultChips => <SectionMediaItem>[
   const SectionMediaItem(id: 'chip.coupons', title: 'Coupons', meta: {'kind': 'chip'}),
   SectionMediaItem(
     id: 'chip.under499',
-    title: 'Under ${FxBook.instance.formatRupees(499)}',
+    title: 'Under ${FxBook.instance.formatNice(BaseAmounts.underChip)}',
     meta: const {'kind': 'chip'},
   ),
 ];

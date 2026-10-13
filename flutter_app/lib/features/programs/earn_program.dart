@@ -236,13 +236,13 @@ List<Widget> _payouts(BuildContext context, Map<String, dynamic> s) => [
         final acct = sMap(r['payoutAccount']);
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           PCard(glow: NwsbColors.gold, children: [
-            _money('Available', sNum(bal['availableINR']), 'Minimum ${FxBook.instance.formatRupees(sInt(bal['minPayoutINR']))} · paid by UPI after a person approves it'),
+            _money('Available', sNum(bal['availableINR']), 'Minimum about ${FxBook.instance.formatNice(sInt(bal['minPayoutINR']))} · paid to your payout account after a person approves it'),
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerLeft,
               child: PClaim(label: 'Request payout', action: 'requestPayout', enabled: acct['kyc'] == true && sNum(bal['availableINR']) >= sNum(bal['minPayoutINR']), onDone: (_) => reload()),
             ),
-            if (acct['kyc'] != true) const PEmpty('Add your UPI id, legal name and PAN below to request a payout.'),
+            if (acct['kyc'] != true) const PEmpty('Add your payout account and legal name below to request a payout.'),
           ]),
           _PayoutForm(account: acct, onSaved: reload),
         ]);
@@ -286,18 +286,18 @@ class _PayoutFormState extends State<_PayoutForm> {
 
   @override
   Widget build(BuildContext context) => PCard(children: [
-        const PHeading('Payout details', 'UPI account', slot: 'earn_program.payouts'),
-        if ('${widget.account['upi'] ?? ''}'.isNotEmpty) Text('Saved UPI ${widget.account['upi']}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+        const PHeading('Payout details', 'Payout account', slot: 'earn_program.payouts'),
+        if ('${widget.account['upi'] ?? ''}'.isNotEmpty) Text('Saved payout account ${widget.account['upi']}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
         TextField(controller: _upi, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'name@bank', hintStyle: TextStyle(color: NwsbColors.mist))),
-        TextField(controller: _name, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Legal name (as on PAN)', hintStyle: TextStyle(color: NwsbColors.mist))),
-        TextField(controller: _pan, textCapitalization: TextCapitalization.characters, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'PAN', hintStyle: TextStyle(color: NwsbColors.mist))),
+        TextField(controller: _name, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Legal name (as on your bank account)', hintStyle: TextStyle(color: NwsbColors.mist))),
+        TextField(controller: _pan, textCapitalization: TextCapitalization.characters, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Tax id', hintStyle: TextStyle(color: NwsbColors.mist))),
         const SizedBox(height: 10),
         TextButton(
           onPressed: _busy ? null : _save,
           style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
           child: Text(_busy ? 'Saving…' : 'Save payout details', style: const TextStyle(fontWeight: FontWeight.w800)),
         ),
-        const PEmpty('One payout identity per person. The same UPI id or PAN cannot be used on two accounts. TDS may apply.', slot: 'earn_program.payouts'),
+        const PEmpty('One payout identity per person. The same payout account or tax id cannot be used on two accounts. Tax may apply.', slot: 'earn_program.payouts'),
       ]);
 }
 

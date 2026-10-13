@@ -9,6 +9,25 @@ import 'package:intl/intl.dart';
 
 import '../../data/firebase.dart';
 
+/// The app's base currency: the server prices in it (functions/_lib/economy/config.js `currency`).
+const kBaseCurrency = 'INR';
+
+/// Fixed rule amounts, in the base currency. Source of truth is the server;
+/// these only feed display copy.
+abstract final class BaseAmounts {
+  /// A commission line below this (after tax and fee) is not paid.
+  static const minPaidLine = 15;
+
+  /// config.js `coinsPerRupee`: coins worth one base unit in the catalogue.
+  static const coinsPerUnit = 10;
+
+  /// Shown in copy as "N coins ≈ X" so the local figure isn't a fraction of a cent.
+  static const coinExampleCoins = 1000;
+
+  /// The store's "Under X" chip.
+  static const underChip = 499;
+}
+
 class FxBook extends ChangeNotifier {
   FxBook._();
   static final instance = FxBook._();
@@ -64,9 +83,43 @@ class FxBook extends ChangeNotifier {
         .format((cents / 100) * rate);
   }
 
+  /// A fixed rule amount (base currency) as a clean local figure: $6, not
+  /// $5.98. Display only — the server keeps enforcing the exact base value.
+  String formatNice(num baseAmount, {String? locale}) {
+    final loc = (locale ?? Platform.localeName).replaceAll('-', '_');
+    final code = codeFor(loc);
+    final base = rates[kBaseCurrency] ?? 83.5;
+    final rate = rates[code];
+    final outCode = rate == null ? 'USD' : code;
+    final local = (baseAmount / base) * (rate ?? 1);
+    final v = niceRound(local, wholeOnly: outCode == 'JPY');
+    final whole = v == v.roundToDouble();
+    return NumberFormat.simpleCurrency(name: outCode, locale: loc, decimalDigits: whole ? 0 : 2).format(v);
+  }
+
+  /// Rounds to a clean step by magnitude (never 0.18-style values).
+  static double niceRound(double v, {bool wholeOnly = false}) {
+    if (v <= 0) return 0;
+    double step;
+    if (v < 1) {
+      step = v < .1 ? .01 : .05;
+    } else if (v < 10) {
+      step = v < 5 ? .5 : 1;
+    } else if (v < 100) {
+      step = v < 50 ? 1 : 5;
+    } else if (v < 1000) {
+      step = v < 500 ? 5 : 10;
+    } else {
+      step = 50;
+    }
+    if (wholeOnly && step < 1) step = 1;
+    final r = (v / step).round() * step;
+    return double.parse((r == 0 ? step : r).toStringAsFixed(2));
+  }
+
   /// Legacy store amounts were written as rupees. Convert through the USD rate.
   String formatRupees(num rupees, {String? locale}) {
-    final perDollar = rates['INR'] ?? 83.5;
+    final perDollar = rates[kBaseCurrency] ?? 83.5;
     final cents = ((rupees / perDollar) * 100).round();
     return formatCents(cents, locale: locale);
   }
