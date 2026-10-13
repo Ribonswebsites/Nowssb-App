@@ -4,6 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/app_backdrop.dart';
 import 'rewards_data.dart';
 import 'rewards_glass.dart';
 
@@ -15,7 +16,7 @@ class RewardsNewUiPage extends StatefulWidget {
   /// 'boost', 'store', 'coins', 'earn'); wired to AppRoutes once it exists.
   final void Function(String id)? onOpen;
 
-  /// Defaults to the app's original background video; tests pass its poster.
+  /// Defaults to the app's shared AppBackdrop; tests pass its poster.
   final Widget? background;
 
   @override
@@ -40,7 +41,7 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
     return Scaffold(
       backgroundColor: RGlass.bgBottom,
       body: Stack(children: [
-        Positioned.fill(child: widget.background ?? const RVideoBackground()),
+        Positioned.fill(child: widget.background ?? const AppBackdrop()),
         SafeArea(
           child: FutureBuilder<RewardsData>(
             future: _future,

@@ -7,7 +7,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../media/nwsb_video.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import 'rewards_data.dart';
 
@@ -15,9 +14,6 @@ abstract final class RGlass {
   static const bgBottom = Color(0xFF0B0B12);
   static const violet = Color(0xFFB79CFF);
   static const gold = Color(0xFFFFD27A);
-  /// The app's original background video (same asset the app and kit use).
-  static const video = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4';
-  static const poster = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b-poster.webp';
   // Reference card values.
   static const radius = 26.0;
   static const tint = Color(0xFFEDE8FF); // lavender-white
@@ -81,16 +77,6 @@ class RPill extends StatelessWidget {
             child: Text(label, style: const TextStyle(color: RGlass.pillText, fontSize: 12, fontWeight: FontWeight.w700)),
           ),
         ),
-      );
-}
-
-/// The app's original background video, with its poster until it plays.
-class RVideoBackground extends StatelessWidget {
-  const RVideoBackground({super.key});
-  @override
-  Widget build(BuildContext context) => const ColoredBox(
-        color: RGlass.bgBottom,
-        child: NwsbVideo(asset: RGlass.video, poster: RGlass.poster, fit: BoxFit.cover),
       );
 }
 
