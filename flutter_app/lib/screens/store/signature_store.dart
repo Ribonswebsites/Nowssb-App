@@ -10,7 +10,6 @@ import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -112,7 +111,6 @@ class _SignatureBody extends StatelessWidget {
             child: StoreRegistrySection(config: SignatureMix.glassy),
           ),
         ),
-        const LSection('hype', 'Most hyped', NowssbHypeRail()),
         LSection(
           'spotlight',
           'Signature spotlight',

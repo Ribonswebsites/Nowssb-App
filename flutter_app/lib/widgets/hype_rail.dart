@@ -13,6 +13,7 @@ import '../admin/layout/app_pages.dart';
 import '../admin/template/editable.dart';
 import '../shell/nwsb_links.dart';
 import '../theme/tokens.dart';
+import 'glass_wrap.dart';
 import 'sections/section_config.dart';
 
 /// Set from [ensureHypeRoutes] so this file does not import the screens.
@@ -202,15 +203,15 @@ class NowssbHypeRail extends StatelessWidget {
     final items = _itemsFor(config: config, cards: cards);
     final reduce = _reduceMotion(context);
 
-    final posterW = layout.cardWidth ?? 146;
+    final posterW = layout.cardWidth ?? 132;
     final posterH = layout.cardHeight ??
-        (layout.aspect != null && layout.aspect! > 0 ? posterW / layout.aspect! : 198.0);
-    final radius = layout.radius ?? 18;
-    final spacing = layout.spacing ?? 12;
-    final rankGutter = (posterW * 0.34).clamp(44.0, 58.0);
+        (layout.aspect != null && layout.aspect! > 0 ? posterW / layout.aspect! : 128.0);
+    final radius = layout.radius ?? 14;
+    final spacing = layout.spacing ?? 10;
+    final rankGutter = (posterW * 0.28).clamp(36.0, 46.0);
     final tileW = posterW + rankGutter;
-    const textBlock = 72.0; // title + subtitle + hype
-    final stackH = posterH + 16;
+    const textBlock = 52.0;
+    final stackH = posterH + 8;
     final listH = layout.height ?? (stackH + textBlock);
     final pad = layout.padding ?? const EdgeInsets.only(bottom: 16);
     final showHeading = title.trim().isNotEmpty;
@@ -248,24 +249,37 @@ class NowssbHypeRail extends StatelessWidget {
 
     return Padding(
       padding: pad,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (showHeading)
-            Padding(
-              padding: const EdgeInsets.only(left: 2, bottom: 12),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.3,
-                ),
-              ),
+      child: GlassWrap(
+        margin: const EdgeInsets.fromLTRB(0, 2, 10, 2),
+        padding: const EdgeInsets.fromLTRB(8, 8, 0, 6),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xFF050505),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 0, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (showHeading)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2, bottom: 6),
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
+                rail,
+              ],
             ),
-          rail,
-        ],
+          ),
+        ),
       ),
     );
   }

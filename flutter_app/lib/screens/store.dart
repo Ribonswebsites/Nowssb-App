@@ -36,7 +36,6 @@ import 'subscription.dart';
 import 'store/store_terms_sheet.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
-import '../widgets/hype_rail.dart';
 import '../widgets/home_keep_alive.dart';
 import '../shell/nwsb_links.dart';
 
@@ -285,10 +284,6 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         // Server-driven order (Admin → UI Editor); bundled order by default.
         : layoutChildren(context, 'store.home', [
             LSection('header', 'Title & bag', items[0]),
-            const LSection('hype', 'Most hyped', Padding(
-              padding: EdgeInsets.fromLTRB(16, 10, 0, 0),
-              child: NowssbHypeRail(),
-            )),
             LSection('tabs', 'Shop / Resell tabs', items[1]),
             LSection('rotator', 'Picture rotator', items[2]),
             LSection('halfoff', 'Half-off rail', items[3]),

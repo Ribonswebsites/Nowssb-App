@@ -17,7 +17,6 @@ import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/hype_rail.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/sections/artist_cards_section.dart';
@@ -249,7 +248,6 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
         // UI-6 varied mix: artists → tiles → hype → glassy (no two alike).
         2: ('artists', 'Featured meanings'),
         3: ('tiles', 'Category tiles'),
-        4: ('hype', 'Most hyped'),
         5: ('glassy', 'Explore the stores'),
         7: ('search', 'Search'),
         9: ('chips', 'Category chips'),
@@ -279,8 +277,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           config: MeaningMix.tiles,
           onTileTap: _onMixTile,
         ),
-        // Kept as the one hyped row (legacy cards + their admin image slots).
-        const NowssbHypeRail(),
+        const SizedBox.shrink(),
         StoreMixRow(
           title: 'Explore the stores',
           child: StoreRegistrySection(config: MeaningMix.glassy),

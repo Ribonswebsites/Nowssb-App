@@ -71,7 +71,6 @@ class _CouponScreenState extends State<CouponScreen> {
           cacheExtent: 1600,
           children: [
             CouponBannerSection(onCta: _showScratch),
-            const NowssbHypeRail(),
             const CouponsHero(),
             const GlassLine(
               text: 'A free scratch every day. Paid cards show every prize before you draw. Expected value stays under the price.',

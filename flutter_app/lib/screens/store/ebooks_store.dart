@@ -13,7 +13,6 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/hype_rail.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import 'product_detail.dart';
@@ -198,7 +197,6 @@ class _EbooksBody extends StatelessWidget {
             child: StoreRegistrySection(config: EbooksMix.glassy),
           ),
         ),
-        const LSection('hype', 'Most hyped', NowssbHypeRail()),
         const LSection('intro', 'Intro line', Text(
           'Deep-dive guides on sound, phonetic origin and healing practice — '
           'yours to keep, read anywhere, forever. Not a word catalogue.',

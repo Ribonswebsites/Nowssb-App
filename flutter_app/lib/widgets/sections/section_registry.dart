@@ -10,7 +10,6 @@ import 'package:flutter/widgets.dart';
 import 'artist_cards_section.dart';
 import 'category_tiles_section.dart';
 import 'coupon_banner_section.dart';
-import '../hype_rail.dart';
 import 'glassy_carousel_section.dart';
 import 'spotlight_section.dart';
 import 'section_config.dart';
@@ -143,7 +142,7 @@ void ensureSectionRegistry() {
       layout: SectionLayout(height: 320, cardWidth: 146, cardHeight: 198, spacing: 12, radius: 18),
       style: SectionStyle(accent: 0xFFE8A23A),
     ),
-    builder: (context, config) => NowssbHypeRail(config: config, title: ''),
+    builder: (context, config) => const SizedBox.shrink(),
   ));
   r.register(SectionTypeEntry(
     type: SectionTypeId.artistCards,

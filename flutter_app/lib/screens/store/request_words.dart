@@ -16,7 +16,6 @@ import 'store_cards.dart';
 import 'store_home_sections.dart';
 import '../../admin/layout/layout_sections.dart';
 import '../../admin/template/editable.dart';
-import '../../widgets/hype_rail.dart';
 
 void openRequestWords(BuildContext context) {
   Navigator.of(context).push(
@@ -95,7 +94,6 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
             // Server-driven order (Admin → UI Editor); bundled order by default.
             delegate: SliverChildListDelegate(layoutIndexed(context, 'store.request', const {
               0: ('banner', 'Request banner'),
-              2: ('hype', 'Most hyped'),
               4: ('form', 'Request form'),
               6: ('promo', 'Split promo banner'),
               8: ('recent', 'Your recent requests'),
@@ -109,7 +107,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                 pillLabel: 'REQUEST',
               ),
               const SizedBox(height: 16),
-              const NowssbHypeRail(),
+              const SizedBox.shrink(),
               const SizedBox(height: 18),
               StoreGlassPanel(
                 child: Column(

@@ -11,7 +11,6 @@ import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/page_shell.dart';
-import '../../widgets/hype_rail.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -279,7 +278,6 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         0: ('hero', 'Hero film'),
         // UI-6 varied mix: coupons → hype → tiles → glassy (no two alike).
         2: ('coupons', 'Coupon banner'),
-        3: ('hype', 'Most hyped'),
         4: ('tiles', 'Category tiles'),
         5: ('glassy', 'Featured collections'),
         7: ('promo', 'Split promo banner'),
@@ -299,8 +297,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ),
         const SizedBox(height: 18),
         StoreRegistrySection(config: AtelierMix.coupons),
-        // Kept as the one hyped row (legacy cards + their admin image slots).
-        const NowssbHypeRail(),
+        const SizedBox.shrink(),
         StoreRegistrySection(config: AtelierMix.tiles),
         StoreMixRow(
           title: 'Featured collections',
