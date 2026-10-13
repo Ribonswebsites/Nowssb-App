@@ -43,11 +43,13 @@ class EbooksStoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => NewUiGate(
         page: 'ebooks',
-        legacy: (_) => const CoinbackPage(title: 'Ebooks', art: 'assets/store/intro-ebooks.webp'),
+        legacy: _legacy,
         rebuilt: (_) => const EbooksNewUiPage(),
       );
 
-  Widget _retired(BuildContext context) => StoreTermsHost(
+  /// The real eBooks Store body (was unreachable behind the generic
+  /// CoinbackPage; inventory 22 row 65).
+  static Widget _legacy(BuildContext context) => StoreTermsHost(
         which: 'ebooks',
         head: 'Ebooks described by sound',
         child: PageShell(
