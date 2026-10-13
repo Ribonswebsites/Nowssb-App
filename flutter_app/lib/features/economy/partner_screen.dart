@@ -12,6 +12,8 @@ import '../programs/partner_program.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_kit.dart';
 import '../programs/program_router.dart';
+import '../../pages/partner/partner_flag.dart';
+import '../../pages/partner/partner_home_page.dart';
 
 class PartnerScreen extends StatefulWidget {
   const PartnerScreen({super.key, this.initialTab});
@@ -32,8 +34,25 @@ class _PartnerScreenState extends State<PartnerScreen> {
     super.dispose();
   }
 
+  late final Future<bool> _newUi = PartnerNewUi.enabled();
+
   @override
   Widget build(BuildContext context) {
+    // newui_partner: rebuilt page for admins / flagged users; old page stays live.
+    return FutureBuilder<bool>(
+      future: _newUi,
+      builder: (context, snap) {
+        if (snap.data == true) {
+          return PartnerHomePage(
+              onOpenEarnings: () => Navigator.of(context)
+                  .push(MaterialPageRoute<void>(builder: (_) => Programmes.page(Programme.earnings))));
+        }
+        return _legacy(context);
+      },
+    );
+  }
+
+  Widget _legacy(BuildContext context) {
     return EconomyPage(
       goodToKnow: kPartnerDisclaimer,
       title: 'Partner',
@@ -84,7 +103,12 @@ class _PartnerScreenState extends State<PartnerScreen> {
             blackSub: 'Coins, gifts, coupons and early access.',
           ),
           const SizedBox(height: 18),
-          ProgramTabsBlock(spec: kPartnerSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, goRef: _go, showDisclaimer: false),
+          ProgramTabsBlock(
+              spec: kPartnerSpec,
+              initialTab: widget.initialTab,
+              scrollTo: widget.initialTab != null,
+              goRef: _go,
+              showDisclaimer: false),
         ],
       ),
     );

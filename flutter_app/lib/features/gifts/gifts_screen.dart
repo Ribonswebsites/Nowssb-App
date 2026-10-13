@@ -26,6 +26,8 @@ import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../economy/shop_faces.dart';
 import '../programs/gifts_program.dart';
+import 'newui/gifts_flag.dart';
+import 'newui/gifts_hub_page.dart';
 
 class GiftItem {
   const GiftItem(this.id, this.label, this.cents, {this.productId = ''});
@@ -380,6 +382,10 @@ class _GiftsScreenState extends State<GiftsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuilt page behind `newui_gifts` (off for users, on for admins).
+    if (newUiGiftsEnabled()) {
+      return GiftsNewUiPage(initialTab: widget.initialTab ?? (widget.startOnRedeem ? 'redeem' : null));
+    }
     final offers = [for (final g in kGiftCatalog) GiftOffer(g.id, g.label, 'Gift card', g.cents)];
     return GiftsFace(offers: offers, onClaim: (o) => showGiftCardSheet(context, o.id));
   }

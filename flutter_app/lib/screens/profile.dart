@@ -49,6 +49,8 @@ import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_cards.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../pages/profile/new_profile_page.dart';
+import '../pages/profile/profile_flag.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _pBg = Colors.black;
@@ -83,14 +85,26 @@ const kDefaultAvatar =
 /// Shows avatar, Quick Access, Shop, Preferences. The Progress teaser opens
 /// Progress as a pushed route; this widget must never return Progress as its
 /// own body (that made Profile and Progress feel identical).
-class ProfileScreen extends StatefulWidget {
+/// Entry point. Shows the rebuilt page when `newui_profile` is on
+/// (admins always; users only once Ribon flips the flag), else the old page.
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  Widget build(BuildContext context) => ProfileFlagGate(
+        newUi: (_) => const NewProfilePage(),
+        legacy: (_) => const LegacyProfileScreen(),
+      );
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class LegacyProfileScreen extends StatefulWidget {
+  const LegacyProfileScreen({super.key});
+
+  @override
+  State<LegacyProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<LegacyProfileScreen> {
   late SharedPreferences _prefs;
   final _nameController = TextEditingController();
   final _picker = ImagePicker();
