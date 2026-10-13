@@ -5,8 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/features/rewards_newui/rewards_data.dart';
 import 'package:nowssb/features/rewards_newui/rewards_flag.dart';
 import 'package:nowssb/features/rewards_newui/rewards_page.dart';
-import 'package:nowssb/features/rewards_newui/lotus_coin.dart';
-import 'package:nowssb/nowssb_ui/nowssb_ui.dart';
+import 'package:nowssb/widgets/nwsb_coin_fly.dart';
 
 final _now = DateTime(2026, 10, 13);
 RewardsData _full() => RewardsData.fromSummary({
@@ -32,15 +31,16 @@ Future<void> _pump(WidgetTester t, RewardsLoader l, {void Function(String)? onOp
   t.view.physicalSize = const Size(1080, 2400);
   t.view.devicePixelRatio = 2.5;
   addTearDown(t.view.reset);
-  await t.pumpWidget(MaterialApp(home: MediaQuery(data: const MediaQueryData(disableAnimations: true), child: RewardsNewUiPage(loader: l, onOpen: onOpen))));
+  await t.pumpWidget(MaterialApp(home: MediaQuery(data: const MediaQueryData(disableAnimations: true), child: RewardsNewUiPage(loader: l, onOpen: onOpen, background: const ColoredBox(color: Colors.black)))));
 }
 
-Finder _chip(String l) => find.descendant(of: find.byType(FilterChipRow), matching: find.text(l));
+Finder _chip(String l) => find.descendant(of: find.byKey(const Key('rewards.chips')), matching: find.text(l));
 
 void main() {
   test('flag: off for users, on for admins or when flag set', () {
     expect(newUiRewardsOn(isAdmin: false, flag: false), isFalse);
-    expect(newUiRewardsOn(isAdmin: true, flag: false), isTrue);
+    expect(newUiRewardsOn(isAdmin: true, flag: false), isFalse);
+    expect(newUiRewardsOn(isAdmin: false, flag: null), isTrue);
     expect(newUiRewardsOn(isAdmin: false, flag: true), isTrue);
     expect(kNewUiRewardsFlag, 'newui_rewards');
   });
@@ -99,9 +99,9 @@ void main() {
     expect(find.text('24 hour deal'), findsOneWidget);
     expect(find.text('Unlocks tomorrow'), findsOneWidget);
     await t.scrollUntilVisible(find.byKey(const Key('rewards.tile.c1')), 200, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
-    await t.ensureVisible(find.byType(FilterChipRow));
+    await t.ensureVisible(find.byKey(const Key('rewards.chips')));
     await t.pump();
-    await t.scrollUntilVisible(_chip('Expired'), 80, scrollable: find.descendant(of: find.byType(FilterChipRow), matching: find.byType(Scrollable)).first);
+    await t.scrollUntilVisible(_chip('Expired'), 80, scrollable: find.descendant(of: find.byKey(const Key('rewards.chips')), matching: find.byType(Scrollable)).first);
     await t.pump();
     await t.tap(_chip('Expired'));
     await t.pump();
@@ -109,9 +109,9 @@ void main() {
     expect(find.byKey(const Key('rewards.tile.x1')), findsOneWidget);
     expect(find.byKey(const Key('rewards.tile.c1')), findsNothing);
     expect(find.text('Expired'), findsWidgets);
-    await t.ensureVisible(find.byType(FilterChipRow));
+    await t.ensureVisible(find.byKey(const Key('rewards.chips')));
     await t.pump();
-    await t.scrollUntilVisible(_chip('Gifts'), 80, scrollable: find.descendant(of: find.byType(FilterChipRow), matching: find.byType(Scrollable)).first);
+    await t.scrollUntilVisible(_chip('Gifts'), 80, scrollable: find.descendant(of: find.byKey(const Key('rewards.chips')), matching: find.byType(Scrollable)).first);
     await t.pump();
     await t.tap(_chip('Gifts'));
     await t.pump();
@@ -125,12 +125,10 @@ void main() {
     expect(opened, ['earn', 'coins']);
   });
 
-  testWidgets('lotus coin animates with motion and count-up lands on server value', (t) async {
-    await t.pumpWidget(const MaterialApp(home: Scaffold(body: Column(children: [LotusCoin(), CountUpText(420)]))));
-    await t.pump(const Duration(milliseconds: 1200));
-    expect(find.text('420'), findsOneWidget);
-    expect(find.byType(LotusCoin), findsOneWidget);
-    await t.pumpWidget(const SizedBox());
+  testWidgets('uses the existing app coin image only', (t) async {
+    await _pump(t, () async => _full());
+    await t.pump();
+    expect(find.byType(NwsbCoinDisc), findsOneWidget);
   });
 
   testWidgets('honesty note shown', (t) async {

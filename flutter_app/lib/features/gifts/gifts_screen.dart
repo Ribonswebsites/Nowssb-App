@@ -382,7 +382,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Rebuilt page behind `newui_gifts` (off for users, on for admins).
+    // Rebuilt page behind `newui_gifts` (on for everyone; remote false = kill switch).
     if (newUiGiftsEnabled()) {
       return GiftsNewUiPage(initialTab: widget.initialTab ?? (widget.startOnRedeem ? 'redeem' : null));
     }

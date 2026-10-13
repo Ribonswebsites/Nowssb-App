@@ -3,89 +3,81 @@
 /// can be swapped for NowssB Bug Hunter's shared kit when it lands.
 library;
 
-import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-import '../../nowssb_ui/nowssb_ui.dart';
-import 'lotus_coin.dart';
+import '../../widgets/nwsb_coin_fly.dart';
 import 'rewards_data.dart';
 
 abstract final class RGlass {
-  static const bgTop = Color(0xFF2A1F5C);
-  static const bgBottom = Color(0xFF120D2B);
+  static const bgBottom = Color(0xFF0B0B12);
   static const violet = Color(0xFFB79CFF);
   static const gold = Color(0xFFFFD27A);
+  // Reference card values.
+  static const radius = 26.0;
+  static const tint = Color(0xFFEDE8FF); // lavender-white
+  static const cardAlpha = .18;
+  static const innerAlpha = .28;
+  static const blur = 24.0;
+  static const pill = Color(0xFFEDEDF2);
+  static const pillText = Color(0xFF1A1A22);
+  static const muted = Color(0xFFC9C7D6);
 }
 
-/// Thin adapter over the shared kit's [NGlass]. Lite glass by default;
-/// pass [blur] only for hero/bars (kit rule: max 4 blurred on screen).
+/// Frosted card matching card-reference-exact.png: lavender-white tint ~18%,
+/// 1px soft white border, r26, strong backdrop blur, soft shadow.
+/// [inner] = the slightly more opaque nested panel.
 class RGlassBox extends StatelessWidget {
-  const RGlassBox({super.key, required this.child, this.padding = const EdgeInsets.all(12), this.radius = 20, this.tint, this.blur = 0});
+  const RGlassBox({super.key, required this.child, this.padding = const EdgeInsets.all(14), this.radius = RGlass.radius, this.tint, this.inner = false});
   final Widget child;
   final EdgeInsets padding;
   final double radius;
   final Color? tint;
-  final double blur;
+  final bool inner;
   @override
-  Widget build(BuildContext context) => NGlass(radius: radius, padding: padding, tint: tint, accent: tint ?? NTokens.violet, blur: blur, child: child);
+  Widget build(BuildContext context) {
+    final r = BorderRadius.circular(radius);
+    return DecoratedBox(
+      decoration: BoxDecoration(borderRadius: r, boxShadow: inner ? null : const [BoxShadow(color: Color(0x33000000), blurRadius: 24, offset: Offset(0, 10))]),
+      child: ClipRRect(
+        borderRadius: r,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: inner ? 10 : RGlass.blur, sigmaY: inner ? 10 : RGlass.blur),
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              borderRadius: r,
+              color: Color.alphaBlend((tint ?? RGlass.tint).withValues(alpha: .25), RGlass.tint).withValues(alpha: inner ? RGlass.innerAlpha : RGlass.cardAlpha),
+              border: Border.all(color: Colors.white.withValues(alpha: .38), width: 1),
+            ),
+            child: child,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-/// Procedural floating orbs + slow breathing glow (spec 16). Respects
-/// reduced motion.
-class RAuraBackground extends StatefulWidget {
-  const RAuraBackground({super.key});
+/// Small light-grey pill with dark text (reference "Next").
+class RPill extends StatelessWidget {
+  const RPill(this.label, {super.key, this.onTap});
+  final String label;
+  final VoidCallback? onTap;
   @override
-  State<RAuraBackground> createState() => _RAuraBackgroundState();
-}
-
-class _RAuraBackgroundState extends State<RAuraBackground> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(seconds: 12));
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
-      _c.stop();
-    } else if (!_c.isAnimating) {
-      _c.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => RepaintBoundary(
-        child: AnimatedBuilder(animation: _c, builder: (_, __) => CustomPaint(painter: _AuraPainter(_c.value))),
+  Widget build(BuildContext context) => Material(
+        color: RGlass.pill,
+        shape: const StadiumBorder(),
+        elevation: 0,
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            child: Text(label, style: const TextStyle(color: RGlass.pillText, fontSize: 12, fontWeight: FontWeight.w700)),
+          ),
+        ),
       );
-}
-
-class _AuraPainter extends CustomPainter {
-  _AuraPainter(this.t);
-  final double t;
-  @override
-  void paint(Canvas canvas, Size size) {
-    final r = Offset.zero & size;
-    canvas.drawRect(
-        r,
-        Paint()
-          ..shader = const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [RGlass.bgTop, RGlass.bgBottom]).createShader(r));
-    const orbs = [(.2, .15, 90.0, Color(0x66B79CFF)), (.85, .35, 120.0, Color(0x447FD3FF)), (.3, .75, 140.0, Color(0x44FF9EDB))];
-    for (var i = 0; i < orbs.length; i++) {
-      final (x, y, rad, c) = orbs[i];
-      final a = 2 * math.pi * (t + i / 3);
-      final o = Offset(size.width * x + 14 * math.cos(a), size.height * y + 18 * math.sin(a));
-      final breathe = rad * (1 + .08 * math.sin(a * 2));
-      canvas.drawCircle(
-          o, breathe, Paint()..shader = RadialGradient(colors: [c, c.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: o, radius: breathe)));
-    }
-  }
-
-  @override
-  bool shouldRepaint(_AuraPainter old) => old.t != t;
 }
 
 class RCoinChip extends StatelessWidget {
@@ -102,68 +94,95 @@ class RCoinChip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             radius: 30,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              const CoinDot(size: 18),
+              const NwsbCoinDisc(size: 18),
               const SizedBox(width: 6),
-              CountUpText(coins, key: const Key('rewards.coins'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+              Text('$coins', key: const Key('rewards.coins'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             ]),
           ),
         ),
       );
 }
 
+/// Hero banner laid out like the reference card: round photo on top, a
+/// nested frosted panel with bold title, muted body, "Skip" link left,
+/// light "Next" pill right, and small page dots.
 class RHeroCarousel extends StatefulWidget {
-  const RHeroCarousel({super.key, required this.slides});
+  const RHeroCarousel({super.key, required this.slides, this.onSkip});
   final List<(String, String)> slides;
+  final VoidCallback? onSkip;
   @override
   State<RHeroCarousel> createState() => _RHeroCarouselState();
 }
 
 class _RHeroCarouselState extends State<RHeroCarousel> {
+  final _pc = PageController();
   int _i = 0;
+  static const _photos = ['lotus', 'lake', 'candle_incense', 'milky_way'];
+
   @override
-  Widget build(BuildContext context) => Column(children: [
-        SizedBox(
-          height: 140,
-          child: PageView(
-            onPageChanged: (i) => setState(() => _i = i),
-            children: [
-              for (final (t, s) in widget.slides)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: RGlassBox(
-                    tint: RGlass.violet,
-                    blur: NTokens.blurLarge,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                    child: Row(children: [
-                      Expanded(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                          FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Text(t, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800))),
-                          const SizedBox(height: 6),
-                          Text(s, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white.withValues(alpha: .8))),
-                        ]),
-                      ),
-                      const LotusCoin(size: 96),
-                    ]),
+  void dispose() {
+    _pc.dispose();
+    super.dispose();
+  }
+
+  void _next() {
+    final n = (_i + 1) % widget.slides.length;
+    _pc.animateToPage(n, duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
+  }
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 330,
+        child: PageView.builder(
+          controller: _pc,
+          itemCount: widget.slides.length,
+          onPageChanged: (i) => setState(() => _i = i),
+          itemBuilder: (_, k) {
+            final (t, s) = widget.slides[k];
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: RGlassBox(
+                padding: const EdgeInsets.fromLTRB(14, 18, 14, 14),
+                child: Column(children: [
+                  Container(
+                    width: 132, height: 132,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(image: AssetImage('assets/images/circles/${_photos[k % _photos.length]}.webp'), fit: BoxFit.cover),
+                    ),
                   ),
-                ),
-            ],
-          ),
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: RGlassBox(
+                      inner: true,
+                      radius: 22,
+                      padding: const EdgeInsets.fromLTRB(16, 14, 12, 10),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800, height: 1.15)),
+                        const SizedBox(height: 4),
+                        Text(s, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: RGlass.muted, fontSize: 12.5, height: 1.35)),
+                        const Spacer(),
+                        Row(children: [
+                          GestureDetector(onTap: widget.onSkip, child: const Text('Skip', style: TextStyle(color: RGlass.muted, fontSize: 12))),
+                          const Spacer(),
+                          for (var d = 0; d < widget.slides.length; d++)
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              width: d == _i ? 6 : 4, height: d == _i ? 6 : 4,
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: d == _i ? .9 : .4)),
+                            ),
+                          const Spacer(),
+                          RPill('Next', onTap: _next),
+                        ]),
+                      ]),
+                    ),
+                  ),
+                ]),
+              ),
+            );
+          },
         ),
-        const SizedBox(height: 8),
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          for (var k = 0; k < widget.slides.length; k++)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              width: k == _i ? 22 : 8,
-              height: 4,
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: k == _i ? .9 : .3), borderRadius: BorderRadius.circular(2)),
-            ),
-        ]),
-      ]);
+      );
 }
 
 class RShortcutTile extends StatelessWidget {
@@ -201,9 +220,8 @@ class RDealStrip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: RGlassBox(
-        tint: RGlass.gold,
-        child: Row(children: [
-          const Text('24 hour deal', style: TextStyle(color: RGlass.gold, fontWeight: FontWeight.w700)),
+                child: Row(children: [
+          const Text('24 hour deal', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
           const SizedBox(width: 10),
           Expanded(child: Text(title, style: const TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis)),
           if (h != null) Text(h, style: TextStyle(color: Colors.white.withValues(alpha: .8), fontSize: 12)),
@@ -259,8 +277,30 @@ class RFilterChips extends StatelessWidget {
   final String selected;
   final ValueChanged<String> onSelect;
   @override
-  Widget build(BuildContext context) =>
-      FilterChipRow(labels: options, selected: {options.indexOf(selected)}, onSelect: (i) => onSelect(options[i]));
+  Widget build(BuildContext context) => SizedBox(
+        height: 36,
+        child: ListView.separated(
+          key: const Key('rewards.chips'),
+          scrollDirection: Axis.horizontal,
+          itemCount: options.length,
+          separatorBuilder: (_, __) => const SizedBox(width: 8),
+          itemBuilder: (_, i) {
+            final o = options[i];
+            final on = o == selected;
+            return GestureDetector(
+              onTap: () => onSelect(o),
+              child: on
+                  ? IgnorePointer(child: RPill(o, onTap: () {}))
+                  : RGlassBox(
+                      inner: true,
+                      radius: 18,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      child: Text(o, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+                    ),
+            );
+          },
+        ),
+      );
 }
 
 class RGiftTile extends StatelessWidget {
@@ -328,7 +368,17 @@ class RStateMessage extends StatelessWidget {
   Widget build(BuildContext context) => Center(
         child: Padding(
           padding: EdgeInsets.all(compact ? 16 : 32),
-          child: GlassStateCard(icon: icon, title: title, message: body, action: action, onAction: onAction),
+          child: RGlassBox(
+            padding: const EdgeInsets.all(24),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon, color: Colors.white, size: 40),
+              const SizedBox(height: 12),
+              Text(title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 6),
+              Text(body, textAlign: TextAlign.center, style: const TextStyle(color: RGlass.muted, fontSize: 13)),
+              if (action != null) ...[const SizedBox(height: 16), RPill(action!, onTap: onAction)],
+            ]),
+          ),
         ),
       );
 }

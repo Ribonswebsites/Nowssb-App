@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nowssb/pages/signature_words/signature_flag.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:nowssb/pages/signature_words/signature_models.dart';
 import 'package:nowssb/pages/signature_words/signature_words_page.dart';
 
@@ -90,8 +90,9 @@ void main() {
     await t.pumpWidget(const SizedBox());
   });
 
-  test('flag override', () {
-    expect(newUiSignatureEnabled(override: true), isTrue);
-    expect(newUiSignatureEnabled(override: false), isFalse);
+  test('flag rules: off for users, on for admins and remote release', () {
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
   });
 }

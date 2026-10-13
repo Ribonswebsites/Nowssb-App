@@ -84,15 +84,21 @@ void main() {
     await t.pumpWidget(_app(_Repo(() async => _full), cc: 'DE'));
     await t.pumpAndSettle();
     expect(find.text('120'), findsOneWidget);
-    expect(find.text('20 / 50 · Coins'), findsOneWidget);
+    await t.scrollUntilVisible(find.text('20 / 50 · Coins'), 200,
+        scrollable: find.descendant(of: find.byKey(const Key('partner-hub')), matching: find.byType(Scrollable)).first);
+    final hub = find.descendant(of: find.byKey(const Key('partner-hub')), matching: find.byType(Scrollable)).first;
+    await t.scrollUntilVisible(find.byKey(const Key('partner-copy')), 200, scrollable: hub);
+    await t.ensureVisible(find.byKey(const Key('partner-copy')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner-copy')));
-    await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
     expect(find.text('Link copied'), findsOneWidget);
     await t.scrollUntilVisible(find.byKey(const Key('partner-payout')), 200,
         scrollable: find.descendant(of: find.byKey(const Key('partner-hub')), matching: find.byType(Scrollable)).first);
     expect(find.textContaining('(DE)'), findsOneWidget);
     expect(find.textContaining('VAT ID'), findsOneWidget);
     expect(find.textContaining('₹'), findsNothing);
+    expect(find.textContaining('€'), findsOneWidget);
   });
 
   test('payout info is country-aware and never India-specific', () {

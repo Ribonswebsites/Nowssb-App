@@ -6,6 +6,7 @@ import 'package:nowssb/theme/liquid_glass_theme.dart' show NwsbEffects;
 import 'glass_core.dart';
 import 'pills_chips.dart';
 import 'circle_assets.dart';
+import 'tickets.dart';
 import 'tokens.dart';
 
 class CircleImage extends StatelessWidget {
@@ -20,6 +21,9 @@ class CircleImage extends StatelessWidget {
           image: image == null ? null : DecorationImage(image: image!, fit: BoxFit.cover)));
 }
 
+/// Widest a meditation card grows (phone card size).
+const double kMeditationCardMaxWidth = 420;
+
 /// V1 Meditation card, matched to /workspace/specs/card-reference-exact.png.
 /// Every size is a fraction of the card width W (measured on the reference):
 /// radius .10W, side padding .06W, status row .07W, photo .64W with a thin
@@ -28,16 +32,26 @@ class CircleImage extends StatelessWidget {
 /// home bar .30W. Outer glass: white 18%->9%, blur 26, 1px white 36% border.
 class MeditationCard extends StatelessWidget {
   const MeditationCard({super.key, required this.title, this.subtitle, this.image,
-    this.cta = 'Next', this.onCta, this.secondary = 'Skip', this.onSecondary, this.dots = 3, this.dotIndex = 0,
+    this.cta = 'Next', this.onCta, this.secondary = 'Skip', this.onSecondary, this.onSkip, this.circle, this.dots = 3, this.dotIndex = 0,
     this.blur = NTokens.cardBlur, this.statusBar = true, this.time = '9:41', this.onClose, this.onHeart, this.liked = false,
     this.homeBar = true});
   final String title; final String? subtitle, secondary; final ImageProvider? image;
-  final String cta; final VoidCallback? onCta, onSecondary, onClose, onHeart; final int? dots; final int dotIndex;
+  final String cta; final VoidCallback? onCta, onSecondary, onClose, onHeart;
+  /// Tap on the Skip link ([secondary]). Falls back to [onSecondary].
+  final VoidCallback? onSkip;
+  /// Any widget for the top circle (icon, animation, avatar). When null the
+  /// [image] is shown. It is clipped to the circle inside the light ring.
+  final Widget? circle; final int? dots; final int dotIndex;
   final double blur; final bool statusBar, liked, homeBar; final String time;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(builder: (context, c) {
-        final w = c.maxWidth.isFinite ? c.maxWidth : 300.0;
+        // Bounded size: the card is ~1.75W tall, so cap W by the available
+        // height (and at phone-card size) so it never overflows; any residual
+        // (big text scale) is absorbed by FittedBox.scaleDown below.
+        var w = c.maxWidth.isFinite ? c.maxWidth : 300.0;
+        w = w.clamp(0.0, kMeditationCardMaxWidth);
+        if (c.maxHeight.isFinite) w = w.clamp(0.0, c.maxHeight / 1.8);
         final r = BorderRadius.circular(w * .10);
         final reduced = NwsbEffects.instance.reduced;
         Widget card = DecoratedBox(
@@ -68,7 +82,8 @@ class MeditationCard extends StatelessWidget {
                 decoration: BoxDecoration(shape: BoxShape.circle,
                     border: Border.all(color: Colors.white.withValues(alpha: .55), width: 1.2),
                     color: Colors.white.withValues(alpha: .12),
-                    image: image == null ? null : DecorationImage(image: image!, fit: BoxFit.cover))),
+                    image: circle != null || image == null ? null : DecorationImage(image: image!, fit: BoxFit.cover)),
+                child: circle == null ? null : ClipOval(child: circle)),
             SizedBox(height: w * .06),
             // Inner frosted panel (lighter, own radius)
             DecoratedBox(
@@ -83,7 +98,8 @@ class MeditationCard extends StatelessWidget {
                     Text(subtitle!, style: TextStyle(color: NTokens.bodyGrey, fontSize: w * .031, height: 1.45))],
                   SizedBox(height: w * .04),
                   Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                    Expanded(child: secondary == null ? const SizedBox.shrink() : GestureDetector(onTap: onSecondary,
+                    Expanded(child: secondary == null ? const SizedBox.shrink() : GestureDetector(key: const Key('meditation-skip'),
+                        behavior: HitTestBehavior.opaque, onTap: onSkip ?? onSecondary,
                         child: Text(secondary!, maxLines: 1, overflow: TextOverflow.ellipsis,
                             style: TextStyle(color: Colors.white.withValues(alpha: .8), fontSize: w * .034, fontWeight: FontWeight.w500)))),
                     SizedBox(width: w * .02),
@@ -111,7 +127,10 @@ class MeditationCard extends StatelessWidget {
         card = ClipRRect(borderRadius: r, child: reduced || blur <= 0 ? card
             : BackdropFilter(filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur), child: card));
         // No drop shadow: on translucent glass it shows through as a dark inner band.
-        return RepaintBoundary(child: card);
+        card = RepaintBoundary(child: SizedBox(width: w, child: card));
+        if (!c.maxHeight.isFinite) return Center(widthFactor: 1, child: card);
+        return Center(child: ConstrainedBox(constraints: BoxConstraints(maxHeight: c.maxHeight),
+            child: FittedBox(fit: BoxFit.scaleDown, child: card)));
       });
 }
 
@@ -190,30 +209,14 @@ class TicketCard extends StatelessWidget {
 }
 
 /// V4 Coupon list row: image left, label + bold offer + "View products >", New badge, side notches.
+/// Coupon list row. Kept for existing callers; renders [NTicketCard].
 class CouponListCard extends StatelessWidget {
   const CouponListCard({super.key, required this.label, required this.offer, this.image, this.isNew = false,
     this.rarity = Rarity.rare, this.onTap, this.expired = false});
   final String label, offer; final ImageProvider? image; final bool isNew, expired; final Rarity rarity; final VoidCallback? onTap;
   @override
-  Widget build(BuildContext context) {
-    Widget card = ClipPath(clipper: const NotchClipper(radius: 22, notch: 10), child: NGlass(
-        radius: 22, accent: rarity.color, onTap: onTap, padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
-        child: Row(children: [
-          CircleImage(image: image, size: 64, ring: rarity.color),
-          const SizedBox(width: 12),
-          const SizedBox(height: 64, child: DashedLine(vertical: true)),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [RarityChip(rarity), if (isNew) ...[const SizedBox(width: 6), const GlassBadge('NEW')]]),
-            const SizedBox(height: 6),
-            Text(label, style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
-            Text(offer, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-            const Text('View products >', style: TextStyle(color: NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700)),
-          ])),
-        ])));
-    if (expired) card = ExpiredOverlay(child: card);
-    return card;
-  }
+  Widget build(BuildContext context) => NTicketCard(label: label, title: offer, image: image, isNew: isNew,
+      rarity: rarity, onTap: onTap, expired: expired);
 }
 
 class ExpiredOverlay extends StatelessWidget {

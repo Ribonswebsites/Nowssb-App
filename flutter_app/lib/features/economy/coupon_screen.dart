@@ -26,6 +26,8 @@ import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../programs/coupons_program.dart';
 import '../../admin/template/editable.dart';
+import '../../pages/coupons/coupons_flag.dart';
+import '../../pages/coupons/coupons_home_page.dart';
 
 class CouponScreen extends StatefulWidget {
   const CouponScreen({super.key, this.initialTab});
@@ -51,8 +53,14 @@ class _CouponScreenState extends State<CouponScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CouponsFace(scratch: const DailyScratchCard());
+    // newui_coupons: rebuilt page for admins / flagged users; old page stays live.
+    return FutureBuilder<bool>(
+      future: _newUi,
+      builder: (_, s) => s.data == true ? const CouponsHomePage() : CouponsFace(scratch: const DailyScratchCard()),
+    );
   }
+
+  late final Future<bool> _newUi = CouponsNewUi.enabled();
 
   Widget _retired(BuildContext context) {
     return EconomyPage(
@@ -256,7 +264,7 @@ class _PaidPeek extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Text(inr(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
+                        if (sInt(c['coinPrice']) > 0) Text('${sInt(c['coinPrice'])} coins', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
                         const SizedBox(width: 6),
                         const Icon(Icons.chevron_right, color: NwsbColors.goldLight),
                       ],

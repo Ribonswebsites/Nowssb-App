@@ -4,18 +4,20 @@ import 'package:flutter/material.dart';
 
 class NTokens {
   NTokens._();
-  // Dark ink colours (text on white pills etc). NOT backgrounds.
-  static const bgTop = Color(0xFF2A1B6B);
-  static const bgMid = Color(0xFF3B2A9A);
+  // Background: neutral. Pages show the app's original AppBackdrop video.
+  static const bgTop = Color(0xFF101114);
+  static const bgMid = Color(0xFF0C0D10);
+  static const bgBottom = Color(0xFF08090B);
+  static const bgGradient = LinearGradient(
+    begin: Alignment.topLeft, end: Alignment.bottomRight,
+    colors: [bgTop, bgMid, bgBottom],
+  );
   /// Card/panel tokens measured from card-reference-exact.png (W = card width).
   static const panelTop = Color(0x3DFFFFFF); // inner panel 24%
   static const panelBottom = Color(0x1FFFFFFF); // 12%
   static const cardBlur = 26.0;
   static const ink = Color(0xFF1A1630);
   static const bodyGrey = Color(0xA6FFFFFF); // 65%
-  static const bgBottom = Color(0xFF120B3A);
-  // No background tokens: the app background (AppBackdrop video) is the only background.
-
   // Glass
   static const glassTop = Color(0x2EFFFFFF); // 18% (measured from card-reference-exact)
   static const glassBottom = Color(0x17FFFFFF); // 9%
@@ -26,6 +28,8 @@ class NTokens {
   static const violetTint = Color(0x339C7BFF);
   // Accents
   static const violet = Color(0xFF8B5CF6);
+  /// Neutral default accent for kit glass (no violet cast).
+  static const neutral = Color(0xFFFFFFFF);
   static const indigoBtn = Color(0xFF6D4CFF);
   static const pink = Color(0xFFE879F9); // torus
   static const mint = Color(0xFF7FE7D6); // pill shape

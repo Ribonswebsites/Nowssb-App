@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/features/gifts/gifts_screen.dart';
 import 'package:nowssb/features/gifts/newui/gifts_flag.dart';
 import 'package:nowssb/features/gifts/newui/gifts_hub_page.dart';
-import 'package:nowssb/features/gifts/newui/gifts_visuals.dart';
 
 const _catalog = [GiftItem('word', 'Word card', 99), GiftItem('basic7', '7-day Basic', 79)];
 
@@ -20,9 +19,9 @@ Widget _app(GiftsSnapshot s, {VoidCallback? retry, void Function(String)? buy, G
     );
 
 void main() {
-  test('flag: override wins, default off for non-admin', () {
+  test('flag: override wins, default on for everyone', () {
     expect(newUiGiftsEnabled(override: true), isTrue);
-    expect(newUiGiftsEnabled(), isFalse);
+    expect(newUiGiftsEnabled(), isTrue);
   });
 
   testWidgets('loading state', (t) async {
@@ -107,9 +106,15 @@ void main() {
     expect(find.byKey(const Key('gifts.code')), findsOneWidget);
   });
 
-  testWidgets('hero scene animates without errors', (t) async {
-    await t.pumpWidget(const MaterialApp(home: Scaffold(body: GiftsHeroScene(animate: true))));
-    await t.pump(const Duration(seconds: 3));
-    expect(find.byType(GiftsHeroScene), findsOneWidget);
+  testWidgets('how-it-works card: Next walks the steps, Skip jumps to the end', (t) async {
+    await t.pumpWidget(_app(const GiftsSnapshot(load: GiftsLoad.ready, catalog: _catalog)));
+    expect(find.text('Send a calm moment'), findsOneWidget);
+    await t.tap(find.text('Next'));
+    await t.pump();
+    expect(find.text('Add a message'), findsOneWidget);
+    await t.tap(find.text('Skip'));
+    await t.pump();
+    expect(find.text('They open it'), findsOneWidget);
+    expect(find.text('Start again'), findsOneWidget);
   });
 }

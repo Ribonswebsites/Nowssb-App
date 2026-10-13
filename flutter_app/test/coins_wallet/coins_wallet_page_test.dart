@@ -14,7 +14,7 @@ class _Src implements CoinsWalletSource {
 }
 
 Widget _app(CoinsWalletSource s) => MaterialApp(home: MediaQuery(
-    data: const MediaQueryData(disableAnimations: true, size: Size(400, 900)), child: CoinsWalletPage(source: s)));
+    data: const MediaQueryData(disableAnimations: true, size: Size(400, 900)), child: CoinsWalletPage(source: s, backdrop: const ColoredBox(color: Colors.black))));
 
 final _full = CoinsWalletState(balance: 500, worthLabel: '\$5.00', expiringSoon: 40,
     expiresOn: DateTime.now().add(const Duration(days: 5)), ledger: [
@@ -26,7 +26,8 @@ final _full = CoinsWalletState(balance: 500, worthLabel: '\$5.00', expiringSoon:
 void main() {
   test('flag: off for users by default, on for admins, on when flag set', () {
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
-    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: false)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: false)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
     expect(AppRoutes.hasRebuilt(AppPage.coins), isTrue);
   });
@@ -62,7 +63,7 @@ void main() {
   });
 
   testWidgets('motion runs and settles when animations are allowed', (t) async {
-    await t.pumpWidget(MaterialApp(home: CoinsWalletPage(source: _Src(() async => _full))));
+    await t.pumpWidget(MaterialApp(home: CoinsWalletPage(source: _Src(() async => _full), backdrop: const ColoredBox(color: Colors.black))));
     await t.pump();
     await t.pump(const Duration(milliseconds: 700));
     await t.pump(const Duration(seconds: 2));

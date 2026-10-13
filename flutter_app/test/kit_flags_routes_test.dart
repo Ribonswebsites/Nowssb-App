@@ -6,13 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUpAll(() => SharedPreferences.setMockInitialValues({}));
   group('NewUi.decide', () {
-    test('off for regular users by default', () {
-      expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isFalse);
-      expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
-    });
-    test('on for admins', () {
+    test('on for everyone by default', () {
+      expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
       expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
-      expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: false)), isTrue);
+    });
+    test('remote false is a kill switch for everyone, admins included', () {
+      expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
+      expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: false)), isFalse);
     });
     test('remote true releases to everyone', () {
       expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
@@ -23,9 +23,9 @@ void main() {
     });
     test('NwsbAdmin is false with no account', () => expect(NwsbAdmin.isAdmin, isFalse));
     test('key format', () => expect(NewUi.key('coupons'), 'newui_coupons'));
-    test('signed-out non-admin phone is off (no Firebase in tests)', () {
+    test('signed-out non-admin phone is on (no Firebase in tests)', () {
       NewUi.resetForTest();
-      expect(NewUi.isOn('coupons'), isFalse);
+      expect(NewUi.isOn('coupons'), isTrue);
     });
   });
 

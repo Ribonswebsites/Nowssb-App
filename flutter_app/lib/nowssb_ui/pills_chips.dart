@@ -1,6 +1,6 @@
 // Pills, buttons, chips, badges, countdown, rarity chip, page dots.
 import 'package:flutter/material.dart';
-import 'package:nowssb/widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
+import '../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 import 'glass_core.dart';
 import 'tokens.dart';
 

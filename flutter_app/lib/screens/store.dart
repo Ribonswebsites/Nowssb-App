@@ -41,7 +41,7 @@ import '../widgets/home_keep_alive.dart';
 import '../widgets/glass_black_card.dart';
 import '../theme/ui_tokens.dart';
 import '../shell/nwsb_links.dart';
-import 'store/newui/store_flag.dart';
+import '../kit/kit.dart';
 import 'store/newui/store_page.dart';
 
 class StoreScreen extends StatelessWidget {
@@ -51,7 +51,7 @@ class StoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'hub',
         head: 'Before you enter the store',
-        child: newUiStoreEnabled() ? const NewStorePage() : const _StoreHomeContent(),
+        child: NewUiGate(page: 'store', legacy: (_) => const _StoreHomeContent(), rebuilt: (_) => const NewStorePage()),
       );
 }
 

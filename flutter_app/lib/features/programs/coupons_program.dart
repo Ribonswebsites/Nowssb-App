@@ -196,9 +196,9 @@ class _MineHeroState extends State<_MineHero> with SingleTickerProviderStateMixi
   Widget build(BuildContext context) {
     final w = widget;
     final ready = w.discounts + w.sealed + w.tokens;
-    final money = w.capSumINR > 0;
-    final big = money ? inr(w.capSumINR) : '$ready';
-    final caption = money ? 'savings ready' : (ready == 1 ? 'coupon ready' : 'coupons ready');
+    // No currency on screen (no-INR rule): always the count of what's ready.
+    final big = '$ready';
+    final caption = ready == 1 ? 'coupon ready' : 'coupons ready';
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _glow,
@@ -535,7 +535,7 @@ class _CouponTicket extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text('$pct% off', style: const TextStyle(color: NwsbColors.goldLight, fontSize: 24, fontWeight: FontWeight.w300, height: 1.1)),
                   const SizedBox(height: 6),
-                  Text([if (cap > 0) 'cap ${inr(cap)}', until].join(' · '), style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 11.5)),
+                  Text([if (cap > 0) 'capped', until].join(' · '), style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 11.5)),
                 ]),
               ),
             ),
@@ -558,7 +558,12 @@ class _CouponTicket extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(22, 18, 18, 14),
                 child: Row(children: [
                   Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                    // Scales the stack down only when the 62% band is too short
+                    // (it overflowed by 28px with the soon pill); 1:1 otherwise.
+                    child: LayoutBuilder(builder: (_, box) => FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: SizedBox(width: box.maxWidth, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                       Row(children: [
                         const EditableLabel('coupons_program.mine', 'PASS', style: TextStyle(color: _kSubAccent, fontSize: 10.5, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
                         const Spacer(),
@@ -566,8 +571,9 @@ class _CouponTicket extends StatelessWidget {
                       ]),
                       const SizedBox(height: 8),
                       Text('$pct% OFF', style: const TextStyle(color: NwsbColors.goldLight, fontSize: 38, fontWeight: FontWeight.w200, height: 1)),
-                      if (cap > 0) Text('up to ${inr(cap)}', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5)),
-                    ]),
+                      if (cap > 0) const Text('Discount is capped', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5)),
+                    ])),
+                    )),
                   ),
                   const _ArtTile(icon: Icons.workspace_premium_outlined, accent: _kSubAccent, size: 60),
                 ]),
@@ -611,7 +617,7 @@ class _CouponTicket extends StatelessWidget {
                   Text(scope == 'any' ? 'ANY ITEM' : scope.toUpperCase(),
                       style: const TextStyle(color: _kAnyAccent, fontSize: 10.5, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  Text('$pct% off${cap > 0 ? ' · ${inr(cap)}' : ''}',
+                  Text('$pct% off${cap > 0 ? ' · capped' : ''}',
                       style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w300)),
                 ]),
               ),
@@ -1048,7 +1054,7 @@ List<Widget> _shop(BuildContext context, Map<String, dynamic> s) {
         const SizedBox(height: 4),
         Row(children: [
           Expanded(child: Text('${c['title']}', style: TextStyle(color: rarityColor('${c['id']}'), fontSize: 18, fontWeight: FontWeight.w800))),
-          Text(inr(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          if (sInt(c['coinPrice']) > 0) Text('${sInt(c['coinPrice'])} coins', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         ]),
         Text('Rarest prize: ${c['rarest'] ?? ''}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
         const SizedBox(height: 6),
@@ -1214,8 +1220,8 @@ List<Widget> _odds(BuildContext context, Map<String, dynamic> s) {
     for (final e in free.entries) LSection('free_${e.key}', '${rarityTitle(e.key)} odds', table('${rarityTitle(e.key)} free card', sList(e.value))),
     LSection('after', 'After a purchase', PCard(children: [
       const EditableLabel('coupons_program.shared', 'Rarity of the free card after a purchase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-      for (final b in after)
-        Text('Up to ${sNum(b['maxINR']) > 1e9 ? 'any amount' : inr(sNum(b['maxINR']))}: ${sMap(b['odds']).entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
+      for (final (i, b) in after.indexed)
+        Text('${sNum(b['maxINR']) > 1e9 ? 'Largest purchases' : 'Purchase band ${i + 1}'}: ${sMap(b['odds']).entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
       Text('Subscriptions: ${afterSub.entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
     ])),
     LSection('spin', 'Daily Spin odds', table('Daily Spin', spin)),
