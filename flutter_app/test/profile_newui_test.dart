@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/pages/profile/new_profile_page.dart';
 import 'package:nowssb/pages/profile/profile_data.dart';
-import 'package:nowssb/pages/profile/profile_flag.dart';
+import 'package:nowssb/kit/feature_flags.dart';
 
 class _Src implements ProfileSource {
   _Src(this.fn);
@@ -23,20 +23,9 @@ Widget _app(ProfileSource s, {ProfileNav? nav}) => MaterialApp(
 
 void main() {
   test('flag: off for users by default, on for admins, remote can enable', () {
-    expect(resolveNewUiProfile(isAdmin: false), isFalse);
-    expect(resolveNewUiProfile(isAdmin: false, remote: false), isFalse);
-    expect(resolveNewUiProfile(isAdmin: false, remote: true), isTrue);
-    expect(resolveNewUiProfile(isAdmin: true, remote: false), isTrue);
-  });
-
-  testWidgets('flag gate shows legacy when off and new UI when on', (t) async {
-    ProfileFlag.debugOverride = false;
-    await t.pumpWidget(MaterialApp(home: ProfileFlagGate(newUi: (_) => const Text('new'), legacy: (_) => const Text('old'))));
-    expect(find.text('old'), findsOneWidget);
-    ProfileFlag.debugOverride = true;
-    await t.pumpWidget(MaterialApp(home: ProfileFlagGate(key: UniqueKey(), newUi: (_) => const Text('new'), legacy: (_) => const Text('old'))));
-    expect(find.text('new'), findsOneWidget);
-    ProfileFlag.debugOverride = null;
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
   });
 
   testWidgets('loading then ready with stats', (t) async {

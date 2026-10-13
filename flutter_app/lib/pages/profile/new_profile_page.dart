@@ -2,9 +2,9 @@
 /// one clear action per card (spec 0.5, 14-16, 19-20).
 library;
 
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
+
+import '../../nowssb_ui/glass_core.dart';
 
 import '../../screens/app_settings.dart';
 import '../../screens/progress/progress_screen.dart';
@@ -19,8 +19,8 @@ const _ink = Color(0xFFF4F1FF);
 const _sub = Color(0xB3E6E0FF);
 const _violet = Color(0xFFB79CFF);
 
-/// Glass pane used by every item (spec 0.5). Page-local stand-in for the
-/// shared kit's GlassWrapper (14.2); swap when Bug Hunter's kit lands.
+/// Glass pane used by every item (spec 0.5). Wraps the shared kit's NGlass
+/// (nowssb_ui) and adds semantics.
 class ProfileGlass extends StatelessWidget {
   const ProfileGlass({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap, this.semanticLabel});
   final Widget child;
@@ -29,27 +29,11 @@ class ProfileGlass extends StatelessWidget {
   final String? semanticLabel;
 
   @override
-  Widget build(BuildContext context) {
-    final r = BorderRadius.circular(22);
-    Widget body = ClipRRect(
-      borderRadius: r,
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: r,
-            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x26FFFFFF), Color(0x0FFFFFFF)]),
-            border: Border.all(color: const Color(0x33FFFFFF)),
-          ),
-          child: Padding(padding: padding, child: child),
-        ),
-      ),
-    );
-    if (onTap != null) {
-      body = Material(type: MaterialType.transparency, child: InkWell(borderRadius: r, onTap: onTap, child: body));
-    }
-    return Semantics(button: onTap != null, label: semanticLabel, child: body);
-  }
+  Widget build(BuildContext context) => Semantics(
+        button: onTap != null,
+        label: semanticLabel,
+        child: NGlass(padding: padding, onTap: onTap, child: child),
+      );
 }
 
 typedef ProfileNav = void Function(BuildContext context, String target);
