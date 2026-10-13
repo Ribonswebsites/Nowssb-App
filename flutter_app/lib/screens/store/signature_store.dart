@@ -34,11 +34,11 @@ class SignatureStoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => NewUiGate(
         page: 'signature',
-        legacy: _retired,
+        legacy: _legacy,
         rebuilt: (_) => const SignatureWordsPage(),
       );
 
-  Widget _retired(BuildContext context) => StoreTermsHost(
+  Widget _legacy(BuildContext context) => StoreTermsHost(
         which: 'signature',
         head: 'Signatures described by sound',
         child: PageShell(

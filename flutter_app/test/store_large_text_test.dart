@@ -130,7 +130,8 @@ void main() {
         FlutterError.onError = prev;
         // The walk really covered a long page, top to bottom (calm store
         // pages are shorter now that the repeated banners are retired).
-        expect(state.position.maxScrollExtent, greaterThan(1000));
+        // Signature's calm designer layout is shorter at 1.0x.
+        expect(state.position.maxScrollExtent, greaterThan(name == 'Signature Store' ? 1200 : 1000));
         expect(state.position.pixels,
             closeTo(state.position.maxScrollExtent, 1));
         // ignore: avoid_print
