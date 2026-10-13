@@ -148,8 +148,9 @@ class _TreeState extends State<_Tree> with SingleTickerProviderStateMixin {
                 ),
                 boxShadow: [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 14)],
               ),
-              child: Text(label.isEmpty ? '?' : label.characters.first.toUpperCase(),
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: d * 0.36)),
+              child: Text(m == null ? 'You' : (label.isEmpty ? '?' : label.characters.first.toUpperCase()),
+                  maxLines: 1,
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: m == null ? d * 0.26 : d * 0.36)),
             ),
           ),
         ),
@@ -158,17 +159,34 @@ class _TreeState extends State<_Tree> with SingleTickerProviderStateMixin {
   }
 
   void _showMember(BuildContext context, EarnTeamMember m) {
-    showGlassSheet<void>(
-      context,
-      builder: (_) => Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(m.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 10),
-        StatPanel(rows: [
-          (Icons.workspace_premium_rounded, 'Rank', m.rank.isEmpty ? '—' : m.rank),
-          (Icons.auto_awesome_rounded, 'Words sold', '${m.words}'),
-          (Icons.account_tree_rounded, 'Level', m.level == 1 ? 'Direct (1)' : 'Through your team (2)'),
-        ]),
-      ]),
+    final i = widget.l1.indexOf(m) + widget.l2.indexOf(m) + 2;
+    showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'close',
+      barrierColor: Colors.black54,
+      pageBuilder: (ctx, _, __) => SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 28),
+            child: Material(
+              type: MaterialType.transparency,
+              child: MeditationCard(
+                key: const Key('earn-member-card'),
+                image: NCircles.at(i),
+                title: m.name,
+                subtitle: [
+                  'Rank: ${m.rank.isEmpty ? '—' : m.rank}',
+                  'Words sold: ${m.words}',
+                  m.level == 1 ? 'Level: Direct (1)' : 'Level: Through your team (2)',
+                ].join('\n'),
+                cta: 'Close',
+                onCta: () => Navigator.of(ctx).pop(),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

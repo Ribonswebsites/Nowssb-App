@@ -104,7 +104,7 @@ void main() {
     expect(find.text('Silver rank'), findsOneWidget);
     expect(find.text('20%'), findsOneWidget);
     expect(find.text('380 more words to 500'), findsOneWidget);
-    await t.ensureVisible(find.byKey(const Key('earn-task-earnings')));
+    await t.scrollUntilVisible(find.byKey(const Key('earn-task-earnings')), 200);
     await t.pump(const Duration(seconds: 1));
     await t.tap(find.byKey(const Key('earn-task-earnings')));
     expect(earnings, 1);
@@ -143,7 +143,7 @@ void main() {
     await t.tap(find.byKey(const Key('earn-node-a')));
     await t.pump(const Duration(seconds: 1));
     expect(find.text('Asha'), findsOneWidget);
-    expect(find.text('12'), findsOneWidget);
+    expect(find.textContaining('Words sold: 12'), findsOneWidget);
   });
 
   testWidgets('honesty note shows on ready', (t) async {
@@ -153,6 +153,9 @@ void main() {
   });
 
   testWidgets('with motion on, numbers count up to real values', (t) async {
+    t.view.physicalSize = const Size(1200, 3000);
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
     await t.pumpWidget(const MaterialApp(
       home: EarnNewUiPage(data: EarnViewData(load: EarnLoad.ready, signedIn: true, ratePct: 20, wordsSold: 120, team: _team)),
     ));

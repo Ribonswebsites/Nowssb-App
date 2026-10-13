@@ -74,7 +74,7 @@ class EarnNewUiPage extends StatelessWidget {
       case EarnLoad.error:
         return _Message(
           key: const Key('earn-error'),
-          icon: Icons.cloud_off_rounded,
+          image: 'stones',
           title: 'Something went wrong',
           body: data.errorMessage.isEmpty ? 'We could not load your Earn page.' : data.errorMessage,
           action: 'Try again',
@@ -83,7 +83,7 @@ class EarnNewUiPage extends StatelessWidget {
       case EarnLoad.offline:
         return _Message(
           key: const Key('earn-offline'),
-          icon: Icons.wifi_off_rounded,
+          image: 'lake',
           title: 'You are offline',
           body: 'Connect to the internet to see your rank and money.',
           action: 'Try again',
@@ -92,7 +92,7 @@ class EarnNewUiPage extends StatelessWidget {
       case EarnLoad.empty:
         return _Message(
           key: const Key('earn-empty'),
-          icon: Icons.spa_rounded,
+          image: 'lotus',
           title: data.signedIn ? 'Start earning' : 'Sign in to earn',
           body: data.signedIn
               ? 'Share your link. When someone buys, you earn money.'
@@ -153,9 +153,10 @@ class _Loading extends StatelessWidget {
   }
 }
 
+/// State card in the approved meditation-card design (kit MeditationCard).
 class _Message extends StatelessWidget {
-  const _Message({super.key, required this.icon, required this.title, required this.body, required this.action, this.onTap});
-  final IconData icon;
+  const _Message({super.key, required this.image, required this.title, required this.body, required this.action, this.onTap});
+  final String image;
   final String title;
   final String body;
   final String action;
@@ -163,9 +164,135 @@ class _Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: GlassStateCard(icon: icon, title: title, message: body, action: action, onAction: onTap),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+          child: MeditationCard(image: NCircles.of(image), title: title, subtitle: body, cta: action, onCta: onTap),
+        ),
+      );
+}
+
+/// Meditation-card shell with a custom top (the kit card takes only an image).
+/// Same structure: outer frosted card (rHero), round top, inner frosted panel
+/// with bold title, grey body, text link left, white pill right, dots.
+class EarnMeditationShell extends StatelessWidget {
+  const EarnMeditationShell({
+    super.key,
+    required this.top,
+    required this.title,
+    this.subtitle,
+    this.extra,
+    this.secondary,
+    this.onSecondary,
+    required this.cta,
+    this.onCta,
+    this.dots,
+    this.dotIndex = 0,
+  });
+  final Widget top;
+  final String title;
+  final String? subtitle;
+  final Widget? extra;
+  final String? secondary;
+  final VoidCallback? onSecondary;
+  final String cta;
+  final VoidCallback? onCta;
+  final int? dots;
+  final int dotIndex;
+
+  @override
+  Widget build(BuildContext context) => NGlass(
+        radius: NTokens.rHero,
+        padding: const EdgeInsets.all(18),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const SizedBox(height: 8),
+          top,
+          const SizedBox(height: 20),
+          NGlass(
+            radius: NTokens.rCard,
+            elevation: .3,
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.15, fontWeight: FontWeight.w800)),
+              if (subtitle != null) ...[
+                const SizedBox(height: 8),
+                Text(subtitle!, style: const TextStyle(color: NTokens.textLo, fontSize: 12, height: 1.4)),
+              ],
+              if (extra != null) ...[const SizedBox(height: 10), extra!],
+              const SizedBox(height: 14),
+              Row(children: [
+                Expanded(
+                  child: secondary == null
+                      ? const SizedBox.shrink()
+                      : GestureDetector(
+                          onTap: onSecondary,
+                          child: Text(secondary!,
+                              maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
+                        ),
+                ),
+                const SizedBox(width: 8),
+                GlassPill(label: cta, style: PillStyle.white, dense: true, onTap: onCta),
+              ]),
+              if (dots != null) ...[const SizedBox(height: 10), Center(child: PageDots(count: dots!, index: dotIndex))],
+            ]),
+          ),
+        ]),
+      );
+}
+
+/// Frosted ticket row in the approved coupon-card design (kit CouponListCard
+/// layout: notched glass, round image, dashed divider, chip, label, bold line, mint link).
+class EarnTicket extends StatelessWidget {
+  const EarnTicket(
+      {super.key,
+      required this.leading,
+      required this.chip,
+      required this.label,
+      required this.headline,
+      required this.link,
+      this.accent = NTokens.violet,
+      this.onTap});
+  final Widget leading;
+  final String chip;
+  final String label;
+  final String headline;
+  final String link;
+  final Color accent;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => ClipPath(
+        clipper: const NotchClipper(radius: 22, notch: 10),
+        child: NGlass(
+          radius: 22,
+          accent: accent,
+          onTap: onTap,
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+          child: Row(children: [
+            SizedBox.square(dimension: 64, child: leading),
+            const SizedBox(width: 12),
+            const SizedBox(height: 64, child: DashedLine(vertical: true)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                NGlass(
+                  radius: NTokens.rPill,
+                  accent: accent,
+                  tint: accent,
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  child: Text(chip.toUpperCase(),
+                      style: TextStyle(
+                          color: Color.lerp(accent, Colors.white, .5), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1)),
+                ),
+                const SizedBox(height: 6),
+                Text(label, style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
+                Text(headline,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                Text('$link >', style: const TextStyle(color: NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700)),
+              ]),
+            ),
+          ]),
         ),
       );
 }
@@ -178,47 +305,69 @@ class _Ready extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final next = data.nextTarget;
+    final tasks = [
+      ('share', 'yoga_deck', 'Share', 'Your link', 'Share your link', 'Share now', actions.onShareCode, NTokens.rare),
+      (
+        'sell',
+        'singing_bowl',
+        'Sell',
+        'Words and plans',
+        'Sell words and plans',
+        'Earn now',
+        () => actions.onTask?.call('sell'),
+        NTokens.epic
+      ),
+      ('team', 'lotus', 'Team', '${data.teamSize} people', 'Grow your team', 'See team', actions.onTeam, NTokens.mint),
+      ('earnings', 'lake', 'Money', 'Your earnings', 'See your money', 'Open', actions.onEarnings, NTokens.legendary),
+    ];
     return ListView(
       key: const Key('earn-ready'),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
       children: [
-        EarnEntrance(index: 0, child: _RankHero(data: data)),
-        const SizedBox(height: 14),
+        EarnEntrance(index: 0, child: _RankHero(data: data, actions: actions)),
+        const SizedBox(height: 22),
+        const _Heading('Your numbers'),
         EarnEntrance(
-            index: 1,
-            child: Row(children: [
-              Expanded(
-                  child: _Stat(label: 'Money you earn', value: data.ratePct > 0 ? data.ratePct : null, suffix: '%', hint: 'of each sale')),
-              const SizedBox(width: 12),
-              Expanded(child: _Stat(label: 'Words sold', value: data.wordsSold, hint: next == null ? 'All targets done' : 'Next: $next')),
-              const SizedBox(width: 12),
-              Expanded(child: _Stat(label: 'Your team', value: data.teamSize, hint: 'people')),
-            ])),
+          index: 1,
+          child: EarnTicket(
+            key: const Key('earn-stats'),
+            accent: NTokens.mint,
+            leading: _NumberCircle(value: data.ratePct > 0 ? data.ratePct : null, suffix: '%'),
+            chip: 'Money you earn',
+            label: 'Your share',
+            headline: 'Of each sale',
+            link: next == null ? 'All targets done' : 'Next: $next',
+            onTap: actions.onEarnings,
+          ),
+        ),
+        const SizedBox(height: 12),
+        EarnEntrance(
+          index: 2,
+          child: Row(children: [
+            Expanded(child: _MiniStat(label: 'Words sold', value: data.wordsSold)),
+            const SizedBox(width: 12),
+            Expanded(child: _MiniStat(label: 'Your team', value: data.teamSize)),
+          ]),
+        ),
         const SizedBox(height: 22),
         const _Heading('Ways to earn'),
-        EarnEntrance(
-            index: 2,
-            child:
-                _Task(id: 'share', icon: Icons.ios_share_rounded, title: 'Share your link', cta: 'Share now', onTap: actions.onShareCode)),
-        EarnEntrance(
-            index: 3,
-            child: _Task(
-                id: 'sell',
-                icon: Icons.auto_awesome_rounded,
-                title: 'Sell words and plans',
-                cta: 'Earn now',
-                onTap: () => actions.onTask?.call('sell'))),
-        EarnEntrance(
-            index: 4,
-            child: _Task(id: 'team', icon: Icons.account_tree_rounded, title: 'Grow your team', cta: 'See team', onTap: actions.onTeam)),
-        EarnEntrance(
-            index: 5,
-            child: _Task(
-                id: 'earnings',
-                icon: Icons.account_balance_wallet_rounded,
-                title: 'See your money',
-                cta: 'Open',
-                onTap: actions.onEarnings)),
+        for (var i = 0; i < tasks.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: EarnEntrance(
+              index: i + 3,
+              child: EarnTicket(
+                key: Key('earn-task-${tasks[i].$1}'),
+                leading: CircleImage(image: NCircles.of(tasks[i].$2), size: 64, ring: tasks[i].$8),
+                chip: tasks[i].$3,
+                label: tasks[i].$4,
+                headline: tasks[i].$5,
+                link: tasks[i].$6,
+                accent: tasks[i].$8,
+                onTap: tasks[i].$7,
+              ),
+            ),
+          ),
         const SizedBox(height: 18),
         const Text(
           'What you earn depends on real sales. Nothing is guaranteed.',
@@ -231,58 +380,77 @@ class _Ready extends StatelessWidget {
   }
 }
 
+class _NumberCircle extends StatelessWidget {
+  const _NumberCircle({required this.value, this.suffix = ''});
+  final int? value;
+  final String suffix;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration:
+            BoxDecoration(shape: BoxShape.circle, border: Border.all(color: NTokens.mint, width: 2), color: const Color(0x22FFFFFF)),
+        alignment: Alignment.center,
+        child: FittedBox(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: value == null ? const Text('—', style: _big) : EarnCountUp(value: value!, suffix: suffix, style: _big),
+          ),
+        ),
+      );
+}
+
+class _MiniStat extends StatelessWidget {
+  const _MiniStat({required this.label, required this.value});
+  final String label;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) => NGlass(
+        radius: NTokens.rCard,
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
+          const SizedBox(height: 4),
+          EarnCountUp(value: value, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+        ]),
+      );
+}
+
+/// Rank hero as the approved meditation card: medal in the round top,
+/// rank title, progress, "How it works" link left, "See team" pill right.
 class _RankHero extends StatelessWidget {
-  const _RankHero({required this.data});
+  const _RankHero({required this.data, required this.actions});
   final EarnViewData data;
+  final EarnActions actions;
 
   @override
   Widget build(BuildContext context) {
     final i = data.rankIndex;
     final next = data.nextTarget;
-    return EarnGlass(
+    return KeyedSubtree(
       key: const Key('earn-rank-hero'),
-      padding: const EdgeInsets.all(20),
-      child: Row(children: [
-        EarnMedal(color: _medals[i]),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('${_medalNames[i]} rank', style: const TextStyle(color: _soft, fontSize: 12, letterSpacing: 1.2)),
-            const SizedBox(height: 2),
-            Text(data.rank.isEmpty ? 'Agent' : data.rank, style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 10),
-            EarnBreathingBar(value: data.targetProgress, color: _medals[i]),
-            const SizedBox(height: 6),
-            Text(next == null ? 'You reached every target' : '${data.wordsToNext} more words to $next',
-                style: const TextStyle(color: _soft, fontSize: 13)),
-          ]),
+      child: EarnMeditationShell(
+        top: Container(
+          width: 140,
+          height: 140,
+          decoration:
+              BoxDecoration(shape: BoxShape.circle, border: Border.all(color: NTokens.border, width: 2), color: const Color(0x1AFFFFFF)),
+          alignment: Alignment.center,
+          child: EarnMedal(color: _medals[i], size: 104),
         ),
-      ]),
-    );
-  }
-}
-
-class _Stat extends StatelessWidget {
-  const _Stat({required this.label, required this.value, this.suffix = '', required this.hint});
-  final String label;
-  final int? value;
-  final String suffix;
-  final String hint;
-
-  @override
-  Widget build(BuildContext context) {
-    return EarnGlass(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _soft, fontSize: 11)),
-        const SizedBox(height: 4),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: value == null ? const Text('—', style: _big) : EarnCountUp(value: value!, suffix: suffix, style: _big),
-        ),
-        Text(hint, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _soft, fontSize: 11)),
-      ]),
+        title: data.rank.isEmpty ? 'Agent' : data.rank,
+        subtitle: '${_medalNames[i]} rank',
+        extra: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          EarnBreathingBar(value: data.targetProgress, color: _medals[i]),
+          const SizedBox(height: 6),
+          Text(next == null ? 'You reached every target' : '${data.wordsToNext} more words to $next',
+              style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
+        ]),
+        secondary: 'How it works',
+        onSecondary: actions.onHelp,
+        cta: 'See team',
+        onCta: actions.onTeam,
+      ),
     );
   }
 }
@@ -294,39 +462,9 @@ class _Heading extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(left: 4, bottom: 10),
-        child: Text(text.toUpperCase(), style: const TextStyle(color: _soft, fontSize: 11, letterSpacing: 2.2)),
+        child: Text(text.toUpperCase(),
+            style: const TextStyle(color: NTokens.mint, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 2.2)),
       );
-}
-
-/// "Free Coins" banner-row style task (spec 15, Earn).
-class _Task extends StatelessWidget {
-  const _Task({required this.id, required this.icon, required this.title, required this.cta, this.onTap});
-  final String id;
-  final IconData icon;
-  final String title;
-  final String cta;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
-        key: Key('earn-task-$id'),
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: EarnGlass(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          child: Row(children: [
-            Icon(icon, color: _ink),
-            const SizedBox(width: 14),
-            Expanded(child: Text(title, style: const TextStyle(color: _ink, fontSize: 15, fontWeight: FontWeight.w600))),
-            Text('$cta ›', style: const TextStyle(color: Color(0xFFB9A4FF), fontWeight: FontWeight.w600)),
-          ]),
-        ),
-      ),
-    );
-  }
 }
 
 /// "How it works" slides for Earn (spec 19.1, wording from the table).
