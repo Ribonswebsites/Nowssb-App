@@ -1,3 +1,4 @@
+import '../../nowssb_ui/app_video_backdrop.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
@@ -34,10 +35,7 @@ class _AuraBackgroundState extends State<AuraBackground> with SingleTickerProvid
   }
 
   @override
-  Widget build(BuildContext context) => CustomPaint(
-        painter: _AuraPainter(_c),
-        child: widget.child,
-      );
+  Widget build(BuildContext context) => NAppBackdrop(child: widget.child);
 }
 
 class _AuraPainter extends CustomPainter {

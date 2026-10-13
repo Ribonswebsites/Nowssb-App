@@ -1,5 +1,6 @@
 // Pills, buttons, chips, badges, countdown, rarity chip, page dots.
 import 'package:flutter/material.dart';
+import '../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 import 'glass_core.dart';
 import 'tokens.dart';
 
@@ -114,11 +115,7 @@ class CoinDot extends StatelessWidget {
   const CoinDot({super.key, this.size = 24});
   final double size;
   @override
-  Widget build(BuildContext context) => Container(width: size, height: size,
-      decoration: BoxDecoration(shape: BoxShape.circle,
-          gradient: const RadialGradient(center: Alignment(-.4, -.4), colors: [Color(0xFFFFF1B8), NTokens.gold, Color(0xFFB7791F)]),
-          boxShadow: [BoxShadow(color: NTokens.gold.withValues(alpha: .6), blurRadius: size / 2)]),
-      child: Icon(Icons.spa_rounded, size: size * .6, color: const Color(0xFF8A5A00)));
+  Widget build(BuildContext context) => NwsbCoinDisc(size: size);
 }
 
 class PageDots extends StatelessWidget {

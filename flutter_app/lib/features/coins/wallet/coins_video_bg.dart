@@ -1,3 +1,4 @@
+import '../../../nowssb_ui/app_video_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -39,16 +40,5 @@ class _CoinsVideoBackgroundState extends State<CoinsVideoBackground> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final c = _c;
-    final ready = c != null && c.value.isInitialized;
-    return Stack(fit: StackFit.expand, children: [
-      const ColoredBox(color: Colors.black),
-      if (!ready) Image.asset(widget.poster, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox()),
-      if (ready)
-        RepaintBoundary(child: FittedBox(fit: BoxFit.cover, clipBehavior: Clip.hardEdge,
-            child: SizedBox(width: c.value.size.width, height: c.value.size.height, child: VideoPlayer(c)))),
-      widget.child,
-    ]);
-  }
+  Widget build(BuildContext context) => NAppBackdrop(child: widget.child);
 }
