@@ -55,7 +55,19 @@ void main() {
     expect(find.text('500'), findsOneWidget);
     expect(find.textContaining('Worth up to \$5.00'), findsOneWidget);
     expect(find.byKey(const Key('coins_expiry')), findsOneWidget);
+    await t.scrollUntilVisible(find.byKey(const Key('coins_boost')), 200);
     expect(find.byKey(const Key('coins_boost')), findsOneWidget);
+    expect(find.text('1 coin = \$0.01 · up to 35% of a price'), findsOneWidget);
+  });
+
+  testWidgets('motion runs and settles when animations are allowed', (t) async {
+    await t.pumpWidget(MaterialApp(home: CoinsWalletPage(source: _Src(() async => _full))));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 700));
+    await t.pump(const Duration(seconds: 2));
+    expect(find.text('500'), findsOneWidget);
+    expect(t.takeException(), isNull);
+    await t.pumpWidget(const SizedBox());
   });
 
   testWidgets('empty state', (t) async {

@@ -3,6 +3,7 @@ import 'dart:io' show SocketException;
 import 'package:flutter/material.dart';
 import 'coins_wallet_data.dart';
 import 'coins_wallet_glass.dart';
+import 'coins_wallet_motion.dart';
 
 const _gold = Color(0xFFE0A526);
 const _violet = Color(0xFFB39DFF);
@@ -21,6 +22,7 @@ enum _Phase { loading, ready, error, offline }
 class _CoinsWalletPageState extends State<CoinsWalletPage> {
   _Phase _phase = _Phase.loading;
   CoinsWalletState? _s;
+  bool _counted = false;
 
   @override
   void initState() {
@@ -61,11 +63,7 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
               onPressed: _s == null ? null : () => _openHistory(context)),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
-            colors: [Color(0xFF2A1F4F), Color(0xFF4B3A8C), Color(0xFF1B1533)])),
-        child: SafeArea(child: _body(context)),
-      ),
+      body: AuraBackground(child: SafeArea(child: _body(context))),
     );
   }
 
@@ -89,15 +87,15 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
       case _Phase.ready:
         final s = _s!;
         return RefreshIndicator(onRefresh: _load, child: ListView(padding: const EdgeInsets.all(16), children: [
-          _hero(s),
+          CalmEntrance(child: BreathingGlow(child: _hero(s))),
           const SizedBox(height: 16),
-          Row(children: [
+          CalmEntrance(index: 1, child: Row(children: [
             Expanded(child: _bigButton('Earn', Icons.add_circle_outline, const Key('coins_earn'), () => _openEarn(context))),
             const SizedBox(width: 10),
             Expanded(child: _bigButton('Use', Icons.shopping_bag_outlined, const Key('coins_use'), () => _openUse(context, s))),
             const SizedBox(width: 10),
             Expanded(child: _bigButton('History', Icons.receipt_long, const Key('coins_history'), () => _openHistory(context))),
-          ]),
+          ])),
           const SizedBox(height: 16),
           if (s.expiringSoon > 0 && s.expiresOn != null) _expiryStrip(s),
           if (s.balance == 0 && s.ledger.isEmpty)
@@ -105,38 +103,52 @@ class _CoinsWalletPageState extends State<CoinsWalletPage> {
                 'No coins yet. Tap Earn: check in today for your first coins.',
                 style: TextStyle(color: Colors.white))),
           const SizedBox(height: 16),
-          CoinsGlass(key: const Key('coins_boost'), radius: 28, accent: _gold, onTap: widget.onOpenBoost,
+          CalmEntrance(index: 3, child: CoinsGlass(key: const Key('coins_boost'), radius: 28, accent: _gold, onTap: widget.onOpenBoost,
             child: const Row(children: [
               Icon(Icons.bolt, color: _gold, size: 32), SizedBox(width: 12),
               Expanded(child: Text('Coin Boost: earn coins faster. Your spend cap stays the same.',
                   style: TextStyle(color: Colors.white))),
               Icon(Icons.chevron_right, color: Colors.white),
-            ])),
+            ]))),
         ]));
     }
   }
 
-  Widget _hero(CoinsWalletState s) => CoinsGlass(radius: 30, blur: 22, accent: _gold, padding: const EdgeInsets.all(24),
+  Widget _hero(CoinsWalletState s) {
+    final reduce = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    return CoinsGlass(radius: 30, blur: 22, accent: _gold, padding: const EdgeInsets.all(24),
         child: Column(children: [
-          const LotusCoin(size: 72),
-          const SizedBox(height: 8),
+          const LotusCoin3D(size: 84),
           TweenAnimationBuilder<int>(
             tween: IntTween(begin: 0, end: s.balance),
-            duration: const Duration(milliseconds: 900),
-            builder: (_, v, __) => Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Text('$v', key: const Key('coins_balance'),
-                  style: const TextStyle(color: Colors.white, fontSize: 44, fontWeight: FontWeight.w700)),
-              IconButton(icon: const Icon(Icons.info_outline, color: Colors.white70, size: 18),
-                  onPressed: () => _info(context, 'Coin balance',
-                      'Coins you can spend now. Example: price \$10, coins cover up to \$3.50, you pay \$6.50.')),
+            duration: reduce ? Duration.zero : const Duration(milliseconds: 1400),
+            curve: Curves.easeOutCubic,
+            onEnd: () => WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted && !_counted) setState(() => _counted = true);
+            }),
+            builder: (_, v, __) => Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
+              SparkleBurst(play: _counted),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('$v', key: const Key('coins_balance'), style: const TextStyle(color: Colors.white, fontSize: 48,
+                    fontWeight: FontWeight.w700, fontFeatures: [FontFeature.tabularFigures()],
+                    shadows: [Shadow(color: Color(0x88E0A526), blurRadius: 18)])),
+                IconButton(icon: const Icon(Icons.info_outline, color: Colors.white70, size: 18),
+                    onPressed: () => _info(context, 'Coin balance',
+                        'Coins you can spend now. Example: price \$10, coins cover up to \$3.50, you pay \$6.50.')),
+              ]),
             ]),
           ),
-          const Text('coins', style: TextStyle(color: Colors.white70)),
+          const Text('coins', style: TextStyle(color: Colors.white70, letterSpacing: 1.2)),
           if (s.worthLabel != null) ...[
             const SizedBox(height: 6),
             Text('Worth up to ${s.worthLabel} off your next purchase', style: const TextStyle(color: Colors.white)),
           ],
+          const SizedBox(height: 10),
+          CoinsGlass(key: const Key('coins_ratio'), radius: 999, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              child: Text('1 coin = ${s.currency}${s.coinValue.toStringAsFixed(2)} · up to ${s.capPercent}% of a price',
+                  style: const TextStyle(color: Colors.white, fontSize: 12))),
         ]));
+  }
 
   Widget _bigButton(String label, IconData icon, Key key, VoidCallback onTap) => CoinsGlass(key: key, radius: 24,
         accent: _violet, onTap: onTap, padding: const EdgeInsets.symmetric(vertical: 18),
@@ -199,7 +211,8 @@ class _UseCalculatorState extends State<_UseCalculator> {
   double _price = 10;
   @override
   Widget build(BuildContext context) {
-    final c = CoinCalc.of(price: _price, balance: widget.state.balance, capPercent: widget.state.capPercent);
+    final c = CoinCalc.of(price: _price, balance: widget.state.balance, capPercent: widget.state.capPercent,
+        coinValue: widget.state.coinValue);
     return Column(key: const Key('coins_use_sheet'), mainAxisSize: MainAxisSize.min, children: [
       Text('Coins can cover up to ${widget.state.capPercent}% of a price',
           style: const TextStyle(color: Colors.white, fontSize: 18)),
@@ -211,7 +224,7 @@ class _UseCalculatorState extends State<_UseCalculator> {
           onChanged: (v) => setState(() => _price = double.tryParse(v) ?? 0))),
       const SizedBox(height: 12),
       CoinsGlass(accent: _gold, child: Text(
-          'Coins you can use: ${c.coinsUsable}, You pay: \$${c.youPay.toStringAsFixed(2)}',
+          'Coins you can use: ${c.coinsUsable}, You pay: ${widget.state.currency}${c.youPay.toStringAsFixed(2)}',
           key: const Key('coins_calc_result'), style: const TextStyle(color: Colors.white))),
       const SizedBox(height: 6),
       const Text('Final price is confirmed at checkout.', style: TextStyle(color: Colors.white54, fontSize: 12)),

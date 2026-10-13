@@ -30,6 +30,8 @@ class CoinsWalletState {
     required this.balance,
     this.worthLabel,
     this.capPercent = 35,
+    this.coinValue = 0.01,
+    this.currency = '\$',
     this.expiringSoon = 0,
     this.expiresOn,
     this.ledger = const [],
@@ -38,6 +40,9 @@ class CoinsWalletState {
   /// "Worth up to X off" string computed by the Worker (localized). Null = unknown.
   final String? worthLabel;
   final int capPercent;
+  /// Fixed redemption ratio: currency value of one coin (Play loyalty rule: show it).
+  final double coinValue;
+  final String currency;
   final int expiringSoon;
   final DateTime? expiresOn;
   final List<LedgerEntry> ledger;

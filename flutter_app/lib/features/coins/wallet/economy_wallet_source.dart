@@ -14,6 +14,8 @@ class EconomyWalletSource implements CoinsWalletSource {
       balance: (m['coins'] is num ? m['coins'] as num : (coins['balance'] as num?) ?? EconomyMirror.instance.coins).toInt(),
       worthLabel: (coins['worthLabel'] ?? m['coinsWorthLabel'])?.toString(),
       capPercent: ((coins['capPercent'] ?? m['coinCapPercent']) as num?)?.toInt() ?? 35,
+      coinValue: ((coins['coinValue'] ?? m['coinValue']) as num?)?.toDouble() ?? 0.01,
+      currency: '${coins['currencySymbol'] ?? m['currencySymbol'] ?? '\$'}',
       expiringSoon: ((coins['expiringSoon'] ?? m['coinsExpiringSoon']) as num?)?.toInt() ?? 0,
       expiresOn: exp is num ? DateTime.fromMillisecondsSinceEpoch(exp.toInt()) : DateTime.tryParse('${exp ?? ''}'),
       ledger: [for (final e in ledger) if (e is Map) LedgerEntry.fromMap(Map<String, dynamic>.from(e))],

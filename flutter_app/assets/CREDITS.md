@@ -34,3 +34,8 @@
 ## Rewards page (newui_rewards)
 - Golden lotus coin over still water with ripples and orbiting sparkles (lib/features/rewards_newui/lotus_coin.dart), aura background, glass tiles, count-up and calm staggered reveal: procedural CustomPainter / Flutter code, original. No Lottie, Rive, image, video or font files added. Icons: Flutter Material Icons (Apache 2.0).
 - Ideas only, nothing copied or bundled: Meditate app's earn-a-mandala reward loop (screensdesign.com showcase), Dribbble "streak reward" search results for layout mood. Researched Oct 13 2026.
+## NowssB Coins wallet (newui_coins)
+- Golden lotus coin, water ripples, floating 3D orbs, breathing glow and sparkle burst are all drawn in code
+  (CustomPainter, `lib/features/coins/wallet/coins_wallet_motion.dart`). No third-party assets bundled.
+- Style references only (nothing copied): Dribbble meditation concepts
+  https://dribbble.com/shots/26945891--Yoga-Meditation-App, https://dribbble.com/shots/23762839-MindHub-Meditation-App-UI-Kit
