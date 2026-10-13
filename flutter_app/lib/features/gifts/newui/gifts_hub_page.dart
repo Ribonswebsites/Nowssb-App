@@ -6,7 +6,11 @@ import 'package:flutter/material.dart';
 import '../../economy/economy_api.dart';
 import '../gift_unwrap.dart';
 import '../gifts_screen.dart';
+import 'package:flutter/services.dart';
+
+import '../../coins/free_coins_page.dart';
 import 'gifts_kit.dart';
+import 'gifts_visuals.dart';
 
 /// What the hub is showing.
 enum GiftsLoad { loading, ready, empty, error, offline }
@@ -24,7 +28,9 @@ class GiftsEntry {
 
 /// Everything the page renders, in one plain value (easy to test).
 class GiftsSnapshot {
-  const GiftsSnapshot({this.load = GiftsLoad.loading, this.entries = const [], this.catalog = const [], this.minutesToday = 0, this.minutesTarget = 0});
+  const GiftsSnapshot(
+      {this.load = GiftsLoad.loading, this.entries = const [], this.catalog = const [], this.minutesToday = 0, this.minutesTarget = 0, this.coins = 0});
+  final int coins;
   final GiftsLoad load;
   final List<GiftsEntry> entries;
   final List<GiftItem> catalog;
@@ -48,6 +54,7 @@ GiftsSnapshot readGiftsSnapshot({Object? error}) {
     catalog: kGiftCatalog,
     minutesToday: (g['minutesToday'] as num?)?.toInt() ?? 0,
     minutesTarget: (g['minutesTarget'] as num?)?.toInt() ?? 0,
+    coins: EconomyMirror.instance.coins,
   );
 }
 
@@ -105,6 +112,7 @@ class _GiftsNewUiPageState extends State<GiftsNewUiPage> {
         onBuy: (id) => showGiftCardSheet(context, id),
         onRedeem: _redeem,
         initialTab: widget.initialTab,
+        onCoins: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FreeCoinsPage())),
       );
 }
 
@@ -112,7 +120,15 @@ class _GiftsNewUiPageState extends State<GiftsNewUiPage> {
 /// free-gifts progress, occasion rails and My gifts. Pure view.
 class GiftsHubView extends StatelessWidget {
   const GiftsHubView(
-      {super.key, required this.snapshot, required this.onRetry, required this.onBuy, required this.onRedeem, this.initialTab, this.animate = true});
+      {super.key,
+      required this.snapshot,
+      required this.onRetry,
+      required this.onBuy,
+      required this.onRedeem,
+      this.initialTab,
+      this.animate = true,
+      this.onCoins});
+  final VoidCallback? onCoins;
   final GiftsSnapshot snapshot;
   final VoidCallback onRetry;
   final void Function(String cardId) onBuy;
@@ -137,11 +153,20 @@ class GiftsHubView extends StatelessWidget {
         elevation: 0,
         title: const Text('NowssB Gifts'),
         actions: [
+          if (snapshot.load == GiftsLoad.ready || snapshot.load == GiftsLoad.empty) Center(child: GiftsCoinChip(coins: snapshot.coins, onTap: onCoins)),
           IconButton(tooltip: 'How gifts work', icon: const Icon(Icons.help_outline_rounded), onPressed: () => _showHelp(context)),
         ],
       ),
       extendBodyBehindAppBar: true,
-      body: GiftsBackdrop(child: SafeArea(child: _body(context))),
+      body: GiftsBackdrop(
+        child: SafeArea(
+          child: _AutoOpen(
+            open: initialTab == 'redeem' && snapshot.load == GiftsLoad.ready,
+            onOpen: _showRedeem,
+            child: _body(context),
+          ),
+        ),
+      ),
     );
   }
 
@@ -178,14 +203,17 @@ class GiftsHubView extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
           children: [
-            _hero(context),
+            GiftsReveal(index: 0, animate: animate, child: _hero(context)),
             const SizedBox(height: 18),
-            _shortcuts(context),
+            GiftsReveal(index: 1, animate: animate, child: _shortcuts(context)),
             const SizedBox(height: 18),
-            if (snapshot.minutesTarget > 0) ...[_freeProgress(), const SizedBox(height: 18)],
-            for (final o in occasions) ...[_occasionRail(context, o.$1, o.$2), const SizedBox(height: 14)],
+            if (snapshot.minutesTarget > 0) ...[GiftsReveal(index: 2, animate: animate, child: _freeProgress()), const SizedBox(height: 18)],
+            for (final (i, o) in occasions.indexed) ...[
+              GiftsReveal(index: 3 + i, animate: animate, child: _occasionRail(context, o.$1, o.$2)),
+              const SizedBox(height: 14)
+            ],
             const SizedBox(height: 4),
-            _myGiftsPreview(context),
+            GiftsReveal(index: 7, animate: animate, child: _myGiftsPreview(context)),
           ],
         );
     }
@@ -194,10 +222,7 @@ class GiftsHubView extends StatelessWidget {
   Widget _hero(BuildContext context) => GiftsGlass(
         padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
         child: Row(children: [
-          GiftsBreathingGlow(
-            animate: animate,
-            child: const SizedBox(width: 92, height: 92, child: Icon(Icons.card_giftcard_rounded, color: GiftsPalette.pink, size: 64)),
-          ),
+          GiftsHeroScene(size: 96, animate: animate),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -207,7 +232,10 @@ class GiftsHubView extends StatelessWidget {
               const SizedBox(height: 12),
               FilledButton.icon(
                 key: const Key('gifts.send'),
-                onPressed: () => _showBuy(context),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  _showBuy(context);
+                },
                 icon: const Icon(Icons.send_rounded, size: 18),
                 label: const Text('Send gift'),
                 style: FilledButton.styleFrom(backgroundColor: GiftsPalette.pink, foregroundColor: GiftsPalette.bgBottom),
@@ -462,4 +490,41 @@ class _GiftsRedeemSheetState extends State<GiftsRedeemSheet> {
           ]),
         ),
       );
+}
+
+/// Opens a sheet once (deep link to Redeem), after the first frame.
+class _AutoOpen extends StatefulWidget {
+  const _AutoOpen({required this.open, required this.onOpen, required this.child});
+  final bool open;
+  final Future<void> Function(BuildContext) onOpen;
+  final Widget child;
+  @override
+  State<_AutoOpen> createState() => _AutoOpenState();
+}
+
+class _AutoOpenState extends State<_AutoOpen> {
+  bool _done = false;
+
+  void _maybe() {
+    if (_done || !widget.open) return;
+    _done = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onOpen(context);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _maybe();
+  }
+
+  @override
+  void didUpdateWidget(_AutoOpen old) {
+    super.didUpdateWidget(old);
+    _maybe();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
 }

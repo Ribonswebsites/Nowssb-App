@@ -3,16 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/features/gifts/gifts_screen.dart';
 import 'package:nowssb/features/gifts/newui/gifts_flag.dart';
 import 'package:nowssb/features/gifts/newui/gifts_hub_page.dart';
+import 'package:nowssb/features/gifts/newui/gifts_visuals.dart';
 
 const _catalog = [GiftItem('word', 'Word card', 99), GiftItem('basic7', '7-day Basic', 79)];
 
-Widget _app(GiftsSnapshot s, {VoidCallback? retry, void Function(String)? buy, GiftsRedeem? redeem}) => MaterialApp(
+Widget _app(GiftsSnapshot s, {VoidCallback? retry, void Function(String)? buy, GiftsRedeem? redeem, String? tab, VoidCallback? coins}) => MaterialApp(
       home: GiftsHubView(
         snapshot: s,
         animate: false,
         onRetry: retry ?? () {},
         onBuy: buy ?? (_) {},
         onRedeem: redeem ?? (c) async => 'Word card',
+        initialTab: tab,
+        onCoins: coins,
       ),
     );
 
@@ -88,5 +91,25 @@ void main() {
     await t.tap(find.text('Expired'));
     await t.pumpAndSettle();
     expect(find.text('Old'), findsOneWidget);
+  });
+
+  testWidgets('coin chip shows balance and opens coins', (t) async {
+    var n = 0;
+    await t.pumpWidget(_app(const GiftsSnapshot(load: GiftsLoad.ready, catalog: _catalog, coins: 120), coins: () => n++));
+    expect(find.text('120'), findsOneWidget);
+    await t.tap(find.byKey(const Key('gifts.coins')));
+    expect(n, 1);
+  });
+
+  testWidgets('redeem deep link opens the redeem sheet', (t) async {
+    await t.pumpWidget(_app(const GiftsSnapshot(load: GiftsLoad.ready, catalog: _catalog), tab: 'redeem'));
+    await t.pumpAndSettle();
+    expect(find.byKey(const Key('gifts.code')), findsOneWidget);
+  });
+
+  testWidgets('hero scene animates without errors', (t) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: GiftsHeroScene(animate: true))));
+    await t.pump(const Duration(seconds: 3));
+    expect(find.byType(GiftsHeroScene), findsOneWidget);
   });
 }
