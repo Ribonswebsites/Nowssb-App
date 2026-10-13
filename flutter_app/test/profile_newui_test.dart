@@ -18,7 +18,7 @@ class _Src implements ProfileSource {
 const _full = ProfileData(name: 'Ribon', signedIn: true, streak: 5, minutes: 42, sessions: 9, level: 3, week: [true, true, false, false, false, false, false]);
 
 Widget _app(ProfileSource s, {ProfileNav? nav}) => MaterialApp(
-      home: NewProfilePage(source: s, animate: false, onNavigate: nav ?? (_, __) {}),
+      home: NewProfilePage(source: s, animate: false, backdrop: const ColoredBox(color: Colors.black), onNavigate: nav ?? (_, __) {}),
     );
 
 void main() {
@@ -36,7 +36,7 @@ void main() {
     expect(find.byKey(const Key('profile-loading')), findsOneWidget);
     await t.pump(const Duration(milliseconds: 60));
     await t.pump();
-    expect(find.byKey(const Key('profile-name')), findsOneWidget);
+    expect(find.byKey(const Key('profile-hero')), findsOneWidget);
     expect(find.text('Ribon'), findsOneWidget);
     expect(find.text('5'), findsOneWidget);
     expect(find.text('42'), findsOneWidget);

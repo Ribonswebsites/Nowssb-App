@@ -11,6 +11,11 @@ import 'package:nowssb/pages/profile/new_profile_page.dart';
 import 'package:nowssb/pages/profile/profile_data.dart';
 
 final _out = Platform.environment['PROFILE_SHOTS'];
+// Stand-in for the app's original background video: its first frame,
+// extracted with `ffmpeg -i assets/video/fashion-plus-bg-6.mp4 -frames:v 1`.
+final _bgPath = Platform.environment['PROFILE_BG'] ?? '/tmp/profile_bg_frame.png';
+final _bgImage = FileImage(File(_bgPath));
+Widget _bg() => File(_bgPath).existsSync() ? Image(image: _bgImage, fit: BoxFit.cover) : const ColoredBox(color: Colors.black);
 const _fonts = '/workspace/flutter/bin/cache/artifacts/material_fonts';
 
 class _Src implements ProfileSource {
@@ -40,10 +45,10 @@ Future<void> _shot(WidgetTester t, ProfileSource s, String file, {double scroll 
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Roboto', brightness: Brightness.dark),
-      home: NewProfilePage(source: s, animate: false, onNavigate: (_, __) {}),
+      home: NewProfilePage(source: s, animate: false, onNavigate: (_, __) {}, backdrop: _bg()),
     ),
   ));
-  await t.pump();
+    await t.pump();
   await t.pump();
   if (scroll > 0) {
     await t.drag(find.byType(ListView), Offset(0, -scroll));
