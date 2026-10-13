@@ -55,6 +55,9 @@ Future<void> _shot(WidgetTester t, String name, GlassMenuSettingsPage page, {Str
     theme: ThemeData.dark().copyWith(textTheme: ThemeData.dark().textTheme.apply(fontFamily: 'Roboto')),
     home: RepaintBoundary(key: const ValueKey('shot'), child: page),
   ));
+  await t.runAsync(() async {
+    await precacheImage(const AssetImage('assets/fashion/fp-intro.webp'), t.element(find.byType(Scaffold)));
+  });
   await t.pump();
   await t.pump(const Duration(milliseconds: 100));
   if (search != null) {
@@ -64,11 +67,14 @@ Future<void> _shot(WidgetTester t, String name, GlassMenuSettingsPage page, {Str
   await expectLater(find.byKey(const ValueKey('shot')), matchesGoldenFile('goldens/menu_settings/$name.png'));
 }
 
+// Goldens can't play video: use the Fashion Plus poster still instead.
+const Widget _poster = Image(image: AssetImage('assets/fashion/fp-intro.webp'), fit: BoxFit.cover);
+
 void main() {
-  testWidgets('1 main', (t) => _shot(t, 'menu-settings-1', GlassMenuSettingsPage(reduceEffects: true, displayName: 'Ribon', load: () async => _s())));
-  testWidgets('2 search', (t) => _shot(t, 'menu-settings-2', GlassMenuSettingsPage(reduceEffects: true, load: () async => _s()), search: 'scr'));
-  testWidgets('3 admin', (t) => _shot(t, 'menu-settings-3', GlassMenuSettingsPage(reduceEffects: true, displayName: 'Admin', load: () async => _s(admin: true))));
-  testWidgets('4 offline', (t) => _shot(t, 'menu-settings-4', GlassMenuSettingsPage(reduceEffects: true, isOnline: () async => false, load: () async => _s())));
-  testWidgets('5 error', (t) => _shot(t, 'menu-settings-5', GlassMenuSettingsPage(reduceEffects: true, load: () async => throw Exception('x'))));
-  testWidgets('6 no results', (t) => _shot(t, 'menu-settings-6', GlassMenuSettingsPage(reduceEffects: true, load: () async => _s()), search: 'zzz'));
+  testWidgets('1 main', (t) => _shot(t, 'menu-settings-1', GlassMenuSettingsPage(background: _poster, reduceEffects: false, displayName: 'Ribon', load: () async => _s())));
+  testWidgets('2 search', (t) => _shot(t, 'menu-settings-2', GlassMenuSettingsPage(background: _poster, reduceEffects: false, load: () async => _s()), search: 'scr'));
+  testWidgets('3 admin', (t) => _shot(t, 'menu-settings-3', GlassMenuSettingsPage(background: _poster, reduceEffects: false, displayName: 'Admin', load: () async => _s(admin: true))));
+  testWidgets('4 offline', (t) => _shot(t, 'menu-settings-4', GlassMenuSettingsPage(background: _poster, reduceEffects: false, isOnline: () async => false, load: () async => _s())));
+  testWidgets('5 error', (t) => _shot(t, 'menu-settings-5', GlassMenuSettingsPage(background: _poster, reduceEffects: false, load: () async => throw Exception('x'))));
+  testWidgets('6 no results', (t) => _shot(t, 'menu-settings-6', GlassMenuSettingsPage(background: _poster, reduceEffects: false, load: () async => _s()), search: 'zzz'));
 }
