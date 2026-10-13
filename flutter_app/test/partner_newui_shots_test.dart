@@ -47,6 +47,9 @@ const _empty = PartnerData(
   buyerDiscountUsdCents: 0,
 );
 
+/// Poster frame of the app's default background video (Settings index 1).
+const _poster = AssetImage('assets/video/fashion-plus-bg-6-poster.webp');
+
 const _fonts = '/workspace/flutter/bin/cache/artifacts/material_fonts';
 
 Future<void> _loadFonts() async {
@@ -82,7 +85,12 @@ Widget _app(PartnerRepository r) => RepaintBoundary(
           child: MediaQuery(
             data:
                 const MediaQueryData(size: Size(390, 844), disableAnimations: true, padding: EdgeInsets.only(top: 47)),
-            child: PartnerHomePage(repository: r, countryCode: 'DE', onOpenEarnings: () {}),
+            child: PartnerHomePage(
+              repository: r,
+              countryCode: 'DE',
+              onOpenEarnings: () {},
+              background: const Image(image: _poster, fit: BoxFit.cover),
+            ),
           ),
         ),
       ),
@@ -96,6 +104,13 @@ void main() {
     await t.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => t.binding.setSurfaceSize(null));
     await t.pumpWidget(_app(r));
+    await t.runAsync(() async {
+      for (final e in t.allElements.toList()) {
+        if (e.widget is Image) await precacheImage((e.widget as Image).image, e);
+      }
+    });
+    await t.pumpAndSettle();
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 300)));
     await t.pumpAndSettle();
     if (scrollTo > 0) {
       await t.drag(find.byKey(const Key('partner-hub')), Offset(0, -scrollTo));
