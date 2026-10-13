@@ -1,0 +1,213 @@
+// Core: NGlass (blur/lite), GlassVideoScaffold, FloatingShapes.
+// Builds on existing GlassWrap + NwsbEffects + NwsbMotion in package:nowssb.
+import 'dart:math' as math;
+import 'dart:ui';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:video_player/video_player.dart';
+import 'package:nowssb/theme/liquid_glass_theme.dart' show NwsbEffects;
+import 'package:nowssb/widgets/motion.dart' show NwsbMotion;
+import 'tokens.dart';
+
+/// The ONE glass wrapper (spec §0.5). blur > 0 => BackdropFilter (large
+/// surfaces only); blur == 0 => lite mode. Auto-falls back to lite when
+/// NwsbEffects.instance.reduced is true.
+class NGlass extends StatefulWidget {
+  const NGlass({
+    super.key, required this.child, this.radius = NTokens.rCard,
+    this.accent = NTokens.violet, this.blur = 0, this.elevation = 1,
+    this.padding = const EdgeInsets.all(16), this.onTap, this.tint,
+  });
+  final Widget child;
+  final double radius, blur, elevation;
+  final Color accent;
+  final Color? tint;
+  final EdgeInsets padding;
+  final VoidCallback? onTap;
+  @override
+  State<NGlass> createState() => _NGlassState();
+}
+
+class _NGlassState extends State<NGlass> {
+  bool _down = false;
+  @override
+  Widget build(BuildContext context) {
+    final reduced = NwsbEffects.instance.reduced;
+    final useBlur = widget.blur > 0 && !reduced;
+    final r = BorderRadius.circular(widget.radius);
+    final top = useBlur ? NTokens.glassTop : NTokens.glassLiteTop;
+    final bot = useBlur ? NTokens.glassBottom : NTokens.glassLiteBottom;
+    Widget body = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: r,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: [Color.alphaBlend((widget.tint ?? widget.accent).withValues(alpha: .12), top), bot],
+        ),
+        border: Border.all(color: NTokens.border, width: 1),
+      ),
+      child: Stack(children: [
+        // inner top highlight
+        const Positioned(left: 12, right: 12, top: 0, height: 1.2,
+          child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [
+            Colors.transparent, NTokens.highlight, Colors.transparent])))),
+        Padding(padding: widget.padding, child: widget.child),
+      ]),
+    );
+    if (useBlur) {
+      body = RepaintBoundary(child: ClipRRect(borderRadius: r, child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: widget.blur, sigmaY: widget.blur), child: body)));
+    } else {
+      body = ClipRRect(borderRadius: r, child: body);
+    }
+    body = DecoratedBox(
+      decoration: BoxDecoration(borderRadius: r, boxShadow: NTokens.glow(widget.accent, widget.elevation)),
+      child: body);
+    if (widget.onTap == null) return body;
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _down = true),
+      onTapCancel: () => setState(() => _down = false),
+      onTapUp: (_) { setState(() => _down = false); HapticFeedback.selectionClick(); widget.onTap!(); },
+      child: AnimatedScale(scale: _down ? NTokens.press : 1, duration: const Duration(milliseconds: 120),
+        curve: NwsbMotion.curve, child: body),
+    );
+  }
+}
+
+/// Every screen: background video (or gradient fallback) + glow orbs +
+/// floating 3D shapes + glass content. Uses video_player directly with a
+/// configurable asset; swap to VideoPool.instance.lease(...) to share the
+/// app's pooled controllers (lib/media/video_pool.dart).
+class GlassVideoScaffold extends StatefulWidget {
+  const GlassVideoScaffold({
+    super.key, required this.body, this.appBar, this.bottomBar,
+    this.videoAsset = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4',
+    this.posterAsset, this.shapes = true, this.dim = .35,
+  });
+  final Widget body;
+  final PreferredSizeWidget? appBar;
+  final Widget? bottomBar;
+  final String? videoAsset, posterAsset;
+  final bool shapes;
+  final double dim;
+  @override
+  State<GlassVideoScaffold> createState() => _GlassVideoScaffoldState();
+}
+
+class _GlassVideoScaffoldState extends State<GlassVideoScaffold> {
+  VideoPlayerController? _c;
+  @override
+  void initState() {
+    super.initState();
+    final a = widget.videoAsset;
+    if (a != null && !NwsbEffects.instance.reduced) {
+      _c = VideoPlayerController.asset(a, videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true))
+        ..setLooping(true)..setVolume(0)
+        ..initialize().then((_) { if (mounted) { setState(() {}); _c!.play(); } });
+    }
+  }
+  @override
+  void dispose() { _c?.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = _c;
+    return Scaffold(
+      backgroundColor: NTokens.bgBottom,
+      extendBodyBehindAppBar: true,
+      extendBody: true,
+      appBar: widget.appBar,
+      bottomNavigationBar: widget.bottomBar,
+      body: Stack(fit: StackFit.expand, children: [
+        const DecoratedBox(decoration: BoxDecoration(gradient: NTokens.bgGradient)),
+        if (widget.posterAsset != null && (c == null || !c.value.isInitialized))
+          Image.asset(widget.posterAsset!, fit: BoxFit.cover),
+        if (c != null && c.value.isInitialized)
+          RepaintBoundary(child: FittedBox(fit: BoxFit.cover, child: SizedBox(
+            width: c.value.size.width, height: c.value.size.height, child: VideoPlayer(c)))),
+        ColoredBox(color: NTokens.bgBottom.withValues(alpha: widget.dim)),
+        const _GlowOrbs(),
+        if (widget.shapes) const IgnorePointer(child: FloatingShapes()),
+        SafeArea(bottom: false, child: widget.body),
+      ]),
+    );
+  }
+}
+
+class _GlowOrbs extends StatelessWidget {
+  const _GlowOrbs();
+  @override
+  Widget build(BuildContext context) => IgnorePointer(child: Stack(children: [
+        _orb(const Alignment(-1.1, -0.8), NTokens.violet, 320),
+        _orb(const Alignment(1.2, 0.1), NTokens.pink, 260),
+        _orb(const Alignment(-0.6, 1.1), const Color(0xFF3B82F6), 300),
+      ]));
+  Widget _orb(Alignment a, Color c, double s) => Align(alignment: a, child: Container(
+      width: s, height: s, decoration: BoxDecoration(shape: BoxShape.circle,
+      gradient: RadialGradient(colors: [c.withValues(alpha: .45), c.withValues(alpha: 0)]))));
+}
+
+/// Floating 3D torus (pink) + capsule pills (mint), slow drift (8s loop).
+class FloatingShapes extends StatefulWidget {
+  const FloatingShapes({super.key, this.items = FloatingShapes.defaults});
+  final List<ShapeSpec> items;
+  static const defaults = [
+    ShapeSpec.torus(Alignment(-1.05, -0.15), 120, NTokens.pink),
+    ShapeSpec.capsule(Alignment(-0.55, -0.72), 44, NTokens.mint),
+    ShapeSpec.capsule(Alignment(0.92, 0.55), 52, NTokens.mint),
+    ShapeSpec.torus(Alignment(0.95, -0.85), 70, NTokens.pink),
+  ];
+  @override
+  State<FloatingShapes> createState() => _FloatingShapesState();
+}
+
+class ShapeSpec {
+  const ShapeSpec.torus(this.at, this.size, this.color) : torus = true;
+  const ShapeSpec.capsule(this.at, this.size, this.color) : torus = false;
+  final Alignment at; final double size; final Color color; final bool torus;
+}
+
+class _FloatingShapesState extends State<FloatingShapes> with SingleTickerProviderStateMixin {
+  late final AnimationController _a = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat();
+  @override
+  void dispose() { _a.dispose(); super.dispose(); }
+  @override
+  Widget build(BuildContext context) {
+    if (NwsbEffects.instance.reduced) return _layer(0);
+    return AnimatedBuilder(animation: _a, builder: (_, __) => _layer(_a.value));
+  }
+  Widget _layer(double t) => Stack(children: [
+        for (var i = 0; i < widget.items.length; i++)
+          Align(alignment: widget.items[i].at, child: Transform.translate(
+            offset: Offset(0, math.sin((t + i * .25) * 2 * math.pi) * 8),
+            child: Transform.rotate(angle: math.sin((t + i * .3) * 2 * math.pi) * .12,
+              child: CustomPaint(size: Size.square(widget.items[i].size),
+                painter: _ShapePainter(widget.items[i]))))),
+      ]);
+}
+
+class _ShapePainter extends CustomPainter {
+  _ShapePainter(this.s);
+  final ShapeSpec s;
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = s.color;
+    if (s.torus) {
+      final rect = Rect.fromCenter(center: size.center(Offset.zero), width: size.width, height: size.height * .62);
+      final stroke = size.width * .14;
+      final p = Paint()..style = PaintingStyle.stroke..strokeWidth = stroke
+        ..shader = LinearGradient(colors: [Color.lerp(c, Colors.white, .45)!, c, Color.lerp(c, Colors.black, .35)!],
+            begin: Alignment.topLeft, end: Alignment.bottomRight).createShader(rect);
+      canvas.drawOval(rect.deflate(stroke / 2), p);
+      canvas.drawOval(rect.deflate(stroke / 2).translate(0, -stroke * .18),
+          Paint()..style = PaintingStyle.stroke..strokeWidth = stroke * .22..color = Colors.white.withValues(alpha: .35));
+    } else {
+      final rect = Rect.fromLTWH(0, size.height * .2, size.width, size.height * .6);
+      final rr = RRect.fromRectAndRadius(rect, Radius.circular(rect.height / 2));
+      canvas.drawRRect(rr, Paint()..shader = RadialGradient(center: const Alignment(-.4, -.5),
+          colors: [Color.lerp(c, Colors.white, .5)!, c, Color.lerp(c, Colors.black, .3)!]).createShader(rect));
+    }
+  }
+  @override
+  bool shouldRepaint(covariant _ShapePainter o) => false;
+}
