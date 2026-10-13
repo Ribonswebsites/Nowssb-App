@@ -18,6 +18,8 @@ import '../../widgets/glass_black_card.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'request_words.dart';
+import '../../pages/signature_words/signature_flag.dart';
+import '../../pages/signature_words/signature_words_page.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
 import 'store_routes.dart';

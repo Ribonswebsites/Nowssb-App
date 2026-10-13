@@ -16,3 +16,6 @@
 - Glass gift box hero (isometric 3D-style box, ribbon, bow, drifting petals, floor shadow), breathing glow, floating orbs, glass tiles, staggered reveals and coin chip: procedural CustomPainter / Flutter widgets, written for NowssB. No new third-party files.
 - Reuses `assets/gifts/sparkle_stars_loop_gold.json` (credited above, Lottie Simple License, free commercial use) faintly behind the hero box.
 - Ideas only, no art copied: Meditate app's earn-a-mandala reward loop (screensdesign.com, 60fps.design) and glass-card / particle styling seen in Flow - Mindfulness (App Store). Lottie Simple License checked at https://lottiefiles.com/page/license on Oct 13 2026.
+
+## Signature Words (newui_signature)
+- Golden mandala loop: procedural CustomPainter (lib/pages/signature_words/mandala_painter.dart), original code, no third-party assets.
