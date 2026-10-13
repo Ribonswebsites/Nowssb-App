@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/store_catalog.dart';
-import 'package:nowssb/features/ebooks/newui/ebooks_flag.dart';
+import 'package:nowssb/kit/kit.dart';
 import 'package:nowssb/features/ebooks/newui/ebooks_page.dart';
 import 'package:nowssb/features/ebooks/newui/ebooks_source.dart';
 
@@ -129,8 +129,13 @@ void main() {
     expect(find.text('Read anywhere'), findsNothing);
   });
 
-  test('flag override', () {
-    expect(newUiEbooksEnabled(override: true), isTrue);
-    expect(newUiEbooksEnabled(override: false), isFalse);
+  test('newui_ebooks: off for users, on for admins, remote switch wins', () {
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
+  });
+
+  test('storeEbooks route uses the ebooks flag', () {
+    expect(AppRoutes.byScreenId('store.ebooks')?.flag, 'ebooks');
   });
 }
