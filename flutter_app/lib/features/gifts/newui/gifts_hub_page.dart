@@ -139,20 +139,14 @@ class GiftsHubView extends StatelessWidget {
   final String? initialTab;
   final bool animate;
 
-  static const occasions = <(String, Color)>[
-    ('Birthday', GiftsPalette.pink),
-    ('Calm', GiftsPalette.violet),
-    ('Study', GiftsPalette.teal),
-    ('Thank you', GiftsPalette.amber)
-  ];
-
   @override
   Widget build(BuildContext context) {
     return GiftsPageShell(
       title: 'NowssB Gifts',
       backdrop: animate,
       actions: [
-        if (snapshot.load == GiftsLoad.ready || snapshot.load == GiftsLoad.empty) GiftsCoinPill(coins: snapshot.coins, onTap: onCoins),
+        if (snapshot.load == GiftsLoad.ready || snapshot.load == GiftsLoad.empty)
+          CoinChip(key: const Key('gifts.coins'), balance: '${snapshot.coins}', onTap: onCoins),
         IconButton(tooltip: 'How gifts work', icon: const Icon(Icons.help_outline_rounded, color: Colors.white), onPressed: () => _showHelp(context)),
       ],
       body: Builder(
@@ -193,38 +187,34 @@ class GiftsHubView extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 48),
           children: [
-            _hero(context),
-            const SizedBox(height: 18),
+            _HowItWorks(onSend: () => _showBuy(context)),
+            const SizedBox(height: 14),
             GiftsReveal(index: 1, animate: animate, child: _shortcuts(context)),
             const SizedBox(height: 18),
             if (snapshot.minutesTarget > 0) ...[GiftsReveal(index: 2, animate: animate, child: _freeProgress()), const SizedBox(height: 18)],
-            for (final (i, o) in occasions.indexed) ...[
-              GiftsReveal(index: 3 + i, animate: animate, child: _occasionRail(context, o.$1, o.$2)),
-              const SizedBox(height: 14)
+            const GiftsSectionLabel('Gift cards'),
+            for (final (i, g) in snapshot.catalog.indexed) ...[
+              GiftsReveal(
+                index: 3 + i,
+                animate: animate,
+                child: GiftTicketCard(
+                  image: NCircles.at(i),
+                  status: 'Gift',
+                  statusColor: NTokens.rare,
+                  label: 'Price shown in your currency at checkout',
+                  headline: g.label,
+                  link: 'Send gift >',
+                  onTap: () => onBuy(g.id),
+                ),
+              ),
+              const SizedBox(height: 12),
             ],
-            const SizedBox(height: 4),
-            GiftsReveal(index: 7, animate: animate, child: _myGiftsPreview(context)),
+            const SizedBox(height: 6),
+            GiftsReveal(index: 9, animate: animate, child: _myGiftsPreview(context)),
           ],
         );
     }
   }
-
-  Widget _hero(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const _HowItWorks(),
-        const SizedBox(height: 14),
-        Center(
-          child: GiftsPill(
-            key: const Key('gifts.send'),
-            label: 'Send gift',
-            primary: true,
-            icon: Icons.send_rounded,
-            onTap: () {
-              HapticFeedback.lightImpact();
-              _showBuy(context);
-            },
-          ),
-        ),
-      ]);
 
   Widget _shortcuts(BuildContext context) => GiftsShortcuts(
         items: const [
@@ -256,32 +246,6 @@ class GiftsHubView extends StatelessWidget {
             key: const Key('gifts.free'), style: const TextStyle(color: GiftsPalette.soft, fontSize: 12)),
       ]),
     );
-  }
-
-  Widget _occasionRail(BuildContext context, String name, Color color) {
-    final items = snapshot.catalog;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(name, style: const TextStyle(color: GiftsPalette.text, fontSize: 16, fontWeight: FontWeight.w700)),
-      const SizedBox(height: 8),
-      SizedBox(
-        height: 160,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: items.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 10),
-          itemBuilder: (_, i) => SizedBox(
-            width: 140,
-            child: GiftsCardTile(
-                photo: i,
-                title: items[i].label,
-                caption: 'Price shown in your currency at checkout',
-                color: color,
-                footer: 'Send gift',
-                onTap: () => onBuy(items[i].id)),
-          ),
-        ),
-      ),
-    ]);
   }
 
   Widget _myGiftsPreview(BuildContext context) {
@@ -408,21 +372,22 @@ class GiftsMineView extends StatelessWidget {
                             padding: EdgeInsets.all(24),
                             child:
                                 GiftsStateCard(icon: Icons.redeem_rounded, title: 'Nothing here yet.', message: 'Gifts show here when you send or get one.')))
-                    : GridView.count(
+                    : ListView(
                         padding: const EdgeInsets.all(16),
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 12,
-                        childAspectRatio: .9,
                         children: [
-                          for (final e in t.$2)
-                            GiftsCardTile(
-                              photo: t.$2.indexOf(e),
-                              title: e.title,
-                              caption: e.note.isEmpty ? (e.direction == 'sent' ? 'You sent this' : 'A gift for you') : e.note,
-                              footer: e.status == 'redeemed' ? 'Opened' : (e.expired ? '' : 'Not opened'),
+                          for (final (i, e) in t.$2.indexed) ...[
+                            GiftTicketCard(
+                              image: NCircles.at(i + 3),
+                              status: e.expired ? 'Expired' : (e.direction == 'sent' ? 'Sent' : 'Received'),
+                              statusColor: e.direction == 'sent' ? NTokens.epic : NTokens.rare,
+                              isNew: e.direction == 'received' && e.status == 'active',
+                              label: e.note.isEmpty ? (e.direction == 'sent' ? 'You sent this' : 'A gift for you') : e.note,
+                              headline: e.title,
+                              link: e.status == 'redeemed' ? 'Opened' : (e.expired ? 'Expired' : 'Not opened yet'),
                               expired: e.expired,
                             ),
+                            const SizedBox(height: 12),
+                          ],
                         ],
                       ),
             ]),
@@ -487,7 +452,7 @@ class _GiftsRedeemSheetState extends State<GiftsRedeemSheet> {
             FilledButton(
               key: const Key('gifts.redeem'),
               onPressed: _busy ? null : _go,
-              style: FilledButton.styleFrom(backgroundColor: GiftsPalette.cta, foregroundColor: Colors.white, shape: const StadiumBorder()),
+              style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: GiftsPalette.ink, shape: const StadiumBorder()),
               child: Text(_busy ? 'Opening…' : 'Open gift'),
             ),
             if (_msg != null)
@@ -544,35 +509,57 @@ class _SheetBody extends StatelessWidget {
   Widget build(BuildContext context) => child;
 }
 
-/// "How gifts work" in the reference card: circle photo, inner panel,
-/// Skip / Next, page dots. Photos are the app's existing circle images.
+/// "How gifts work" as the approved meditation-card carousel (kit
+/// MeditationCard, neighbour peeking). Photos are existing circle images.
 class _HowItWorks extends StatefulWidget {
-  const _HowItWorks();
+  const _HowItWorks({required this.onSend});
+  final VoidCallback onSend;
   @override
   State<_HowItWorks> createState() => _HowItWorksState();
 }
 
 class _HowItWorksState extends State<_HowItWorks> {
-  int _i = 0;
+  final _pc = PageController(viewportFraction: .84);
   static const _steps = [
-    ('singing_bowl', 'Send a calm moment', 'Pick a gift for someone you care about. Words, bundles, e-books or a few calm days.'),
+    ('singing_bowl', 'Send a calm moment', 'Pick a gift for someone you care about.'),
     ('lotus', 'Add a message', 'Write a short note. It opens with the gift.'),
-    ('lake', 'Send the link', 'Pay with Google Play in your currency. Share the link any way you like.'),
-    ('sea_face', 'They open it', 'They tap the link and the gift unwraps. You see it in My gifts.'),
+    ('lake', 'Send the link', 'Pay with Google Play in your currency.'),
+    ('sea_face', 'They open it', 'They tap the link and the gift unwraps.'),
   ];
 
   @override
-  Widget build(BuildContext context) {
-    final s = _steps[_i];
-    return GiftsRefCard(
-      image: NCircles.of(s.$1),
-      title: s.$2,
-      body: s.$3,
-      index: _i,
-      count: _steps.length,
-      onSkip: () => setState(() => _i = _steps.length - 1),
-      onNext: () => setState(() => _i = (_i + 1) % _steps.length),
-      cta: 'Start again',
-    );
+  void dispose() {
+    _pc.dispose();
+    super.dispose();
   }
+
+  void _go(int i) => _pc.animateToPage(i, duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 420,
+        child: PageView.builder(
+          key: const Key('gifts.how'),
+          controller: _pc,
+          padEnds: false,
+          itemCount: _steps.length,
+          itemBuilder: (_, i) {
+            final s = _steps[i];
+            final last = i == _steps.length - 1;
+            return Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: MeditationCard(
+                image: NCircles.of(s.$1),
+                title: s.$2,
+                subtitle: s.$3,
+                secondary: last ? null : 'Skip',
+                cta: last ? 'Send gift' : 'Next',
+                onCta: last ? widget.onSend : () => _go(i + 1),
+                dots: _steps.length,
+                dotIndex: i,
+              ),
+            );
+          },
+        ),
+      );
 }

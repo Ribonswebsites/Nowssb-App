@@ -57,7 +57,7 @@ void main() {
   testWidgets('buy flow picks a card', (t) async {
     String? picked;
     await t.pumpWidget(_app(const GiftsSnapshot(load: GiftsLoad.ready, catalog: _catalog), buy: (id) => picked = id));
-    await t.tap(find.byKey(const Key('gifts.send')));
+    await t.tap(find.text('Buy a gift'));
     await t.pumpAndSettle();
     await t.tap(find.text('7-day Basic').last);
     await t.pumpAndSettle();
@@ -106,15 +106,20 @@ void main() {
     expect(find.byKey(const Key('gifts.code')), findsOneWidget);
   });
 
-  testWidgets('how-it-works card: Next walks the steps, Skip jumps to the end', (t) async {
-    await t.pumpWidget(_app(const GiftsSnapshot(load: GiftsLoad.ready, catalog: _catalog)));
+  testWidgets('how-it-works carousel: Next moves on, last card sends a gift', (t) async {
+    String? picked;
+    await t.pumpWidget(_app(const GiftsSnapshot(load: GiftsLoad.ready, catalog: _catalog), buy: (id) => picked = id));
     expect(find.text('Send a calm moment'), findsOneWidget);
-    await t.tap(find.text('Next'));
-    await t.pump();
-    expect(find.text('Add a message'), findsOneWidget);
-    await t.tap(find.text('Skip'));
-    await t.pump();
+    for (var i = 0; i < 3; i++) {
+      await t.tap(find.text('Next').first);
+      await t.pumpAndSettle();
+    }
     expect(find.text('They open it'), findsOneWidget);
-    expect(find.text('Start again'), findsOneWidget);
+    await t.tap(find.text('Send gift').first);
+    await t.pumpAndSettle();
+    expect(find.text('Pick a gift'), findsOneWidget);
+    await t.tap(find.text('Word card').last);
+    await t.pumpAndSettle();
+    expect(picked, 'word');
   });
 }

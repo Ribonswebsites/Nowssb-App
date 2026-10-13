@@ -1,190 +1,121 @@
-import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
 
-import '../../../nowssb_ui/nowssb_ui.dart' show NCircles, ExpiredOverlay;
-import '../../../widgets/app_backdrop.dart';
-import '../../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
+import '../../../nowssb_ui/nowssb_ui.dart';
 
-/// Gifts colours. Text is white / grey-white like the reference card.
-/// The only accent is the reference's solid violet CTA pill.
+/// Gifts colours on the shared kit tokens (approved design: neutral frosted
+/// glass, white type, mint section labels, rarity-style status pills).
 class GiftsPalette {
   static const text = Colors.white;
-  static const soft = Color(0xB3FFFFFF);
+  static const soft = NTokens.textLo;
   static const muted = Color(0x99FFFFFF);
-  static const cta = Color(0xFF7C4DFF); // solid violet "Get Started" pill
-  static const ink = Color(0xFF1B1B24); // dark text on the white pill
-  // Kept for call sites; all map to the neutral frosted look now.
-  static const pink = Colors.white;
-  static const violet = Colors.white;
-  static const amber = Colors.white;
-  static const teal = Colors.white;
-  static const bgBottom = Color(0xFF05070D);
+  static const label = NTokens.mint;
+  static const ink = Color(0xFF1B1B24);
+  static const cta = NTokens.violet;
+  static const bgBottom = Color(0xFF08090B);
 }
 
-/// Frosted glass from card-reference-exact.png: lightly white-tinted, blurred,
-/// radius ~26, 1px faint light border, soft shadow. Page-local until UI
-/// Design's updated NGlass lands on main; swap this one class then.
+/// Thin alias so every Gifts surface is the kit's [NGlass] (UI Design's
+/// approved card glass). [inner] = the lighter inner panel.
 class GiftsFrost extends StatelessWidget {
-  const GiftsFrost({super.key, required this.child, this.radius = 26, this.padding = const EdgeInsets.all(16), this.inner = false, this.onTap});
+  const GiftsFrost({super.key, required this.child, this.radius = NTokens.rCard, this.padding = const EdgeInsets.all(16), this.inner = false, this.onTap});
   final Widget child;
   final double radius;
   final EdgeInsets padding;
-
-  /// The lighter inner sub-card (holds the text in the reference).
   final bool inner;
   final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => NGlass(radius: radius, padding: padding, elevation: inner ? .3 : 1, onTap: onTap, child: child);
+}
+
+/// Mint caps section label ("COUPON LIST" in the approved design).
+class GiftsSectionLabel extends StatelessWidget {
+  const GiftsSectionLabel(this.text, {super.key});
+  final String text;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(4, 6, 4, 8),
+        child: Text(text.toUpperCase(), style: const TextStyle(color: GiftsPalette.label, fontSize: 11, letterSpacing: 1.4, fontWeight: FontWeight.w800)),
+      );
+}
+
+/// Status pill in the approved rarity-pill style (glass, tinted text).
+class GiftsStatusPill extends StatelessWidget {
+  const GiftsStatusPill(this.text, {super.key, this.color = NTokens.common});
+  final String text;
+  final Color color;
+  @override
+  Widget build(BuildContext context) => NGlass(
+        radius: NTokens.rPill,
+        accent: color,
+        tint: color,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Text(text.toUpperCase(),
+            style: TextStyle(color: Color.lerp(color, Colors.white, .5), fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w800)),
+      );
+}
+
+/// Gift ticket: the approved frosted coupon ticket (notched glass, circle
+/// photo, dashed divider, status pill + optional NEW, small label, bold
+/// headline, mint link). Same structure as the kit's CouponListCard, but
+/// with honest gift wording instead of its fixed rarity / "View products".
+class GiftTicketCard extends StatelessWidget {
+  const GiftTicketCard(
+      {super.key,
+      required this.label,
+      required this.headline,
+      required this.status,
+      required this.link,
+      this.image,
+      this.statusColor = NTokens.common,
+      this.isNew = false,
+      this.expired = false,
+      this.onTap});
+  final String label, headline, status, link;
+  final ImageProvider? image;
+  final Color statusColor;
+  final bool isNew, expired;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final r = BorderRadius.circular(radius);
-    Widget body = DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: r,
-        color: Colors.white.withValues(alpha: inner ? .16 : .10),
-        border: Border.all(color: Colors.white.withValues(alpha: inner ? .22 : .28), width: 1),
+    Widget card = Semantics(
+      button: onTap != null,
+      label: '$headline. $label. $status${expired ? '. Expired' : ''}',
+      child: ClipPath(
+        clipper: const NotchClipper(radius: 22, notch: 10),
+        child: NGlass(
+          radius: 22,
+          accent: statusColor,
+          onTap: onTap,
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+          child: Row(children: [
+            CircleImage(image: image, size: 64, ring: statusColor),
+            const SizedBox(width: 12),
+            const SizedBox(height: 64, child: DashedLine(vertical: true)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  GiftsStatusPill(status, color: statusColor),
+                  if (isNew) ...[const SizedBox(width: 6), const GlassBadge('NEW')]
+                ]),
+                const SizedBox(height: 6),
+                Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: NTokens.textLo, fontSize: 12)),
+                Text(headline,
+                    maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                Text(link, style: const TextStyle(color: NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700)),
+              ]),
+            ),
+          ]),
+        ),
       ),
-      child: Padding(padding: padding, child: child),
     );
-    if (onTap != null) {
-      body = Material(type: MaterialType.transparency, child: InkWell(borderRadius: r, onTap: onTap, child: body));
-    } else {
-      body = Material(type: MaterialType.transparency, child: body);
-    }
-    final glass = ClipRRect(
-      borderRadius: r,
-      child: inner ? body : BackdropFilter(filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18), child: body),
-    );
-    if (inner) return glass;
-    return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: r, boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 24, offset: Offset(0, 10))]),
-      child: glass,
-    );
+    if (expired) card = ExpiredOverlay(child: card);
+    return card;
   }
 }
 
-/// Small white pill with dark text ("Next"), or the solid violet CTA.
-class GiftsPill extends StatelessWidget {
-  const GiftsPill({super.key, required this.label, required this.onTap, this.primary = false, this.icon});
-  final String label;
-  final VoidCallback? onTap;
-  final bool primary;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) => Material(
-        color: primary ? GiftsPalette.cta : Colors.white,
-        shape: const StadiumBorder(),
-        child: InkWell(
-          customBorder: const StadiumBorder(),
-          onTap: onTap,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: primary ? 22 : 14, vertical: primary ? 11 : 7),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              if (icon != null) ...[Icon(icon, size: 16, color: primary ? Colors.white : GiftsPalette.ink), const SizedBox(width: 6)],
-              Text(label, style: TextStyle(color: primary ? Colors.white : GiftsPalette.ink, fontWeight: FontWeight.w700, fontSize: primary ? 14 : 12)),
-            ]),
-          ),
-        ),
-      );
-}
-
-class GiftsDots extends StatelessWidget {
-  const GiftsDots({super.key, required this.count, required this.index});
-  final int count, index;
-  @override
-  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-        for (var i = 0; i < count; i++)
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            margin: const EdgeInsets.symmetric(horizontal: 2.5),
-            width: i == index ? 14 : 5,
-            height: 5,
-            decoration: BoxDecoration(color: Colors.white.withValues(alpha: i == index ? .9 : .4), borderRadius: BorderRadius.circular(3)),
-          ),
-      ]);
-}
-
-/// One step of the reference card: circle photo on top, inner frosted panel
-/// with bold title, muted body, Skip (left), Next pill (right) and dots.
-class GiftsRefCard extends StatelessWidget {
-  const GiftsRefCard(
-      {super.key, required this.image, required this.title, required this.body, required this.index, required this.count, this.onNext, this.onSkip, this.cta});
-  final ImageProvider image;
-  final String title, body;
-  final int index, count;
-  final VoidCallback? onNext, onSkip;
-
-  /// When set, the last step shows the solid violet CTA pill instead of Next.
-  final String? cta;
-
-  @override
-  Widget build(BuildContext context) {
-    final last = index == count - 1;
-    return GiftsFrost(
-      padding: const EdgeInsets.fromLTRB(14, 18, 14, 14),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          width: 132,
-          height: 132,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            image: DecorationImage(image: image, fit: BoxFit.cover),
-            boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 18, offset: Offset(0, 8))],
-          ),
-        ),
-        const SizedBox(height: 16),
-        GiftsFrost(
-          inner: true,
-          radius: 20,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(color: GiftsPalette.text, fontSize: 22, height: 1.15, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 8),
-            Text(body, style: const TextStyle(color: GiftsPalette.muted, fontSize: 12, height: 1.4)),
-            const SizedBox(height: 14),
-            Row(children: [
-              if (onSkip != null && !last)
-                GestureDetector(onTap: onSkip, child: const Text('Skip', style: TextStyle(color: GiftsPalette.soft, fontSize: 12)))
-              else
-                const SizedBox(),
-              const Spacer(),
-              if (last && cta != null) GiftsPill(label: cta!, primary: true, onTap: onNext) else GiftsPill(label: 'Next', onTap: onNext),
-            ]),
-            const SizedBox(height: 10),
-            Center(child: GiftsDots(count: count, index: index)),
-          ]),
-        ),
-      ]),
-    );
-  }
-}
-
-/// Coin balance with the app's existing gold coin (NwsbCoinDisc).
-class GiftsCoinPill extends StatelessWidget {
-  const GiftsCoinPill({super.key, required this.coins, this.onTap});
-  final int coins;
-  final VoidCallback? onTap;
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: '$coins coins',
-        excludeSemantics: true,
-        child: GiftsFrost(
-          key: const Key('gifts.coins'),
-          radius: 20,
-          onTap: onTap,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const NwsbCoinDisc(size: 18),
-            const SizedBox(width: 6),
-            Text('$coins', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-          ]),
-        ),
-      );
-}
-
-/// Empty / error / offline card in the same frosted style.
+/// Empty / error / offline: kit GlassStateCard.
 class GiftsStateCard extends StatelessWidget {
   const GiftsStateCard({super.key, required this.icon, required this.title, required this.message, this.action, this.onAction});
   final IconData icon;
@@ -192,20 +123,10 @@ class GiftsStateCard extends StatelessWidget {
   final String? action;
   final VoidCallback? onAction;
   @override
-  Widget build(BuildContext context) => GiftsFrost(
-        padding: const EdgeInsets.all(22),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 40, color: Colors.white),
-          const SizedBox(height: 12),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 6),
-          Text(message, textAlign: TextAlign.center, style: const TextStyle(color: GiftsPalette.muted, fontSize: 13)),
-          if (action != null) ...[const SizedBox(height: 16), GiftsPill(label: action!, onTap: onAction)],
-        ]),
-      );
+  Widget build(BuildContext context) => GlassStateCard(icon: icon, title: title, message: message, action: action, onAction: onAction);
 }
 
-/// Four frosted shortcut tiles with the existing circle photos.
+/// Four frosted shortcut tiles (kit glass, white icons).
 class GiftsShortcuts extends StatelessWidget {
   const GiftsShortcuts({super.key, required this.items, required this.onTap});
   final List<(IconData, String)> items;
@@ -220,7 +141,7 @@ class GiftsShortcuts extends StatelessWidget {
                 button: true,
                 label: items[i].$2,
                 excludeSemantics: true,
-                child: GiftsFrost(
+                child: NGlass(
                   radius: 20,
                   onTap: () => onTap(i),
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -237,60 +158,20 @@ class GiftsShortcuts extends StatelessWidget {
       ]);
 }
 
-/// Gift card tile (catalog rails and My gifts): frosted card, circle photo,
-/// bold white title, muted caption, small footer line. Expired is greyed.
-class GiftsCardTile extends StatelessWidget {
-  const GiftsCardTile({super.key, required this.title, required this.caption, this.footer = '', this.color, this.expired = false, this.onTap, this.photo = 0});
-  final String title, caption, footer;
-  final Color? color; // unused: neutral glass everywhere
-  final bool expired;
-  final VoidCallback? onTap;
-  final int photo;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = Semantics(
-      button: onTap != null,
-      label: '$title. $caption${expired ? '. Expired' : ''}',
-      child: GiftsFrost(
-        radius: 24,
-        onTap: onTap,
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Container(
-              width: 44, height: 44, decoration: BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NCircles.at(photo), fit: BoxFit.cover))),
-          const SizedBox(height: 10),
-          Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: GiftsPalette.text, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 3),
-          Text(caption, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: GiftsPalette.muted, fontSize: 11.5, height: 1.3)),
-          if (footer.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(footer, style: const TextStyle(color: GiftsPalette.soft, fontSize: 11, fontWeight: FontWeight.w700)),
-          ],
-        ]),
-      ),
-    );
-    return expired ? ExpiredOverlay(child: t) : t;
-  }
-}
-
-/// The page root: the app's ORIGINAL background (AppBackdrop: the saved
-/// Fashion Plus film, or its still / black) with content on top.
+/// Page root on the app's ORIGINAL background (kit NAppBackdrop = AppBackdrop
+/// video; still colour under flutter test).
 class GiftsPageShell extends StatelessWidget {
   const GiftsPageShell({super.key, required this.title, required this.body, this.actions = const [], this.backdrop = true});
   final String title;
   final Widget body;
   final List<Widget> actions;
-
-  /// Tests switch the video off; the fallback is the app's own deep colour.
   final bool backdrop;
 
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: GiftsPalette.bgBottom,
-        body: Stack(fit: StackFit.expand, children: [
-          if (backdrop) const Positioned.fill(child: AppBackdrop()) else const ColoredBox(color: GiftsPalette.bgBottom),
-          SafeArea(
+        body: NAppBackdrop(
+          child: SafeArea(
             child: Column(children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 6, 12, 4),
@@ -306,7 +187,7 @@ class GiftsPageShell extends StatelessWidget {
               Expanded(child: body),
             ]),
           ),
-        ]),
+        ),
       );
 }
 
