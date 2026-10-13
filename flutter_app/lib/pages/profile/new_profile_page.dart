@@ -1,5 +1,5 @@
 /// Rebuilt Profile page (flag `newui_profile`). Sits on the app's original
-/// background (AppBackdrop: the user's chosen video/image), with the shared
+/// background (kit NAppBackdrop -> AppBackdrop: the user's chosen video), with the shared
 /// kit's frosted NGlass cards on top, matching card-reference-exact.png.
 library;
 
@@ -13,7 +13,8 @@ import '../../screens/app_settings.dart';
 import '../../screens/progress/progress_screen.dart';
 import '../../screens/saved_words.dart';
 import '../../screens/subscription.dart';
-import '../../widgets/app_backdrop.dart';
+import '../../nowssb_ui/app_video_backdrop.dart';
+import '../../nowssb_ui/circle_assets.dart';
 import 'milestones.dart';
 import 'profile_data.dart';
 
@@ -25,7 +26,7 @@ Widget _card({Key? key, required Widget child, EdgeInsets padding = const EdgeIn
       key: key,
       button: onTap != null,
       label: label,
-      child: NGlass(padding: padding, onTap: onTap, child: child),
+      child: NGlass(radius: NTokens.rCard, elevation: .3, padding: padding, onTap: onTap, child: child),
     );
 
 typedef ProfileNav = void Function(BuildContext context, String target);
@@ -85,7 +86,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(children: [
-        Positioned.fill(child: widget.backdrop ?? const AppBackdrop()),
+        Positioned.fill(child: widget.backdrop ?? const NAppBackdrop()),
         SafeArea(child: _body()),
       ]),
     );
@@ -145,10 +146,11 @@ class _NewProfilePageState extends State<NewProfilePage> {
           key: const Key('profile-hero'),
           label: 'Profile of ${d.name}',
           child: MeditationCard(
-            image: d.avatarUrl != null ? NetworkImage(d.avatarUrl!) : null,
+            image: d.avatarUrl != null ? NetworkImage(d.avatarUrl!) : NCircles.yogaDeck,
             title: d.name,
             subtitle: 'Level ${d.level} · ${d.signedIn ? 'Synced to your account' : 'Saved on this phone'}',
-            cta: 'Progress',
+            secondary: d.isEmpty ? 'Start your first session' : '${d.streak}-day streak',
+            cta: 'Next',
             onCta: () => widget.onNavigate(context, 'progress'),
           ),
         )),
@@ -178,6 +180,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
         const SizedBox(height: 14),
         _enter(3, _milestones(d)),
         const SizedBox(height: 14),
+        const Padding(padding: EdgeInsets.fromLTRB(4, 4, 0, 10), child: Text('YOUR SPACE', style: TextStyle(color: NTokens.mint, fontSize: 11, letterSpacing: 1.6, fontWeight: FontWeight.w800))),
         _link('progress', Icons.insights_rounded, 'My progress', 'See your full practice history'),
         _link('saved', Icons.bookmark_rounded, 'Saved words', 'Words you kept for later'),
         _link('subscription', Icons.workspace_premium_rounded, 'Subscription', 'Your plan and benefits'),
@@ -264,23 +267,42 @@ class _NewProfilePageState extends State<NewProfilePage> {
     );
   }
 
+  /// Ticket card in the approved coupon-list style (notched frosted glass,
+  /// round image, dashed divider, pill) built from kit pieces.
   Widget _link(String target, IconData icon, String title, String hint) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: _card(
-          key: Key('profile-link-$target'),
-          onTap: () => widget.onNavigate(context, target),
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Semantics(
+          button: true,
           label: title,
-          child: Row(children: [
-            Icon(icon, color: _ink),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: const TextStyle(color: _ink, fontSize: 16, fontWeight: FontWeight.w500)),
-                Text(hint, style: const TextStyle(color: _sub, fontSize: 12)),
+          child: ClipPath(
+            clipper: const NotchClipper(radius: 22, notch: 10),
+            child: NGlass(
+              key: Key('profile-link-$target'),
+              radius: 22,
+              onTap: () => widget.onNavigate(context, target),
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+              child: Row(children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: .12), border: Border.all(color: Colors.white.withValues(alpha: .5), width: 1.5)),
+                  child: Icon(icon, color: _ink, size: 24),
+                ),
+                const SizedBox(width: 12),
+                const SizedBox(height: 52, child: DashedLine(vertical: true)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(title, style: const TextStyle(color: _ink, fontSize: 17, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 2),
+                    Text(hint, style: const TextStyle(color: _sub, fontSize: 12)),
+                    const SizedBox(height: 4),
+                    const Text('Open >', style: TextStyle(color: NTokens.mint, fontSize: 12, fontWeight: FontWeight.w700)),
+                  ]),
+                ),
               ]),
             ),
-            const Icon(Icons.chevron_right_rounded, color: _sub),
-          ]),
+          ),
         ),
       );
 }

@@ -22,10 +22,10 @@ Widget _app(ProfileSource s, {ProfileNav? nav}) => MaterialApp(
     );
 
 void main() {
-  test('flag: off for users by default, on for admins, remote can enable', () {
+  test('flag: on for everyone by default; remote false is the kill switch', () {
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
-    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
-    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null, debugOverride: false)), isFalse);
   });
 
   testWidgets('loading then ready with stats', (t) async {
@@ -78,6 +78,8 @@ void main() {
     await t.pump();
     await t.tap(find.byKey(const Key('profile-settings')));
     await t.scrollUntilVisible(find.byKey(const Key('profile-link-progress')), 100);
+    await t.ensureVisible(find.byKey(const Key('profile-link-progress')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('profile-link-progress')));
     await t.scrollUntilVisible(find.byKey(const Key('profile-link-subscription')), 100);
     await t.tap(find.byKey(const Key('profile-link-subscription')));

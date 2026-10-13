@@ -14,8 +14,15 @@ final _out = Platform.environment['PROFILE_SHOTS'];
 // Stand-in for the app's original background video: its first frame,
 // extracted with `ffmpeg -i assets/video/fashion-plus-bg-6.mp4 -frames:v 1`.
 final _bgPath = Platform.environment['PROFILE_BG'] ?? '/tmp/profile_bg_frame.png';
-final _bgImage = FileImage(File(_bgPath));
-Widget _bg() => File(_bgPath).existsSync() ? Image(image: _bgImage, fit: BoxFit.cover) : const ColoredBox(color: Colors.black);
+ui.Image? _bgFrame;
+Widget _bg() => _bgFrame != null ? RawImage(image: _bgFrame, fit: BoxFit.cover) : const ColoredBox(color: Colors.black);
+Future<void> _decodeBg(WidgetTester t) async {
+  if (_bgFrame != null || !File(_bgPath).existsSync()) return;
+  await t.runAsync(() async {
+    final codec = await ui.instantiateImageCodec(File(_bgPath).readAsBytesSync());
+    _bgFrame = (await codec.getNextFrame()).image;
+  });
+}
 const _fonts = '/workspace/flutter/bin/cache/artifacts/material_fonts';
 
 class _Src implements ProfileSource {
@@ -39,6 +46,7 @@ Future<void> _shot(WidgetTester t, ProfileSource s, String file, {double scroll 
   t.view.physicalSize = const Size(1170, 2532);
   t.view.devicePixelRatio = 3;
   addTearDown(t.view.reset);
+  await _decodeBg(t);
   final key = GlobalKey();
   await t.pumpWidget(RepaintBoundary(
     key: key,
