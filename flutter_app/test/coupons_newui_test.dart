@@ -141,4 +141,12 @@ void main() {
     expect(find.text('7-DAY EBOOK', skipOffstage: false), findsOneWidget);
     await t.pumpWidget(const SizedBox());
   });
+
+  test('catalogue scope lines carry no currency', () async {
+    final l = await const DefaultCouponsRepo().load();
+    for (final c in l) {
+      expect(c.scope, isNot(matches(RegExp(r'₹|INR|Rs\b'))));
+    }
+    expect(neutralScope('Cap ₹35. Does not stack.'), 'Discount is capped. Does not stack.');
+  });
 }
