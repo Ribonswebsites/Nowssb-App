@@ -1,4 +1,4 @@
-/// Slide-down notification card. Sits above every screen.
+/// Notification bubbles that pop out of the bell. Sit above every screen.
 library;
 
 import 'dart:async';
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../data/notifications.dart';
 import '../data/phone_notifications.dart';
 import '../theme/liquid_glass_theme.dart';
+import 'glass_motion.dart';
 
 class NotificationPopupHost extends StatefulWidget {
   const NotificationPopupHost({super.key, required this.child});
@@ -57,6 +58,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
                 children: [
                   for (final item in list)
                     _BannerCard(
+                      key: ObjectKey(item),
                       item: item,
                       onClose: () => NotificationBanner.dismiss(item),
                     ),
@@ -70,7 +72,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
 }
 
 class _BannerCard extends StatefulWidget {
-  const _BannerCard({required this.item, required this.onClose});
+  const _BannerCard({super.key, required this.item, required this.onClose});
   final NotifItem item;
   final VoidCallback onClose;
 
@@ -95,65 +97,76 @@ class _BannerCardState extends State<_BannerCard> {
     super.dispose();
   }
 
+  /// A glass chat bubble that springs out of the bell (top right), wobbles
+  /// and settles. Swipe it sideways, tap it or tap the cross to dismiss.
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: const Color(0xF0141418),
-        elevation: 8,
-        borderRadius: BorderRadius.circular(18),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: widget.onClose,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0x33FFFFFF)),
-            ),
-            padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.notifications_none_rounded,
-                      color: Colors.black, size: 18),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.item.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 14,
-                        ),
+      child: Dismissible(
+        key: ObjectKey(widget.item),
+        direction: DismissDirection.horizontal,
+        onDismissed: (_) => widget.onClose(),
+        child: BubblePopIn(
+          origin: Alignment.topRight,
+          wobble: -0.18,
+          child: SpringPress(
+            onTap: widget.onClose,
+            scale: 0.98,
+            child: Material(
+              type: MaterialType.transparency,
+              child: GlassBubble(
+                tail: BubbleTail.topRight,
+                blur: true,
+                padding: const EdgeInsets.fromLTRB(14, 10, 4, 10),
+                child: Row(
+                  children: [
+                    const BubblePopIn(
+                      origin: Alignment.center,
+                      delay: Duration(milliseconds: 120),
+                      wobble: 0.5,
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: Colors.white,
+                        child: Icon(Icons.notifications_none_rounded, color: Colors.black, size: 18),
                       ),
-                      if (widget.item.body.isNotEmpty)
-                        Text(
-                          widget.item.body,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xCCFFFFFF),
-                            fontSize: 12,
-                            height: 1.3,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.item.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
+                          if (widget.item.body.isNotEmpty)
+                            Text(
+                              widget.item.body,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xCCFFFFFF),
+                                fontSize: 12,
+                                height: 1.3,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: widget.onClose,
+                      icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: widget.onClose,
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                ),
-              ],
+              ),
             ),
           ),
         ),

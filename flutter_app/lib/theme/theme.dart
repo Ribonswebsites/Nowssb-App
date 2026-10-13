@@ -9,6 +9,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'motion_glass.dart';
 import 'tokens.dart';
 
 class NwsbTheme {
@@ -66,6 +67,11 @@ class NwsbTheme {
         ),
         textTheme: _text(NwsbColors.ink, NwsbColors.inkSoft),
         splashFactory: NoSplash.splashFactory,
+        extensions: const [NwsbMotionTheme()],
+        dialogTheme: _dialog,
+        bottomSheetTheme: _sheet,
+        snackBarTheme: _toast,
+        chipTheme: _chip,
       );
 
   /// Everything else. Deep navy, pale copy, gold accents.
@@ -79,5 +85,40 @@ class NwsbTheme {
         ),
         textTheme: _text(Colors.white, const Color(0xB3C8E8F5)),
         splashFactory: NoSplash.splashFactory,
+        extensions: const [NwsbMotionTheme()],
+        dialogTheme: _dialog,
+        bottomSheetTheme: _sheet,
+        snackBarTheme: _toast,
+        chipTheme: _chip,
       );
+
+  // Shared by both surfaces so dialogs, sheets, toasts and chips match the
+  // glass widgets (theme/motion_glass.dart). Plain Material dialogs and
+  // sheets pick these up without being rewritten.
+  static final _dialog = DialogThemeData(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(NwsbGlass.sheet.radius)),
+  );
+
+  static final _sheet = BottomSheetThemeData(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(NwsbGlass.sheet.radius)),
+    ),
+    clipBehavior: Clip.antiAlias,
+    showDragHandle: false,
+  );
+
+  static final _toast = SnackBarThemeData(
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: NwsbGlass.toast.tint,
+    contentTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
+    actionTextColor: NwsbColors.goldLight,
+    elevation: 0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(NwsbGlass.toast.radius),
+      side: BorderSide(color: NwsbGlass.toast.border),
+    ),
+    insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 18),
+  );
+
+  static const _chip = ChipThemeData(shape: StadiumBorder());
 }

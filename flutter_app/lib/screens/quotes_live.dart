@@ -14,6 +14,7 @@ import '../data/firebase.dart';
 import '../data/settings.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/glass_motion.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/neumorphic.dart';
@@ -101,6 +102,13 @@ class _LiveQuoteTabState extends State<LiveQuoteTab> {
     await p.setString(_kHomeQuoteHidden, _dayKey(DateTime.now()));
   }
 
+  void _openWeek() => Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
+      );
+
+  /// A thought bubble from the orb: the orb springs in, then the glass
+  /// bubble pops out of it, wobbles and settles. Swipe it away or tap the
+  /// cross to hide it for the day; tap it for the week's quotes.
   @override
   Widget build(BuildContext context) {
     if (_hidden) return const SizedBox.shrink();
@@ -109,100 +117,90 @@ class _LiveQuoteTabState extends State<LiveQuoteTab> {
       builder: (context, _) {
         final live = Settings.instance.liveQuote.trim();
         final quote = live.isNotEmpty ? live : _kBuddhaQuote;
-        final inner = Container(
-          decoration: BoxDecoration(
-            color: const Color(0xFF0B0B12),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 28, 8),
-                child: GestureDetector(
-                  onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
+        final bubble = Stack(
+          children: [
+            GlassBubble(
+              key: const ValueKey('home-quote-bubble'),
+              tail: BubbleTail.thought,
+              blur: true,
+              padding: const EdgeInsets.fromLTRB(14, 11, 30, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const EditableLabel('quotes_live.LiveQuoteTab',
+                    'Today quotes to live by',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Color(0xFFE8D5A3),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                  behavior: HitTestBehavior.opaque,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const AppThinkingLoader(
-                        size: 34,
-                        state: OrbState.composing,
-                        blackCircle: true,
-                      ),
-                      const SizedBox(width: 8),
-                      Container(width: 1, height: 36, color: const Color(0x33FFFFFF)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const EditableLabel('quotes_live.LiveQuoteTab',
-                              'Today quotes to live by',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Color(0xFFE8D5A3),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              quote,
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 13.5,
-                                height: 1.25,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 3),
+                  Text(
+                    quote,
+                    maxLines: 4,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13.5,
+                      height: 1.28,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 2,
+              right: 2,
+              child: GestureDetector(
+                key: const ValueKey('home-quote-close'),
+                onTap: _hide,
+                behavior: HitTestBehavior.opaque,
+                child: const Padding(
+                  padding: EdgeInsets.all(6),
+                  child: Icon(Icons.close_rounded, color: Colors.white, size: 18),
                 ),
               ),
-              Positioned(
-                top: 4,
-                right: 4,
-                child: GestureDetector(
-                  onTap: _hide,
-                  behavior: HitTestBehavior.opaque,
-                  child: const Padding(
-                    padding: EdgeInsets.all(4),
-                    child: Icon(Icons.close_rounded, color: Colors.white, size: 18),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         );
-        final normal = HomeSkinScope.of(context) == HomeSkin.normal;
-        final banner = Dismissible(
+        return Dismissible(
           key: const ValueKey('home-today-quote'),
           direction: DismissDirection.horizontal,
           onDismissed: (_) => _hide(),
-          child: normal
-              ? Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-                  child: NeuCard(
-                    padding: const EdgeInsets.all(8),
-                    radius: 24,
-                    child: inner,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 2),
+            child: SpringPress(
+              onTap: _openWeek,
+              scale: 0.98,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const BubblePopIn(
+                    origin: Alignment.center,
+                    wobble: 0,
+                    child: AppThinkingLoader(
+                      size: 38,
+                      state: OrbState.composing,
+                      blackCircle: true,
+                    ),
                   ),
-                )
-              : GlassWrap(
-                  margin: const EdgeInsets.fromLTRB(16, 6, 16, 0),
-                  padding: const EdgeInsets.all(8),
-                  child: inner,
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: BubblePopIn(
+                      origin: Alignment.topLeft,
+                      delay: const Duration(milliseconds: 140),
+                      child: bubble,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         );
-        return banner;
       },
     );
   }

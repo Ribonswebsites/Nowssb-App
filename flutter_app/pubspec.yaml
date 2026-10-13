@@ -61,6 +61,11 @@ dependencies:
   flutter_cache_manager: ^3.4.1
   flutter_liquid_glass_plus: ^0.0.7
   liquid_glass_animation: ^0.0.1
+  # Real liquid-glass refraction for the user app's glass widgets
+  # (widgets/glass_motion.dart). MIT, pre-release (Impeller only; the
+  # widgets fall back to a BackdropFilter blur elsewhere), so pinned exactly.
+  # Already in the lock file through flutter_liquid_glass_plus.
+  liquid_glass_renderer: 0.2.0-dev.4
   siri_orb: ^0.0.3
   share_plus: ^12.0.2
   # Android home-screen widget (streak + word of the day) — the receiver,
