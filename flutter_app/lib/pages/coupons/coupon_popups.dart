@@ -103,12 +103,13 @@ Widget _tinted(String head, String text, Color tint) => Padding(
       ),
     );
 
-Widget primaryPill(String label, VoidCallback onTap, {Key? key}) => CouponGlass(
+/// Full-width violet pill (reference primary action).
+Widget primaryPill(String label, VoidCallback onTap, {Key? key}) => Material(
       key: key,
-      radius: 26,
-      padding: EdgeInsets.zero,
-      tint: kCouponViolet,
+      color: kCouponViolet,
+      shape: const StadiumBorder(),
       child: InkWell(
+        customBorder: const StadiumBorder(),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -182,7 +183,7 @@ Future<Set<String>?> showCouponFilter(BuildContext context, String title, List<S
           radius: 28,
           tint: kCouponViolet,
           padding: const EdgeInsets.all(16),
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child: Material(type: MaterialType.transparency, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 17)),
             for (final o in options)
               CheckboxListTile(
@@ -191,7 +192,7 @@ Future<Set<String>?> showCouponFilter(BuildContext context, String title, List<S
                 onChanged: (v) => set(() => v == true ? pick.add(o) : pick.remove(o)),
               ),
             primaryPill('Show coupons', () => Navigator.of(ctx).pop(pick)),
-          ]),
+          ])),
         ),
       ),
     ),
