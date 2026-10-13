@@ -43,7 +43,9 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byType(TemplateThumb), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
-      await tester.pump(const Duration(seconds: 5));
+      // Film pieces open a video through VideoPool, whose bring-up timeout
+      // (8 s) outlives the widget; let it run out.
+      await tester.pump(const Duration(seconds: 10));
     });
   }
 }
