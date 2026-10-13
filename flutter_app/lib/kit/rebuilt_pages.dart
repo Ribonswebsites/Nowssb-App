@@ -11,6 +11,7 @@ import '../features/earn/newui/earn_newui_screen.dart';
 import '../screens/store/newui/store_page.dart';
 import '../pages/partner/partner_home_page.dart';
 import '../pages/signature_words/signature_words_page.dart';
+import '../pages/earnings/earnings_page.dart';
 import 'app_routes.dart';
 
 bool _done = false;
@@ -25,6 +26,7 @@ void registerRebuiltPages() {
   AppRoutes.registerRebuilt(AppPage.store, (c, a) => const NewStorePage());
   AppRoutes.registerRebuilt(AppPage.partner, (c, a) => const PartnerHomePage());
   AppRoutes.registerRebuilt(AppPage.storeSignature, (c, a) => const SignatureWordsPage());
+  AppRoutes.registerRebuilt(AppPage.earnings, (c, a) => const EarningsNewUiScreen());
   // ignore: unused_local_variable
   const pages = AppPage.values; // keeps the import live until the first line lands
 }
