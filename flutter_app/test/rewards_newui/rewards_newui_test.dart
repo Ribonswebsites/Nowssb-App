@@ -37,7 +37,7 @@ Future<void> _pump(WidgetTester t, RewardsLoader l, {void Function(String)? onOp
 Finder _chip(String l) => find.descendant(of: find.byKey(const Key('rewards.chips')), matching: find.text(l));
 
 void main() {
-  test('flag: off for users, on for admins or when flag set', () {
+  test('flag: on for everyone, remote false is the kill switch', () {
     expect(newUiRewardsOn(isAdmin: false, flag: false), isFalse);
     expect(newUiRewardsOn(isAdmin: true, flag: false), isFalse);
     expect(newUiRewardsOn(isAdmin: false, flag: null), isTrue);
@@ -87,6 +87,7 @@ void main() {
   testWidgets('empty state', (t) async {
     await _pump(t, () async => RewardsData.fromSummary(const {}));
     await t.pump();
+    await t.scrollUntilVisible(find.byKey(const Key('rewards.empty')), 300, scrollable: find.descendant(of: find.byKey(const Key('rewards.scroll')), matching: find.byType(Scrollable)).first);
     expect(find.byKey(const Key('rewards.empty')), findsOneWidget);
     expect(find.text('Check in'), findsOneWidget);
   });

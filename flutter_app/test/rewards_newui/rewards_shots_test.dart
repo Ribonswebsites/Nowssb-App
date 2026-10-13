@@ -65,7 +65,7 @@ void main() {
         for (final e in find.byType(Image).evaluate()) {
           await precacheImage((e.widget as Image).image, e);
         }
-        for (final n in ['lotus', 'lake', 'candle_incense', 'milky_way']) {
+        for (final n in ['yoga_deck', 'sea_face', 'stones', 'lotus', 'singing_bowl']) {
           await precacheImage(AssetImage('assets/images/circles/$n.webp'), ctx);
         }
         await precacheImage(const AssetImage('assets/icons/nwsb-coin.webp'), ctx);
@@ -93,7 +93,7 @@ void main() {
 
   testWidgets('1 hub top', (t) => shot(t, 'rewards-1', () async => _demo()));
   testWidgets('2 hub scrolled', (t) => shot(t, 'rewards-2', () async => _demo(), then: () => t.drag(scroller(), const Offset(0, -520))));
-  testWidgets('3 my rewards grid', (t) => shot(t, 'rewards-3', () async => _demo(), then: () => t.drag(scroller(), const Offset(0, -1600))));
+  testWidgets('3 my rewards grid', (t) => shot(t, 'rewards-3', () async => _demo(), then: () => t.drag(scroller(), const Offset(0, -1250))));
   testWidgets('4 loading', (t) => shot(t, 'rewards-4', () => Completer<RewardsData>().future));
   testWidgets('5 empty', (t) => shot(t, 'rewards-5', () async => RewardsData.fromSummary(const {})));
   testWidgets('6 error', (t) => shot(t, 'rewards-6', () async => throw Exception('x')));

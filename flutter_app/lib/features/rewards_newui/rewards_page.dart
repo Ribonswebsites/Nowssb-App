@@ -5,6 +5,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../widgets/app_backdrop.dart';
+import '../../nowssb_ui/nowssb_ui.dart';
 import 'rewards_data.dart';
 import 'rewards_glass.dart';
 
@@ -86,8 +87,7 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
     return CustomScrollView(key: const Key('rewards.scroll'), slivers: [
       SliverPadding(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-        sliver: SliverList.list(
-            children: [
+        sliver: SliverList.list(children: [
           Row(children: [
             if (Navigator.of(context).canPop()) const BackButton(color: Colors.white),
             const Expanded(child: Text('Rewards', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700))),
@@ -127,7 +127,7 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
           Text('Coins have no cash value and can cover only part of a price. Boosts speed up earning, never the spend cap.',
               style: TextStyle(color: Colors.white.withValues(alpha: .55), fontSize: 11)),
           const SizedBox(height: 20),
-          const Text('My Rewards', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+          const Text('MY REWARDS', style: TextStyle(color: NTokens.mint, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
           const SizedBox(height: 8),
           RFilterChips(options: const ['All', 'Coupons', 'Gifts', 'Chests', 'Expired'], selected: _filter, onSelect: (f) => setState(() => _filter = f)),
           const SizedBox(height: 12),
@@ -148,15 +148,12 @@ class _RewardsNewUiPageState extends State<RewardsNewUiPage> {
       else
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
-          sliver: SliverGrid.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            childAspectRatio: .8,
-            children: [for (final i in shown) RGiftTile(item: i)],
+          sliver: SliverList.separated(
+            itemCount: shown.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (_, k) => RGiftTile(item: shown[k]),
           ),
         ),
     ]);
   }
-
 }
