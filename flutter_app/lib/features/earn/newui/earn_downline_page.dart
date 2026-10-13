@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../nowssb_ui/nowssb_ui.dart';
-import 'earn_backdrop.dart';
+import 'earn_newui_page.dart' show earnVideoAsset, kEarnVideoPoster;
 import 'earn_motion.dart';
 import 'earn_view_data.dart';
 
@@ -21,46 +21,42 @@ class EarnDownlinePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final l1 = data.team.where((m) => m.level == 1).toList();
     final l2 = data.team.where((m) => m.level == 2).toList();
-    return Scaffold(
-      backgroundColor: NTokens.bgBottom,
+    return GlassVideoScaffold(
+      videoAsset: earnVideoAsset(),
+      posterAsset: kEarnVideoPoster,
       appBar: const GlassTopBar(title: 'Your team'),
-      extendBodyBehindAppBar: true,
-      body: EarnBackdrop(
-        child: SafeArea(
-          child: data.team.isEmpty
-              ? const Center(
-                  key: Key('earn-team-empty'),
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: GlassStateCard(
-                      icon: Icons.account_tree_rounded,
-                      title: 'No team yet',
-                      message: 'When someone joins through you, they show up here.',
-                    ),
-                  ),
-                )
-              : Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: Text('${l1.length} direct · ${l2.length} through your team',
-                        key: const Key('earn-team-counts'), style: const TextStyle(color: NTokens.textLo)),
-                  ),
-                  Expanded(
-                    child: InteractiveViewer(
-                      minScale: 0.6,
-                      maxScale: 3,
-                      boundaryMargin: const EdgeInsets.all(200),
-                      child: LayoutBuilder(builder: (context, c) => _Tree(size: c.biggest, l1: l1, l2: l2)),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(24, 0, 24, 16),
-                    child: Text('Pinch to zoom. Tap a person to see their progress.',
-                        textAlign: TextAlign.center, style: TextStyle(color: NTokens.textLo, fontSize: 12)),
-                  ),
-                ]),
-        ),
-      ),
+      body: data.team.isEmpty
+          ? const Center(
+              key: Key('earn-team-empty'),
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: GlassStateCard(
+                  icon: Icons.account_tree_rounded,
+                  title: 'No team yet',
+                  message: 'When someone joins through you, they show up here.',
+                ),
+              ),
+            )
+          : Column(children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Text('${l1.length} direct · ${l2.length} through your team',
+                    key: const Key('earn-team-counts'), style: const TextStyle(color: NTokens.textLo)),
+              ),
+              Expanded(
+                child: InteractiveViewer(
+                  minScale: 0.6,
+                  maxScale: 3,
+                  boundaryMargin: const EdgeInsets.all(200),
+                  child: LayoutBuilder(builder: (context, c) => _Tree(size: c.biggest, l1: l1, l2: l2)),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(24, 0, 24, 16),
+                child: Text('Pinch to zoom. Tap a person to see their progress.',
+                    textAlign: TextAlign.center, style: TextStyle(color: NTokens.textLo, fontSize: 12)),
+              ),
+            ]),
     );
   }
 }
