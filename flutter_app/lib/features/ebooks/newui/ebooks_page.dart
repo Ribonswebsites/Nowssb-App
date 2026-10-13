@@ -6,7 +6,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../../data/store_catalog.dart';
-import '../../../kit/kit.dart';
+import '../../../screens/store/store_cards.dart' show inr;
 import '../../../nowssb_ui/nowssb_ui.dart';
 import '../../../screens/store/store_actions.dart';
 import '../../../shell/nwsb_links.dart';
@@ -30,7 +30,10 @@ class EbooksActions {
   void doRead(BuildContext c, EbBook b) => read != null ? read!(c, b) : NwsbLinks.reader(c);
 }
 
-String _money(num rupees) => KitMoney.cents((rupees * 100).round());
+/// Catalog prices are INR (rupees). KitMoney.cents expects USD cents, and
+/// KitMoney.rupees is deprecated, so show the same INR label the legacy
+/// store shows until the catalog carries minor-unit prices.
+String _money(num rupees) => inr(rupees);
 
 const _outlines = [NTokens.violet, NTokens.mint, NTokens.pink, NTokens.gold];
 Color _outline(int i) => _outlines[i % _outlines.length];
@@ -230,9 +233,9 @@ class EbookDetailNewUi extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         if (owned)
-          GlassPill(label: 'Open in Reader', style: PillStyle.solid, icon: Icons.menu_book_rounded, onTap: () => actions.doRead(context, book))
+          Center(child: GlassPill(label: 'Open in Reader', style: PillStyle.solid, icon: Icons.menu_book_rounded, onTap: () => actions.doRead(context, book)))
         else ...[
-          GlassPill(label: 'Buy', style: PillStyle.solid, onTap: () => actions.doBuy(context, book)),
+          SizedBox(width: double.infinity, child: Center(child: GlassPill(label: 'Buy', style: PillStyle.solid, onTap: () => actions.doBuy(context, book)))),
           const Padding(
             padding: EdgeInsets.only(top: 6, bottom: 12),
             child: Text("You'll be charged through Google Play.", textAlign: TextAlign.center, style: TextStyle(color: NTokens.textLo, fontSize: 12)),
