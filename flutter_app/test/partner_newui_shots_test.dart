@@ -99,7 +99,7 @@ Widget _app(PartnerRepository r) => RepaintBoundary(
 void main() {
   final on = Platform.environment['PARTNER_SHOTS'] == '1';
 
-  Future<void> render(WidgetTester t, PartnerRepository r, String name, {double scrollTo = 0}) async {
+  Future<void> render(WidgetTester t, PartnerRepository r, String name, {double scrollTo = 0, int swipe = 0}) async {
     await t.runAsync(_loadFonts);
     await t.binding.setSurfaceSize(const Size(390, 844));
     addTearDown(() => t.binding.setSurfaceSize(null));
@@ -116,12 +116,16 @@ void main() {
       await t.drag(find.byKey(const Key('partner-hub')), Offset(0, -scrollTo));
       await t.pumpAndSettle();
     }
+    for (var i = 0; i < swipe; i++) {
+      await t.drag(find.byType(PageView), const Offset(-300, 0));
+      await t.pumpAndSettle();
+    }
     await _shot(t, name);
   }
 
   testWidgets('1 hub top', (t) => render(t, _Repo(() async => _full), 'partner-1'), skip: !on);
-  testWidgets('2 hub scrolled', (t) => render(t, _Repo(() async => _full), 'partner-2', scrollTo: 330), skip: !on);
-  testWidgets('3 payout card', (t) => render(t, _Repo(() async => _full), 'partner-3', scrollTo: 2000), skip: !on);
+  testWidgets('2 hub scrolled', (t) => render(t, _Repo(() async => _full), 'partner-2', scrollTo: 440), skip: !on);
+  testWidgets('3 payout card', (t) => render(t, _Repo(() async => _full), 'partner-3', swipe: 2), skip: !on);
   testWidgets('4 empty', (t) => render(t, _Repo(() async => _empty), 'partner-4'), skip: !on);
   testWidgets('5 error', (t) => render(t, _Repo(() async => throw StateError('x')), 'partner-5'), skip: !on);
   testWidgets('6 offline', (t) => render(t, _Repo(() async => throw const PartnerOfflineException()), 'partner-6'),

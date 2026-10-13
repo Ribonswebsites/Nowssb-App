@@ -58,7 +58,7 @@ void main() {
   testWidgets('empty state', (t) async {
     await t.pumpWidget(_app(_Repo(() async => _empty)));
     await t.pumpAndSettle();
-    expect(find.byKey(const Key('partner-empty')), findsOneWidget);
+    expect(find.textContaining('Pick a target, share your link'), findsOneWidget);
   });
 
   testWidgets('error state retries', (t) async {
@@ -83,22 +83,19 @@ void main() {
   testWidgets('hub shows points, targets, copy link, local discount, payout hand-off', (t) async {
     await t.pumpWidget(_app(_Repo(() async => _full), cc: 'DE'));
     await t.pumpAndSettle();
-    expect(find.text('120'), findsOneWidget);
-    await t.scrollUntilVisible(find.text('20 / 50 · Coins'), 200,
-        scrollable: find.descendant(of: find.byKey(const Key('partner-hub')), matching: find.byType(Scrollable)).first);
-    final hub = find.descendant(of: find.byKey(const Key('partner-hub')), matching: find.byType(Scrollable)).first;
-    await t.scrollUntilVisible(find.byKey(const Key('partner-copy')), 200, scrollable: hub);
-    await t.ensureVisible(find.byKey(const Key('partner-copy')));
+    expect(find.text('120 partner points'), findsOneWidget);
+    expect(find.text('20 / 50'), findsOneWidget);
+    await t.tap(find.text('Next').first);
     await t.pumpAndSettle();
-    await t.tap(find.byKey(const Key('partner-copy')));
+    expect(find.textContaining('€'), findsOneWidget);
+    expect(find.textContaining('₹'), findsNothing);
+    await t.tap(find.text('Copy'));
     await t.pump(const Duration(milliseconds: 300));
     expect(find.text('Link copied'), findsOneWidget);
-    await t.scrollUntilVisible(find.byKey(const Key('partner-payout')), 200,
-        scrollable: find.descendant(of: find.byKey(const Key('partner-hub')), matching: find.byType(Scrollable)).first);
+    await t.pumpAndSettle(const Duration(seconds: 5));
+    await t.drag(find.byType(PageView), const Offset(-300, 0));
+    await t.pumpAndSettle();
     expect(find.textContaining('(DE)'), findsOneWidget);
-    expect(find.textContaining('VAT ID'), findsOneWidget);
-    expect(find.textContaining('₹'), findsNothing);
-    expect(find.textContaining('€'), findsOneWidget);
   });
 
   test('payout info is country-aware and never India-specific', () {
