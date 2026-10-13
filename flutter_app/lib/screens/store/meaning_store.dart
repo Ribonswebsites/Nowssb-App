@@ -17,7 +17,6 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
-import '../../features/economy/shop_faces.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
 import '../../widgets/hype_rail.dart';
@@ -74,7 +73,7 @@ class MeaningStoreScreen extends StatelessWidget {
   const MeaningStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => const CoinbackPage(title: 'Meanings', art: 'assets/store/intro-meanings.webp');
+  Widget build(BuildContext context) => _retired(context);
 
   Widget _retired(BuildContext context) => StoreTermsHost(
         which: 'meaning',
