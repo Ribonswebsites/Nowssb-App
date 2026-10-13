@@ -19,6 +19,7 @@ import '../../data/entitlements.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import '../../features/ebooks/newui/ebooks_page.dart';
+import '../../features/ebooks/newui/ebooks_source.dart' show ebookCatalogToCents;
 import '../../kit/kit.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -372,7 +373,7 @@ class _FocusPanel extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: NwsbColors.gold)),
           ),
-          Text(owned ? 'Yours' : inr(_price(book)),
+          Text(owned ? 'Yours' : KitMoney.cents(ebookCatalogToCents(_price(book))),
               style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
@@ -527,7 +528,7 @@ class _Shelf extends StatelessWidget {
                 borderRadius: BorderRadius.circular(UiRadii.pill),
                 border: Border.all(color: const Color(0x66E8D5A3)),
               ),
-              child: Text(_owned(b) ? 'Yours' : inr(_price(b)),
+              child: Text(_owned(b) ? 'Yours' : KitMoney.cents(ebookCatalogToCents(_price(b))),
                   style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
