@@ -19,8 +19,9 @@ Widget _app(GlassMenuSettingsPage p) => MaterialApp(home: p);
 void main() {
   group('flag', () {
     tearDown(() => NewUiMenuSettingsFlag.debugOverride = null);
-    test('off for users, on for admins', () {
-      expect(NewUiMenuSettingsFlag.resolve(isAdmin: false), isFalse);
+    test('on for everyone by default, remote false kills', () {
+      expect(NewUiMenuSettingsFlag.resolve(isAdmin: false), isTrue);
+      expect(NewUiMenuSettingsFlag.resolve(isAdmin: true, remote: false), isFalse);
       expect(NewUiMenuSettingsFlag.resolve(isAdmin: false, remote: true), isTrue);
       expect(NewUiMenuSettingsFlag.resolve(isAdmin: true), isTrue);
       NewUiMenuSettingsFlag.debugOverride = false;

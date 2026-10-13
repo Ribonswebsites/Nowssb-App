@@ -91,7 +91,7 @@ void main() {
   });
 
   test('flag rules: off for users, on for admins and remote release', () {
-    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
     expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
   });

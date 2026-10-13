@@ -26,7 +26,8 @@ final _full = CoinsWalletState(balance: 500, worthLabel: '\$5.00', expiringSoon:
 void main() {
   test('flag: off for users by default, on for admins, on when flag set', () {
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: false)), isFalse);
-    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: false)), isTrue);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: false)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
     expect(AppRoutes.hasRebuilt(AppPage.coins), isTrue);
   });

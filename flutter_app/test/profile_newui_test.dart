@@ -23,7 +23,7 @@ Widget _app(ProfileSource s, {ProfileNav? nav}) => MaterialApp(
 
 void main() {
   test('flag: off for users by default, on for admins, remote can enable', () {
-    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isFalse);
+    expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: null)), isTrue);
     expect(NewUi.decide(const NewUiInputs(isAdmin: false, remote: true)), isTrue);
     expect(NewUi.decide(const NewUiInputs(isAdmin: true, remote: null)), isTrue);
   });

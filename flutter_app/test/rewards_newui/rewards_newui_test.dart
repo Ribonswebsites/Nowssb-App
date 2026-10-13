@@ -39,7 +39,8 @@ Finder _chip(String l) => find.descendant(of: find.byKey(const Key('rewards.chip
 void main() {
   test('flag: off for users, on for admins or when flag set', () {
     expect(newUiRewardsOn(isAdmin: false, flag: false), isFalse);
-    expect(newUiRewardsOn(isAdmin: true, flag: false), isTrue);
+    expect(newUiRewardsOn(isAdmin: true, flag: false), isFalse);
+    expect(newUiRewardsOn(isAdmin: false, flag: null), isTrue);
     expect(newUiRewardsOn(isAdmin: false, flag: true), isTrue);
     expect(kNewUiRewardsFlag, 'newui_rewards');
   });
