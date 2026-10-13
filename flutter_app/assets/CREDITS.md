@@ -26,9 +26,8 @@
 - Researched only (not bundled): LottieFiles free animations under the Lottie Simple License (https://lottiefiles.com/page/license); flutter_holographic (github.com/xcc3641/flutter_holographic) as a technique reference. Nothing copied.
 ## Profile page (newui_profile)
 - Glass cards use the shared kit NGlass (lib/nowssb_ui); flag via kit NewUiGate.
-- Aura backdrop (lib/pages/profile/aura_painter.dart): procedural CustomPainter, original, no third-party assets.
-- 3D breathing orb with ring and moon (lib/pages/profile/breathing_orb.dart): drawn in code (lit-sphere gradients, rim light, specular highlight), original. Inspired by the general "breathing orb / glass meditation" trend (e.g. Dribbble meditation glassmorphism shots, sleek.design meditation template); nothing copied or bundled.
-- Milestone badges (lib/pages/profile/milestones.dart + new_profile_page.dart): code-drawn gradients + Material Icons (Apache-2.0, bundled with Flutter).
+- Background: the app's original AppBackdrop video/image (no new background art; per Ribon's correction).
+- Milestone badges (lib/pages/profile/milestones.dart + new_profile_page.dart): white frosted circles + Material Icons (Apache-2.0, bundled with Flutter).
 
 
 
