@@ -88,6 +88,7 @@ void main() {
     await t.pumpWidget(_app(_Src(() async => _full), nav: (_, x) => went.add(x)));
     await t.pump();
     await t.tap(find.byKey(const Key('profile-settings')));
+    await t.scrollUntilVisible(find.byKey(const Key('profile-link-progress')), 100);
     await t.tap(find.byKey(const Key('profile-link-progress')));
     await t.scrollUntilVisible(find.byKey(const Key('profile-link-subscription')), 100);
     await t.tap(find.byKey(const Key('profile-link-subscription')));

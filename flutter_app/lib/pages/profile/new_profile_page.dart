@@ -11,6 +11,8 @@ import '../../screens/progress/progress_screen.dart';
 import '../../screens/saved_words.dart';
 import '../../screens/subscription.dart';
 import 'aura_painter.dart';
+import 'breathing_orb.dart';
+import 'milestones.dart';
 import 'profile_data.dart';
 
 const _ink = Color(0xFFF4F1FF);
@@ -105,7 +107,7 @@ class _NewProfilePageState extends State<NewProfilePage> {
     return Scaffold(
       backgroundColor: const Color(0xFF0C0A16),
       body: Stack(children: [
-        Positioned.fill(child: widget.animate ? const ProfileAura() : CustomPaint(painter: AuraPainter(0))),
+        Positioned.fill(child: _motion ? const ProfileAura() : CustomPaint(painter: AuraPainter(0))),
         SafeArea(child: _body()),
       ]),
     );
@@ -167,24 +169,24 @@ class _NewProfilePageState extends State<NewProfilePage> {
           ),
         ]),
         const SizedBox(height: 12),
-        ProfileGlass(
-          child: Row(children: [
-            CircleAvatar(
-              radius: 32,
-              backgroundColor: const Color(0x55B79CFF),
+        _enter(0, Column(children: [
+          BreathingOrb(
+            key: const Key('profile-orb'),
+            size: 170,
+            animate: _motion,
+            child: CircleAvatar(
+              radius: 30,
+              backgroundColor: const Color(0x33FFFFFF),
               foregroundImage: d.avatarUrl != null ? NetworkImage(d.avatarUrl!) : null,
               child: Text(initial, style: const TextStyle(color: _ink, fontSize: 24)),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(d.name, key: const Key('profile-name'), style: const TextStyle(color: _ink, fontSize: 20, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 4),
-                Text('Level ${d.level} · ${d.signedIn ? 'Synced' : 'On this phone'}', style: const TextStyle(color: _sub)),
-              ]),
-            ),
-          ]),
-        ),
+          ),
+          Text(d.name, key: const Key('profile-name'), style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 4),
+          Text('Level ${d.level} · ${d.signedIn ? 'Synced' : 'On this phone'}', style: const TextStyle(color: _sub)),
+          const SizedBox(height: 4),
+          const Text('Breathe with the orb: in as it grows, out as it settles.', style: TextStyle(color: _sub, fontSize: 12), textAlign: TextAlign.center),
+        ])),
         const SizedBox(height: 14),
         if (d.isEmpty)
           ProfileGlass(
@@ -198,22 +200,70 @@ class _NewProfilePageState extends State<NewProfilePage> {
             ]),
           )
         else ...[
-          Row(children: [
+          _enter(1, Row(children: [
             Expanded(child: _stat('Day streak', '${d.streak}', const Key('stat-streak'))),
             const SizedBox(width: 10),
             Expanded(child: _stat('Minutes', '${d.minutes}', const Key('stat-minutes'))),
             const SizedBox(width: 10),
             Expanded(child: _stat('Sessions', '${d.sessions}', const Key('stat-sessions'))),
-          ]),
+          ])),
           const SizedBox(height: 14),
-          _week(d.week),
+          _enter(2, _week(d.week)),
         ],
+        const SizedBox(height: 14),
+        _enter(3, _milestones(d)),
         const SizedBox(height: 14),
         _link('progress', Icons.insights_rounded, 'My progress', 'See your full practice history'),
         _link('saved', Icons.bookmark_rounded, 'Saved words', 'Words you kept for later'),
         _link('subscription', Icons.workspace_premium_rounded, 'Subscription', 'Your plan and benefits'),
         _link('settings', Icons.settings_rounded, 'Settings', 'Sound, reminders and account'),
       ],
+    );
+  }
+
+  bool get _motion => widget.animate && !(MediaQuery.maybeOf(context)?.disableAnimations ?? false);
+
+  /// Gentle staggered rise-in; skipped entirely under reduce-motion.
+  Widget _enter(int i, Widget child) {
+    if (!_motion) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 500 + 120 * i),
+      curve: Curves.easeOutCubic,
+      builder: (_, v, c) => Opacity(opacity: v, child: Transform.translate(offset: Offset(0, 16 * (1 - v)), child: c)),
+      child: child,
+    );
+  }
+
+  Widget _milestones(ProfileData d) {
+    final list = milestonesFor(d);
+    final earned = list.where((m) => m.earned).length;
+    return ProfileGlass(
+      key: const Key('profile-milestones'),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Milestones · $earned of ${list.length}', style: const TextStyle(color: _ink, fontSize: 16, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 12),
+        Wrap(spacing: 10, runSpacing: 10, children: [
+          for (final m in list)
+            Semantics(
+              label: '${m.title}, ${m.earned ? 'earned' : 'goal: ${m.goal}'}',
+              child: Tooltip(
+                message: m.earned ? m.title : m.goal,
+                child: Container(
+                  key: Key('milestone-${m.id}-${m.earned ? 'on' : 'off'}'),
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: m.earned ? const RadialGradient(center: Alignment(-0.3, -0.4), colors: [Color(0xFFF1E9FF), Color(0xFFB79CFF), Color(0xFF5B45B8)]) : null,
+                    border: Border.all(color: const Color(0x44FFFFFF)),
+                  ),
+                  child: Icon(m.earned ? Icons.spa_rounded : Icons.lock_outline_rounded, color: m.earned ? const Color(0xFF231A4A) : _sub, size: 22),
+                ),
+              ),
+            ),
+        ]),
+      ]),
     );
   }
 
