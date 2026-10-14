@@ -170,7 +170,7 @@ class _CouponScreenState extends State<CouponScreen> {
                     bannerSub: 'Scratch, codes, shop',
                     onBanner: _showScratch,
                     cards: [
-                      WorkCard(category: 'Scratch', title: 'Daily scratch', meta: 'One free card on this account', action: 'Scratch now', image: 'assets/gifts/coupon-hero.png', onTap: _showScratch),
+                      WorkCard(category: 'Scratch', title: 'Daily scratch', meta: 'One free card on this account', action: 'Scratch now', image: 'assets/rails/art-scratch.jpg', onTap: _showScratch),
                       WorkCard(category: 'Shop', title: 'Coupon shop', meta: 'Paid cards', action: 'Open shop', image: 'assets/gifts/coupon-banner.png', onTap: () => _openTabs('shop')),
                       WorkCard(category: 'Mine', title: 'My coupons', meta: 'Codes already on the account', action: 'Open mine', image: 'assets/rails/coupons-01.jpg', onTap: () => _openTabs('mine')),
                       WorkCard(category: 'Code', title: 'Add a code', meta: 'It comes off the price. It is not cash.', action: 'Add code', image: 'assets/rails/coupons-02.jpg', onTap: () => _openTabs('mine')),

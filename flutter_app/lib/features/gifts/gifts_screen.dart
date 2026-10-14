@@ -425,9 +425,9 @@ class _GiftsScreenState extends State<GiftsScreen> {
             bannerSub: 'Three ribbons. One real purchase, sent as a code.',
             onBanner: () => showGiftCardSheet(context, 'word'),
             cards: [
-              WorkCard(category: 'Gift', title: 'Word gift', meta: 'Red ribbon. A word, a stage, or a 7-day pass.', action: 'Send', image: 'assets/gifts/box-red.webp', onTap: () => showGiftCardSheet(context, 'word')),
-              WorkCard(category: 'Gift', title: 'Subscription gift', meta: 'Gold ribbon. Basic, Standard, or Premium.', action: 'Send', image: 'assets/gifts/box-gold.webp', onTap: () => showGiftCardSheet(context, 'standard30')),
-              WorkCard(category: 'Gift', title: 'Signature gift', meta: 'Black ribbon. The high tier.', action: 'Send', image: 'assets/gifts/box-black.webp', onTap: () => showGiftCardSheet(context, 'signature3')),
+              WorkCard(category: 'Gift', title: 'Word gift', meta: 'Red ribbon. A word, a stage, or a 7-day pass.', action: 'Send', image: 'assets/rails/art-gift-red.jpg', onTap: () => showGiftCardSheet(context, 'word')),
+              WorkCard(category: 'Gift', title: 'Subscription gift', meta: 'Gold ribbon. Basic, Standard, or Premium.', action: 'Send', image: 'assets/rails/art-gift-gold.jpg', onTap: () => showGiftCardSheet(context, 'standard30')),
+              WorkCard(category: 'Gift', title: 'Signature gift', meta: 'Black ribbon. The high tier.', action: 'Send', image: 'assets/rails/art-gift-black.jpg', onTap: () => showGiftCardSheet(context, 'signature3')),
             ],
           ),
           RoutineDeck(
@@ -436,10 +436,10 @@ class _GiftsScreenState extends State<GiftsScreen> {
             bannerSub: 'One free spin. History and redeem stay here.',
             onBanner: () => _openSpin(context),
             cards: [
-              WorkCard(category: 'Spin', title: 'Daily spin', meta: 'It spins, then slows onto the peg.', action: 'Spin', image: 'assets/gifts/gift-hero.png', onTap: () => _openSpin(context)),
-              WorkCard(category: 'History', title: 'Received', meta: 'Gifts already on this account', action: 'Open history', image: 'assets/gifts/box-gold.webp', onTap: () => _openTabs('received')),
-              WorkCard(category: 'Redeem', title: 'Got a code?', meta: 'A code from someone else', action: 'Redeem', image: 'assets/gifts/box-red.webp', onTap: () => _openTabs('redeem')),
-              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Ranks and codes', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+              WorkCard(category: 'Spin', title: 'Daily spin', meta: 'It spins, then slows onto the peg.', action: 'Spin', image: 'assets/rails/art-spin.jpg', onTap: () => _openSpin(context)),
+              WorkCard(category: 'History', title: 'Received', meta: 'Gifts already on this account', action: 'Open history', image: 'assets/rails/art-listen.jpg', onTap: () => _openTabs('received')),
+              WorkCard(category: 'Redeem', title: 'Got a code?', meta: 'A code from someone else', action: 'Redeem', image: 'assets/rails/art-coins.jpg', onTap: () => _openTabs('redeem')),
+              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Ranks and codes', action: 'Open earn', image: 'assets/rails/art-book.jpg', onTap: () => Programmes.open(context, Programme.earn)),
             ],
           ),
         ],

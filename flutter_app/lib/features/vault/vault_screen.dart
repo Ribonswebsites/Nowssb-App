@@ -74,7 +74,7 @@ class _VaultBodyState extends State<_VaultBody> {
               bannerSub: 'Coins you earn by using the app',
               onBanner: () => _openTabs('today'),
               cards: [
-                WorkCard(category: 'Login', title: 'Daily login', meta: 'Collect today’s coins', action: 'Collect', image: 'assets/rails/rewards-01.jpg', onTap: () => runReward(context, () => EconomyApi.call('claimDailyLogin'), title: 'Daily login')),
+                WorkCard(category: 'Login', title: 'Daily login', meta: 'Collect today’s coins', action: 'Collect', image: 'assets/rails/art-coins.jpg', onTap: () => runReward(context, () => EconomyApi.call('claimDailyLogin'), title: 'Daily login')),
                 for (var i = 0; i < actions.length; i++)
                   WorkCard(
                     category: 'Today',

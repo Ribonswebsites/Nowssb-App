@@ -7,10 +7,9 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:video_player/video_player.dart';
 
 import '../admin/template/editable.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 
 class LoginStage extends StatelessWidget {
   const LoginStage({
@@ -62,16 +61,7 @@ class LoginStage extends StatelessWidget {
       fit: StackFit.expand,
       children: [
         const ColoredBox(color: Color(0xFF05060C)),
-        const Positioned.fill(
-          child: NwsbVideo(
-            asset: 'assets/video/login-phone.mp4',
-            poster: 'assets/video/login-phone-poster.webp',
-            fit: BoxFit.cover,
-            alignment: Alignment(0, -0.15),
-            priority: ClipPriority.feature,
-            slot: 'login_stage.LoginStage',
-          ),
-        ),
+        const Positioned.fill(child: _LoginFilm()),
         const Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -79,19 +69,20 @@ class LoginStage extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0x66000000),
+                  Color(0x99000000),
+                  Color(0x22000000),
                   Color(0x00000000),
                   Color(0x00000000),
-                  Color(0xE0000000),
+                  Color(0xCC000000),
                 ],
-                stops: [0, 0.16, 0.46, 1],
+                stops: [0, 0.12, 0.22, 0.52, 1],
               ),
             ),
           ),
         ),
         SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(22, pad.top + 6, 22, pad.bottom + 16),
+          padding: EdgeInsets.fromLTRB(22, pad.top + 56, 22, pad.bottom + 12),
           child: Column(
             children: [
               if (onClose != null)
@@ -106,7 +97,7 @@ class LoginStage extends StatelessWidget {
                 'NowssB',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 52,
+                  fontSize: 36,
                   fontWeight: FontWeight.w700,
                   height: 0.95,
                   letterSpacing: 0.2,
@@ -136,7 +127,7 @@ class LoginStage extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: (h * 0.30).clamp(160.0, 280.0)),
+              SizedBox(height: (h * 0.22).clamp(120.0, 210.0)),
               _GlassField(
                 controller: id,
                 hint: 'Email or Phone Number',
@@ -467,5 +458,62 @@ class _GoogleMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SvgPicture.string(_svg, width: 16, height: 16);
+  }
+}
+
+/// The portrait the owner sent. The still is painted first so the face is
+/// there before the decoder opens, then the same clip moves.
+class _LoginFilm extends StatefulWidget {
+  const _LoginFilm();
+
+  @override
+  State<_LoginFilm> createState() => _LoginFilmState();
+}
+
+class _LoginFilmState extends State<_LoginFilm> {
+  late final VideoPlayerController _film;
+  var _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _film = VideoPlayerController.asset('assets/video/login-phone.mp4')
+      ..setLooping(true)
+      ..setVolume(0);
+    _film.initialize().then((_) {
+      if (!mounted) return;
+      _film.play();
+      setState(() => _ready = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _film.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.asset(
+          'assets/video/login-phone-poster.webp',
+          fit: BoxFit.cover,
+          alignment: const Alignment(0, -0.05),
+        ),
+        if (_ready && _film.value.size.width > 0)
+          FittedBox(
+            fit: BoxFit.cover,
+            alignment: const Alignment(0, -0.05),
+            child: SizedBox(
+              width: _film.value.size.width,
+              height: _film.value.size.height,
+              child: VideoPlayer(_film),
+            ),
+          ),
+      ],
+    );
   }
 }
