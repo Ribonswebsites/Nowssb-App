@@ -8,6 +8,7 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import '../../widgets/brand_top_banner.dart';
+import '../../widgets/hub_rails.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
@@ -107,6 +108,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 title: 'Your Earning',
                 mark: NwsbMarks.piggy,
               ),
+              const SizedBox(height: 12),
+              const IdentityRails(RailKind.earnings),
               const SizedBox(height: 12),
               const ColoredSplitPromoBanner(
                 margin: EdgeInsets.zero,

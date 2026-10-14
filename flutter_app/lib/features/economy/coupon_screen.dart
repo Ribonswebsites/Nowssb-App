@@ -18,6 +18,7 @@ import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../widgets/hype_rail.dart';
+import '../../widgets/hub_rails.dart';
 import '../../widgets/sections/coupon_banner_section.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart';
@@ -148,6 +149,8 @@ class _CouponScreenState extends State<CouponScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
                   GlassWrapper(radius: 28, blur: true, padding: EdgeInsets.zero, child: CouponBannerSection(onCta: _showScratch)),
+                  const SizedBox(height: 12),
+                  const IdentityRails(RailKind.coupons),
                   const SizedBox(height: 12),
                   const StripBanner(title: 'Expiring soon', line: 'Use a coupon before it leaves the account'),
                   GlassWrapper(

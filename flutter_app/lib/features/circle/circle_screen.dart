@@ -12,6 +12,7 @@ import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/flip_portrait.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/glass_wrap.dart';
+import '../../widgets/hub_rails.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../data/firebase.dart';
@@ -151,6 +152,8 @@ class _CircleScreenState extends State<CircleScreen> {
                 onTap: _welcome,
               ),
               const SizedBox(height: 12),
+              const IdentityRails(RailKind.earn),
+              const SizedBox(height: 14),
               const CoinCollectCard(pageKey: 'earn', amount: 10, title: 'Earn coins'),
               const SizedBox(height: 12),
               const TrioRail(current: Programme.earn),

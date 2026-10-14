@@ -19,6 +19,7 @@ import '../screens/profile.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
 import '../screens/quick_access.dart';
+import '../screens/app_settings.dart';
 import '../screens/store/cart_pages.dart';
 import '../screens/store/meaning_store.dart';
 import '../features/notifications/inbox_screen.dart';
@@ -333,7 +334,7 @@ class _NavShellState extends State<NavShell> {
       'journal' => const InboxScreen(),
       'cart' => const CartPage(),
       'wishlist' => const WishlistPage(),
-      'settings' => const ProfileScreen(),
+      'settings' => const AppSettingsScreen(),
       'meaningstore' => const MeaningStoreScreen(),
       _ => null,
     };

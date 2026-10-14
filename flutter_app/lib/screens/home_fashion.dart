@@ -61,6 +61,7 @@ import 'normal/header_actions_sheet.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import 'quick_access.dart';
+import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
 import 'progress/progress_screen.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -74,6 +75,7 @@ import 'store/request_words.dart';
 import 'sentence_builder.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/nwsb_icon.dart';
+import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
 import '../widgets/sections/spotlight_section.dart';
@@ -336,7 +338,7 @@ class _HomeFashionState extends State<HomeFashion> {
       case 'coach':
         _push(const PersonalCoachScreen());
       case 'settings':
-        _go(4);
+        _push(const AppSettingsScreen());
       case 'quick-access':
         _push(const QuickAccessScreen());
       case 'sentence':
@@ -776,6 +778,8 @@ class _HomeFashionState extends State<HomeFashion> {
                   return HomeHeader(
                     notifications: NotifStore.instance.unreadRaw,
                     onNotifications: () => showNotificationsSheet(context),
+                    onSettings: () => _push(const AppSettingsScreen()),
+                    onMenu: () => showHomeMenuDrawer(context, goTab: _go),
                   );
                 },
               ),

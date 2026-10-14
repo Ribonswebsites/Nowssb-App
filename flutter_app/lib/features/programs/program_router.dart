@@ -11,8 +11,19 @@ import 'program_hub.dart';
 
 enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings }
 
+typedef ProgrammeBuilder = Widget Function(String? tab);
+
 abstract final class Programmes {
-  static Widget page(Programme p, {String? tab}) => switch (p) {
+  static final Map<Programme, ProgrammeBuilder> _bound = {};
+
+  /// Real pages register here so this file does not import them (they already
+  /// import this router).
+  static void bind(Programme p, ProgrammeBuilder builder) => _bound[p] = builder;
+
+  static Widget page(Programme p, {String? tab}) {
+    final built = _bound[p];
+    if (built != null) return built(tab);
+    return switch (p) {
         Programme.earn => const ProgramHub(title: 'NowssB Earn', subs: ['Ranks', 'Team', 'Payouts']),
         Programme.rewards => const ProgramHub(title: 'NowssB Rewards', subs: ['Wallet', 'Streaks', 'Quests']),
         Programme.coupons => const ProgramHub(title: 'NowssB Coupons', subs: ['Scratch', 'My coupons', 'Shop']),
@@ -21,6 +32,7 @@ abstract final class Programmes {
         Programme.partner => PartnerScreen(initialTab: tab),
         Programme.earnings => const ProgramHub(title: 'Earnings', subs: ['Sales', 'Referrals', 'Payouts']),
       };
+  }
 
   static Future<void> open(BuildContext context, Programme p, {String? tab}) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page(p, tab: tab)));

@@ -16,6 +16,7 @@ import '../../features/programs/gifts_program.dart';
 import '../../features/programs/partner_program.dart';
 import '../../features/programs/reference_program.dart';
 import '../../features/programs/rewards_program.dart';
+import '../../screens/app_settings.dart';
 import '../../screens/fashion_plus.dart';
 import '../../screens/healing_path.dart';
 import '../../screens/home_fashion.dart';
@@ -84,6 +85,7 @@ final List<AppPage> kAppPages = [
   AppPage('progress', 'Progress', 'You', Icons.insights_rounded, () => PracticeProgressScreen(words: _words())),
   AppPage('subscription', 'Subscription', 'You', Icons.workspace_premium_rounded, () => const SubscriptionScreen()),
   AppPage('quickaccess', 'Quick access', 'You', Icons.apps_rounded, () => const QuickAccessScreen()),
+  AppPage('settings', 'Settings', 'You', Icons.settings_rounded, () => const AppSettingsScreen()),
   AppPage('notifications', 'Notification settings', 'You', Icons.notifications_rounded, () => const NotificationsSettingsPage()),
   AppPage('notifications.preferences', 'Notification preferences', 'You', Icons.tune_rounded, () => const NotifPreferencesScreen()),
   AppPage('fashionplus', 'Fashion Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),

@@ -72,6 +72,7 @@ import 'sound_library.dart';
 import 'notifications_sheet.dart';
 import 'quick_access.dart';
 import 'widgets_page.dart';
+import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
@@ -83,6 +84,7 @@ import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
 import '../widgets/sections/spotlight_section.dart';
 import '../features/earn/earn_hub_screen.dart';
+import 'app_settings.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
 import 'progress/progress_screen.dart';
@@ -244,6 +246,10 @@ class _HomeNormalState extends State<HomeNormal> {
 
   void _openDashboardProgress() {
     _push(PracticeProgressScreen(words: ContentStore.instance.library));
+  }
+
+  void _openHomeMenu(BuildContext context) {
+    showHomeMenuDrawer(context, goTab: _go);
   }
 
   void _openMainOption(String label, int tab) {
@@ -646,6 +652,7 @@ class _HomeNormalState extends State<HomeNormal> {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: _TopRow(
+              onMenu: () => _openHomeMenu(context),
               onNotifications: () => showNotificationsSheet(context),
               glassMode: _glassMode,
               onGlassToggle: () => setState(() {
@@ -684,18 +691,46 @@ class _HomeNormalState extends State<HomeNormal> {
   }
 }
 
-/// .nmh-toprow — logo + title on the left; notifications on the right.
-/// Settings and the hamburger menu are gone.
+/// .nmh-toprow — logo + title on the left; Settings | Quick | Menu on the
+/// right. The expanding SVG control opens the glass 3D actions carousel.
 class _TopRow extends StatelessWidget {
   const _TopRow({
+    required this.onMenu,
     required this.onNotifications,
     required this.glassMode,
     required this.onGlassToggle,
   });
 
+  final VoidCallback onMenu;
   final VoidCallback onNotifications;
   final bool glassMode;
   final VoidCallback onGlassToggle;
+
+  void _openActions(BuildContext context) {
+    showHeaderActionsSheet(
+      context,
+      glassMode: glassMode,
+      onGlassToggle: onGlassToggle,
+      onNotifications: () => showNotificationsSheet(context),
+      onFashionHome: () => Settings.instance.setFashionHome(true),
+      onStore: () => NavScope.goTo(context, 3),
+      onPlayer: () {
+        final words = ContentStore.instance.library;
+        if (words.isEmpty) {
+          NavScope.goTo(context, 1);
+          return;
+        }
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => PracticePlayerScreen(
+              words: words,
+              title: 'Practice',
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -752,11 +787,106 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const Spacer(),
+        // Right cluster: Settings | Notifications | Hamburger
+        // Quick access belongs in Fashion Hero — bell returns here.
+        _HeaderButton(
+          icon: Icons.settings_outlined,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const AppSettingsScreen(),
+            ),
+          ),
+        ),
+        const _HeaderDivider(),
         _HeaderButton(
           icon: Icons.notifications_none_rounded,
           onTap: onNotifications,
         ),
+        const _HeaderDivider(),
+        _HamburgerButton(onTap: onMenu),
       ],
+    );
+  }
+}
+
+/// Hairline between right-cluster header controls (Settings | Quick | Menu).
+class _HeaderDivider extends StatelessWidget {
+  const _HeaderDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Container(
+        width: 1,
+        height: 22,
+        decoration: BoxDecoration(
+          color: glass ? const Color(0x66FFFFFF) : const Color(0x33244766),
+          borderRadius: BorderRadius.circular(1),
+        ),
+      ),
+    );
+  }
+}
+
+/// Rounded header control — four-square [NwsbMarks.features] mark that
+/// expands into the glass cover-flow sheet.
+class _HeaderActionsSvgButton extends StatelessWidget {
+  const _HeaderActionsSvgButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: glass ? const Color(0xAFFFFFFF) : NwsbColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+          boxShadow: glass ? null : NwsbShadows.raisedXs,
+        ),
+        child: const Center(
+          child: NwsbIcon(
+            NwsbMarks.features,
+            size: 20,
+            color: NwsbColors.ink,
+            strokeWidth: 1.7,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HamburgerButton extends StatelessWidget {
+  const _HamburgerButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final glass = NormalGlassMode.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          color: glass ? const Color(0xBFFFFFFF) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: glass ? Border.all(color: const Color(0xDFFFFFFF)) : null,
+          boxShadow: glass ? null : NwsbShadows.raisedXs,
+        ),
+        child: const Icon(Icons.menu_rounded, size: 23, color: NwsbColors.ink),
+      ),
     );
   }
 }

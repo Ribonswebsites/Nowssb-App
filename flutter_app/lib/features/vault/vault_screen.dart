@@ -16,6 +16,7 @@ import '../../data/practice_progress.dart';
 import '../../shell/nwsb_links.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
+import '../../widgets/hub_rails.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/glass_wrap.dart';
@@ -68,6 +69,8 @@ class _VaultBodyState extends State<_VaultBody> {
           mark: NwsbMarks.rewards,
           onTap: () => _go.value?.call('today'),
         ),
+        const SizedBox(height: 12),
+        const IdentityRails(RailKind.rewards),
         const SizedBox(height: 12),
         const _TodayCard(),
         const SizedBox(height: 12),
