@@ -11,6 +11,7 @@ import '../features/economy/economy_theme.dart';
 import '../features/programs/program_router.dart';
 import '../shell/nwsb_links.dart';
 import '../theme/tokens.dart';
+import '../widgets/glass_wrap.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/nwsb_icon.dart';
 import 'healing_path.dart';
