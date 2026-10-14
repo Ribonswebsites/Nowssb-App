@@ -28,7 +28,6 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/hub_rails.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -141,354 +140,50 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'settings', [
-              LSection('rails', 'Card rails', const IdentityRails(RailKind.settings)),
-              LSection('deck', 'Settings cards', RoutineDeck(
-                title: 'Settings',
+              LSection('look', 'Look and play', RoutineDeck(
+                title: 'Look and play',
                 banner: 'Settings',
-                bannerSub: 'Player, look, alerts, account',
+                bannerSub: 'Player, look, alerts',
                 onBanner: () => _push(const PlayerSettingsScreen()),
                 cards: [
-                  WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
-                  WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', tint: const Color(0xFFB9D5E8), onTap: () => _push(const WidgetsPage())),
-                  WorkCard(category: 'Look', title: 'Fashion Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Fashion Plus', tint: const Color(0xFFCBBBE8), onTap: () => _push(const FashionPlusScreen())),
-                  WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', tint: const Color(0xFFBFE2D1), onTap: () => _push(const QuickAccessScreen())),
-                  WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', tint: const Color(0xFFF0D39B), onTap: () => _push(const NotificationsSettingsPage())),
-                  WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', tint: const Color(0xFFD4C5E8), onTap: () => _push(const PlayerSettingsScreen())),
+                  WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', image: 'assets/rails/glass-01.jpg', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
+                  WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', image: 'assets/rails/glass-02.jpg', onTap: () => _push(const WidgetsPage())),
+                  WorkCard(category: 'Look', title: 'Fashion Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Fashion Plus', image: 'assets/rails/glass-03.jpg', onTap: () => _push(const FashionPlusScreen())),
+                  WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', image: 'assets/rails/glass-04.jpg', onTap: () => _push(const QuickAccessScreen())),
+                  WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', image: 'assets/rails/clear-01.jpg', onTap: () => _push(const NotificationsSettingsPage())),
+                  WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', image: 'assets/rails/clear-02.jpg', onTap: () => _push(const PlayerSettingsScreen())),
+                  WorkCard(category: 'Words', title: "Today's quote", meta: s.todayQuote.trim().isEmpty ? 'Quotes to live by' : s.todayQuote.trim(), action: 'Open quotes', image: 'assets/rails/clear-03.jpg', onTap: () => _push(const QuotesWeekScreen())),
                 ],
               )),
-              LSection(
-                  'profile',
-                  'Profile card',
-                  NestedDarkWrap(
-                    // Profile is a bottom-nav root — switch tab, don't push a second Profile.
-                    onTap: () => NavScope.goTo(context, 4),
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 52,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0x22E8D5A3),
-                                Color(0x1CC8E8F5),
-                              ],
-                            ),
-                            border: Border.all(
-                              color: const Color(0x40E8D5A3),
-                              width: 2,
-                            ),
-                          ),
-                          child: const Icon(Icons.person_outline,
-                              color: NwsbColors.gold),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const EditableLabel(
-                                'app_settings.AppSettingsScreen',
-                                'Your profile',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              const EditableLabel(
-                                'app_settings.AppSettingsScreen',
-                                'Account · plan · edit',
-                                style: TextStyle(
-                                  color: Color(0x85FFFFFF),
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 7),
-                              ListenableBuilder(
-                                listenable: EconomyMirror.instance,
-                                builder: (context, _) {
-                                  final plan = EconomyMirror.instance.plan;
-                                  final label = plan.trim().isEmpty
-                                      ? 'FREE'
-                                      : plan.toUpperCase();
-                                  return _Badge(label);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.chevron_right,
-                            color: Color(0x38FFFFFF), size: 18),
-                      ],
-                    ),
-                  )),
-              const SizedBox(height: 8),
-              LSection(
-                  'promo',
-                  'Promo banner',
-                  ColoredSplitPromoBanner(
-                    spec: SplitPromoExtras.at(13),
-                    margin: EdgeInsets.zero,
-                  )),
-              const SizedBox(height: 18),
-              LSection(
-                  'search',
-                  'Search settings',
-                  Container(
-                    height: 48,
-                    margin: const EdgeInsets.only(bottom: 22),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0x14FFFFFF),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0x24FFFFFF)),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search,
-                            size: 18, color: Color(0x59FFFFFF)),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: TextField(
-                            controller: _search,
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 14),
-                            decoration: const InputDecoration(
-                              hintText: 'Search settings...',
-                              hintStyle: TextStyle(color: Color(0x59FFFFFF)),
-                              border: InputBorder.none,
-                              isDense: true,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
-              if (_match('Player Guide') ||
-                  _match('Hero header') ||
-                  _match('Fashion Plus') ||
-                  _match('Quick Access') ||
-                  _match('Today\'s quote') ||
-                  _match('Player Settings'))
-                LSection(
-                    'intro-appearance',
-                    'Intro & Appearance',
-                    _Sec(
-                      label: 'INTRO & APPEARANCE',
-                      children: [
-                        if (_match('Player Guide'))
-                          _NavRow(
-                            icon: Icons.menu_book_outlined,
-                            title: 'Player Guide',
-                            sub: 'Replay the player setup pages',
-                            onTap: () {
-                              // Decode the opening slide and orb badges
-                              // during the route transition.
-                              OnboardingWarmup.playerGuide(context,
-                                  firstOnly: true);
-                              _push(
-                                PlayerGuideScreen(
-                                  onDone: () =>
-                                      Navigator.of(context).maybePop(),
-                                ),
-                              );
-                            },
-                          ),
-                        if (_match('Hero header'))
-                          _NavRow(
-                            icon: Icons.view_agenda_outlined,
-                            title: 'Hero header & widgets',
-                            sub: 'TV · full · plain · shortcuts',
-                            onTap: () => _push(const WidgetsPage()),
-                          ),
-                        if (_match('Fashion Plus'))
-                          _NavRow(
-                            icon: Icons.auto_awesome_outlined,
-                            title: 'Fashion Plus',
-                            sub: s.fashionPlus
-                                ? 'Motion on'
-                                : 'Still backgrounds',
-                            onTap: () => _push(const FashionPlusScreen()),
-                          ),
-                        if (_match('Quick Access'))
-                          _NavRow(
-                            icon: Icons.dashboard_customize_outlined,
-                            title: 'Quick Access',
-                            sub: 'Customize bottom navigation',
-                            onTap: () => _push(const QuickAccessScreen()),
-                          ),
-                        if (_match('Today\'s quote'))
-                          _NavRow(
-                            icon: Icons.format_quote_rounded,
-                            title: 'Today\'s quote',
-                            sub: s.todayQuote.trim().isEmpty
-                                ? 'Quotes to live by this week'
-                                : s.todayQuote.trim(),
-                            onTap: () => _push(const QuotesWeekScreen()),
-                          ),
-                        if (_match('Player Settings'))
-                          _NavRow(
-                            icon: Icons.tune_rounded,
-                            title: 'Player Settings',
-                            sub: 'AURA equalizer · quality · sleep',
-                            last: true,
-                            onTap: () => _push(const PlayerSettingsScreen()),
-                          ),
-                      ],
-                    )),
-              if (_match('Screen') || _match('Nav'))
-                LSection(
-                    'device',
-                    'Device',
-                    _Sec(
-                      label: 'DEVICE',
-                      children: [
-                        if (_match('Screen'))
-                          _ToggleRow(
-                            icon: Icons.phone_android,
-                            title: 'Keep Screen Awake',
-                            sub: 'Stay on while NowssB is open',
-                            value: _screenWake,
-                            onChanged: (v) {
-                              setState(() => _screenWake = v);
-                              _saveBool('ss_screen_wake', v);
-                              DeviceFlags.keepAwake(v);
-                            },
-                          ),
-                        if (_match('Nav'))
-                          _PillRow(
-                            icon: Icons.space_dashboard_outlined,
-                            title: 'Nav Bar',
-                            sub: s.navColor == 'glass' ? 'Glass' : 'Black',
-                            pill: s.navColor == 'glass' ? 'Glass' : 'Black',
-                            last: true,
-                            onTap: _cycleNav,
-                          ),
-                      ],
-                    )),
-              if (_match('Notification'))
-                LSection(
-                    'notifications',
-                    'Notifications',
-                    _Sec(
-                      label: 'NOTIFICATIONS',
-                      children: [
-                        _NavRow(
-                          icon: Icons.notifications_none,
-                          title: 'Notifications',
-                          sub: 'Daily words, streak and today’s offer',
-                          last: true,
-                          onTap: () => _push(const NotificationsSettingsPage()),
-                        ),
-                      ],
-                    )),
-              if (_match('Appear') || _match('Privacy') || _match('Delete'))
-                LSection(
-                    'privacy-social',
-                    'Privacy & Social',
-                    _Sec(
-                      label: 'PRIVACY & SOCIAL',
-                      children: [
-                        if (_match('Appear'))
-                          _ToggleRow(
-                            icon: Icons.travel_explore,
-                            title: 'Appear in Discover',
-                            sub: 'Others can find your profile',
-                            value: _appearDiscover,
-                            onChanged: _setDiscover,
-                          ),
-                        if (_match('Privacy'))
-                          _NavRow(
-                            icon: Icons.lock_outline,
-                            title: 'Privacy Policy',
-                            sub: 'What NowssB keeps and why',
-                            onTap: () => _openUrl('https://nowssb.com/privacy'),
-                          ),
-                        if (_match('Delete'))
-                          _NavRow(
-                            icon: Icons.person_remove_outlined,
-                            title: 'Delete Account',
-                            sub: 'Erase your account and its data',
-                            last: true,
-                            danger: true,
-                            onTap: _deleteAccount,
-                          ),
-                      ],
-                    )),
-              if (_match('Cached') ||
-                  _match('Clear Practice') ||
-                  _match('About') ||
-                  _match('Terms') ||
-                  _match('Sign Out'))
-                LSection(
-                    'app-about',
-                    'App & About',
-                    _Sec(
-                      label: 'APP & ABOUT',
-                      children: [
-                        if (_match('Cached'))
-                          _NavRow(
-                            icon: Icons.cleaning_services_outlined,
-                            title: 'Cached Data',
-                            sub: 'Clear temporary media cache',
-                            onTap: _clearCache,
-                          ),
-                        if (_match('Clear Practice'))
-                          _NavRow(
-                            icon: Icons.delete_outline,
-                            title: 'Clear Practice History',
-                            sub: 'Remove session logs — cannot be undone',
-                            danger: true,
-                            onTap: () => _confirmClearHistory(),
-                          ),
-                        if (_match('Request') || _match('Word'))
-                          _NavRow(
-                            icon: Icons.edit_note_outlined,
-                            title: 'Request Words',
-                            sub: 'Ask the atelier for a new word',
-                            onTap: () => openRequestWords(context),
-                          ),
-                        // Only for an account the server marks as admin
-                        // (Firestore admins/{uid}) — see lib/admin.
-                        if (AdminState.instance.isAdmin &&
-                            (_match('Admin') ||
-                                _match('Template') ||
-                                _match('Edit')))
-                          _NavRow(
-                            icon: Icons.admin_panel_settings_outlined,
-                            title: 'Admin',
-                            sub: 'Words · quotes · requests · template editor',
-                            onTap: () => openAdminHome(context),
-                          ),
-                        if (_match('About'))
-                          _NavRow(
-                            icon: Icons.info_outline,
-                            title: 'About NowssB',
-                            sub: 'v2.6.0 · nowssb.com',
-                            onTap: _openAbout,
-                          ),
-                        if (_match('Terms'))
-                          _NavRow(
-                            icon: Icons.description_outlined,
-                            title: 'Terms of Service',
-                            sub: 'nowssb.com/terms',
-                            onTap: () => _openUrl('https://nowssb.com/terms'),
-                          ),
-                        if (_match('Sign Out'))
-                          _NavRow(
-                            icon: Icons.logout,
-                            title: 'Sign Out',
-                            sub: 'End this session',
-                            last: true,
-                            danger: true,
-                            onTap: _signOut,
-                          ),
-                      ],
-                    )),
+              LSection('device', 'This phone', RoutineDeck(
+                title: 'This phone',
+                banner: 'Device',
+                bannerSub: 'Screen, bar, privacy',
+                onBanner: _cycleNav,
+                cards: [
+                  WorkCard(category: 'Screen', title: 'Keep Screen Awake', meta: _screenWake ? 'Stays on' : 'Can sleep', action: _screenWake ? 'Turn off' : 'Turn on', image: 'assets/rails/01.png', onTap: () { final v = !_screenWake; setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); }),
+                  WorkCard(category: 'Nav', title: 'Nav Bar', meta: s.navColor == 'glass' ? 'Glass' : 'Black', action: 'Switch', image: 'assets/rails/02.png', onTap: _cycleNav),
+                  WorkCard(category: 'You', title: 'Your profile', meta: 'Account, plan, edit', action: 'Open profile', image: 'assets/rails/03.png', onTap: () => NavScope.goTo(context, 4)),
+                  WorkCard(category: 'Discover', title: 'Appear in Discover', meta: _appearDiscover ? 'Others can find you' : 'Hidden', action: _appearDiscover ? 'Hide' : 'Show', image: 'assets/rails/04.png', onTap: () => _setDiscover(!_appearDiscover)),
+                ],
+              )),
+              LSection('account', 'Account', RoutineDeck(
+                title: 'Account',
+                banner: 'Account',
+                bannerSub: 'Privacy, cache, sign out',
+                onBanner: _signOut,
+                cards: [
+                  WorkCard(category: 'Privacy', title: 'Privacy Policy', meta: 'What NowssB keeps', action: 'Read', image: 'assets/rails/05.png', onTap: () => _openUrl('https://nowssb.com/privacy')),
+                  WorkCard(category: 'Account', title: 'Delete Account', meta: 'Erase this account', action: 'Delete', image: 'assets/rails/06.png', onTap: _deleteAccount),
+                  WorkCard(category: 'Cache', title: 'Cached Data', meta: 'Temporary media', action: 'Clear cache', image: 'assets/rails/07.png', onTap: () { _clearCache(); }),
+                  WorkCard(category: 'History', title: 'Clear Practice History', meta: 'Session logs', action: 'Clear history', image: 'assets/rails/08.png', onTap: () { _confirmClearHistory(); }),
+                  WorkCard(category: 'Words', title: 'Request Words', meta: 'Ask the atelier', action: 'Request', image: 'assets/rails/09.png', onTap: () => openRequestWords(context)),
+                  if (AdminState.instance.isAdmin) WorkCard(category: 'Admin', title: 'Admin', meta: 'Words, quotes, editor', action: 'Open admin', image: 'assets/rails/10.png', onTap: () => openAdminHome(context)),
+                  WorkCard(category: 'About', title: 'About NowssB', meta: 'v2.6.0', action: 'About', image: 'assets/rails/11.png', onTap: () { _openAbout(); }),
+                  WorkCard(category: 'Terms', title: 'Terms of Service', meta: 'nowssb.com/terms', action: 'Read terms', image: 'assets/rails/earn-01.jpg', onTap: () => _openUrl('https://nowssb.com/terms')),
+                  WorkCard(category: 'Session', title: 'Sign Out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/clear-04.jpg', onTap: _signOut),
+                ],
+              )),
             ]),
           ),
         ),

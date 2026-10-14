@@ -35,7 +35,6 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
-import 'hub_rails.dart';
 import 'routine_deck.dart';
 import '../admin/template/editable.dart';
 
@@ -230,217 +229,41 @@ class HomeMenuDrawer extends StatelessWidget {
                         compact: true,
                         onTap: () => _push(context, const SubscriptionScreen()),
                       ),
-                      const IdentityRails(RailKind.menu),
                       RoutineDeck(
-                        title: 'Menu',
+                        title: 'Go',
                         banner: 'Your menu',
-                        bannerSub: 'Home, practice, store, settings',
+                        bannerSub: 'Home, practice, library',
                         onBanner: () => _goTab(context, 0),
                         cards: [
-                          WorkCard(category: 'Home', title: 'Home', meta: 'Dashboard', action: 'Open home', onTap: () => _goTab(context, 0)),
-                          WorkCard(category: 'Practice', title: 'Daily Practice', meta: 'Morning ritual', action: 'Open practice', tint: const Color(0xFFB9D5E8), onTap: () => _goTab(context, 1)),
-                          WorkCard(category: 'Library', title: 'Sound Library', meta: 'Root frequencies', action: 'Open library', tint: const Color(0xFFCBBBE8), onTap: () => _push(context, const SoundLibraryScreen())),
-                          WorkCard(category: 'Store', title: 'Store', meta: 'Words and books', action: 'Open store', tint: const Color(0xFFBFE2D1), onTap: () => _goTab(context, 3)),
-                          WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', tint: const Color(0xFFF0D39B), onTap: () => _goTab(context, 4)),
-                          WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', tint: const Color(0xFFD4C5E8), onTap: () => _push(context, const AppSettingsScreen())),
+                          WorkCard(category: 'Home', title: 'Home', meta: 'Dashboard', action: 'Open home', image: 'assets/rails/01.png', onTap: () => _goTab(context, 0)),
+                          WorkCard(category: 'Practice', title: 'Daily Practice', meta: 'Morning ritual', action: 'Open practice', image: 'assets/rails/02.png', onTap: () => _goTab(context, 1)),
+                          WorkCard(category: 'Practice', title: 'My Routines', meta: 'Five routine slots', action: 'Open routines', image: 'assets/rails/03.png', onTap: () => _push(context, const _RoutinesPage())),
+                          WorkCard(category: 'Library', title: 'Sound Library', meta: 'Root frequencies', action: 'Open library', image: 'assets/rails/04.png', onTap: () => _push(context, const SoundLibraryScreen())),
+                          WorkCard(category: 'Science', title: 'Word Science', meta: 'The NowssB system', action: 'Open science', image: 'assets/rails/05.png', onTap: () => _push(context, const AboutNowssbScreen(science: true))),
+                          WorkCard(category: 'Read', title: 'Shabdapathy', meta: 'Foundations', action: 'Open reader', image: 'assets/rails/06.png', onTap: () => _push(context, const ReaderHubScreen())),
                         ],
                       ),
-                      _SectionLabel('Practice', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['home']!,
-                            label: 'Home',
-                            sub: 'Dashboard',
-                            onTap: () => _goTab(context, 0),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['practice']!,
-                            viewBox: 22,
-                            label: 'Daily Practice',
-                            sub: 'Morning ritual',
-                            onTap: () => _goTab(context, 1),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['routines']!,
-                            label: 'My Routines',
-                            sub: '5 routine slots',
-                            onTap: () => _push(context, const _RoutinesPage()),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Content', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['library']!,
-                            label: 'Sound Library',
-                            sub: 'Root frequencies',
-                            onTap: () =>
-                                _push(context, const SoundLibraryScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['science']!,
-                            label: 'Word Science',
-                            sub: 'NowssB system',
-                            onTap: () => _push(
-                              context,
-                              const AboutNowssbScreen(science: true),
-                            ),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['shabda']!,
-                            label: 'Shabdapathy',
-                            sub: 'Foundations',
-                            onTap: () =>
-                                _push(context, const ReaderHubScreen()),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Journey', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['progress']!,
-                            viewBox: 22,
-                            label: 'My Progress',
-                            sub: 'Healing journey',
-                            onTap: () => _push(
-                              context,
-                              PracticeProgressScreen(
-                                words: ContentStore.instance.library,
-                              ),
-                            ),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['store']!,
-                            label: 'NowssB Store',
-                            sub: 'Word & Meaning Libraries',
-                            onTap: () => _goTab(context, 3),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['meaning']!,
-                            label: 'Meaning Store',
-                            sub: 'True hidden meanings',
-                            onTap: () =>
-                                _push(context, const MeaningStoreScreen()),
-                          ),
-                        ],
-                      ),
-                      _SectionLabel('Account', light: light),
-                      _Group(
-                        light: light,
-                        children: [
-                          _Row(
-                            light: light,
-                            mark: _mark['profile']!,
-                            label: 'Profile',
-                            sub: 'Settings & account',
-                            onTap: () => _goTab(context, 4),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['settings']!,
-                            label: 'Settings',
-                            sub: 'Preferences',
-                            onTap: () =>
-                                _push(context, const AppSettingsScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bell,
-                            label: 'Notifications',
-                            sub: 'Turn them on for this phone',
-                            onTap: () => _push(
-                              context,
-                              const NotificationsSettingsPage(),
-                            ),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.piggy,
-                            label: 'NowssB Earn',
-                            sub: 'Agents, codes, commission',
-                            onTap: () => _push(context, const EarnHubScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.rewards,
-                            label: 'NowssB Rewards',
-                            sub: 'Daily coins, quests, one invite',
-                            onTap: () => _push(context, const VaultScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.gift,
-                            label: 'NowssB Gifts',
-                            sub: 'Boxes, the wheel, gift cards',
-                            onTap: () => _push(context, const GiftsScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.coupon,
-                            label: 'NowssB Coupons',
-                            sub: 'Scratch, codes, paid cards',
-                            onTap: () => _push(context, const CouponScreen()),
-                          ),
-                          if (AppControl.instance.flag('resale', fallback: false))
-                            _Row(
-                              light: light,
-                              mark: NwsbMarks.bag,
-                              label: 'Resell',
-                              sub: 'Listings inside the Store',
-                              onTap: () => _push(context, const BazaarScreen()),
-                            ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.user,
-                            label: 'Word Print',
-                            sub: 'Public profile',
-                            onTap: () => _push(context, const WordPrintScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.feed,
-                            label: 'Echo Wall',
-                            sub: 'Reflections',
-                            onTap: () => _push(context, const EchoWallScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bars,
-                            label: 'Earnings',
-                            sub: 'Payouts and commissions',
-                            onTap: () => _push(context, const EarningsScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: NwsbMarks.bell,
-                            label: 'Activity',
-                            sub: 'Coin and cash ledger',
-                            onTap: () => _push(context, const EarnHubScreen()),
-                          ),
-                          _Row(
-                            light: light,
-                            mark: _mark['connect']!,
-                            label: 'NowssB Connect',
-                            sub: 'Echo Wall · community',
-                            last: true,
-                            onTap: () =>
-                                _push(context, const EchoWallScreen()),
-                          ),
+                      RoutineDeck(
+                        title: 'Account',
+                        banner: 'You',
+                        bannerSub: 'Progress, store, settings',
+                        onBanner: () => _goTab(context, 4),
+                        cards: [
+                          WorkCard(category: 'Progress', title: 'My Progress', meta: 'Healing journey', action: 'Open progress', image: 'assets/rails/07.png', onTap: () => _push(context, PracticeProgressScreen(words: ContentStore.instance.library))),
+                          WorkCard(category: 'Store', title: 'NowssB Store', meta: 'Word and meaning libraries', action: 'Open store', image: 'assets/rails/08.png', onTap: () => _goTab(context, 3)),
+                          WorkCard(category: 'Store', title: 'Meaning Store', meta: 'Hidden meanings', action: 'Open meanings', image: 'assets/rails/09.png', onTap: () => _push(context, const MeaningStoreScreen())),
+                          WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', image: 'assets/rails/10.png', onTap: () => _goTab(context, 4)),
+                          WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/11.png', onTap: () => _push(context, const AppSettingsScreen())),
+                          WorkCard(category: 'Alerts', title: 'Notifications', meta: 'This phone', action: 'Open alerts', image: 'assets/rails/glass-01.jpg', onTap: () => _push(context, const NotificationsSettingsPage())),
+                          WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => _push(context, const EarnHubScreen())),
+                          WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Coins, quests, invite', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => _push(context, const VaultScreen())),
+                          WorkCard(category: 'Gifts', title: 'NowssB Gifts', meta: 'Boxes and gift cards', action: 'Open gifts', image: 'assets/rails/gifts-01.jpg', onTap: () => _push(context, const GiftsScreen())),
+                          WorkCard(category: 'Coupons', title: 'NowssB Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/coupons-01.jpg', onTap: () => _push(context, const CouponScreen())),
+                          WorkCard(category: 'You', title: 'Word Print', meta: 'Public profile', action: 'Open print', image: 'assets/rails/glass-02.jpg', onTap: () => _push(context, const WordPrintScreen())),
+                          WorkCard(category: 'Wall', title: 'Echo Wall', meta: 'Reflections', action: 'Open the wall', image: 'assets/rails/glass-03.jpg', onTap: () => _push(context, const EchoWallScreen())),
+                          WorkCard(category: 'Cash', title: 'Earnings', meta: 'Payouts and commissions', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => _push(context, const EarningsScreen())),
+                          WorkCard(category: 'Ledger', title: 'Activity', meta: 'Coin and cash ledger', action: 'Open activity', image: 'assets/rails/clear-04.jpg', onTap: () => _push(context, const EarnHubScreen())),
+                          WorkCard(category: 'Connect', title: 'NowssB Connect', meta: 'Community', action: 'Open connect', image: 'assets/rails/glass-04.jpg', onTap: () => _push(context, const EchoWallScreen())),
                         ],
                       ),
                       Padding(

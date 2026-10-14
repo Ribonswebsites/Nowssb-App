@@ -46,7 +46,6 @@ import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_router.dart';
-import '../widgets/hub_rails.dart';
 import '../widgets/routine_deck.dart';
 
 const _accent = Color(0xFFE3BD7D);
@@ -456,7 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
-                    LSection('rails', 'Practice rails', const IdentityRails(RailKind.profile)),
+                    LSection('programs', 'Programs', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
                     LSection('quick', 'Quick access', _quickAccess()),
                     LSection('recent', 'Recent activity', _recentActivity()),
@@ -637,11 +636,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       bannerSub: 'Earn, rewards, coupons, gifts',
       onBanner: () => Programmes.open(context, Programme.earn),
       cards: [
-        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', tint: const Color(0xFFE9C1A5), onTap: () => Programmes.open(context, Programme.earn)),
-        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', tint: const Color(0xFFB9D5E8), onTap: () => Programmes.open(context, Programme.rewards)),
-        WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', tint: const Color(0xFFCBBBE8), onTap: () => Programmes.open(context, Programme.coupons)),
-        WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', tint: const Color(0xFFBFE2D1), onTap: () => Programmes.open(context, Programme.gifts)),
-        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', tint: const Color(0xFFF0D39B), onTap: () => Programmes.open(context, Programme.earnings)),
+        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/earn-02.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', image: 'assets/rails/rewards-02.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+        WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', image: 'assets/rails/coupons-02.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
+        WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', image: 'assets/rails/gifts-02.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
+        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/earnings-02.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
       ],
     );
       },

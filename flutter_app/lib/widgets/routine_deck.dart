@@ -62,28 +62,6 @@ class RoutineDeck extends StatefulWidget {
 }
 
 class _RoutineDeckState extends State<RoutineDeck> {
-  late final ScrollController _scroll;
-  var _active = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _scroll = ScrollController()..addListener(_onScroll);
-  }
-
-  @override
-  void dispose() {
-    _scroll
-      ..removeListener(_onScroll)
-      ..dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    final next = (_scroll.offset / 344).round().clamp(0, widget.cards.length - 1);
-    if (next != _active && mounted) setState(() => _active = next);
-  }
-
   @override
   Widget build(BuildContext context) {
     final n = widget.cards.length;
@@ -103,12 +81,9 @@ class _RoutineDeckState extends State<RoutineDeck> {
           const SizedBox(height: 12),
           _Banner(title: widget.banner, subtitle: widget.bannerSub, onTap: widget.onBanner ?? (n == 0 ? null : widget.cards.first.onTap)),
           const SizedBox(height: 14),
-          _Dots(count: n, active: _active),
-          const SizedBox(height: 14),
           SizedBox(
             height: 392,
             child: ListView.separated(
-              controller: _scroll,
               scrollDirection: Axis.horizontal,
               itemCount: n,
               separatorBuilder: (_, __) => const SizedBox(width: 14),
