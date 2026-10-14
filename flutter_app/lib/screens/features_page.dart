@@ -29,6 +29,11 @@ class _Feature {
 
 void _push(BuildContext c, Widget p) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => p));
 
+const _practiceArt = <String>['assets/rails/gen-70.jpg', 'assets/rails/gen-71.jpg', 'assets/rails/gen-72.jpg', 'assets/rails/coupons-03.jpg', 'assets/rails/coupons-04.jpg', 'assets/rails/coupons-05.jpg'];
+const _storeArt = <String>['assets/rails/coupons-06.jpg', 'assets/rails/coupons-07.jpg', 'assets/rails/earn-03.jpg', 'assets/rails/earn-04.jpg', 'assets/rails/earn-05.jpg', 'assets/rails/earn-06.jpg'];
+const _programArt = <String>['assets/rails/earn-07.jpg', 'assets/rails/earnings-03.jpg', 'assets/rails/earnings-04.jpg', 'assets/rails/earnings-05.jpg', 'assets/rails/earnings-06.jpg', 'assets/rails/gifts-03.jpg'];
+const _youArt = <String>['assets/rails/gifts-04.jpg', 'assets/rails/gifts-05.jpg', 'assets/rails/gifts-06.jpg', 'assets/rails/gifts-07.jpg'];
+
 final _practice = <_Feature>[
   _Feature('player', 'Practice player', 'Listen to a word, say it aloud, sit with it. Each sitting counts toward your streak.', NwsbMarks.play24, (c) => NwsbLinks.tab(c, 1)),
   _Feature('library', 'Sound Library', 'Every recorded word, with its own voice and meaning.', NwsbMarks.sound, (c) => _push(c, const SoundLibraryScreen())),
@@ -82,7 +87,7 @@ class FeaturesPage extends StatelessWidget {
             onBanner: () => NwsbLinks.tab(context, 1),
             cards: [
               for (var i = 0; i < _practice.length; i++)
-                WorkCard(category: 'Practice', title: _practice[i].title, meta: _practice[i].line, action: 'Open', image: 'assets/rails/${(i + 1).toString().padLeft(2, '0')}.png', onTap: () => _practice[i].open(context)),
+                WorkCard(category: 'Practice', title: _practice[i].title, meta: _practice[i].line, action: 'Open', image: _practiceArt[i], onTap: () => _practice[i].open(context)),
             ],
           ),
           RoutineDeck(
@@ -92,7 +97,7 @@ class FeaturesPage extends StatelessWidget {
             onBanner: () => NwsbLinks.tab(context, 3),
             cards: [
               for (var i = 0; i < _store.length; i++)
-                WorkCard(category: 'Store', title: _store[i].title, meta: _store[i].line, action: 'Open', image: 'assets/rails/glass-0${(i % 4) + 1}.jpg', onTap: () => _store[i].open(context)),
+                WorkCard(category: 'Store', title: _store[i].title, meta: _store[i].line, action: 'Open', image: _storeArt[i], onTap: () => _store[i].open(context)),
             ],
           ),
           RoutineDeck(
@@ -102,7 +107,7 @@ class FeaturesPage extends StatelessWidget {
             onBanner: () => Programmes.open(context, Programme.earn),
             cards: [
               for (var i = 0; i < _programmes.length; i++)
-                WorkCard(category: 'Program', title: _programmes[i].title, meta: _programmes[i].line, action: 'Open', image: 'assets/rails/${['earn-01.jpg', 'coupons-01.jpg', 'gifts-01.jpg', 'clear-01.jpg', 'earn-02.jpg', 'rewards-01.jpg'][i]}', onTap: () => _programmes[i].open(context)),
+                WorkCard(category: 'Program', title: _programmes[i].title, meta: _programmes[i].line, action: 'Open', image: _programArt[i], onTap: () => _programmes[i].open(context)),
             ],
           ),
           RoutineDeck(
@@ -112,7 +117,7 @@ class FeaturesPage extends StatelessWidget {
             onBanner: () => _push(context, const WidgetsPage()),
             cards: [
               for (var i = 0; i < _you.length; i++)
-                WorkCard(category: 'You', title: _you[i].title, meta: _you[i].line, action: 'Open', image: 'assets/rails/clear-0${(i % 4) + 1}.jpg', onTap: () => _you[i].open(context)),
+                WorkCard(category: 'You', title: _you[i].title, meta: _you[i].line, action: 'Open', image: _youArt[i], onTap: () => _you[i].open(context)),
             ],
           ),
         ],
