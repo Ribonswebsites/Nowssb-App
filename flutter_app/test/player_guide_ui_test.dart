@@ -42,11 +42,11 @@ void main() {
     expect(introIdx, greaterThan(guideIdx));
   });
 
-  test('settings can replay the player guide', () {
-    final settings = File('lib/screens/app_settings.dart').readAsStringSync();
-    expect(settings, contains("import 'player_guide.dart';"));
-    expect(settings, contains("title: 'Player Guide'"));
-    expect(settings, contains('PlayerGuideScreen'));
+  test('settings page and the hamburger drawer are gone', () {
+    expect(File('lib/screens/app_settings.dart').existsSync(), isFalse);
+    expect(File('lib/widgets/home_menu_drawer.dart').existsSync(), isFalse);
+    final player = File('lib/screens/practice_player.dart').readAsStringSync();
+    expect(player, contains('PlayerGuideScreen'));
   });
 
   testWidgets('first setup page shows welcome copy and chrome', (tester) async {

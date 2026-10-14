@@ -103,6 +103,7 @@ flutter:
     - assets/meanings/
     - assets/ebooks/
     - assets/profile_source/
+    - assets/profile/rails/
     - assets/routine/
     - assets/store/collections/
     - assets/store/store-rotator/

@@ -24,14 +24,10 @@ class HomeHeader extends StatelessWidget {
     super.key,
     this.notifications = 0,
     this.onNotifications,
-    this.onSettings,
-    this.onMenu,
   });
 
   final int notifications;
   final VoidCallback? onNotifications;
-  final VoidCallback? onSettings;
-  final VoidCallback? onMenu;
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +97,6 @@ class HomeHeader extends StatelessWidget {
                   badge: notifications,
                   onTap: onNotifications,
                 ),
-                const _HdrRule(),
-                _HdrIcon(mark: NwsbMarks.gear, onTap: onSettings),
-                const _HdrRule(),
-                _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
               ],
             ),
           ),
@@ -112,17 +104,6 @@ class HomeHeader extends StatelessWidget {
       ),
     );
   }
-}
-
-class _HdrRule extends StatelessWidget {
-  const _HdrRule();
-  @override
-  Widget build(BuildContext context) => Container(
-        width: 1,
-        height: 22,
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        color: const Color(0x2EFFFFFF),
-      );
 }
 
 class _HdrIcon extends StatelessWidget {
