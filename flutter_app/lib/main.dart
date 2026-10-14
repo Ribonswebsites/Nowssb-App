@@ -56,6 +56,7 @@ import 'widgets/update_prompt.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
+import 'widgets/faint_film.dart';
 import 'widgets/hype_open.dart';
 
 Future<void> main() async {
@@ -65,7 +66,7 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.dark,
+    statusBarIconBrightness: Brightness.light,
   ));
 
   // Firebase first, but it is allowed to fail: an Android build has no
@@ -243,7 +244,14 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
               navigatorKey: _navigatorKey,
               child: AdminEditFab(
                 navigatorKey: _navigatorKey,
-                child: NotificationPopupHost(child: child ?? const SizedBox()),
+                child: NotificationPopupHost(
+                  child: Stack(
+                    children: [
+                      const Positioned.fill(child: FaintFilm()),
+                      child ?? const SizedBox(),
+                    ],
+                  ),
+                ),
               ),
             )),
         title: 'NowssB',

@@ -8,8 +8,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../theme/tokens.dart';
 import '../../widgets/four_banners.dart';
+import '../../widgets/glass_system.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -42,6 +45,33 @@ class _CouponScreenState extends State<CouponScreen> {
   final _scratch = GlobalKey();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _guide());
+  }
+
+  Future<void> _guide() async {
+    if (!mounted) return;
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool('nwsb.guide.coupons') == true) return;
+    if (!mounted) return;
+    await PageGuide.show(context, title: 'My Coupons', lines: const [
+      'A coupon is a scratch or a code. It is not cash.',
+      'Tap Scratch to reveal today’s card.',
+      'Add a code, then use it at checkout. Coins cover only part of the price.',
+    ]);
+    await prefs.setBool('nwsb.guide.coupons', true);
+  }
+
+  void _help() {
+    PageGuide.show(context, title: 'My Coupons', lines: const [
+      'A coupon is a scratch or a code. It is not cash.',
+      'Tap Scratch to reveal today’s card.',
+      'Add a code, then use it at checkout. Coins cover only part of the price.',
+    ]);
+  }
+
+  @override
   void dispose() {
     _go.dispose();
     super.dispose();
@@ -55,6 +85,48 @@ class _CouponScreenState extends State<CouponScreen> {
     Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 380), alignment: 0.08);
   }
 
+  void _detail(WideCouponData d) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: GlassWrapper(
+          radius: 36,
+          blur: true,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(color: const Color(0xFF0B0B12), borderRadius: BorderRadius.circular(28)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(d.banner, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 6),
+                Text(d.line, style: const TextStyle(color: Color(0xB3FFFFFF))),
+                const SizedBox(height: 8),
+                Text(d.copy, style: const TextStyle(color: kTileGold, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 8),
+                const Text('Coins cover only part of the price. A coupon is not cash.', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () async {
+                      Navigator.pop(ctx);
+                      await NowssbLoader.run(context, EconomyApi.call('claimTicket', {'code': d.copy}));
+                    },
+                    child: const Text('Apply now'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
@@ -62,52 +134,87 @@ class _CouponScreenState extends State<CouponScreen> {
       title: 'NowssB Coupons',
       mark: NwsbMarks.coupon,
       showBalance: false,
-      header: const CouponsPageHeader(trailing: CoinBalancePill()),
-      child: RefreshIndicator(
-        color: NwsbColors.gold,
-        onRefresh: () => EconomyMirror.instance.refresh(),
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-          cacheExtent: 1600,
-          children: [
-            CouponBannerSection(onCta: _showScratch),
-            const CouponsHero(),
-            const GlassLine(
-              text: 'A free scratch every day. Paid cards show every prize before you draw. Expected value stays under the price.',
-              mark: NwsbMarks.coupon,
+      header: CouponsPageHeader(trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+        IconButton(onPressed: _help, icon: const Icon(Icons.help_outline, color: Colors.white)),
+        const CoinBalancePill(),
+      ])),
+      child: Column(
+        children: [
+          Expanded(
+            child: RefreshIndicator(
+              color: NwsbColors.gold,
+              onRefresh: () => EconomyMirror.instance.refresh(),
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                children: [
+                  GlassWrapper(radius: 28, blur: true, padding: EdgeInsets.zero, child: CouponBannerSection(onCta: _showScratch)),
+                  const SizedBox(height: 12),
+                  const StripBanner(title: 'Expiring soon', line: 'Use a coupon before it leaves the account'),
+                  GlassWrapper(
+                    radius: 28,
+                    blur: true,
+                    child: const Column(
+                      children: [
+                        Text('Level up your savings', style: TextStyle(color: Color(0xFFD7C2F5), fontWeight: FontWeight.w600)),
+                        SizedBox(height: 6),
+                        Text('COUPONS FOR YOU', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const _CodeBox(),
+                  const SizedBox(height: 14),
+                  SizedBox(
+                    height: 168,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        for (final d in kWideCoupons.take(6))
+                          GlassCardD(name: d.kicker, offer: d.banner, color: d.coins > 0 ? kTileGold : kTileViolet),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  for (var i = 0; i < kWideCoupons.length && i < 6; i++)
+                    GlassCardB(
+                      title: kWideCoupons[i].banner,
+                      line: kWideCoupons[i].line,
+                      action: 'View details',
+                      fresh: i.isEven,
+                      onTap: () => _detail(kWideCoupons[i]),
+                    ),
+                  GlassCardA(title: 'How a coupon works', line: 'Scratch, or add a code. It comes off the price. It is not cash.', onNext: _help),
+                  const SizedBox(height: 8),
+                  KeyedSubtree(key: _scratch, child: const DailyScratchCard()),
+                  const SizedBox(height: 12),
+                  const CouponRails(),
+                  const SizedBox(height: 12),
+                  _PaidPeek(onOpen: () => _tab('shop')),
+                  const SizedBox(height: 12),
+                  const FourBanners(
+                    current: Programme.coupons,
+                    splitTitle: 'Coupons',
+                    splitCta: 'Scratch',
+                    blackTitle: 'Odds on the card',
+                    blackSub: 'A free scratch, and three paid cards. Nothing is cash.',
+                  ),
+                  const SizedBox(height: 12),
+                  ProgramTabsBlock(spec: kCouponsSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, goRef: _go, showDisclaimer: false),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            const EditableLabel('coupon_screen.CouponScreen', 'FREE SCRATCH', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            KeyedSubtree(key: _scratch, child: const DailyScratchCard()),
-            const SizedBox(height: 18),
-            const EditableLabel('coupon_screen.CouponScreen', 'COUPON TICKETS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            const EditableLabel('coupon_screen.CouponScreen', 'Tap a ticket to flip it. Claim puts the coupon on your account and in the checkout picker.',
-                style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35)),
-            const SizedBox(height: 10),
-            const CouponRails(),
-            const SizedBox(height: 18),
-            const EditableLabel('coupon_screen.CouponScreen', 'PAID CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 4),
-            const EditableLabel('coupon_screen.CouponScreen',
-              'Odds are fixed until a published change. A Signature prize does not unlock a rank rate.',
-              style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.35),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+            child: Row(
+              children: [
+                Expanded(child: GlassWrapper(radius: 999, onTap: () => _tab('mine'), child: const Center(child: Text('All rewards', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700))))),
+                const SizedBox(width: 10),
+                Expanded(child: GlassWrapper(radius: 999, onTap: _showScratch, child: const Center(child: Text('Scratch cards', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700))))),
+              ],
             ),
-            const SizedBox(height: 8),
-            _PaidPeek(onOpen: () => _tab('shop')),
-            const SizedBox(height: 18),
-            const FourBanners(
-              current: Programme.coupons,
-              splitTitle: 'Coupons',
-              splitCta: 'Scratch',
-              blackTitle: 'Odds on the card',
-              blackSub: 'A free scratch, and three paid cards. Nothing is cash.',
-            ),
-            const SizedBox(height: 18),
-            ProgramTabsBlock(spec: kCouponsSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, goRef: _go, showDisclaimer: false),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -236,6 +343,47 @@ class _OpenedCard extends StatelessWidget {
 
 /// The paid cards from the server's own odds table, with a jump to the
 /// Coupon Shop tab (where each card is bought directly on Play).
+class _CodeBox extends StatefulWidget {
+  const _CodeBox();
+  @override
+  State<_CodeBox> createState() => _CodeBoxState();
+}
+
+class _CodeBoxState extends State<_CodeBox> {
+  final _code = TextEditingController();
+  @override
+  void dispose() {
+    _code.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassWrapper(
+      radius: 18,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _code,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(hintText: 'Enter coupon code', hintStyle: TextStyle(color: Color(0x66FFFFFF)), border: InputBorder.none),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final raw = _code.text.trim();
+              if (raw.isEmpty) return;
+              await NowssbLoader.run(context, EconomyApi.call('claimTicket', {'code': raw}));
+            },
+            child: const Text('Add coupon', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _PaidPeek extends StatelessWidget {
   const _PaidPeek({required this.onOpen});
   final VoidCallback onOpen;

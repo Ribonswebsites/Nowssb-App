@@ -116,3 +116,18 @@ class NwsbSpace {
   static const pageTop = 16.0;
   static const gap = 14.0;
 }
+
+/// Glass and the faint background film. Tune these, not the widgets.
+const double kBgVideoOpacity = 0.12;
+const double kGlassBlurLarge = 60;
+const double kGlassBlurMedium = 45;
+const double kGlassBlurSmall = 30;
+const double kGlassFill = 0.15;
+const double kGlassSaturation = 1.5;
+
+const kTileViolet = Color(0xFF7B4DFF);
+const kTileOrange = Color(0xFFE2792F);
+const kTileTeal = Color(0xFF2CC4B5);
+const kTileGold = Color(0xFFE4C56A);
+const kTilePink = Color(0xFFE85D9A);
+const kTileBlue = Color(0xFF3D7DFF);

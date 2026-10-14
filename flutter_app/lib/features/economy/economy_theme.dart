@@ -3,7 +3,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/app_thinking_loader.dart';
-import '../../widgets/app_backdrop.dart';
+import '../../widgets/glass_system.dart';
 import '../../widgets/glass_wrap.dart';
 import '../programs/rewards_program.dart';
 import '../../widgets/nwsb_coin_fly.dart';
@@ -47,47 +47,29 @@ class EconomyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        children: [
-          const Positioned.fill(child: AppBackdrop()),
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x99000000), Color(0x66000000), Color(0x88000000), Color(0xCC000000)],
-                    stops: [0, 0.22, 0.72, 1.0],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 10, 12, 6),
-                  child: header ??
-                      Row(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 10, 12, 6),
+              child: header ??
+                  Row(
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.of(context).maybePop(),
                         behavior: HitTestBehavior.opaque,
-                        child: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                          child: const Icon(Icons.arrow_back, size: 19, color: NwsbColors.ink),
+                        child: GlassWrapper(
+                          radius: 999,
+                          padding: const EdgeInsets.all(10),
+                          blur: true,
+                          child: const Icon(Icons.arrow_back, size: 18, color: Colors.white),
                         ),
                       ),
                       const SizedBox(width: 12),
-                      _Mark(mark),
-                      const SizedBox(width: 8),
                       Expanded(
-                        child: EditableLabel('economy_theme.EconomyPage',
+                        child: EditableLabel(
+                          'economy_theme.EconomyPage',
                           title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -98,14 +80,12 @@ class EconomyPage extends StatelessWidget {
                       if (showBalance) const CoinBalancePill(),
                     ],
                   ),
-                ),
-                if (banner != null) banner!,
-                Expanded(child: child),
-                if (goodToKnow != null) _GoodToKnowBar(goodToKnow!),
-              ],
             ),
-          ),
-        ],
+            if (banner != null) banner!,
+            Expanded(child: child),
+            if (goodToKnow != null) _GoodToKnowBar(goodToKnow!),
+          ],
+        ),
       ),
     );
   }
