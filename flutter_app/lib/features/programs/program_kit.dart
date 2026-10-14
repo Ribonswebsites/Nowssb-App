@@ -164,10 +164,14 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
           Padding(
             key: _anchor,
             padding: const EdgeInsets.only(top: 6, bottom: 12),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [for (var i = 0; i < spec.tabs.length; i++) _chip(spec.tabs[i].title, i)],
+            child: SizedBox(
+              height: 92,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: spec.tabs.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (_, i) => _tabCard(spec.tabs[i].title, i),
+              ),
             ),
           ),
           ListenableBuilder(
@@ -199,6 +203,33 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
             PDisclaimer(spec.disclaimer, slot: 'program_kit.${spec.pageId}'),
           ],
         ],
+      ),
+    );
+  }
+
+  Widget _tabCard(String label, int i) {
+    final on = i == _tab;
+    return GestureDetector(
+      onTap: () {
+        RewardHaptics.tick();
+        setState(() => _tab = i);
+      },
+      child: Container(
+        width: 168,
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        decoration: BoxDecoration(
+          color: on ? Colors.white : Colors.black,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: on ? Colors.white : const Color(0x33FFFFFF)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${i + 1} of ${widget.spec.tabs.length}', style: TextStyle(color: on ? const Color(0xFF666666) : const Color(0x99FFFFFF), fontSize: 11, fontWeight: FontWeight.w600)),
+            const Spacer(),
+            Text(label, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: on ? Colors.black : Colors.white, fontWeight: FontWeight.w800, fontSize: 15, height: 1.1)),
+          ],
+        ),
       ),
     );
   }

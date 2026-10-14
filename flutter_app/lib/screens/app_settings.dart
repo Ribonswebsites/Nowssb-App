@@ -28,7 +28,7 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/hub_rails.dart';
+import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
@@ -140,7 +140,20 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'settings', [
-              LSection('rails', 'Card rails', const IdentityRails(RailKind.settings)),
+              LSection('deck', 'Settings cards', RoutineDeck(
+                title: 'Settings',
+                banner: 'Settings',
+                bannerSub: 'Player, look, alerts, account',
+                onBanner: () => _push(const PlayerSettingsScreen()),
+                cards: [
+                  WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
+                  WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', tint: const Color(0xFFB9D5E8), onTap: () => _push(const WidgetsPage())),
+                  WorkCard(category: 'Look', title: 'Fashion Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Fashion Plus', tint: const Color(0xFFCBBBE8), onTap: () => _push(const FashionPlusScreen())),
+                  WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', tint: const Color(0xFFBFE2D1), onTap: () => _push(const QuickAccessScreen())),
+                  WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', tint: const Color(0xFFF0D39B), onTap: () => _push(const NotificationsSettingsPage())),
+                  WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', tint: const Color(0xFFD4C5E8), onTap: () => _push(const PlayerSettingsScreen())),
+                ],
+              )),
               LSection(
                   'profile',
                   'Profile card',

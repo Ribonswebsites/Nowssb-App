@@ -35,7 +35,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
-import 'hub_rails.dart';
+import 'routine_deck.dart';
 import '../admin/template/editable.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
@@ -229,7 +229,20 @@ class HomeMenuDrawer extends StatelessWidget {
                         compact: true,
                         onTap: () => _push(context, const SubscriptionScreen()),
                       ),
-                      const IdentityRails(RailKind.menu),
+                      RoutineDeck(
+                        title: 'Menu',
+                        banner: 'Your menu',
+                        bannerSub: 'Home, practice, store, settings',
+                        onBanner: () => _goTab(context, 0),
+                        cards: [
+                          WorkCard(category: 'Home', title: 'Home', meta: 'Dashboard', action: 'Open home', onTap: () => _goTab(context, 0)),
+                          WorkCard(category: 'Practice', title: 'Daily Practice', meta: 'Morning ritual', action: 'Open practice', tint: const Color(0xFFB9D5E8), onTap: () => _goTab(context, 1)),
+                          WorkCard(category: 'Library', title: 'Sound Library', meta: 'Root frequencies', action: 'Open library', tint: const Color(0xFFCBBBE8), onTap: () => _push(context, const SoundLibraryScreen())),
+                          WorkCard(category: 'Store', title: 'Store', meta: 'Words and books', action: 'Open store', tint: const Color(0xFFBFE2D1), onTap: () => _goTab(context, 3)),
+                          WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', tint: const Color(0xFFF0D39B), onTap: () => _goTab(context, 4)),
+                          WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', tint: const Color(0xFFD4C5E8), onTap: () => _push(context, const AppSettingsScreen())),
+                        ],
+                      ),
                       _SectionLabel('Practice', light: light),
                       _Group(
                         light: light,
@@ -298,9 +311,14 @@ class HomeMenuDrawer extends StatelessWidget {
                             light: light,
                             mark: _mark['progress']!,
                             viewBox: 22,
-                            label: 'Profile',
-                            sub: 'Account and earnings',
-                            onTap: () => _goTab(context, 4),
+                            label: 'My Progress',
+                            sub: 'Healing journey',
+                            onTap: () => _push(
+                              context,
+                              PracticeProgressScreen(
+                                words: ContentStore.instance.library,
+                              ),
+                            ),
                           ),
                           _Row(
                             light: light,

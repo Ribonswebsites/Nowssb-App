@@ -10,7 +10,6 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
-import '../../widgets/hub_rails.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -297,33 +296,23 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           videoTitle: '',
         ),
         const SizedBox(height: 18),
-        HubRails(
-          a: railSet(const ['Trust', 'Breath', 'Still', 'Dawn', 'Night'], '4 min'),
-          b: railSet(const ['Words', 'Roots', 'Stages', 'Saved', 'New'], 'atelier'),
-          c: railSet(const ['7 day', 'First word', 'Streak', 'Listen', 'Repeat'], 'a short step'),
+        const StoreRoomDeck(current: 'word'),
+        StoreRegistrySection(config: AtelierMix.coupons),
+        const SizedBox.shrink(),
+        StoreRegistrySection(config: AtelierMix.tiles),
+        StoreMixRow(
+          title: 'Featured collections',
+          child: StoreRegistrySection(config: AtelierMix.glassy),
         ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 168,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              SizedBox(
-                width: 320,
-                child: ColoredSplitPromoBanner.forSurface(
-                  SplitPromoSurface.wordAtelier,
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const MeaningStoreScreen())),
-                ),
-              ),
-              const SizedBox(width: 12),
-              SizedBox(
-                width: 320,
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(7, onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SignatureStoreScreen()))),
-                ),
-              ),
-            ],
+        const SizedBox(height: 16),
+        ColoredSplitPromoBanner.forSurface(
+          SplitPromoSurface.wordAtelier,
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const MeaningStoreScreen(),
+            ),
           ),
+          margin: const EdgeInsets.only(bottom: 8),
         ),
         const SizedBox(height: 8),
         StoreGlassPanel(
@@ -389,7 +378,16 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ),
         const SizedBox(height: 8),
         ...sections,
-        const SizedBox.shrink(),
+        ColoredSplitPromoBanner(
+          spec: SplitPromoExtras.at(
+            7,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SignatureStoreScreen(),
+              ),
+            ),
+          ),
+        ),
         const StoreDisclaimer(
           text:
               'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',

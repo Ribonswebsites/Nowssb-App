@@ -45,8 +45,8 @@ import 'subscription.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
-import '../features/programs/program_cards.dart';
-import '../widgets/hub_rails.dart';
+import '../features/programs/program_router.dart';
+import '../widgets/routine_deck.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -457,7 +457,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: layoutChildren(context, 'profile', [
                     LSection('banner', 'Banner', _banner()),
                     LSection('card', 'Profile card', _profileCard()),
-                    LSection('rails', 'Practice rails', const IdentityRails(RailKind.profile)),
                     LSection('earn', 'Earn hub', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
                     LSection('about', 'About', _about()),
@@ -638,91 +637,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final refs = EconomyMirror.instance.paidReferrals;
     final tier = live ? EconomyMirror.instance.circleTier : 'Member';
     final earned = live ? EconomyMirror.instance.lifetimeCents : 0;
-    return Column(
-      children: [
-        const SectionBlock(
-          marginBottom: 18,
-          title: 'Programs',
-          child: ProgramCardsStrip(),
-        ),
-        SectionBlock(
-          marginBottom: 18,
-          title: 'Rewards',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CoinCount(
-                    value: coins,
-                    style: const TextStyle(fontFamily: _mono, fontSize: 32, fontWeight: FontWeight.w600, color: _accent, height: 1),
-                  ),
-                  const SizedBox(height: 6),
-                  Text('Streak $streak · open Vault', style: const TextStyle(fontSize: 12.5, color: _dim)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SectionBlock(
-          marginBottom: 18,
-          title: 'NowssB Earn',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen())),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(tier, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
-                  const SizedBox(height: 6),
-                  Text('$code · $refs paid referrals', style: const TextStyle(fontSize: 12.5, color: _dim)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SectionBlock(
-          marginBottom: 18,
-          title: 'Gifts',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const GiftsScreen())),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EditableLabel('profile.ProfileScreen', 'Send or redeem', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
-                  SizedBox(height: 6),
-                  EditableLabel('profile.ProfileScreen', 'A real purchase, shared as a code', style: TextStyle(fontSize: 12.5, color: _dim)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        SectionBlock(
-          marginBottom: 34,
-          title: 'Earnings',
-          child: GlassCard(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-            child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())),
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                live ? FxBook.instance.formatCents(earned) : 'Sign in',
-                style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent),
-              ),
-              const SizedBox(height: 6),
-              const EditableLabel('profile.ProfileScreen', 'Sales and referrals · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
-            ],
-          ),
-            ),
-          ),
-        ),
+    return RoutineDeck(
+      title: 'Programs',
+      banner: 'NowssB',
+      bannerSub: 'Earn, rewards, coupons, gifts',
+      onBanner: () => Programmes.open(context, Programme.earn),
+      cards: [
+        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', tint: const Color(0xFFE9C1A5), onTap: () => Programmes.open(context, Programme.earn)),
+        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', tint: const Color(0xFFB9D5E8), onTap: () => Programmes.open(context, Programme.rewards)),
+        WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', tint: const Color(0xFFCBBBE8), onTap: () => Programmes.open(context, Programme.coupons)),
+        WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', tint: const Color(0xFFBFE2D1), onTap: () => Programmes.open(context, Programme.gifts)),
+        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', tint: const Color(0xFFF0D39B), onTap: () => Programmes.open(context, Programme.earnings)),
       ],
     );
       },
@@ -744,10 +669,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _progress() {
-    return const SizedBox.shrink();
-  }
-
-  Widget _progressRetired() {
     void openProgress() {
       Navigator.of(context).push(
         MaterialPageRoute(

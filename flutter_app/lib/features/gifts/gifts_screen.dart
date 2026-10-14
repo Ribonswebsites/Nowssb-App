@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
-import '../../widgets/hub_rails.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
@@ -407,8 +406,6 @@ class _GiftsScreenState extends State<GiftsScreen> {
             mark: NwsbMarks.gift,
             onTap: () => showGiftCardSheet(context, kGiftCatalog.first.id),
           ),
-          const SizedBox(height: 12),
-          const IdentityRails(RailKind.gifts),
           const SizedBox(height: 16),
           const GiftsHero(),
           const GiftShowcase(),

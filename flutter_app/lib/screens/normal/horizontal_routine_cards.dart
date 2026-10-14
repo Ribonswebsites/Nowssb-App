@@ -16,7 +16,6 @@ import '../../theme/tokens.dart';
 import '../../widgets/black_glass_banner.dart';
 import 'glassmorphism_theme.dart';
 import 'essentials_process_line.dart';
-import '../../widgets/hub_rails.dart';
 import '../../admin/template/editable.dart';
 
 class NmHorizontalRoutineCards extends StatefulWidget {
@@ -184,6 +183,8 @@ class _EssentialCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final darkGlass = fashion;
+    final foreground =
+        darkGlass ? Colors.white : const Color(0xFF263142);
     final surface = darkGlass
         ? _darkGlassFill
         : (glass ? const Color(0xD9FFFFFF) : const Color(0xFFECEEF2));
@@ -192,54 +193,38 @@ class _EssentialCard extends StatelessWidget {
         : (glass ? const Color(0xFFFFFFFF) : Colors.transparent);
     final radius = BorderRadius.circular(24);
 
-    Widget face = ClipRRect(
-      borderRadius: radius,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          EditableImage.asset(card.image, fit: BoxFit.cover, alignment: Alignment.center, slot: 'horizontal_routine_cards.EssentialCard'),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0x00000000), Color(0x33201030), Color(0xCC5A1878), Color(0xE0460F62)],
-                stops: [0.2, 0.5, 0.78, 1],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const RailFaces(count: '+12', size: 26),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: card.circleColor, width: 2)),
-                      child: const Text('Active', style: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w700, fontSize: 12)),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700, height: 1.05)),
-                const SizedBox(height: 6),
-                Text(card.meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 12, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(child: Text(card.category, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xC6FFFFFF), fontSize: 13))),
-                    const Text('Continue  ›', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    Widget face = Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(card.category,
+                style: TextStyle(
+                    color: foreground.withValues(alpha: darkGlass ? .78 : .72),
+                    fontSize: 12)),
+            const SizedBox(height: 10),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: EditableImage.asset(card.image,
+                    height: 152,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter, slot: 'horizontal_routine_cards.EssentialCard')),
+            const SizedBox(height: 12),
+            Text(card.meta,
+                style: TextStyle(
+                    color: foreground.withValues(alpha: darkGlass ? .75 : .7),
+                    fontSize: 12)),
+            const SizedBox(height: 4),
+            Text(card.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    color: foreground,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15)),
+          ]),
     );
 
     Widget cardPane;
@@ -321,6 +306,49 @@ class _EssentialCard extends StatelessWidget {
                 ]),
               ),
             ],
+          ),
+          Positioned(
+            top: 16,
+            right: 16,
+            child: Container(
+              width: 74,
+              height: 74,
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: .82),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 3),
+                boxShadow: const [
+                  BoxShadow(
+                      color: Color(0x55000000),
+                      blurRadius: 12,
+                      offset: Offset(0, 5)),
+                ],
+              ),
+              child: EditableImage.asset('assets/banners/promo/store.png',
+                  fit: BoxFit.contain, slot: 'horizontal_routine_cards.EssentialCard'),
+            ),
+          ),
+          Positioned(
+            left: 135,
+            top: 269,
+            child: Container(
+              width: 60,
+              height: 60,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: card.circleColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 3),
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Color(0x55000000),
+                        blurRadius: 12,
+                        offset: Offset(0, 5))
+                  ]),
+              child: EditableImage.asset('assets/banners/promo/store.png',
+                  fit: BoxFit.contain, slot: 'horizontal_routine_cards.EssentialCard'),
+            ),
           ),
         ],
       ),

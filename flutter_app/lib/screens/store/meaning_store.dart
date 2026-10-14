@@ -17,6 +17,7 @@ import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
+import 'store_routes.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/sections/artist_cards_section.dart';
@@ -28,7 +29,6 @@ import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import 'request_words.dart';
-import 'store_routes.dart';
 import 'store_terms_sheet.dart';
 import 'signature_store.dart';
 import '../../shell/nwsb_links.dart';
@@ -266,6 +266,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           videoAsset: nwsbVideo(kStoreMeaningDoorVidFile),
           videoTitle: '',
         ),
+        const StoreRoomDeck(current: 'meaning'),
         const StoreSubscribeBanner(
           pillIconAsset: kMsMeaningProductArt,
         ),

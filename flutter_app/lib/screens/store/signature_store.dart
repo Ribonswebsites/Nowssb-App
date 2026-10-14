@@ -76,6 +76,7 @@ class _SignatureBody extends StatelessWidget {
           videoAsset: 'assets/video/signature-store-hero.mp4',
           videoTitle: '',
         )),
+        const LSection('rooms', 'Store rooms', StoreRoomDeck(current: 'signature')),
         // UI-7 varied mix: artists → glassy → hype → spotlight (no two alike).
         LSection(
           'artists',

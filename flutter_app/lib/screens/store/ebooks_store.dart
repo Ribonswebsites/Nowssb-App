@@ -178,6 +178,7 @@ class _EbooksBody extends StatelessWidget {
             ),
           ),
         )),
+        const LSection('rooms', 'Store rooms', StoreRoomDeck(current: 'ebooks')),
         // UI-7 varied mix: coupons → tiles → glassy → hype (no two alike).
         LSection(
           'coupons',
