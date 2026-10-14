@@ -141,22 +141,7 @@ class _CircleScreenState extends State<CircleScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              const EarnHero(),
-              const SizedBox(height: 12),
-              BrandTopBanner(
-                bare: true,
-                title: 'NowssB Earn',
-                mark: NwsbMarks.piggy,
-                art: 'assets/banners/earn/bag-blonde.jpg',
-                artAlignment: const Alignment(0.12, -0.02),
-                onTap: _welcome,
-              ),
-              const SizedBox(height: 12),
               const IdentityRails(RailKind.earn),
-              const SizedBox(height: 14),
-              const CoinCollectCard(pageKey: 'earn', amount: 10, title: 'Earn coins'),
-              const SizedBox(height: 12),
-              const TrioRail(current: Programme.earn),
               const SizedBox(height: 14),
               GlassWrap(
                 margin: EdgeInsets.zero,
@@ -164,8 +149,9 @@ class _CircleScreenState extends State<CircleScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: const Color(0x1AFFFFFF),
                     borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0x55FFFFFF)),
                   ),
                   child: Row(
                     children: [
@@ -244,8 +230,9 @@ class _CircleScreenState extends State<CircleScreen> {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: const Color(0x1AFFFFFF),
                     borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0x55FFFFFF)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -346,9 +333,9 @@ class _CircleScreenState extends State<CircleScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: const Color(0x1AFFFFFF),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0x29FFFFFF)),
+                  border: Border.all(color: const Color(0x55FFFFFF)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

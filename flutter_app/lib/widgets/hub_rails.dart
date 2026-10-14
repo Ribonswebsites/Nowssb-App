@@ -677,7 +677,7 @@ class _ClearChallengeCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: const Color(0x14FFFFFF),
@@ -699,51 +699,56 @@ class _ClearChallengeCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Expanded(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: const Color(0x66FFFFFF)),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xF2FFFFFF), Color(0x99FFFFFF), Color(0x00FFFFFF)],
-                        stops: [0, 0.72, 1],
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w800, fontSize: 18, height: 1.1)),
-                          const SizedBox(height: 4),
-                          Text(card.meta, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF3A3A3A), fontSize: 12, height: 1.25)),
-                          const Spacer(),
-                          Row(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: const Color(0x55FFFFFF)),
+                          color: const Color(0x1AFFFFFF),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Skip', style: TextStyle(color: Color(0xFF5A5A5A), fontWeight: FontWeight.w600)),
+                              Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18, height: 1.1)),
+                              const SizedBox(height: 4),
+                              Text(card.meta, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 12, height: 1.25)),
                               const Spacer(),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
-                                child: const Text('Next', style: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w800)),
+                              Row(
+                                children: [
+                                  const Text('Skip', style: TextStyle(color: Color(0xE6FFFFFF), fontWeight: FontWeight.w600)),
+                                  const Spacer(),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0x33FFFFFF),
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(color: const Color(0x88FFFFFF)),
+                                    ),
+                                    child: const Text('Next', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  for (var dot = 0; dot < 4; dot++)
+                                    Container(
+                                      width: dot == index % 4 ? 7 : 5,
+                                      height: dot == index % 4 ? 7 : 5,
+                                      margin: const EdgeInsets.symmetric(horizontal: 3),
+                                      decoration: BoxDecoration(color: dot == index % 4 ? Colors.white : const Color(0x66FFFFFF), shape: BoxShape.circle),
+                                    ),
+                                ],
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              for (var dot = 0; dot < 4; dot++)
-                                Container(
-                                  width: dot == index % 4 ? 7 : 5,
-                                  height: dot == index % 4 ? 7 : 5,
-                                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                                  decoration: BoxDecoration(color: dot == index % 4 ? const Color(0xFF1A1A1A) : const Color(0x551A1A1A), shape: BoxShape.circle),
-                                ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

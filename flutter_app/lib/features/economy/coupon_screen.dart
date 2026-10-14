@@ -148,21 +148,7 @@ class _CouponScreenState extends State<CouponScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
-                  GlassWrapper(radius: 28, blur: true, padding: EdgeInsets.zero, child: CouponBannerSection(onCta: _showScratch)),
-                  const SizedBox(height: 12),
                   const IdentityRails(RailKind.coupons),
-                  const StripBanner(title: 'Expiring soon', line: 'Use a coupon before it leaves the account'),
-                  GlassWrapper(
-                    radius: 28,
-                    blur: true,
-                    child: const Column(
-                      children: [
-                        Text('Level up your savings', style: TextStyle(color: Color(0xFFD7C2F5), fontWeight: FontWeight.w600)),
-                        SizedBox(height: 6),
-                        Text('COUPONS FOR YOU', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
-                      ],
-                    ),
-                  ),
                   const SizedBox(height: 12),
                   const _CodeBox(),
                   const SizedBox(height: 14),

@@ -456,16 +456,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
-                    LSection('banner', 'Banner', _banner()),
-                    LSection('card', 'Profile card', _profileCard()),
                     LSection('rails', 'Practice rails', const IdentityRails(RailKind.profile)),
-                    LSection('earn', 'Earn hub', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
-                    LSection('about', 'About', _about()),
-                    LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
-                      SplitPromoSurface.profile,
-                      onTap: () => NavScope.goTo(context, 1),
-                    )),
                     LSection('quick', 'Quick access', _quickAccess()),
                     LSection('recent', 'Recent activity', _recentActivity()),
                     LSection('motto', 'Motto', _motto()),
