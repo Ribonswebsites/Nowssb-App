@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../admin/template/editable.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 
 class LoginStage extends StatelessWidget {
   const LoginStage({
@@ -56,16 +58,18 @@ class LoginStage extends StatelessWidget {
   Widget build(BuildContext context) {
     final pad = MediaQuery.paddingOf(context);
     final h = MediaQuery.sizeOf(context).height;
-    final faceGap = (h * 0.16).clamp(72.0, 150.0) + 64;
+    final faceGap = (h * 0.48).clamp(300.0, 560.0);
     return Stack(
       fit: StackFit.expand,
       children: [
         const ColoredBox(color: Color(0xFF05060C)),
         const Positioned.fill(
-          child: EditableImage.asset(
-            'assets/login/login-neon.png',
+          child: NwsbVideo(
+            asset: 'assets/video/login-phone.mp4',
+            poster: 'assets/login/login-neon.png',
             fit: BoxFit.cover,
-            alignment: Alignment(0, 0.2),
+            alignment: Alignment(0, -0.42),
+            priority: ClipPriority.feature,
             slot: 'login_stage.LoginStage',
           ),
         ),
@@ -100,6 +104,7 @@ class LoginStage extends StatelessWidget {
                     icon: const Icon(Icons.close, color: Colors.white),
                   ),
                 ),
+              SizedBox(height: faceGap),
               const EditableLabel('login_stage.LoginStage',
                 'NowssB',
                 style: TextStyle(
@@ -121,7 +126,7 @@ class LoginStage extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: faceGap),
+              const SizedBox(height: 18),
               const EditableLabel(
                 'login_stage.LoginStage',
                 'YOUR MIND DESERVES\nBETTER FREQUENCIES',
@@ -190,9 +195,17 @@ class LoginStage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _GlassButton(
+                height: busy ? 88 : 54,
                 onTap: busy ? null : onSubmit,
                 child: busy
-                    ? const AppThinkingLoader(size: 22)
+                    ? const AppThinkingLoader(
+                        size: 52,
+                        blackCircle: true,
+                        circlePad: 8,
+                        axis: Axis.horizontal,
+                        label: 'Loading please wait',
+                        labelStyle: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                      )
                     : EditableLabel(
                         'login_stage.LoginStage',
                         codeSent ? 'Verify' : (createAccount ? 'Sign Up' : 'Log In'),

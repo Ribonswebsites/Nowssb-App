@@ -10,7 +10,6 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
-import '../../widgets/hub_rails.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -22,6 +21,7 @@ import 'meaning_store.dart';
 import 'request_words.dart';
 import 'signature_store.dart';
 import 'store_routes.dart';
+import 'store_shelf.dart';
 import 'store_terms_sheet.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
@@ -65,17 +65,11 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   final _search = TextEditingController();
   String _query = '';
   String _chip = 'ALL';
-  var _allRows = false;
 
   @override
   void dispose() {
     _search.dispose();
     super.dispose();
-  }
-
-  List<RmCategory> get _cats {
-    if (_chip == 'ALL') return kRmCategories;
-    return kRmCategories.where((c) => c.id == _chip).toList();
   }
 
   bool _match(String word, String root) {
@@ -113,164 +107,32 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     );
   }
 
+  List<StorePiece> _pieces() {
+    final out = <StorePiece>[];
+    final seen = <String>{};
+    void add(String title, String line, String group, String art, VoidCallback tap) {
+      final key = title.toLowerCase();
+      if (!seen.add(key) || !_match(title, line)) return;
+      out.add(StorePiece(title: title, line: line, art: art, group: group, onTap: tap));
+    }
+
+    for (final cat in kRmCategories) {
+      for (final w in cat.words) {
+        final name = w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
+        final id = 'word:${name.toLowerCase()}';
+        final price = StorePrices.instance.priceFor(id);
+        add(name, w.root, storeGroup(w.word), kRmWordImg, () => openAtelierWord(context, word: w.word, root: w.root, img: kRmWordImg, price: price));
+      }
+    }
+    for (final row in kPlaceRows) {
+      add(row.$1, row.$2, row.$3, kRmWordImg, () => openAtelierWord(context, word: row.$1, root: row.$2, img: kRmWordImg));
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cats = _cats;
-    final rowCats = (_chip == 'ALL' && !_allRows && cats.length > 10)
-        ? cats.take(10).toList()
-        : cats;
-    final sections = <Widget>[];
-    // Count product rails actually emitted (search may empty some).
-    var productRailIndex = 0;
-    for (var i = 0; i < rowCats.length; i++) {
-      final cat = rowCats[i];
-      sections.add(RmCatBanner(
-        title: cat.label,
-        sub: cat.sub,
-        badge: cat.badge,
-        labelColor: cat.labelColor != null ? Color(cat.labelColor!) : null,
-        logoAsset: kRmCatLogoAsset,
-        categoryId: cat.id,
-        artAsset: storeCollectionArt(cat.id),
-        pillLabel: cat.badge ?? cat.label,
-        onViewAll: () => _openViewAll(cat.label),
-      ));
-      sections.add(RmRowHeader(
-        title: cat.label,
-        onViewAll: () => _openViewAll(cat.label),
-      ));
-      sections.add(Builder(builder: (context) {
-        final cards = <Widget>[];
-        for (final w in cat.words) {
-          if (!_match(w.word, w.root)) continue;
-          final name = w.word.isEmpty
-              ? w.word
-              : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
-          // Real Play price (admin per-word price, else the default);
-          // the strike-through shows only for a real admin sale.
-          final id = 'word:${name.toLowerCase()}';
-          final price = StorePrices.instance.priceFor(id);
-          const img = kRmWordImg;
-          cards.add(RmWordCard(
-            name: name,
-            root: w.root,
-            imgUrl: img,
-            price: price,
-            originalPrice: StorePrices.instance.regularIfOnSale(id),
-            onTap: () => openAtelierWord(context,
-                word: w.word, root: w.root, img: img, price: price),
-          ));
-        }
-        final sig = cat.signature;
-        if (sig != null && _match(sig.name, 'Most Exclusive')) {
-          cards.add(RmWordCard(
-            name: sig.name,
-            root: 'Most Exclusive',
-            imgUrl: sig.img,
-            signature: true,
-            price: kMsSignaturePrice,
-            onTap: () => openAtelierWord(
-              context,
-              word: sig.name,
-              root: 'Most Exclusive',
-              img: sig.img,
-              signature: true,
-            ),
-          ));
-        }
-        if (cards.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 18),
-            child: EditableLabel('word_atelier.WordAtelierBody',
-              'No words match this search in this collection.',
-              style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12),
-            ),
-          );
-        }
-        return RmWordRow(children: cards);
-      }));
-      productRailIndex++;
-
-      if (_chip == 'ALL' && productRailIndex == 1) {
-        // Moved from Store home: Words / Request / Meanings + atelier pills
-        // sit below the first 50% OFF row.
-        sections.add(StoreQuickMosaic(
-          onWords: () {}, // already on Word Atelier
-          onMeanings: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const MeaningStoreScreen(),
-            ),
-          ),
-          onSignature: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const SignatureStoreScreen(),
-            ),
-          ),
-          onEbooks: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const EbooksStoreScreen(),
-            ),
-          ),
-          onRequest: () => openRequestWords(context),
-        ));
-        sections.add(const StoreGlassFilmBanner(
-          asset: 'assets/video/store-title-banner.mp4',
-        ));
-        // Plans banner — same subscribe film as the Meaning / Signature rooms.
-        sections.add(const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
-          videoAsset: StoreSubscribeBanner.kSubscriptionAlternateVideo,
-        )));
-      }
-
-      // After the 4th rail → frequency package (grid + Limited Time Free + Browse by Goal).
-      if (_chip == 'ALL' && productRailIndex == 4) {
-        sections.add(StoreFrequencyPackage(
-          onSelectCategory: (id) => setState(() => _chip = id),
-          onSeeAll: () => _openViewAll('Browse by Goal'),
-          onOpenWord: _openWord,
-          onRequestWords: () => openRequestWords(context),
-        ));
-      }
-
-      // After the 6th rail → Recommended + Featured Playlist glass (image-4).
-      if (_chip == 'ALL' && productRailIndex == 6) {
-        sections.add(StoreRecommendedSection(
-          onSeeAll: () => _openViewAll('Recommended for You'),
-          onOpenWord: _openWord,
-        ));
-        sections.add(StoreFeaturedPlaylistSection(
-          onSeeAll: () => _openViewAll('Featured Playlist'),
-          onOpenWord: _openWord,
-        ));
-      }
-
-      // After the 7th rail → Featured Bundle glass + tall 3-card carousel (image-5).
-      if (_chip == 'ALL' && productRailIndex == 7) {
-        sections.add(StoreFeaturedBundleSection(
-          onSeeAll: () => _openViewAll('Featured Bundle'),
-          onOpenWord: _openWord,
-        ));
-        sections.add(StoreGlassPlaylistCarousel(
-          onSeeAll: () => _openViewAll('Playlists'),
-          onOpenWord: _openWord,
-        ));
-      }
-
-      // Every fifth category row — same as part010 ROW_VIDS.
-      if (_chip == 'ALL' && (i + 1) % 5 == 0) {
-        final vidIdx = (i + 1) ~/ 5 - 1;
-        if (vidIdx >= 0 && vidIdx < kRmRowVids.length) {
-          sections.add(RmRowVid(url: nwsbVideo(kRmRowVids[vidIdx])));
-        }
-      }
-    }
-
-    if (_chip == 'ALL' && !_allRows && cats.length > 10) {
-      sections.add(StoreViewMoreTap(
-        leftover: cats.length - 10,
-        onTap: () => setState(() => _allRows = true),
-      ));
-    }
+    final pieces = _pieces();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -298,7 +160,6 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ),
         const SizedBox(height: 18),
         const StoreRoomDeck(current: 'word'),
-        const IdentityRails(RailKind.profile),
         StoreRegistrySection(config: AtelierMix.coupons),
         const SizedBox.shrink(),
         StoreRegistrySection(config: AtelierMix.tiles),
@@ -351,35 +212,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
           style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
         ),
         const SizedBox(height: 12),
-        StoreGlassPanel(
-          radius: 28,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-          child: SizedBox(
-            height: 36,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                StoreFilterChip(
-                    label: 'ALL',
-                    selected: _chip == 'ALL',
-                    black: true,
-                    onTap: () => setState(() => _chip = 'ALL')),
-                const SizedBox(width: 7),
-                for (final c in kRmCategories) ...[
-                  StoreFilterChip(
-                    label: c.label.toUpperCase(),
-                    selected: _chip == c.id,
-                    black: true,
-                    onTap: () => setState(() => _chip = c.id),
-                  ),
-                  const SizedBox(width: 7),
-                ],
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        ...sections,
+        StoreShelf(pieces: pieces, labels: const ['Words', 'Saved', 'Guides', 'Glass', 'Clear']),
         ColoredSplitPromoBanner(
           spec: SplitPromoExtras.at(
             7,

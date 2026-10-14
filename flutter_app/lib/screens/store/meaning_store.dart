@@ -25,6 +25,7 @@ import '../../widgets/sections/category_tiles_section.dart';
 import '../../widgets/sections/section_config.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
+import 'store_shelf.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
@@ -196,6 +197,26 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
     if (hit.isNotEmpty) openMeaningDetail(context, hit.first);
   }
 
+
+  List<StorePiece> _meaningPieces() {
+    final out = <StorePiece>[];
+    final seen = <String>{};
+    void add(String title, String line, String group, String art, VoidCallback tap) {
+      if (!seen.add(title.toLowerCase())) return;
+      if (_query.isNotEmpty && !title.toLowerCase().contains(_query.toLowerCase()) && !line.toLowerCase().contains(_query.toLowerCase())) return;
+      out.add(StorePiece(title: title, line: line, art: art, group: group, onTap: tap));
+    }
+    for (final m in _base) {
+      add(m.word, m.root, storeGroup(m.word) == 'Language' && m.category == 'Nations & People' ? 'Countries' : storeGroup(m.word), m.img, () => openMeaningDetail(context, m));
+    }
+    for (final row in kPlaceRows) {
+      add(row.$1, row.$2, row.$3, kMsMeaningProductArt, () {
+        openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kMsMeaningProductArt));
+      });
+    }
+    return out;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!_ready) {
@@ -224,20 +245,6 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       if (_chip != 'ALL' && m.category != _chip) continue;
       (cats[m.category] ??= []).add(m);
     }
-    final order = [
-      'Elements',
-      'Human',
-      'Emotions',
-      'Cosmos',
-      'Nations & People',
-      ...cats.keys.where((k) => !const {
-            'Elements',
-            'Human',
-            'Emotions',
-            'Cosmos',
-            'Nations & People'
-          }.contains(k)),
-    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,85 +300,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
           ),
         ),
         const SizedBox(height: 14),
-        SizedBox(
-          height: 36,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              StoreFilterChip(
-                  label: 'ALL',
-                  selected: _chip == 'ALL',
-                  onTap: () => setState(() => _chip = 'ALL')),
-              const SizedBox(width: 7),
-              for (final c in [
-                'Elements',
-                'Human',
-                'Emotions',
-                'Cosmos',
-                'Nations & People'
-              ]) ...[
-                StoreFilterChip(
-                    label: c.toUpperCase(),
-                    selected: _chip == c,
-                    onTap: () => setState(() => _chip = c)),
-                const SizedBox(width: 7),
-              ],
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        StoreFrequencyPackage(
-          meanings: true,
-          onSelectCategory: (id) {
-            const map = {
-              'elements': 'Elements',
-              'sacred': 'Emotions',
-              'nature': 'Elements',
-              'warriors': 'Human',
-              'focus': 'Emotions',
-              'calm': 'Emotions',
-              'cosmos': 'Cosmos',
-            };
-            setState(() => _chip = map[id] ?? 'ALL');
-          },
-          onSeeAll: () => _openViewAll('Browse by Goal'),
-          onRequestWords: () => openRequestWords(context),
-          onOpenWord: _openMeaning,
-        ),
-        StoreRecommendedSection(
-          meanings: true,
-          onSeeAll: () => _openViewAll('Recommended for You'),
-          onOpenWord: _openMeaning,
-        ),
-        ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.meaningStore,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const SignatureStoreScreen(),
-            ),
-          ),
-          margin: const EdgeInsets.only(bottom: 8),
-        ),
-        StoreFeaturedPlaylistSection(
-          meanings: true,
-          onSeeAll: () => _openViewAll('Featured Playlist'),
-          onOpenWord: _openMeaning,
-        ),
-        StoreGlassPlaylistCarousel(
-          meanings: true,
-          onSeeAll: () => _openViewAll('Featured Collections'),
-          onOpenWord: _openMeaning,
-        ),
-        const SizedBox(height: 36),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(8).copyWith(
-            title: 'Every meaning,\none plan.',
-            cta: 'See meaning plans',
-            onTap: () => NwsbLinks.subscription(context),
-          ),
-          margin: const EdgeInsets.only(bottom: 36),
-        ),
-        ..._meaningCollectionSections(context, order, cats),
+        StoreShelf(pieces: _meaningPieces(), labels: const ['Meanings', 'Saved', 'Guides', 'Glass', 'Clear']),
         if (cats.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 48),

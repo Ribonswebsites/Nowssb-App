@@ -16,8 +16,8 @@ import '../../widgets/page_shell.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import 'product_detail.dart';
-import 'store_actions.dart';
 import 'store_cards.dart';
+import 'store_shelf.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
@@ -204,38 +204,27 @@ class _EbooksBody extends StatelessWidget {
           style: TextStyle(fontSize: 13, height: 1.6, color: Color(0x80FFFFFF)),
         )),
         const SizedBox(height: 18),
-        LSection('browse', 'Browse strip', _EbookBrowseStrip(
-          onOpen: (b) => openEbookDetail(context, b),
-          books: books,
-        )),
-        const SizedBox(height: 12),
-        LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.ebooksStore,
-          onTap: books.isEmpty ? null : () => openEbookDetail(context, books.first),
-          margin: const EdgeInsets.only(bottom: 8),
-        )),
-        const SizedBox(height: 8),
-        LSection.group('books', 'All books', align: CrossAxisAlignment.start, [for (final b in books) _EbookRow(book: b)]),
-        const SizedBox(height: 40),
-        LSection('promo2', 'Promo banner', ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(12).copyWith(
-            title: 'Read the science\nbehind the sound.',
-            cta: 'Read a guide',
-            onTap: books.isEmpty
-                ? null
-                : () => openEbookDetail(context, books[1 % books.length]),
-          ),
-          margin: const EdgeInsets.only(bottom: 48),
-        )),
-        const LSection('mix', 'Banner mix', BannerMix(seed: 0)),
-        const SizedBox(height: 12),
-        LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(13).copyWith(
-            title: 'Your ebooks,\nready to read.',
-            cta: 'Open Reader',
-            onTap: () => NwsbLinks.reader(context),
-          ),
-        )),
+        StoreShelf(
+          labels: const ['Books', 'Saved', 'Guides', 'Glass', 'Clear'],
+          pieces: [
+            for (final b in books)
+              StorePiece(
+                title: b.title,
+                line: b.sub,
+                art: b.cover,
+                group: 'Language',
+                onTap: () => openEbookDetail(context, b),
+              ),
+            for (final row in kPlaceRows)
+              StorePiece(
+                title: row.$1,
+                line: row.$2,
+                art: kEbProductArt,
+                group: row.$3,
+                onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kEbProductArt),
+              ),
+          ],
+        ),
         const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(text: kEbDisclaimer)),
       ]),
     );

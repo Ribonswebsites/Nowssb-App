@@ -17,6 +17,7 @@ import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import '../../widgets/sections/artist_cards_section.dart';
 import 'store_routes.dart';
+import 'store_shelf.dart';
 import 'store_terms_sheet.dart';
 import 'request_words.dart';
 import '../../admin/template/editable.dart';
@@ -59,13 +60,7 @@ class _SignatureBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final words =
         kRmCategories.where((c) => c.signature != null).map((c) => c.signature!).toList();
-    final half = (words.length / 2).ceil();
-    final w1 = words.take(half).toList();
-    final w2 = words.skip(half).toList();
     final meanings = kMsSignature.entries.toList();
-    final mh = (meanings.length / 2).ceil();
-    final m1 = meanings.take(mh).toList();
-    final m2 = meanings.skip(mh).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,177 +116,39 @@ class _SignatureBody extends StatelessWidget {
         const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
           videoAsset: StoreSubscribeBanner.kSubscriptionOfferVideo,
         )),
-        LSection('words', 'Signature collection', RmCatBanner(
-          title: 'Signature Collection',
-          sub: 'One per collection — the rarest Signature each one has',
-          pillLabel: 'SIGNATURE',
-          logoAsset: kMsMeaningIconAsset,
-          onViewAll: () => showStoreViewAllPanel(
-            context,
-            title: 'Signature Collection',
-            items: storeDefaultViewAllItems(),
-            onOpenWord: (w, r, i, p) => openAtelierWord(
-              context,
-              word: w,
-              root: r,
-              img: i,
-              price: p,
-              signature: true,
-            ),
-          ),
-        )),
-        RmWordRow(
-          children: [
-            for (final s in w1)
-              RmWordCard(
-                name: s.name,
-                root: 'Most Exclusive',
-                imgUrl: s.img,
-                signature: true,
-                price: kMsSignaturePrice,
-                onTap: () => openAtelierWord(
-                  context,
-                  word: s.name,
-                  root: 'Most Exclusive',
-                  img: s.img,
-                  signature: true,
-                ),
+        StoreShelf(
+          labels: const ['Signatures', 'Saved', 'Guides', 'Glass', 'Clear'],
+          pieces: [
+            for (final s in words)
+              StorePiece(
+                title: s.name,
+                line: 'Most Exclusive',
+                art: s.img,
+                group: 'Language',
+                onTap: () => openAtelierWord(context, word: s.name, root: 'Most Exclusive', img: s.img, signature: true),
               ),
-          ],
-        ),
-        LSection('promo', 'Request words banner', ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.signatureStore,
-          onTap: () => openRequestWords(context),
-          margin: const EdgeInsets.only(bottom: 8),
-        )),
-        if (w2.isNotEmpty) LSection.group('words2', 'Signature collection II', align: CrossAxisAlignment.start, [
-          RmCatBanner(
-            title: 'Signature Collection · II',
-            sub: 'The rest of the rare Signature set',
-            pillLabel: 'RARE II',
-            logoAsset: kMsMeaningIconAsset,
-            onViewAll: () => showStoreViewAllPanel(
-              context,
-              title: 'Signature Collection · II',
-              items: storeDefaultViewAllItems(),
-              onOpenWord: (w, r, i, p) => openAtelierWord(
-                context,
-                word: w,
-                root: r,
-                img: i,
-                price: p,
-                signature: true,
-              ),
-            ),
-          ),
-          RmWordRow(
-            children: [
-              for (final s in w2)
-                RmWordCard(
-                  name: s.name,
-                  root: 'Most Exclusive',
-                  imgUrl: s.img,
-                  signature: true,
-                  price: kMsSignaturePrice,
-                  onTap: () => openAtelierWord(
-                    context,
-                    word: s.name,
-                    root: 'Most Exclusive',
-                    img: s.img,
-                    signature: true,
-                  ),
-                ),
-            ],
-          ),
-        ]),
-        LSection('meanings', 'Signature meanings', RmCatBanner(
-          title: 'Signature Meanings',
-          sub: 'The full decoded origin — Signature grade',
-          pillLabel: 'MEANINGS',
-          logoAsset: kMsMeaningIconAsset,
-          onViewAll: () => showStoreViewAllPanel(
-            context,
-            title: 'Signature Meanings',
-            items: storeDefaultViewAllItems(),
-            onOpenWord: (w, r, i, p) => openAtelierWord(
-              context,
-              word: w,
-              root: r,
-              img: i,
-              price: p,
-              signature: true,
-            ),
-          ),
-        )),
-        MsGrid(
-          children: [
-            for (final e in m1)
-              MsCard(
-                word: e.value.word,
-                root: e.value.root,
-                imgUrl: kMsSignatureImg,
-                price: kMsSignaturePrice,
-                signature: true,
+            for (final e in meanings)
+              StorePiece(
+                title: e.value.word,
+                line: e.value.root,
+                art: kMsSignatureImg,
+                group: storeGroup(e.value.word),
                 onTap: () => openMeaningDetail(
                   context,
-                  MsMeaning(
-                    word: e.value.word,
-                    key: e.value.key,
-                    root: e.value.root,
-                    category: e.key,
-                    price: kMsSignaturePrice,
-                    img: kMsSignatureImg,
-                  ),
+                  MsMeaning(word: e.value.word, key: e.value.key, root: e.value.root, category: e.key, price: kMsSignaturePrice, img: kMsSignatureImg),
                   signature: true,
                 ),
+              ),
+            for (final row in kPlaceRows)
+              StorePiece(
+                title: row.$1,
+                line: row.$2,
+                art: kMsSignatureImg,
+                group: row.$3,
+                onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kMsSignatureImg),
               ),
           ],
         ),
-        if (m2.isNotEmpty) LSection.group('meanings2', 'Signature meanings II', align: CrossAxisAlignment.start, [
-          RmCatBanner(
-            title: 'Signature Meanings · II',
-            sub: 'The rest of the decoded Signature set',
-            pillLabel: 'DECODED',
-            logoAsset: kMsMeaningIconAsset,
-            onViewAll: () => showStoreViewAllPanel(
-              context,
-              title: 'Signature Meanings · II',
-              items: storeDefaultViewAllItems(),
-              onOpenWord: (w, r, i, p) => openAtelierWord(
-                context,
-                word: w,
-                root: r,
-                img: i,
-                price: p,
-                signature: true,
-              ),
-            ),
-          ),
-          MsGrid(
-            children: [
-              for (final e in m2)
-                MsCard(
-                  word: e.value.word,
-                  root: e.value.root,
-                  imgUrl: kMsSignatureImg,
-                  price: kMsSignaturePrice,
-                  signature: true,
-                  onTap: () => openMeaningDetail(
-                    context,
-                    MsMeaning(
-                      word: e.value.word,
-                      key: e.value.key,
-                      root: e.value.root,
-                      category: e.key,
-                      price: kMsSignaturePrice,
-                      img: kMsSignatureImg,
-                    ),
-                    signature: true,
-                  ),
-                ),
-            ],
-          ),
-        ]),
         const SizedBox(height: 18),
         LSection('info', 'About signatures', Container(
           padding: const EdgeInsets.all(16),

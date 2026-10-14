@@ -110,11 +110,22 @@ const _rate = ['4.7', '4.8', '4.9', '4.6', '5.0'];
 const _saves = ['16', '12', '8', '24', '31'];
 const _people = ['+12', '+8', '+2k', '+6', '+19'];
 
+ImageProvider<Object> railImage(String art) => art.startsWith('http') ? NetworkImage(art) : AssetImage(art);
+
+Widget railPicture(String art, {double? width, double? height, Alignment alignment = Alignment.center, BoxFit fit = BoxFit.cover}) {
+  final broken = ColoredBox(color: const Color(0xFF2A1038), child: SizedBox(width: width, height: height));
+  if (art.startsWith('http')) {
+    return Image.network(art, width: width, height: height, fit: fit, alignment: alignment, errorBuilder: (_, __, ___) => broken);
+  }
+  return Image.asset(art, width: width, height: height, fit: fit, alignment: alignment, errorBuilder: (_, __, ___) => broken);
+}
+
 class RailCard {
-  const RailCard(this.title, this.line, this.meta);
+  const RailCard(this.title, this.line, this.meta, {this.art = ''});
   final String title;
   final String line;
   final String meta;
+  final String art;
 }
 
 List<RailCard> railSet(List<String> titles, String meta) => [
@@ -227,6 +238,7 @@ class HubRails extends StatelessWidget {
     this.arts = kRailArt,
     this.labels = const ['Continue', 'Your list', 'Challenges'],
     this.onOpen,
+    this.openGuide = true,
   });
 
   final List<RailCard> a;
@@ -237,18 +249,25 @@ class HubRails extends StatelessWidget {
   final List<String> arts;
   final List<String> labels;
   final void Function(RailCard card)? onOpen;
+  final bool openGuide;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _label(labels[0]),
-        _rail(context, 292, 332, a, 0),
-        _label(labels.length > 1 ? labels[1] : 'Your list'),
-        _rail(context, 318, 168, b, 1),
-        _label(labels.length > 2 ? labels[2] : 'Challenges'),
-        _rail(context, 214, 312, c, 2),
+        if (a.isNotEmpty) ...[
+          _label(labels[0]),
+          _rail(context, 292, 332, a, 0),
+        ],
+        if (b.isNotEmpty) ...[
+          _label(labels.length > 1 ? labels[1] : 'Your list'),
+          _rail(context, 318, 168, b, 1),
+        ],
+        if (c.isNotEmpty) ...[
+          _label(labels.length > 2 ? labels[2] : 'Challenges'),
+          _rail(context, 214, 312, c, 2),
+        ],
         if (d.isNotEmpty) ...[
           _label(labels.length > 3 ? labels[3] : 'Glass'),
           _rail(context, 300, 392, d, 3),
@@ -275,7 +294,7 @@ class HubRails extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (_, i) {
           final card = list[i];
-          final art = _pick(rail, i);
+          final art = card.art.isNotEmpty ? card.art : _pick(rail, i);
           final child = switch (rail) {
             0 => _FeatureCard(card: card, art: art, index: i),
             1 => _RowCard(card: card, art: art, index: i),
@@ -288,7 +307,7 @@ class HubRails extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 onOpen?.call(card);
-                openRailGuide(context, card, rail >= 3 ? (rail == 3 ? kGlassArt[i % kGlassArt.length] : kClearArt[i % kClearArt.length]) : art);
+                if (openGuide) openRailGuide(context, card, art);
               },
               child: child,
             ),
@@ -413,7 +432,7 @@ class _FeatureCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(art, fit: BoxFit.cover, alignment: Alignment.center, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF2A1038))),
+            railPicture(art),
             const DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -482,7 +501,7 @@ class _RowCard extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.asset(art, width: 112, height: 148, fit: BoxFit.cover, alignment: const Alignment(0, -0.4), errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF2A1038), child: SizedBox(width: 112, height: 148))),
+              child: railPicture(art, width: 112, height: 148, alignment: const Alignment(0, -0.4)),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -535,7 +554,7 @@ class _ChallengeCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0x66FFFFFF), width: 2),
-                image: DecorationImage(image: AssetImage(art), fit: BoxFit.cover, alignment: const Alignment(0, 0.35)),
+                image: DecorationImage(image: railImage(art), fit: BoxFit.cover, alignment: const Alignment(0, 0.35)),
               ),
             ),
             const SizedBox(height: 12),
@@ -597,7 +616,7 @@ class _GlassCourseCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0x22FFFFFF))),
+              railPicture(art),
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -675,7 +694,7 @@ class _ClearChallengeCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: const Color(0x88FFFFFF), width: 2),
-                    image: DecorationImage(image: AssetImage(art), fit: BoxFit.cover),
+                    image: DecorationImage(image: railImage(art), fit: BoxFit.cover),
                   ),
                 ),
                 const SizedBox(height: 14),
@@ -795,7 +814,7 @@ class _RailGuide extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0x88FFFFFF), width: 2),
-                        image: DecorationImage(image: AssetImage(art), fit: BoxFit.cover),
+                        image: DecorationImage(image: railImage(art), fit: BoxFit.cover),
                       ),
                     ),
                     const SizedBox(height: 14),
