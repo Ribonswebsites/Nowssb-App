@@ -28,6 +28,7 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/hub_rails.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -140,6 +141,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'settings', [
+              LSection('rails', 'Card rails', const IdentityRails(RailKind.settings)),
               LSection('deck', 'Settings cards', RoutineDeck(
                 title: 'Settings',
                 banner: 'Settings',

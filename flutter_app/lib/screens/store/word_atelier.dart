@@ -10,6 +10,7 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/hub_rails.dart';
 import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
@@ -297,6 +298,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         ),
         const SizedBox(height: 18),
         const StoreRoomDeck(current: 'word'),
+        const IdentityRails(RailKind.profile),
         StoreRegistrySection(config: AtelierMix.coupons),
         const SizedBox.shrink(),
         StoreRegistrySection(config: AtelierMix.tiles),

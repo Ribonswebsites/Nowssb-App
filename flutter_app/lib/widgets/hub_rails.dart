@@ -5,7 +5,11 @@
 /// and the circular Skip / Next card. No fake status bar.
 library;
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
+
+import '../features/programs/program_router.dart';
 
 const kRailArt = <String>[
   'assets/rails/01.png',
@@ -88,6 +92,19 @@ const kEarningsArt = <String>[
   'assets/rails/earnings-06.jpg',
 ];
 
+const kGlassArt = <String>[
+  'assets/rails/glass-01.jpg',
+  'assets/rails/glass-02.jpg',
+  'assets/rails/glass-03.jpg',
+  'assets/rails/glass-04.jpg',
+];
+
+const kClearArt = <String>[
+  'assets/rails/clear-01.jpg',
+  'assets/rails/clear-02.jpg',
+  'assets/rails/clear-03.jpg',
+  'assets/rails/clear-04.jpg',
+];
 const _dur = ['18h 9m', '12h 24m', '4 min', '8 min', '21 min'];
 const _rate = ['4.7', '4.8', '4.9', '4.6', '5.0'];
 const _saves = ['16', '12', '8', '24', '31'];
@@ -187,7 +204,15 @@ class IdentityRails extends StatelessWidget {
           c: _pack(const ['First payout', 'Hold window', 'Add UPI', 'Invite sale', 'Review'], const ['When the minimum clears', 'Thirty days', 'India rail', 'A paid plan', 'A person checks it']),
         ),
     };
-    return HubRails(a: spec.a, b: spec.b, c: spec.c, arts: spec.arts, labels: spec.labels);
+    return HubRails(
+      a: spec.a,
+      b: spec.b,
+      c: spec.c,
+      d: _pack(const ['Fog Practice', 'Lotus Hour', 'Sound Rings', 'Soft Cloth'], const ['A glass seat', 'Still water', 'In circles', 'Morning']),
+      e: _pack(const ['30 days of breath', 'Forest pool', 'Night shore', 'The case'], const ['A month of sitting', 'One still hour', 'After dark', 'Keep it close']),
+      arts: spec.arts,
+      labels: [...spec.labels, 'Glass', 'Clear'],
+    );
   }
 }
 
@@ -197,6 +222,8 @@ class HubRails extends StatelessWidget {
     required this.a,
     required this.b,
     required this.c,
+    this.d = const [],
+    this.e = const [],
     this.arts = kRailArt,
     this.labels = const ['Continue', 'Your list', 'Challenges'],
     this.onOpen,
@@ -205,6 +232,8 @@ class HubRails extends StatelessWidget {
   final List<RailCard> a;
   final List<RailCard> b;
   final List<RailCard> c;
+  final List<RailCard> d;
+  final List<RailCard> e;
   final List<String> arts;
   final List<String> labels;
   final void Function(RailCard card)? onOpen;
@@ -220,6 +249,14 @@ class HubRails extends StatelessWidget {
         _rail(318, 168, b, 1),
         _label(labels.length > 2 ? labels[2] : 'Challenges'),
         _rail(214, 312, c, 2),
+        if (d.isNotEmpty) ...[
+          _label(labels.length > 3 ? labels[3] : 'Glass'),
+          _rail(300, 392, d, 3),
+        ],
+        if (e.isNotEmpty) ...[
+          _label(labels.length > 4 ? labels[4] : 'Clear'),
+          _rail(250, 430, e, 4),
+        ],
       ],
     );
   }
@@ -242,11 +279,19 @@ class HubRails extends StatelessWidget {
           final child = switch (rail) {
             0 => _FeatureCard(card: card, art: art, index: i),
             1 => _RowCard(card: card, art: art, index: i),
-            _ => _ChallengeCard(card: card, art: art, index: i),
+            2 => _ChallengeCard(card: card, art: art, index: i),
+            3 => _GlassCourseCard(card: card, art: art, index: i, total: list.length),
+            _ => _ClearChallengeCard(card: card, art: art, index: i),
           };
           return SizedBox(
             width: w,
-            child: onOpen == null ? child : GestureDetector(onTap: () => onOpen!(card), child: child),
+            child: GestureDetector(
+              onTap: () {
+                onOpen?.call(card);
+                openRailGuide(context, card, rail >= 3 ? (rail == 3 ? kGlassArt[i % kGlassArt.length] : kClearArt[i % kClearArt.length]) : art);
+              },
+              child: child,
+            ),
           );
         },
       ),
@@ -254,6 +299,8 @@ class HubRails extends StatelessWidget {
   }
 
   String _pick(int rail, int i) {
+    if (rail == 3) return kGlassArt[i % kGlassArt.length];
+    if (rail == 4) return kClearArt[i % kClearArt.length];
     final n = arts.length;
     if (n == 0) return kRailArt[i % kRailArt.length];
     if (n >= 15) return arts[(rail * 5 + i) % n];
@@ -511,12 +558,12 @@ class _ChallengeCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                for (var d = 0; d < 3; d++)
+                for (var dot = 0; dot < 3; dot++)
                   Container(
-                    width: d == index % 3 ? 7 : 5,
-                    height: d == index % 3 ? 7 : 5,
+                    width: dot == index % 3 ? 7 : 5,
+                    height: dot == index % 3 ? 7 : 5,
                     margin: const EdgeInsets.symmetric(horizontal: 3),
-                    decoration: BoxDecoration(color: d == index % 3 ? Colors.white : const Color(0x55FFFFFF), shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: dot == index % 3 ? Colors.white : const Color(0x55FFFFFF), shape: BoxShape.circle),
                   ),
               ],
             ),
@@ -526,3 +573,277 @@ class _ChallengeCard extends StatelessWidget {
     );
   }
 }
+
+// The fourth and fifth rails. The first three card widgets are unchanged.
+class _GlassCourseCard extends StatelessWidget {
+  const _GlassCourseCard({required this.card, required this.art, required this.index, required this.total});
+  final RailCard card;
+  final String art;
+  final int index;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: const Color(0x66FFFFFF)),
+            color: const Color(0x1AFFFFFF),
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(art, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0x22FFFFFF))),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x00000000), Color(0x33000000), Color(0xCC120818)],
+                    stops: [0.35, 0.62, 1],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        RailFaces(count: _people[index % _people.length]),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                          child: const Text('Active', style: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w700, fontSize: 12)),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700, height: 1.05)),
+                    const SizedBox(height: 8),
+                    _MetaRow(index: index),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Text('${index + 1} of $total', style: const TextStyle(color: Color(0xC6FFFFFF), fontSize: 13)),
+                        const Spacer(),
+                        const Text('Continue  ›', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ClearChallengeCard extends StatelessWidget {
+  const _ClearChallengeCard({required this.card, required this.art, required this.index});
+  final RailCard card;
+  final String art;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0x14FFFFFF),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: const Color(0x55FFFFFF)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+            child: Column(
+              children: [
+                Container(
+                  width: 132,
+                  height: 132,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0x88FFFFFF), width: 2),
+                    image: DecorationImage(image: AssetImage(art), fit: BoxFit.cover),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Expanded(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0x66FFFFFF)),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xF2FFFFFF), Color(0x99FFFFFF), Color(0x00FFFFFF)],
+                        stops: [0, 0.72, 1],
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w800, fontSize: 18, height: 1.1)),
+                          const SizedBox(height: 4),
+                          Text(card.meta, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF3A3A3A), fontSize: 12, height: 1.25)),
+                          const Spacer(),
+                          Row(
+                            children: [
+                              const Text('Skip', style: TextStyle(color: Color(0xFF5A5A5A), fontWeight: FontWeight.w600)),
+                              const Spacer(),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
+                                child: const Text('Next', style: TextStyle(color: Color(0xFF1A1A1A), fontWeight: FontWeight.w800)),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              for (var dot = 0; dot < 4; dot++)
+                                Container(
+                                  width: dot == index % 4 ? 7 : 5,
+                                  height: dot == index % 4 ? 7 : 5,
+                                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                                  decoration: BoxDecoration(color: dot == index % 4 ? const Color(0xFF1A1A1A) : const Color(0x551A1A1A), shape: BoxShape.circle),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+void openRailGuide(BuildContext context, RailCard card, String art) {
+  showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Guide',
+    barrierColor: const Color(0x99000000),
+    pageBuilder: (ctx, _, __) => _RailGuide(card: card, art: art),
+  );
+}
+
+class _RailGuide extends StatelessWidget {
+  const _RailGuide({required this.card, required this.art});
+  final RailCard card;
+  final String art;
+
+  Programme? _match() {
+    final t = '${card.title} ${card.meta}'.toLowerCase();
+    return Programmes.forPoster(card.title) ??
+        (t.contains('earn') || t.contains('payout') || t.contains('rank') || t.contains('sale')
+            ? Programme.earn
+            : t.contains('reward') || t.contains('coin') || t.contains('streak') || t.contains('quest')
+                ? Programme.rewards
+                : t.contains('coupon') || t.contains('scratch')
+                    ? Programme.coupons
+                    : t.contains('gift')
+                        ? Programme.gifts
+                        : null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final next = _match();
+    return SafeArea(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 360),
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                decoration: BoxDecoration(
+                  color: const Color(0x14FFFFFF),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0x66FFFFFF)),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0x88FFFFFF), width: 2),
+                        image: DecorationImage(image: AssetImage(art), fit: BoxFit.cover),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xF2FFFFFF), Color(0x99FFFFFF), Color(0x22FFFFFF)],
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(card.title, style: const TextStyle(color: Color(0xFF1A1A1A), fontSize: 22, fontWeight: FontWeight.w800)),
+                          const SizedBox(height: 6),
+                          Text(card.meta, style: const TextStyle(color: Color(0xFF333333), fontSize: 13, height: 1.35)),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: [
+                              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Skip', style: TextStyle(color: Color(0xFF333333)))),
+                              const Spacer(),
+                              FilledButton(
+                                style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  if (next != null) Programmes.open(context, next);
+                                },
+                                child: Text(next == null ? 'Close' : 'Next'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+

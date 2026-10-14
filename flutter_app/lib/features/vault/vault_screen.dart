@@ -18,6 +18,7 @@ import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/four_banners.dart';
+import '../../widgets/hub_rails.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
@@ -69,6 +70,7 @@ class _VaultBodyState extends State<_VaultBody> {
           onTap: () => _go.value?.call('today'),
         ),
         const SizedBox(height: 12),
+        const IdentityRails(RailKind.rewards),
         const _TodayCard(),
         const SizedBox(height: 12),
         const FourBanners(

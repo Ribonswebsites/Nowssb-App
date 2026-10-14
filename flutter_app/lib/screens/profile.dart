@@ -46,6 +46,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_router.dart';
+import '../widgets/hub_rails.dart';
 import '../widgets/routine_deck.dart';
 
 const _accent = Color(0xFFE3BD7D);
@@ -457,6 +458,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: layoutChildren(context, 'profile', [
                     LSection('banner', 'Banner', _banner()),
                     LSection('card', 'Profile card', _profileCard()),
+                    LSection('rails', 'Practice rails', const IdentityRails(RailKind.profile)),
                     LSection('earn', 'Earn hub', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
                     LSection('about', 'About', _about()),

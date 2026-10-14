@@ -35,6 +35,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
+import 'hub_rails.dart';
 import 'routine_deck.dart';
 import '../admin/template/editable.dart';
 
@@ -229,6 +230,7 @@ class HomeMenuDrawer extends StatelessWidget {
                         compact: true,
                         onTap: () => _push(context, const SubscriptionScreen()),
                       ),
+                      const IdentityRails(RailKind.menu),
                       RoutineDeck(
                         title: 'Menu',
                         banner: 'Your menu',
