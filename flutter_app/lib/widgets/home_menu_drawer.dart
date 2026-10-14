@@ -10,8 +10,6 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'brand_top_banner.dart';
-
 import '../data/app_control.dart';
 import '../data/content.dart';
 import '../screens/app_settings.dart';
