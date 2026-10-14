@@ -13,6 +13,7 @@ import '../programs/reference_program.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../../widgets/four_banners.dart';
+import '../../widgets/routine_deck.dart';
 
 class ReferenceScreen extends StatefulWidget {
   const ReferenceScreen({super.key, this.initialTab});
@@ -43,11 +44,18 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          const ReferenceHero(),
-          const SizedBox(height: 12),
-          const ProgramShelf(current: Programme.reference),
-          const SizedBox(height: 12),
-          const CoinCollectCard(pageKey: 'reference', amount: 8, title: 'Reference coins'),
+          RoutineDeck(
+            title: 'Reference',
+            banner: 'Your link',
+            bannerSub: 'One code. A friend’s first valid link counts.',
+            onBanner: () => Programmes.open(context, Programme.earn),
+            cards: [
+              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Cash on real sales', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+              WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you spend', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+              WorkCard(category: 'Gifts', title: 'Gifts', meta: 'Send a plan', action: 'Open gifts', image: 'assets/rails/gifts-01.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
+              WorkCard(category: 'Coupons', title: 'Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/coupons-01.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
+            ],
+          ),
           const SizedBox(height: 12),
           const GlassLine(
             text: 'Your code attributes a sale. Their parent takes a small second level. Both must hold a plan.',

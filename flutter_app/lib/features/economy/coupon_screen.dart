@@ -19,6 +19,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../widgets/hype_rail.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/sections/coupon_banner_section.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart';
@@ -148,7 +149,18 @@ class _CouponScreenState extends State<CouponScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
-                  const IdentityRails(RailKind.coupons),
+                  RoutineDeck(
+                    title: 'Coupons',
+                    banner: 'NowssB Coupons',
+                    bannerSub: 'Scratch, codes, shop',
+                    onBanner: _showScratch,
+                    cards: [
+                      WorkCard(category: 'Scratch', title: 'Daily scratch', meta: 'One card on this account', action: 'Scratch', image: 'assets/rails/coupons-01.jpg', onTap: _showScratch),
+                      WorkCard(category: 'Shop', title: 'Coupon shop', meta: 'Paid cards', action: 'Open shop', image: 'assets/rails/coupons-02.jpg', onTap: () => _tab('shop')),
+                      WorkCard(category: 'Mine', title: 'My coupons', meta: 'Codes already on the account', action: 'Open mine', image: 'assets/rails/clear-02.jpg', onTap: () => _tab('mine')),
+                      WorkCard(category: 'Help', title: 'How a coupon works', meta: 'It comes off the price. It is not cash.', action: 'Read', image: 'assets/rails/clear-03.jpg', onTap: _help),
+                    ],
+                  ),
                   const SizedBox(height: 12),
                   const _CodeBox(),
                   const SizedBox(height: 14),

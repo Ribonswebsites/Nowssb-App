@@ -19,6 +19,7 @@ import '../../widgets/brand_top_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
@@ -61,25 +62,21 @@ class _VaultBodyState extends State<_VaultBody> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
       children: [
-        const RewardsHero(),
-        const SizedBox(height: 12),
-        BrandTopBanner(
-          bare: true,
-          title: 'NowssB Rewards',
-          mark: NwsbMarks.rewards,
-          onTap: () => _go.value?.call('today'),
+        RoutineDeck(
+          title: 'Rewards',
+          banner: 'NowssB Rewards',
+          bannerSub: 'Coins, quests, one invite',
+          onBanner: () => _go.value?.call('today'),
+          cards: [
+            WorkCard(category: 'Today', title: 'Today’s coins', meta: 'Claim the daily coins', action: 'Open today', image: 'assets/rails/rewards-01.jpg', onTap: () => _go.value?.call('today')),
+            WorkCard(category: 'Quests', title: 'Quests', meta: 'Short tasks on this account', action: 'Open quests', image: 'assets/rails/rewards-02.jpg', onTap: () => _go.value?.call('quests')),
+            WorkCard(category: 'Store', title: 'Words', meta: 'Priced on Google Play', action: 'Open store', image: 'assets/rails/01.png', onTap: () => NwsbLinks.tab(context, 3)),
+            WorkCard(category: 'Store', title: 'Meanings', meta: 'The meaning store', action: 'Open meanings', image: 'assets/rails/02.png', onTap: () => NwsbLinks.meanings(context)),
+            WorkCard(category: 'Store', title: 'Ebooks', meta: 'The ebook store', action: 'Open ebooks', image: 'assets/rails/03.png', onTap: () => NwsbLinks.ebooks(context)),
+            WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Ranks and payouts', action: 'Open earn', image: 'assets/rails/earn-02.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+          ],
         ),
-        const SizedBox(height: 12),
-        const IdentityRails(RailKind.rewards),
         const _TodayCard(),
-        const SizedBox(height: 12),
-        const FourBanners(
-          current: Programme.rewards,
-          splitTitle: 'NowssB Rewards',
-          splitCta: 'Claim today’s coins',
-          blackTitle: 'Your coins',
-          blackSub: 'Earned only. At most 30% of a Play purchase.',
-        ),
         const SizedBox(height: 12),
         ListenableBuilder(
           listenable: EconomyMirror.instance,

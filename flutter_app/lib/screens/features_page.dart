@@ -11,7 +11,7 @@ import '../features/economy/economy_theme.dart';
 import '../features/programs/program_router.dart';
 import '../shell/nwsb_links.dart';
 import '../theme/tokens.dart';
-import '../widgets/glass_wrap.dart';
+import '../widgets/routine_deck.dart';
 import '../widgets/nwsb_icon.dart';
 import 'healing_path.dart';
 import 'progress/progress_screen.dart';
@@ -74,13 +74,48 @@ class FeaturesPage extends StatelessWidget {
       showBalance: false,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-        children: layoutChildren(context, 'features', [
-          const LSection('intro', 'Intro', _Intro()),
-          LSection('practice', 'Practice', _Group(eyebrow: 'PRACTICE', title: 'Listen, say, sit', items: _practice)),
-          LSection('store', 'Store', _Group(eyebrow: 'STORE', title: 'Words to keep', items: _store)),
-          LSection('programmes', 'Programmes', _Group(eyebrow: 'PROGRAMMES', title: 'Coins, gifts and links', items: _programmes)),
-          LSection('you', 'You', _Group(eyebrow: 'YOURS', title: 'Make it yours', items: _you)),
-        ]),
+        children: [
+          RoutineDeck(
+            title: 'Practice',
+            banner: 'Listen, say, sit',
+            bannerSub: 'Player, library, progress',
+            onBanner: () => NwsbLinks.tab(context, 1),
+            cards: [
+              for (var i = 0; i < _practice.length; i++)
+                WorkCard(category: 'Practice', title: _practice[i].title, meta: _practice[i].line, action: 'Open', image: 'assets/rails/${(i + 1).toString().padLeft(2, '0')}.png', onTap: () => _practice[i].open(context)),
+            ],
+          ),
+          RoutineDeck(
+            title: 'Store',
+            banner: 'Words to keep',
+            bannerSub: 'Meanings, signatures, books',
+            onBanner: () => NwsbLinks.tab(context, 3),
+            cards: [
+              for (var i = 0; i < _store.length; i++)
+                WorkCard(category: 'Store', title: _store[i].title, meta: _store[i].line, action: 'Open', image: 'assets/rails/glass-0${(i % 4) + 1}.jpg', onTap: () => _store[i].open(context)),
+            ],
+          ),
+          RoutineDeck(
+            title: 'Programs',
+            banner: 'NowssB',
+            bannerSub: 'Earn, rewards, coupons, gifts',
+            onBanner: () => Programmes.open(context, Programme.earn),
+            cards: [
+              for (var i = 0; i < _programmes.length; i++)
+                WorkCard(category: 'Program', title: _programmes[i].title, meta: _programmes[i].line, action: 'Open', image: 'assets/rails/${['earn-01.jpg', 'coupons-01.jpg', 'gifts-01.jpg', 'clear-01.jpg', 'earn-02.jpg', 'rewards-01.jpg'][i]}', onTap: () => _programmes[i].open(context)),
+            ],
+          ),
+          RoutineDeck(
+            title: 'You',
+            banner: 'Make it yours',
+            bannerSub: 'Customize, connect, saved',
+            onBanner: () => _push(context, const WidgetsPage()),
+            cards: [
+              for (var i = 0; i < _you.length; i++)
+                WorkCard(category: 'You', title: _you[i].title, meta: _you[i].line, action: 'Open', image: 'assets/rails/clear-0${(i % 4) + 1}.jpg', onTap: () => _you[i].open(context)),
+            ],
+          ),
+        ],
       ),
     );
   }

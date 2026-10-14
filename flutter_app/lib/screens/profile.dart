@@ -432,7 +432,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
-    final int today = (DateTime.now().weekday - 1).clamp(0, 6).toInt();
     return Theme(
       data: ThemeData.dark(useMaterial3: true).copyWith(
         scaffoldBackgroundColor: Colors.black,
@@ -456,16 +455,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
                     LSection('programs', 'Programs', _earnHub()),
-                    LSection('progress', 'Progress', _progress()),
-                    LSection('quick', 'Quick access', _quickAccess()),
-                    LSection('recent', 'Recent activity', _recentActivity()),
-                    LSection('motto', 'Motto', _motto()),
-                    LSection('week', 'Week tracker', _weekTracker(today)),
-                    LSection('prefs', 'Preferences', _preferences()),
-                    LSection('shop', 'Shop', _shop()),
-                    LSection('account', 'Account', _account()),
-                    LSection('quote', 'Quote', _quote()),
-                    LSection('signout', 'Sign out', _signOut()),
+                    LSection('you', 'You', RoutineDeck(
+                      title: 'You',
+                      banner: 'Your profile',
+                      bannerSub: 'Practice, saved words, settings',
+                      onBanner: () => _openQuick('Settings'),
+                      cards: [
+                        WorkCard(category: 'Practice', title: 'Sessions', meta: 'Open today’s practice', action: 'Open practice', image: 'assets/rails/01.png', onTap: () => _openQuick('Sessions')),
+                        WorkCard(category: 'Saved', title: 'Saved words', meta: 'Words you kept', action: 'Open saved', image: 'assets/rails/02.png', onTap: () => _openQuick('Saved')),
+                        WorkCard(category: 'Journal', title: 'Journal', meta: 'Messages and purchases', action: 'Open journal', image: 'assets/rails/03.png', onTap: () => _openQuick('Journal')),
+                        WorkCard(category: 'Progress', title: 'My progress', meta: 'Sessions and streak', action: 'Open progress', image: 'assets/rails/04.png', onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library)))),
+                        WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/05.png', onTap: () => _openQuick('Settings')),
+                      ],
+                    )),
+                    LSection('shop', 'Shop', ListenableBuilder(
+                      listenable: Listenable.merge([CartBag.instance, Entitlements.instance]),
+                      builder: (context, _) => RoutineDeck(
+                        title: 'Shop',
+                        banner: 'Bag',
+                        bannerSub: 'Cart, wishlist, orders',
+                        onBanner: () => _openShop('Cart'),
+                        cards: [
+                          WorkCard(category: 'Bag', title: 'Cart', meta: '${CartBag.instance.cartCount} in the bag', action: 'Open cart', image: 'assets/rails/06.png', onTap: () => _openShop('Cart')),
+                          WorkCard(category: 'Saved', title: 'Wishlist', meta: '${CartBag.instance.wishCount} saved', action: 'Open wishlist', image: 'assets/rails/07.png', onTap: () => _openShop('Wishlist')),
+                          WorkCard(category: 'Orders', title: 'Orders', meta: '${Entitlements.instance.owned.length} owned', action: 'Open orders', image: 'assets/rails/08.png', onTap: () => _openShop('Orders')),
+                          WorkCard(category: 'Store', title: 'Store', meta: 'Words and books', action: 'Open store', image: 'assets/rails/09.png', onTap: () => _openShop('Store')),
+                        ],
+                      ),
+                    )),
+                    LSection('account', 'Account', RoutineDeck(
+                      title: 'Account',
+                      banner: 'This account',
+                      bannerSub: 'Sound, reminder, sign out',
+                      onBanner: () { _doSignOut(); },
+                      cards: [
+                        WorkCard(category: 'Sound', title: 'Sound', meta: _soundOn ? 'On' : 'Off', action: _soundOn ? 'Turn off' : 'Turn on', image: 'assets/rails/10.png', onTap: () { final next = !_soundOn; setState(() => _soundOn = next); _prefs.setString('nowssb_sound', next ? 'on' : 'off'); }),
+                        WorkCard(category: 'Time', title: 'Practice length', meta: _durationText, action: 'Add 15 min', image: 'assets/rails/11.png', onTap: () { _stepDuration(15); }),
+                        WorkCard(category: 'Time', title: 'Daily reminder', meta: _reminderText, action: 'Set time', image: 'assets/rails/glass-01.jpg', onTap: () { _pickReminder(); }),
+                        WorkCard(category: 'Activity', title: 'Recent coins', meta: 'Sales and referrals', action: 'Open activity', image: 'assets/rails/glass-02.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()))),
+                        WorkCard(category: 'Session', title: 'Sign out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/clear-04.jpg', onTap: () { _doSignOut(); }),
+                      ],
+                    )),
                   ]),
                 ),
               ),

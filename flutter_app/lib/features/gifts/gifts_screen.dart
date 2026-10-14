@@ -7,6 +7,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
@@ -401,16 +402,18 @@ class _GiftsScreenState extends State<GiftsScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         cacheExtent: 1600,
         children: [
-          BrandTopBanner(
-            bare: true,
-            title: 'NowssB Gifts',
-            mark: NwsbMarks.gift,
-            onTap: () => showGiftCardSheet(context, kGiftCatalog.first.id),
+          RoutineDeck(
+            title: 'Gifts',
+            banner: 'NowssB Gifts',
+            bannerSub: 'Send, redeem, history',
+            onBanner: () => showGiftCardSheet(context, kGiftCatalog.first.id),
+            cards: [
+              WorkCard(category: 'Send', title: 'Gift cards', meta: 'A real purchase, shared as a code', action: 'Send a gift', image: 'assets/rails/gifts-01.jpg', onTap: () => showGiftCardSheet(context, kGiftCatalog.first.id)),
+              WorkCard(category: 'History', title: 'Received', meta: 'Gifts on this account', action: 'Open history', image: 'assets/rails/gifts-02.jpg', onTap: () => _tab('received')),
+              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Ranks and codes', action: 'Open earn', image: 'assets/rails/earn-02.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+              WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you spend', action: 'Open rewards', image: 'assets/rails/rewards-02.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+            ],
           ),
-          const SizedBox(height: 12),
-          const IdentityRails(RailKind.gifts),
-          const SizedBox(height: 16),
-          const GiftsHero(),
           const GiftShowcase(),
           const SizedBox(height: 16),
           const GiftWheel(),

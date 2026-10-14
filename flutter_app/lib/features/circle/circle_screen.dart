@@ -13,6 +13,7 @@ import '../../widgets/flip_portrait.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../data/firebase.dart';
@@ -141,7 +142,19 @@ class _CircleScreenState extends State<CircleScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              const IdentityRails(RailKind.earn),
+              RoutineDeck(
+                title: 'Earn',
+                banner: signedIn ? w.circleTier : 'NowssB Earn',
+                bannerSub: signedIn ? '$units units · ${w.code.isEmpty ? 'code pending' : w.code}' : 'Sign in to see your rank',
+                onBanner: () => Programmes.open(context, Programme.reference),
+                cards: [
+                  WorkCard(category: 'Rank', title: signedIn ? w.circleTier : 'Sign in', meta: signedIn ? '$units of $next to the next tier' : 'Your rank is on this account', action: signedIn ? 'See plans' : 'Sign in', image: 'assets/rails/earn-01.jpg', onTap: () { if (!signedIn) { NwsbSignInPage.open(context); } else { Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())); } }),
+                  WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you earn', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+                  WorkCard(category: 'Coupons', title: 'Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/coupons-01.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
+                  WorkCard(category: 'Gifts', title: 'Gifts', meta: 'Send or redeem', action: 'Open gifts', image: 'assets/rails/gifts-01.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
+                  WorkCard(category: 'Cash', title: 'Earnings', meta: 'Sales and payouts', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
+                ],
+              ),
               const SizedBox(height: 14),
               GlassWrap(
                 margin: EdgeInsets.zero,

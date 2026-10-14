@@ -10,6 +10,7 @@ import '../economy/money.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
@@ -103,29 +104,18 @@ class _EarningsScreenState extends State<EarningsScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
-              const BrandTopBanner(
-                bare: true,
-                title: 'Your Earning',
-                mark: NwsbMarks.piggy,
+              RoutineDeck(
+                title: 'Earnings',
+                banner: 'Your earning',
+                bannerSub: india ? 'India · UPI' : 'Sales and referrals',
+                onBanner: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'sales'))),
+                cards: [
+                  WorkCard(category: 'Cash', title: 'Lifetime', meta: FxBook.instance.formatCents(w.lifetimeCents), action: 'Open sales', image: 'assets/rails/earnings-01.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'sales')))),
+                  WorkCard(category: 'Cash', title: 'Available', meta: FxBook.instance.formatCents(w.cash), action: 'Open payouts', image: 'assets/rails/earnings-02.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'payouts')))),
+                  WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Sales ledger and lock', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+                  WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins on this account', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+                ],
               ),
-              const SizedBox(height: 12),
-              const IdentityRails(RailKind.earnings),
-              const ColoredSplitPromoBanner(
-                margin: EdgeInsets.zero,
-                spec: SplitPromoSpec(
-                  title: 'Your Earning',
-                  cta: 'Sales and referrals',
-                  leftColor: Color(0xFF143028),
-                  rightColor: Color(0xFF2D6A4F),
-                  art: SplitPromoArts.blondeLotus,
-                ),
-              ),
-              const SizedBox(height: 12),
-              const ProgramShelf(current: Programme.earnings),
-              const SizedBox(height: 12),
-              const CoinCollectCard(pageKey: 'earning', amount: 8, title: 'Earning coins'),
-              const SizedBox(height: 12),
-              ProgramLink(title: 'NowssB Earn · Sales and payouts', sub: 'Sales ledger, money lock, payout history', mark: NwsbMarks.piggy, page: () => const CircleScreen(initialTab: 'sales')),
               const SizedBox(height: 12),
               const GlassLine(text: 'Pending for 30 days, then available. A person approves the payout.'),
               const SizedBox(height: 12),
