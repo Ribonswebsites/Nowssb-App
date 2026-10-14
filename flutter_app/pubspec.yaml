@@ -119,6 +119,7 @@ flutter:
     - assets/banners/earn/
     - assets/banners/programs/
     - assets/gifts/
+    - assets/rails/
     - assets/footer/
     - assets/login/
     - assets/media/

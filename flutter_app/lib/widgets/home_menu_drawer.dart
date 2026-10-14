@@ -35,6 +35,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
+import 'hub_rails.dart';
 import '../admin/template/editable.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
@@ -228,6 +229,11 @@ class HomeMenuDrawer extends StatelessWidget {
                         compact: true,
                         onTap: () => _push(context, const SubscriptionScreen()),
                       ),
+                      HubRails(
+                        a: railSet(const ['Earn', 'Rewards', 'Gifts', 'Coupons', 'Profile'], 'open'),
+                        b: railSet(const ['Library', 'Store', 'Practice', 'Settings', 'Words'], 'go'),
+                        c: railSet(const ['Streak', 'Today', 'Saved', 'Invite', 'Rank'], 'a short step'),
+                      ),
                       _SectionLabel('Practice', light: light),
                       _Group(
                         light: light,
@@ -296,14 +302,9 @@ class HomeMenuDrawer extends StatelessWidget {
                             light: light,
                             mark: _mark['progress']!,
                             viewBox: 22,
-                            label: 'My Progress',
-                            sub: 'Healing journey',
-                            onTap: () => _push(
-                              context,
-                              PracticeProgressScreen(
-                                words: ContentStore.instance.library,
-                              ),
-                            ),
+                            label: 'Profile',
+                            sub: 'Account and earnings',
+                            onTap: () => _goTab(context, 4),
                           ),
                           _Row(
                             light: light,

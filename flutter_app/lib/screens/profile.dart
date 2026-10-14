@@ -46,6 +46,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_cards.dart';
+import '../widgets/hub_rails.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -706,18 +707,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: GlassCard(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
             child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())),
+              onTap: () {},
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    live ? FxBook.instance.formatCents(earned) : 'Sign in',
-                    style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent),
-                  ),
-                  const SizedBox(height: 6),
-                  const EditableLabel('profile.ProfileScreen', 'Sales and referrals · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
-                ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                live ? FxBook.instance.formatCents(earned) : 'Sign in',
+                style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent),
               ),
+              const SizedBox(height: 6),
+              const EditableLabel('profile.ProfileScreen', 'Sales and referrals · payout history', style: TextStyle(fontSize: 12.5, color: _dim)),
+              const SizedBox(height: 8),
+              HubRails(
+                a: railSet(const ['Sales', 'Today', 'This week', 'Pending', 'Paid'], 'earnings'),
+                b: railSet(const ['Words', 'Meanings', 'Plans', 'Gifts', 'Bonus'], 'earned'),
+                c: railSet(const ['Invite', 'First sale', 'Streak', 'Rank', 'Payout'], 'a short step'),
+              ),
+            ],
+          ),
             ),
           ),
         ),
@@ -742,6 +749,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _progress() {
+    return const SizedBox.shrink();
+  }
+
+  Widget _progressRetired() {
     void openProgress() {
       Navigator.of(context).push(
         MaterialPageRoute(

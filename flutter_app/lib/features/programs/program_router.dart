@@ -5,25 +5,21 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../circle/circle_screen.dart';
-import '../economy/coupon_screen.dart';
 import '../economy/partner_screen.dart';
 import '../economy/reference_screen.dart';
-import '../earn/earnings_screen.dart';
-import '../gifts/gifts_screen.dart';
-import '../vault/vault_screen.dart';
+import 'program_hub.dart';
 
 enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings }
 
 abstract final class Programmes {
   static Widget page(Programme p, {String? tab}) => switch (p) {
-        Programme.earn => CircleScreen(initialTab: tab),
-        Programme.rewards => VaultScreen(initialTab: tab),
-        Programme.coupons => CouponScreen(initialTab: tab),
-        Programme.gifts => GiftsScreen(initialTab: tab),
+        Programme.earn => const ProgramHub(title: 'NowssB Earn', subs: ['Ranks', 'Team', 'Payouts']),
+        Programme.rewards => const ProgramHub(title: 'NowssB Rewards', subs: ['Wallet', 'Streaks', 'Quests']),
+        Programme.coupons => const ProgramHub(title: 'NowssB Coupons', subs: ['Scratch', 'My coupons', 'Shop']),
+        Programme.gifts => const ProgramHub(title: 'NowssB Gifts', subs: ['Send', 'Redeem', 'History']),
         Programme.reference => ReferenceScreen(initialTab: tab),
         Programme.partner => PartnerScreen(initialTab: tab),
-        Programme.earnings => const EarningsScreen(),
+        Programme.earnings => const ProgramHub(title: 'Earnings', subs: ['Sales', 'Referrals', 'Payouts']),
       };
 
   static Future<void> open(BuildContext context, Programme p, {String? tab}) =>

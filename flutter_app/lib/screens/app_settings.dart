@@ -28,6 +28,7 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/hub_rails.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
@@ -139,6 +140,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'settings', [
+              LSection('rails', 'Card rails', HubRails(
+                a: [RailCard('Sound', '1 of 5', 'keep'), RailCard('Player', '2 of 5', 'keep'), RailCard('Routine', '3 of 5', 'keep'), RailCard('Theme', '4 of 5', 'settings'), RailCard('Alerts', '5 of 5', 'settings')],
+                b: [RailCard('Account', '1 of 5', 'you'), RailCard('Privacy', '2 of 5', 'you'), RailCard('Downloads', '3 of 5', 'you'), RailCard('Language', '4 of 5', 'you'), RailCard('Help', '5 of 5', 'you')],
+                c: [RailCard('Reduce effects', '1 of 5', 'a short step'), RailCard('Notifications', '2 of 5', 'a short step'), RailCard('Backup', '3 of 5', 'a short step'), RailCard('Sign out', '4 of 5', 'a short step'), RailCard('About', '5 of 5', 'a short step')],
+              )),
               LSection(
                   'profile',
                   'Profile card',

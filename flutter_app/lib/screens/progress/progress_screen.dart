@@ -88,6 +88,20 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Center(
+          child: TextButton(
+            onPressed: () => NavScope.goTo(context, 4),
+            child: const Text('Progress is on your Profile', style: TextStyle(color: Colors.white, fontSize: 16)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _retiredBuild(BuildContext context) {
     final progress = PracticeProgress.instance;
     final organFor = <String, String>{
       for (final w in widget.words)
