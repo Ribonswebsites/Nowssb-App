@@ -225,10 +225,6 @@ class HomeMenuDrawer extends StatelessWidget {
                       bottom + 40,
                     ),
                     children: [
-                      BrandTopBanner(
-                        compact: true,
-                        onTap: () => _push(context, const SubscriptionScreen()),
-                      ),
                       RoutineDeck(
                         title: 'Go',
                         banner: 'Your menu',
@@ -254,6 +250,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           WorkCard(category: 'Store', title: 'Meaning Store', meta: 'Hidden meanings', action: 'Open meanings', image: 'assets/rails/gen-09.jpg', onTap: () => _push(context, const MeaningStoreScreen())),
                           WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', image: 'assets/rails/gen-10.jpg', onTap: () => _goTab(context, 4)),
                           WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/gen-11.jpg', onTap: () => _push(context, const AppSettingsScreen())),
+                          WorkCard(category: 'Plans', title: 'Plans', meta: 'Resonance, Frequency, Frequency X', action: 'Open plans', image: 'assets/rails/rewards-03.jpg', onTap: () => _push(context, const SubscriptionScreen())),
                           WorkCard(category: 'Alerts', title: 'Notifications', meta: 'This phone', action: 'Open alerts', image: 'assets/rails/glass-01.jpg', onTap: () => _push(context, const NotificationsSettingsPage())),
                           WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => _push(context, const EarnHubScreen())),
                           WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Coins, quests, invite', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => _push(context, const VaultScreen())),
