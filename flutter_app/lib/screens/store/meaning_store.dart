@@ -248,74 +248,10 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutIndexed(context, 'store.meaning', const {
-        0: ('hero', 'Hero film'),
-        1: ('subscribe', 'Subscribe banner'),
-        // UI-6 varied mix: artists → tiles → hype → glassy (no two alike).
-        2: ('artists', 'Featured meanings'),
-        3: ('tiles', 'Category tiles'),
-        5: ('glassy', 'Explore the stores'),
-        7: ('search', 'Search'),
-        9: ('chips', 'Category chips'),
-        11: ('goals', 'Browse by goal'),
-        12: ('recommended', 'Recommended for you'),
-        13: ('promo', 'Signature Store banner'),
-        14: ('playlist', 'Featured playlist'),
-        15: ('collections', 'Featured collections'),
-        17: ('promo2', 'Signature promo'),
-        18: ('rows', 'Meaning collections'),
-        -2: ('promo3', 'Request words banner'),
-        -1: ('disclaimer', 'Disclaimer'),
-      }, [
-        // Single hero/video area — no back-to-back promo banners.
-        StorePixelsHero(
-          videoAsset: nwsbVideo(kStoreMeaningDoorVidFile),
-          videoTitle: '',
-        ),
+      children: [
         const StoreRoomDeck(current: 'meaning'),
-        const StoreSubscribeBanner(
-          pillIconAsset: kMsMeaningProductArt,
-        ),
-        StoreMixRow(
-          title: 'Featured meanings',
-          child: ArtistCardsSection(config: _artists, onTap: _openArtist),
-        ),
-        CategoryTilesSection(
-          config: MeaningMix.tiles,
-          onTileTap: _onMixTile,
-        ),
-        const SizedBox.shrink(),
-        StoreMixRow(
-          title: 'Explore the stores',
-          child: StoreRegistrySection(config: MeaningMix.glassy),
-        ),
-        const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: StoreSearchBar(
-            controller: _search,
-            hint: 'Search meanings…',
-            onChanged: (v) => setState(() => _query = v),
-          ),
-        ),
-        const SizedBox(height: 14),
-        StoreShelf(pieces: _meaningPieces(), labels: const ['Meanings', 'Saved', 'Guides', 'Glass', 'Clear']),
-        if (cats.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 48),
-            child: Center(
-                child: EditableLabel('meaning_store.MeaningStoreBody', 'No meanings match.',
-                    style: TextStyle(color: Color(0x8CFFFFFF)))),
-          ),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(9, onTap: () => openRequestWords(context)),
-        ),
-        const StoreDisclaimer(
-          text:
-              'Meanings shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked.',
-        ),
-      ]),
+        StoreShelf(pieces: _meaningPieces()),
+      ],
     );
   }
 

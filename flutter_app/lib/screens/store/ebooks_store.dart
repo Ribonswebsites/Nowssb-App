@@ -90,121 +90,8 @@ class _EbooksBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'store.ebooks', [
-        // Single hero/video — no back-to-back promo / word-banner stacks.
-        LSection('hero', 'Hero film', Container(
-          margin: const EdgeInsets.only(bottom: 16),
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.black,
-          ),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                const NwsbVideo(
-                  asset: 'assets/video/hero-ebooks.mp4',
-                  poster: 'assets/video/hero-ebooks-poster.webp',
-                  priority: ClipPriority.feature,
-                  slot: 'ebooks_store.EbooksBody',
-                ),
-                const IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0x22060C18), Color(0xE6060C18)],
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 18,
-                  right: 18,
-                  bottom: 16,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            EditableLabel('ebooks_store.EbooksBody',
-                              'READ · LEARN · PRACTICE',
-                              style: TextStyle(
-                                fontSize: 10,
-                                letterSpacing: 3,
-                                fontWeight: FontWeight.w700,
-                                color: NwsbColors.goldLight,
-                              ),
-                            ),
-                            SizedBox(height: 6),
-                            EditableLabel('ebooks_store.EbooksBody',
-                              'The NowssB Ebooks',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: EditableImage.asset(
-                          kEbProductArt,
-                          width: 56,
-                          height: 56,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => EditableImage.asset(
-                            kEbIntroArt,
-                            width: 56,
-                            height: 56,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                const SizedBox(width: 56, height: 56),
-                                slot: 'ebooks_store.EbooksBody',
-                          ),
-                          slot: 'ebooks_store.EbooksBody',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )),
-        const LSection('rooms', 'Store rooms', StoreRoomDeck(current: 'ebooks')),
-        // UI-7 varied mix: coupons → tiles → glassy → hype (no two alike).
-        LSection(
-          'coupons',
-          'Coupon banner',
-          StoreRegistrySection(config: EbooksMix.coupons),
-        ),
-        LSection(
-          'tiles',
-          'Category tiles',
-          StoreRegistrySection(config: EbooksMix.tiles),
-        ),
-        LSection(
-          'glassy',
-          'Explore the stores',
-          StoreMixRow(
-            title: 'Explore the stores',
-            child: StoreRegistrySection(config: EbooksMix.glassy),
-          ),
-        ),
-        const LSection('intro', 'Intro line', Text(
-          'Deep-dive guides on sound, phonetic origin and healing practice — '
-          'yours to keep, read anywhere, forever. Not a word catalogue.',
-          style: TextStyle(fontSize: 13, height: 1.6, color: Color(0x80FFFFFF)),
-        )),
-        const SizedBox(height: 18),
+      children: [
+        const StoreRoomDeck(current: 'ebooks'),
         StoreShelf(
           labels: const ['Books', 'Saved', 'Guides', 'Glass', 'Clear'],
           pieces: [
@@ -226,8 +113,7 @@ class _EbooksBody extends StatelessWidget {
               ),
           ],
         ),
-        const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(text: kEbDisclaimer)),
-      ]),
+      ],
     );
   }
 }

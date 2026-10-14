@@ -19,7 +19,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../economy/coupon_screen.dart';
 import '../economy/partner_screen.dart';
 import '../economy/reference_screen.dart';
-import '../../widgets/program_shelf.dart';
+import '../../widgets/routine_deck.dart';
+import '../programs/program_router.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
 import '../programs/coupons_program.dart';
@@ -39,73 +40,31 @@ class EarnHubScreen extends StatelessWidget {
       goodToKnow: kEarnDisclaimer,
       title: 'NowssB Earn',
       mark: NwsbMarks.piggy,
-      banner: const ColoredSplitPromoBanner(
-        margin: EdgeInsets.fromLTRB(16, 0, 16, 8),
-        spec: SplitPromoSpec(
-          title: 'NowssB Earn',
-          cta: 'Agents, rewards, gifts',
-          leftColor: Color(0xFF2A1B4D),
-          rightColor: Color(0xFFC8A96E),
-          art: SplitPromoArts.egyptianGold,
-        ),
-      ),
       child: ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) {
           final w = EconomyMirror.instance;
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-            // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'earn', [
-              if (w.uid == null)
-                GoldButton(
-                  label: 'Sign in to see your balance',
-                  onTap: () => NwsbSignInPage.open(context),
-                )
-              else ...[
-                CoinCount(value: w.coins, style: const TextStyle(fontSize: 28, color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
-                MoneyCount(cents: w.cash, style: const TextStyle(color: NwsbColors.mist)),
-                Text(w.plan, style: const TextStyle(color: NwsbColors.mist)),
-                const SizedBox(height: 6),
-                Text('${w.sellerTier} · ${w.wordsSold}/${w.nextSellerTarget} sold', style: const TextStyle(color: NwsbColors.mist)),
-                Text('${w.circleTier} · ${w.code.isEmpty ? 'code paused' : w.code}', style: const TextStyle(color: NwsbColors.mist)),
-              ],
-              const SizedBox(height: 8),
-              const LSection('note', 'Privacy note', EconomyNote('This page is only yours. Coin and cash balances are not on the public Word Print.')),
-              const SizedBox(height: 8),
-              const GlassLine(text: 'Earn, rewards, gifts, resell, print, the wall. Swipe the shelf.'),
-              const SizedBox(height: 12),
-              const CoinCollectCard(pageKey: 'hub', amount: 8, title: 'Earn hub coins'),
-              const SizedBox(height: 12),
-              // Each poster opens its own programme (see openPoster).
-              const ProgramShelf(),
-              const SizedBox(height: 14),
-              // The six programs from the plan, each with its full tab set.
-              LSection.group('programs', 'Programs', [
-                const EditableLabel('earn_hub_screen.EarnHubScreen', 'THE PROGRAMS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12)),
-                const SizedBox(height: 8),
-                ProgramLink(title: 'NowssB Earn', sub: 'Ranks, team, sales, targets, payouts', mark: NwsbMarks.piggy, page: () => const EarnProgramPage()),
-                ProgramLink(title: 'NowssB Rewards', sub: 'Daily coins, streaks, quests, season, leagues', mark: NwsbMarks.rewards, page: () => const RewardsProgramPage()),
-                ProgramLink(title: 'NowssB Coupons', sub: 'Scratch cards, rarity, odds, prizes', mark: NwsbMarks.coupon, page: () => const CouponsProgramPage()),
-                ProgramLink(title: 'NowssB Gifts', sub: 'Free boxes, gift cards, send and redeem', mark: NwsbMarks.gift, page: () => const GiftsProgramPage()),
-                ProgramLink(title: 'NowssB Reference', sub: 'Your links, friends, sharer ladder', mark: NwsbMarks.reference, page: () => const ReferenceProgramPage()),
-                ProgramLink(title: 'Partner Program', sub: 'Milestones, perks, buyer discount', mark: NwsbMarks.crown, page: () => const PartnerProgramPage()),
-              ]),
-              const SizedBox(height: 12),
-              LSection.group('more', 'More', [
-                ProgramLink(title: 'Your Earning', sub: 'Balance, payout account, request a payout', mark: NwsbMarks.bars, page: () => const EarningsScreen()),
-                ProgramLink(title: 'Word Print', sub: 'Your public profile of words', mark: NwsbMarks.word, page: () => WordPrintScreen(uid: w.uid)),
-                ProgramLink(title: 'Echo Wall', sub: 'Posts from people on NowssB', mark: NwsbMarks.verified, page: () => const EchoWallScreen()),
-              ]),
-              const SizedBox(height: 18),
-              const LSection('coins', 'Coin ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'COIN LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
-              const SizedBox(height: 8),
-              _ledger('coinLedger', w.uid),
-              const SizedBox(height: 16),
-              const LSection('cash', 'Cash ledger', EditableLabel('earn_hub_screen.EarnHubScreen', 'CASH LEDGER', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.2, fontSize: 12))),
-              const SizedBox(height: 8),
-              _ledger('commissionLedger', w.uid),
-            ]),
+            children: [
+              RoutineDeck(
+                title: 'Earn',
+                banner: 'NowssB Earn',
+                bannerSub: w.uid == null ? 'Sign in to see your balance' : '${w.circleTier} · ${w.code.isEmpty ? 'code paused' : w.code}',
+                onBanner: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnProgramPage())),
+                cards: [
+                  if (w.uid == null)
+                    WorkCard(category: 'Account', title: 'Sign in', meta: 'See coins and cash', action: 'Sign in', image: 'assets/rails/earn-01.jpg', onTap: () => NwsbSignInPage.open(context))
+                  else
+                    WorkCard(category: 'Balance', title: '${w.coins} coins', meta: FxBook.instance.formatCents(w.cash), action: 'Open ranks', image: 'assets/rails/earn-01.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnProgramPage()))),
+                  WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Daily coins, streaks, quests', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+                  WorkCard(category: 'Coupons', title: 'NowssB Coupons', meta: 'Scratch cards and codes', action: 'Open coupons', image: 'assets/gifts/coupon-hero.png', onTap: () => Programmes.open(context, Programme.coupons)),
+                  WorkCard(category: 'Gifts', title: 'NowssB Gifts', meta: 'Send a real purchase as a code', action: 'Open gifts', image: 'assets/gifts/box-gold.webp', onTap: () => Programmes.open(context, Programme.gifts)),
+                  WorkCard(category: 'Reference', title: 'NowssB Reference', meta: 'Your link and the people on it', action: 'Open reference', image: 'assets/rails/earn-04.jpg', onTap: () => Programmes.open(context, Programme.reference)),
+                  WorkCard(category: 'Cash', title: 'Your earning', meta: 'Payout account and requests', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen()))),
+                ],
+              ),
+            ],
           );
         },
       ),

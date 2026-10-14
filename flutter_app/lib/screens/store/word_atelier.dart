@@ -136,98 +136,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutIndexed(context, 'store.atelier', const {
-        0: ('hero', 'Hero film'),
-        // UI-6 varied mix: coupons → hype → tiles → glassy (no two alike).
-        2: ('coupons', 'Coupon banner'),
-        4: ('tiles', 'Category tiles'),
-        5: ('glassy', 'Featured collections'),
-        7: ('promo', 'Split promo banner'),
-        9: ('search', 'Search'),
-        11: ('intro', 'Your word library intro'),
-        15: ('chips', 'Category chips'),
-        17: ('promo2', 'Meaning Store banner'),
-        18: ('rows', 'Word collections'),
-        -2: ('promo3', 'Signature Store banner'),
-        -1: ('disclaimer', 'Disclaimer'),
-      }, [
-        StorePixelsHero(
-          onBrowseAll: _browseAll,
-          onViewCart: _viewCart,
-          videoAsset: nwsbVideo(kRmHeroVidFile),
-          videoTitle: '',
-        ),
-        const SizedBox(height: 18),
+      children: [
         const StoreRoomDeck(current: 'word'),
-        StoreRegistrySection(config: AtelierMix.coupons),
-        const SizedBox.shrink(),
-        StoreRegistrySection(config: AtelierMix.tiles),
-        StoreMixRow(
-          title: 'Featured collections',
-          child: StoreRegistrySection(config: AtelierMix.glassy),
-        ),
-        const SizedBox(height: 16),
-        ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.wordAtelier,
-          onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(
-              builder: (_) => const MeaningStoreScreen(),
-            ),
-          ),
-          margin: const EdgeInsets.only(bottom: 8),
-        ),
-        const SizedBox(height: 8),
-        StoreGlassPanel(
-          radius: 32,
-          padding: const EdgeInsets.all(5),
-          child: StoreSearchBar(
-            controller: _search,
-            onChanged: (v) => setState(() => _query = v),
-            onGo: () {
-              if (_query.trim().isEmpty) {
-                openRequestWords(context);
-                return;
-              }
-              // If nothing matches, offer request-word flow.
-              final any = kRmCategories.any((c) => c.words.any(
-                    (w) => _match(w.word, w.root),
-                  ));
-              if (!any) openRequestWords(context);
-            },
-          ),
-        ),
-        const SizedBox(height: 16),
-        const EditableLabel('word_atelier.WordAtelierBody',
-          'YOUR WORD LIBRARY',
-          style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2.2,
-              color: NwsbColors.gold),
-        ),
-        const SizedBox(height: 6),
-        const EditableLabel('word_atelier.WordAtelierBody',
-          'Every word carries a vibrational signature.',
-          style: TextStyle(fontSize: 13, color: Color(0x99FFFFFF)),
-        ),
-        const SizedBox(height: 12),
-        StoreShelf(pieces: pieces, labels: const ['Words', 'Saved', 'Guides', 'Glass', 'Clear']),
-        ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(
-            7,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => const SignatureStoreScreen(),
-              ),
-            ),
-          ),
-        ),
-        const StoreDisclaimer(
-          text:
-              'Words shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
-        ),
-      ]),
+        StoreShelf(pieces: pieces),
+      ],
     );
   }
 }

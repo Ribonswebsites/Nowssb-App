@@ -208,14 +208,16 @@ class _RoutineCard extends StatelessWidget {
                           const SizedBox(height: 10),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(16),
-                            child: EditableImage.asset(
-                              image,
-                              height: 152,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                              alignment: Alignment.topCenter,
-                              slot: 'routine_deck.RoutineCard',
-                            ),
+                            child: image.startsWith('http')
+                                ? Image.network(image, height: 152, width: double.infinity, fit: BoxFit.cover, alignment: Alignment.topCenter, errorBuilder: (_, __, ___) => const SizedBox(height: 152))
+                                : EditableImage.asset(
+                                    image,
+                                    height: 152,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    alignment: Alignment.topCenter,
+                                    slot: 'routine_deck.RoutineCard',
+                                  ),
                           ),
                           const SizedBox(height: 12),
                           Text(card.meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xBFFFFFFF), fontSize: 12)),

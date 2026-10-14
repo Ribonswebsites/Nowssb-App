@@ -87,6 +87,46 @@ class _EarningsScreenState extends State<EarningsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: EditableLabel('earnings_screen.EarningsScreen', text)));
   }
 
+  void _openAccount(BuildContext context, bool india, bool unsupported, bool canPay) {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF10141C),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(ctx).bottom),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                initialValue: _country,
+                dropdownColor: const Color(0xFF141820),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(labelText: 'Payout country'),
+                items: [for (final item in _countries) DropdownMenuItem(value: item.$1, child: Text(item.$2))],
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() => _country = value);
+                  Navigator.pop(ctx);
+                  _openAccount(context, value == 'IN', value == 'XX', canPay);
+                },
+              ),
+              if (india) ...[
+                TextField(controller: _upi, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'UPI id, name@bank')),
+                TextField(controller: _legal, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Legal name')),
+                TextField(controller: _pan, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'PAN')),
+              ],
+              if (!india && !unsupported)
+                TextField(controller: _email, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Wise or PayPal email')),
+              const SizedBox(height: 12),
+              GoldButton(label: 'Save payout account', onTap: () { Navigator.pop(ctx); runPrivate(context, _saveAccount); }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
@@ -116,122 +156,18 @@ class _EarningsScreenState extends State<EarningsScreen> {
                   WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins on this account', action: 'Open rewards', image: 'assets/rails/gen-57.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
                 ],
               ),
-              const SizedBox(height: 12),
-              const GlassLine(text: 'Pending for 30 days, then available. A person approves the payout.'),
-              const SizedBox(height: 12),
-              EconomyNote(
-                unsupported
-                    ? 'This country is not on a payout rail yet. Earnings stay in your balance and are not sent in the wrong currency.'
-                    : india
-                        ? 'India settles in INR to your UPI id.'
-                        : 'Outside India payouts go to your Wise or PayPal account, sent by hand after a review.',
-              ),
-              const SizedBox(height: 12),
-              const EditableLabel('earnings_screen.EarningsScreen', 'Lifetime', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
-              MoneyCount(cents: w.lifetimeCents),
-              const SizedBox(height: 4),
-              const EditableLabel('earnings_screen.EarningsScreen', 'Available', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
-              MoneyCount(cents: w.cash),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                initialValue: _country,
-                dropdownColor: const Color(0xFF141820),
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(labelText: 'Payout country', labelStyle: TextStyle(color: NwsbColors.mist)),
-                items: [
-                  for (final item in _countries)
-                    DropdownMenuItem(value: item.$1, child: Text(item.$2)),
-                ],
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(() => _country = value);
-                },
-              ),
-              if (india) ...[
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _upi,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: w.upi.isEmpty ? 'UPI id, name@bank' : w.upi,
-                    hintStyle: const TextStyle(color: NwsbColors.mist),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _legal,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(hintText: 'Legal name (as on bank / PAN)', hintStyle: TextStyle(color: NwsbColors.mist)),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _pan,
-                  textCapitalization: TextCapitalization.characters,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(hintText: 'PAN (needed above the TDS limit)', hintStyle: TextStyle(color: NwsbColors.mist)),
-                ),
-              ],
-              if (!india && !unsupported) ...[
-                const SizedBox(height: 8),
-                Wrap(spacing: 8, children: [
-                  for (final m in const [('wise', 'Wise'), ('paypal', 'PayPal')])
-                    ChoiceChip(
-                      label: Text(m.$2),
-                      selected: _method == m.$1,
-                      onSelected: (_) => setState(() => _method = m.$1),
-                    ),
-                ]),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _email,
-                  keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(hintText: _method == 'paypal' ? 'PayPal email' : 'Wise email', hintStyle: const TextStyle(color: NwsbColors.mist)),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _legal,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(hintText: 'Legal name on that account', hintStyle: TextStyle(color: NwsbColors.mist)),
-                ),
-              ],
-              const SizedBox(height: 8),
-              GoldButton(
-                label: india ? 'Save India payout account' : unsupported ? 'Save country' : 'Save Wise / PayPal account',
-                filled: false,
-                onTap: () => runPrivate(context, _saveAccount),
-              ),
-              const SizedBox(height: 8),
-              GoldButton(
-                label: 'Request payout',
-                onTap: canPay
-                    ? () => runPrivate(context, () => EconomyApi.call('requestPayout'))
-                    : null,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                w.payoutRail.isEmpty ? 'No payout rail saved yet.' : 'Saved rail: ${w.payoutRail}',
-                style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  for (final item in const [('all', 'All'), ('sale', 'Sales'), ('circle', 'Referrals'), ('payout', 'Payouts')])
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(item.$2),
-                        selected: _filter == item.$1,
-                        onSelected: (_) => setState(() => _filter = item.$1),
-                      ),
-                    ),
+              RoutineDeck(
+                title: 'Payout',
+                banner: 'Your account',
+                bannerSub: w.payoutRail.isEmpty ? 'No payout rail saved yet' : 'Saved rail: ${w.payoutRail}',
+                onBanner: () => _openAccount(context, india, unsupported, canPay),
+                cards: [
+                  WorkCard(category: 'Account', title: 'Payout account', meta: india ? 'India · UPI' : unsupported ? 'Country not supported yet' : 'Wise or PayPal', action: 'Set account', image: 'assets/rails/earnings-02.jpg', onTap: () => _openAccount(context, india, unsupported, canPay)),
+                  WorkCard(category: 'Cash', title: 'Request payout', meta: FxBook.instance.formatCents(w.cash), action: canPay ? 'Request' : 'Save account first', image: 'assets/rails/earnings-03.jpg', onTap: canPay ? () => runPrivate(context, () => EconomyApi.call('requestPayout')) : () => _openAccount(context, india, unsupported, canPay)),
+                  WorkCard(category: 'Sales', title: 'Sales', meta: 'What this account sold', action: 'Open sales', image: 'assets/rails/earnings-04.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'sales')))),
+                  WorkCard(category: 'Referrals', title: 'Referrals', meta: 'The second level', action: 'Open referrals', image: 'assets/rails/earnings-05.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'payouts')))),
                 ],
               ),
-              const SizedBox(height: 12),
-              if (!NwsbFirebase.ready || w.uid == null)
-                const EconomyMessage(title: 'Nothing to show', body: 'Sign in to see earnings.')
-              else
-                _History(uid: w.uid!, filter: _filter),
             ],
           );
         },

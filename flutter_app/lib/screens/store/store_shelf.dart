@@ -3,7 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import 'store_cards.dart';
 
 class StorePiece {
@@ -79,64 +79,35 @@ class StoreShelf extends StatefulWidget {
 }
 
 class _StoreShelfState extends State<StoreShelf> {
-  String _filter = 'All';
-
   @override
   Widget build(BuildContext context) {
-    final shown = _filter == 'All' ? widget.pieces : widget.pieces.where((p) => p.group == _filter).toList();
-    final cards = [
-      for (final p in shown)
-        RailCard(p.title, p.line, p.group, art: p.art),
-    ];
-    final byTitle = {for (final p in shown) p.title: p};
+    final groups = <String, List<StorePiece>>{};
+    for (final p in widget.pieces) {
+      final key = kStoreFilters.contains(p.group) ? p.group : 'Language';
+      (groups[key] ??= []).add(p);
+    }
+    final order = [for (final name in kStoreFilters) if (name != 'All' && (groups[name]?.isNotEmpty ?? false)) name];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 36,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              for (final name in kStoreFilters) ...[
-                StoreFilterChip(
-                  label: name.toUpperCase(),
-                  selected: _filter == name,
-                  black: true,
-                  onTap: () => setState(() => _filter = name),
+        for (final name in order)
+          RoutineDeck(
+            title: name,
+            banner: name,
+            bannerSub: '${groups[name]!.length} in this row',
+            cards: [
+              for (final p in groups[name]!.take(12))
+                WorkCard(
+                  category: p.group,
+                  title: p.title,
+                  meta: p.line,
+                  action: 'Open',
+                  image: p.art,
+                  onTap: p.onTap,
                 ),
-                const SizedBox(width: 7),
-              ],
             ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        if (shown.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 28),
-            child: Text('Nothing in this filter.', style: TextStyle(color: Color(0xB3FFFFFF))),
-          )
-        else
-          HubRails(
-            a: _take(cards, 0),
-            b: _take(cards, 1),
-            c: _take(cards, 2),
-            d: _take(cards, 3),
-            e: _take(cards, 4),
-            labels: widget.labels,
-            openGuide: false,
-            onOpen: (card) => byTitle[card.title]?.onTap(),
           ),
       ],
     );
-  }
-
-  List<RailCard> _take(List<RailCard> all, int rail) {
-    if (all.isEmpty) return const [];
-    final out = <RailCard>[];
-    for (var i = rail; i < all.length; i += 5) {
-      out.add(all[i]);
-    }
-    if (rail >= 3) return out.take(4).toList();
-    return out;
   }
 }

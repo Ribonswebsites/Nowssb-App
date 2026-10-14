@@ -56,7 +56,12 @@ class StoreRoomDeck extends StatelessWidget {
             title: r.$2,
             meta: r.$3,
             action: r.$4,
-            image: kRoutineArts[rooms.indexOf(r) % kRoutineArts.length],
+            image: switch (r.$1) {
+              'meaning' => 'assets/meanings/meanings-branding.jpg',
+              'signature' => 'assets/signature/sig-meanings-icon.webp',
+              'ebooks' => 'assets/ebooks/ebooks-headphones.jpg',
+              _ => 'assets/meanings/meanings-device.png',
+            },
             onTap: () => openStoreFromPicker(context, r.$1, current: current),
           ),
       ],

@@ -50,90 +50,79 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
             bannerSub: 'One code. A friend’s first valid link counts.',
             onBanner: () => Programmes.open(context, Programme.earn),
             cards: [
-              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Cash on real sales', action: 'Open earn', image: 'assets/rails/gen-66.jpg', onTap: () => Programmes.open(context, Programme.earn)),
-              WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you spend', action: 'Open rewards', image: 'assets/rails/gen-67.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
-              WorkCard(category: 'Gifts', title: 'Gifts', meta: 'Send a plan', action: 'Open gifts', image: 'assets/rails/gen-68.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
-              WorkCard(category: 'Coupons', title: 'Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/gen-69.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
+              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Cash on real sales', action: 'Open earn', image: 'assets/rails/earn-02.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+              WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you spend', action: 'Open rewards', image: 'assets/rails/rewards-02.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+              WorkCard(category: 'Gifts', title: 'Gifts', meta: 'Send a plan', action: 'Open gifts', image: 'assets/gifts/box-red.webp', onTap: () => Programmes.open(context, Programme.gifts)),
+              WorkCard(category: 'Coupons', title: 'Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/gifts/coupon-hero.png', onTap: () => Programmes.open(context, Programme.coupons)),
             ],
           ),
-          const SizedBox(height: 12),
-          const GlassLine(
-            text: 'Your code attributes a sale. Their parent takes a small second level. Both must hold a plan.',
-          ),
-          const SizedBox(height: 16),
-          ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) {
-          final w = EconomyMirror.instance;
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                w.code.isEmpty ? 'Your code shows on this account' : w.code,
-                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '${w.circleTier} · ${w.unitsSold} sales · parent ${w.referredBy.isEmpty ? 'none' : w.referredBy}',
-                style: const TextStyle(color: Color(0xB3FFFFFF)),
-              ),
-              const SizedBox(height: 12),
-              GoldButton(
-                label: 'Copy reference code',
-                filled: false,
-                onTap: w.code.isEmpty
-                    ? null
-                    : () async {
-                        await Clipboard.setData(ClipboardData(text: w.code));
-                        if (context.mounted) setState(() => _note = 'Code copied.');
-                      },
-              ),
-              const SizedBox(height: 18),
-              TextField(
-                controller: _code,
-                style: const TextStyle(color: Colors.white),
-                textCapitalization: TextCapitalization.characters,
-                decoration: const InputDecoration(
-                  hintText: 'Someone else’s code',
-                  hintStyle: TextStyle(color: Color(0x66FFFFFF)),
-                ),
-              ),
-              const SizedBox(height: 8),
-              GoldButton(
-                label: 'Apply code',
-                onTap: () async {
-                  try {
-                    await EconomyApi.call('applyReferralCode', {'code': _code.text.trim()});
-                    if (mounted) setState(() => _note = 'Code saved. It cannot be changed.');
-                  } on EconomyException catch (e) {
-                    if (!EconomyApi.isMissing(e)) {
-                      if (mounted) setState(() => _note = e.message);
-                      return;
-                    }
-                    if (mounted) setState(() => _note = EconomyApi.switchingOnMessage);
-                  }
-                },
-              ),
-              if (_note != null) ...[
-                const SizedBox(height: 10),
-                Text(_note!, style: const TextStyle(color: Colors.white)),
-              ],
+          RoutineDeck(
+            title: 'Your code',
+            banner: 'Reference',
+            bannerSub: 'One code. A friend’s first valid link counts.',
+            onBanner: () => _share(context),
+            cards: [
+              WorkCard(category: 'Code', title: 'Copy your code', meta: 'The code on this account', action: 'Copy', image: 'assets/rails/earn-05.jpg', onTap: () => _share(context)),
+              WorkCard(category: 'Code', title: 'Apply a code', meta: 'Someone else’s code, once', action: 'Apply', image: 'assets/rails/earn-06.jpg', onTap: () => _applySheet(context)),
+              WorkCard(category: 'Board', title: 'Your links', meta: 'Friends on this code', action: 'Open board', image: 'assets/rails/earn-07.jpg', onTap: () => _tabs('board')),
             ],
-          );
-        },
           ),
-          const SizedBox(height: 18),
-          const FourBanners(
-            current: Programme.reference,
-            splitTitle: 'Share a word you love',
-            splitCta: 'Share a link',
-            blackTitle: 'Your links',
-            blackSub: 'One link per word, plan and meaning.',
-          ),
-          const SizedBox(height: 18),
-          ProgramTabsBlock(spec: kReferenceSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, showDisclaimer: false),
         ],
       ),
     );
+  }
+
+  Future<void> _share(BuildContext context) async {
+    final code = EconomyMirror.instance.code;
+    if (code.isEmpty) {
+      setState(() => _note = 'Your code shows once this account has one.');
+      return;
+    }
+    await Clipboard.setData(ClipboardData(text: code));
+    if (mounted) setState(() => _note = 'Code copied.');
+  }
+
+  void _applySheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF10141C),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _code,
+              style: const TextStyle(color: Colors.white),
+              textCapitalization: TextCapitalization.characters,
+              decoration: const InputDecoration(hintText: 'Someone else’s code'),
+            ),
+            const SizedBox(height: 12),
+            GoldButton(
+              label: 'Apply code',
+              onTap: () async {
+                Navigator.pop(ctx);
+                try {
+                  await EconomyApi.call('applyReferralCode', {'code': _code.text.trim()});
+                  if (mounted) setState(() => _note = 'Code saved. It cannot be changed.');
+                } on EconomyException catch (e) {
+                  if (mounted) setState(() => _note = EconomyApi.isMissing(e) ? EconomyApi.switchingOnMessage : e.message);
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _tabs(String id) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: SafeArea(child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [ProgramTabsBlock(spec: kReferenceSpec, initialTab: id, scrollTo: true, showDisclaimer: false)],
+      )),
+    )));
   }
 }

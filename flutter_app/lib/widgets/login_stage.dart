@@ -58,7 +58,6 @@ class LoginStage extends StatelessWidget {
   Widget build(BuildContext context) {
     final pad = MediaQuery.paddingOf(context);
     final h = MediaQuery.sizeOf(context).height;
-    final faceGap = (h * 0.48).clamp(300.0, 560.0);
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -66,9 +65,9 @@ class LoginStage extends StatelessWidget {
         const Positioned.fill(
           child: NwsbVideo(
             asset: 'assets/video/login-phone.mp4',
-            poster: 'assets/login/login-neon.png',
+            poster: 'assets/video/login-phone-poster.webp',
             fit: BoxFit.cover,
-            alignment: Alignment(0, -0.42),
+            alignment: Alignment(0, -0.15),
             priority: ClipPriority.feature,
             slot: 'login_stage.LoginStage',
           ),
@@ -80,20 +79,19 @@ class LoginStage extends StatelessWidget {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0xC0000000),
-                  Color(0x33000000),
-                  Color(0x14000000),
-                  Color(0x99000000),
-                  Color(0xF0000000),
+                  Color(0x66000000),
+                  Color(0x00000000),
+                  Color(0x00000000),
+                  Color(0xE0000000),
                 ],
-                stops: [0, 0.22, 0.42, 0.62, 1],
+                stops: [0, 0.16, 0.46, 1],
               ),
             ),
           ),
         ),
         SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(22, pad.top + 18, 22, pad.bottom + 16),
+          padding: EdgeInsets.fromLTRB(22, pad.top + 6, 22, pad.bottom + 16),
           child: Column(
             children: [
               if (onClose != null)
@@ -104,7 +102,6 @@ class LoginStage extends StatelessWidget {
                     icon: const Icon(Icons.close, color: Colors.white),
                   ),
                 ),
-              SizedBox(height: faceGap),
               const EditableLabel('login_stage.LoginStage',
                 'NowssB',
                 style: TextStyle(
@@ -139,7 +136,7 @@ class LoginStage extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: (h * 0.30).clamp(160.0, 280.0)),
               _GlassField(
                 controller: id,
                 hint: 'Email or Phone Number',

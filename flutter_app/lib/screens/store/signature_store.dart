@@ -65,57 +65,8 @@ class _SignatureBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: layoutChildren(context, 'store.signature', [
-        // Video hero — no stacked title overlay (header has subtitle).
-        const LSection('hero', 'Hero film', StorePixelsHero(
-          videoAsset: 'assets/video/signature-store-hero.mp4',
-          videoTitle: '',
-        )),
-        const LSection('rooms', 'Store rooms', StoreRoomDeck(current: 'signature')),
-        // UI-7 varied mix: artists → glassy → hype → spotlight (no two alike).
-        LSection(
-          'artists',
-          'Signature artists',
-          StoreMixRow(
-            title: 'Rarest signatures',
-            child: ArtistCardsSection(
-              config: SignatureMix.artists,
-              onTap: (item) {
-                for (final c in kRmCategories) {
-                  final s = c.signature;
-                  if (s != null && s.key == item.id) {
-                    openAtelierWord(
-                      context,
-                      word: s.name,
-                      root: 'Most Exclusive',
-                      img: s.img,
-                      signature: true,
-                    );
-                    return;
-                  }
-                }
-                storeMixOpenLink(context, item);
-              },
-            ),
-          ),
-        ),
-        LSection(
-          'glassy',
-          'Explore the stores',
-          StoreMixRow(
-            title: 'Explore the stores',
-            child: StoreRegistrySection(config: SignatureMix.glassy),
-          ),
-        ),
-        LSection(
-          'spotlight',
-          'Signature spotlight',
-          StoreRegistrySection(config: SignatureMix.spotlight),
-        ),
-        // Subscribe banner uses #3 only — never Signature hero film.
-        const LSection('subscribe', 'Subscribe banner', StoreSubscribeBanner(
-          videoAsset: StoreSubscribeBanner.kSubscriptionOfferVideo,
-        )),
+      children: [
+        const StoreRoomDeck(current: 'signature'),
         StoreShelf(
           labels: const ['Signatures', 'Saved', 'Guides', 'Glass', 'Clear'],
           pieces: [
@@ -149,60 +100,7 @@ class _SignatureBody extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 18),
-        LSection('info', 'About signatures', Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0x0AFFFFFF),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: const Color(0x26E8D5A3)),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.add, color: NwsbColors.goldLight),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EditableLabel('signature_store.SignatureBody', 'Signature · Request',
-                        style: TextStyle(
-                            fontSize: 9,
-                            letterSpacing: 1.5,
-                            color: NwsbColors.gold)),
-                    SizedBox(height: 4),
-                    EditableLabel('signature_store.SignatureBody', 'Request a Signature',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white)),
-                    SizedBox(height: 3),
-                    EditableLabel('signature_store.SignatureBody',
-                      'Personally crafted & delivered within 48 hours.',
-                      style:
-                          TextStyle(fontSize: 12, color: Color(0x8CFFFFFF)),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        )),
-        const SizedBox(height: 36),
-        LSection('promo2', 'Promo banner', ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(10, onTap: () => openRequestWords(context)),
-          margin: const EdgeInsets.only(bottom: 40),
-        )),
-        const LSection('mix', 'Banner mix', BannerMix(seed: 0)),
-        const SizedBox(height: 12),
-        LSection('promo3', 'Promo banner 2', ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(11, onTap: () => openRequestWords(context)),
-        )),
-        const LSection('disclaimer', 'Disclaimer', StoreDisclaimer(
-          text:
-              'Signatures are one-of-a-kind. Owned once, never restocked. For educational and wellness purposes only.',
-        )),
-      ]),
+      ],
     );
   }
 }

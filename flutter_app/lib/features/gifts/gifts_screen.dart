@@ -18,6 +18,7 @@ import '../../widgets/four_banners.dart';
 import '../../admin/template/editable.dart';
 import '../economy/reward_fx.dart';
 import 'gift_show.dart';
+import 'spin_wheel.dart';
 import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
@@ -372,9 +373,25 @@ class _GiftsScreenState extends State<GiftsScreen> {
 
   void _tab(String id) => _go.value?.call(id);
 
+  void _openSpin(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(
+      backgroundColor: Color(0xFF07070C),
+      body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: GiftWheel())),
+    )));
+  }
+
+  void _openTabs(String id) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: SafeArea(child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [ProgramTabsBlock(spec: kGiftsSpec, initialTab: id, scrollTo: true, showDisclaimer: false)],
+      )),
+    )));
+  }
+
   @override
   Widget build(BuildContext context) {
-    final start = widget.initialTab ?? (widget.startOnRedeem ? 'redeem' : null);
     return EconomyPage(
       goodToKnow: kGiftsDisclaimer,
       title: 'NowssB Gifts',
@@ -403,52 +420,28 @@ class _GiftsScreenState extends State<GiftsScreen> {
         cacheExtent: 1600,
         children: [
           RoutineDeck(
-            title: 'Gifts',
+            title: 'Send',
             banner: 'NowssB Gifts',
-            bannerSub: 'Send, redeem, history',
-            onBanner: () => showGiftCardSheet(context, kGiftCatalog.first.id),
+            bannerSub: 'Three ribbons. One real purchase, sent as a code.',
+            onBanner: () => showGiftCardSheet(context, 'word'),
             cards: [
-              WorkCard(category: 'Send', title: 'Gift cards', meta: 'A real purchase, shared as a code', action: 'Send a gift', image: 'assets/rails/gen-58.jpg', onTap: () => showGiftCardSheet(context, kGiftCatalog.first.id)),
-              WorkCard(category: 'History', title: 'Received', meta: 'Gifts on this account', action: 'Open history', image: 'assets/rails/gen-59.jpg', onTap: () => _tab('received')),
-              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Ranks and codes', action: 'Open earn', image: 'assets/rails/gen-60.jpg', onTap: () => Programmes.open(context, Programme.earn)),
-              WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you spend', action: 'Open rewards', image: 'assets/rails/gen-61.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+              WorkCard(category: 'Gift', title: 'Word gift', meta: 'Red ribbon. A word, a stage, or a 7-day pass.', action: 'Send', image: 'assets/gifts/box-red.webp', onTap: () => showGiftCardSheet(context, 'word')),
+              WorkCard(category: 'Gift', title: 'Subscription gift', meta: 'Gold ribbon. Basic, Standard, or Premium.', action: 'Send', image: 'assets/gifts/box-gold.webp', onTap: () => showGiftCardSheet(context, 'standard30')),
+              WorkCard(category: 'Gift', title: 'Signature gift', meta: 'Black ribbon. The high tier.', action: 'Send', image: 'assets/gifts/box-black.webp', onTap: () => showGiftCardSheet(context, 'signature3')),
             ],
           ),
-          const GiftShowcase(),
-          const SizedBox(height: 16),
-          const GiftWheel(),
-          const SizedBox(height: 12),
-          const RandomGiftButton(),
-          const SizedBox(height: 16),
-          const EditableLabel('gifts_screen.GiftsScreen', 'GIFT CARDS', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          const GiftPlanGrid(),
-          const SizedBox(height: 12),
-          const GiftOpenCard(),
-          const SizedBox(height: 12),
-          ColoredSplitPromoBanner(
-            margin: EdgeInsets.zero,
-            spec: SplitPromoSpec(
-              title: 'Got a code?',
-              cta: 'Redeem a gift',
-              leftColor: const Color(0xFF3D2914),
-              rightColor: const Color(0xFFE07A3D),
-              art: SplitPromoArts.redLotus,
-              onTap: () => _tab('redeem'),
-            ),
+          RoutineDeck(
+            title: 'Use',
+            banner: 'Daily spin',
+            bannerSub: 'One free spin. History and redeem stay here.',
+            onBanner: () => _openSpin(context),
+            cards: [
+              WorkCard(category: 'Spin', title: 'Daily spin', meta: 'It spins, then slows onto the peg.', action: 'Spin', image: 'assets/gifts/gift-hero.png', onTap: () => _openSpin(context)),
+              WorkCard(category: 'History', title: 'Received', meta: 'Gifts already on this account', action: 'Open history', image: 'assets/gifts/box-gold.webp', onTap: () => _openTabs('received')),
+              WorkCard(category: 'Redeem', title: 'Got a code?', meta: 'A code from someone else', action: 'Redeem', image: 'assets/gifts/box-red.webp', onTap: () => _openTabs('redeem')),
+              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Ranks and codes', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+            ],
           ),
-          const SizedBox(height: 12),
-          const FourBanners(
-            current: Programme.gifts,
-            splitTitle: 'NowssB Gifts',
-            splitCta: 'Send a gift',
-            blackTitle: 'A real purchase',
-            blackSub: 'The code exists only after Play accepts it.',
-          ),
-          const SizedBox(height: 12),
-          const BannerMix(seed: 5),
-          const SizedBox(height: 16),
-          ProgramTabsBlock(spec: kGiftsSpec, initialTab: start, scrollTo: start != null, goRef: _go, showDisclaimer: false),
         ],
       ),
     );

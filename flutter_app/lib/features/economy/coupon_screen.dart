@@ -81,10 +81,25 @@ class _CouponScreenState extends State<CouponScreen> {
 
   void _tab(String id) => _go.value?.call(id);
 
+  void _openTabs(String id) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: SafeArea(child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          const _CodeBox(),
+          const SizedBox(height: 12),
+          ProgramTabsBlock(spec: kCouponsSpec, initialTab: id, scrollTo: true, goRef: _go, showDisclaimer: false),
+        ],
+      )),
+    )));
+  }
+
   void _showScratch() {
-    final ctx = _scratch.currentContext;
-    if (ctx == null) return;
-    Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 380), alignment: 0.08);
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(
+      backgroundColor: Color(0xFF07070C),
+      body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: DailyScratchCard())),
+    )));
   }
 
   void _detail(WideCouponData d) {
@@ -155,63 +170,15 @@ class _CouponScreenState extends State<CouponScreen> {
                     bannerSub: 'Scratch, codes, shop',
                     onBanner: _showScratch,
                     cards: [
-                      WorkCard(category: 'Scratch', title: 'Daily scratch', meta: 'One card on this account', action: 'Scratch', image: 'assets/rails/gen-62.jpg', onTap: _showScratch),
-                      WorkCard(category: 'Shop', title: 'Coupon shop', meta: 'Paid cards', action: 'Open shop', image: 'assets/rails/gen-63.jpg', onTap: () => _tab('shop')),
-                      WorkCard(category: 'Mine', title: 'My coupons', meta: 'Codes already on the account', action: 'Open mine', image: 'assets/rails/gen-64.jpg', onTap: () => _tab('mine')),
-                      WorkCard(category: 'Help', title: 'How a coupon works', meta: 'It comes off the price. It is not cash.', action: 'Read', image: 'assets/rails/gen-65.jpg', onTap: _help),
+                      WorkCard(category: 'Scratch', title: 'Daily scratch', meta: 'One free card on this account', action: 'Scratch now', image: 'assets/gifts/coupon-hero.png', onTap: _showScratch),
+                      WorkCard(category: 'Shop', title: 'Coupon shop', meta: 'Paid cards', action: 'Open shop', image: 'assets/gifts/coupon-banner.png', onTap: () => _openTabs('shop')),
+                      WorkCard(category: 'Mine', title: 'My coupons', meta: 'Codes already on the account', action: 'Open mine', image: 'assets/rails/coupons-01.jpg', onTap: () => _openTabs('mine')),
+                      WorkCard(category: 'Code', title: 'Add a code', meta: 'It comes off the price. It is not cash.', action: 'Add code', image: 'assets/rails/coupons-02.jpg', onTap: () => _openTabs('mine')),
+                      WorkCard(category: 'Help', title: 'How a coupon works', meta: 'Scratch, or add a code', action: 'Read', image: 'assets/rails/coupons-03.jpg', onTap: _help),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const _CodeBox(),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    height: 168,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        for (final d in kWideCoupons.take(6))
-                          GlassCardD(name: d.kicker, offer: d.banner, color: d.coins > 0 ? kTileGold : kTileViolet),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  for (var i = 0; i < kWideCoupons.length && i < 6; i++)
-                    GlassCardB(
-                      title: kWideCoupons[i].banner,
-                      line: kWideCoupons[i].line,
-                      action: 'View details',
-                      fresh: i.isEven,
-                      onTap: () => _detail(kWideCoupons[i]),
-                    ),
-                  GlassCardA(title: 'How a coupon works', line: 'Scratch, or add a code. It comes off the price. It is not cash.', onNext: _help),
-                  const SizedBox(height: 8),
-                  KeyedSubtree(key: _scratch, child: const DailyScratchCard()),
-                  const SizedBox(height: 12),
-                  const CouponRails(),
-                  const SizedBox(height: 12),
-                  _PaidPeek(onOpen: () => _tab('shop')),
-                  const SizedBox(height: 12),
-                  const FourBanners(
-                    current: Programme.coupons,
-                    splitTitle: 'Coupons',
-                    splitCta: 'Scratch',
-                    blackTitle: 'Odds on the card',
-                    blackSub: 'A free scratch, and three paid cards. Nothing is cash.',
-                  ),
-                  const SizedBox(height: 12),
-                  ProgramTabsBlock(spec: kCouponsSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, goRef: _go, showDisclaimer: false),
                 ],
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-            child: Row(
-              children: [
-                Expanded(child: GlassWrapper(radius: 999, onTap: () => _tab('mine'), child: const Center(child: Text('All rewards', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700))))),
-                const SizedBox(width: 10),
-                Expanded(child: GlassWrapper(radius: 999, onTap: _showScratch, child: const Center(child: Text('Scratch cards', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700))))),
-              ],
             ),
           ),
         ],

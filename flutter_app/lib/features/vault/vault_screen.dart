@@ -59,79 +59,105 @@ class _VaultBodyState extends State<_VaultBody> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
-      children: [
-        RoutineDeck(
-          title: 'Rewards',
-          banner: 'NowssB Rewards',
-          bannerSub: 'Coins, quests, one invite',
-          onBanner: () => _go.value?.call('today'),
-          cards: [
-            WorkCard(category: 'Today', title: 'Today’s coins', meta: 'Claim the daily coins', action: 'Open today', image: 'assets/rails/gen-43.jpg', onTap: () => _go.value?.call('today')),
-            WorkCard(category: 'Quests', title: 'Quests', meta: 'Short tasks on this account', action: 'Open quests', image: 'assets/rails/gen-44.jpg', onTap: () => _go.value?.call('quests')),
-            WorkCard(category: 'Store', title: 'Words', meta: 'Priced on Google Play', action: 'Open store', image: 'assets/rails/gen-45.jpg', onTap: () => NwsbLinks.tab(context, 3)),
-            WorkCard(category: 'Store', title: 'Meanings', meta: 'The meaning store', action: 'Open meanings', image: 'assets/rails/gen-46.jpg', onTap: () => NwsbLinks.meanings(context)),
-            WorkCard(category: 'Store', title: 'Ebooks', meta: 'The ebook store', action: 'Open ebooks', image: 'assets/rails/gen-47.jpg', onTap: () => NwsbLinks.ebooks(context)),
-            WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Ranks and payouts', action: 'Open earn', image: 'assets/rails/gen-48.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+    return ListenableBuilder(
+      listenable: EconomyMirror.instance,
+      builder: (context, _) {
+        final s = EconomyMirror.instance.summary;
+        final actions = sList(sMap(s['today'])['actions']);
+        final quests = sList(sMap(s['quests'])['starter']);
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+          children: [
+            RoutineDeck(
+              title: 'Today',
+              banner: 'NowssB Rewards',
+              bannerSub: 'Coins you earn by using the app',
+              onBanner: () => _openTabs('today'),
+              cards: [
+                WorkCard(category: 'Login', title: 'Daily login', meta: 'Collect today’s coins', action: 'Collect', image: 'assets/rails/rewards-01.jpg', onTap: () => runReward(context, () => EconomyApi.call('claimDailyLogin'), title: 'Daily login')),
+                for (var i = 0; i < actions.length; i++)
+                  WorkCard(
+                    category: 'Today',
+                    title: '${actions[i]['title']}',
+                    meta: '+${sInt(actions[i]['coins'])} coins',
+                    action: _done(actions[i]) ? 'Done' : 'Open',
+                    image: _rewardArt('${actions[i]['title']}', i),
+                    onTap: () => _openActivity(context, '${actions[i]['title']}'),
+                  ),
+              ],
+            ),
+            RoutineDeck(
+              title: 'Quests',
+              banner: 'Quests',
+              bannerSub: 'Claim when the count is done',
+              onBanner: () => _openTabs('quests'),
+              cards: [
+                for (var i = 0; i < quests.length; i++)
+                  WorkCard(
+                    category: 'Quest',
+                    title: '${quests[i]['title'] ?? 'Quest'}',
+                    meta: '${sInt(quests[i]['value'])} of ${sInt(quests[i]['goal'])} · +${sInt(quests[i]['coins'])} coins',
+                    action: quests[i]['claimed'] == true ? 'Claimed' : 'Claim',
+                    image: 'assets/rails/rewards-0${(i % 7) + 1}.jpg',
+                    onTap: () {
+                      if (quests[i]['claimed'] == true) return;
+                      if (sNum(quests[i]['value']) < sNum(quests[i]['goal'])) {
+                        _openTabs('quests');
+                        return;
+                      }
+                      runReward(context, () => EconomyApi.call('claimQuest', {'kind': 'starter', 'id': quests[i]['id']}), title: '${quests[i]['title']}');
+                    },
+                  ),
+                WorkCard(category: 'Shop', title: 'Words', meta: 'Priced on Google Play', action: 'Open store', image: 'assets/rails/earn-03.jpg', onTap: () => NwsbLinks.tab(context, 3)),
+                WorkCard(category: 'Shop', title: 'Meanings', meta: 'The meaning store', action: 'Open meanings', image: 'assets/meanings/meanings-branding.jpg', onTap: () => NwsbLinks.meanings(context)),
+                WorkCard(category: 'Shop', title: 'Ebooks', meta: 'The ebook store', action: 'Open ebooks', image: 'assets/ebooks/ebooks-headphones.jpg', onTap: () => NwsbLinks.ebooks(context)),
+              ],
+            ),
           ],
-        ),
-        const _TodayCard(),
-        const SizedBox(height: 12),
-        ListenableBuilder(
-          listenable: EconomyMirror.instance,
-          builder: (context, _) {
-            final w = EconomyMirror.instance;
-            return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              CoinCount(value: w.coins),
-              Text('${w.plan} · streak ${w.streak} · ${w.freezesLeft} freezes left', style: const TextStyle(color: NwsbColors.mist)),
-            ]);
-          },
-        ),
-        const SizedBox(height: 12),
-        const EconomyNote(
-          'Coins are earned. They cover at most 30% of a Play purchase. They cannot be bought, gifted, or cashed out.',
-        ),
-        const SizedBox(height: 12),
-        const EconomyNote(
-          'Invite a friend once. If they subscribe, you get one free month when you have no plan, or coins when you already do. No tiers and no ongoing percent — that lives in NowssB Earn.',
-        ),
-        const SizedBox(height: 18),
-        const EditableLabel('vault_screen.VaultScreen', 'QUESTS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-        const SizedBox(height: 8),
-        const _StarterQuests(),
-        const SizedBox(height: 18),
-        const BannerMix(seed: 4),
-        const SizedBox(height: 18),
-        const EditableLabel('vault_screen.VaultScreen', 'COIN SPENDS', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-        const SizedBox(height: 8),
-        const _SpendRail(),
-        const SizedBox(height: 18),
-        const EditableLabel('vault_screen.VaultScreen', 'PLAY PURCHASES', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-        const SizedBox(height: 8),
-        BlackOffer(title: 'Words', mark: NwsbMarks.word, line: 'Every word, priced on Google Play', onTap: () => NwsbLinks.tab(context, 3)),
-        BlackOffer(title: 'Meanings', mark: NwsbMarks.meaning, line: 'The meaning store', onTap: () => NwsbLinks.meanings(context)),
-        BlackOffer(title: 'Ebooks', mark: NwsbMarks.ebook, line: 'The ebook store', onTap: () => NwsbLinks.ebooks(context)),
-        BlackOffer(
-          title: 'Plans',
-          mark: NwsbMarks.crown,
-          line: 'Resonance, Frequency, Frequency X',
-          onTap: () => NwsbLinks.subscription(context),
-        ),
-        const _PlayBuy(label: 'Restore streak', catalogId: 'nwsb_streak_restore', mark: NwsbMarks.flame),
-        const SizedBox(height: 18),
-        const EditableLabel('vault_screen.VaultScreen', 'MILESTONE CHEST', style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 12)),
-        const SizedBox(height: 8),
-        const _MilestoneForm(),
-        const SizedBox(height: 12),
-        ListenableBuilder(
-          listenable: EconomyMirror.instance,
-          builder: (context, _) => Text('Practice credits ${EconomyMirror.instance.practiceCredits}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
-        ),
-        const SizedBox(height: 18),
-        ProgramTabsBlock(spec: kRewardsSpec, initialTab: widget.initialTab, scrollTo: widget.initialTab != null, goRef: _go, showDisclaimer: false),
-      ],
+        );
+      },
     );
+  }
+
+  bool _done(dynamic a) {
+    if (a is! Map) return false;
+    final per = a['per'];
+    if (per == 'once' && sInt(a['done']) > 0) return true;
+    if (per == 'day' && sInt(a['done']) >= sInt(a['limit'])) return true;
+    return false;
+  }
+
+  String _rewardArt(String title, int i) {
+    final t = title.toLowerCase();
+    if (t.contains('practice') || t.contains('sound') || t.contains('pronun')) return 'assets/rails/earn-0${(i % 7) + 1}.jpg';
+    if (t.contains('gift') || t.contains('share')) return 'assets/gifts/box-gold.webp';
+    if (t.contains('quote') || t.contains('meaning') || t.contains('word')) return 'assets/meanings/meanings-device.png';
+    return 'assets/rails/rewards-0${(i % 7) + 1}.jpg';
+  }
+
+  void _openActivity(BuildContext context, String title) {
+    final t = title.toLowerCase();
+    if (t.contains('profile')) {
+      NwsbLinks.tab(context, 4);
+    } else if (t.contains('meaning') || t.contains('word')) {
+      NwsbLinks.meanings(context);
+    } else if (t.contains('echo') || t.contains('program')) {
+      Programmes.open(context, Programme.earn);
+    } else if (t.contains('ebook')) {
+      NwsbLinks.ebooks(context);
+    } else {
+      NwsbLinks.tab(context, 1);
+    }
+  }
+
+  void _openTabs(String id) {
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: SafeArea(child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [ProgramTabsBlock(spec: kRewardsSpec, initialTab: id, scrollTo: true, goRef: _go, showDisclaimer: false)],
+      )),
+    )));
   }
 }
 
