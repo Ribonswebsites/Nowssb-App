@@ -244,18 +244,18 @@ class HubRails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _label(labels[0]),
-        _rail(292, 332, a, 0),
+        _rail(context, 292, 332, a, 0),
         _label(labels.length > 1 ? labels[1] : 'Your list'),
-        _rail(318, 168, b, 1),
+        _rail(context, 318, 168, b, 1),
         _label(labels.length > 2 ? labels[2] : 'Challenges'),
-        _rail(214, 312, c, 2),
+        _rail(context, 214, 312, c, 2),
         if (d.isNotEmpty) ...[
           _label(labels.length > 3 ? labels[3] : 'Glass'),
-          _rail(300, 392, d, 3),
+          _rail(context, 300, 392, d, 3),
         ],
         if (e.isNotEmpty) ...[
           _label(labels.length > 4 ? labels[4] : 'Clear'),
-          _rail(250, 430, e, 4),
+          _rail(context, 250, 430, e, 4),
         ],
       ],
     );
@@ -266,7 +266,7 @@ class HubRails extends StatelessWidget {
         child: Text(t, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
       );
 
-  Widget _rail(double w, double h, List<RailCard> list, int rail) {
+  Widget _rail(BuildContext context, double w, double h, List<RailCard> list, int rail) {
     return SizedBox(
       height: h,
       child: ListView.separated(

@@ -1,5 +1,9 @@
-/// "Remember me" on the sign-in screens: when it is off, the next cold start
-/// signs the account out (AuthGate.forgetUnremembered).
+/// "Remember me" on the sign-in screens.
+///
+/// It used to sign the account out on the next cold start when the box was
+/// off. A stale "off" from older builds, saved again on every sign-in, made
+/// the app ask for login after every close. The session now stays until
+/// Sign out. This class only remembers the tick.
 ///
 /// Builds before 3 Oct 2026 (80f3cf0d) wrote `nwsb.rememberMe = false` on
 /// every sign-out from Settings, when the flag only switched notifications

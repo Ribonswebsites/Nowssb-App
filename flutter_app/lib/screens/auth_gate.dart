@@ -38,21 +38,13 @@ class AuthGate extends StatefulWidget {
     reopen.value++;
   }
 
-  /// Cold start: a session signed in with "Remember me" unticked ends here,
-  /// before anything binds to the account. Notifications are not touched;
-  /// they have their own switches.
+  /// Cold start used to sign the account out when "Remember me" was off.
+  /// A stale "off" from older builds, and the box staying unticked, made
+  /// every relaunch ask for login again. The session now stays until the
+  /// person taps Sign out.
   static Future<void> forgetUnremembered() async {
     try {
-      // Always read (also without Firebase): this clears the stale "off" that
-      // older builds wrote on sign-out — see lib/data/remember_me.dart.
-      if (await RememberMe.read()) return;
-      if (!NwsbFirebase.ready) return;
-      final user = await FirebaseAuth.instance
-          .authStateChanges()
-          .first
-          .timeout(const Duration(seconds: 3), onTimeout: () => FirebaseAuth.instance.currentUser);
-      if (user == null) return;
-      await FirebaseAuth.instance.signOut();
+      await RememberMe.read();
     } catch (e) {
       debugPrint('NowssB remember-me: $e');
     }
@@ -85,6 +77,7 @@ class _AuthGateState extends State<AuthGate> {
   int? _resendToken;
   // The number the current code was sent to; editing the number drops it.
   String? _codeFor;
+  static const _guestKey = 'nwsb.guestSession';
 
   /// One subscription for the life of the gate. Building a new
   /// authStateChanges() stream on every rebuild re-subscribed the
@@ -115,14 +108,23 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Future<void> _loadRemember() async {
-    final remember = await RememberMe.read();
-    if (mounted) setState(() => _remember = remember);
+    final prefs = await SharedPreferences.getInstance();
+    final remember = await RememberMe.read(prefs);
+    final guest = prefs.getBool(_guestKey) ?? false;
+    if (!mounted) return;
+    setState(() {
+      _remember = remember;
+      // Exploring without an account should survive closing the app.
+      // Sign out clears this flag, so that still returns to the login screen.
+      if (guest) _guest = true;
+    });
   }
 
   Future<void> _saveRemember() => RememberMe.write(_remember);
 
   void _leaveGuest() {
     if (mounted) setState(() => _guest = false);
+    unawaited(SharedPreferences.getInstance().then((p) => p.setBool(_guestKey, false)));
   }
 
   @override
@@ -403,7 +405,13 @@ class _AuthGateState extends State<AuthGate> {
           setState(() => _remember = !_remember);
           unawaited(_saveRemember());
         },
-        onExplore: _busy ? null : () => setState(() => _guest = true),
+        onExplore: _busy
+            ? null
+            : () async {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool(_guestKey, true);
+                if (mounted) setState(() => _guest = true);
+              },
       ),
     );
   }
