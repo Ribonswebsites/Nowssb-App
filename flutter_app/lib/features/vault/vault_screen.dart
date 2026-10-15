@@ -19,7 +19,6 @@ import '../../widgets/brand_top_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/hub_rails.dart';
-import '../../widgets/routine_deck.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
@@ -68,49 +67,64 @@ class _VaultBodyState extends State<_VaultBody> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
-            RoutineDeck(
-              title: 'Today',
-              banner: 'NowssB Rewards',
-              bannerSub: 'Coins you earn by using the app',
-              onBanner: () => _openTabs('today'),
-              cards: [
-                WorkCard(category: 'Login', title: 'Daily login', meta: 'Collect today’s coins', action: 'Collect', image: 'assets/rails/art-coins.jpg', onTap: () => runReward(context, () => EconomyApi.call('claimDailyLogin'), title: 'Daily login')),
-                for (var i = 0; i < actions.length; i++)
-                  WorkCard(
-                    category: 'Today',
-                    title: '${actions[i]['title']}',
-                    meta: '+${sInt(actions[i]['coins'])} coins',
-                    action: _done(actions[i]) ? 'Done' : 'Open',
-                    image: _rewardArt('${actions[i]['title']}', i),
-                    onTap: () => _openActivity(context, '${actions[i]['title']}'),
-                  ),
-              ],
-            ),
-            RoutineDeck(
-              title: 'Quests',
-              banner: 'Quests',
-              bannerSub: 'Claim when the count is done',
-              onBanner: () => _openTabs('quests'),
-              cards: [
-                for (var i = 0; i < quests.length; i++)
-                  WorkCard(
-                    category: 'Quest',
-                    title: '${quests[i]['title'] ?? 'Quest'}',
-                    meta: '${sInt(quests[i]['value'])} of ${sInt(quests[i]['goal'])} · +${sInt(quests[i]['coins'])} coins',
-                    action: quests[i]['claimed'] == true ? 'Claimed' : 'Claim',
-                    image: 'assets/rails/rewards-0${(i % 7) + 1}.jpg',
-                    onTap: () {
-                      if (quests[i]['claimed'] == true) return;
-                      if (sNum(quests[i]['value']) < sNum(quests[i]['goal'])) {
+            HubRails(
+              labels: const ['Today', 'Quests', 'Shop', 'Glass', 'Clear'],
+              openGuide: false,
+              onOpen: (card) {
+                switch (card.title) {
+                  case 'Daily login':
+                    runReward(context, () => EconomyApi.call('claimDailyLogin'), title: 'Daily login');
+                  break;
+                  case 'Words':
+                    NwsbLinks.tab(context, 3);
+                  break;
+                  case 'Meanings':
+                    NwsbLinks.meanings(context);
+                  break;
+                  case 'Ebooks':
+                    NwsbLinks.ebooks(context);
+                  break;
+                  case 'Quests':
+                    _openTabs('quests');
+                  break;
+                  default:
+                    final hit = quests.where((q) => '${q['title'] ?? 'Quest'}' == card.title);
+                    if (hit.isNotEmpty) {
+                      final q = hit.first;
+                      if (q['claimed'] == true) return;
+                      if (sNum(q['value']) < sNum(q['goal'])) {
                         _openTabs('quests');
                         return;
                       }
-                      runReward(context, () => EconomyApi.call('claimQuest', {'kind': 'starter', 'id': quests[i]['id']}), title: '${quests[i]['title']}');
-                    },
-                  ),
-                WorkCard(category: 'Shop', title: 'Words', meta: 'Priced on Google Play', action: 'Open store', image: 'assets/rails/earn-03.jpg', onTap: () => NwsbLinks.tab(context, 3)),
-                WorkCard(category: 'Shop', title: 'Meanings', meta: 'The meaning store', action: 'Open meanings', image: 'assets/meanings/meanings-branding.jpg', onTap: () => NwsbLinks.meanings(context)),
-                WorkCard(category: 'Shop', title: 'Ebooks', meta: 'The ebook store', action: 'Open ebooks', image: 'assets/ebooks/ebooks-headphones.jpg', onTap: () => NwsbLinks.ebooks(context)),
+                      runReward(context, () => EconomyApi.call('claimQuest', {'kind': 'starter', 'id': q['id']}), title: '${q['title']}');
+                      return;
+                    }
+                    _openActivity(context, card.title);
+                    break;
+                }
+              },
+              a: [
+                const RailCard('Daily login', 'Collect today’s coins', 'Collect', art: 'assets/rails/art-coins.jpg'),
+                for (var i = 0; i < actions.length; i++)
+                  RailCard('${actions[i]['title']}', '+${sInt(actions[i]['coins'])} coins', _done(actions[i]) ? 'Done' : 'Open', art: _rewardArt('${actions[i]['title']}', i)),
+              ],
+              b: [
+                for (var i = 0; i < quests.length; i++)
+                  RailCard('${quests[i]['title'] ?? 'Quest'}', '${sInt(quests[i]['value'])} of ${sInt(quests[i]['goal'])}', quests[i]['claimed'] == true ? 'Claimed' : 'Claim', art: 'assets/rails/rewards-0${(i % 7) + 1}.jpg'),
+                if (quests.isEmpty) const RailCard('Quests', 'Claim when the count is done', 'Open', art: 'assets/rails/rewards-01.jpg'),
+              ],
+              c: const [
+                RailCard('Words', 'Priced on Google Play', 'Store', art: 'assets/rails/gen-01.jpg'),
+                RailCard('Meanings', 'The meaning store', 'Store', art: 'assets/rails/gen-02.jpg'),
+                RailCard('Ebooks', 'The ebook store', 'Store', art: 'assets/rails/art-book.jpg'),
+              ],
+              d: const [
+                RailCard('Daily login', 'Once a day', 'Collect', art: 'assets/rails/gen-03.jpg'),
+                RailCard('Quests', 'Starter counts', 'Open', art: 'assets/rails/gen-04.jpg'),
+              ],
+              e: const [
+                RailCard('Words', 'Open the atelier', 'Store', art: 'assets/rails/gen-05.jpg'),
+                RailCard('Meanings', 'Open the meanings', 'Store', art: 'assets/rails/gen-06.jpg'),
               ],
             ),
           ],

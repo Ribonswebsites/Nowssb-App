@@ -19,7 +19,6 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../widgets/hype_rail.dart';
 import '../../widgets/hub_rails.dart';
-import '../../widgets/routine_deck.dart';
 import '../../widgets/sections/coupon_banner_section.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart';
@@ -164,17 +163,52 @@ class _CouponScreenState extends State<CouponScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 children: [
-                  RoutineDeck(
-                    title: 'Coupons',
-                    banner: 'NowssB Coupons',
-                    bannerSub: 'Scratch, codes, shop',
-                    onBanner: _showScratch,
-                    cards: [
-                      WorkCard(category: 'Scratch', title: 'Daily scratch', meta: 'One free card on this account', action: 'Scratch now', image: 'assets/rails/art-scratch.jpg', onTap: _showScratch),
-                      WorkCard(category: 'Shop', title: 'Coupon shop', meta: 'Paid cards', action: 'Open shop', image: 'assets/gifts/coupon-banner.png', onTap: () => _openTabs('shop')),
-                      WorkCard(category: 'Mine', title: 'My coupons', meta: 'Codes already on the account', action: 'Open mine', image: 'assets/rails/coupons-01.jpg', onTap: () => _openTabs('mine')),
-                      WorkCard(category: 'Code', title: 'Add a code', meta: 'It comes off the price. It is not cash.', action: 'Add code', image: 'assets/rails/coupons-02.jpg', onTap: () => _openTabs('mine')),
-                      WorkCard(category: 'Help', title: 'How a coupon works', meta: 'Scratch, or add a code', action: 'Read', image: 'assets/rails/coupons-03.jpg', onTap: _help),
+                  HubRails(
+                    labels: const ['Scratch', 'Shop', 'Mine', 'Glass', 'Clear'],
+                    openGuide: false,
+                    onOpen: (card) {
+                      switch (card.title) {
+                        case 'Daily scratch':
+                        case 'Scratch again':
+                          _showScratch();
+                        break;
+                        case 'Coupon shop':
+                          _openTabs('shop');
+                        break;
+                        case 'My coupons':
+                        case 'Add a code':
+                          _openTabs('mine');
+                        break;
+                        case 'How a coupon works':
+                        case 'Rules':
+                          _help();
+                        break;
+                        case 'History':
+                          _openTabs('history');
+                        break;
+                      }
+                    },
+                    a: const [
+                      RailCard('Daily scratch', 'One free card on this account', 'Scratch', art: 'assets/rails/art-scratch.jpg'),
+                      RailCard('Coupon shop', 'Paid cards', 'Shop', art: 'assets/rails/coupons-01.jpg'),
+                      RailCard('My coupons', 'Codes already on the account', 'Mine', art: 'assets/rails/coupons-02.jpg'),
+                    ],
+                    b: const [
+                      RailCard('Add a code', 'It comes off the price. It is not cash.', 'Code', art: 'assets/rails/coupons-03.jpg'),
+                      RailCard('How a coupon works', 'Scratch, or add a code', 'Read', art: 'assets/rails/coupons-04.jpg'),
+                      RailCard('History', 'Cards you already opened', 'Open', art: 'assets/rails/coupons-05.jpg'),
+                    ],
+                    c: const [
+                      RailCard('Scratch again', 'Today’s card, if it is still closed', 'Scratch', art: 'assets/rails/coupons-06.jpg'),
+                      RailCard('Coupon shop', 'Buy a card', 'Shop', art: 'assets/rails/coupons-07.jpg'),
+                    ],
+                    d: const [
+                      RailCard('My coupons', 'Use one at checkout', 'Mine', art: 'assets/rails/gen-20.jpg'),
+                      RailCard('Add a code', 'Paste a code you were given', 'Code', art: 'assets/rails/gen-21.jpg'),
+                    ],
+                    e: const [
+                      RailCard('Rules', 'A coupon is not cash', 'Read', art: 'assets/rails/gen-22.jpg'),
+                      RailCard('History', 'What already paid out', 'Open', art: 'assets/rails/gen-23.jpg'),
                     ],
                   ),
                 ],
