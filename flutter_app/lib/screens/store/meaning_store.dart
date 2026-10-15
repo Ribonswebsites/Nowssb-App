@@ -17,6 +17,7 @@ import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
+import 'store_actions.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
 import '../../widgets/routine_deck.dart';
@@ -265,8 +266,10 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   title: m.word,
                   meta: m.root,
                   action: 'Open',
-                  image: storeSubjectArt(m.word, catId: cat),
+                  image: kNowssbStoreMark,
                   onTap: () => openMeaningDetail(context, m),
+                  onCart: () => storeAddToCart(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
+                  onBuy: () => storeBuyNow(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
                 ),
             ],
           ),
@@ -283,8 +286,10 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                     title: row.$1,
                     meta: row.$2,
                     action: 'Open',
-                    image: storeSubjectArt(row.$1, catId: group),
-                    onTap: () => openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kMsMeaningProductArt)),
+                    image: kNowssbStoreMark,
+                    onTap: () => openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kNowssbStoreMark)),
+                    onCart: () => storeAddToCart(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
+                    onBuy: () => storeBuyNow(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
                   ),
             ],
           ),

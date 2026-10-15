@@ -27,6 +27,8 @@ class WorkCard {
     required this.meta,
     required this.action,
     required this.onTap,
+    this.onBuy,
+    this.onCart,
     this.image,
     this.tint = const Color(0xFFE9C1A5),
   });
@@ -36,6 +38,8 @@ class WorkCard {
   final String meta;
   final String action;
   final VoidCallback onTap;
+  final VoidCallback? onBuy;
+  final VoidCallback? onCart;
   final String? image;
   final Color tint;
 }
@@ -82,7 +86,7 @@ class _RoutineDeckState extends State<RoutineDeck> {
           _Banner(title: widget.banner, subtitle: widget.bannerSub, onTap: widget.onBanner ?? (n == 0 ? null : widget.cards.first.onTap)),
           const SizedBox(height: 14),
           SizedBox(
-            height: 392,
+            height: 420,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: n,
@@ -231,14 +235,22 @@ class _RoutineCard extends StatelessWidget {
                 const SizedBox(height: 38),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18)),
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(card.action, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600))),
-                      const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
-                    ],
-                  ),
+                  child: card.onBuy != null || card.onCart != null
+                      ? Row(
+                          children: [
+                            Expanded(child: _CardAct(label: 'Add to cart', onTap: card.onCart)),
+                            const SizedBox(width: 8),
+                            Expanded(child: _CardAct(label: 'Buy now', onTap: card.onBuy, filled: true)),
+                          ],
+                        )
+                      : Row(
+                          children: [
+                            Expanded(child: Text(card.action, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600))),
+                            const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                          ],
+                        ),
                 ),
               ],
             ),
@@ -254,10 +266,46 @@ class _RoutineCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 3),
                 ),
-                child: const EditableImage.asset('assets/banners/promo/store.png', fit: BoxFit.contain, slot: 'routine_deck.RoutineCard'),
+                child: EditableImage.asset(
+                  card.onBuy != null || card.onCart != null ? 'assets/store/nowssb-store-mark.png' : 'assets/banners/promo/store.png',
+                  fit: BoxFit.contain,
+                  slot: 'routine_deck.RoutineCard',
+                ),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CardAct extends StatelessWidget {
+  const _CardAct({required this.label, required this.onTap, this.filled = false});
+  final String label;
+  final VoidCallback? onTap;
+  final bool filled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: filled ? Colors.white : const Color(0xFF1A1A1A),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap == null
+            ? null
+            : () {
+                HapticFeedback.selectionClick();
+                onTap!();
+              },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: filled ? Colors.black : Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+          ),
         ),
       ),
     );

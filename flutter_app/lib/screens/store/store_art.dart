@@ -142,6 +142,9 @@ const _byCat = <String, String>{
   'Language': 'assets/rails/store-word.jpg',
 };
 
+/// The Store mark: white leather frame, headphones, NOWSSB STORE.
+const kNowssbStoreMark = 'assets/store/nowssb-store-mark.png';
+
 /// A picture of the word, then of its row, then a different one from the pool.
 String storeSubjectArt(String word, {String catId = ''}) {
   final key = word.toLowerCase();

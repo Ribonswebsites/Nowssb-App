@@ -16,6 +16,7 @@ import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import '../../widgets/sections/artist_cards_section.dart';
+import 'store_actions.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
 import 'store_shelf.dart';
@@ -80,8 +81,10 @@ class _SignatureBody extends StatelessWidget {
                 title: s.name,
                 meta: 'Most exclusive',
                 action: 'Open',
-                image: storeSubjectArt(s.name, catId: 'signature'),
-                onTap: () => openAtelierWord(context, word: s.name, root: 'Most Exclusive', img: s.img, signature: true),
+                image: kNowssbStoreMark,
+                onTap: () => openAtelierWord(context, word: s.name, root: 'Most Exclusive', img: kNowssbStoreMark, signature: true),
+                onCart: () => storeAddToCart(context, wordBagItem(name: s.name, root: 'Most Exclusive', img: kNowssbStoreMark, signature: true)),
+                onBuy: () => storeBuyNow(context, wordBagItem(name: s.name, root: 'Most Exclusive', img: kNowssbStoreMark, signature: true)),
               ),
           ],
         ),
@@ -96,12 +99,14 @@ class _SignatureBody extends StatelessWidget {
                 title: e.value.word,
                 meta: e.value.root,
                 action: 'Open',
-                image: storeSubjectArt(e.value.word, catId: 'signature'),
+                image: kNowssbStoreMark,
                 onTap: () => openMeaningDetail(
                   context,
-                  MsMeaning(word: e.value.word, key: e.value.key, root: e.value.root, category: e.key, price: kMsSignaturePrice, img: kMsSignatureImg),
+                  MsMeaning(word: e.value.word, key: e.value.key, root: e.value.root, category: e.key, price: kMsSignaturePrice, img: kNowssbStoreMark),
                   signature: true,
                 ),
+                onCart: () => storeAddToCart(context, meaningBagItem(word: e.value.word, root: e.value.root, img: kNowssbStoreMark, price: kMsSignaturePrice, signature: true)),
+                onBuy: () => storeBuyNow(context, meaningBagItem(word: e.value.word, root: e.value.root, img: kNowssbStoreMark, price: kMsSignaturePrice, signature: true)),
               ),
           ],
         ),
@@ -118,8 +123,10 @@ class _SignatureBody extends StatelessWidget {
                     title: row.$1,
                     meta: row.$2,
                     action: 'Open',
-                    image: storeSubjectArt(row.$1, catId: group),
-                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kMsSignatureImg),
+                    image: kNowssbStoreMark,
+                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kNowssbStoreMark),
+                    onCart: () => storeAddToCart(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark, signature: true)),
+                    onBuy: () => storeBuyNow(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark, signature: true)),
                   ),
             ],
           ),

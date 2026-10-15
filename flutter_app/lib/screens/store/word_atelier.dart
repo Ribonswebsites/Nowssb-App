@@ -20,6 +20,7 @@ import 'ebooks_store.dart';
 import 'meaning_store.dart';
 import 'request_words.dart';
 import 'signature_store.dart';
+import 'store_actions.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
 import 'store_shelf.dart';
@@ -153,8 +154,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                       title: w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}',
                       meta: w.root,
                       action: 'Open',
-                      image: storeSubjectArt(w.word, catId: cat.id),
-                      onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: kRmWordImg, price: StorePrices.instance.priceFor('word:${w.word.toLowerCase()}')),
+                      image: kNowssbStoreMark,
+                      onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.word.toLowerCase()}')),
+                      onCart: () => storeAddToCart(context, wordBagItem(name: w.word, root: w.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.word.toLowerCase()}'))),
+                      onBuy: () => storeBuyNow(context, wordBagItem(name: w.word, root: w.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.word.toLowerCase()}'))),
                     ),
               ],
             ),
@@ -171,8 +174,10 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                     title: row.$1,
                     meta: row.$2,
                     action: 'Open',
-                    image: storeSubjectArt(row.$1, catId: group),
-                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kRmWordImg),
+                    image: kNowssbStoreMark,
+                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kNowssbStoreMark),
+                    onCart: () => storeAddToCart(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark)),
+                    onBuy: () => storeBuyNow(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark)),
                   ),
             ],
           ),
