@@ -28,7 +28,7 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/hub_rails.dart';
+import '../widgets/course_face.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -56,6 +56,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
 
   bool _screenWake = true;
   bool _appearDiscover = true;
+  int _set = 0;
+  int _pick = 0;
 
   @override
   void initState() {
@@ -122,6 +124,61 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     HapticFeedback.selectionClick();
   }
 
+  Widget _settingsFace(Settings s) {
+    final groups = <List<WorkCard>>[
+      [
+        WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', image: 'assets/rails/02.png', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
+        WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', image: 'assets/rails/03.png', onTap: () => _push(const WidgetsPage())),
+        WorkCard(category: 'Look', title: 'Fashion Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Fashion Plus', image: 'assets/rails/04.png', onTap: () => _push(const FashionPlusScreen())),
+        WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', image: 'assets/rails/05.png', onTap: () => _push(const QuickAccessScreen())),
+        WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', image: 'assets/rails/06.png', onTap: () => _push(const NotificationsSettingsPage())),
+        WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', image: 'assets/rails/07.png', onTap: () => _push(const PlayerSettingsScreen())),
+        WorkCard(category: 'Words', title: "Today's quote", meta: s.todayQuote.trim().isEmpty ? 'Quotes to live by' : s.todayQuote.trim(), action: 'Open quotes', image: 'assets/rails/08.png', onTap: () => _push(const QuotesWeekScreen())),
+      ],
+      [
+        WorkCard(category: 'Screen', title: 'Keep Screen Awake', meta: _screenWake ? 'Stays on' : 'Can sleep', action: _screenWake ? 'Turn off' : 'Turn on', image: 'assets/rails/01.png', onTap: () { final v = !_screenWake; setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); }),
+        WorkCard(category: 'Nav', title: 'Nav Bar', meta: s.navColor == 'glass' ? 'Glass' : 'Black', action: 'Switch', image: 'assets/rails/09.png', onTap: _cycleNav),
+        WorkCard(category: 'You', title: 'Your profile', meta: 'Account, plan, edit', action: 'Open profile', image: 'assets/rails/10.png', onTap: () => NavScope.goTo(context, 4)),
+        WorkCard(category: 'Discover', title: 'Appear in Discover', meta: _appearDiscover ? 'Others can find you' : 'Hidden', action: _appearDiscover ? 'Hide' : 'Show', image: 'assets/rails/11.png', onTap: () => _setDiscover(!_appearDiscover)),
+      ],
+      [
+        WorkCard(category: 'Privacy', title: 'Privacy Policy', meta: 'What NowssB keeps', action: 'Read', image: 'assets/rails/02.png', onTap: () => _openUrl('https://nowssb.com/privacy')),
+        WorkCard(category: 'Account', title: 'Delete Account', meta: 'Erase this account', action: 'Delete', image: 'assets/rails/03.png', onTap: _deleteAccount),
+        WorkCard(category: 'Cache', title: 'Cached Data', meta: 'Temporary media', action: 'Clear cache', image: 'assets/rails/04.png', onTap: () { _clearCache(); }),
+        WorkCard(category: 'History', title: 'Clear Practice History', meta: 'Session logs', action: 'Clear history', image: 'assets/rails/05.png', onTap: () { _confirmClearHistory(); }),
+        WorkCard(category: 'Words', title: 'Request Words', meta: 'Ask the atelier', action: 'Request', image: 'assets/rails/06.png', onTap: () => openRequestWords(context)),
+        if (AdminState.instance.isAdmin) WorkCard(category: 'Admin', title: 'Admin', meta: 'Words, quotes, editor', action: 'Open admin', image: 'assets/rails/07.png', onTap: () => openAdminHome(context)),
+        WorkCard(category: 'About', title: 'About NowssB', meta: 'v9.5.0', action: 'About', image: 'assets/rails/08.png', onTap: () { _openAbout(); }),
+        WorkCard(category: 'Terms', title: 'Terms of Service', meta: 'nowssb.com/terms', action: 'Read terms', image: 'assets/rails/09.png', onTap: () => _openUrl('https://nowssb.com/terms')),
+        WorkCard(category: 'Session', title: 'Sign Out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/10.png', onTap: _signOut),
+      ],
+    ];
+    final names = ['Look', 'Phone', 'Account'];
+    final cards = groups[_set.clamp(0, 2)];
+    final i = _pick.clamp(0, cards.length - 1);
+    final card = cards[i];
+    return CourseFace(
+      avatar: const CircleAvatar(radius: 26, backgroundColor: Color(0xFF2A2038), child: Icon(Icons.settings, color: Colors.white)),
+      onAvatar: () => NavScope.goTo(context, 4),
+      segments: names,
+      segment: _set,
+      onSegment: (n) => setState(() { _set = n; _pick = 0; }),
+      image: card.image ?? 'assets/rails/02.png',
+      title: card.title,
+      meta: card.meta,
+      foot: card.action,
+      indexLabel: '${i + 1} of ${cards.length}',
+      onContinue: card.onTap,
+      chips: [for (final c in cards) CourseChip(c.title, 1)],
+      chip: i,
+      onChip: (n) => setState(() => _pick = n),
+      rowTitle: card.title,
+      rowMeta: card.meta,
+      rowImage: card.image,
+      onRow: card.onTap,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     UiScope.watch(context); // the Admin row follows the admin flag live
@@ -141,51 +198,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'settings', [
-              LSection('rails', 'Card rails', const IdentityRails(RailKind.settings)),
-              LSection('look', 'Look and play', RoutineDeck(
-                title: 'Look and play',
-                banner: 'Settings',
-                bannerSub: 'Player, look, alerts',
-                onBanner: () => _push(const PlayerSettingsScreen()),
-                cards: [
-                  WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', image: 'assets/rails/gen-12.jpg', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
-                  WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', image: 'assets/rails/gen-13.jpg', onTap: () => _push(const WidgetsPage())),
-                  WorkCard(category: 'Look', title: 'Fashion Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Fashion Plus', image: 'assets/rails/gen-14.jpg', onTap: () => _push(const FashionPlusScreen())),
-                  WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', image: 'assets/rails/gen-15.jpg', onTap: () => _push(const QuickAccessScreen())),
-                  WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', image: 'assets/rails/clear-01.jpg', onTap: () => _push(const NotificationsSettingsPage())),
-                  WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', image: 'assets/rails/clear-02.jpg', onTap: () => _push(const PlayerSettingsScreen())),
-                  WorkCard(category: 'Words', title: "Today's quote", meta: s.todayQuote.trim().isEmpty ? 'Quotes to live by' : s.todayQuote.trim(), action: 'Open quotes', image: 'assets/rails/clear-03.jpg', onTap: () => _push(const QuotesWeekScreen())),
-                ],
-              )),
-              LSection('device', 'This phone', RoutineDeck(
-                title: 'This phone',
-                banner: 'Device',
-                bannerSub: 'Screen, bar, privacy',
-                onBanner: _cycleNav,
-                cards: [
-                  WorkCard(category: 'Screen', title: 'Keep Screen Awake', meta: _screenWake ? 'Stays on' : 'Can sleep', action: _screenWake ? 'Turn off' : 'Turn on', image: 'assets/rails/gen-16.jpg', onTap: () { final v = !_screenWake; setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); }),
-                  WorkCard(category: 'Nav', title: 'Nav Bar', meta: s.navColor == 'glass' ? 'Glass' : 'Black', action: 'Switch', image: 'assets/rails/gen-17.jpg', onTap: _cycleNav),
-                  WorkCard(category: 'You', title: 'Your profile', meta: 'Account, plan, edit', action: 'Open profile', image: 'assets/rails/gen-18.jpg', onTap: () => NavScope.goTo(context, 4)),
-                  WorkCard(category: 'Discover', title: 'Appear in Discover', meta: _appearDiscover ? 'Others can find you' : 'Hidden', action: _appearDiscover ? 'Hide' : 'Show', image: 'assets/rails/gen-19.jpg', onTap: () => _setDiscover(!_appearDiscover)),
-                ],
-              )),
-              LSection('account', 'Account', RoutineDeck(
-                title: 'Account',
-                banner: 'Account',
-                bannerSub: 'Privacy, cache, sign out',
-                onBanner: _signOut,
-                cards: [
-                  WorkCard(category: 'Privacy', title: 'Privacy Policy', meta: 'What NowssB keeps', action: 'Read', image: 'assets/rails/gen-20.jpg', onTap: () => _openUrl('https://nowssb.com/privacy')),
-                  WorkCard(category: 'Account', title: 'Delete Account', meta: 'Erase this account', action: 'Delete', image: 'assets/rails/gen-21.jpg', onTap: _deleteAccount),
-                  WorkCard(category: 'Cache', title: 'Cached Data', meta: 'Temporary media', action: 'Clear cache', image: 'assets/rails/gen-22.jpg', onTap: () { _clearCache(); }),
-                  WorkCard(category: 'History', title: 'Clear Practice History', meta: 'Session logs', action: 'Clear history', image: 'assets/rails/gen-23.jpg', onTap: () { _confirmClearHistory(); }),
-                  WorkCard(category: 'Words', title: 'Request Words', meta: 'Ask the atelier', action: 'Request', image: 'assets/rails/gen-24.jpg', onTap: () => openRequestWords(context)),
-                  if (AdminState.instance.isAdmin) WorkCard(category: 'Admin', title: 'Admin', meta: 'Words, quotes, editor', action: 'Open admin', image: 'assets/rails/gen-25.jpg', onTap: () => openAdminHome(context)),
-                  WorkCard(category: 'About', title: 'About NowssB', meta: 'v2.6.0', action: 'About', image: 'assets/rails/gen-26.jpg', onTap: () { _openAbout(); }),
-                  WorkCard(category: 'Terms', title: 'Terms of Service', meta: 'nowssb.com/terms', action: 'Read terms', image: 'assets/rails/gen-27.jpg', onTap: () => _openUrl('https://nowssb.com/terms')),
-                  WorkCard(category: 'Session', title: 'Sign Out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/gen-28.jpg', onTap: _signOut),
-                ],
-              )),
+              LSection('face', 'Settings face', _settingsFace(s)),
             ]),
           ),
         ),

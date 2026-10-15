@@ -46,7 +46,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_router.dart';
-import '../widgets/hub_rails.dart';
+import '../widgets/course_face.dart';
 import '../widgets/routine_deck.dart';
 
 const _accent = Color(0xFFE3BD7D);
@@ -68,6 +68,17 @@ const kNwsbBanners = <String>[
   'https://media.nowssb.com/migrated-images/517802ba6a6c3a6c_grok_image_1782591559591_yxgud5.jpg',
   'https://media.nowssb.com/migrated-images/671fd0928171078a_grok_image_1782591561380_ytpn3b.jpg',
   'https://media.nowssb.com/migrated-images/58d0a40a97d4a693_grok_image_1782591732123_epmpiu.jpg',
+];
+
+const kPrebuiltAvatars = <String>[
+  'https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg',
+  'https://media.nowssb.com/migrated-images/17587b3f27c8e7d8_image-135_hziacn.jpg',
+  'https://media.nowssb.com/migrated-images/f681259af0c4f876_image-92_rfnjut.jpg',
+  'https://media.nowssb.com/migrated-images/9147b52d3315a74e_image-190_jqulqk.jpg',
+  'https://media.nowssb.com/migrated-images/6d0c1f1bf3f99533_image-240_wxgthb.jpg',
+  'https://media.nowssb.com/migrated-images/22b21387760ef082_image-156_awwho5.jpg',
+  'https://media.nowssb.com/migrated-images/8c19d1f70b15463a_image-162_vl3unq.jpg',
+  'https://media.nowssb.com/migrated-images/fd4c15348fdba199_image-167_qbyiji.jpg',
 ];
 
 const kDefaultAvatar =
@@ -98,6 +109,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TimeOfDay _reminder = const TimeOfDay(hour: 7, minute: 0);
   bool _loading = true;
   bool _recentOpen = false;
+  int _face = 0;
+  int _chip = 0;
   String _toast = '';
   OverlayEntry? _toastEntry;
 
@@ -475,51 +488,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
-                    LSection('card', 'Profile photo', _profileCard()),
-                    LSection('score', 'Score', _scorePanel()),
-                    LSection('rails', 'Practice rails', const IdentityRails(RailKind.profile)),
-                    LSection('programs', 'Programs', _earnHub()),
-                    LSection('you', 'You', RoutineDeck(
-                      title: 'You',
-                      banner: 'Your profile',
-                      bannerSub: 'Practice, saved words, settings',
-                      onBanner: () => _openQuick('Settings'),
-                      cards: [
-                        WorkCard(category: 'Practice', title: 'Sessions', meta: 'Open today’s practice', action: 'Open practice', image: 'assets/rails/gen-29.jpg', onTap: () => _openQuick('Sessions')),
-                        WorkCard(category: 'Saved', title: 'Saved words', meta: 'Words you kept', action: 'Open saved', image: 'assets/rails/gen-30.jpg', onTap: () => _openQuick('Saved')),
-                        WorkCard(category: 'Journal', title: 'Journal', meta: 'Messages and purchases', action: 'Open journal', image: 'assets/rails/gen-31.jpg', onTap: () => _openQuick('Journal')),
-                        WorkCard(category: 'Progress', title: 'My progress', meta: 'Sessions and streak', action: 'Open progress', image: 'assets/rails/gen-32.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library)))),
-                        WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/gen-33.jpg', onTap: () => _openQuick('Settings')),
-                      ],
-                    )),
-                    LSection('shop', 'Shop', ListenableBuilder(
-                      listenable: Listenable.merge([CartBag.instance, Entitlements.instance]),
-                      builder: (context, _) => RoutineDeck(
-                        title: 'Shop',
-                        banner: 'Bag',
-                        bannerSub: 'Cart, wishlist, orders',
-                        onBanner: () => _openShop('Cart'),
-                        cards: [
-                          WorkCard(category: 'Bag', title: 'Cart', meta: '${CartBag.instance.cartCount} in the bag', action: 'Open cart', image: 'assets/rails/gen-34.jpg', onTap: () => _openShop('Cart')),
-                          WorkCard(category: 'Saved', title: 'Wishlist', meta: '${CartBag.instance.wishCount} saved', action: 'Open wishlist', image: 'assets/rails/gen-35.jpg', onTap: () => _openShop('Wishlist')),
-                          WorkCard(category: 'Orders', title: 'Orders', meta: '${Entitlements.instance.owned.length} owned', action: 'Open orders', image: 'assets/rails/gen-36.jpg', onTap: () => _openShop('Orders')),
-                          WorkCard(category: 'Store', title: 'Store', meta: 'Words and books', action: 'Open store', image: 'assets/rails/gen-37.jpg', onTap: () => _openShop('Store')),
-                        ],
-                      ),
-                    )),
-                    LSection('account', 'Account', RoutineDeck(
-                      title: 'Account',
-                      banner: 'This account',
-                      bannerSub: 'Sound, reminder, sign out',
-                      onBanner: () { _doSignOut(); },
-                      cards: [
-                        WorkCard(category: 'Sound', title: 'Sound', meta: _soundOn ? 'On' : 'Off', action: _soundOn ? 'Turn off' : 'Turn on', image: 'assets/rails/gen-38.jpg', onTap: () { final next = !_soundOn; setState(() => _soundOn = next); _prefs.setString('nowssb_sound', next ? 'on' : 'off'); }),
-                        WorkCard(category: 'Time', title: 'Practice length', meta: _durationText, action: 'Add 15 min', image: 'assets/rails/gen-39.jpg', onTap: () { _stepDuration(15); }),
-                        WorkCard(category: 'Time', title: 'Daily reminder', meta: _reminderText, action: 'Set time', image: 'assets/rails/gen-40.jpg', onTap: () { _pickReminder(); }),
-                        WorkCard(category: 'Activity', title: 'Recent coins', meta: 'Sales and referrals', action: 'Open activity', image: 'assets/rails/gen-41.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()))),
-                        WorkCard(category: 'Session', title: 'Sign out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/gen-42.jpg', onTap: () { _doSignOut(); }),
-                      ],
-                    )),
+                    LSection('face', 'Profile', _courseFace()),
                   ]),
                 ),
               ),
@@ -530,6 +499,166 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Widget _courseFace() {
+    return ListenableBuilder(
+      listenable: Listenable.merge([EconomyMirror.instance, PracticeProgress.instance, CartBag.instance, Entitlements.instance]),
+      builder: (context, _) {
+        final banner = (_bannerUrl != null && _bannerUrl!.startsWith('http')) ? _bannerUrl! : kNwsbBanners.first;
+        final coins = EconomyMirror.instance.coins;
+        final streak = EconomyMirror.instance.live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
+        final score = PracticeProgress.instance.totalSessions;
+        final cart = CartBag.instance.cartCount;
+        final wish = CartBag.instance.wishCount;
+        final orders = Entitlements.instance.owned.length;
+        const rows = ['NowssB coins', 'Cart', 'Wishlist', 'Order history'];
+        final counts = [coins, cart, wish, orders];
+        final openers = <VoidCallback>[
+          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())),
+          () => _openShop('Cart'),
+          () => _openShop('Wishlist'),
+          () => _openShop('Order history'),
+        ];
+        return CourseFace(
+          avatar: _avatarBubble(),
+          onAvatar: _openPhotoChoices,
+          onBell: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const InboxScreen())),
+          segments: const ['You', 'Banner'],
+          segment: _face,
+          onSegment: (i) => setState(() => _face = i),
+          image: _face == 1 ? banner : (_photo != null ? 'file:${_photo!.path}' : ((_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : banner)),
+          title: _face == 1 ? 'Your banner' : _nameController.text,
+          meta: _face == 1 ? 'Pick one from the row' : 'NowssB coins $coins   ·   Streak $streak   ·   Score $score',
+          foot: _face == 1 ? 'Choose' : 'Continue',
+          indexLabel: _face == 1 ? '${kNwsbBanners.length} banners' : '1 of 4',
+          onContinue: _face == 1 ? _openBannerTab : () => NavScope.goTo(context, 1),
+          chips: _face == 1
+              ? const []
+              : [
+                  for (var i = 0; i < rows.length; i++) CourseChip(rows[i], counts[i]),
+                ],
+          chip: _chip.clamp(0, rows.length - 1),
+          onChip: (i) => setState(() => _chip = i),
+          rowTitle: _face == 1 ? null : rows[_chip.clamp(0, rows.length - 1)],
+          rowMeta: _face == 1 ? null : '${counts[_chip.clamp(0, rows.length - 1)]}',
+          rowImage: banner,
+          onRow: _face == 1 ? null : openers[_chip.clamp(0, rows.length - 1)],
+          extra: _face == 1 ? _bannerGrid() : null,
+        );
+      },
+    );
+  }
+
+  Widget _avatarBubble() {
+    final url = (_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : kPrebuiltAvatars.first;
+    return Container(
+      width: 52,
+      height: 52,
+      padding: const EdgeInsets.all(2),
+      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      child: ClipOval(
+        child: _photo != null
+            ? Image.file(_photo!, fit: BoxFit.cover)
+            : CachedNetworkImage(imageUrl: url, fit: BoxFit.cover),
+      ),
+    );
+  }
+
+  Widget _bannerGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: kNwsbBanners.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.5),
+      itemBuilder: (_, i) {
+        final url = kNwsbBanners[i];
+        final on = url == _bannerUrl;
+        return GestureDetector(
+          onTap: () async {
+            await _prefs.setString('nwsb_local_banner', url);
+            if (!mounted) return;
+            setState(() => _bannerUrl = url);
+            _showToast('Banner updated');
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: on ? Colors.white : const Color(0x33FFFFFF), width: on ? 2 : 1),
+              image: DecorationImage(image: CachedNetworkImageProvider(url), fit: BoxFit.cover),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _openBannerTab() => setState(() => _face = 1);
+
+  Future<void> _openPhotoChoices() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xF2161024),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Profile photo', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 12),
+              ListTile(
+                title: const Text('Prebuilt avatars', style: TextStyle(color: Colors.white)),
+                subtitle: const Text('The eight NowssB faces', style: TextStyle(color: Color(0x99FFFFFF))),
+                onTap: () => Navigator.pop(ctx, 'prebuilt'),
+              ),
+              ListTile(
+                title: const Text('From your phone', style: TextStyle(color: Colors.white)),
+                subtitle: const Text('Gallery or camera', style: TextStyle(color: Color(0x99FFFFFF))),
+                onTap: () => Navigator.pop(ctx, 'phone'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    if (choice == 'phone') {
+      await _pickPhoto();
+      return;
+    }
+    await _openPrebuiltAvatars();
+  }
+
+  Future<void> _openPrebuiltAvatars() async {
+    final url = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xF2161024),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            itemCount: kPrebuiltAvatars.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, mainAxisSpacing: 12, crossAxisSpacing: 12),
+            itemBuilder: (_, i) => GestureDetector(
+              onTap: () => Navigator.pop(ctx, kPrebuiltAvatars[i]),
+              child: ClipOval(child: CachedNetworkImage(imageUrl: kPrebuiltAvatars[i], fit: BoxFit.cover)),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (url == null || !mounted) return;
+    await _prefs.setString('nwsb_local_photo', url);
+    await _prefs.remove('nwsb_photo_path');
+    setState(() {
+      _avatarUrl = url;
+      _photo = null;
+    });
+    _showToast('Avatar set');
   }
 
   Widget _banner() {
