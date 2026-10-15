@@ -14,6 +14,7 @@ import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 
 class ReferenceScreen extends StatefulWidget {
   const ReferenceScreen({super.key, this.initialTab});
@@ -44,66 +45,17 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          HubRails(
-            labels: const ['Your link', 'Open', 'Share', 'Glass', 'Clear'],
-            openGuide: false,
-            onOpen: (card) {
-              switch (card.title) {
-                case 'NowssB Earn':
-                  Programmes.open(context, Programme.earn);
-                break;
-                case 'Rewards':
-                  Programmes.open(context, Programme.rewards);
-                break;
-                case 'Gifts':
-                  Programmes.open(context, Programme.gifts);
-                break;
-                case 'Coupons':
-                  Programmes.open(context, Programme.coupons);
-                break;
-                case 'Copy your code':
-                  _share(context);
-                break;
-                case 'Apply a code':
-                  _applySheet(context);
-                break;
-                case 'Your links':
-                  _tabs('board');
-                break;
-                case 'Friends':
-                  _tabs('friends');
-                break;
-                case 'Share cards':
-                  _tabs('cards');
-                break;
-                case 'Rules':
-                  _tabs('rules');
-                break;
-              }
-            },
-            a: const [
-              RailCard('Copy your code', 'The code on this account', 'Copy', art: 'assets/rails/earn-05.jpg'),
-              RailCard('Apply a code', 'Someone else’s code, once', 'Apply', art: 'assets/rails/earn-06.jpg'),
-              RailCard('Your links', 'Friends on this code', 'Board', art: 'assets/rails/earn-07.jpg'),
-            ],
-            b: const [
-              RailCard('NowssB Earn', 'Cash on real sales', 'Open', art: 'assets/rails/earn-02.jpg'),
-              RailCard('Rewards', 'Coins you spend', 'Open', art: 'assets/rails/art-coins.jpg'),
-              RailCard('Gifts', 'Send a plan', 'Open', art: 'assets/rails/art-gift-red.jpg'),
-              RailCard('Coupons', 'Scratch and codes', 'Open', art: 'assets/rails/art-scratch.jpg'),
-            ],
-            c: const [
-              RailCard('Friends', 'People on your link', 'Board', art: 'assets/rails/gen-30.jpg'),
-              RailCard('Share cards', 'Cards you can send', 'Share', art: 'assets/rails/gen-31.jpg'),
-              RailCard('Rules', 'One code. One parent.', 'Read', art: 'assets/rails/gen-32.jpg'),
-            ],
-            d: const [
-              RailCard('Copy your code', 'Hold it, then send it', 'Copy', art: 'assets/rails/gen-33.jpg'),
-              RailCard('Apply a code', 'It cannot be changed later', 'Apply', art: 'assets/rails/gen-34.jpg'),
-            ],
-            e: const [
-              RailCard('Your links', 'The board for this code', 'Open', art: 'assets/rails/gen-35.jpg'),
-              RailCard('NowssB Earn', 'Ranks behind the code', 'Open', art: 'assets/rails/gen-36.jpg'),
+          const IdentityRails(RailKind.earn),
+          RoutineDeck(
+            title: 'Reference',
+            banner: 'Your link',
+            bannerSub: 'One code. A friend’s first valid link counts.',
+            onBanner: () => _share(context),
+            cards: [
+              WorkCard(category: 'Code', title: 'Copy your code', meta: 'The code on this account', action: 'Copy', image: 'assets/rails/earn-05.jpg', onTap: () => _share(context)),
+              WorkCard(category: 'Code', title: 'Apply a code', meta: 'Someone else’s code, once', action: 'Apply', image: 'assets/rails/earn-06.jpg', onTap: () => _applySheet(context)),
+              WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Cash on real sales', action: 'Open earn', image: 'assets/rails/gen-66.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+              WorkCard(category: 'Board', title: 'Your links', meta: 'Friends on this code', action: 'Open board', image: 'assets/rails/earn-07.jpg', onTap: () => _tabs('board')),
             ],
           ),
         ],

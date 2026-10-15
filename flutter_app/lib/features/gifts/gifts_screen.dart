@@ -7,6 +7,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
@@ -397,7 +398,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
       mark: NwsbMarks.gift,
       action: GestureDetector(
         // History: switch to Received and scroll the tabs into view.
-        onTap: () => _tab('received'),
+        onTap: () => _openTabs('received'),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
@@ -418,67 +419,17 @@ class _GiftsScreenState extends State<GiftsScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         cacheExtent: 1600,
         children: [
-          HubRails(
-            labels: const ['Send', 'Use', 'More gifts', 'Glass', 'Clear'],
-            openGuide: false,
-            onOpen: (card) {
-              switch (card.title) {
-                case 'Word gift':
-                case 'Red ribbon':
-                  showGiftCardSheet(context, 'word');
-                break;
-                case 'Subscription gift':
-                case 'Gold ribbon':
-                  showGiftCardSheet(context, 'standard30');
-                break;
-                case 'Signature gift':
-                case 'Black ribbon':
-                  showGiftCardSheet(context, 'signature3');
-                break;
-                case 'Daily spin':
-                case 'Free spin':
-                  _openSpin(context);
-                break;
-                case 'Received':
-                  _openTabs('received');
-                break;
-                case 'Got a code?':
-                  _openTabs('redeem');
-                break;
-                case 'NowssB Earn':
-                  Programmes.open(context, Programme.earn);
-                break;
-                case 'History':
-                  _openTabs('received');
-                break;
-                case 'Rules':
-                  _openTabs('rules');
-                break;
-              }
-            },
-            a: const [
-              RailCard('Word gift', 'Red ribbon. A word, a stage, or a 7-day pass.', 'Send', art: 'assets/rails/art-gift-red.jpg'),
-              RailCard('Subscription gift', 'Gold ribbon. Basic, Standard, or Premium.', 'Send', art: 'assets/rails/art-gift-gold.jpg'),
-              RailCard('Signature gift', 'Black ribbon. The high tier.', 'Send', art: 'assets/rails/art-gift-black.jpg'),
-            ],
-            b: const [
-              RailCard('Daily spin', 'It spins, then slows onto the peg.', 'Spin', art: 'assets/rails/art-spin.jpg'),
-              RailCard('Received', 'Gifts already on this account', 'History', art: 'assets/rails/art-listen.jpg'),
-              RailCard('Got a code?', 'A code from someone else', 'Redeem', art: 'assets/rails/art-coins.jpg'),
-              RailCard('NowssB Earn', 'Ranks and codes', 'Open', art: 'assets/rails/art-book.jpg'),
-            ],
-            c: const [
-              RailCard('Red ribbon', 'A word, a stage, or seven days', 'Send', art: 'assets/rails/gen-10.jpg'),
-              RailCard('Gold ribbon', 'Basic, Standard, or Premium', 'Send', art: 'assets/rails/gen-11.jpg'),
-              RailCard('Black ribbon', 'The signature tier', 'Send', art: 'assets/rails/gen-12.jpg'),
-            ],
-            d: const [
-              RailCard('Free spin', 'One spin on this account', 'Spin', art: 'assets/rails/gen-13.jpg'),
-              RailCard('History', 'What you sent and received', 'Open', art: 'assets/rails/gen-14.jpg'),
-            ],
-            e: const [
-              RailCard('Got a code?', 'Redeem it here', 'Redeem', art: 'assets/rails/gen-15.jpg'),
-              RailCard('Rules', 'A gift is a real purchase', 'Read', art: 'assets/rails/gen-16.jpg'),
+          const IdentityRails(RailKind.gifts),
+          RoutineDeck(
+            title: 'Gifts',
+            banner: 'NowssB Gifts',
+            bannerSub: 'Send, redeem, history',
+            onBanner: () => showGiftCardSheet(context, 'word'),
+            cards: [
+              WorkCard(category: 'Send', title: 'Gift cards', meta: 'A real purchase, shared as a code', action: 'Send a gift', image: 'assets/rails/art-gift-red.jpg', onTap: () => showGiftCardSheet(context, 'word')),
+              WorkCard(category: 'History', title: 'Received', meta: 'Gifts on this account', action: 'Open history', image: 'assets/rails/art-gift-gold.jpg', onTap: () => _openTabs('received')),
+              WorkCard(category: 'Redeem', title: 'Redeem', meta: 'A code from someone else', action: 'Redeem', image: 'assets/rails/art-gift-black.jpg', onTap: () => _openTabs('redeem')),
+              WorkCard(category: 'Spin', title: 'Daily spin', meta: 'One free spin', action: 'Spin', image: 'assets/rails/art-spin.jpg', onTap: () => _openSpin(context)),
             ],
           ),
         ],

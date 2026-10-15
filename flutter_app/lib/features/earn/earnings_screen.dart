@@ -10,6 +10,7 @@ import '../economy/money.dart';
 import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
@@ -143,60 +144,17 @@ class _EarningsScreenState extends State<EarningsScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
-              HubRails(
-                labels: const ['Cash', 'Payout', 'Sales', 'Glass', 'Clear'],
-                openGuide: false,
-                onOpen: (card) {
-                  switch (card.title) {
-                    case 'Lifetime':
-                    case 'Sales':
-                      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'sales')));
-                    break;
-                    case 'Available':
-                    case 'Referrals':
-                      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'payouts')));
-                    break;
-                    case 'NowssB Earn':
-                      Programmes.open(context, Programme.earn);
-                    break;
-                    case 'Rewards':
-                      Programmes.open(context, Programme.rewards);
-                    break;
-                    case 'Payout account':
-                      _openAccount(context, india, unsupported, canPay);
-                    break;
-                    case 'Request payout':
-                      if (canPay) {
-                        runPrivate(context, () => EconomyApi.call('requestPayout'));
-                      } else {
-                        _openAccount(context, india, unsupported, canPay);
-                      }
-                    break;
-                  }
-                },
-                a: [
-                  RailCard('Lifetime', FxBook.instance.formatCents(w.lifetimeCents), 'Cash', art: 'assets/rails/earnings-01.jpg'),
-                  RailCard('Available', FxBook.instance.formatCents(w.cash), 'Cash', art: 'assets/rails/earnings-02.jpg'),
-                  RailCard('NowssB Earn', 'Sales ledger and lock', 'Open', art: 'assets/rails/earnings-06.jpg'),
-                ],
-                b: [
-                  RailCard('Payout account', india ? 'India · UPI' : unsupported ? 'Country not supported yet' : 'Wise or PayPal', 'Account', art: 'assets/rails/gen-54.jpg'),
-                  RailCard('Request payout', FxBook.instance.formatCents(w.cash), canPay ? 'Request' : 'Save account first', art: 'assets/rails/gen-55.jpg'),
-                  RailCard('Sales', 'What this account sold', 'Open', art: 'assets/rails/gen-56.jpg'),
-                  RailCard('Referrals', 'The second level', 'Open', art: 'assets/rails/gen-57.jpg'),
-                ],
-                c: [
-                  RailCard('Rewards', 'Coins on this account', 'Open', art: 'assets/rails/art-coins.jpg'),
-                  RailCard('Payout account', w.payoutRail.isEmpty ? 'No rail saved yet' : w.payoutRail, 'Account', art: 'assets/rails/earnings-03.jpg'),
-                  RailCard('Request payout', 'The server checks the minimum', 'Cash', art: 'assets/rails/earnings-04.jpg'),
-                ],
-                d: [
-                  RailCard('Lifetime', 'Everything this account earned', 'Cash', art: 'assets/rails/gen-40.jpg'),
-                  RailCard('Available', 'Ready to request', 'Cash', art: 'assets/rails/gen-41.jpg'),
-                ],
-                e: [
-                  RailCard('Sales', 'Cleared purchases', 'Open', art: 'assets/rails/gen-42.jpg'),
-                  RailCard('Referrals', 'Paid one level down', 'Open', art: 'assets/rails/gen-43.jpg'),
+              const IdentityRails(RailKind.earnings),
+              RoutineDeck(
+                title: 'Earnings',
+                banner: 'Your earning',
+                bannerSub: india ? 'India · UPI' : 'Sales and referrals',
+                onBanner: () => _openAccount(context, india, unsupported, canPay),
+                cards: [
+                  WorkCard(category: 'Cash', title: 'Lifetime', meta: FxBook.instance.formatCents(w.lifetimeCents), action: 'Open sales', image: 'assets/rails/gen-54.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'sales')))),
+                  WorkCard(category: 'Cash', title: 'Available', meta: FxBook.instance.formatCents(w.cash), action: 'Open payouts', image: 'assets/rails/gen-55.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'payouts')))),
+                  WorkCard(category: 'Account', title: 'Payout account', meta: india ? 'India · UPI' : 'Wise or PayPal', action: 'Set account', image: 'assets/rails/earnings-02.jpg', onTap: () => _openAccount(context, india, unsupported, canPay)),
+                  WorkCard(category: 'Cash', title: 'Request payout', meta: FxBook.instance.formatCents(w.cash), action: canPay ? 'Request' : 'Save account first', image: 'assets/rails/earnings-03.jpg', onTap: canPay ? () => runPrivate(context, () => EconomyApi.call('requestPayout')) : () => _openAccount(context, india, unsupported, canPay)),
                 ],
               ),
             ],

@@ -9,6 +9,7 @@ import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/flip_portrait.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../data/firebase.dart';
@@ -229,40 +230,18 @@ class _CircleScreenState extends State<CircleScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              HubRails(
-                labels: const ['Your rank', 'Open', 'The ladder', 'Your code', 'Clear'],
-                openGuide: false,
-                onOpen: (card) => _act(context, card, signedIn, w.code, w.referredBy),
-                a: [
-                  RailCard(signedIn ? 'Your rank' : 'Sign in', signedIn ? w.circleTier : 'See coins and cash', '$units of $next', art: 'assets/rails/earn-01.jpg'),
-                  RailCard('Rewards', 'Coins you earn in the app', 'Open', art: 'assets/rails/art-coins.jpg'),
-                  RailCard('Coupons', 'Scratch cards and codes', 'Open', art: 'assets/rails/art-scratch.jpg'),
-                  RailCard('Gifts', 'Send a real purchase', 'Open', art: 'assets/rails/art-gift-red.jpg'),
-                ],
-                b: [
-                  RailCard('Earnings', 'Sales and payouts', 'Cash', art: 'assets/rails/earnings-01.jpg'),
-                  RailCard('Reference', 'Your link', 'Code', art: 'assets/rails/art-listen.jpg'),
-                  RailCard('Copy code', signedIn && w.code.isNotEmpty ? w.code : 'Sign in first', 'Code', art: 'assets/rails/earn-05.jpg'),
-                  RailCard('Apply a code', w.referredBy.isEmpty ? 'Once' : 'Already applied', 'Code', art: 'assets/rails/earn-06.jpg'),
-                ],
-                c: [
-                  RailCard('Starter Agent', '0–99 units · 10% of net', 'Ladder', art: 'assets/rails/earn-02.jpg'),
-                  RailCard('Rising Agent', '100 units · 15% of net', 'Ladder', art: 'assets/rails/earn-03.jpg'),
-                  RailCard('Pro Agent', '300 units · 20% of net', 'Ladder', art: 'assets/rails/earn-04.jpg'),
-                  RailCard('Elite Agent', '500 units · 25% of net', 'Ladder', art: 'assets/rails/earn-07.jpg'),
-                  RailCard('Master Agent', '1000 units · 30% of net', 'Ladder', art: 'assets/rails/gen-49.jpg'),
-                ],
-                d: [
-                  RailCard('Partner', 'Welcome to the earn', 'Earn', art: 'assets/rails/art-gift-gold.jpg'),
-                  RailCard('Your legs', signedIn ? '$units units on your code' : 'Share the code first', 'Team', art: 'assets/rails/art-book.jpg'),
-                  RailCard('See plans', 'A paid plan keeps the code live', 'Plan', art: 'assets/rails/art-gift-black.jpg'),
-                  RailCard('My team', 'One level under you', 'Team', art: 'assets/rails/gen-50.jpg'),
-                ],
-                e: [
-                  RailCard('Ledger', 'Referral payments', 'Cash', art: 'assets/rails/art-spin.jpg'),
-                  RailCard('Payouts', 'Request when the rail is saved', 'Cash', art: 'assets/rails/earnings-03.jpg'),
-                  RailCard('Sales', 'What this account sold', 'Cash', art: 'assets/rails/earnings-04.jpg'),
-                  RailCard('Rules', 'What is paid, and what is not', 'Read', art: 'assets/rails/earnings-05.jpg'),
+              const IdentityRails(RailKind.earn),
+              RoutineDeck(
+                title: 'Earn',
+                banner: signedIn ? w.circleTier : 'NowssB Earn',
+                bannerSub: signedIn ? '$units units · ${w.code.isEmpty ? 'code pending' : w.code}' : 'Sign in to see your rank',
+                onBanner: () => Programmes.open(context, Programme.reference),
+                cards: [
+                  WorkCard(category: 'Rank', title: signedIn ? w.circleTier : 'Sign in', meta: signedIn ? '$units of $next to the next tier' : 'Your rank is on this account', action: signedIn ? 'See plans' : 'Sign in', image: 'assets/rails/gen-49.jpg', onTap: () { if (!signedIn) { NwsbSignInPage.open(context); } else { Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())); } }),
+                  WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you earn', action: 'Open rewards', image: 'assets/rails/gen-50.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+                  WorkCard(category: 'Coupons', title: 'Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/gen-51.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
+                  WorkCard(category: 'Gifts', title: 'Gifts', meta: 'Send or redeem', action: 'Open gifts', image: 'assets/rails/gen-52.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
+                  WorkCard(category: 'Cash', title: 'Earnings', meta: 'Sales and payouts', action: 'Open earnings', image: 'assets/rails/gen-53.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
                 ],
               ),
             ],

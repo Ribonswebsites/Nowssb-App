@@ -46,6 +46,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_router.dart';
+import '../widgets/hub_rails.dart';
 import '../widgets/routine_deck.dart';
 
 const _accent = Color(0xFFE3BD7D);
@@ -454,6 +455,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
+                    LSection('rails', 'Practice rails', const IdentityRails(RailKind.profile)),
                     LSection('programs', 'Programs', _earnHub()),
                     LSection('you', 'You', RoutineDeck(
                       title: 'You',

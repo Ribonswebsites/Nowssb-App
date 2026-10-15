@@ -19,6 +19,7 @@ import '../../widgets/brand_top_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/hub_rails.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
@@ -61,70 +62,21 @@ class _VaultBodyState extends State<_VaultBody> {
     return ListenableBuilder(
       listenable: EconomyMirror.instance,
       builder: (context, _) {
-        final s = EconomyMirror.instance.summary;
-        final actions = sList(sMap(s['today'])['actions']);
-        final quests = sList(sMap(s['quests'])['starter']);
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
-            HubRails(
-              labels: const ['Today', 'Quests', 'Shop', 'Glass', 'Clear'],
-              openGuide: false,
-              onOpen: (card) {
-                switch (card.title) {
-                  case 'Daily login':
-                    runReward(context, () => EconomyApi.call('claimDailyLogin'), title: 'Daily login');
-                  break;
-                  case 'Words':
-                    NwsbLinks.tab(context, 3);
-                  break;
-                  case 'Meanings':
-                    NwsbLinks.meanings(context);
-                  break;
-                  case 'Ebooks':
-                    NwsbLinks.ebooks(context);
-                  break;
-                  case 'Quests':
-                    _openTabs('quests');
-                  break;
-                  default:
-                    final hit = quests.where((q) => '${q['title'] ?? 'Quest'}' == card.title);
-                    if (hit.isNotEmpty) {
-                      final q = hit.first;
-                      if (q['claimed'] == true) return;
-                      if (sNum(q['value']) < sNum(q['goal'])) {
-                        _openTabs('quests');
-                        return;
-                      }
-                      runReward(context, () => EconomyApi.call('claimQuest', {'kind': 'starter', 'id': q['id']}), title: '${q['title']}');
-                      return;
-                    }
-                    _openActivity(context, card.title);
-                    break;
-                }
-              },
-              a: [
-                const RailCard('Daily login', 'Collect today’s coins', 'Collect', art: 'assets/rails/art-coins.jpg'),
-                for (var i = 0; i < actions.length; i++)
-                  RailCard('${actions[i]['title']}', '+${sInt(actions[i]['coins'])} coins', _done(actions[i]) ? 'Done' : 'Open', art: _rewardArt('${actions[i]['title']}', i)),
-              ],
-              b: [
-                for (var i = 0; i < quests.length; i++)
-                  RailCard('${quests[i]['title'] ?? 'Quest'}', '${sInt(quests[i]['value'])} of ${sInt(quests[i]['goal'])}', quests[i]['claimed'] == true ? 'Claimed' : 'Claim', art: 'assets/rails/rewards-0${(i % 7) + 1}.jpg'),
-                if (quests.isEmpty) const RailCard('Quests', 'Claim when the count is done', 'Open', art: 'assets/rails/rewards-01.jpg'),
-              ],
-              c: const [
-                RailCard('Words', 'Priced on Google Play', 'Store', art: 'assets/rails/gen-01.jpg'),
-                RailCard('Meanings', 'The meaning store', 'Store', art: 'assets/rails/gen-02.jpg'),
-                RailCard('Ebooks', 'The ebook store', 'Store', art: 'assets/rails/art-book.jpg'),
-              ],
-              d: const [
-                RailCard('Daily login', 'Once a day', 'Collect', art: 'assets/rails/gen-03.jpg'),
-                RailCard('Quests', 'Starter counts', 'Open', art: 'assets/rails/gen-04.jpg'),
-              ],
-              e: const [
-                RailCard('Words', 'Open the atelier', 'Store', art: 'assets/rails/gen-05.jpg'),
-                RailCard('Meanings', 'Open the meanings', 'Store', art: 'assets/rails/gen-06.jpg'),
+            const IdentityRails(RailKind.rewards),
+            RoutineDeck(
+              title: 'Rewards',
+              banner: 'NowssB Rewards',
+              bannerSub: 'Coins, quests, one invite',
+              onBanner: () => _openTabs('today'),
+              cards: [
+                WorkCard(category: 'Today', title: 'Today’s coins', meta: 'Claim the daily coins', action: 'Open today', image: 'assets/rails/art-coins.jpg', onTap: () => runReward(context, () => EconomyApi.call('claimDailyLogin'), title: 'Daily login')),
+                WorkCard(category: 'Quests', title: 'Quests', meta: 'Short tasks on this account', action: 'Open quests', image: 'assets/rails/gen-44.jpg', onTap: () => _openTabs('quests')),
+                WorkCard(category: 'Store', title: 'Words', meta: 'Priced on Google Play', action: 'Open store', image: 'assets/rails/gen-45.jpg', onTap: () => NwsbLinks.tab(context, 3)),
+                WorkCard(category: 'Store', title: 'Meanings', meta: 'The meaning store', action: 'Open meanings', image: 'assets/rails/gen-46.jpg', onTap: () => NwsbLinks.meanings(context)),
+                WorkCard(category: 'Store', title: 'Ebooks', meta: 'The ebook store', action: 'Open ebooks', image: 'assets/rails/art-book.jpg', onTap: () => NwsbLinks.ebooks(context)),
               ],
             ),
           ],
