@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../widgets/routine_deck.dart';
+import 'store_art.dart';
 import 'ebooks_store.dart';
 import 'meaning_store.dart';
 import 'signature_store.dart';
@@ -56,12 +57,7 @@ class StoreRoomDeck extends StatelessWidget {
             title: r.$2,
             meta: r.$3,
             action: r.$4,
-            image: switch (r.$1) {
-              'meaning' => 'assets/meanings/meanings-branding.jpg',
-              'signature' => 'assets/signature/sig-meanings-icon.webp',
-              'ebooks' => 'assets/ebooks/ebooks-headphones.jpg',
-              _ => 'assets/meanings/meanings-device.png',
-            },
+            image: kStoreRoomArt[r.$1] ?? 'assets/rails/store/word.jpg',
             onTap: () => openStoreFromPicker(context, r.$1, current: current),
           ),
       ],

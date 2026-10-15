@@ -22,7 +22,9 @@ import 'store_shelf.dart';
 import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
+import 'store_art.dart';
 import 'store_routes.dart';
+import '../../widgets/routine_deck.dart';
 import 'store_terms_sheet.dart';
 import '../../shell/nwsb_links.dart';
 import '../../admin/template/editable.dart';
@@ -92,27 +94,40 @@ class _EbooksBody extends StatelessWidget {
       // Server-driven order (Admin → UI Editor); bundled order by default.
       children: [
         const StoreRoomDeck(current: 'ebooks'),
-        StoreShelf(
-          labels: const ['Books', 'Saved', 'Guides', 'Glass', 'Clear'],
-          pieces: [
+        RoutineDeck(
+          title: 'Books',
+          banner: 'eBooks',
+          bannerSub: 'Read the books',
+          cards: [
             for (final b in books)
-              StorePiece(
+              WorkCard(
+                category: 'Book',
                 title: b.title,
-                line: b.sub,
-                art: b.cover,
-                group: 'Language',
+                meta: b.sub,
+                action: 'Open',
+                image: b.cover.startsWith('assets/') ? b.cover : 'assets/rails/store/ebooks.jpg',
                 onTap: () => openEbookDetail(context, b),
-              ),
-            for (final row in kPlaceRows)
-              StorePiece(
-                title: row.$1,
-                line: row.$2,
-                art: kEbProductArt,
-                group: row.$3,
-                onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kEbProductArt),
               ),
           ],
         ),
+        for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
+          RoutineDeck(
+            title: group,
+            banner: group,
+            bannerSub: 'The ${group.toLowerCase()} row',
+            cards: [
+              for (final row in kPlaceRows)
+                if (row.$3 == group)
+                  WorkCard(
+                    category: group,
+                    title: row.$1,
+                    meta: row.$2,
+                    action: 'Open',
+                    image: storeSubjectArt(row.$1, catId: group),
+                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kEbProductArt),
+                  ),
+            ],
+          ),
       ],
     );
   }

@@ -17,7 +17,9 @@ import '../../data/content.dart';
 import '../../data/store_catalog.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
+import 'store_art.dart';
 import 'store_routes.dart';
+import '../../widgets/routine_deck.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/sections/artist_cards_section.dart';
@@ -250,7 +252,42 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const StoreRoomDeck(current: 'meaning'),
-        StoreShelf(pieces: _meaningPieces()),
+        for (final cat in cats.keys)
+          RoutineDeck(
+            title: cat,
+            banner: cat,
+            bannerSub: '${cats[cat]!.length} meanings',
+            onBanner: () => _openViewAll(cat),
+            cards: [
+              for (final m in cats[cat]!)
+                WorkCard(
+                  category: cat,
+                  title: m.word,
+                  meta: m.root,
+                  action: 'Open',
+                  image: storeSubjectArt(m.word, catId: cat),
+                  onTap: () => openMeaningDetail(context, m),
+                ),
+            ],
+          ),
+        for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
+          RoutineDeck(
+            title: group,
+            banner: group,
+            bannerSub: 'The ${group.toLowerCase()} row',
+            cards: [
+              for (final row in kPlaceRows)
+                if (row.$3 == group)
+                  WorkCard(
+                    category: group,
+                    title: row.$1,
+                    meta: row.$2,
+                    action: 'Open',
+                    image: storeSubjectArt(row.$1, catId: group),
+                    onTap: () => openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kMsMeaningProductArt)),
+                  ),
+            ],
+          ),
       ],
     );
   }

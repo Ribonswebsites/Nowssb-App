@@ -20,8 +20,10 @@ import 'ebooks_store.dart';
 import 'meaning_store.dart';
 import 'request_words.dart';
 import 'signature_store.dart';
+import 'store_art.dart';
 import 'store_routes.dart';
 import 'store_shelf.dart';
+import '../../widgets/routine_deck.dart';
 import 'store_terms_sheet.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
@@ -132,13 +134,48 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
 
   @override
   Widget build(BuildContext context) {
-    final pieces = _pieces();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const StoreRoomDeck(current: 'word'),
-        StoreShelf(pieces: pieces),
+        for (final cat in kRmCategories)
+          if (cat.words.any((w) => _match(w.word, w.root)))
+            RoutineDeck(
+              title: cat.label,
+              banner: cat.label,
+              bannerSub: cat.sub,
+              onBanner: () => _openViewAll(cat.label),
+              cards: [
+                for (final w in cat.words)
+                  if (_match(w.word, w.root))
+                    WorkCard(
+                      category: cat.label,
+                      title: w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}',
+                      meta: w.root,
+                      action: 'Open',
+                      image: storeSubjectArt(w.word, catId: cat.id),
+                      onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: kRmWordImg, price: StorePrices.instance.priceFor('word:${w.word.toLowerCase()}')),
+                    ),
+              ],
+            ),
+        for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
+          RoutineDeck(
+            title: group,
+            banner: group,
+            bannerSub: 'The ${group.toLowerCase()} row',
+            cards: [
+              for (final row in kPlaceRows)
+                if (row.$3 == group && _match(row.$1, row.$2))
+                  WorkCard(
+                    category: group,
+                    title: row.$1,
+                    meta: row.$2,
+                    action: 'Open',
+                    image: storeSubjectArt(row.$1, catId: group),
+                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kRmWordImg),
+                  ),
+            ],
+          ),
       ],
     );
   }

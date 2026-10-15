@@ -16,8 +16,10 @@ import 'store_home_sections.dart';
 import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import '../../widgets/sections/artist_cards_section.dart';
+import 'store_art.dart';
 import 'store_routes.dart';
 import 'store_shelf.dart';
+import '../../widgets/routine_deck.dart';
 import 'store_terms_sheet.dart';
 import 'request_words.dart';
 import '../../admin/template/editable.dart';
@@ -67,39 +69,60 @@ class _SignatureBody extends StatelessWidget {
       // Server-driven order (Admin → UI Editor); bundled order by default.
       children: [
         const StoreRoomDeck(current: 'signature'),
-        StoreShelf(
-          labels: const ['Signatures', 'Saved', 'Guides', 'Glass', 'Clear'],
-          pieces: [
+        RoutineDeck(
+          title: 'Signature words',
+          banner: 'Most exclusive',
+          bannerSub: 'The mark on a word',
+          cards: [
             for (final s in words)
-              StorePiece(
+              WorkCard(
+                category: 'Signature',
                 title: s.name,
-                line: 'Most Exclusive',
-                art: s.img,
-                group: 'Language',
+                meta: 'Most exclusive',
+                action: 'Open',
+                image: storeSubjectArt(s.name, catId: 'signature'),
                 onTap: () => openAtelierWord(context, word: s.name, root: 'Most Exclusive', img: s.img, signature: true),
               ),
+          ],
+        ),
+        RoutineDeck(
+          title: 'Signature meanings',
+          banner: 'Meanings',
+          bannerSub: 'The mark on a meaning',
+          cards: [
             for (final e in meanings)
-              StorePiece(
+              WorkCard(
+                category: e.key,
                 title: e.value.word,
-                line: e.value.root,
-                art: kMsSignatureImg,
-                group: storeGroup(e.value.word),
+                meta: e.value.root,
+                action: 'Open',
+                image: storeSubjectArt(e.value.word, catId: 'signature'),
                 onTap: () => openMeaningDetail(
                   context,
                   MsMeaning(word: e.value.word, key: e.value.key, root: e.value.root, category: e.key, price: kMsSignaturePrice, img: kMsSignatureImg),
                   signature: true,
                 ),
               ),
-            for (final row in kPlaceRows)
-              StorePiece(
-                title: row.$1,
-                line: row.$2,
-                art: kMsSignatureImg,
-                group: row.$3,
-                onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kMsSignatureImg),
-              ),
           ],
         ),
+        for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
+          RoutineDeck(
+            title: group,
+            banner: group,
+            bannerSub: 'The ${group.toLowerCase()} row',
+            cards: [
+              for (final row in kPlaceRows)
+                if (row.$3 == group)
+                  WorkCard(
+                    category: group,
+                    title: row.$1,
+                    meta: row.$2,
+                    action: 'Open',
+                    image: storeSubjectArt(row.$1, catId: group),
+                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kMsSignatureImg),
+                  ),
+            ],
+          ),
       ],
     );
   }
