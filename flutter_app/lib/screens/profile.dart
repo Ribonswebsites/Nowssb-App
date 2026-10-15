@@ -143,6 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     switch (label) {
       case 'Cart':
       case 'Orders':
+      case 'Order history':
         // The bag, with "Your purchases" (server-confirmed) under it.
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CartPage()));
       case 'Wishlist':
@@ -168,6 +169,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     _bannerUrl = _prefs.getString('nwsb_local_banner');
     _avatarUrl = _prefs.getString('nwsb_local_photo');
+    final localPath = _prefs.getString('nwsb_photo_path');
+    if (localPath != null && File(localPath).existsSync()) _photo = File(localPath);
     if (mounted) setState(() => _loading = false);
   }
 
@@ -302,10 +305,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickPhoto() async {
-    final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 90);
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: const Color(0xF00A0A0C),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(title: const Text('Choose from gallery', style: TextStyle(color: _text)), onTap: () => Navigator.pop(ctx, ImageSource.gallery)),
+            ListTile(title: const Text('Take a photo', style: TextStyle(color: _text)), onTap: () => Navigator.pop(ctx, ImageSource.camera)),
+          ],
+        ),
+      ),
+    );
+    if (source == null || !mounted) return;
+    final picked = await _picker.pickImage(source: source, imageQuality: 90);
     if (picked == null || !mounted) return;
     final local = File(picked.path);
     setState(() => _photo = local);
+    await _prefs.setString('nwsb_photo_path', local.path);
+    _showToast('Profile photo set');
     await _persistPhoto(local);
   }
 
@@ -455,6 +475,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
+                    LSection('card', 'Profile photo', _profileCard()),
+                    LSection('score', 'Score', _scorePanel()),
                     LSection('rails', 'Practice rails', const IdentityRails(RailKind.profile)),
                     LSection('programs', 'Programs', _earnHub()),
                     LSection('you', 'You', RoutineDeck(
@@ -602,26 +624,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Positioned(
                     top: 18,
                     right: 17,
-                    child: Container(
-                      width: 76,
-                      height: 76,
-                      clipBehavior: Clip.antiAlias,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: const Color(0xFF0A0A0A),
-                        border: Border.all(color: const Color(0x99E8D5A3), width: 1.2),
-                        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(2, 3))],
+                    child: GestureDetector(
+                      onTap: _pickPhoto,
+                      child: Container(
+                        width: 76,
+                        height: 76,
+                        clipBehavior: Clip.antiAlias,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color(0xFF0A0A0A),
+                          border: Border.all(color: const Color(0x99E8D5A3), width: 1.2),
+                          boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 8, offset: Offset(2, 3))],
+                        ),
+                        child: _photo != null
+                            ? Image.file(_photo!, fit: BoxFit.cover)
+                            : CachedNetworkImage(
+                                imageUrl: (_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : kDefaultAvatar,
+                                fit: BoxFit.cover,
+                                errorWidget: (_, __, ___) => Center(child: Text((_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase(), style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text))),
+                              ),
                       ),
-                      child: _photo != null
-                          ? Image.file(_photo!, fit: BoxFit.cover)
-                          : CachedNetworkImage(
-                              imageUrl: (_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : kDefaultAvatar,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => Center(child: Text((_nameController.text.trim().isEmpty ? 'P' : _nameController.text.trim().substring(0, 1)).toUpperCase(), style: const TextStyle(fontFamily: _mono, fontSize: 24, fontWeight: FontWeight.w600, color: _text))),
-                            ),
                     ),
                   ),
-                  Positioned(right: 10, bottom: 10, child: _circleButton(asset: 'assets/icons/icon_02.svg', size: 28, onTap: _pickPhoto)),
+                  Positioned(right: 10, bottom: 8, child: _circleButton(asset: 'assets/icons/icon_02.svg', size: 28, onTap: _pickPhoto)),
+                  const Positioned(left: 8, bottom: 10, child: Text('Set photo', style: TextStyle(color: _accent, fontSize: 11, fontWeight: FontWeight.w700))),
                 ]),
               ),
               Expanded(
@@ -646,6 +672,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
+        ),
+      );
+
+  Widget _scorePanel() {
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        EconomyMirror.instance,
+        PracticeProgress.instance,
+        CartBag.instance,
+        Entitlements.instance,
+      ]),
+      builder: (context, _) {
+        final live = EconomyMirror.instance.live;
+        final coins = EconomyMirror.instance.coins;
+        final streak = live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
+        final score = PracticeProgress.instance.totalSessions;
+        return GlassCard(
+          margin: const EdgeInsets.only(bottom: 28),
+          padding: const EdgeInsets.fromLTRB(8, 14, 8, 8),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  _scoreCell('NowssB coins', '$coins'),
+                  _scoreCell('Streak', '$streak'),
+                  _scoreCell('Score', '$score'),
+                ],
+              ),
+              const SizedBox(height: 8),
+              _shopRow('Cart', '${CartBag.instance.cartCount}', 26),
+              _shopRow('Wishlist', '${CartBag.instance.wishCount}', 28),
+              _shopRow('Order history', '${Entitlements.instance.owned.length}', 30),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _scoreCell(String label, String value) => Expanded(
+        child: Column(
+          children: [
+            Text(value, style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, color: _accent)),
+            const SizedBox(height: 4),
+            Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, color: _dim)),
+          ],
         ),
       );
 
