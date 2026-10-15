@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -111,6 +112,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _recentOpen = false;
   int _face = 0;
   int _chip = 0;
+  int _prog = 0;
+  String? _bannerPath;
   String _toast = '';
   OverlayEntry? _toastEntry;
 
@@ -181,6 +184,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _reminder = TimeOfDay(hour: int.tryParse(parts[0]) ?? 7, minute: int.tryParse(parts[1]) ?? 0);
     }
     _bannerUrl = _prefs.getString('nwsb_local_banner');
+    final bannerPath = _prefs.getString('nwsb_banner_path');
+    if (bannerPath != null && File(bannerPath).existsSync()) _bannerPath = bannerPath;
     _avatarUrl = _prefs.getString('nwsb_local_photo');
     final localPath = _prefs.getString('nwsb_photo_path');
     if (localPath != null && File(localPath).existsSync()) _photo = File(localPath);
@@ -466,6 +471,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
+    final int today = (DateTime.now().weekday - 1).clamp(0, 6);
     return Theme(
       data: ThemeData.dark(useMaterial3: true).copyWith(
         scaffoldBackgroundColor: Colors.black,
@@ -489,6 +495,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
                     LSection('face', 'Profile', _courseFace()),
+                    LSection('earn', 'Earn hub', _earnHub()),
+                    LSection('progress', 'Progress', _progress()),
+                    LSection('about', 'About', _about()),
+                    LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
+                      SplitPromoSurface.profile,
+                      onTap: () => NavScope.goTo(context, 1),
+                    )),
+                    LSection('quick', 'Quick access', _quickAccess()),
+                    LSection('recent', 'Recent activity', _recentActivity()),
+                    LSection('motto', 'Motto', _motto()),
+                    LSection('week', 'Week tracker', _weekTracker(today)),
+                    LSection('prefs', 'Preferences', _preferences()),
+                    LSection('shop', 'Shop', _shop()),
+                    LSection('account', 'Account', _account()),
+                    LSection('quote', 'Quote', _quote()),
+                    LSection('signout', 'Sign out', _signOut()),
                   ]),
                 ),
               ),
@@ -505,10 +527,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListenableBuilder(
       listenable: Listenable.merge([EconomyMirror.instance, PracticeProgress.instance, CartBag.instance, Entitlements.instance]),
       builder: (context, _) {
-        final banner = (_bannerUrl != null && _bannerUrl!.startsWith('http')) ? _bannerUrl! : kNwsbBanners.first;
+        final banner = _bannerSrc;
+        final photo = _photoSrc;
         final coins = EconomyMirror.instance.coins;
         final streak = EconomyMirror.instance.live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
         final score = PracticeProgress.instance.totalSessions;
+        final words = PracticeProgress.instance.uniqueWords;
         final cart = CartBag.instance.cartCount;
         final wish = CartBag.instance.wishCount;
         final orders = Entitlements.instance.owned.length;
@@ -524,29 +548,148 @@ class _ProfileScreenState extends State<ProfileScreen> {
           avatar: _avatarBubble(),
           onAvatar: _openPhotoChoices,
           onBell: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const InboxScreen())),
-          segments: const ['You', 'Banner'],
+          segments: const ['You', 'Progress'],
           segment: _face,
           onSegment: (i) => setState(() => _face = i),
-          image: _face == 1 ? banner : (_photo != null ? 'file:${_photo!.path}' : ((_avatarUrl != null && _avatarUrl!.startsWith('http')) ? _avatarUrl! : banner)),
-          title: _face == 1 ? 'Your banner' : _nameController.text,
-          meta: _face == 1 ? 'Pick one from the row' : 'NowssB coins $coins   ·   Streak $streak   ·   Score $score',
-          foot: _face == 1 ? 'Choose' : 'Continue',
-          indexLabel: _face == 1 ? '${kNwsbBanners.length} banners' : '1 of 4',
-          onContinue: _face == 1 ? _openBannerTab : () => NavScope.goTo(context, 1),
-          chips: _face == 1
-              ? const []
-              : [
-                  for (var i = 0; i < rows.length; i++) CourseChip(rows[i], counts[i]),
-                ],
+          image: banner,
+          title: _nameController.text,
+          meta: 'NowssB coins $coins   ·   Streak $streak   ·   Score $score',
+          foot: 'Continue',
+          indexLabel: '1 of 4',
+          onContinue: () => NavScope.goTo(context, 1),
+          onImage: _openBannerChoices,
+          chips: [
+            for (var i = 0; i < rows.length; i++) CourseChip(rows[i], counts[i]),
+          ],
           chip: _chip.clamp(0, rows.length - 1),
           onChip: (i) => setState(() => _chip = i),
-          rowTitle: _face == 1 ? null : rows[_chip.clamp(0, rows.length - 1)],
-          rowMeta: _face == 1 ? null : '${counts[_chip.clamp(0, rows.length - 1)]}',
-          rowImage: banner,
-          onRow: _face == 1 ? null : openers[_chip.clamp(0, rows.length - 1)],
-          extra: _face == 1 ? _bannerGrid() : null,
+          rowTitle: rows[_chip.clamp(0, rows.length - 1)],
+          rowMeta: '${counts[_chip.clamp(0, rows.length - 1)]}',
+          rowImage: photo,
+          rowCircle: true,
+          onRowImage: _openPhotoChoices,
+          onRow: openers[_chip.clamp(0, rows.length - 1)],
+          instead: _face == 1 ? _progressCard(streak: streak, score: score, words: words, coins: coins, photo: photo) : null,
         );
       },
+    );
+  }
+
+  String get _bannerSrc {
+    if (_bannerPath != null && File(_bannerPath!).existsSync()) return 'file:$_bannerPath';
+    if (_bannerUrl != null && _bannerUrl!.startsWith('http')) return _bannerUrl!;
+    return kNwsbBanners.first;
+  }
+
+  String get _photoSrc {
+    if (_photo != null) return 'file:${_photo!.path}';
+    if (_avatarUrl != null && _avatarUrl!.startsWith('http')) return _avatarUrl!;
+    return kPrebuiltAvatars.first;
+  }
+
+  Widget _progressCard({required int streak, required int score, required int words, required int coins, required String photo}) {
+    const arts = ['assets/rails/02.png', 'assets/rails/04.png', 'assets/rails/06.png', 'assets/rails/08.png'];
+    final slides = [
+      (title: '$streak day streak', meta: 'One sit a day keeps the circle.', art: arts[0]),
+      (title: '$score sessions', meta: 'Sessions you have finished.', art: arts[1]),
+      (title: '$words words', meta: 'Different words you have practiced.', art: arts[2]),
+      (title: '$coins coins', meta: 'NowssB coins on this account.', art: photo),
+    ];
+    final i = _prog.clamp(0, slides.length - 1);
+    final slide = slides[i];
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: Container(
+          height: 420,
+          padding: const EdgeInsets.fromLTRB(18, 22, 18, 16),
+          decoration: BoxDecoration(
+            color: const Color(0x1AFFFFFF),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: const Color(0x55FFFFFF)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 148,
+                height: 148,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: const Color(0x88FFFFFF), width: 2),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: slide.art.startsWith('http') || slide.art.startsWith('file:')
+                    ? (slide.art.startsWith('file:')
+                        ? Image.file(File(slide.art.substring(5)), fit: BoxFit.cover)
+                        : CachedNetworkImage(imageUrl: slide.art, fit: BoxFit.cover))
+                    : Image.asset(slide.art, fit: BoxFit.cover),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0x22FFFFFF),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0x44FFFFFF)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(slide.title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.05)),
+                      const SizedBox(height: 8),
+                      Text(slide.meta, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 14, height: 1.35)),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () => setState(() => _prog = i == 0 ? 0 : i - 1),
+                            child: const Text('Skip', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                          ),
+                          const Spacer(),
+                          GestureDetector(
+                            onTap: () {
+                              if (i >= slides.length - 1) {
+                                NavScope.goTo(context, 1);
+                              } else {
+                                setState(() => _prog = i + 1);
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0x33FFFFFF),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(color: const Color(0x88FFFFFF)),
+                              ),
+                              child: const Text('Next', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (var d = 0; d < slides.length; d++)
+                            Container(
+                              width: d == i ? 7 : 5,
+                              height: d == i ? 7 : 5,
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              decoration: BoxDecoration(color: d == i ? Colors.white : const Color(0x66FFFFFF), shape: BoxShape.circle),
+                            ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -595,10 +738,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _openBannerTab() => setState(() => _face = 1);
 
-  Future<void> _openPhotoChoices() async {
+  Future<void> _openPhotoChoices() => _openChooser(
+        title: 'Profile photo',
+        preview: _photoSrc,
+        circle: true,
+        prebuiltLabel: 'Prebuilt avatars',
+        prebuiltSub: 'The eight NowssB faces',
+        onPrebuilt: _openPrebuiltAvatars,
+        onPhone: _pickPhoto,
+      );
+
+  Future<void> _openBannerChoices() => _openChooser(
+        title: 'Banner',
+        preview: _bannerSrc,
+        circle: false,
+        prebuiltLabel: 'Prebuilt banners',
+        prebuiltSub: 'The banners from the website',
+        onPrebuilt: _openPrebuiltBanners,
+        onPhone: _pickBannerPhoto,
+      );
+
+  Future<void> _openChooser({
+    required String title,
+    required String preview,
+    required bool circle,
+    required String prebuiltLabel,
+    required String prebuiltSub,
+    required Future<void> Function() onPrebuilt,
+    required Future<void> Function() onPhone,
+  }) async {
     final choice = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: const Color(0xF2161024),
+      backgroundColor: const Color(0xF0101014),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) => SafeArea(
         child: Padding(
@@ -606,11 +777,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Profile photo', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(circle ? 80 : 18),
+                child: SizedBox(
+                  width: circle ? 96 : double.infinity,
+                  height: circle ? 96 : 120,
+                  child: preview.startsWith('file:')
+                      ? Image.file(File(preview.substring(5)), fit: BoxFit.cover)
+                      : CachedNetworkImage(imageUrl: preview, fit: BoxFit.cover),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 8),
               ListTile(
-                title: const Text('Prebuilt avatars', style: TextStyle(color: Colors.white)),
-                subtitle: const Text('The eight NowssB faces', style: TextStyle(color: Color(0x99FFFFFF))),
+                title: Text(prebuiltLabel, style: const TextStyle(color: Colors.white)),
+                subtitle: Text(prebuiltSub, style: const TextStyle(color: Color(0x99FFFFFF))),
                 onTap: () => Navigator.pop(ctx, 'prebuilt'),
               ),
               ListTile(
@@ -625,10 +807,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     if (!mounted || choice == null) return;
     if (choice == 'phone') {
-      await _pickPhoto();
-      return;
+      await onPhone();
+    } else {
+      await onPrebuilt();
     }
-    await _openPrebuiltAvatars();
+  }
+
+  Future<void> _pickBannerPhoto() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: const Color(0xF00A0A0C),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(title: const Text('Choose from gallery', style: TextStyle(color: _text)), onTap: () => Navigator.pop(ctx, ImageSource.gallery)),
+            ListTile(title: const Text('Take a photo', style: TextStyle(color: _text)), onTap: () => Navigator.pop(ctx, ImageSource.camera)),
+          ],
+        ),
+      ),
+    );
+    if (source == null || !mounted) return;
+    final picked = await _picker.pickImage(source: source, imageQuality: 90);
+    if (picked == null || !mounted) return;
+    await _prefs.setString('nwsb_banner_path', picked.path);
+    setState(() => _bannerPath = picked.path);
+    _showToast('Banner updated');
+  }
+
+  Future<void> _openPrebuiltBanners() async {
+    final url = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xF0101014),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            itemCount: kNwsbBanners.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.6),
+            itemBuilder: (_, i) => GestureDetector(
+              onTap: () => Navigator.pop(ctx, kNwsbBanners[i]),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: CachedNetworkImage(imageUrl: kNwsbBanners[i], fit: BoxFit.cover),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    if (url == null || !mounted) return;
+    await _prefs.setString('nwsb_local_banner', url);
+    await _prefs.remove('nwsb_banner_path');
+    setState(() {
+      _bannerUrl = url;
+      _bannerPath = null;
+    });
+    _showToast('Banner updated');
   }
 
   Future<void> _openPrebuiltAvatars() async {

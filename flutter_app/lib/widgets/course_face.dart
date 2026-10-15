@@ -34,8 +34,12 @@ class CourseFace extends StatelessWidget {
     this.rowMeta,
     this.rowImage,
     this.onRow,
+    this.onRowImage,
+    this.onImage,
     this.onBell,
     this.extra,
+    this.instead,
+    this.rowCircle = false,
   });
 
   final Widget avatar;
@@ -56,8 +60,12 @@ class CourseFace extends StatelessWidget {
   final String? rowMeta;
   final String? rowImage;
   final VoidCallback? onRow;
+  final VoidCallback? onRowImage;
+  final VoidCallback? onImage;
   final VoidCallback? onBell;
   final Widget? extra;
+  final Widget? instead;
+  final bool rowCircle;
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +129,11 @@ class CourseFace extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
+        if (instead != null)
+          instead!
+        else ...[
         GestureDetector(
-          onTap: onContinue,
+          onTap: onImage ?? onContinue,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(28),
             child: SizedBox(
@@ -166,8 +177,16 @@ class CourseFace extends StatelessWidget {
                           children: [
                             Text(indexLabel, style: const TextStyle(color: Color(0xCCFFFFFF))),
                             const Spacer(),
-                            Text(foot, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                            const Icon(Icons.chevron_right, color: Colors.white, size: 18),
+                            GestureDetector(
+                              onTap: onContinue,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(foot, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                                  const Icon(Icons.chevron_right, color: Colors.white, size: 18),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -215,9 +234,14 @@ class CourseFace extends StatelessWidget {
               decoration: BoxDecoration(color: const Color(0xF0101016), borderRadius: BorderRadius.circular(26)),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: SizedBox(width: 108, height: 108, child: _pic(rowImage ?? image)),
+                  GestureDetector(
+                    onTap: onRowImage,
+                    child: rowCircle
+                        ? ClipOval(child: SizedBox(width: 88, height: 88, child: _pic(rowImage ?? image)))
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: SizedBox(width: 108, height: 108, child: _pic(rowImage ?? image)),
+                          ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -244,6 +268,7 @@ class CourseFace extends StatelessWidget {
         if (extra != null) ...[
           const SizedBox(height: 14),
           extra!,
+        ],
         ],
       ],
     );
