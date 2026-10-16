@@ -101,6 +101,9 @@ flutter:
     - assets/progress/
     - assets/store/
     - assets/store/words/
+    - assets/store/waves/
+    - assets/store/meaning-flips/
+    - assets/store/ebook-flips/
     - assets/meanings/
     - assets/ebooks/
     - assets/profile_source/

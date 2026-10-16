@@ -1,7 +1,7 @@
 /// Pictures of what a store card is, not the same logo on every card.
 library;
 
-import 'store_word_art.dart';
+import 'store_flip_art.dart';
 
 const kStoreRoomArt = <String, String>{
   'word': 'assets/rails/store-word.jpg',
@@ -147,19 +147,38 @@ const _byCat = <String, String>{
 /// The Store mark: white leather frame, headphones, NOWSSB STORE.
 const kNowssbStoreMark = 'assets/store/nowssb-store-mark.png';
 
-/// The generated frame for this word, meaning, book, or signature.
-/// Falls back to the plain store mark when that picture is not in the app yet.
-String storeFrameFor(String name, {String? alt}) {
-  for (final raw in [name, if (alt != null) alt]) {
-    final slug = raw
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
-        .replaceAll(RegExp(r'^-+|-+$'), '');
-    if (slug.isNotEmpty && kStoreWordFrames.contains(slug)) {
-      return 'assets/store/words/$slug.png';
-    }
+/// Meaning store icon. Stays on one face of every meaning card.
+const kMeaningsIcon = 'assets/store/meanings-icon.png';
+
+/// Ebook store icon. Stays on one face of every ebook card.
+const kEbooksIcon = 'assets/store/ebooks-icon.jpg';
+
+String _artSlug(String raw) => raw
+    .toLowerCase()
+    .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+    .replaceAll(RegExp(r'^-+|-+$'), '');
+
+String _fromSet(String name, Set<String> known, String folder, String fallback) {
+  final slug = _artSlug(name);
+  if (slug.isNotEmpty && known.contains(slug)) return 'assets/store/$folder/$slug.png';
+  return fallback;
+}
+
+/// Person in white headphones with a sound wave, for this word.
+String storeWaveFor(String name) => _fromSet(name, kStoreWaveFrames, 'waves', kNowssbStoreMark);
+
+/// Meaning icon edited for this word.
+String storeMeaningFlip(String name) => _fromSet(name, kMeaningFlipFrames, 'meaning-flips', kMeaningsIcon);
+
+/// Ebook icon edited for this book.
+String storeEbookFlip(String name, {String? alt}) {
+  final hit = _fromSet(name, kEbookFlipFrames, 'ebook-flips', '');
+  if (hit.isNotEmpty) return hit;
+  if (alt != null) {
+    final altHit = _fromSet(alt, kEbookFlipFrames, 'ebook-flips', '');
+    if (altHit.isNotEmpty) return altHit;
   }
-  return kNowssbStoreMark;
+  return kEbooksIcon;
 }
 
 /// A picture of the word, then of its row, then a different one from the pool.
