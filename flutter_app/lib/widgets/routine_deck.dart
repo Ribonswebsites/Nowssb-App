@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../admin/template/editable.dart';
+import 'nwsb_icon.dart';
 
 const kRoutineArts = <String>[
   'assets/routine/trusting-the-breath.png',
@@ -86,7 +87,7 @@ class _RoutineDeckState extends State<RoutineDeck> {
           _Banner(title: widget.banner, subtitle: widget.bannerSub, onTap: widget.onBanner ?? (n == 0 ? null : widget.cards.first.onTap)),
           const SizedBox(height: 14),
           SizedBox(
-            height: 420,
+            height: widget.cards.any((c) => c.onBuy != null || c.onCart != null) ? 530 : 420,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: n,
@@ -181,6 +182,7 @@ class _RoutineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const radius = 24.0;
+    final shop = card.onBuy != null || card.onCart != null;
     return SizedBox(
       width: 330,
       child: GestureDetector(
@@ -188,126 +190,206 @@ class _RoutineCard extends StatelessWidget {
           HapticFeedback.selectionClick();
           card.onTap();
         },
-        child: Stack(
-          clipBehavior: Clip.none,
+        child: shop ? _shopFace(radius) : _plainFace(radius),
+      ),
+    );
+  }
+
+  Widget _plainFace(double radius) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Column(
           children: [
-            Column(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(radius),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
-                    child: Container(
-                      height: 297,
-                      decoration: BoxDecoration(
-                        color: const Color(0x0EFFFFFF),
-                        borderRadius: BorderRadius.circular(radius),
-                        border: Border.all(color: const Color(0x21FFFFFF)),
-                      ),
-                      padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(card.category, style: const TextStyle(color: Color(0xC6FFFFFF), fontSize: 12)),
-                          const SizedBox(height: 10),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: image.startsWith('http')
-                                ? Image.network(image, height: 152, width: double.infinity, fit: BoxFit.cover, alignment: Alignment.topCenter, errorBuilder: (_, __, ___) => const SizedBox(height: 152))
-                                : EditableImage.asset(
-                                    image,
-                                    height: 152,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                    alignment: Alignment.topCenter,
-                                    slot: 'routine_deck.RoutineCard',
-                                  ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(card.meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xBFFFFFFF), fontSize: 12)),
-                          const SizedBox(height: 4),
-                          Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, height: 1.15)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 38),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18)),
-                  child: card.onBuy != null || card.onCart != null
-                      ? Row(
-                          children: [
-                            Expanded(child: _CardAct(label: 'Add to cart', onTap: card.onCart)),
-                            const SizedBox(width: 8),
-                            Expanded(child: _CardAct(label: 'Buy now', onTap: card.onBuy, filled: true)),
-                          ],
-                        )
-                      : Row(
-                          children: [
-                            Expanded(child: Text(card.action, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600))),
-                            const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
-                          ],
-                        ),
-                ),
-              ],
+            _glass(
+              radius,
+              height: 297,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(card.category, style: const TextStyle(color: Color(0xC6FFFFFF), fontSize: 12)),
+                  const SizedBox(height: 10),
+                  _photo(image, height: 152, fit: BoxFit.cover),
+                  const SizedBox(height: 12),
+                  Text(card.meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xBFFFFFFF), fontSize: 12)),
+                  const SizedBox(height: 4),
+                  Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, height: 1.15)),
+                ],
+              ),
             ),
-            Positioned(
-              left: 135,
-              top: 269,
-              child: Container(
-                width: 60,
-                height: 60,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: card.tint,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
-                ),
-                child: EditableImage.asset(
-                  card.onBuy != null || card.onCart != null ? 'assets/store/nowssb-store-mark.png' : 'assets/banners/promo/store.png',
-                  fit: BoxFit.contain,
-                  slot: 'routine_deck.RoutineCard',
-                ),
+            const SizedBox(height: 38),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18)),
+              child: Row(
+                children: [
+                  Expanded(child: Text(card.action, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600))),
+                  const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                ],
               ),
             ),
           ],
         ),
+        const Positioned(left: 135, top: 269, child: _StoreDot()),
+      ],
+    );
+  }
+
+  Widget _shopFace(double radius) {
+    return _glass(
+      radius,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(card.category, style: const TextStyle(color: Color(0xC6FFFFFF), fontSize: 12)),
+          const SizedBox(height: 10),
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              _photo(image, height: 290, fit: BoxFit.contain),
+              const Positioned(bottom: -28, child: _StoreDot()),
+            ],
+          ),
+          const SizedBox(height: 36),
+          Text(card.meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xBFFFFFFF), fontSize: 12)),
+          const SizedBox(height: 4),
+          Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, height: 1.15)),
+          const SizedBox(height: 14),
+          _OctButtons(onCart: card.onCart, onBuy: card.onBuy),
+        ],
+      ),
+    );
+  }
+
+  Widget _glass(double radius, {double? height, required Widget child}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+        child: Container(
+          height: height,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0x0EFFFFFF),
+            borderRadius: BorderRadius.circular(radius),
+            border: Border.all(color: const Color(0x21FFFFFF)),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  Widget _photo(String src, {required double height, required BoxFit fit}) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: ColoredBox(
+        color: Colors.black,
+        child: src.startsWith('http')
+            ? Image.network(src, height: height, width: double.infinity, fit: fit, errorBuilder: (_, __, ___) => SizedBox(height: height))
+            : EditableImage.asset(src, height: height, width: double.infinity, fit: fit, slot: 'routine_deck.RoutineCard'),
       ),
     );
   }
 }
 
-class _CardAct extends StatelessWidget {
-  const _CardAct({required this.label, required this.onTap, this.filled = false});
-  final String label;
-  final VoidCallback? onTap;
-  final bool filled;
+class _StoreDot extends StatelessWidget {
+  const _StoreDot();
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: filled ? Colors.white : const Color(0xFF1A1A1A),
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap == null
-            ? null
-            : () {
-                HapticFeedback.selectionClick();
-                onTap!();
-              },
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: filled ? Colors.black : Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+    return Container(
+      width: 60,
+      height: 60,
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE9C1A5),
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 3),
+      ),
+      child: const EditableImage.asset(
+        'assets/banners/promo/store.png',
+        fit: BoxFit.contain,
+        slot: 'routine_deck.RoutineCard',
+      ),
+    );
+  }
+}
+
+class _OctButtons extends StatelessWidget {
+  const _OctButtons({required this.onCart, required this.onBuy});
+  final VoidCallback? onCart;
+  final VoidCallback? onBuy;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        GestureDetector(
+          onTap: onCart == null
+              ? null
+              : () {
+                  HapticFeedback.selectionClick();
+                  onCart!();
+                },
+          child: Container(
+            width: 36,
+            height: 36,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: const Color(0xE60A101C),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0x66E8D5A3)),
+            ),
+            child: const NwsbIcon(NwsbMarks.cart, size: 16, color: Color(0xFFE8D5A3)),
           ),
         ),
-      ),
+        const SizedBox(width: 8),
+        Container(width: 1, height: 28, color: const Color(0x66FFFFFF)),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: onBuy == null
+              ? null
+              : () {
+                  HapticFeedback.selectionClick();
+                  onBuy!();
+                },
+          child: Container(
+            height: 36,
+            padding: const EdgeInsets.only(left: 12, right: 3),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: const LinearGradient(colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)]),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Buy Now', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF060C18))),
+                SizedBox(width: 7),
+                _BagDisc(),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BagDisc extends StatelessWidget {
+  const _BagDisc();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 30,
+      height: 30,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      child: const NwsbIcon(NwsbMarks.bag, size: 15, color: Color(0xFF060C18)),
     );
   }
 }
