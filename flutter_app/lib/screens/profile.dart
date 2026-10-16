@@ -11,6 +11,8 @@ import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import '../app_update.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../data/firebase.dart';
 import '../data/settings.dart';
 
@@ -1515,7 +1517,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 class _Background extends StatelessWidget {
   const _Background();
   @override
-  Widget build(BuildContext context) => DecoratedBox(decoration: BoxDecoration(image: DecorationImage(image: slotImageProvider(context, 'profile.Background', 'assets/profile_source/img-bg.jpeg', const AssetImage('assets/profile_source/img-bg.jpeg')), fit: BoxFit.cover, alignment: Alignment.topCenter), gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x26000000), Color(0xB8000000), Color(0xEA000000)])), child: const SizedBox.expand());
+  Widget build(BuildContext context) => const Stack(
+        fit: StackFit.expand,
+        children: [
+          NwsbVideo(
+            asset: 'assets/video/subscription-bg.mp4',
+            priority: ClipPriority.decoration,
+            autoplay: true,
+            loop: true,
+            fit: BoxFit.cover,
+            slot: 'profile.Background',
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x66060C18), Color(0x44060C18), Color(0x99060C18)],
+              ),
+            ),
+          ),
+        ],
+      );
 }
 
 class _GrainPainter extends CustomPainter {

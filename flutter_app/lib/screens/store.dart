@@ -304,7 +304,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         children: [
           const Positioned.fill(
             child: NwsbVideo(
-              asset: 'assets/video/player-bg-loop.mp4',
+              asset: 'assets/video/subscription-bg.mp4',
               priority: ClipPriority.decoration,
               autoplay: true,
               loop: true,

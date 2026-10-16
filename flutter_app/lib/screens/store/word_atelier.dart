@@ -40,7 +40,7 @@ class WordAtelierScreen extends StatelessWidget {
         eyebrow: '',
         title: 'NowssB Store',
         subtitle: 'The Word Atelier',
-        film: 'assets/video/player-bg-loop.mp4',
+        film: 'assets/video/subscription-bg.mp4',
         usePageFilm: true,
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(

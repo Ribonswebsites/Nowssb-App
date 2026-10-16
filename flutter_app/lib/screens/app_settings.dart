@@ -190,7 +190,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     return PageShell(
       eyebrow: 'NowssB',
       title: 'Settings',
-      film: 'assets/video/hero-bg.mp4',
+      film: 'assets/video/subscription-bg.mp4',
+      usePageFilm: true,
       onBack: () => Navigator.of(context).maybePop(),
       slivers: [
         SliverPadding(

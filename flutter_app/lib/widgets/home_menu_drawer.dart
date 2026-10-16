@@ -30,6 +30,8 @@ import '../screens/sound_library.dart';
 import '../screens/store/meaning_store.dart';
 import '../screens/subscription.dart';
 import '../shell/nav_shell.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
@@ -132,7 +134,7 @@ class HomeMenuDrawer extends StatelessWidget {
     // Fashion menu mirrors AppSettingsScreen exactly (solid deep + gold wash,
     // not the old photo backdrop). Normal keeps neumorphic light look.
     final bg = light ? const Color(0xFFEEF1F7) : const Color(0xFF060C18);
-    final headerBg = light ? const Color(0xFFEEF1F7) : const Color(0xEB060C18);
+    final headerBg = light ? const Color(0xFFEEF1F7) : const Color(0x66060C18);
     final titleColor = light ? NwsbColors.ink : Colors.white;
     final footerColor =
         light ? const Color(0x66000000) : const Color(0x4DFFFFFF);
@@ -145,15 +147,24 @@ class HomeMenuDrawer extends StatelessWidget {
           children: [
             if (!light) ...[
               const Positioned.fill(
-                child: ColoredBox(color: Color(0xFF060C18)),
+                child: NwsbVideo(
+                  asset: 'assets/video/subscription-bg.mp4',
+                  priority: ClipPriority.decoration,
+                  autoplay: true,
+                  loop: true,
+                  fit: BoxFit.cover,
+                  slot: 'home_menu_drawer.HomeMenuDrawer',
+                ),
               ),
               const Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment(-0.6, -0.8),
-                      radius: 1.1,
-                      colors: [Color(0x44E8D5A3), Color(0x00060C18)],
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0x88060C18), Color(0x55060C18), Color(0x99060C18)],
+                      ),
                     ),
                   ),
                 ),

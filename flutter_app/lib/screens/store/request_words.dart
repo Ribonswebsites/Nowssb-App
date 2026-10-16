@@ -84,7 +84,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
       eyebrow: '',
       title: 'NowssB Store',
       subtitle: 'Request Words',
-      film: 'assets/video/player-bg-loop.mp4',
+      film: 'assets/video/subscription-bg.mp4',
       usePageFilm: true,
       onBack: () => Navigator.of(context).pop(),
       slivers: [
