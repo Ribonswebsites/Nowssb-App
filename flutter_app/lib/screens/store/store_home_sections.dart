@@ -22,6 +22,7 @@ import 'store_actions.dart';
 import 'store_cards.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../admin/template/editable.dart';
+import 'store_art.dart';
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
 
@@ -2369,21 +2370,83 @@ class _MosaicPill extends StatelessWidget {
   }
 }
 
+/// Word-store flip used on the half-off row. No colour tiles.
+class _SaleFlip extends StatefulWidget {
+  const _SaleFlip({required this.front, required this.back});
+  final String front;
+  final String back;
+
+  @override
+  State<_SaleFlip> createState() => _SaleFlipState();
+}
+
+class _SaleFlipState extends State<_SaleFlip> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 420));
+  bool _showingFront = true;
+  bool _run = true;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.front != widget.back) _loop();
+  }
+
+  Future<void> _loop() async {
+    while (_run && mounted) {
+      await Future<void>.delayed(const Duration(seconds: 1));
+      if (!_run || !mounted || widget.front == widget.back) return;
+      await _c.forward(from: 0);
+      if (!_run || !mounted) return;
+      setState(() => _showingFront = !_showingFront);
+      _c.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _run = false;
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.front == widget.back) return _saleStill(widget.front);
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) {
+        final t = _c.value;
+        final past = t >= 0.5;
+        final showFront = _showingFront ? !past : past;
+        final angle = (t < 0.5 ? t : 1 - t) * 3.14159;
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0014)
+            ..rotateY(angle),
+          child: _saleStill(showFront ? widget.front : widget.back),
+        );
+      },
+    );
+  }
+}
+
+Widget _saleStill(String src) {
+  return EditableImage.asset(
+    src,
+    fit: BoxFit.contain,
+    width: double.infinity,
+    height: double.infinity,
+    slot: 'store_home_sections.StoreHalfOffRail',
+  );
+}
+
 /// Myntra-style half-off hero, then glass product boxes. Uses our banner art.
 class StoreHalfOffRail extends StatelessWidget {
   const StoreHalfOffRail({super.key, this.onViewAll, this.onOpenWord});
 
   final VoidCallback? onViewAll;
   final void Function(String word, String root)? onOpenWord;
-
-  static const _backs = [
-    Color(0xFF7C4DFF),
-    Color(0xFFE07A32),
-    Color(0xFF2EC4B6),
-    Color(0xFFE85D9A),
-    Color(0xFF3D8BDB),
-    Color(0xFFD4A017),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -2515,14 +2578,10 @@ class StoreHalfOffRail extends StatelessWidget {
                             child: ClipRRect(
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                               child: ColoredBox(
-                                color: _backs[i % _backs.length],
-                                child: Padding(
-                                  padding: const EdgeInsets.all(10),
-                                  child: EditableImage.asset(
-                                    'assets/store/nowssb-bag-headphones.webp',
-                                    fit: BoxFit.contain,
-                                    slot: 'store_home_sections.StoreHalfOffRail',
-                                  ),
+                                color: Colors.black,
+                                child: _SaleFlip(
+                                  front: kNowssbStoreMark,
+                                  back: storeWaveFor(word.word),
                                 ),
                               ),
                             ),

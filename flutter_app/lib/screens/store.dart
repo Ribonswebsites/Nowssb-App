@@ -418,7 +418,8 @@ class _StoreImageRotator extends StatefulWidget {
   State<_StoreImageRotator> createState() => _StoreImageRotatorState();
 }
 
-class _StoreImageRotatorState extends State<_StoreImageRotator> {
+class _StoreImageRotatorState extends State<_StoreImageRotator>
+    with SingleTickerProviderStateMixin {
   static const _images = <String>[
     'assets/store/store-rotator/1.jpg',
     'assets/store/store-rotator/2.png',
@@ -427,21 +428,30 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
   ];
   static const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
   Timer? _timer;
-  var _index = 0;
+  late final AnimationController _turn;
+  var _front = 0;
 
   @override
   void initState() {
     super.initState();
+    _turn = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
     if (!_flutterTest) {
-      _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-        if (mounted) setState(() => _index = (_index + 1) % _images.length);
-      });
+      _timer = Timer.periodic(const Duration(seconds: 4), (_) => _flipNext());
     }
+  }
+
+  Future<void> _flipNext() async {
+    if (!mounted || _turn.isAnimating) return;
+    await _turn.forward(from: 0);
+    if (!mounted) return;
+    setState(() => _front = (_front + 1) % _images.length);
+    _turn.value = 0;
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _turn.dispose();
     super.dispose();
   }
 
@@ -450,33 +460,32 @@ class _StoreImageRotatorState extends State<_StoreImageRotator> {
         borderRadius: BorderRadius.circular(18),
         child: AspectRatio(
           aspectRatio: 1.55,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 700),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
-            layoutBuilder: (current, previous) => Stack(
-              fit: StackFit.expand,
-              alignment: Alignment.center,
-              children: [
-                ...previous,
-                if (current != null) current,
-              ],
-            ),
-            child: EditableImage.asset(
-              _images[_index],
-              key: ValueKey(_images[_index]),
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-              errorBuilder: (_, __, ___) => const ColoredBox(
-                color: Colors.black,
-                child: Center(
-                  child: Icon(Icons.image_outlined,
-                      color: Color(0x66FFFFFF), size: 34),
+          child: AnimatedBuilder(
+            animation: _turn,
+            builder: (context, _) {
+              final t = _turn.value;
+              final i = t >= 0.5 ? (_front + 1) % _images.length : _front;
+              final angle = (t < 0.5 ? t : 1 - t) * 3.14159;
+              return Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.0012)
+                  ..rotateY(angle),
+                child: EditableImage.asset(
+                  _images[i],
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (_, __, ___) => const ColoredBox(
+                    color: Colors.black,
+                    child: Center(
+                      child: Icon(Icons.image_outlined, color: Color(0x66FFFFFF), size: 34),
+                    ),
+                  ),
+                  slot: 'store.StoreImageRotator',
                 ),
-              ),
-              slot: 'store.StoreImageRotator',
-            ),
+              );
+            },
           ),
         ),
       );
