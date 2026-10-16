@@ -1,6 +1,8 @@
 /// Pictures of what a store card is, not the same logo on every card.
 library;
 
+import 'store_word_art.dart';
+
 const kStoreRoomArt = <String, String>{
   'word': 'assets/rails/store-word.jpg',
   'meaning': 'assets/rails/store-meaning.jpg',
@@ -144,6 +146,21 @@ const _byCat = <String, String>{
 
 /// The Store mark: white leather frame, headphones, NOWSSB STORE.
 const kNowssbStoreMark = 'assets/store/nowssb-store-mark.png';
+
+/// The generated frame for this word, meaning, book, or signature.
+/// Falls back to the plain store mark when that picture is not in the app yet.
+String storeFrameFor(String name, {String? alt}) {
+  for (final raw in [name, if (alt != null) alt]) {
+    final slug = raw
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+$'), '');
+    if (slug.isNotEmpty && kStoreWordFrames.contains(slug)) {
+      return 'assets/store/words/$slug.png';
+    }
+  }
+  return kNowssbStoreMark;
+}
 
 /// A picture of the word, then of its row, then a different one from the pool.
 String storeSubjectArt(String word, {String catId = ''}) {

@@ -100,6 +100,7 @@ flutter:
     - assets/icons/
     - assets/progress/
     - assets/store/
+    - assets/store/words/
     - assets/meanings/
     - assets/ebooks/
     - assets/profile_source/

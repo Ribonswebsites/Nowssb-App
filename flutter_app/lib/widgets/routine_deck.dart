@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../admin/template/editable.dart';
+import '../screens/store/store_art.dart';
 import 'nwsb_icon.dart';
 
 const kRoutineArts = <String>[
@@ -248,7 +249,7 @@ class _RoutineCard extends StatelessWidget {
             clipBehavior: Clip.none,
             alignment: Alignment.bottomCenter,
             children: [
-              _photo(image, height: 290, fit: BoxFit.contain),
+              _FlipFrame(front: kNowssbStoreMark, back: image, height: 290),
               const Positioned(bottom: -28, child: _StoreDot()),
             ],
           ),
@@ -294,6 +295,72 @@ class _RoutineCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _FlipFrame extends StatefulWidget {
+  const _FlipFrame({required this.front, required this.back, required this.height});
+  final String front;
+  final String back;
+  final double height;
+
+  @override
+  State<_FlipFrame> createState() => _FlipFrameState();
+}
+
+class _FlipFrameState extends State<_FlipFrame> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.front != widget.back) _c.forward();
+  }
+
+  @override
+  void didUpdateWidget(covariant _FlipFrame old) {
+    super.didUpdateWidget(old);
+    if (old.back != widget.back && widget.front != widget.back) {
+      _c.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.front == widget.back) return _still(widget.back, widget.height);
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) {
+        final t = _c.value;
+        final front = t < 0.5;
+        final angle = front ? t * 3.14159 : (1 - t) * 3.14159;
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.0014)
+            ..rotateY(angle),
+          child: _still(front ? widget.front : widget.back, widget.height),
+        );
+      },
+    );
+  }
+}
+
+Widget _still(String src, double height) {
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(16),
+    child: ColoredBox(
+      color: Colors.black,
+      child: src.startsWith('http')
+          ? Image.network(src, height: height, width: double.infinity, fit: BoxFit.contain, errorBuilder: (_, __, ___) => SizedBox(height: height))
+          : EditableImage.asset(src, height: height, width: double.infinity, fit: BoxFit.contain, slot: 'routine_deck.RoutineCard'),
+    ),
+  );
 }
 
 class _StoreDot extends StatelessWidget {
