@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../theme/player_aura.dart';
-import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import 'practice.dart';
 import 'player_settings.dart';
 import '../admin/template/editable.dart';
+import '../data/models.dart';
+import '../data/practice_progress.dart';
+import '../player/frequency_ritual.dart';
 
 class SelectLevelScreen extends StatefulWidget {
-  const SelectLevelScreen({super.key, this.initialLevel = 3});
+  const SelectLevelScreen({super.key, this.initialLevel = 3, this.word});
   final int initialLevel;
+  final Word? word;
 
   @override
   State<SelectLevelScreen> createState() => _SelectLevelScreenState();
@@ -92,7 +94,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                 const SizedBox(height: 18),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
-                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: EditableLabel('select_level.SelectLevelScreen', 'SELECT STAGE', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 4, fontWeight: FontWeight.w500))),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: EditableLabel('select_level.SelectLevelScreen', 'SELECT FREQUENCY', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 3, fontWeight: FontWeight.w500))),
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
                 ]),
                 const SizedBox(height: 18),
@@ -108,68 +110,16 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                   margin: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 18),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: levels.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 2.15,
-                  ),
-                  itemBuilder: (_, i) {
-                    final level = levels[i];
-                    final selected = _selected == level;
-                    return GestureDetector(
-                      onTap: () => setState(() => _selected = level),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 250),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(99),
-                          gradient: const LinearGradient(colors: [Color(0x0FFFFFFF), Color(0x05000000)]),
-                          border: Border.all(color: selected ? const Color(0x8CFFFFFF) : const Color(0x24FFFFFF)),
-                          boxShadow: selected ? const [BoxShadow(color: Color(0x38FFFFFF), blurRadius: 26)] : const [],
-                        ),
-                        child: Row(children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  level.toString().padLeft(2, '0'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w300, height: 1),
-                                ),
-                                Text(
-                                  'STAGE ${_words[level - 1]}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 8, letterSpacing: 1.1),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const NwsbIcon(NwsbMarks.stages, size: 14, color: Colors.white),
-                          const SizedBox(width: 4),
-                          const AppThinkingLoader(
-                            size: 22,
-                            state: OrbState.composing,
-                            blackCircle: true,
-                          ),
-                        ]),
-                      ),
-                    );
-                  },
+                Column(
+                  children: [
+                    for (final level in levels) _frequencyRow(level),
+                  ],
                 ),
                 const SizedBox(height: 14),
                 _ActionRow(icon: Icons.grid_view_rounded, label: _expanded ? 'VIEW LESS' : 'VIEW ALL', trailing: _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded, onTap: () => setState(() => _expanded = !_expanded)),
                 if (_expanded) ...[
                   const SizedBox(height: 8),
-                  _ActionRow(icon: Icons.keyboard_arrow_up_rounded, label: 'PREVIOUS STAGES', trailing: null, compact: true, onTap: () => setState(() => _expanded = false)),
+                  _ActionRow(icon: Icons.keyboard_arrow_up_rounded, label: 'CLOSE FREQUENCIES', trailing: null, compact: true, onTap: () => setState(() => _expanded = false)),
                 ],
               ]),
             ),
@@ -180,7 +130,65 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
     );
   }
 
-  static const _words = ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE', 'TEN'];
+  String _spoken(int level) {
+    final word = widget.word;
+    if (word == null) return 'The same word';
+    final line = frequencyLine(word, level);
+    return line == word.word ? word.word : line;
+  }
+
+  Widget _frequencyRow(int level) {
+    final selected = _selected == level;
+    return GestureDetector(
+      onTap: () async {
+        setState(() => _selected = level);
+        await PracticeProgress.instance.setLevel(level);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 240),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: selected ? const Color(0x16FFFFFF) : const Color(0x08FFFFFF),
+          border: Border.all(color: selected ? const Color(0xE6FFFFFF) : const Color(0x24FFFFFF), width: selected ? 1.4 : 1),
+          boxShadow: selected ? const [BoxShadow(color: Color(0x40FFFFFF), blurRadius: 22)] : const [],
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 34,
+              child: Text(
+                level.toString().padLeft(2, '0'),
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w300, height: 1),
+              ),
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    kFrequencyNames[level - 1].toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 13, letterSpacing: 1.8, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    _spoken(level),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            const NwsbIcon(NwsbMarks.stages, size: 16, color: Color(0xFFE8D5A3)),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _CircleButton extends StatelessWidget {

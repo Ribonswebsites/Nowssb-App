@@ -48,6 +48,7 @@ import '../data/word_voice.dart';
 import '../shell/nav_shell.dart';
 import 'store/request_words.dart';
 import '../admin/template/editable.dart';
+import '../player/frequency_ritual.dart';
 import '../widgets/content_lock.dart';
 import '../data/word_private.dart';
 
@@ -128,6 +129,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   Timer? _sleepTimer;
   DateTime? _startedAt;
   String? _error;
+  var _playGen = 0;
+  RitualFrame? _ritual;
 
   /// Paid fields fetched from /api/content/word for the current index.
   Word? _paidOverride;
@@ -315,13 +318,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!await ensureWordOpen(context, _word) || !mounted || _playing) return;
     final unlocked = await WordPrivateStore.instance.resolve(_word);
     if (!mounted || _playing) return;
+    final gen = ++_playGen;
     setState(() {
       _paidOverride = unlocked;
       _playing = true;
       _completed = false;
       _error = null;
       _startedAt = DateTime.now();
+      _ritual = null;
     });
+    bool alive() => mounted && _playing && _playGen == gen;
     try {
       final prefs = Settings.instance;
       var rate = (0.34 * prefs.speed).clamp(0.2, 0.85);
@@ -377,24 +383,42 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       await _tts.stop();
       unawaited(WordVoice.instance.stop());
       final started = DateTime.now();
-      // Ramp volume while the word plays (not after it finishes).
       if (fadeInSeconds > 0 && volume > 0) {
         unawaited(_fadeInVolume(volume, fadeInSeconds));
       }
-      final ownVoice = await WordVoice.instance.play(_word, volume: startVol);
-      if (!ownVoice) await _tts.speak(_word.word);
-      if (prefs.spatialAudio && !ownVoice) {
-        await _tts.setPitch((pitch * 1.16).clamp(0.5, 2.0));
-        await _tts.setVolume((volume * 0.42).clamp(0.0, 1.0));
-        final echo = _word.word.trim();
-        if (echo.isNotEmpty) await _tts.speak(echo);
-      }
+      final line = frequencyLine(_word, PracticeProgress.instance.level);
+      await PlayerRitual.run(
+        alive: alive,
+        line: line,
+        onFrame: (frame) {
+          if (!alive()) return;
+          setState(() => _ritual = frame);
+        },
+        say: (text, asset) async {
+          if (!alive()) return;
+          if (!await PlayerRitual.playAsset(asset, volume: startVol)) {
+            if (!alive()) return;
+            await _tts.speak(text);
+          }
+        },
+        sayWord: (text) async {
+          if (!alive()) return;
+          if (text == _word.word) {
+            final own = await WordVoice.instance.play(_word, volume: startVol);
+            if (!own && alive()) await _tts.speak(text);
+          } else if (alive()) {
+            await _tts.speak(text);
+          }
+        },
+      );
+      if (mounted && _playGen == gen) setState(() => _ritual = null);
+      if (!alive()) return;
       final elapsed = DateTime.now().difference(started).inSeconds;
       await PracticeProgress.instance.recordCompletedWord(
         _word,
         durationSec: elapsed > 0 ? elapsed : 1,
       );
-      if (mounted) setState(() => _completed = true);
+      if (mounted && alive()) setState(() => _completed = true);
     } catch (_) {
       if (mounted) {
         setState(
@@ -402,7 +426,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         );
       }
     } finally {
-      if (mounted) setState(() => _playing = false);
+      if (mounted) {
+        setState(() {
+          _playing = false;
+          _ritual = null;
+        });
+      }
     }
   }
 
@@ -427,9 +456,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   Future<void> _togglePlay() async {
     if (_playing) {
+      _playGen++;
       await _tts.stop();
       unawaited(WordVoice.instance.stop());
-      if (mounted) setState(() => _playing = false);
+      await PlayerRitual.stop();
+      if (mounted) {
+        setState(() {
+          _playing = false;
+          _ritual = null;
+        });
+      }
       return;
     }
     await _prepareAndPlay();
@@ -769,9 +805,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withOpacity(.62),
-      builder: (_) => const FractionallySizedBox(
+      builder: (_) => FractionallySizedBox(
         heightFactor: .96,
-        child: SelectLevelScreen(),
+        child: SelectLevelScreen(
+          initialLevel: PracticeProgress.instance.level,
+          word: _word,
+        ),
       ),
     );
   }
@@ -1354,6 +1393,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 ),
               ),
             ),
+            if (_ritual != null)
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(color: Color(0x99000000)),
+                  child: RitualStage(frame: _ritual!),
+                ),
+              ),
           ],
         ),
       ),
@@ -1627,7 +1673,7 @@ class _ProfileHeader extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Stage ${progress.level}  ›',
+                        'Frequency · ${frequencyName(progress.level)}  ›',
                         style: const TextStyle(
                           color: Color(0xFFE8D5A3),
                           fontSize: 12,
@@ -1699,7 +1745,7 @@ class _LevelList extends StatelessWidget {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Stage $n',
+                          'Frequency · ${frequencyName(n)}',
                           style: TextStyle(
                             color: on ? const Color(0xFFE8D5A3) : Colors.white,
                             fontSize: 14,
@@ -3273,7 +3319,7 @@ class _LevelPill extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Stage $level',
+              'Frequency · ${frequencyName(level)}',
               style: const TextStyle(
                 color: Color(0xFFF4F4F5),
                 fontSize: 12,

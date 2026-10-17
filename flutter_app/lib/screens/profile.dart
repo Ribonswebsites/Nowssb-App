@@ -1109,8 +1109,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       bannerSub: 'Earn, rewards, coupons, gifts',
       onBanner: () => Programmes.open(context, Programme.earn),
       cards: [
-        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/earn-02.jpg', onTap: () => Programmes.open(context, Programme.earn)),
-        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', image: 'assets/rails/rewards-02.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
+        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/member-card.png', onTap: () => Programmes.open(context, Programme.earn)),
+        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', image: 'assets/rails/rewards-coins.png', onTap: () => Programmes.open(context, Programme.rewards)),
         WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', image: 'assets/rails/coupons-02.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
         WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', image: 'assets/rails/gifts-02.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
         WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/earnings-02.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
