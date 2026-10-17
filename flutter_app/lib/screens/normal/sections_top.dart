@@ -577,8 +577,7 @@ class NmPractice extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// Same media as [FashPractice] / website Fashion Plus practice card.
-  static const practiceVid =
-      'assets/video/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
+  static const practiceVid = 'assets/video/practice-halo.mp4';
 
   static const practiceStill =
       'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg';
@@ -592,19 +591,7 @@ class NmPractice extends StatelessWidget {
     // Black My Routine–style banner outside cards (sibling above Spill +
     // carousel). Card 1 = website Player treatment (swirl media + branding
     // icon + glass Enter) — same as FashPractice / WebView.
-    final playerCard = ListenableBuilder(
-      listenable: Settings.instance,
-      builder: (context, _) {
-        final motion = Settings.instance.fashionPlus;
-        final media = motion
-            ? const NwsbVideo(
-                asset: practiceVid,
-                priority: ClipPriority.feature,
-                fit: BoxFit.cover,
-                slot: 'normal_sections_top.NmPractice',
-              )
-            : const NwsbImage(url: practiceStill, slot: 'normal_sections_top.NmPractice');
-        return GestureDetector(
+    final playerCard = GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: ClipRRect(
@@ -613,7 +600,14 @@ class NmPractice extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-                Positioned.fill(child: media),
+                const Positioned.fill(
+                  child: NwsbVideo(
+                    asset: practiceVid,
+                    priority: ClipPriority.feature,
+                    fit: BoxFit.cover,
+                    slot: 'normal_sections_top.NmPractice',
+                  ),
+                ),
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -668,8 +662,6 @@ class NmPractice extends StatelessWidget {
             ),
           ),
         );
-      },
-    );
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -1053,16 +1045,7 @@ class NmReader extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: const AspectRatio(
-              aspectRatio: 16 / 9,
-              child: NwsbVideo(
-                asset: 'assets/video/reader-section.mp4',
-                poster: 'assets/video/reader-section-poster.webp',
-                priority: ClipPriority.decoration,
-                fit: BoxFit.cover,
-                slot: 'normal_sections_top.NmReader',
-              ),
-            ),
+            child: const ReaderFilm(slot: 'normal_sections_top.NmReader'),
           ),
         ),
         const EditableLabel('normal_sections_top.NmReader',

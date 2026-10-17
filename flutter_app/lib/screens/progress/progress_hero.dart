@@ -20,7 +20,7 @@ import '../../admin/template/editable.dart';
 
 const kProgressScene1 = 'assets/video/my-progress-scene-1.mp4';
 /// Scroll-up page backdrop (smoke / silk) — full bleed, not a card.
-const kProgressScrollBg = 'assets/video/player-bg-loop.mp4';
+const kProgressScrollBg = 'assets/video/subscription-bg.mp4';
 
 /// Full-screen hero (scene-1) backdrop. Crossfades out as user scrolls.
 /// Natural cover fill — orb + ripple visible as authored in the film.

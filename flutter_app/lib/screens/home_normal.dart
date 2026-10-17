@@ -517,7 +517,7 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             NmReader(onTap: () => _push(const ReaderHubScreen())),
             const SizedBox(height: 24),
-            const YourRewardsSection(),
+            const ProgramTrioRail(),
           ]),
         ),
         (
@@ -548,14 +548,7 @@ class _HomeNormalState extends State<HomeNormal> {
             onOrders: () => _go(4),
           )
         ),
-        ('trendshop', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          NmTrendShop(onTap: () => _go(3)),
-          const SizedBox(height: 24),
-          // NowssB Gifts, then NowssB Coupons right below it.
-          const GiftsHomeSection(),
-          const SizedBox(height: 24),
-          const CouponsHomeSection(),
-        ])),
+        ('trendshop', NmTrendShop(onTap: () => _go(3))),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',

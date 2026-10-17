@@ -26,6 +26,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 
 import '../media/nwsb_image.dart';
+import '../media/nwsb_video.dart';
 import '../theme/tokens.dart';
 import 'nwsb_icon.dart';
 import '../admin/template/editable.dart';
@@ -1068,6 +1069,79 @@ class TitleWithGlassEnter extends StatelessWidget {
         const SizedBox(width: 12),
         GlassEnterPill(onTap: onTap),
       ],
+    );
+  }
+}
+
+/// Reader film. A line sits just right of centre. The line on that side
+/// changes on its own.
+class ReaderFilm extends StatefulWidget {
+  const ReaderFilm({super.key, this.slot = 'home_parts.ReaderFilm'});
+  final String slot;
+
+  @override
+  State<ReaderFilm> createState() => _ReaderFilmState();
+}
+
+class _ReaderFilmState extends State<ReaderFilm> {
+  static const _lines = [
+    'Every meaning',
+    'Every eBook',
+    'One reader',
+    'Hear the word',
+  ];
+  var _i = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.doWhile(() async {
+      await Future.delayed(const Duration(seconds: 2));
+      if (!mounted) return false;
+      setState(() => _i = (_i + 1) % _lines.length);
+      return true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AspectRatio(
+      aspectRatio: 16 / 9,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          NwsbVideo(
+            asset: 'assets/video/reader-section.mp4',
+            poster: 'assets/video/reader-section-poster.webp',
+            fit: BoxFit.cover,
+            slot: widget.slot,
+          ),
+          Positioned(
+            left: 0,
+            right: 14,
+            top: 0,
+            bottom: 0,
+            child: Align(
+              alignment: const Alignment(0.72, 0),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 420),
+                child: Text(
+                  _lines[_i],
+                  key: ValueKey(_i),
+                  textAlign: TextAlign.left,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    height: 1.05,
+                    shadows: [Shadow(color: Color(0xCC000000), blurRadius: 12)],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

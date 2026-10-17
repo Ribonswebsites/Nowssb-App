@@ -56,6 +56,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   bool _screenWake = true;
   bool _appearDiscover = true;
   int _set = 0;
+  int _pick = 0;
 
   @override
   void initState() {
@@ -180,7 +181,10 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     for (var i = 0; i < names.length; i++)
                       Expanded(
                         child: GestureDetector(
-                          onTap: () => setState(() => _set = i),
+                          onTap: () => setState(() {
+                            _set = i;
+                            _pick = 0;
+                          }),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             alignment: Alignment.center,
@@ -208,15 +212,22 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           ],
         ),
         const SizedBox(height: 14),
+        if (cards.isNotEmpty) ...[
+          _settingsBanner(cards[_pick.clamp(0, cards.length - 1)], _pick.clamp(0, cards.length - 1), cards.length),
+          const SizedBox(height: 14),
+        ],
         if (cards.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
             child: Text('Nothing in this filter.', textAlign: TextAlign.center, style: TextStyle(color: Color(0x99FFFFFF))),
           )
         else
-          for (final card in cards) ...[
+          for (var n = 0; n < cards.length; n++) ...[
             GestureDetector(
-              onTap: card.onTap,
+              onTap: () {
+                setState(() => _pick = n);
+                cards[n].onTap();
+              },
               child: Container(
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.all(8),
@@ -228,7 +239,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       child: SizedBox(
                         width: 84,
                         height: 84,
-                        child: Image.asset(card.image ?? 'assets/rails/02.png', fit: BoxFit.cover),
+                        child: Image.asset(cards[n].image ?? 'assets/rails/02.png', fit: BoxFit.cover),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -236,9 +247,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(card.title, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, height: 1.1)),
+                          Text(cards[n].title, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, height: 1.1)),
                           const SizedBox(height: 6),
-                          Text(card.meta, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+                          Text(cards[n].meta, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
                         ],
                       ),
                     ),
@@ -254,6 +265,66 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             ),
           ],
       ],
+    );
+  }
+
+  Widget _settingsBanner(WorkCard card, int index, int total) {
+    return GestureDetector(
+      onTap: card.onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: SizedBox(
+          height: 240,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(card.image ?? 'assets/rails/02.png', fit: BoxFit.cover),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x33000000), Color(0x00000000), Color(0xCC7A2EA8)],
+                  ),
+                ),
+              ),
+              const Positioned(
+                top: 14,
+                right: 14,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text('Active', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 18,
+                right: 18,
+                bottom: 16,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(card.title, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w700, height: 1.05)),
+                    const SizedBox(height: 6),
+                    Text(card.meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 13)),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text('${index + 1} of $total', style: const TextStyle(color: Color(0xCCFFFFFF))),
+                        const Spacer(),
+                        Text(card.action, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                        const Icon(Icons.chevron_right, color: Colors.white, size: 18),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

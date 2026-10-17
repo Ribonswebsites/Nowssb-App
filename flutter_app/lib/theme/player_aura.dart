@@ -23,10 +23,10 @@ const kPlayerBoxFilms = <String>[kPlayerBoxFilm];
 const kPlayerAuraFilm = 'assets/video/player-aura-bg.mp4';
 
 /// Full Now Playing page film. Settings + AURA clock use this, never the box clips.
-const kPlayerPageFilm = 'assets/video/player-bg-loop.mp4';
+const kPlayerPageFilm = 'assets/video/subscription-bg.mp4';
 
 /// Intros + leftover player rooms share the AURA film.
-const kPlayerSharedFilm = kPlayerAuraFilm;
+const kPlayerSharedFilm = 'assets/video/subscription-bg.mp4';
 
 const kPlayerAuraBg = Color(0xFF202731);
 const kPlayerAuraFg = Color(0xFFF2F2EF);

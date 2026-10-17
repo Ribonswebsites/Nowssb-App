@@ -49,7 +49,6 @@ import 'player_settings.dart';
 import 'fashion/header.dart';
 import 'daily_tasks.dart';
 import 'fashion/hero.dart';
-import 'fashion/round_ring_section.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
@@ -575,17 +574,13 @@ class _HomeFashionState extends State<HomeFashion> {
             const SizedBox(height: 24),
             const PartnerHomeSection(),
             const SizedBox(height: 24),
-            const YourRewardsSection(),
+            const ProgramTrioRail(),
           ])
         ),
         ('routines', RoutinesSection(onTap: () => _go(1), fashion: true)),
-        ('offer', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          FashOffer(onTap: () => _go(3)),
-          const SizedBox(height: 24),
-          const GiftsHomeSection(),
-        ])),
+        ('offer', FashOffer(onTap: () => _go(3))),
         // NowssB Coupons: below NowssB Gifts, a contained glass block.
-        ('roundring', const RoundRingSection()),
+        ('roundring', const SizedBox.shrink()),
         ('cube', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           QuickAccessSection(
             onCart: () => NwsbLinks.cart(context),

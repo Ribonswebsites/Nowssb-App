@@ -24,7 +24,7 @@ class FaintFilm extends StatelessWidget {
           child: reduce
               ? const AppBackdrop()
               : const NwsbVideo(
-                  asset: 'assets/video/player-bg-loop.mp4',
+                  asset: 'assets/video/subscription-bg.mp4',
                   priority: ClipPriority.feature,
                   autoplay: true,
                   loop: true,

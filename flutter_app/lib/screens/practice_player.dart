@@ -1225,7 +1225,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     }
 
     final theme = _theme;
-    final pageBackgroundVideo = 'assets/video/player-bg-loop.mp4';
+    final pageBackgroundVideo = 'assets/video/subscription-bg.mp4';
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) {

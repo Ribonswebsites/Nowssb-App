@@ -670,6 +670,9 @@ class YourRewardsSection extends StatelessWidget {
                     compact: true,
                     title: 'NowssB Rewards',
                     mark: NwsbMarks.rewards,
+                    art: 'assets/rails/rewards-coins.png',
+                    artFit: BoxFit.cover,
+                    artAlignment: Alignment.center,
                   ),
                   const SizedBox(height: 12),
                   if (!signedIn)
@@ -913,6 +916,81 @@ Future<void> copyFriendInvite(BuildContext context) async {
   }
 }
 
+
+/// Rewards, Gifts, and Coupons as one row. Same size. It turns on its own.
+class ProgramTrioRail extends StatefulWidget {
+  const ProgramTrioRail({super.key});
+
+  @override
+  State<ProgramTrioRail> createState() => _ProgramTrioRailState();
+}
+
+class _ProgramTrioRailState extends State<ProgramTrioRail> {
+  late final PageController _page = PageController();
+  Timer? _timer;
+  var _i = 0;
+  var _hold = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_flutterTest) return;
+    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (!mounted || _hold || !_page.hasClients) return;
+      if (!TickerMode.of(context)) return;
+      final next = (_i + 1) % 3;
+      _page.animateToPage(next, duration: const Duration(milliseconds: 480), curve: Curves.easeOutCubic);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _page.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 640,
+          child: Listener(
+            onPointerDown: (_) => _hold = true,
+            onPointerUp: (_) => _hold = false,
+            onPointerCancel: (_) => _hold = false,
+            child: PageView(
+              controller: _page,
+              onPageChanged: (i) => setState(() => _i = i),
+              children: const [
+                YourRewardsSection(),
+                GiftsHomeSection(),
+                HomeCouponShelf(),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (var n = 0; n < 3; n++)
+              Container(
+                width: n == _i ? 16 : 7,
+                height: 7,
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                decoration: BoxDecoration(
+                  color: n == _i ? Colors.white : const Color(0x55FFFFFF),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
 
 /// Home door for NowssB Coupons (scratch cards, odds, your coupons).
 class CouponsHomeSection extends StatelessWidget {

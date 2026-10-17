@@ -16,6 +16,7 @@ class BrandTopBanner extends StatelessWidget {
     this.mark,
     this.art = 'assets/banners/brand-cleo.png',
     this.artAlignment = Alignment.bottomLeft,
+    this.artFit = BoxFit.contain,
   });
 
   final VoidCallback? onTap;
@@ -25,6 +26,7 @@ class BrandTopBanner extends StatelessWidget {
   final String? mark;
   final String art;
   final Alignment artAlignment;
+  final BoxFit artFit;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +47,7 @@ class BrandTopBanner extends StatelessWidget {
                 child: EditableImage.asset(
                   art,
                   height: h,
-                  fit: BoxFit.contain,
+                  fit: artFit,
                   alignment: artAlignment,
                   errorBuilder: (_, __, ___) => const ColoredBox(
                     color: Color(0xFF120818),

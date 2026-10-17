@@ -284,8 +284,7 @@ class FashPractice extends StatelessWidget {
   final VoidCallback? onTap;
 
   /// Website `PRACTICE_VID` — part066.js. Bundled under assets/video/.
-  static const practiceVid =
-      'assets/video/09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4';
+  static const practiceVid = 'assets/video/practice-halo.mp4';
 
   static const practiceStill =
       'https://media.nowssb.com/migrated-images/4daad1a85b624fed_grok_image_1778052232385_qpdmgh.jpg';
@@ -323,29 +322,23 @@ class FashPractice extends StatelessWidget {
               PracticeCarousel(
                 fashion: true,
                 onTap: onTap,
-                playerCard: ListenableBuilder(
-                  listenable: Settings.instance,
-                  builder: (context, _) {
-                    final motion = Settings.instance.fashionPlus;
-                    final media = motion
-                        ? const NwsbVideo(
+                playerCard: GestureDetector(
+                  onTap: onTap,
+                  behavior: HitTestBehavior.opaque,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(18),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        const Positioned.fill(
+                          child: NwsbVideo(
                             asset: practiceVid,
                             priority: ClipPriority.feature,
                             fit: BoxFit.cover,
                             slot: 'fashion_sections_top.FashPractice',
-                          )
-                        : const NwsbImage(url: practiceStill, slot: 'fashion_sections_top.FashPractice');
-                    // Card 1 — NowssB Player exactly as before (no redesign).
-                    return GestureDetector(
-                      onTap: onTap,
-                      behavior: HitTestBehavior.opaque,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(18),
-                        clipBehavior: Clip.antiAlias,
-                        child: Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Positioned.fill(child: media),
+                          ),
+                        ),
                             // Light left-edge scrim only — keep the film readable.
                             const DecoratedBox(
                               decoration: BoxDecoration(
@@ -385,9 +378,7 @@ class FashPractice extends StatelessWidget {
                           ],
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
               ),
               const SizedBox(height: 12),
               Text(
@@ -427,15 +418,7 @@ class FashReader extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
-            child: const AspectRatio(
-              aspectRatio: 16 / 9,
-              child: NwsbVideo(
-                asset: 'assets/video/reader-section.mp4',
-                poster: 'assets/video/reader-section-poster.webp',
-                fit: BoxFit.cover,
-                slot: 'fashion_sections_top.FashReader',
-              ),
-            ),
+            child: const ReaderFilm(slot: 'fashion_sections_top.FashReader'),
           ),
           const SizedBox(height: 14),
           Column(
