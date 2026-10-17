@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import '../data/content.dart';
 import '../data/models.dart';
 import '../data/word_art.dart';
+import '../data/playback_session.dart';
 import '../data/practice_progress.dart';
 import '../data/store_catalog.dart';
 import '../media/nwsb_image.dart';
@@ -24,7 +25,6 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../theme/player_aura.dart';
 import '../widgets/app_backdrop.dart';
-import '../widgets/hype_rail.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/intro_gate.dart';
 import '../widgets/tv_frame.dart';
@@ -442,9 +442,9 @@ class _SlmFeed extends StatelessWidget {
                     0: ('hype', 'Most hyped'),
                     1: ('feed', 'Library'),
                   }, noCopy: const {'feed'}, [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(16, 12, 0, 4),
-                      child: NowssbHypeRail(),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      child: _libraryLead(pool),
                     ),
                     if (chip == 'Currently Playing') ...[
                       CurrentlyPlayingAlbum(
@@ -599,6 +599,131 @@ class _SlmFeed extends StatelessWidget {
     );
   }
 
+
+  /// 0 tall Now Playing, 1 slim Now Playing, 2 the Sound Library film.
+  int _leadKind(String name) {
+    switch (name) {
+      case 'All':
+      case 'Global':
+      case 'Trending':
+        return 0;
+      case 'Purchased':
+      case 'Sentences':
+        return 1;
+      case 'Currently Playing':
+      case 'My Words':
+        return 2;
+      default:
+        return name.hashCode.abs().isEven ? 1 : 2;
+    }
+  }
+
+  Widget _libraryLead(List<Word> pool) {
+    final kind = _leadKind(chip);
+    if (kind == 2) return _soundFilm();
+    return _nowPlayingLead(pool, tall: kind == 0);
+  }
+
+  Widget _nowPlayingLead(List<Word> pool, {required bool tall}) {
+    return ListenableBuilder(
+      listenable: PlaybackSession.instance,
+      builder: (context, _) {
+        final session = PlaybackSession.instance;
+        final live = session.word;
+        final word = live ?? (pool.isEmpty ? null : pool.first);
+        final title = word?.word ?? 'NowssB';
+        final picture = word == null ? '' : art(word.word);
+        final sub = live == null ? 'Tap play' : (session.playing ? 'Playing · NowssB' : 'Paused · NowssB');
+        return GestureDetector(
+          onTap: word == null ? null : () => onPlayWord(word),
+          child: Container(
+            height: tall ? 156 : 84,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xF0101014),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0x33FFFFFF)),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: SizedBox(
+                    width: tall ? 120 : 64,
+                    height: tall ? 136 : 64,
+                    child: picture.isEmpty
+                        ? const ColoredBox(color: Color(0xFF1A1A1E))
+                        : picture.startsWith('http')
+                            ? Image.network(picture, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1A1E)))
+                            : Image.asset(picture, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1A1E))),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('NOW PLAYING', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 11, letterSpacing: 1.4, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 6),
+                      Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: tall ? 26 : 18, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 4),
+                      Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  child: Icon(session.playing ? Icons.pause_rounded : Icons.play_arrow_rounded, color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _soundFilm() {
+    return GestureDetector(
+      onTap: onPractice,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: SizedBox(
+          height: 156,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              const NwsbVideo(
+                asset: 'assets/video/sound-library-banner.mp4',
+                fit: BoxFit.cover,
+                autoplay: true,
+                loop: true,
+                showPoster: true,
+                slot: 'sound_library.LibraryLead',
+              ),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x22000000), Color(0xCC000000)],
+                  ),
+                ),
+              ),
+              const Positioned(
+                left: 16,
+                bottom: 14,
+                child: Text('Sound Library', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   List<Word> get _playingRail {
     final practiced = allWords

@@ -28,7 +28,6 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/course_face.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -57,7 +56,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   bool _screenWake = true;
   bool _appearDiscover = true;
   int _set = 0;
-  int _pick = 0;
 
   @override
   void initState() {
@@ -154,28 +152,108 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       ],
     ];
     final names = ['Look', 'Phone', 'Account'];
-    final cards = groups[_set.clamp(0, 2)];
-    final i = _pick.clamp(0, cards.length - 1);
-    final card = cards[i];
-    return CourseFace(
-      avatar: const CircleAvatar(radius: 26, backgroundColor: Color(0xFF2A2038), child: Icon(Icons.settings, color: Colors.white)),
-      onAvatar: () => NavScope.goTo(context, 4),
-      segments: names,
-      segment: _set,
-      onSegment: (n) => setState(() { _set = n; _pick = 0; }),
-      image: card.image ?? 'assets/rails/02.png',
-      title: card.title,
-      meta: card.meta,
-      foot: card.action,
-      indexLabel: '${i + 1} of ${cards.length}',
-      onContinue: card.onTap,
-      chips: [for (final c in cards) CourseChip(c.title, 1)],
-      chip: i,
-      onChip: (n) => setState(() => _pick = n),
-      rowTitle: card.title,
-      rowMeta: card.meta,
-      rowImage: card.image,
-      onRow: card.onTap,
+    final cards = groups[_set.clamp(0, 2)].where((c) => _match(c.title, c.meta)).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () => NavScope.goTo(context, 4),
+              child: const CircleAvatar(
+                radius: 22,
+                backgroundColor: Color(0xFF2A2038),
+                child: Icon(Icons.settings, color: Colors.white, size: 22),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  color: const Color(0x33110A18),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0x33FFFFFF)),
+                ),
+                child: Row(
+                  children: [
+                    for (var i = 0; i < names.length; i++)
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _set = i),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: i == _set ? const Color(0xCC2A2038) : Colors.transparent,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              names[i],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: i == _set ? FontWeight.w700 : FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        if (cards.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 24),
+            child: Text('Nothing in this filter.', textAlign: TextAlign.center, style: TextStyle(color: Color(0x99FFFFFF))),
+          )
+        else
+          for (final card in cards) ...[
+            GestureDetector(
+              onTap: card.onTap,
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: const Color(0xF0101016), borderRadius: BorderRadius.circular(22)),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: SizedBox(
+                        width: 84,
+                        height: 84,
+                        child: Image.asset(card.image ?? 'assets/rails/02.png', fit: BoxFit.cover),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(card.title, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, height: 1.1)),
+                          const SizedBox(height: 6),
+                          Text(card.meta, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(color: Color(0xFF2A2A32), shape: BoxShape.circle),
+                      child: const Icon(Icons.chevron_right, color: Colors.white, size: 18),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+      ],
     );
   }
 
