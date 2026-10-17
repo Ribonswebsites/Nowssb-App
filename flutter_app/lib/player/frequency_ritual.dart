@@ -16,9 +16,7 @@
 library;
 
 import 'dart:async';
-import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -76,9 +74,6 @@ class PlayerRitual {
     CueLine('Repeat after it.', 'assets/voice/cues/repeat-after.mp3'),
   ];
 
-  static const again = CueLine('Do you want to hear it again?', 'assets/voice/cues/hear-again.mp3');
-  static const finish = CueLine('Let the sound finish.', 'assets/voice/cues/let-it-finish.mp3');
-
   static final AudioPlayer _player = AudioPlayer();
   static int _token = 0;
 
@@ -128,13 +123,11 @@ class PlayerRitual {
     ];
     for (final step in counts) {
       if (!alive()) return;
-      onFrame(RitualFrame(count: step.$1, caption: 'Settle'));
+      onFrame(RitualFrame(count: step.$1, caption: step.$1 == 3 ? 'Three.' : step.$1 == 2 ? 'Two.' : 'One.'));
       await _hold(say(step.$1 == 3 ? 'Three.' : step.$1 == 2 ? 'Two.' : 'One.', step.$2));
       if (!alive()) return;
     }
     if (!alive()) return;
-    onFrame(const RitualFrame(caption: 'Begin'));
-    await _hold(say('Begin.', 'assets/voice/cues/begin.mp3'));
     for (final cue in before) {
       if (!alive()) return;
       onFrame(RitualFrame(caption: cue.line));
@@ -143,15 +136,6 @@ class PlayerRitual {
     if (!alive()) return;
     onFrame(RitualFrame(caption: line));
     await sayWord(line);
-    if (!alive()) return;
-    onFrame(RitualFrame(caption: again.line));
-    await _hold(say(again.line, again.asset));
-    if (!alive()) return;
-    onFrame(RitualFrame(caption: line));
-    await sayWord(line);
-    if (!alive()) return;
-    onFrame(RitualFrame(caption: finish.line));
-    await _hold(say(finish.line, finish.asset));
   }
 
   static Future<void> _hold(Future<void> speak) async {
@@ -162,112 +146,4 @@ class PlayerRitual {
     final left = 720 - DateTime.now().difference(started).inMilliseconds;
     if (left > 0) await Future<void>.delayed(Duration(milliseconds: left));
   }
-}
-
-class RitualStage extends StatefulWidget {
-  const RitualStage({super.key, required this.frame});
-  final RitualFrame frame;
-
-  @override
-  State<RitualStage> createState() => _RitualStageState();
-}
-
-class _RitualStageState extends State<RitualStage> with SingleTickerProviderStateMixin {
-  late final AnimationController _spin = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat();
-
-  @override
-  void dispose() {
-    _spin.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final count = widget.frame.count;
-    return IgnorePointer(
-      child: Center(
-        child: SizedBox(
-          width: 280,
-          height: 280,
-          child: AnimatedBuilder(
-            animation: _spin,
-            builder: (context, _) {
-              return CustomPaint(
-                painter: _RingPainter(_spin.value),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (count != null)
-                        Text(
-                          '$count',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 92,
-                            height: 0.9,
-                            fontWeight: FontWeight.w200,
-                          ),
-                        )
-                      else
-                        const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 36),
-                        child: Text(
-                          widget.frame.caption,
-                          textAlign: TextAlign.center,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFFE8D5A3),
-                            fontSize: 16,
-                            height: 1.25,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _RingPainter extends CustomPainter {
-  _RingPainter(this.t);
-  final double t;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final arc = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 1.4
-      ..color = const Color(0x88FFFFFF);
-    for (var i = 0; i < 5; i++) {
-      final radius = 46.0 + i * 16;
-      canvas.save();
-      canvas.translate(c.dx, c.dy);
-      canvas.rotate(t * (i.isEven ? 1 : -1) * math.pi * 2 * (0.35 + i * 0.12));
-      canvas.translate(-c.dx, -c.dy);
-      canvas.drawArc(Rect.fromCircle(center: c, radius: radius), -0.4, 2.2, false, arc);
-      canvas.restore();
-    }
-    final sweep = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
-      ..shader = SweepGradient(
-        transform: GradientRotation(t * math.pi * 2),
-        colors: const [Color(0x00E8D5A3), Color(0xFFE8D5A3), Color(0x00FFFFFF)],
-      ).createShader(Rect.fromCircle(center: c, radius: 128));
-    canvas.drawCircle(c, 128, sweep);
-  }
-
-  @override
-  bool shouldRepaint(covariant _RingPainter oldDelegate) => oldDelegate.t != t;
 }

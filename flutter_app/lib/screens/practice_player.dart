@@ -161,7 +161,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _introDone = true;
       _guideDone = true;
       _flagsReady = true;
-      unawaited(_prepareAndPlay());
       _rewardPlayerOpen();
     } else {
       unawaited(_loadIntroFlags());
@@ -193,7 +192,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         _flagsReady = true;
       });
       if (_introDone && _guideDone) {
-        unawaited(_prepareAndPlay());
         _rewardPlayerOpen();
       } else if (_introDone && !_guideDone) {
         // Guide still pending; do not start playback yet.
@@ -413,6 +411,18 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       );
       if (mounted && _playGen == gen) setState(() => _ritual = null);
       if (!alive()) return;
+      final again = await _askHearAgain();
+      if (again && alive()) {
+        if (mounted) setState(() => _ritual = RitualFrame(caption: line));
+        if (line == _word.word) {
+          final own = await WordVoice.instance.play(_word, volume: startVol);
+          if (!own && alive()) await _tts.speak(line);
+        } else if (alive()) {
+          await _tts.speak(line);
+        }
+        if (mounted && _playGen == gen) setState(() => _ritual = null);
+      }
+      if (!alive()) return;
       final elapsed = DateTime.now().difference(started).inSeconds;
       await PracticeProgress.instance.recordCompletedWord(
         _word,
@@ -433,6 +443,67 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         });
       }
     }
+  }
+
+  Future<bool> _askHearAgain() async {
+    if (!mounted) return false;
+    final answer = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: const Color(0x99000000),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color(0xF0000000),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0x33FFFFFF)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text(
+                        'Do you want to hear it again?',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700, height: 1.25),
+                      ),
+                      const SizedBox(height: 18),
+                      GestureDetector(
+                        onTap: () => Navigator.of(ctx).pop(true),
+                        child: Container(
+                          height: 48,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99)),
+                          child: const Text('Hear it again', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800)),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      GestureDetector(
+                        onTap: () => Navigator.of(ctx).pop(false),
+                        child: Container(
+                          height: 44,
+                          alignment: Alignment.center,
+                          child: const Text('Not now', style: TextStyle(color: Color(0xB3FFFFFF), fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    return answer == true;
   }
 
   Future<void> _minimizeToPill() async {
@@ -1148,7 +1219,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         onBegin: () {
           unawaited(_markIntroSeen());
           setState(() => _introDone = true);
-          unawaited(_prepareAndPlay());
           _rewardPlayerOpen();
         },
       );
@@ -1223,6 +1293,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   word: _word,
                                   video: _theme.video,
                                   playing: _playing,
+                                  ritual: _ritual,
                                   accent: theme.accent,
                                   onReplay: _prepareAndPlay,
                                   onCopy: _copyWord,
@@ -1393,13 +1464,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 ),
               ),
             ),
-            if (_ritual != null)
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: const BoxDecoration(color: Color(0x99000000)),
-                  child: RitualStage(frame: _ritual!),
-                ),
-              ),
           ],
         ),
       ),
@@ -3152,6 +3216,7 @@ class _VisualStage extends StatelessWidget {
     required this.word,
     required this.video,
     required this.playing,
+    this.ritual,
     required this.accent,
     required this.onReplay,
     required this.onCopy,
@@ -3171,6 +3236,7 @@ class _VisualStage extends StatelessWidget {
   final Word word;
   final String video;
   final bool playing;
+  final RitualFrame? ritual;
   final Color accent;
   final VoidCallback onReplay;
   final VoidCallback onCopy;
@@ -3213,21 +3279,62 @@ class _VisualStage extends StatelessWidget {
               showPoster: true,
               slot: 'practice_player.VisualStage',
             ),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0x00000000),
-                    Color(0x00000000),
-                    Color(0xD9000000),
-                  ],
-                  stops: [0, 0.42, 1],
+            if (ritual != null)
+              Positioned.fill(
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                    child: ColoredBox(
+                      color: const Color(0x66101014),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: const BorderRadius.all(Radius.circular(26)),
+                            border: Border.all(color: const Color(0x33FFFFFF)),
+                          ),
+                          child: Column(
+                            children: [
+                              const Spacer(flex: 3),
+                              const AppThinkingLoader(size: 132, state: OrbState.composing),
+                              const SizedBox(height: 18),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 22),
+                                child: Text(
+                                  ritual!.caption,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.25, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              const Spacer(flex: 4),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
+            if (ritual == null)
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x00000000),
+                      Color(0x00000000),
+                      Color(0xD9000000),
+                    ],
+                    stops: [0, 0.42, 1],
+                  ),
+                ),
+              ),
+            if (ritual == null)
+              Positioned(
               top: 10,
               left: 10,
               right: 10,
@@ -3256,7 +3363,8 @@ class _VisualStage extends StatelessWidget {
                 ],
               ),
             ),
-            Positioned(
+            if (ritual == null)
+              Positioned(
               left: 0,
               right: 0,
               bottom: 0,
