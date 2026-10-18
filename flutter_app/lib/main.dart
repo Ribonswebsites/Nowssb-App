@@ -172,6 +172,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     // it ends; this also resumes a download a previous launch left partial.
     unawaited(NwsbUpdater.instance.check(force: true));
     if (_splashDone) {
+      SplashGate.done.value = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _checkForUpdate(coldStart: true);
         unawaited(PhoneNotifications.instance.announceAfterLaunch().then((_) => AdminPromoGuard.apply()));

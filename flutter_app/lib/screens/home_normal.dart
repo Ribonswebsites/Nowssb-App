@@ -354,13 +354,7 @@ class _HomeNormalState extends State<HomeNormal> {
   }
 
   List<(String, Widget?)> _sections() => [
-        ('greet', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const LiveQuoteTab(),
-            NmGreeting(name: widget.name),
-          ],
-        )),
+        ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
         (
           'heroCurve',

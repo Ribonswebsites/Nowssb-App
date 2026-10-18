@@ -645,14 +645,13 @@ class _HomeFashionState extends State<HomeFashion> {
       [
         LSection(
           'hero',
-          'Hero: quote, greeting, curve & rail',
+          'Hero: greeting, curve & rail',
           // The greeting sits ABOVE the deck, not inside it —
           // app/js/part083.js:505 inserts it before the deck
           // in the home; it does not travel with the rail.
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const LiveQuoteTab(),
               HeroGreeting(name: widget.name),
               // Search + Quick access live ONLY inside HeroCurveStage.
               HeroCurveStage(

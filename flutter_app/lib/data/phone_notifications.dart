@@ -180,23 +180,18 @@ class PhoneNotifications {
   }
 }
 
-/// In-app banner. The host mounts once under MaterialApp.
+/// In-app card. The host mounts once under MaterialApp.
 ///
-/// Popups belong on the home tab, and only when nothing is pushed over it.
-/// Agreement pages, store intros, and every other tab stay quiet.
+/// It shows on every root tab while a notification is waiting, and stays
+/// off anything pushed over the shell (agreements, the player, intros).
 class NotificationBanner {
   NotificationBanner._();
   static final items = ValueNotifier<List<NotifItem>>(const []);
   static final showPopups = ValueNotifier<bool>(true);
 
-  static bool _onHome = true;
   static bool _routeRoot = true;
 
-  static void setOnHome(bool value) {
-    if (_onHome == value) return;
-    _onHome = value;
-    _publish();
-  }
+  static void setOnHome(bool _) {}
 
   static void setRouteRoot(bool value) {
     if (_routeRoot == value) return;
@@ -205,8 +200,7 @@ class NotificationBanner {
   }
 
   static void _publish() {
-    final next = _onHome && _routeRoot;
-    if (showPopups.value != next) showPopups.value = next;
+    if (showPopups.value != _routeRoot) showPopups.value = _routeRoot;
   }
 
   static void push(NotifItem item) {

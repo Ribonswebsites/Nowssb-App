@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
 import '../data/app_control.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,6 +27,8 @@ import 'reader/reader_hub.dart';
 import 'sound_library.dart';
 import 'store.dart';
 import 'subscription.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
@@ -44,6 +47,7 @@ const _kBuddhaQuote =
 
 const _kQuoteMarks = 'nwsb_quote_marks';
 const _kHomeQuoteHidden = 'nwsb_home_quote_hidden_day';
+const _kDailyQuoteShown = 'nwsb_daily_quote_popup_day';
 
 String _dayKey(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -1383,4 +1387,325 @@ class _SharedLine {
   const _SharedLine(this.name, this.text);
   final String name;
   final String text;
+}
+
+/// Once a day, after the splash, the line opens as its own card.
+/// Quotes or Close. It does not sit on the home page.
+Future<void> showDailyQuoteIfNeeded(BuildContext context) async {
+  final prefs = await SharedPreferences.getInstance();
+  final today = _dayKey(DateTime.now());
+  if (prefs.getString(_kDailyQuoteShown) == today) return;
+  if (!context.mounted) return;
+  final live = Settings.instance.liveQuote.trim();
+  final line = live.isNotEmpty ? live : _kBuddhaQuote;
+  await showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Today quote',
+    barrierColor: const Color(0xC0000000),
+    transitionDuration: const Duration(milliseconds: 460),
+    pageBuilder: (dialogContext, _, __) {
+      return _DailyQuotePopup(
+        quote: line,
+        onClose: () => Navigator.of(dialogContext).pop(),
+        onQuotes: () {
+          Navigator.of(dialogContext).pop();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
+            );
+          });
+        },
+      );
+    },
+    transitionBuilder: (context, anim, _, child) {
+      final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutBack);
+      return FadeTransition(
+        opacity: anim,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.88, end: 1).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+  final again = await SharedPreferences.getInstance();
+  await again.setString(_kDailyQuoteShown, today);
+}
+
+class _DailyQuotePopup extends StatefulWidget {
+  const _DailyQuotePopup({
+    required this.quote,
+    required this.onClose,
+    required this.onQuotes,
+  });
+
+  final String quote;
+  final VoidCallback onClose;
+  final VoidCallback onQuotes;
+
+  @override
+  State<_DailyQuotePopup> createState() => _DailyQuotePopupState();
+}
+
+class _DailyQuotePopupState extends State<_DailyQuotePopup>
+    with TickerProviderStateMixin {
+  late final AnimationController _spin = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 16),
+  )..repeat();
+  late final AnimationController _breath = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 3200),
+  )..repeat(reverse: true);
+
+  @override
+  void initState() {
+    super.initState();
+    HapticFeedback.mediumImpact();
+  }
+
+  @override
+  void dispose() {
+    _spin.dispose();
+    _breath.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final h = MediaQuery.sizeOf(context).height;
+    final videoH = (h * 0.42).clamp(240.0, 380.0);
+    final day = _days[DateTime.now().weekday - 1];
+    return SafeArea(
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+          child: Material(
+            color: const Color(0xFF07070C),
+            elevation: 24,
+            shadowColor: const Color(0xAA6E4CFF),
+            borderRadius: BorderRadius.circular(28),
+            clipBehavior: Clip.antiAlias,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: const Color(0x33E8D5A3)),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x666E4CFF), blurRadius: 36, spreadRadius: 1),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    height: videoH,
+                    width: double.infinity,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        AnimatedBuilder(
+                          animation: _breath,
+                          builder: (_, child) => Transform.scale(
+                            scale: 1.04 + _breath.value * 0.06,
+                            child: child,
+                          ),
+                          child: const NwsbVideo(
+                            asset: 'assets/video/practice-halo.mp4',
+                            fit: BoxFit.cover,
+                            priority: ClipPriority.feature,
+                            autoplay: true,
+                            loop: true,
+                            slot: 'quotes_live.DailyQuotePopup',
+                          ),
+                        ),
+                        const DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0x44000000),
+                                Color(0x00000000),
+                                Color(0xFF07070C),
+                              ],
+                              stops: [0, 0.55, 1],
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: IgnorePointer(
+                            child: RotationTransition(
+                              turns: _spin,
+                              child: const SizedBox(
+                                width: 228,
+                                height: 228,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    CustomPaint(
+                                      size: Size(228, 228),
+                                      painter: _HaloRing(),
+                                    ),
+                                    Align(alignment: Alignment(0, -1), child: _OrbitDot()),
+                                    Align(alignment: Alignment(-0.88, 0.5), child: _OrbitDot()),
+                                    Align(alignment: Alignment(0.88, 0.5), child: _OrbitDot()),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 12,
+                          right: 12,
+                          child: GestureDetector(
+                            onTap: widget.onClose,
+                            behavior: HitTestBehavior.opaque,
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: const Color(0x99000000),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: const Color(0x66FFFFFF)),
+                              ),
+                              child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
+                    child: Column(
+                      children: [
+                        Text(
+                          'TODAY  ·  ${day.toUpperCase()}',
+                          style: const TextStyle(
+                            color: Color(0xFFE8D5A3),
+                            fontSize: 11,
+                            letterSpacing: 2.4,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const EditableLabel(
+                          'quotes_live.DailyQuotePopup',
+                          'A line for today',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                            height: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          widget.quote,
+                          textAlign: TextAlign.center,
+                          maxLines: 6,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color(0xF2FFFFFF),
+                            fontSize: 15.5,
+                            height: 1.35,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 48,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: OutlinedButton(
+                                  onPressed: widget.onClose,
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    side: const BorderSide(color: Color(0x66FFFFFF)),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                                  ),
+                                  child: const EditableLabel(
+                                    'quotes_live.DailyQuotePopup',
+                                    'Close',
+                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: FilledButton(
+                                  onPressed: widget.onQuotes,
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: const Color(0xFFE8D5A3),
+                                    foregroundColor: const Color(0xFF14110A),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                                  ),
+                                  child: const EditableLabel(
+                                    'quotes_live.DailyQuotePopup',
+                                    'Quotes',
+                                    style: TextStyle(color: Color(0xFF14110A), fontSize: 15, fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _OrbitDot extends StatelessWidget {
+  const _OrbitDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 7,
+      height: 7,
+      decoration: const BoxDecoration(
+        color: Color(0xFFE8D5A3),
+        shape: BoxShape.circle,
+        boxShadow: [BoxShadow(color: Color(0xFFE8D5A3), blurRadius: 8)],
+      ),
+    );
+  }
+}
+
+class _HaloRing extends CustomPainter {
+  const _HaloRing();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = Offset(size.width / 2, size.height / 2);
+    final r = size.shortestSide / 2 - 4;
+    final gold = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round
+      ..color = const Color(0xCCE8D5A3);
+    final soft = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..strokeCap = StrokeCap.round
+      ..color = const Color(0x66FFFFFF);
+    canvas.drawArc(Rect.fromCircle(center: c, radius: r), -1.15, 2.2, false, gold);
+    canvas.drawArc(Rect.fromCircle(center: c, radius: r - 16), 1.5, 1.5, false, soft);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

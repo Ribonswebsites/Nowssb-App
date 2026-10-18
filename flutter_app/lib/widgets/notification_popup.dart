@@ -1,13 +1,14 @@
-/// Slide-down notification card. Sits above every screen.
+/// Glance-style notification card. Sits above every screen, over the bar.
 library;
 
-import 'dart:async';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
 import '../data/phone_notifications.dart';
+import '../screens/notifications_sheet.dart';
 import '../theme/liquid_glass_theme.dart';
 
 class NotificationPopupHost extends StatefulWidget {
@@ -19,18 +20,23 @@ class NotificationPopupHost extends StatefulWidget {
 }
 
 class _NotificationPopupHostState extends State<NotificationPopupHost> {
+  var _surfaced = false;
+
   @override
   void initState() {
     super.initState();
     NwsbEffects.instance.bind();
     NotificationBanner.items.addListener(_onItems);
     NotificationBanner.showPopups.addListener(_onItems);
+    NotifStore.instance.addListener(_surfaceUnread);
+    _surfaceUnread();
   }
 
   @override
   void dispose() {
     NotificationBanner.items.removeListener(_onItems);
     NotificationBanner.showPopups.removeListener(_onItems);
+    NotifStore.instance.removeListener(_surfaceUnread);
     super.dispose();
   }
 
@@ -38,29 +44,44 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     if (mounted) setState(() {});
   }
 
+  /// One waiting item, once, so a card is there when the inbox already has
+  /// something. New arrivals still come through [NotificationBanner.push].
+  void _surfaceUnread() {
+    if (_surfaced || !NotifStore.instance.loaded) return;
+    final unread = NotifStore.instance.feed.where((e) => !e.read);
+    if (unread.isEmpty) {
+      if (NotificationBanner.items.value.isNotEmpty) _surfaced = true;
+      return;
+    }
+    _surfaced = true;
+    if (NotificationBanner.items.value.isNotEmpty) return;
+    if (FirebaseAuth.instance.currentUser == null) return;
+    NotificationBanner.push(unread.first);
+  }
+
   @override
   Widget build(BuildContext context) {
     final list = NotificationBanner.items.value;
     final signedIn = FirebaseAuth.instance.currentUser != null;
     final allow = NotificationBanner.showPopups.value;
+    final item = list.isEmpty ? null : list.first;
     return Stack(
       children: [
         widget.child,
-        if (signedIn && allow && list.isNotEmpty)
+        if (signedIn && allow && item != null)
           Positioned(
-            top: 0,
-            left: 12,
-            right: 12,
+            left: 10,
+            right: 10,
+            bottom: 0,
             child: SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  for (final item in list)
-                    _BannerCard(
-                      item: item,
-                      onClose: () => NotificationBanner.dismiss(item),
-                    ),
-                ],
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 86),
+                child: _GlanceNotice(
+                  key: ValueKey('${item.at}|${item.type}|${item.title}'),
+                  item: item,
+                  onClose: () => NotificationBanner.dismiss(item),
+                ),
               ),
             ),
           ),
@@ -69,93 +90,206 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   }
 }
 
-class _BannerCard extends StatefulWidget {
-  const _BannerCard({required this.item, required this.onClose});
+class _GlanceNotice extends StatefulWidget {
+  const _GlanceNotice({super.key, required this.item, required this.onClose});
   final NotifItem item;
   final VoidCallback onClose;
 
   @override
-  State<_BannerCard> createState() => _BannerCardState();
+  State<_GlanceNotice> createState() => _GlanceNoticeState();
 }
 
-class _BannerCardState extends State<_BannerCard> {
-  Timer? _timer;
-
+class _GlanceNoticeState extends State<_GlanceNotice> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(seconds: 5), () {
+    Future<void>.delayed(const Duration(seconds: 8), () {
       if (mounted) widget.onClose();
     });
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  String get _category {
+    final label = NotifStore.instance.labelOf(widget.item.type);
+    if (label.isNotEmpty && label != widget.item.type) return label;
+    return switch (widget.item.type) {
+      'messages' => 'Messages',
+      'posts' => 'Reels',
+      'reactions' => 'Connect',
+      'follows' => 'People',
+      'orders' => 'Orders',
+      'delivery' => 'Delivery',
+      'cart' => 'Cart',
+      'arrivals' => 'Library',
+      'offers' => 'Offers',
+      'trending' => 'Trending',
+      'routine' => 'Practice',
+      'rx' => 'Practice',
+      'streak' => 'Streak',
+      'reader' => 'Reading',
+      'subscription' => 'Plans',
+      'support' => 'NowssB',
+      _ => 'NowssB',
+    };
+  }
+
+  String get _headline {
+    final title = widget.item.title.trim();
+    final body = widget.item.body.trim();
+    if (title.isEmpty) return body;
+    if (body.isEmpty || body == title) return title;
+    return '$title $body';
+  }
+
+  void _open() {
+    HapticFeedback.selectionClick();
+    widget.onClose();
+    showNotificationsSheet(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Material(
-        color: const Color(0xF0141418),
-        elevation: 8,
-        borderRadius: BorderRadius.circular(18),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(18),
-          onTap: widget.onClose,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0x33FFFFFF)),
-            ),
-            padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.white,
-                  child: Icon(Icons.notifications_none_rounded,
-                      color: Colors.black, size: 18),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.item.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 14,
-                        ),
-                      ),
-                      if (widget.item.body.isNotEmpty)
-                        Text(
-                          widget.item.body,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xCCFFFFFF),
-                            fontSize: 12,
-                            height: 1.3,
-                          ),
-                        ),
-                    ],
+    return Dismissible(
+      key: ValueKey('glance-${widget.item.at}-${widget.item.title}'),
+      direction: DismissDirection.horizontal,
+      onDismissed: (_) => widget.onClose(),
+      child: GestureDetector(
+        onTap: _open,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 2, 6),
+              child: Row(
+                children: const [
+                  Text(
+                    'nowssb',
+                    style: TextStyle(
+                      color: Color(0xF2FFFFFF),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.2,
+                    ),
                   ),
-                ),
-                IconButton(
-                  onPressed: widget.onClose,
-                  icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                ),
-              ],
+                  Spacer(),
+                  Text(
+                    'News',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Icon(Icons.keyboard_arrow_up_rounded, color: Colors.white, size: 22),
+                ],
+              ),
             ),
-          ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: const Color(0xE6101014),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0x22FFFFFF)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 3,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFF2D2D),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  _category,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 15.5,
+                                    fontWeight: FontWeight.w700,
+                                    height: 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _headline,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              height: 1.25,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: 86,
+                      height: 76,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: ColoredBox(
+                              color: const Color(0xFF1A1A1E),
+                              child: CachedNetworkImage(
+                                imageUrl: NotifIcons.urlFor(widget.item.type),
+                                width: 86,
+                                height: 76,
+                                fit: BoxFit.cover,
+                                errorWidget: (_, __, ___) => const SizedBox(width: 86, height: 76),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: -4,
+                            top: -8,
+                            child: Container(
+                              width: 26,
+                              height: 26,
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFF2D2D),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Text(
+                                'NEWS',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 6.2,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.1,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -35,6 +35,13 @@ import 'package:video_player/video_player.dart';
 import '../media/onboarding_warmup.dart';
 import '../admin/template/editable.dart';
 
+class SplashGate {
+  SplashGate._();
+
+  /// Flips when the intro clip leaves, or at once when splash is turned off.
+  static final done = ValueNotifier<bool>(false);
+}
+
 class Splash extends StatefulWidget {
   const Splash({super.key, required this.onDone});
 
@@ -130,6 +137,7 @@ class _SplashState extends State<Splash> {
     if (_leaving) return;
     _leaving = true;
     _ceiling?.cancel();
+    SplashGate.done.value = true;
     widget.onDone();
   }
 

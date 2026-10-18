@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
@@ -16,6 +17,8 @@ import '../screens/sound_library.dart';
 import '../screens/practice.dart';
 import '../screens/practice_player.dart';
 import '../screens/profile.dart';
+import '../screens/quotes_live.dart';
+import '../screens/splash.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
 import '../screens/quick_access.dart';
@@ -26,6 +29,7 @@ import '../features/notifications/inbox_screen.dart';
 import '../features/notifications/notif_router.dart';
 import '../widgets/pool_hud.dart';
 import '../widgets/mini_player_pill.dart';
+import '../widgets/nwsb_icon.dart';
 import '../data/phone_notifications.dart';
 import '../data/playback_session.dart';
 import '../admin/template/editable.dart';
@@ -74,6 +78,10 @@ class NavScope extends InheritedWidget {
 class _NavShellState extends State<NavShell> {
   int _i = Settings.instance.lastTab;
 
+  /// `welcome`, or a tab index as text, while a one-time guide is up.
+  String? _coach;
+  var _dayLock = false;
+
   /// Which home. The website keeps both in the DOM and switches a class;
   /// here it is two different screens rather than two skins — see
   /// lib/screens/home_fashion.dart. The answer is remembered between
@@ -93,6 +101,11 @@ class _NavShellState extends State<NavShell> {
     // Daily 'open the app' activity (server caps it at once a day).
     reportEarn('open');
     NotifRouter.instance.attach(context, goTab: _goToTab, popToRoot: _popShellOverlays);
+    if (SplashGate.done.value) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_openDay()));
+    } else {
+      SplashGate.done.addListener(_onSplashDone);
+    }
   }
 
   StreamSubscription<Uri>? _widgetTaps;
@@ -127,6 +140,7 @@ class _NavShellState extends State<NavShell> {
 
   @override
   void dispose() {
+    SplashGate.done.removeListener(_onSplashDone);
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
     unawaited(_widgetTaps?.cancel());
@@ -136,6 +150,59 @@ class _NavShellState extends State<NavShell> {
     }
     NotifRouter.instance.detach(context);
     super.dispose();
+  }
+
+  void _onSplashDone() {
+    if (!SplashGate.done.value) return;
+    SplashGate.done.removeListener(_onSplashDone);
+    unawaited(_openDay());
+  }
+
+  Future<void> _openDay() async {
+    if (_dayLock || !mounted) return;
+    _dayLock = true;
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 420));
+      if (!mounted) return;
+      await showDailyQuoteIfNeeded(context);
+      if (!mounted) return;
+      await _offerGuide();
+    } finally {
+      _dayLock = false;
+    }
+  }
+
+  Future<void> _offerGuide() async {
+    if (!mounted || _coach != null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final welcome = prefs.getBool('nwsb_guide_welcome_v1') ?? false;
+    if (!mounted) return;
+    if (!welcome) {
+      setState(() => _coach = 'welcome');
+      return;
+    }
+    final seen = prefs.getStringList('nwsb_tab_guide_v1') ?? const <String>[];
+    final id = '$_i';
+    if (seen.contains(id)) return;
+    setState(() => _coach = id);
+  }
+
+  Future<void> _dismissCoach() async {
+    final id = _coach;
+    if (id == null || !mounted) return;
+    setState(() => _coach = null);
+    final prefs = await SharedPreferences.getInstance();
+    if (id == 'welcome') {
+      await prefs.setBool('nwsb_guide_welcome_v1', true);
+    } else {
+      final seen = List<String>.from(prefs.getStringList('nwsb_tab_guide_v1') ?? const <String>[]);
+      if (!seen.contains(id)) {
+        seen.add(id);
+        await prefs.setStringList('nwsb_tab_guide_v1', seen);
+      }
+    }
+    if (!mounted) return;
+    await _offerGuide();
   }
 
   void _onSettings() {
@@ -213,8 +280,12 @@ class _NavShellState extends State<NavShell> {
     NotificationBanner.setOnHome(tab == 0);
     if (tab == _i) return;
     Settings.instance.fadeBackgroundForNavigation();
-    setState(() => _i = tab);
+    setState(() {
+      _i = tab;
+      if (_coach != null && _coach != 'welcome') _coach = null;
+    });
     Settings.instance.setLastTab(tab);
+    if (!_dayLock) unawaited(_offerGuide());
   }
 
   static const _navFeatures = <String, Map<String, String>>{
@@ -466,6 +537,9 @@ class _NavShellState extends State<NavShell> {
                         final background = settings.navColor == 'black'
                             ? const Color(0xF5000000)
                             : const Color(0xF5182033);
+                        final slots = settings.navSlots;
+                        final found = slots.indexWhere((s) => _primaryTab(s) == 0);
+                        final homeSlot = found >= 0 ? found : 0;
                         return Container(
                           height: 58,
                           decoration: BoxDecoration(
@@ -474,9 +548,7 @@ class _NavShellState extends State<NavShell> {
                             border: Border.all(color: const Color(0x22FFFFFF)),
                           ),
                           child: Row(children: [
-                            for (var i = 0;
-                                i < settings.navSlots.length;
-                                i++) ...[
+                            for (var i = 0; i < slots.length; i++) ...[
                               if (i > 0)
                                 Container(
                                   width: 1,
@@ -486,82 +558,14 @@ class _NavShellState extends State<NavShell> {
                                   color: const Color(0x33FFFFFF),
                                 ),
                               Expanded(
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () => _goToSlot(settings.navSlots[i]),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      (_navFeatures[settings.navSlots[i]]
-                                                      ?['img'] ??
-                                                  '')
-                                              .startsWith('asset:')
-                                          ? EditableImage.asset(
-                                              (_navFeatures[settings
-                                                              .navSlots[i]]
-                                                          ?['img'] ??
-                                                      '')
-                                                  .substring(6),
-                                              width: 28,
-                                              height: 28,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (_, __, ___) =>
-                                                  Icon(
-                                                Icons.circle_outlined,
-                                                size: 22,
-                                                color: settings.navSlots[i] ==
-                                                            'connect' ||
-                                                        _primaryTab(settings
-                                                                .navSlots[i]) ==
-                                                            _i
-                                                    ? NwsbColors.goldLight
-                                                    : const Color(0x99FFFFFF),
-                                              ),
-                                              slot: 'nav_shell.NavShell',
-                                            )
-                                          : Image.network(
-                                              _navFeatures[settings.navSlots[i]]
-                                                      ?['img'] ??
-                                                  '',
-                                              width: 28,
-                                              height: 28,
-                                              fit: BoxFit.contain,
-                                              errorBuilder: (_, __, ___) =>
-                                                  Icon(
-                                                Icons.circle_outlined,
-                                                size: 22,
-                                                color: settings.navSlots[i] ==
-                                                            'connect' ||
-                                                        _primaryTab(settings
-                                                                .navSlots[i]) ==
-                                                            _i
-                                                    ? NwsbColors.goldLight
-                                                    : const Color(0x99FFFFFF),
-                                              ),
-                                            ),
-                                      const SizedBox(height: 3),
-                                      Text(
-                                        _navFeatures[settings.navSlots[i]]
-                                                ?['label'] ??
-                                            settings.navSlots[i],
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 9,
-                                          fontWeight: _primaryTab(
-                                                      settings.navSlots[i]) ==
-                                                  _i
-                                              ? FontWeight.w700
-                                              : FontWeight.w400,
-                                          color: _primaryTab(
-                                                      settings.navSlots[i]) ==
-                                                  _i
-                                              ? NwsbColors.goldLight
-                                              : const Color(0x99FFFFFF),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                child: _NavSlot(
+                                  active: _primaryTab(slots[i]) == _i,
+                                  asHome: _i != 0 && i == homeSlot,
+                                  image: _navFeatures[slots[i]]?['img'] ?? '',
+                                  label: _navFeatures[slots[i]]?['label'] ?? slots[i],
+                                  onTap: () => _i != 0 && i == homeSlot
+                                      ? _goToTab(0)
+                                      : _goToSlot(slots[i]),
                                 ),
                               ),
                             ],
@@ -573,9 +577,210 @@ class _NavShellState extends State<NavShell> {
                 ),
               ),
             ),
+            if (_coach != null)
+              Positioned.fill(
+                child: _RoomGuide(
+                  coach: _coach!,
+                  tab: _i,
+                  onDone: () => unawaited(_dismissCoach()),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
+}
+
+class _NavSlot extends StatelessWidget {
+  const _NavSlot({
+    required this.active,
+    required this.asHome,
+    required this.image,
+    required this.label,
+    required this.onTap,
+  });
+
+  final bool active;
+  final bool asHome;
+  final String image;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? NwsbColors.goldLight : const Color(0x99FFFFFF);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (asHome)
+            const NwsbIcon(NwsbMarks.house, size: 26, color: Color(0xF2FFFFFF), strokeWidth: 1.9)
+          else if (image.startsWith('asset:'))
+            EditableImage.asset(
+              image.substring(6),
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Icon(Icons.circle_outlined, size: 22, color: color),
+              slot: 'nav_shell.NavShell',
+            )
+          else
+            Image.network(
+              image,
+              width: 28,
+              height: 28,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Icon(Icons.circle_outlined, size: 22, color: color),
+            ),
+          const SizedBox(height: 3),
+          Text(
+            asHome ? 'Home' : label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: active ? FontWeight.w700 : FontWeight.w400,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoomGuide extends StatelessWidget {
+  const _RoomGuide({required this.coach, required this.tab, required this.onDone});
+
+  final String coach;
+  final int tab;
+  final VoidCallback onDone;
+
+  static const _rooms = <(String, String)>[
+    ('Home', 'This is the day. The session sits up here. The other rooms are on the bar.'),
+    ('Practice', 'These are today\'s words. Tap one and the player opens on it.'),
+    ('Library', 'Everything you can hear. The chips filter it. Now playing is the card under them.'),
+    ('Store', 'Ebooks, words, and plans. The black card under each film is the way in.'),
+    ('Profile', 'Streak, account, and settings. The gear on this page opens the rest.'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final welcome = coach == 'welcome';
+    final room = _rooms[tab.clamp(0, _rooms.length - 1)];
+    final title = welcome ? 'Five rooms' : room.$1;
+    final body = welcome
+        ? 'Home, Practice, Library, Store, and Profile. Each one gets a short mark the first time you open it.'
+        : room.$2;
+    final x = ((tab.clamp(0, 4) + 0.5) / 5) * 2 - 1;
+    return Material(
+      color: const Color(0x66000000),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(onTap: onDone, behavior: HitTestBehavior.opaque),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            bottom: 0,
+            child: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 84),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: const Color(0xF0141418),
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: const Color(0x33E8D5A3)),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'GUIDE',
+                              style: TextStyle(
+                                color: Color(0xFFE8D5A3),
+                                fontSize: 11,
+                                letterSpacing: 2.2,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              body,
+                              style: const TextStyle(
+                                color: Color(0xCCFFFFFF),
+                                fontSize: 14,
+                                height: 1.35,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: FilledButton(
+                                onPressed: onDone,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: const Color(0xFFE8D5A3),
+                                  foregroundColor: const Color(0xFF14110A),
+                                  minimumSize: const Size(96, 40),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                ),
+                                child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.w800)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment(x, 0),
+                      child: CustomPaint(
+                        size: const Size(16, 9),
+                        painter: const _GuideTail(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GuideTail extends CustomPainter {
+  const _GuideTail();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..close();
+    canvas.drawPath(path, Paint()..color = const Color(0xF0141418));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
