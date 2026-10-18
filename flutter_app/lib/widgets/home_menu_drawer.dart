@@ -16,6 +16,7 @@ import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import '../features/earn/earn_hub_screen.dart';
 import '../features/earn/earnings_screen.dart';
+import '../features/social/connect_screen.dart';
 import '../features/social/echo_wall_screen.dart';
 import '../features/gifts/gifts_screen.dart';
 import '../features/economy/coupon_screen.dart';
@@ -271,7 +272,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           WorkCard(category: 'Wall', title: 'Echo Wall', meta: 'Reflections', action: 'Open the wall', image: 'assets/rails/glass-03.jpg', onTap: () => _push(context, const EchoWallScreen())),
                           WorkCard(category: 'Cash', title: 'Earnings', meta: 'Payouts and commissions', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => _push(context, const EarningsScreen())),
                           WorkCard(category: 'Ledger', title: 'Activity', meta: 'Coin and cash ledger', action: 'Open activity', image: 'assets/rails/clear-04.jpg', onTap: () => _push(context, const EarnHubScreen())),
-                          WorkCard(category: 'Connect', title: 'NowssB Connect', meta: 'Community', action: 'Open connect', image: 'assets/rails/glass-04.jpg', onTap: () => _push(context, const EchoWallScreen())),
+                          WorkCard(category: 'Connect', title: 'NowssB Connect', meta: 'Community', action: 'Open connect', image: 'assets/rails/glass-04.jpg', onTap: () => _push(context, const ConnectScreen())),
                         ],
                       ),
                       Padding(

@@ -76,7 +76,6 @@ import '../widgets/home_menu_drawer.dart';
 import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
-import '../widgets/subscription_today_offer.dart';
 import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
@@ -502,10 +501,6 @@ class _HomeNormalState extends State<HomeNormal> {
                   spec: SplitPromoExtras.at(8, onTap: () => _go(3)),
                   margin: EdgeInsets.zero,
                 ),
-              ),
-              SubscriptionTodayOffer(
-                neumorphic: true,
-                onClaim: () => _push(const SubscriptionScreen()),
               ),
               const SizedBox(height: 16),
               const EarnUmbrellaSection(),

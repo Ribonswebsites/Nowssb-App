@@ -135,7 +135,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
   Widget build(BuildContext context) {
     final neu = HomeSkinScope.of(context) == HomeSkin.normal;
     return SizedBox(
-      height: 440,
+      height: 580,
       child: NotificationListener<ScrollNotification>(
         onNotification: (n) {
           if (n is ScrollStartNotification && n.dragDetails != null) {
@@ -225,59 +225,69 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
               ),
             ),
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    flex: 7,
-                    child: EditableImage.asset(
-                      'assets/banners/brand-cleo.png',
-                      fit: BoxFit.contain,
-                      alignment: Alignment.bottomLeft,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                      slot: 'earn_home_sections.EarnUmbrellaSection',
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 4,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const EditableLabel(
-                          'earn_home_sections.EarnUmbrellaSection',
-                          'Join today',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                          ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final artW = (constraints.maxWidth - 128).clamp(40.0, constraints.maxWidth).toDouble();
+                  final artH = constraints.maxHeight;
+                  return Stack(
+                    children: [
+                      Positioned(
+                        left: 0,
+                        top: 0,
+                        width: artW,
+                        height: artH,
+                        child: EditableImage.asset(
+                          'assets/banners/brand-cleo-earn.png',
+                          width: artW,
+                          height: artH,
+                          fit: BoxFit.contain,
+                          alignment: Alignment.bottomCenter,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                          slot: 'earn_home_sections.EarnUmbrellaSection',
                         ),
-                        const SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: _openEarn,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(99),
-                            ),
-                            child: const EditableLabel(
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        width: 124,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const EditableLabel(
                               'earn_home_sections.EarnUmbrellaSection',
-                              'Open Earn',
+                              'Join today',
                               style: TextStyle(
-                                color: Color(0xFF111111),
+                                color: Colors.white,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: _openEarn,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(99),
+                                ),
+                                child: const EditableLabel(
+                                  'earn_home_sections.EarnUmbrellaSection',
+                                  'Open Earn',
+                                  style: TextStyle(
+                                    color: Color(0xFF111111),
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
@@ -636,19 +646,6 @@ class YourRewardsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _OutsidePromo(
-          slides: const [
-            _Slide(
-              title: 'NowssB Rewards',
-              cta: 'Open rewards',
-              left: Color(0xFF2A1B4D),
-              right: Color(0xFFC8A96E),
-              art: SplitPromoArts.egyptianGold,
-              dest: _Dest.rewards,
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
         SectionPane(
           child: ListenableBuilder(
             listenable: EconomyMirror.instance,
@@ -735,19 +732,6 @@ class GiftsHomeSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const _OutsidePromo(
-          slides: [
-            _Slide(
-              title: 'NowssB Gifts',
-              cta: 'Send a gift',
-              left: Color(0xFF3D2914),
-              right: Color(0xFFE07A3D),
-              art: SplitPromoArts.redLotus,
-              dest: _Dest.gifts,
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
         SectionPane(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -955,7 +939,7 @@ class _ProgramTrioRailState extends State<ProgramTrioRail> {
     return Column(
       children: [
         SizedBox(
-          height: 640,
+          height: 700,
           child: Listener(
             onPointerDown: (_) => _hold = true,
             onPointerUp: (_) => _hold = false,

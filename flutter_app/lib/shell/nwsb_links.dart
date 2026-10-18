@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../features/notifications/inbox_screen.dart';
 import '../features/programs/program_router.dart';
-import '../features/social/echo_wall_screen.dart';
+import '../features/social/connect_screen.dart';
 import '../screens/daily_tasks.dart';
 import '../screens/personal_coach.dart';
 import '../screens/reader/reader_hub.dart';
@@ -32,7 +32,7 @@ abstract final class NwsbLinks {
   static void ebooks(BuildContext context) => push(context, const EbooksStoreScreen());
   static void reader(BuildContext context) => push(context, const ReaderHubScreen());
   static void requestWord(BuildContext context) => push(context, const RequestWordsScreen());
-  static void connect(BuildContext context) => push(context, const EchoWallScreen());
+  static void connect(BuildContext context) => push(context, const ConnectScreen());
   static void cart(BuildContext context) => push(context, const CartPage());
   static void wishlist(BuildContext context) => push(context, const WishlistPage());
   static void activity(BuildContext context) => push(context, const InboxScreen());
