@@ -939,7 +939,7 @@ class _ProgramTrioRailState extends State<ProgramTrioRail> {
     return Column(
       children: [
         SizedBox(
-          height: 700,
+          height: 620,
           child: Listener(
             onPointerDown: (_) => _hold = true,
             onPointerUp: (_) => _hold = false,
@@ -948,9 +948,9 @@ class _ProgramTrioRailState extends State<ProgramTrioRail> {
               controller: _page,
               onPageChanged: (i) => setState(() => _i = i),
               children: const [
-                YourRewardsSection(),
-                GiftsHomeSection(),
-                HomeCouponShelf(),
+                Align(alignment: Alignment.topCenter, child: YourRewardsSection()),
+                Align(alignment: Alignment.topCenter, child: GiftsHomeSection()),
+                Align(alignment: Alignment.topCenter, child: HomeCouponShelf()),
               ],
             ),
           ),

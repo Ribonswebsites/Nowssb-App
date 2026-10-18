@@ -160,7 +160,7 @@ String _artSlug(String raw) => raw
 
 String _fromSet(String name, Set<String> known, String folder, String fallback) {
   final slug = _artSlug(name);
-  if (slug.isNotEmpty && known.contains(slug)) return 'assets/store/$folder/$slug.png';
+  if (slug.isNotEmpty && known.contains(slug)) return 'assets/store/$folder/$slug.webp';
   return fallback;
 }
 

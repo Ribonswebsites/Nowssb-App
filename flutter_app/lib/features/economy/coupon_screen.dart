@@ -423,6 +423,7 @@ class HomeCouponShelf extends StatelessWidget {
           decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18)),
           child: LayoutBuilder(
             builder: (context, c) => Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const EditableLabel('coupon_screen.HomeCouponShelf',

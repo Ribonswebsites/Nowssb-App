@@ -89,8 +89,92 @@ flutter:
   uses-material-design: true
 
   assets:
-    # Every clip and its poster, on the phone after the download.
-    - assets/video/
+    # Only the clips the app actually plays, plus each clip's poster.
+    # Other files in assets/video stay for the website and are not packed in.
+    - assets/video/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr.mp4
+    - assets/video/28eb0c85b5fd748e_grok_video_2026-07-24-15-42-55_lknomr-poster.webp
+    - assets/video/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk.mp4
+    - assets/video/415dd447da33973b_grok_video_2026-07-30-14-35-05_q3tyzk-poster.webp
+    - assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4
+    - assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b-poster.webp
+    - assets/video/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei.mp4
+    - assets/video/beaf11ea10561d43_grok_video_2026-07-30-15-35-40_xwm1ei-poster.webp
+    - assets/video/choose-store.mp4
+    - assets/video/choose-store-poster.webp
+    - assets/video/connect-banner.mp4
+    - assets/video/connect-banner-poster.webp
+    - assets/video/coupon-a.mp4
+    - assets/video/coupon-a-poster.webp
+    - assets/video/fashion-plus-bg-5.mp4
+    - assets/video/fashion-plus-bg-5-poster.webp
+    - assets/video/fashion-plus-bg-6.mp4
+    - assets/video/fashion-plus-bg-6-poster.webp
+    - assets/video/fashion-plus-bg-ember.mp4
+    - assets/video/fashion-plus-bg-ember-poster.webp
+    - assets/video/fashion-plus-bg-silver.mp4
+    - assets/video/fashion-plus-bg-silver-poster.webp
+    - assets/video/grok-video-use-this.mp4
+    - assets/video/grok-video-use-this-poster.webp
+    - assets/video/healing-path-bg.mp4
+    - assets/video/healing-path-bg-poster.webp
+    - assets/video/hero-bg.mp4
+    - assets/video/hero-bg-poster.webp
+    - assets/video/hero-ebooks.mp4
+    - assets/video/hero-ebooks-poster.webp
+    - assets/video/hero-meaning-store.mp4
+    - assets/video/hero-meaning-store-poster.webp
+    - assets/video/hero-word-store.mp4
+    - assets/video/hero-word-store-poster.webp
+    - assets/video/login-phone.mp4
+    - assets/video/login-phone-poster.webp
+    - assets/video/my-progress-scene-1.mp4
+    - assets/video/my-progress-scene-1-poster.webp
+    - assets/video/normal-glass-background.mp4
+    - assets/video/normal-glass-background-poster.webp
+    - assets/video/orb-loop.mp4
+    - assets/video/orb-loop-poster.webp
+    - assets/video/player-actions-tab.mp4
+    - assets/video/player-actions-tab-poster.webp
+    - assets/video/player-aura-bg.mp4
+    - assets/video/player-aura-bg-poster.webp
+    - assets/video/player-bg-loop.mp4
+    - assets/video/player-bg-loop-poster.webp
+    - assets/video/player-box-rings.mp4
+    - assets/video/player-box-rings-poster.webp
+    - assets/video/practice-halo.mp4
+    - assets/video/practice-halo-poster.webp
+    - assets/video/practice-orb.mp4
+    - assets/video/practice-orb-poster.webp
+    - assets/video/reader-section.mp4
+    - assets/video/reader-section-poster.webp
+    - assets/video/rx-banner.mp4
+    - assets/video/rx-banner-poster.webp
+    - assets/video/signature-banner.mp4
+    - assets/video/signature-banner-poster.webp
+    - assets/video/signature-store-hero.mp4
+    - assets/video/signature-store-hero-poster.webp
+    - assets/video/sound-library-banner.mp4
+    - assets/video/sound-library-banner-poster.webp
+    - assets/video/start-animation.mp4
+    - assets/video/start-animation-poster.webp
+    - assets/video/store-banner-fash.mp4
+    - assets/video/store-banner-fash-poster.webp
+    - assets/video/store-orb-box.mp4
+    - assets/video/store-orb-box-poster.webp
+    - assets/video/store-section.mp4
+    - assets/video/store-section-poster.webp
+    - assets/video/store-verify-banner.mp4
+    - assets/video/store-verify-banner-poster.webp
+    - assets/video/subscription-a.mp4
+    - assets/video/subscription-a-poster.webp
+    - assets/video/subscription-b.mp4
+    - assets/video/subscription-b-poster.webp
+    - assets/video/subscription-bg.mp4
+    - assets/video/subscription-bg-poster.webp
+    - assets/video/tv-screen.mp4
+    - assets/video/tv-screen-poster.webp
+    - assets/video/word-acts.mp4
+    - assets/video/word-acts-poster.webp
     - assets/videos/
     - assets/notifications/
 
