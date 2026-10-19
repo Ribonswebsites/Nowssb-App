@@ -165,8 +165,6 @@ class _NavShellState extends State<NavShell> {
       await Future<void>.delayed(const Duration(milliseconds: 420));
       if (!mounted) return;
       await showDailyQuoteIfNeeded(context);
-      if (!mounted) return;
-      await _offerGuide();
     } finally {
       _dayLock = false;
     }
@@ -285,7 +283,6 @@ class _NavShellState extends State<NavShell> {
       if (_coach != null && _coach != 'welcome') _coach = null;
     });
     Settings.instance.setLastTab(tab);
-    if (!_dayLock) unawaited(_offerGuide());
   }
 
   static const _navFeatures = <String, Map<String, String>>{

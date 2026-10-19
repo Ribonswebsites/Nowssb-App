@@ -31,14 +31,12 @@ import '../admin/layout/layout_sections.dart';
 import '../data/content.dart';
 import '../data/notifications.dart';
 import '../data/settings.dart';
-import '../media/video_pool.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
 import '../widgets/enter_curve_stage.dart';
-import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
 import '../widgets/earth_day_film.dart';
@@ -55,7 +53,6 @@ import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
-import 'normal/header_actions_sheet.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import 'quick_access.dart';
@@ -285,28 +282,6 @@ class _HomeFashionState extends State<HomeFashion> {
       default:
         _go(tab);
     }
-  }
-
-  bool _glassMode = true;
-
-  /// Quick action hero chip → HeaderActionsSheet destinations.
-  void _openQuickAction() {
-    showHeaderActionsSheet(
-      context,
-      glassMode: _glassMode,
-      // Same switch as the classic home: lighter video budget in glass mode.
-      onGlassToggle: () => setState(() {
-        _glassMode = !_glassMode;
-        VideoPool.instance.setGlassHomeMode(_glassMode);
-      }),
-      onNotifications: () => showNotificationsSheet(context),
-      // Already on the Fashion home → its own settings (Fashion Plus).
-      onFashionHome: () => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const FashionPlusScreen()),
-      ),
-      onStore: () => _go(3),
-      onPlayer: () => _go(1),
-    );
   }
 
   void _openSearchDest(String key) {
@@ -653,16 +628,6 @@ class _HomeFashionState extends State<HomeFashion> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               HeroGreeting(name: widget.name),
-              // Search + Quick access live ONLY inside HeroCurveStage.
-              HeroCurveStage(
-                glass: true,
-                onSearch: () => showDestinationSearchSheet(
-                  context,
-                  onSelect: _openSearchDest,
-                ),
-                // Quick action → HeaderActionsSheet, NOT QuickAccessScreen.
-                onQuickAccess: _openQuickAction,
-              ),
               FashionHero(
                 onExplore: () => _go(2),
                 onGuide: () => _push(const FeaturesPage()),

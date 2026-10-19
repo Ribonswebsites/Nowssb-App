@@ -73,7 +73,6 @@ import 'notifications_sheet.dart';
 import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
-import '../widgets/hero_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
 import '../widgets/earth_day_film.dart';
@@ -322,49 +321,9 @@ class _HomeNormalState extends State<HomeNormal> {
   /// The twenty-nine, in `REG.norm.items` order. A null widget is a row with
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
-  /// Quick action hero chip → HeaderActionsSheet destinations.
-  /// QuickAccessScreen (nav customize) stays on settings/hamburger only.
-  void _openQuickAction() {
-    showHeaderActionsSheet(
-      context,
-      glassMode: _glassMode,
-      onGlassToggle: () => setState(() {
-        _glassMode = !_glassMode;
-        VideoPool.instance.setGlassHomeMode(_glassMode);
-      }),
-      onNotifications: () => showNotificationsSheet(context),
-      onFashionHome: () => Settings.instance.setFashionHome(true),
-      onStore: () => NavScope.goTo(context, 3),
-      onPlayer: () {
-        final words = ContentStore.instance.library;
-        if (words.isEmpty) {
-          NavScope.goTo(context, 1);
-          return;
-        }
-        Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => PracticePlayerScreen(
-              words: words,
-              title: 'Practice',
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        (
-          'heroCurve',
-          HeroCurveStage(
-            compact: true,
-            onSearch: () => showDestinationSearchSheet(context),
-            // Quick action chip → HeaderActionsSheet (destinations), NOT QuickAccessScreen.
-            onQuickAccess: _openQuickAction,
-          )
-        ),
         (
           'promoRail',
           NormalPromoRail(

@@ -21,6 +21,15 @@ class NotificationPopupHost extends StatefulWidget {
 
 class _NotificationPopupHostState extends State<NotificationPopupHost> {
   var _surfaced = false;
+  var _closed = false;
+
+  static final _standIn = NotifItem(
+    type: 'offers',
+    title: 'A line is waiting',
+    body: 'Today’s quote is open. Read it, or leave it.',
+    at: 0,
+    read: false,
+  );
 
   @override
   void initState() {
@@ -62,13 +71,13 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   @override
   Widget build(BuildContext context) {
     final list = NotificationBanner.items.value;
-    final signedIn = FirebaseAuth.instance.currentUser != null;
     final allow = NotificationBanner.showPopups.value;
-    final item = list.isEmpty ? null : list.first;
+    final live = list.isEmpty ? null : list.first;
+    final item = live ?? (_closed ? null : _standIn);
     return Stack(
       children: [
         widget.child,
-        if (signedIn && allow && item != null)
+        if (allow && item != null)
           Positioned(
             left: 10,
             right: 10,
@@ -78,9 +87,16 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 86),
                 child: _GlanceNotice(
-                  key: ValueKey('${item.at}|${item.type}|${item.title}'),
+                  key: ValueKey(live == null ? 'glance-standin' : '${item.at}|${item.type}|${item.title}'),
                   item: item,
-                  onClose: () => NotificationBanner.dismiss(item),
+                  thumbnail: live == null ? 'assets/banners/gyro/buddha.png' : null,
+                  onClose: () {
+                    if (live == null) {
+                      setState(() => _closed = true);
+                    } else {
+                      NotificationBanner.dismiss(item);
+                    }
+                  },
                 ),
               ),
             ),
@@ -91,9 +107,10 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
 }
 
 class _GlanceNotice extends StatefulWidget {
-  const _GlanceNotice({super.key, required this.item, required this.onClose});
+  const _GlanceNotice({super.key, required this.item, required this.onClose, this.thumbnail});
   final NotifItem item;
   final VoidCallback onClose;
+  final String? thumbnail;
 
   @override
   State<_GlanceNotice> createState() => _GlanceNoticeState();
@@ -251,13 +268,20 @@ class _GlanceNoticeState extends State<_GlanceNotice> {
                             borderRadius: BorderRadius.circular(12),
                             child: ColoredBox(
                               color: const Color(0xFF1A1A1E),
-                              child: CachedNetworkImage(
-                                imageUrl: NotifIcons.urlFor(widget.item.type),
-                                width: 86,
-                                height: 76,
-                                fit: BoxFit.cover,
-                                errorWidget: (_, __, ___) => const SizedBox(width: 86, height: 76),
-                              ),
+                              child: widget.thumbnail != null
+                                  ? Image.asset(
+                                      widget.thumbnail!,
+                                      width: 86,
+                                      height: 76,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : CachedNetworkImage(
+                                      imageUrl: NotifIcons.urlFor(widget.item.type),
+                                      width: 86,
+                                      height: 76,
+                                      fit: BoxFit.cover,
+                                      errorWidget: (_, __, ___) => const SizedBox(width: 86, height: 76),
+                                    ),
                             ),
                           ),
                           Positioned(

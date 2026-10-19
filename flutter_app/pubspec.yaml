@@ -105,6 +105,14 @@ flutter:
     - assets/video/connect-banner-poster.webp
     - assets/video/coupon-a.mp4
     - assets/video/coupon-a-poster.webp
+    - assets/video/earth-afternoon.mp4
+    - assets/video/earth-afternoon-poster.webp
+    - assets/video/earth-evening.mp4
+    - assets/video/earth-evening-poster.webp
+    - assets/video/earth-morning.mp4
+    - assets/video/earth-morning-poster.webp
+    - assets/video/earth-night.mp4
+    - assets/video/earth-night-poster.webp
     - assets/video/fashion-plus-bg-5.mp4
     - assets/video/fashion-plus-bg-5-poster.webp
     - assets/video/fashion-plus-bg-6.mp4

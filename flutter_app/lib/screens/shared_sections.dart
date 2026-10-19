@@ -937,32 +937,40 @@ class EbooksSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              EditableLabel('shared_sections.EbooksSection',
-                'NowssB',
-                style: TextStyle(fontSize: 14, color: Color(0x99FFFFFF)),
+          const ColoredBox(
+            color: Color(0xFF0C0C10),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(4, 12, 4, 4),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'NowssB',
+                    style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    'eBooks',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1.15,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Word science and sound healing, read anywhere.',
+                    style: TextStyle(fontSize: 14, color: Colors.white, height: 1.35),
+                  ),
+                ],
               ),
-              EditableLabel('shared_sections.EbooksSection',
-                'eBooks',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                  height: 1.15,
-                ),
-              ),
-              SizedBox(height: 6),
-              EditableLabel('shared_sections.EbooksSection',
-                'Word science and sound healing, read anywhere.',
-                style: TextStyle(fontSize: 13, color: Color(0xB3FFFFFF)),
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 14),
           Align(
-              alignment: Alignment.centerLeft, child: EnterPill(onTap: onTap)),
+            alignment: Alignment.centerLeft,
+            child: _EbookEnter(onTap: onTap),
+          ),
           const SizedBox(height: 16),
           SecBanner(
             title: 'eBooks',
@@ -970,6 +978,37 @@ class EbooksSection extends StatelessWidget {
             mark: NwsbMarks.ebook,
             markViewBox: 22,
             onTap: onTap,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EbookEnter extends StatelessWidget {
+  const _EbookEnter({this.onTap});
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Enter',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: const Center(
+              child: NwsbIcon(NwsbMarks.enterArrow, size: 13, viewBox: 12, strokeWidth: 1.9, color: Color(0xFF111111)),
+            ),
           ),
         ],
       ),

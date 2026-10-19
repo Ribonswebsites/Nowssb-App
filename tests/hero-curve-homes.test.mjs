@@ -15,7 +15,8 @@ assert.match(index, /nwsb-curve-fash glass-wrap/, "Fashion curve sits in a glass
 assert.match(index, /Sound that finds you/, "Curve uses the Sound that finds you line");
 assert.match(index, /Pronunciation & sound healing, wherever you are/, "Curve uses the pronunciation headline");
 assert.doesNotMatch(index, /she stays/, "Do not put the she-stays swipe line");
-assert.match(homeFash, /HeroCurveStage\(glass: true\)/, "Flutter Fashion home puts the curve under the greeting in glass");
+assert.doesNotMatch(homeFash, /HeroCurveStage\(/, "Flutter Fashion home no longer mounts the red-hair curve");
+assert.match(homeFash, /FashionHero\(/, "The television card sits in the hero slot");
 assert.match(css, /width:\s*152px/, "Orbiting stills are 16:9 wide");
 assert.match(css, /height:\s*86px/, "Orbiting stills are 16:9 short");
 assert.match(css, /height:\s*72%/, "Center subject is smaller than full-bleed");
@@ -25,7 +26,7 @@ assert.match(css, /perspective:\s*980px/, "Curve stage must be a 3D scene");
 assert.match(js, /data-nwsb-curve/, "Spinner must bind every curve stage");
 assert.match(flutter, /rows = \[-118.0, 0.0, 118.0\]/, "Hero curve has three rows of stills");
 assert.match(index, /nwsb-hero-ring-c/, "Website hero curve has three rings");
-assert.match(homeNm, /HeroCurveStage\(compact: true\)/, "Flutter Normal home puts the curve under search");
+assert.doesNotMatch(homeNm, /HeroCurveStage\(/, "Flutter Normal home no longer mounts the red-hair curve");
 assert.match(index, /nwsb-curve-embed/, "Promo tablet mounts the embedded 3D curve");
 assert.match(index, /tab-subject\.webp/, "Promo tablet uses the blonde cutout");
 assert.match(tvFrame, /Positioned.fill\(child: overlay!\)/, "Tablet overlay sits outside the video save-layer");
@@ -44,4 +45,4 @@ const herorowAt = index.indexOf('class="hhr-blk');
 assert.ok(greetAt >= 0 && curveFashAt > greetAt && herorowAt > curveFashAt,
   "Fashion curve sits below the greeting and above the hero row");
 
-console.log("3D curve is on both homes, Flutter and WebView.");
+console.log("Website curve stays. Flutter homes lead with the television card.");

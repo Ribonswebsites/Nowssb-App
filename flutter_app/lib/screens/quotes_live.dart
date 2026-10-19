@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
 import '../data/app_control.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,8 +26,6 @@ import 'reader/reader_hub.dart';
 import 'sound_library.dart';
 import 'store.dart';
 import 'subscription.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
@@ -1403,7 +1400,7 @@ Future<void> showDailyQuoteIfNeeded(BuildContext context) async {
     barrierDismissible: true,
     barrierLabel: 'Today quote',
     barrierColor: const Color(0xC0000000),
-    transitionDuration: const Duration(milliseconds: 460),
+    transitionDuration: const Duration(milliseconds: 220),
     pageBuilder: (dialogContext, _, __) {
       return _DailyQuotePopup(
         quote: line,
@@ -1420,21 +1417,15 @@ Future<void> showDailyQuoteIfNeeded(BuildContext context) async {
       );
     },
     transitionBuilder: (context, anim, _, child) {
-      final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutBack);
-      return FadeTransition(
-        opacity: anim,
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 0.88, end: 1).animate(curved),
-          child: child,
-        ),
-      );
+      return FadeTransition(opacity: anim, child: child);
     },
   );
   final again = await SharedPreferences.getInstance();
   await again.setString(_kDailyQuoteShown, today);
 }
 
-class _DailyQuotePopup extends StatefulWidget {
+
+class _DailyQuotePopup extends StatelessWidget {
   const _DailyQuotePopup({
     required this.quote,
     required this.onClose,
@@ -1446,266 +1437,83 @@ class _DailyQuotePopup extends StatefulWidget {
   final VoidCallback onQuotes;
 
   @override
-  State<_DailyQuotePopup> createState() => _DailyQuotePopupState();
-}
-
-class _DailyQuotePopupState extends State<_DailyQuotePopup>
-    with TickerProviderStateMixin {
-  late final AnimationController _spin = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 16),
-  )..repeat();
-  late final AnimationController _breath = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 3200),
-  )..repeat(reverse: true);
-
-  @override
-  void initState() {
-    super.initState();
-    HapticFeedback.mediumImpact();
-  }
-
-  @override
-  void dispose() {
-    _spin.dispose();
-    _breath.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final h = MediaQuery.sizeOf(context).height;
-    final videoH = (h * 0.42).clamp(240.0, 380.0);
     final day = _days[DateTime.now().weekday - 1];
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
           child: Material(
-            color: const Color(0xFF07070C),
-            elevation: 24,
-            shadowColor: const Color(0xAA6E4CFF),
+            color: const Color(0xFF0E0E12),
             borderRadius: BorderRadius.circular(28),
             clipBehavior: Clip.antiAlias,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: const Color(0x33E8D5A3)),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x666E4CFF), blurRadius: 36, spreadRadius: 1),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    height: videoH,
-                    width: double.infinity,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        AnimatedBuilder(
-                          animation: _breath,
-                          builder: (_, child) => Transform.scale(
-                            scale: 1.04 + _breath.value * 0.06,
-                            child: child,
-                          ),
-                          child: const NwsbVideo(
-                            asset: 'assets/video/practice-halo.mp4',
-                            fit: BoxFit.cover,
-                            priority: ClipPriority.feature,
-                            autoplay: true,
-                            loop: true,
-                            slot: 'quotes_live.DailyQuotePopup',
-                          ),
-                        ),
-                        const DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Color(0x44000000),
-                                Color(0x00000000),
-                                Color(0xFF07070C),
-                              ],
-                              stops: [0, 0.55, 1],
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: IgnorePointer(
-                            child: RotationTransition(
-                              turns: _spin,
-                              child: const SizedBox(
-                                width: 228,
-                                height: 228,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    CustomPaint(
-                                      size: Size(228, 228),
-                                      painter: _HaloRing(),
-                                    ),
-                                    Align(alignment: Alignment(0, -1), child: _OrbitDot()),
-                                    Align(alignment: Alignment(-0.88, 0.5), child: _OrbitDot()),
-                                    Align(alignment: Alignment(0.88, 0.5), child: _OrbitDot()),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 12,
-                          right: 12,
-                          child: GestureDetector(
-                            onTap: widget.onClose,
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: const Color(0x99000000),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0x66FFFFFF)),
-                              ),
-                              child: const Icon(Icons.close_rounded, color: Colors.white, size: 20),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 230,
+                  width: double.infinity,
+                  child: Image.asset(
+                    'assets/banners/gyro/buddha.png',
+                    fit: BoxFit.cover,
+                    alignment: const Alignment(0, -0.2),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
-                    child: Column(
-                      children: [
-                        Text(
-                          'TODAY  ·  ${day.toUpperCase()}',
-                          style: const TextStyle(
-                            color: Color(0xFFE8D5A3),
-                            fontSize: 11,
-                            letterSpacing: 2.4,
-                            fontWeight: FontWeight.w800,
-                          ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+                  child: Column(
+                    children: [
+                      Text(
+                        day.toUpperCase(),
+                        style: const TextStyle(
+                          color: Color(0xFFE8D5A3),
+                          fontSize: 12,
+                          letterSpacing: 3,
+                          fontWeight: FontWeight.w700,
                         ),
-                        const SizedBox(height: 8),
-                        const EditableLabel(
-                          'quotes_live.DailyQuotePopup',
-                          'A line for today',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            height: 1.1,
-                          ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        quote,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          height: 1.35,
+                          fontWeight: FontWeight.w600,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          widget.quote,
-                          textAlign: TextAlign.center,
-                          maxLines: 6,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xF2FFFFFF),
-                            fontSize: 15.5,
-                            height: 1.35,
-                            fontWeight: FontWeight.w600,
+                      ),
+                      const SizedBox(height: 22),
+                      SizedBox(
+                        height: 48,
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: onQuotes,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: const Color(0xFFE8D5A3),
+                            foregroundColor: const Color(0xFF14110A),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                           ),
+                          child: const Text('Quotes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
                         ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: 48,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: widget.onClose,
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    side: const BorderSide(color: Color(0x66FFFFFF)),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                                  ),
-                                  child: const EditableLabel(
-                                    'quotes_live.DailyQuotePopup',
-                                    'Close',
-                                    style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: FilledButton(
-                                  onPressed: widget.onQuotes,
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: const Color(0xFFE8D5A3),
-                                    foregroundColor: const Color(0xFF14110A),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                                  ),
-                                  child: const EditableLabel(
-                                    'quotes_live.DailyQuotePopup',
-                                    'Quotes',
-                                    style: TextStyle(color: Color(0xFF14110A), fontSize: 15, fontWeight: FontWeight.w800),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 44,
+                        width: double.infinity,
+                        child: TextButton(
+                          onPressed: onClose,
+                          child: const Text('Close', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
   }
-}
-
-class _OrbitDot extends StatelessWidget {
-  const _OrbitDot();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 7,
-      height: 7,
-      decoration: const BoxDecoration(
-        color: Color(0xFFE8D5A3),
-        shape: BoxShape.circle,
-        boxShadow: [BoxShadow(color: Color(0xFFE8D5A3), blurRadius: 8)],
-      ),
-    );
-  }
-}
-
-class _HaloRing extends CustomPainter {
-  const _HaloRing();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final r = size.shortestSide / 2 - 4;
-    final gold = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round
-      ..color = const Color(0xCCE8D5A3);
-    final soft = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..strokeCap = StrokeCap.round
-      ..color = const Color(0x66FFFFFF);
-    canvas.drawArc(Rect.fromCircle(center: c, radius: r), -1.15, 2.2, false, gold);
-    canvas.drawArc(Rect.fromCircle(center: c, radius: r - 16), 1.5, 1.5, false, soft);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
