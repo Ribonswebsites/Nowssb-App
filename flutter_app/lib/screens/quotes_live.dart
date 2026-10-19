@@ -13,6 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/firebase.dart';
 import '../data/settings.dart';
+import '../media/nwsb_video.dart';
+import '../media/video_pool.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/glass_wrap.dart';
@@ -45,7 +47,13 @@ const _kBuddhaQuote =
 
 const _kQuoteMarks = 'nwsb_quote_marks';
 const _kHomeQuoteHidden = 'nwsb_home_quote_hidden_day';
-const _kDailyQuoteShown = 'nwsb_daily_quote_popup_day';
+const _kDailyQuoteShown = 'nwsb_daily_quote_popup_v3';
+
+/// Notifications wait until this day's quote has opened or been skipped.
+class DailyQuoteGate {
+  DailyQuoteGate._();
+  static final done = ValueNotifier<bool>(false);
+}
 
 String _dayKey(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -1392,130 +1400,183 @@ class _SharedLine {
 Future<void> showDailyQuoteIfNeeded(BuildContext context) async {
   final prefs = await SharedPreferences.getInstance();
   final today = _dayKey(DateTime.now());
-  if (prefs.getString(_kDailyQuoteShown) == today) return;
-  if (!context.mounted) return;
+  if (prefs.getString(_kDailyQuoteShown) == today) {
+    DailyQuoteGate.done.value = true;
+    return;
+  }
+  if (!context.mounted) {
+    DailyQuoteGate.done.value = true;
+    return;
+  }
   final live = Settings.instance.liveQuote.trim();
   final line = live.isNotEmpty ? live : _kBuddhaQuote;
-  await showGeneralDialog<void>(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: 'Today quote',
-    barrierColor: const Color(0xC0000000),
-    transitionDuration: const Duration(milliseconds: 220),
-    pageBuilder: (dialogContext, _, __) {
-      return _DailyQuotePopup(
-        quote: line,
-        onClose: () => Navigator.of(dialogContext).pop(),
-        onQuotes: () {
-          Navigator.of(dialogContext).pop();
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (!context.mounted) return;
-            Navigator.of(context).push(
-              MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
-            );
-          });
-        },
-      );
-    },
-    transitionBuilder: (context, anim, _, child) {
-      return FadeTransition(opacity: anim, child: child);
-    },
-  );
-  final again = await SharedPreferences.getInstance();
-  await again.setString(_kDailyQuoteShown, today);
+  try {
+    await showGeneralDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Today quote',
+      barrierColor: const Color(0xC0000000),
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (dialogContext, _, __) {
+        return _DailyQuotePopup(
+          quote: line,
+          onClose: () => Navigator.of(dialogContext).pop(),
+          onQuotes: () {
+            Navigator.of(dialogContext).pop();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!context.mounted) return;
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const QuotesWeekScreen()),
+              );
+            });
+          },
+        );
+      },
+      transitionBuilder: (context, anim, _, child) {
+        return FadeTransition(opacity: anim, child: child);
+      },
+    );
+    final again = await SharedPreferences.getInstance();
+    await again.setString(_kDailyQuoteShown, today);
+  } finally {
+    DailyQuoteGate.done.value = true;
+  }
 }
 
 
-class _DailyQuotePopup extends StatelessWidget {
-  const _DailyQuotePopup({
-    required this.quote,
-    required this.onClose,
-    required this.onQuotes,
-  });
-
+class _DailyQuotePopup extends StatefulWidget {
+  const _DailyQuotePopup({required this.quote, required this.onClose, required this.onQuotes});
   final String quote;
   final VoidCallback onClose;
   final VoidCallback onQuotes;
 
   @override
+  State<_DailyQuotePopup> createState() => _DailyQuotePopupState();
+}
+
+class _DailyQuotePopupState extends State<_DailyQuotePopup> with SingleTickerProviderStateMixin {
+  late final AnimationController _rise = AnimationController(vsync: this, duration: const Duration(milliseconds: 700))..forward();
+
+  @override
+  void dispose() {
+    _rise.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final day = _days[now.weekday - 1].toUpperCase();
-    return Material(
-      color: const Color(0xFF07060A),
-      child: SafeArea(
+    final rise = CurvedAnimation(parent: _rise, curve: Curves.easeOutCubic);
+    return SafeArea(
+      child: Center(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(22, 16, 22, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    day,
-                    style: const TextStyle(
-                      color: Color(0x99FFFFFF),
-                      fontSize: 12,
-                      letterSpacing: 3,
-                      fontWeight: FontWeight.w700,
+          padding: const EdgeInsets.symmetric(horizontal: 22),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color(0x33FFFFFF),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0x66FFFFFF)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: ColoredBox(
+                      color: const Color(0xFF07070C),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(
+                            height: 168,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                const NwsbVideo(
+                                  asset: 'assets/video/healing-path-bg.mp4',
+                                  priority: ClipPriority.feature,
+                                  fit: BoxFit.cover,
+                                ),
+                                const DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [Color(0x00000000), Color(0xEE07070C)],
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 16,
+                                  bottom: 12,
+                                  child: Text(
+                                    day,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      letterSpacing: 2.4,
+                                      fontWeight: FontWeight.w700,
+                                      decoration: TextDecoration.none,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(18, 4, 18, 16),
+                            child: FadeTransition(
+                              opacity: rise,
+                              child: SlideTransition(
+                                position: Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(rise),
+                                child: Text(
+                                  widget.quote,
+                                  style: GoogleFonts.libreBaskerville(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    height: 1.35,
+                                    decoration: TextDecoration.none,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextButton(
+                                    onPressed: widget.onClose,
+                                    child: const Text('Close', style: TextStyle(color: Colors.white, fontSize: 15, decoration: TextDecoration.none)),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: FilledButton(
+                                    onPressed: widget.onQuotes,
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: const Color(0xFF07070C),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    ),
+                                    child: const Text('Quotes', style: TextStyle(fontWeight: FontWeight.w800, decoration: TextDecoration.none)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    '${now.day}',
-                    style: GoogleFonts.libreBaskerville(
-                      color: const Color(0x33FFFFFF),
-                      fontSize: 42,
-                      height: 1,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Container(width: 48, height: 3, color: Colors.white),
-              const SizedBox(height: 22),
-              Text(
-                quote,
-                style: GoogleFonts.libreBaskerville(
-                  color: Colors.white,
-                  fontSize: 34,
-                  height: 1.22,
-                  fontWeight: FontWeight.w400,
                 ),
               ),
-              const Spacer(),
-              Row(
-                children: [
-                  Expanded(
-                    child: SizedBox(
-                      height: 52,
-                      child: TextButton(
-                        onPressed: onClose,
-                        child: const Text(
-                          'Close',
-                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: SizedBox(
-                      height: 52,
-                      child: FilledButton(
-                        onPressed: onQuotes,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF07060A),
-                          shape: const RoundedRectangleBorder(),
-                        ),
-                        child: const Text('Quotes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
         ),
       ),

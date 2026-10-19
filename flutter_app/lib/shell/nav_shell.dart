@@ -167,6 +167,7 @@ class _NavShellState extends State<NavShell> {
       await showDailyQuoteIfNeeded(context);
     } finally {
       _dayLock = false;
+      DailyQuoteGate.done.value = true;
     }
   }
 
