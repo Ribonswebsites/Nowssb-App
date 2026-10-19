@@ -50,6 +50,7 @@ import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
+import 'fashion/player_explainer.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
@@ -358,10 +359,16 @@ class _HomeFashionState extends State<HomeFashion> {
         ('greet', const FashGreeting()),
         (
           'herorow',
-          FashHeroRow(
-            onCustomize: () => _push(const WidgetsPage()),
-            onFeatures: () => _push(const FeaturesPage()),
-            onEarn: () => _push(const EarnHubScreen()),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              FashHeroRow(
+                onCustomize: () => _push(const WidgetsPage()),
+                onFeatures: () => _push(const FeaturesPage()),
+                onEarn: () => _push(const EarnHubScreen()),
+              ),
+              PlayerExplainer(onOpen: () => _go(1)),
+            ],
           ),
         ),
         (

@@ -91,10 +91,9 @@ class TrioRail extends StatefulWidget {
 }
 
 class _RailFace {
-  const _RailFace(this.label, this.image, this.tint, this.programme, [this.tab]);
+  const _RailFace(this.label, this.mark, this.programme, [this.tab]);
   final String label;
-  final String image;
-  final Color tint;
+  final String mark;
   final Programme programme;
   final String? tab;
   void open(BuildContext context) => Programmes.open(context, programme, tab: tab);
@@ -103,13 +102,12 @@ class _RailFace {
 class _TrioRailState extends State<TrioRail> {
   static const _loop = 80;
   static const _all = <_RailFace>[
-    _RailFace('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), Programme.gifts),
-    _RailFace('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), Programme.rewards),
-    _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
-    // The coin ledger (Rewards · Wallet), not the Rewards front again.
-    _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),
-    _RailFace('NowssB Coupons', 'assets/banners/earn/hands-light.png', Color(0xFF7A1F4F), Programme.coupons),
-    _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.png', Color(0xFF1F4E7A), Programme.reference),
+    _RailFace('NowssB Gifts', NwsbMarks.gift, Programme.gifts),
+    _RailFace('NowssB Rewards', NwsbMarks.rewards, Programme.rewards),
+    _RailFace('Your Earning', NwsbMarks.piggy, Programme.earnings),
+    _RailFace('Coins earned', NwsbMarks.earn, Programme.rewards, 'wallet'),
+    _RailFace('NowssB Coupons', NwsbMarks.coupon, Programme.coupons),
+    _RailFace('Reference', NwsbMarks.reference, Programme.reference),
   ];
 
   late final List<_RailFace> _faces = [
@@ -149,90 +147,112 @@ class _TrioRailState extends State<TrioRail> {
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
-      margin: EdgeInsets.zero,
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-      child: SizedBox(
-        height: 176,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: const SizedBox(
-                width: 112,
-                height: 176,
-                child: Image(
-                  image: AssetImage('assets/banners/earn/hands-raise.png'),
-                  fit: BoxFit.cover,
-                  alignment: Alignment(0, -0.05),
-                ),
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(4, 0, 4, 10),
+          child: Text(
+            'Your programs',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              height: 1.05,
+              decoration: TextDecoration.none,
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: SizedBox(
-                height: 122,
-                child: PageView.builder(
-                  controller: _pages,
-                  padEnds: false,
-                  physics: const ClampingScrollPhysics(),
-                  itemCount: _faces.length * _loop,
-                  itemBuilder: (_, i) {
-                    final face = _faces[i % _faces.length];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () => face.open(context),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              ColoredBox(color: face.tint),
-                              Image(
-                                image: AssetImage(face.image),
-                                fit: BoxFit.cover,
-                                alignment: const Alignment(0, -0.1),
-                                color: face.tint.withValues(alpha: 0.42),
-                                colorBlendMode: BlendMode.srcATop,
-                              ),
-                              const DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [Color(0x00000000), Color(0xCC000000)],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 8,
-                                right: 8,
-                                bottom: 8,
-                                child: Text(
-                                  face.label,
-                                  maxLines: 2,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 13,
-                                    height: 1.12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        GlassWrap(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+          child: SizedBox(
+            height: 176,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: const SizedBox(
+                    width: 112,
+                    height: 176,
+                    child: Image(
+                      image: AssetImage('assets/banners/earn/yoga-light.png'),
+                      fit: BoxFit.cover,
+                      alignment: Alignment(0, -0.15),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                    height: 132,
+                    child: PageView.builder(
+                      controller: _pages,
+                      padEnds: false,
+                      physics: const ClampingScrollPhysics(),
+                      itemCount: _faces.length * _loop,
+                      itemBuilder: (_, i) {
+                        final face = _faces[i % _faces.length];
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: GestureDetector(
+                            onTap: () => face.open(context),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF000000),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: const Color(0x33FFFFFF)),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      width: 42,
+                                      height: 42,
+                                      decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: NwsbIcon(
+                                        face.mark,
+                                        size: 20,
+                                        color: const Color(0xFF0A0A0C),
+                                        strokeWidth: 1.8,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      face.label,
+                                      maxLines: 2,
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 13,
+                                        height: 1.12,
+                                        decoration: TextDecoration.none,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
