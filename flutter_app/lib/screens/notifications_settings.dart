@@ -13,7 +13,7 @@ import '../widgets/glass_wrap.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
-import '../widgets/notification_popup.dart';
+import 'notifications_sheet.dart';
 
 class NotificationsSettingsPage extends StatelessWidget {
   const NotificationsSettingsPage({super.key});
@@ -307,7 +307,7 @@ class _FeedList extends StatelessWidget {
           if (feed.length > shown) ...[
             const Divider(height: 1, color: Color(0x0FFFFFFF)),
             InkWell(
-              onTap: () => showNotifChat(context),
+              onTap: () => showNotificationsSheet(context),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(

@@ -20,7 +20,7 @@ import '../widgets/home_skin.dart';
 import '../widgets/neumorphic.dart';
 import '../widgets/scroll_progress_rail.dart';
 import 'healing_path.dart';
-import '../widgets/notification_popup.dart';
+import 'notifications_sheet.dart';
 import 'player_settings.dart';
 import 'practice.dart';
 import 'reader/reader_hub.dart';
@@ -1136,7 +1136,7 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => showNotifChat(context),
+                        onTap: () => showNotificationsSheet(context),
                         child: Container(
                           width: 42,
                           height: 42,
@@ -1440,87 +1440,82 @@ class _DailyQuotePopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final day = _days[now.weekday - 1];
-    final months = const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final stamp = '${day.toUpperCase()}  ${now.day} ${months[now.month - 1].toUpperCase()}';
-    final ink = GoogleFonts.libreBaskerville(color: const Color(0xFF1C140C), height: 1.35);
-    final w = MediaQuery.sizeOf(context).width - 56;
-    return SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
-          child: SizedBox(
-            width: w > 420 ? 420 : w,
-            child: Column(
-            mainAxisSize: MainAxisSize.min,
+    final day = _days[now.weekday - 1].toUpperCase();
+    return Material(
+      color: const Color(0xFF07060A),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 16, 22, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF3E6D0),
-                  borderRadius: BorderRadius.circular(4),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x66000000), blurRadius: 28, offset: Offset(0, 16)),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(26, 28, 26, 26),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        stamp,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFF8A3A2A),
-                          fontSize: 11,
-                          letterSpacing: 2.4,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        quote,
-                        textAlign: TextAlign.center,
-                        style: ink.copyWith(fontSize: 26, fontWeight: FontWeight.w400),
-                      ),
-                      const SizedBox(height: 22),
-                      const Center(
-                        child: SizedBox(
-                          width: 36,
-                          child: Divider(color: Color(0xFF8A3A2A), thickness: 1),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'A line for the day',
-                        textAlign: TextAlign.center,
-                        style: ink.copyWith(fontSize: 12, fontStyle: FontStyle.italic, color: const Color(0xFF5C4636)),
-                      ),
-                    ],
+              Row(
+                children: [
+                  Text(
+                    day,
+                    style: const TextStyle(
+                      color: Color(0x99FFFFFF),
+                      fontSize: 12,
+                      letterSpacing: 3,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
+                  const Spacer(),
+                  Text(
+                    '${now.day}',
+                    style: GoogleFonts.libreBaskerville(
+                      color: const Color(0x33FFFFFF),
+                      fontSize: 42,
+                      height: 1,
+                    ),
+                  ),
+                ],
               ),
+              const Spacer(),
+              Container(width: 48, height: 3, color: Colors.white),
               const SizedBox(height: 22),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton(
-                  onPressed: onQuotes,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFF3E6D0),
-                    side: const BorderSide(color: Color(0xFFF3E6D0)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                  ),
-                  child: const Text('Open quotes', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+              Text(
+                quote,
+                style: GoogleFonts.libreBaskerville(
+                  color: Colors.white,
+                  fontSize: 34,
+                  height: 1.22,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
-              TextButton(
-                onPressed: onClose,
-                child: const Text('Close', style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 15)),
+              const Spacer(),
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: TextButton(
+                        onPressed: onClose,
+                        child: const Text(
+                          'Close',
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: FilledButton(
+                        onPressed: onQuotes,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF07060A),
+                          shape: const RoundedRectangleBorder(),
+                        ),
+                        child: const Text('Quotes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
-            ),
           ),
         ),
       ),

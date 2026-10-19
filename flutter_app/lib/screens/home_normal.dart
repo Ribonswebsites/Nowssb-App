@@ -69,7 +69,7 @@ import 'normal/rotating_promo_rail.dart';
 import 'shared_sections.dart';
 import 'fashion/sections_mid.dart';
 import 'sound_library.dart';
-import '../widgets/notification_popup.dart';
+import 'notifications_sheet.dart';
 import 'quick_access.dart';
 import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
@@ -594,7 +594,7 @@ class _HomeNormalState extends State<HomeNormal> {
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
             child: _TopRow(
               onMenu: () => _openHomeMenu(context),
-              onNotifications: () => showNotifChat(context),
+              onNotifications: () => showNotificationsSheet(context),
               glassMode: _glassMode,
               onGlassToggle: () => setState(() {
                 _glassMode = !_glassMode;
@@ -652,7 +652,7 @@ class _TopRow extends StatelessWidget {
       context,
       glassMode: glassMode,
       onGlassToggle: onGlassToggle,
-      onNotifications: () => showNotifChat(context),
+      onNotifications: () => showNotificationsSheet(context),
       onFashionHome: () => Settings.instance.setFashionHome(true),
       onStore: () => NavScope.goTo(context, 3),
       onPlayer: () {

@@ -5,7 +5,7 @@ library;
 import 'package:flutter/material.dart';
 
 import '../data/practice_progress.dart';
-import 'notification_popup.dart';
+import '../screens/notifications_sheet.dart';
 import '../screens/practice.dart';
 import '../screens/progress/progress_screen.dart';
 import '../screens/sound_library.dart';
@@ -116,7 +116,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                 ),
               ),
                       GestureDetector(
-                        onTap: () => showNotifChat(context),
+                        onTap: () => showNotificationsSheet(context),
                         child: Container(
                           width: 44,
                           height: 44,
