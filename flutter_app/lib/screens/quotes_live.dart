@@ -8,6 +8,7 @@ import '../data/app_control.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/firebase.dart';
@@ -19,7 +20,7 @@ import '../widgets/home_skin.dart';
 import '../widgets/neumorphic.dart';
 import '../widgets/scroll_progress_rail.dart';
 import 'healing_path.dart';
-import 'notifications_sheet.dart';
+import '../widgets/notification_popup.dart';
 import 'player_settings.dart';
 import 'practice.dart';
 import 'reader/reader_hub.dart';
@@ -1135,7 +1136,7 @@ class _QuoteMonthSheetState extends State<_QuoteMonthSheet> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => showNotificationsSheet(context),
+                        onTap: () => showNotifChat(context),
                         child: Container(
                           width: 42,
                           height: 42,
@@ -1438,78 +1439,87 @@ class _DailyQuotePopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final day = _days[DateTime.now().weekday - 1];
+    final now = DateTime.now();
+    final day = _days[now.weekday - 1];
+    final months = const ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final stamp = '${day.toUpperCase()}  ${now.day} ${months[now.month - 1].toUpperCase()}';
+    final ink = GoogleFonts.libreBaskerville(color: const Color(0xFF1C140C), height: 1.35);
+    final w = MediaQuery.sizeOf(context).width - 56;
     return SafeArea(
       child: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
-          child: Material(
-            color: const Color(0xFF0E0E12),
-            borderRadius: BorderRadius.circular(28),
-            clipBehavior: Clip.antiAlias,
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
+          child: SizedBox(
+            width: w > 420 ? 420 : w,
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: 230,
-                  width: double.infinity,
-                  child: Image.asset(
-                    'assets/banners/gyro/buddha.png',
-                    fit: BoxFit.cover,
-                    alignment: const Alignment(0, -0.2),
-                  ),
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3E6D0),
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x66000000), blurRadius: 28, offset: Offset(0, 16)),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(26, 28, 26, 26),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        day.toUpperCase(),
+                        stamp,
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Color(0xFFE8D5A3),
-                          fontSize: 12,
-                          letterSpacing: 3,
+                          color: Color(0xFF8A3A2A),
+                          fontSize: 11,
+                          letterSpacing: 2.4,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 18),
                       Text(
                         quote,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          height: 1.35,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: ink.copyWith(fontSize: 26, fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(height: 22),
-                      SizedBox(
-                        height: 48,
-                        width: double.infinity,
-                        child: FilledButton(
-                          onPressed: onQuotes,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: const Color(0xFFE8D5A3),
-                            foregroundColor: const Color(0xFF14110A),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                          ),
-                          child: const Text('Quotes', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+                      const Center(
+                        child: SizedBox(
+                          width: 36,
+                          child: Divider(color: Color(0xFF8A3A2A), thickness: 1),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 44,
-                        width: double.infinity,
-                        child: TextButton(
-                          onPressed: onClose,
-                          child: const Text('Close', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
-                        ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'A line for the day',
+                        textAlign: TextAlign.center,
+                        style: ink.copyWith(fontSize: 12, fontStyle: FontStyle.italic, color: const Color(0xFF5C4636)),
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton(
+                  onPressed: onQuotes,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFFF3E6D0),
+                    side: const BorderSide(color: Color(0xFFF3E6D0)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                  ),
+                  child: const Text('Open quotes', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                ),
+              ),
+              TextButton(
+                onPressed: onClose,
+                child: const Text('Close', style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 15)),
+              ),
+            ],
             ),
           ),
         ),

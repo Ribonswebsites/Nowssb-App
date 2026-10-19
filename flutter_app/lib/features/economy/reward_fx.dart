@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../admin/template/editable.dart';
+import '../../data/notifications.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
@@ -59,6 +60,7 @@ class RewardHaptics {
 /// even if the widget that asked has already gone (context may be stale).
 Future<void> playCoins(BuildContext? context, int gained, {int? balanceAfter, String title = 'NowssB coins', bool reveal = true}) async {
   if (gained <= 0) return;
+  unawaited(NotifStore.instance.pingCoins(gained));
   final after = balanceAfter ?? EconomyMirror.instance.coins;
   final before = math.max(0, after - gained);
   if (reveal) {
@@ -113,6 +115,7 @@ Future<void> celebrate(BuildContext context, Map<String, dynamic> r, {String? ti
   final chest = find('chest');
   final reveal = find('reveal');
   final gained = coinsIn(r);
+  if (gained > 0) unawaited(NotifStore.instance.pingCoins(gained));
   final after = balanceIn(r) ?? EconomyMirror.instance.coins;
   final rarity = '${r['rarity'] ?? reveal?['rarity'] ?? ''}';
   if (box != null) {

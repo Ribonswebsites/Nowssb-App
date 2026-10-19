@@ -96,6 +96,30 @@ class SpinNow {
   }
 }
 
+/// The daily wheel on its own page. A notification tap lands here.
+class SpinWheelPage extends StatelessWidget {
+  const SpinWheelPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF07070C),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: const Text('Spinning wheel'),
+      ),
+      body: const SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: GiftWheel(),
+        ),
+      ),
+    );
+  }
+}
+
 class GiftWheel extends StatefulWidget {
   const GiftWheel({super.key});
 

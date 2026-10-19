@@ -137,6 +137,13 @@ class NotifStore extends ChangeNotifier {
       NotifKind(k: 'streak', label: 'Streak', sub: 'Evening reminder if you have not practiced'),
       NotifKind(k: 'reader', label: 'Reading', sub: 'Reminders you set in the Reader'),
     ]),
+    NotifGroup(name: 'Rewards', items: [
+      NotifKind(k: 'coins', label: 'Coins', sub: 'When coins are waiting to collect'),
+      NotifKind(k: 'rewards', label: 'Rewards', sub: 'Streaks, quests and the wallet'),
+      NotifKind(k: 'gifts', label: 'Gifts', sub: 'Send, redeem and boxes'),
+      NotifKind(k: 'spin', label: 'Spinning wheel', sub: 'The daily spin'),
+      NotifKind(k: 'update', label: 'Latest update', sub: 'What changed in the app'),
+    ]),
     NotifGroup(name: 'Offers', items: [
       NotifKind(k: 'offers', label: 'Offers & news', sub: 'Announcements from NowssB, never in quiet hours'),
     ]),
@@ -284,11 +291,60 @@ class NotifStore extends ChangeNotifier {
       }
       _loaded = true;
       notifyListeners();
+      unawaited(ensureLiveBoard());
     } catch (_) {
       _loaded = true;
       notifyListeners();
     }
     _listenRemote();
+  }
+
+  /// One of each live door, refreshed each day, so the bell is never empty.
+  /// These are the rows you tap: coins, rewards, gifts, the wheel, the update.
+  Future<void> ensureLiveBoard() async {
+    if (!_loaded || !_master) return;
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
+    const rows = <(String, String, String)>[
+      ('coins', 'Go collect', 'Your coins are waiting. Open them and collect.'),
+      ('rewards', 'Rewards', 'Streaks, quests and today’s coins.'),
+      ('gifts', 'Gifts', 'Send a gift, or redeem one that is yours.'),
+      ('spin', 'Spinning wheel', 'Your free spin is ready. Open the wheel.'),
+      ('update', 'Latest update', 'Home, the player and the store were updated.'),
+    ];
+    var changed = false;
+    for (final row in rows) {
+      if (_off.contains(row.$1) || mute?.call(row.$1) == true) continue;
+      final today = _feed.any((e) => e.remotePath == null && e.type == row.$1 && e.at >= start);
+      if (today) continue;
+      _feed.removeWhere((e) => e.remotePath == null && e.type == row.$1);
+      _feed = [
+        NotifItem(
+          type: row.$1,
+          title: row.$2,
+          body: row.$3,
+          at: now.millisecondsSinceEpoch,
+          read: false,
+        ),
+        ..._feed,
+      ].take(feedMax).toList();
+      changed = true;
+    }
+    if (!changed) return;
+    await _persistFeed();
+    notifyListeners();
+  }
+
+  /// Coins just landed. The bell gets a fresh "Go collect" and the chat drops.
+  Future<void> pingCoins(int gained) async {
+    if (gained <= 0 || !_loaded) return;
+    _feed.removeWhere((e) => e.remotePath == null && e.type == 'coins');
+    await _persistFeed();
+    await notify(
+      type: 'coins',
+      title: 'Go collect',
+      body: 'You earned $gained coins. Open them and collect.',
+    );
   }
 
   Future<void> _persistMaster() async {

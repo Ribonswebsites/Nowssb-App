@@ -32,7 +32,7 @@ import '../widgets/app_thinking_loader.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
-import 'notifications_sheet.dart';
+import '../widgets/notification_popup.dart';
 import 'practice.dart';
 import 'practice_player.dart';
 import 'profile.dart';
@@ -424,7 +424,7 @@ class _SlmFeed extends StatelessWidget {
                 onChip: onChip,
                 onBack: onBack,
                 embedded: embedded,
-                onNotifications: () => showNotificationsSheet(context),
+                onNotifications: () => showNotifChat(context),
                 onProfile: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const ProfileScreen()),
                 ),

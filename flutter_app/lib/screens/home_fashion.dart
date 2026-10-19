@@ -52,7 +52,7 @@ import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
-import 'notifications_sheet.dart';
+import '../widgets/notification_popup.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import 'quick_access.dart';
@@ -732,7 +732,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 builder: (context, _) {
                   return HomeHeader(
                     notifications: NotifStore.instance.unreadRaw,
-                    onNotifications: () => showNotificationsSheet(context),
+                    onNotifications: () => showNotifChat(context),
                     onSettings: () => _push(const AppSettingsScreen()),
                     onMenu: () => showHomeMenuDrawer(context, goTab: _go),
                   );

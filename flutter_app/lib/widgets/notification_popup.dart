@@ -1,15 +1,37 @@
-/// Glance-style notification card. Sits above every screen, over the bar.
+/// Chat that drops from the top bell. Not a card on the nav.
 library;
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
 import '../data/phone_notifications.dart';
-import '../screens/notifications_sheet.dart';
+import '../features/notifications/notif_router.dart';
+import '../screens/splash.dart';
 import '../theme/liquid_glass_theme.dart';
+
+/// The bell opens this. A thread under the button, each line its own page.
+Future<void> showNotifChat(BuildContext context) {
+  HapticFeedback.lightImpact();
+  return showGeneralDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'Notifications',
+    barrierColor: const Color(0x66000000),
+    transitionDuration: const Duration(milliseconds: 220),
+    pageBuilder: (context, _, __) => const _NotifChat(),
+    transitionBuilder: (context, anim, _, child) {
+      final curved = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(begin: const Offset(0, -0.06), end: Offset.zero).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
 
 class NotificationPopupHost extends StatefulWidget {
   const NotificationPopupHost({super.key, required this.child});
@@ -20,85 +42,67 @@ class NotificationPopupHost extends StatefulWidget {
 }
 
 class _NotificationPopupHostState extends State<NotificationPopupHost> {
-  var _surfaced = false;
-  var _closed = false;
-
-  static final _standIn = NotifItem(
-    type: 'offers',
-    title: 'A line is waiting',
-    body: 'Today’s quote is open. Read it, or leave it.',
-    at: 0,
-    read: false,
-  );
+  final _hidden = <String>{};
 
   @override
   void initState() {
     super.initState();
     NwsbEffects.instance.bind();
-    NotificationBanner.items.addListener(_onItems);
-    NotificationBanner.showPopups.addListener(_onItems);
-    NotifStore.instance.addListener(_surfaceUnread);
-    _surfaceUnread();
+    NotificationBanner.items.addListener(_on);
+    NotificationBanner.showPopups.addListener(_on);
+    NotifStore.instance.addListener(_on);
+    SplashGate.done.addListener(_on);
   }
 
   @override
   void dispose() {
-    NotificationBanner.items.removeListener(_onItems);
-    NotificationBanner.showPopups.removeListener(_onItems);
-    NotifStore.instance.removeListener(_surfaceUnread);
+    NotificationBanner.items.removeListener(_on);
+    NotificationBanner.showPopups.removeListener(_on);
+    NotifStore.instance.removeListener(_on);
+    SplashGate.done.removeListener(_on);
     super.dispose();
   }
 
-  void _onItems() {
+  void _on() {
     if (mounted) setState(() {});
   }
 
-  /// One waiting item, once, so a card is there when the inbox already has
-  /// something. New arrivals still come through [NotificationBanner.push].
-  void _surfaceUnread() {
-    if (_surfaced || !NotifStore.instance.loaded) return;
-    final unread = NotifStore.instance.feed.where((e) => !e.read);
-    if (unread.isEmpty) {
-      if (NotificationBanner.items.value.isNotEmpty) _surfaced = true;
-      return;
+  static String _id(NotifItem e) => '${e.type}|${e.at}|${e.title}';
+
+  NotifItem? _pick() {
+    if (!SplashGate.done.value || !NotificationBanner.showPopups.value) return null;
+    final banner = NotificationBanner.items.value;
+    if (banner.isNotEmpty && !_hidden.contains(_id(banner.first))) return banner.first;
+    final unread = NotifStore.instance.feed.where((e) => !e.read && !_hidden.contains(_id(e)));
+    for (final e in unread) {
+      if (e.type == 'coins') return e;
     }
-    _surfaced = true;
-    if (NotificationBanner.items.value.isNotEmpty) return;
-    if (FirebaseAuth.instance.currentUser == null) return;
-    NotificationBanner.push(unread.first);
+    if (unread.isEmpty) return null;
+    return unread.first;
+  }
+
+  void _open(NotifItem item) {
+    setState(() => _hidden.add(_id(item)));
+    NotificationBanner.dismiss(item);
+    NotifRouter.instance.openItem(item);
   }
 
   @override
   Widget build(BuildContext context) {
-    final list = NotificationBanner.items.value;
-    final allow = NotificationBanner.showPopups.value;
-    final live = list.isEmpty ? null : list.first;
-    final item = live ?? (_closed ? null : _standIn);
+    final item = _pick();
+    final top = MediaQuery.paddingOf(context).top + 62;
     return Stack(
       children: [
         widget.child,
-        if (allow && item != null)
+        if (item != null)
           Positioned(
-            left: 10,
-            right: 10,
-            bottom: 0,
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 86),
-                child: _GlanceNotice(
-                  key: ValueKey(live == null ? 'glance-standin' : '${item.at}|${item.type}|${item.title}'),
-                  item: item,
-                  thumbnail: live == null ? 'assets/banners/gyro/buddha.png' : null,
-                  onClose: () {
-                    if (live == null) {
-                      setState(() => _closed = true);
-                    } else {
-                      NotificationBanner.dismiss(item);
-                    }
-                  },
-                ),
-              ),
+            top: top,
+            right: 12,
+            left: 56,
+            child: _ChatBubble(
+              item: item,
+              onOpen: () => _open(item),
+              onClose: () => setState(() => _hidden.add(_id(item))),
             ),
           ),
       ],
@@ -106,216 +110,219 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   }
 }
 
-class _GlanceNotice extends StatefulWidget {
-  const _GlanceNotice({super.key, required this.item, required this.onClose, this.thumbnail});
-  final NotifItem item;
-  final VoidCallback onClose;
-  final String? thumbnail;
-
-  @override
-  State<_GlanceNotice> createState() => _GlanceNoticeState();
-}
-
-class _GlanceNoticeState extends State<_GlanceNotice> {
-  @override
-  void initState() {
-    super.initState();
-    Future<void>.delayed(const Duration(seconds: 8), () {
-      if (mounted) widget.onClose();
-    });
-  }
-
-  String get _category {
-    final label = NotifStore.instance.labelOf(widget.item.type);
-    if (label.isNotEmpty && label != widget.item.type) return label;
-    return switch (widget.item.type) {
-      'messages' => 'Messages',
-      'posts' => 'Reels',
-      'reactions' => 'Connect',
-      'follows' => 'People',
-      'orders' => 'Orders',
-      'delivery' => 'Delivery',
-      'cart' => 'Cart',
-      'arrivals' => 'Library',
-      'offers' => 'Offers',
-      'trending' => 'Trending',
-      'routine' => 'Practice',
-      'rx' => 'Practice',
-      'streak' => 'Streak',
-      'reader' => 'Reading',
-      'subscription' => 'Plans',
-      'support' => 'NowssB',
-      _ => 'NowssB',
-    };
-  }
-
-  String get _headline {
-    final title = widget.item.title.trim();
-    final body = widget.item.body.trim();
-    if (title.isEmpty) return body;
-    if (body.isEmpty || body == title) return title;
-    return '$title $body';
-  }
-
-  void _open() {
-    HapticFeedback.selectionClick();
-    widget.onClose();
-    showNotificationsSheet(context);
-  }
+class _NotifChat extends StatelessWidget {
+  const _NotifChat();
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: ValueKey('glance-${widget.item.at}-${widget.item.title}'),
-      direction: DismissDirection.horizontal,
-      onDismissed: (_) => widget.onClose(),
-      child: GestureDetector(
-        onTap: _open,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 0, 2, 6),
-              child: Row(
-                children: const [
-                  Text(
-                    'nowssb',
-                    style: TextStyle(
-                      color: Color(0xF2FFFFFF),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  Spacer(),
-                  Text(
-                    'News',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Icon(Icons.keyboard_arrow_up_rounded, color: Colors.white, size: 22),
-                ],
-              ),
-            ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: const Color(0xE6101014),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0x22FFFFFF)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+    final top = MediaQuery.paddingOf(context).top + 58;
+    final maxH = MediaQuery.sizeOf(context).height * 0.72;
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, top, 12, 0),
+        child: Align(
+          alignment: Alignment.topRight,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 380, maxHeight: maxH),
+            child: Material(
+              color: Colors.transparent,
+              child: ListenableBuilder(
+                listenable: NotifStore.instance,
+                builder: (context, _) {
+                  final feed = NotifStore.instance.feed;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(right: 108),
+                        child: _Tail(),
+                      ),
+                      Flexible(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: const Color(0xF0141418),
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(color: const Color(0x33FFFFFF)),
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(
-                                width: 3,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFF2D2D),
-                                  borderRadius: BorderRadius.circular(2),
+                              const Padding(
+                                padding: EdgeInsets.fromLTRB(16, 14, 16, 8),
+                                child: Row(
+                                  children: [
+                                    Text('Notifications', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 8),
                               Flexible(
-                                child: Text(
-                                  _category,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15.5,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1,
-                                  ),
-                                ),
+                                child: feed.isEmpty
+                                    ? const Padding(
+                                        padding: EdgeInsets.fromLTRB(16, 8, 16, 20),
+                                        child: Text(
+                                          'Nothing waiting.',
+                                          style: TextStyle(color: Color(0x99FFFFFF), fontSize: 14),
+                                        ),
+                                      )
+                                    : ListView.separated(
+                                        shrinkWrap: true,
+                                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+                                        itemCount: feed.length,
+                                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                                        itemBuilder: (context, i) {
+                                          final n = feed[i];
+                                          return _ChatRow(
+                                            item: n,
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                              NotifRouter.instance.openItem(n);
+                                            },
+                                          );
+                                        },
+                                      ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _headline,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500,
-                              height: 1.25,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    SizedBox(
-                      width: 86,
-                      height: 76,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: ColoredBox(
-                              color: const Color(0xFF1A1A1E),
-                              child: widget.thumbnail != null
-                                  ? Image.asset(
-                                      widget.thumbnail!,
-                                      width: 86,
-                                      height: 76,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : CachedNetworkImage(
-                                      imageUrl: NotifIcons.urlFor(widget.item.type),
-                                      width: 86,
-                                      height: 76,
-                                      fit: BoxFit.cover,
-                                      errorWidget: (_, __, ___) => const SizedBox(width: 86, height: 76),
-                                    ),
-                            ),
-                          ),
-                          Positioned(
-                            left: -4,
-                            top: -8,
-                            child: Container(
-                              width: 26,
-                              height: 26,
-                              alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFFF2D2D),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Text(
-                                'NEWS',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 6.2,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.1,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
+}
+
+class _ChatBubble extends StatelessWidget {
+  const _ChatBubble({required this.item, required this.onOpen, required this.onClose});
+  final NotifItem item;
+  final VoidCallback onOpen;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(right: 108),
+          child: _Tail(),
+        ),
+        GestureDetector(
+          onTap: onOpen,
+          behavior: HitTestBehavior.opaque,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0xF0141418),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0x33FFFFFF)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: _ChatCopy(item: item)),
+                  IconButton(
+                    onPressed: onClose,
+                    icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ChatRow extends StatelessWidget {
+  const _ChatRow({required this.item, required this.onTap});
+  final NotifItem item;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: item.read ? const Color(0xFF101014) : const Color(0xFF1C1C22),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0x22FFFFFF)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+          child: _ChatCopy(item: item),
+        ),
+      ),
+    );
+  }
+}
+
+class _ChatCopy extends StatelessWidget {
+  const _ChatCopy({required this.item});
+  final NotifItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = NotifStore.instance.labelOf(item.type);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.isEmpty ? item.title : label,
+          style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.6),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          item.title,
+          style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700, height: 1.2),
+        ),
+        if (item.body.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            item.body,
+            style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13.5, height: 1.3),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _Tail extends StatelessWidget {
+  const _Tail();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size(16, 8),
+      painter: _TailPainter(),
+    );
+  }
+}
+
+class _TailPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Path()
+      ..moveTo(0, size.height)
+      ..lineTo(size.width / 2, 0)
+      ..lineTo(size.width, size.height)
+      ..close();
+    canvas.drawPath(p, Paint()..color = const Color(0xF0141418));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

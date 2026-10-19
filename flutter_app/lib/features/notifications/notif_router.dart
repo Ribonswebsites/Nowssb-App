@@ -11,8 +11,11 @@
 /// shell is there and the start animation is done ([markReady]).
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../data/notifications.dart';
 import '../../data/content.dart';
 import '../../data/home_widget_sync.dart';
 import '../../data/models.dart';
@@ -27,6 +30,7 @@ import '../earn/earn_hub_screen.dart';
 import '../economy/reference_screen.dart';
 import '../gifts/gifts_screen.dart';
 import '../programs/coupons_program.dart';
+import '../gifts/spin_wheel.dart';
 import '../programs/rewards_program.dart';
 import 'inbox_screen.dart';
 import 'notif_preferences_screen.dart';
@@ -75,6 +79,30 @@ class NotifRouter {
     _flush();
   }
 
+  /// Where a feed row goes. Each kind opens its own page, then you use it.
+  static String routeFor(NotifItem item) => switch (item.type) {
+        'coins' => 'coins',
+        'rewards' => 'rewards',
+        'gifts' => 'gifts',
+        'spin' => 'spin',
+        'update' => 'update',
+        'streak' => 'progress',
+        'routine' => 'practice',
+        'reader' => 'reader',
+        'orders' || 'delivery' || 'cart' => 'store',
+        'subscription' => 'subscription',
+        'offers' => 'rewards',
+        'arrivals' => 'library',
+        _ => 'inbox',
+      };
+
+  void openItem(NotifItem item) {
+    final list = NotifStore.instance.feed;
+    final i = list.indexWhere((e) => e.type == item.type && e.at == item.at && e.title == item.title);
+    if (i >= 0) unawaited(NotifStore.instance.markRead(i));
+    open(routeFor(item));
+  }
+
   void _flush() {
     final r = _pending;
     final ctx = _context;
@@ -109,6 +137,12 @@ class NotifRouter {
         return PracticeProgressScreen(words: ContentStore.instance.library);
       case 'rewards':
         return const RewardsProgramPage();
+      case 'coins':
+        return const RewardsTabPage(tab: 'today');
+      case 'spin':
+        return const SpinWheelPage();
+      case 'update':
+        return const LatestUpdatePage();
       case 'coupons':
         return const CouponsProgramPage();
       case 'gifts':
@@ -152,5 +186,56 @@ class NotifRouter {
     if (screen == null) return;
     _popToRoot?.call();
     Navigator.of(ctx).push(MaterialPageRoute<void>(builder: (_) => screen));
+  }
+}
+
+/// The latest-update row. A short page, not another inbox.
+class LatestUpdatePage extends StatelessWidget {
+  const LatestUpdatePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const lines = <(String, String)>[
+      ('Home', 'The television card is the first card. The red-hair hero is gone.'),
+      ('Morning film', 'The day film above Open a door is playing again.'),
+      ('Coins', 'A Go collect line opens Today, where you collect.'),
+      ('Rewards', 'Rewards opens the rewards room. You use it from there.'),
+      ('Gifts', 'Gifts opens send and redeem.'),
+      ('Wheel', 'Spinning wheel opens the daily spin.'),
+    ];
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF07070C),
+        foregroundColor: Colors.white,
+        title: const Text('Latest update'),
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        itemCount: lines.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 10),
+        itemBuilder: (_, i) {
+          final row = lines[i];
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0xFF141418),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0x22FFFFFF)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(row.$1, style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
+                  const SizedBox(height: 6),
+                  Text(row.$2, style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.35)),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 }

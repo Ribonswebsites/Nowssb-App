@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
+import '../features/notifications/notif_router.dart';
 import '../theme/tokens.dart';
 import 'notifications_settings.dart';
 import '../admin/template/editable.dart';
@@ -127,7 +128,10 @@ class NotificationsSheet extends StatelessWidget {
                                           child: _SheetItem(
                                             item: n,
                                             label: store.labelOf(n.type),
-                                            onTap: () => store.markRead(i),
+                                            onTap: () {
+                                              Navigator.of(context).pop();
+                                              NotifRouter.instance.openItem(n);
+                                            },
                                           ),
                                         );
                                       },
