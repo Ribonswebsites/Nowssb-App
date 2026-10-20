@@ -7,6 +7,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../widgets/four_banners.dart';
 import 'economy_api.dart';
+import '../partner/partner_home.dart';
 import 'economy_theme.dart';
 import '../programs/partner_program.dart';
 import '../programs/program_heroes.dart';
@@ -33,7 +34,10 @@ class _PartnerScreenState extends State<PartnerScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => PartnerHome(initialTab: widget.initialTab);
+
+  // Previous layout, kept for reference until v2 is approved.
+  Widget buildLegacy(BuildContext context) {
     return EconomyPage(
       goodToKnow: kPartnerDisclaimer,
       title: 'Partner',
