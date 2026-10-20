@@ -1,10 +1,9 @@
-import 'dart:ui' show ImageFilter;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../nowssb_ui/nowssb_ui.dart' show NGlass;
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/routine_deck.dart';
 import '../circle/circle_screen.dart';
@@ -31,7 +30,7 @@ class EarningsScreen extends StatefulWidget {
 const _tabs = <(String, String)>[('words', 'Words'), ('meanings', 'Meanings'), ('subscriptions', 'Subscriptions'), ('bonuses', 'Bonuses')];
 const _targets = [100, 500, 1000, 2000];
 
-String money(int cents) => FxBook.instance.formatCents(cents);
+String _money(int cents) => FxBook.instance.formatCents(cents);
 
 class _EarningsScreenState extends State<EarningsScreen> {
   String _tab = 'words';
@@ -73,7 +72,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
           final w = EconomyMirror.instance;
           if (w.uid == null) {
             return ListView(padding: const EdgeInsets.all(16), children: [
-              FrostCard(
+              _EFrostCard(
                 title: 'Sign in to see your money',
                 body: 'Your earnings and withdrawals stay on your account.',
                 next: 'Sign in',
@@ -97,9 +96,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     bannerSub: w.payoutRail.isEmpty ? 'Link a payout account' : 'Payout account linked',
                     onBanner: () => openPayoutAccount(context),
                     cards: [
-                      WorkCard(category: 'Withdraw', title: 'Withdraw', meta: money(w.cash), action: 'Start', image: 'assets/rails/earnings-03.jpg', onTap: () => openWithdraw(context)),
+                      WorkCard(category: 'Withdraw', title: 'Withdraw', meta: _money(w.cash), action: 'Start', image: 'assets/rails/earnings-03.jpg', onTap: () => openWithdraw(context)),
                       WorkCard(category: 'Account', title: 'Payout account', meta: w.payoutRail.isEmpty ? 'Not linked' : 'Linked', action: w.payoutRail.isEmpty ? 'Link' : 'Change', image: 'assets/rails/earnings-02.jpg', onTap: () => openPayoutAccount(context)),
-                      WorkCard(category: 'Team', title: 'Your team', meta: money(data.teamCents), action: 'Open team', image: 'assets/rails/earnings-04.jpg', onTap: () => _push(context, const CircleScreen(initialTab: 'team'))),
+                      WorkCard(category: 'Team', title: 'Your team', meta: _money(data.teamCents), action: 'Open team', image: 'assets/rails/earnings-04.jpg', onTap: () => _push(context, const CircleScreen(initialTab: 'team'))),
                       WorkCard(category: 'History', title: 'Statements', meta: 'Monthly summaries', action: 'Open', image: 'assets/rails/earnings-05.jpg', onTap: () => _push(context, const EarningsStatementsPage())),
                     ],
                   ),
@@ -123,36 +122,23 @@ void _push(BuildContext context, Widget page) => Navigator.of(context).push(Mate
 
 // ---------- Glass pieces (approved card: frosted glass, soft white border, big radius, white title, grey body, Skip / Next pill) ----------
 
-class Frost extends StatelessWidget {
-  const Frost({super.key, required this.child, this.padding = const EdgeInsets.all(18), this.radius = 28});
+class _EFrost extends StatelessWidget {
+  const _EFrost({super.key, required this.child, this.padding = const EdgeInsets.all(18), this.radius = 28});
   final Widget child;
   final EdgeInsets padding;
   final double radius;
 
   @override
   Widget build(BuildContext context) {
+    // Kit glass (nowssb_ui NGlass): the approved frosted card surface.
     return RepaintBoundary(
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(radius),
-              color: Colors.white.withValues(alpha: 0.10),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
-            ),
-            child: Material(type: MaterialType.transparency, child: child),
-          ),
-        ),
-      ),
+      child: NGlass(radius: radius, blur: 22, padding: padding, child: Material(type: MaterialType.transparency, child: child)),
     );
   }
 }
 
-class FrostCard extends StatelessWidget {
-  const FrostCard({super.key, required this.title, required this.body, required this.next, this.onNext, this.skip, this.onSkip});
+class _EFrostCard extends StatelessWidget {
+  const _EFrostCard({super.key, required this.title, required this.body, required this.next, this.onNext, this.skip, this.onSkip});
   final String title;
   final String body;
   final String next;
@@ -162,7 +148,7 @@ class FrostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Frost(
+    return _EFrost(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
         Text(title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
         const SizedBox(height: 6),
@@ -171,15 +157,15 @@ class FrostCard extends StatelessWidget {
         Row(children: [
           if (skip != null) Flexible(child: TextButton(onPressed: onSkip, child: Text(skip!, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70)))),
           const Spacer(),
-          Flexible(flex: 3, child: NextPill(label: next, onTap: onNext)),
+          Flexible(flex: 3, child: _ENextPill(label: next, onTap: onNext)),
         ]),
       ]),
     );
   }
 }
 
-class NextPill extends StatelessWidget {
-  const NextPill({super.key, required this.label, this.onTap});
+class _ENextPill extends StatelessWidget {
+  const _ENextPill({super.key, required this.label, this.onTap});
   final String label;
   final VoidCallback? onTap;
 
@@ -203,8 +189,8 @@ class NextPill extends StatelessWidget {
   }
 }
 
-class StatusChip extends StatelessWidget {
-  const StatusChip(this.status, {super.key});
+class _EStatusChip extends StatelessWidget {
+  const _EStatusChip(this.status, {super.key});
   final String status;
 
   @override
@@ -228,15 +214,15 @@ Widget _info(BuildContext context, String term, String definition, String exampl
       tooltip: 'What is $term?',
       visualDensity: VisualDensity.compact,
       icon: const Icon(Icons.info_outline_rounded, size: 16, color: Colors.white70),
-      onPressed: () => showInfo(context, term, definition, example),
+      onPressed: () => _showInfo(context, term, definition, example),
     );
 
-Future<void> showInfo(BuildContext context, String term, String definition, String example) {
+Future<void> _showInfo(BuildContext context, String term, String definition, String example) {
   return showDialog<void>(
     context: context,
     builder: (ctx) => Dialog(
       backgroundColor: Colors.transparent,
-      child: FrostCard(title: term, body: '$definition\n\nExample: $example', next: 'Got it', onNext: () => Navigator.pop(ctx)),
+      child: _EFrostCard(title: term, body: '$definition\n\nExample: $example', next: 'Got it', onNext: () => Navigator.pop(ctx)),
     ),
   );
 }
@@ -255,22 +241,22 @@ class _MoneyPanel extends StatelessWidget {
     Widget stat(String label, int cents, String def, String ex) => Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [Flexible(child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12))), _info(context, label, def, ex)]),
-            FittedBox(fit: BoxFit.scaleDown, child: Text(money(cents), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800))),
+            FittedBox(fit: BoxFit.scaleDown, child: Text(_money(cents), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800))),
           ]),
         );
-    return Frost(
+    return _EFrost(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          stat('Available', available, 'Money you can withdraw now.', 'You earn ${money(500)} and it clears. It shows here.'),
+          stat('Available', available, 'Money you can withdraw now.', 'You earn ${_money(500)} and it clears. It shows here.'),
           stat('Pending', pending, 'Money still on hold, so refunds can be reversed fairly.', 'A sale today shows as Pending until the hold ends.'),
-          stat('Paid out', paid, 'Money already sent to your payout account.', 'You withdrew ${money(1000)} last month.'),
+          stat('Paid out', paid, 'Money already sent to your payout account.', 'You withdrew ${_money(1000)} last month.'),
         ]),
         const SizedBox(height: 6),
         Text('Pending money is released after a short hold window.', style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12)),
         const SizedBox(height: 12),
         Row(children: [
           const Expanded(child: Text('Withdraw to your payout account', style: TextStyle(color: Colors.white70, fontSize: 12))),
-          NextPill(key: const Key('earnings.withdraw'), label: 'Withdraw', onTap: onWithdraw),
+          _ENextPill(key: const Key('earnings.withdraw'), label: 'Withdraw', onTap: onWithdraw),
         ]),
       ]),
     );
@@ -290,7 +276,7 @@ class _Breakdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rows = data.rows.where((r) => r.tab == tab).toList();
-    return Frost(
+    return _EFrost(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const Text('Money you earn', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
         const SizedBox(height: 10),
@@ -344,9 +330,9 @@ class _RowTile extends StatelessWidget {
             if (d != null) Text(MaterialLocalizations.of(context).formatMediumDate(d), style: const TextStyle(color: Colors.white54, fontSize: 12)),
           ]),
         ),
-        Text(money(row.cents), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        Text(_money(row.cents), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
         const SizedBox(width: 8),
-        StatusChip(row.status),
+        _EStatusChip(row.status),
       ]),
     );
   }
@@ -363,7 +349,7 @@ class _Team extends StatelessWidget {
   Widget build(BuildContext context) {
     final total = direct + team;
     final share = total == 0 ? 0.0 : direct / total;
-    return Frost(
+    return _EFrost(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           const Expanded(child: Text('Your team', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800))),
@@ -372,9 +358,9 @@ class _Team extends StatelessWidget {
         const SizedBox(height: 8),
         ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: share, minHeight: 10, backgroundColor: const Color(0xFFB9A8FF).withValues(alpha: 0.4), color: Colors.white)),
         const SizedBox(height: 8),
-        Text('Your sales ${money(direct)} · Team ${money(team)}', style: const TextStyle(color: Colors.white70, fontSize: 13)),
+        Text('Your sales ${_money(direct)} · Team ${_money(team)}', style: const TextStyle(color: Colors.white70, fontSize: 13)),
         const SizedBox(height: 10),
-        Align(alignment: Alignment.centerRight, child: NextPill(key: const Key('earnings.team'), label: 'See team', onTap: () => _push(context, const CircleScreen(initialTab: 'team')))),
+        Align(alignment: Alignment.centerRight, child: _ENextPill(key: const Key('earnings.team'), label: 'See team', onTap: () => _push(context, const CircleScreen(initialTab: 'team')))),
       ]),
     );
   }
@@ -389,7 +375,7 @@ class _Target extends StatelessWidget {
   Widget build(BuildContext context) {
     final target = _targets.firstWhere((t) => sold < t, orElse: () => _targets.last);
     final value = (sold / target).clamp(0.0, 1.0);
-    return Frost(
+    return _EFrost(
       child: Row(children: [
         SizedBox(
           width: 72,
@@ -418,7 +404,7 @@ class _Target extends StatelessWidget {
 
 /// Global, provider-led: the app only collects country and the provider
 /// email. Identity and tax checks happen at the payout provider.
-const payoutCountries = <(String, String)>[
+const _payoutCountries = <(String, String)>[
   ('US', 'United States'), ('GB', 'United Kingdom'), ('CA', 'Canada'), ('AU', 'Australia'), ('DE', 'Germany'), ('FR', 'France'),
   ('ES', 'Spain'), ('IT', 'Italy'), ('NL', 'Netherlands'), ('AE', 'United Arab Emirates'), ('SG', 'Singapore'), ('JP', 'Japan'),
   ('BR', 'Brazil'), ('MX', 'Mexico'), ('NZ', 'New Zealand'), ('IN', 'India'), ('XX', 'Another country'),
@@ -478,7 +464,7 @@ class _PayoutAccountSheetState extends State<PayoutAccountSheet> {
     );
     return Padding(
       padding: EdgeInsets.fromLTRB(12, 12, 12, 12 + MediaQuery.viewInsetsOf(context).bottom),
-      child: Frost(
+      child: _EFrost(
         child: SingleChildScrollView(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
             const Text('Link your payout account', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
@@ -488,11 +474,11 @@ class _PayoutAccountSheetState extends State<PayoutAccountSheet> {
             DropdownButtonFormField<String>(
               key: const Key('payout.country'),
               isExpanded: true,
-              initialValue: payoutCountries.any((c) => c.$1 == _country) ? _country : 'XX',
+              initialValue: _payoutCountries.any((c) => c.$1 == _country) ? _country : 'XX',
               dropdownColor: const Color(0xFF221A3A),
               style: const TextStyle(color: Colors.white),
               decoration: field.copyWith(labelText: 'Country you get paid in'),
-              items: [for (final c in payoutCountries) DropdownMenuItem(value: c.$1, child: Text(c.$2))],
+              items: [for (final c in _payoutCountries) DropdownMenuItem(value: c.$1, child: Text(c.$2))],
               onChanged: (v) => setState(() => _country = v ?? 'US'),
             ),
             const SizedBox(height: 10),
@@ -507,7 +493,7 @@ class _PayoutAccountSheetState extends State<PayoutAccountSheet> {
             Row(children: [
               TextButton(onPressed: () => Navigator.pop(context), child: const Text('Skip', style: TextStyle(color: Colors.white70))),
               const Spacer(),
-              NextPill(key: const Key('payout.save'), label: 'Save account', onTap: unsupported ? null : _save),
+              _ENextPill(key: const Key('payout.save'), label: 'Save account', onTap: unsupported ? null : _save),
             ]),
             const Text('Next: Wise may open to verify you.', style: TextStyle(color: Colors.white54, fontSize: 12)),
           ]),
@@ -537,15 +523,15 @@ class _WithdrawSheetState extends State<WithdrawSheet> {
     final w = EconomyMirror.instance;
     final linked = w.payoutRail.isNotEmpty;
     final (title, body, next) = switch (_step) {
-      0 => ('Amount', 'You can withdraw ${money(w.cash)}. The full available balance is sent. The minimum and any fee are checked by the server before it goes out.', w.cash > 0 ? 'Next' : null),
+      0 => ('Amount', 'You can withdraw ${_money(w.cash)}. The full available balance is sent. The minimum and any fee are checked by the server before it goes out.', w.cash > 0 ? 'Next' : null),
       1 => linked
           ? ('Payout account', 'Paying to your Wise account${w.country.isEmpty ? '' : ' (${w.country})'}.', 'Next')
           : ('Link your payout account', 'You need a payout account before you can withdraw.', 'Link account'),
-      _ => ('Confirm', 'Withdraw ${money(w.cash)} to Wise. You will see it as Requested, then Processing, then Paid. Expected timing depends on your country.', 'Withdraw'),
+      _ => ('Confirm', 'Withdraw ${_money(w.cash)} to Wise. You will see it as Requested, then Processing, then Paid. Expected timing depends on your country.', 'Withdraw'),
     };
     return Padding(
       padding: const EdgeInsets.all(12),
-      child: Frost(
+      child: _EFrost(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Text('Step ${_step + 1} of 3', style: const TextStyle(color: Colors.white54, fontSize: 12)),
           const SizedBox(height: 6),
@@ -558,7 +544,7 @@ class _WithdrawSheetState extends State<WithdrawSheet> {
           Row(children: [
             TextButton(key: const Key('withdraw.back'), onPressed: () => _step == 0 ? Navigator.pop(context) : setState(() => _step--), child: Text(_step == 0 ? 'Cancel' : 'Back', style: const TextStyle(color: Colors.white70))),
             const Spacer(),
-            NextPill(key: const Key('withdraw.next'), label: next ?? 'Next', onTap: next == null ? null : () => _advance(linked)),
+            _ENextPill(key: const Key('withdraw.next'), label: next ?? 'Next', onTap: next == null ? null : () => _advance(linked)),
           ]),
         ]),
       ),
@@ -578,7 +564,7 @@ class _WithdrawSheetState extends State<WithdrawSheet> {
       context: context,
       builder: (ctx) => Dialog(
         backgroundColor: Colors.transparent,
-        child: FrostCard(title: 'Withdraw now?', body: 'This can not be undone once it is processing.', skip: 'Cancel', onSkip: () => Navigator.pop(ctx, false), next: 'Yes, withdraw', onNext: () => Navigator.pop(ctx, true)),
+        child: _EFrostCard(title: 'Withdraw now?', body: 'This can not be undone once it is processing.', skip: 'Cancel', onSkip: () => Navigator.pop(ctx, false), next: 'Yes, withdraw', onNext: () => Navigator.pop(ctx, true)),
       ),
     );
     if (ok != true || !mounted) return;
@@ -619,9 +605,9 @@ class EarningsStatementsPage extends StatelessWidget {
                 }
                 final keys = months.keys.toList()..sort((a, b) => b.compareTo(a));
                 return ListView(padding: const EdgeInsets.all(16), children: [
-                  const FrostCard(title: 'Download PDF or CSV', body: 'Export files are coming soon. They will be made by our server.', next: 'Soon'),
+                  const _EFrostCard(title: 'Download PDF or CSV', body: 'Export files are coming soon. They will be made by our server.', next: 'Soon'),
                   const SizedBox(height: 12),
-                  if (keys.isEmpty) const FrostCard(title: 'No statements yet', body: 'Your first monthly summary appears after your first sale.', next: 'OK'),
+                  if (keys.isEmpty) const _EFrostCard(title: 'No statements yet', body: 'Your first monthly summary appears after your first sale.', next: 'OK'),
                   for (final k in keys) ...[
                     _MonthCard(month: k, rows: months[k]!),
                     const SizedBox(height: 12),
@@ -642,10 +628,10 @@ class _MonthCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final earned = rows.where((r) => r.tab != 'payout' && r.status != 'Reversed').fold(0, (a, r) => a + r.cents);
     final paid = rows.where((r) => r.tab == 'payout' && r.status == 'Paid').fold(0, (a, r) => a + r.cents);
-    return Frost(
+    return _EFrost(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(month, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
-        Text('Earned ${money(earned)} · Paid out ${money(paid)} · ${rows.length} items', style: const TextStyle(color: Colors.white70)),
+        Text('Earned ${_money(earned)} · Paid out ${_money(paid)} · ${rows.length} items', style: const TextStyle(color: Colors.white70)),
         for (final r in rows.take(6)) _RowTile(r),
       ]),
     );
@@ -679,7 +665,7 @@ class _EarningsGuideState extends State<EarningsGuide> {
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Column(mainAxisSize: MainAxisSize.min, children: [
-        FrostCard(
+        _EFrostCard(
           key: const Key('earnings.guide'),
           title: _slides[_i].$1,
           body: _slides[_i].$2,
@@ -712,7 +698,7 @@ Future<void> showEarningsHelp(BuildContext context) {
     isScrollControlled: true,
     builder: (ctx) => Padding(
       padding: const EdgeInsets.all(12),
-      child: Frost(
+      child: _EFrost(
         child: SingleChildScrollView(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
             const Text('Help', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
