@@ -1091,16 +1091,22 @@ class _ReaderFilmState extends State<ReaderFilm> {
     'Hear the word',
   ];
   var _i = 0;
+  // Cancelled in dispose, so leaving Home never leaves a timer running.
+  Timer? _tick;
 
   @override
   void initState() {
     super.initState();
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 2));
-      if (!mounted) return false;
+    _tick = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!mounted) return;
       setState(() => _i = (_i + 1) % _lines.length);
-      return true;
     });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
   }
 
   @override
