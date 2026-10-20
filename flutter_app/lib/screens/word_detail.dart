@@ -28,6 +28,7 @@ import '../widgets/app_backdrop.dart';
 import '../widgets/content_lock.dart';
 import '../admin/template/editable.dart';
 import '../media/nwsb_video.dart';
+import 'word_level_changer.dart';
 
 class WordDetail extends StatefulWidget {
   const WordDetail({super.key, required this.word});
@@ -178,6 +179,11 @@ class _WordDetailState extends State<WordDetail> {
                           value: word.tip,
                           icon: Icons.lightbulb_outline,
                         ),
+                      const SizedBox(height: 8),
+                      const _SectionLabel('LEVELS'),
+                      const SizedBox(height: 12),
+                      WordLevelChanger(word: word, open: open),
+                      const SizedBox(height: 18),
                       if (word.stages.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         const _SectionLabel('STAGES'),
