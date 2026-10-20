@@ -19,6 +19,7 @@ import '../data/word_art.dart';
 import '../data/playback_session.dart';
 import '../data/practice_progress.dart';
 import '../data/store_catalog.dart';
+import 'store/store_art.dart';
 import '../media/nwsb_image.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
@@ -78,11 +79,7 @@ int _hash(String s) {
 String _artForWord(String name, Map<String, RmCategory> byWord) {
   final custom = WordArt.instance.imageFor(name, '');
   if (custom.isNotEmpty) return custom;
-  final key = name.toLowerCase();
-  final hit = byWord[key];
-  if (hit != null) return _colAsset(hit);
-  final cs = kRmCategories;
-  return _colAsset(cs[_hash(key) % cs.length]);
+  return storeSubjectArt(name);
 }
 
 Map<String, RmCategory> _wordToCol() {

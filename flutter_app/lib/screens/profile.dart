@@ -1533,7 +1533,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             final all = _recentSessions;
             final cats = <String>['All', ...{for (final r in all) r.cat}.take(4)];
             final shown = [for (final r in all) if (_recentFilter == 'All' || r.cat == _recentFilter) r].take(8).toList();
-            const imgs = ['assets/profile_source/img-act1.jpeg', 'assets/profile_source/img-act2.jpeg', 'assets/profile_source/img-act3.jpeg', 'assets/profile_source/img-motto.jpeg'];
+            const imgs = ['assets/profile_source/img-act1.jpeg', 'assets/profile_source/img-act2.jpeg', 'assets/profile_source/img-act3.jpeg', 'assets/rails/clear-03.jpg', 'assets/rails/clear-04.jpg', 'assets/rails/glass-04.jpg', 'assets/rails/glass-01.jpg', 'assets/rails/clear-02.jpg'];
             return Column(mainAxisSize: MainAxisSize.min, children: [
               SizedBox(height: 38, child: ListView(scrollDirection: Axis.horizontal, children: cats.map((x) => Padding(padding: const EdgeInsets.only(right: 7), child: _SheetTab(label: x, active: x == _recentFilter, onTap: () => setState(() => _recentFilter = x)))).toList())),
               const SizedBox(height: 14),

@@ -265,13 +265,13 @@ class GiftPlanGrid extends StatelessWidget {
 
   static const _items = <(String, String, String, String)>[
     ('Stage card', 'One locked stage.', 'assets/gifts/box-red.webp', 'stage'),
-    ('Word card', 'One full word.', 'assets/gifts/box-red.webp', 'word'),
+    ('Word card', 'One full word.', 'assets/rails/subj-gift-word.jpg', 'word'),
     ('Bundle card', 'Ten words.', 'assets/gifts/box-black.webp', 'bundle'),
     ('7-day Basic', 'No rank credit.', 'assets/gifts/box-gold.webp', 'basic'),
-    ('7-day ebook', 'After the trial.', 'assets/gifts/box-gold.webp', 'ebook'),
-    ('30-day Standard', 'Gifted is not a rate.', 'assets/gifts/box-gold.webp', 'standard'),
-    ('30-day Premium', 'Higher tier.', 'assets/gifts/box-gold.webp', 'premium'),
-    ('3-day Signature', 'Does not unlock Partner.', 'assets/gifts/box-black.webp', 'signature'),
+    ('7-day ebook', 'After the trial.', 'assets/rails/subj-gift-ebook.jpg', 'ebook'),
+    ('30-day Standard', 'Gifted is not a rate.', 'assets/rails/subj-gift-standard.jpg', 'standard'),
+    ('30-day Premium', 'Higher tier.', 'assets/rails/subj-gift-premium.jpg', 'premium'),
+    ('3-day Signature', 'Does not unlock Partner.', 'assets/rails/subj-gift-signature.jpg', 'signature'),
   ];
 
   @override

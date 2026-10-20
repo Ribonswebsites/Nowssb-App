@@ -125,11 +125,11 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         final name = w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
         final id = 'word:${name.toLowerCase()}';
         final price = StorePrices.instance.priceFor(id);
-        add(name, w.root, storeGroup(w.word), kRmWordImg, () => openAtelierWord(context, word: w.word, root: w.root, img: kRmWordImg, price: price));
+        add(name, w.root, storeGroup(w.word), storeSubjectArt(w.word), () => openAtelierWord(context, word: w.word, root: w.root, img: storeSubjectArt(w.word), price: price));
       }
     }
     for (final row in kPlaceRows) {
-      add(row.$1, row.$2, row.$3, kRmWordImg, () => openAtelierWord(context, word: row.$1, root: row.$2, img: kRmWordImg));
+      add(row.$1, row.$2, row.$3, storeSubjectArt(row.$1), () => openAtelierWord(context, word: row.$1, root: row.$2, img: storeSubjectArt(row.$1)));
     }
     return out;
   }
@@ -155,7 +155,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                       title: w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}',
                       meta: w.root,
                       action: 'Open',
-                      image: kNowssbStoreMark,
+                      image: storeSubjectArt(w.word),
                       flip: storeWaveFor(w.word),
                       onTap: () => openAtelierWord(context, word: w.word, root: w.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.word.toLowerCase()}')),
                       onCart: () => storeAddToCart(context, wordBagItem(name: w.word, root: w.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.word.toLowerCase()}'))),
@@ -176,7 +176,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                     title: row.$1,
                     meta: row.$2,
                     action: 'Open',
-                    image: kNowssbStoreMark,
+                    image: storeSubjectArt(row.$1),
                     flip: storeWaveFor(row.$1),
                     onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kNowssbStoreMark),
                     onCart: () => storeAddToCart(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark)),

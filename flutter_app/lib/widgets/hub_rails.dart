@@ -93,17 +93,19 @@ const kEarningsArt = <String>[
 ];
 
 const kGlassArt = <String>[
-  'assets/rails/mean-moon.jpg',
-  'assets/rails/mean-love.jpg',
-  'assets/rails/ui-science.jpg',
-  'assets/rails/ui-fashion.jpg',
+  'assets/rails/gen-01.jpg',
+  'assets/rails/gen-02.jpg',
+  'assets/rails/gen-03.jpg',
+  'assets/rails/gen-08.jpg',
+  'assets/rails/ui-wishlist.jpg',
 ];
 
 const kClearArt = <String>[
-  'assets/rails/ui-progress.jpg',
-  'assets/rails/mean-water.jpg',
-  'assets/rails/mean-dark.jpg',
-  'assets/rails/mean-sun.jpg',
+  'assets/rails/glass-02.jpg',
+  'assets/rails/ui-time.jpg',
+  'assets/rails/ui-cart.jpg',
+  'assets/rails/ui-orders.jpg',
+  'assets/rails/member-card.png',
 ];
 const _dur = ['18h 9m', '12h 24m', '4 min', '8 min', '21 min'];
 const _rate = ['4.7', '4.8', '4.9', '4.6', '5.0'];
@@ -196,18 +198,18 @@ class IdentityRails extends StatelessWidget {
             'assets/rails/ui-coins.jpg',
             'assets/rails/ui-quests.jpg',
             'assets/rails/mean-fire.jpg',
-            'assets/rails/mean-sun.jpg',
+            'assets/rails/glass-03.jpg',
             'assets/rails/ui-print.jpg',
             'assets/rails/ui-ledger.jpg',
-            'assets/rails/ui-store.jpg',
+            'assets/rails/gen-09.jpg',
             'assets/rails/ui-history.jpg',
-            'assets/rails/ui-plans.jpg',
-            'assets/rails/ui-science.jpg',
-            'assets/rails/ui-progress.jpg',
+            'assets/rails/gen-06.jpg',
+            'assets/rails/gen-04.jpg',
+            'assets/rails/gen-07.jpg',
             'assets/rails/ui-routines.jpg',
             'assets/rails/ui-bell.jpg',
-            'assets/rails/ui-gift.jpg',
-            'assets/rails/ui-connect.jpg',
+            'assets/rails/gen-05.jpg',
+            'assets/rails/clear-01.jpg',
           ],
           a: _pack(const ['Daily login', 'Quest board', 'Streak flame', 'Season', 'Badges'], const ['Today', 'Quests', 'Fire', 'Season', 'Marks']),
           b: _pack(const ['Wallet', 'Spend', 'Freezes', 'League', 'Mastery'], const ['Coins', 'Shop', 'Saved days', 'Table', 'Skill']),

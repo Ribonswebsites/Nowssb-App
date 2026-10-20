@@ -56,7 +56,7 @@ const kMeaningWarmAssets = <String>[
 ];
 
 String _msOnlyArt(String key, String candidate) {
-  if (candidate.startsWith('assets/meanings/')) return candidate;
+  if (candidate.startsWith('assets/')) return candidate;
   const arts = <String>[
     kMsMeaningIntroArt,
     kMsMeaningProductArt,
@@ -267,8 +267,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   title: m.word,
                   meta: m.root,
                   action: 'Open',
-                  image: kMeaningsIcon,
-                  flip: meaningFlipArt(m.key),
+                  image: meaningFlipArt(m.key),
+                  flip: kMeaningsIcon,
                   onTap: () => openMeaningDetail(context, m),
                   onCart: () => storeAddToCart(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
                   onBuy: () => storeBuyNow(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
@@ -288,8 +288,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                     title: row.$1,
                     meta: row.$2,
                     action: 'Open',
-                    image: kMeaningsIcon,
-                    flip: meaningFlipArt(row.$1),
+                    image: storeSubjectArt(row.$1),
+                    flip: kMeaningsIcon,
                     onTap: () => openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kNowssbStoreMark)),
                     onCart: () => storeAddToCart(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
                     onBuy: () => storeBuyNow(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
