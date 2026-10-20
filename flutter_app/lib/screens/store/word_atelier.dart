@@ -2,6 +2,7 @@
 /// Media matches index.html / app/js/part010.js (no collection photo banners).
 library;
 
+import 'store_first_use_guide.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
@@ -55,7 +56,7 @@ class WordAtelierScreen extends StatelessWidget {
           ),
         ],
         ),
-      );
+      ).withStoreGuide('word_atelier');
 }
 
 class _WordAtelierBody extends StatefulWidget {

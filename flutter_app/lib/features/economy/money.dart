@@ -13,17 +13,8 @@ class FxBook extends ChangeNotifier {
   FxBook._();
   static final instance = FxBook._();
 
-  Map<String, double> rates = const {
-    'USD': 1,
-    'INR': 83.5,
-    'EUR': 0.92,
-    'GBP': 0.78,
-    'AED': 3.67,
-    'SGD': 1.35,
-    'AUD': 1.52,
-    'CAD': 1.36,
-    'JPY': 149,
-  };
+  /// Only the base currency until `config/fx` loads. No hardcoded rates.
+  Map<String, double> rates = const {'USD': 1};
 
   bool started = false;
 
@@ -66,7 +57,13 @@ class FxBook extends ChangeNotifier {
 
   /// Legacy store amounts were written as rupees. Convert through the USD rate.
   String formatRupees(num rupees, {String? locale}) {
-    final perDollar = rates['INR'] ?? 83.5;
+    final perDollar = rates['INR'];
+    if (perDollar == null || perDollar <= 0) {
+      // FX not loaded: show the stored amount in its own base currency.
+      final loc = (locale ?? Platform.localeName).replaceAll('-', '_');
+      return NumberFormat.simpleCurrency(name: 'INR', locale: loc, decimalDigits: 0)
+          .format(rupees);
+    }
     final cents = ((rupees / perDollar) * 100).round();
     return formatCents(cents, locale: locale);
   }

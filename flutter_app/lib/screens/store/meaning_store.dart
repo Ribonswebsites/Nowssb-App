@@ -10,6 +10,7 @@
 /// Video banners stay unchanged.
 library;
 
+import 'store_first_use_guide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -91,7 +92,7 @@ class MeaningStoreScreen extends StatelessWidget {
           ),
         ],
         ),
-      );
+      ).withStoreGuide('meaning_store');
 }
 
 class _MeaningStoreBody extends StatefulWidget {
