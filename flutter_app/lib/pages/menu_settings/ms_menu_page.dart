@@ -3,7 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'ms_glass.dart';
+import 'ms_widgets.dart';
 
 class MsEntry {
   const MsEntry(this.id, this.icon, this.title, this.subtitle, this.onTap);

@@ -1,12 +1,12 @@
-/// Shared look for the rebuilt Menu & Settings (`newui_menu_settings`).
-/// Frosted MeditationCard-style glass over the app's original background.
+/// Layout pieces for the rebuilt Menu & Settings (`newui_menu_settings`),
+/// built on the shared nowssb_ui kit (NGlass, GlassPill) over the app's
+/// original background.
 library;
-
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
 import '../../data/app_control.dart';
+import '../../nowssb_ui/nowssb_ui.dart';
 import '../../widgets/app_backdrop.dart';
 
 const String kMenuSettingsFlag = 'newui_menu_settings';
@@ -25,68 +25,16 @@ class MenuSettingsFlag {
   }
 }
 
-const kTextLo = Color(0xB3FFFFFF);
+const kTextLo = NTokens.textLo;
 
-/// Frosted card: white 17%, blur 18, 24px radius, 1px white 30% border.
-class MsGlass extends StatelessWidget {
-  const MsGlass({super.key, required this.child, this.radius = 24, this.padding = const EdgeInsets.all(16), this.blur = true});
-  final Widget child;
-  final double radius;
-  final EdgeInsets padding;
-  final bool blur;
-  @override
-  Widget build(BuildContext context) {
-    final r = BorderRadius.circular(radius);
-    final box = DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: r,
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [
-          Colors.white.withValues(alpha: .22),
-          Colors.white.withValues(alpha: .08),
-        ]),
-        border: Border.all(color: Colors.white.withValues(alpha: .30)),
-      ),
-      child: Material(type: MaterialType.transparency, child: Padding(padding: padding, child: child)),
-    );
-    final reduce = MediaQuery.maybeOf(context)?.disableAnimations == true;
-    return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: r, boxShadow: const [
-        BoxShadow(color: Color(0x33000000), blurRadius: 24, offset: Offset(0, 10)),
-      ]),
-      child: ClipRRect(
-        borderRadius: r,
-        child: blur && !reduce
-            ? BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18), child: box)
-            : box,
-      ),
-    );
-  }
-}
+/// Large-surface blur for the shared NGlass.
+const double kMsBlur = 18;
 
-/// Small pill: white with dark text, or violet filled for the primary action.
-class MsPill extends StatelessWidget {
-  const MsPill({super.key, required this.label, this.onTap, this.primary = false, this.danger = false});
-  final String label;
-  final VoidCallback? onTap;
-  final bool primary, danger;
-  @override
-  Widget build(BuildContext context) {
-    final bg = primary ? const Color(0xFF7C5CFF) : danger ? const Color(0xFFFFE3E8) : Colors.white;
-    final fg = primary ? Colors.white : danger ? const Color(0xFFB00030) : const Color(0xFF17142A);
-    return Material(
-      color: bg,
-      shape: const StadiumBorder(),
-      child: InkWell(
-        customBorder: const StadiumBorder(),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-          child: Text(label, style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w700)),
-        ),
-      ),
-    );
-  }
-}
+/// Pill on the shared kit: white (default), violet solid (primary) or
+/// outlined (danger).
+Widget msPill(String label, VoidCallback? onTap, {Key? key, bool primary = false, bool danger = false}) =>
+    GlassPill(key: key, label: label, onTap: onTap, dense: true,
+        style: primary ? PillStyle.solid : danger ? PillStyle.outlined : PillStyle.white);
 
 /// Scaffold: original background + safe list + back + title.
 class MsScaffold extends StatelessWidget {
@@ -152,7 +100,8 @@ class MsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 14),
-        child: MsGlass(
+        child: NGlass(
+          blur: kMsBlur,
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
@@ -197,7 +146,7 @@ class MsRow extends StatelessWidget {
           if (toggle != null)
             Switch(value: toggle!, activeTrackColor: const Color(0xFF7C5CFF), onChanged: (_) => onTap?.call())
           else
-            MsPill(label: action, onTap: onTap, danger: danger),
+            msPill(action, onTap, danger: danger),
         ]),
       ),
     );

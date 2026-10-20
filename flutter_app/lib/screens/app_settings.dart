@@ -8,7 +8,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../pages/menu_settings/ms_glass.dart';
+import '../pages/menu_settings/ms_widgets.dart';
 import '../pages/menu_settings/ms_settings_page.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';

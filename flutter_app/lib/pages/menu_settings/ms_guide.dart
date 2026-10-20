@@ -4,7 +4,8 @@ library;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'ms_glass.dart';
+import '../../nowssb_ui/nowssb_ui.dart';
+import 'ms_widgets.dart';
 
 const _kSeen = 'ms_guide_seen_v1';
 
@@ -47,8 +48,9 @@ class _MsGuideDialogState extends State<MsGuideDialog> {
       key: const Key('ms_guide'),
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(28),
-      child: MsGlass(
-        radius: 30,
+      child: NGlass(
+        radius: NTokens.rHero,
+        blur: kMsBlur,
         padding: const EdgeInsets.all(18),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           const SizedBox(height: 6),
@@ -62,8 +64,9 @@ class _MsGuideDialogState extends State<MsGuideDialog> {
             child: const Icon(Icons.self_improvement_rounded, color: Colors.white, size: 44),
           ),
           const SizedBox(height: 16),
-          MsGlass(
-            blur: false,
+          NGlass(
+            radius: NTokens.rCard,
+            elevation: .3,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
               const SizedBox(height: 8),
@@ -75,11 +78,9 @@ class _MsGuideDialogState extends State<MsGuideDialog> {
                   child: const Text('Skip', style: TextStyle(color: kTextLo, fontSize: 12)),
                 ),
                 const Spacer(),
-                MsPill(
-                  label: last ? 'Begin' : 'Next',
-                  primary: last,
-                  onTap: () => last ? Navigator.of(context).pop() : setState(() => _i++),
-                ),
+                msPill(last ? 'Begin' : 'Next',
+                    () => last ? Navigator.of(context).pop() : setState(() => _i++),
+                    primary: last),
               ]),
               const SizedBox(height: 6),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [

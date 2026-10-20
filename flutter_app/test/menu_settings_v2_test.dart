@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nowssb/pages/menu_settings/ms_glass.dart';
+import 'package:nowssb/pages/menu_settings/ms_widgets.dart';
 import 'package:nowssb/pages/menu_settings/ms_guide.dart';
 import 'package:nowssb/pages/menu_settings/ms_menu_page.dart';
 import 'package:nowssb/pages/menu_settings/ms_settings_page.dart';

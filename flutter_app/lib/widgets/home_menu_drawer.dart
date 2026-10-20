@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/app_control.dart';
-import '../pages/menu_settings/ms_glass.dart';
+import '../pages/menu_settings/ms_widgets.dart';
 import '../pages/menu_settings/ms_menu_page.dart';
 import '../data/content.dart';
 import '../screens/app_settings.dart';

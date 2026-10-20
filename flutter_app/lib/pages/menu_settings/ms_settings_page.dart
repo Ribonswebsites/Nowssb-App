@@ -4,7 +4,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'ms_glass.dart';
+import 'ms_widgets.dart';
 import 'ms_guide.dart';
 
 /// Everything Settings can do; wired by AppSettingsScreen, faked in tests.
