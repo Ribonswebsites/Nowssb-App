@@ -63,6 +63,7 @@ class EarnData {
     }
     return null;
   }
+
   final EarnLoad load;
   final String message;
   final bool enabled;
@@ -78,16 +79,20 @@ class EarnData {
     final words = (s['words'] as num?)?.toInt() ?? 0;
     List<Map> list(String k) => (s[k] is List ? s[k] as List : const []).whereType<Map>().toList();
     final targets = list('targets')
-        .map((t) => EarnTarget((t['words'] as num?)?.toInt() ?? 0, t['reached'] == true || words >= ((t['words'] as num?) ?? 1 << 30), '${t['title'] ?? ''}',
+        .map((t) => EarnTarget(
+            (t['words'] as num?)?.toInt() ?? 0, t['reached'] == true || words >= ((t['words'] as num?) ?? 1 << 30), '${t['title'] ?? ''}',
             coins: (t['coins'] as num?)?.toInt() ?? 0, coupon: '${t['coupon'] ?? ''}', cash: (t['cash'] ?? t['cashINR'] ?? 0) as num))
         .where((t) => t.words > 0)
         .toList()
       ..sort((a, b) => a.words.compareTo(b.words));
     final bal = s['balances'] is Map ? s['balances'] as Map : const {};
-    // The server still names INR fields; [currency] says what unit they are.
+    // LEGACY server compatibility: earnSummary still sends *INR fields with no
+    // currency code. Treat them as INR until the server sends `currency` and
+    // plain `lifetime`/`pending`/`available` in the user's local currency.
     final currency = '${bal['currency'] ?? (bal.containsKey('lifetimeINR') ? 'INR' : '')}';
     final ranks = list('ranks')
-        .map((r) => EarnRank('${r['title'] ?? ''}', '${r['metal'] ?? ''}', (r['minWords'] as num?)?.toInt() ?? 0, (r['ratePct'] as num?)?.round() ?? 0))
+        .map((r) => EarnRank(
+            '${r['title'] ?? ''}', '${r['metal'] ?? ''}', (r['minWords'] as num?)?.toInt() ?? 0, (r['ratePct'] as num?)?.round() ?? 0))
         .toList()
       ..sort((a, b) => a.minWords.compareTo(b.minWords));
     final pa = s['payoutAccount'] is Map ? s['payoutAccount'] as Map : const {};
@@ -109,7 +114,9 @@ class EarnData {
             level: ((m['level'] as num?)?.toInt() ?? 1).clamp(1, 2),
           ),
       ],
-      invites: [for (final i in list('invites')) EarnInvite('${i['id'] ?? ''}', '${i['rank'] ?? ''}', '${i['fromName'] ?? 'A NowssB officer'}')],
+      invites: [
+        for (final i in list('invites')) EarnInvite('${i['id'] ?? ''}', '${i['rank'] ?? ''}', '${i['fromName'] ?? 'A NowssB officer'}')
+      ],
       payoutCountry: '${pa['country'] ?? ''}',
       ranks: ranks,
       currency: currency,

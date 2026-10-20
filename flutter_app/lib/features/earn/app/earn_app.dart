@@ -78,7 +78,8 @@ class _EarnAppState extends State<EarnApp> {
       case EarnLoad.error:
         return _state('earn-error', 2, 'Something went wrong', _d.message.isEmpty ? 'We could not load Earn.' : _d.message, 'Try again');
       case EarnLoad.ready:
-        if (!_d.enabled) return _state('earn-paused', 3, 'Earn is paused', 'Earn is switched off right now. Please check back later.', 'Refresh');
+        if (!_d.enabled)
+          return _state('earn-paused', 3, 'Earn is paused', 'Earn is switched off right now. Please check back later.', 'Refresh');
         return RefreshIndicator(
           onRefresh: _load,
           child: switch (_tab) {
@@ -95,7 +96,8 @@ class _EarnAppState extends State<EarnApp> {
         key: Key(key),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(26),
-          child: MeditationCard(photo: kEarnPhotos[photo], title: title, body: body, cta: cta, onCta: _load),
+          child: MeditationCard(
+              image: AssetImage(kEarnPhotos[photo]), title: title, subtitle: body, cta: cta, onCta: _load, secondary: null, dots: null),
         ),
       );
 }
@@ -108,11 +110,20 @@ class _TopBar extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
         child: Row(children: [
           if (Navigator.of(context).canPop())
-            IconButton(tooltip: 'Back', onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_ios_new_rounded, color: kInk, size: 20))
+            IconButton(
+                tooltip: 'Back',
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: kInk, size: 20))
           else
             const SizedBox(width: 48),
-          const Expanded(child: Text('NowssB Earn', textAlign: TextAlign.center, style: TextStyle(color: kInk, fontSize: 18, fontWeight: FontWeight.w700))),
-          IconButton(key: const Key('earn-help'), tooltip: 'How Earn works', onPressed: onHelp, icon: const Icon(Icons.help_outline_rounded, color: kInk)),
+          const Expanded(
+              child: Text('NowssB Earn',
+                  textAlign: TextAlign.center, style: TextStyle(color: kInk, fontSize: 18, fontWeight: FontWeight.w700))),
+          IconButton(
+              key: const Key('earn-help'),
+              tooltip: 'How Earn works',
+              onPressed: onHelp,
+              icon: const Icon(Icons.help_outline_rounded, color: kInk)),
         ]),
       );
 }
@@ -121,32 +132,40 @@ class _Tabs extends StatelessWidget {
   const _Tabs({required this.index, required this.onTap});
   final int index;
   final ValueChanged<int> onTap;
-  static const items = [(Icons.home_rounded, 'Home'), (Icons.flag_rounded, 'Targets'), (Icons.account_tree_rounded, 'Team'), (Icons.checklist_rounded, 'Tasks')];
+  static const items = [
+    (Icons.home_rounded, 'Home'),
+    (Icons.flag_rounded, 'Targets'),
+    (Icons.account_tree_rounded, 'Team'),
+    (Icons.checklist_rounded, 'Tasks')
+  ];
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
-        child: Frost(
-          radius: 26,
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-          child: Row(children: [
-            for (var i = 0; i < items.length; i++)
-              Expanded(
-                child: InkWell(
-                  key: Key('earn-tab-$i'),
-                  borderRadius: BorderRadius.circular(20),
-                  onTap: () => onTap(i),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: i == index ? Colors.white : Colors.transparent),
-                    child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(items[i].$1, size: 20, color: i == index ? const Color(0xFF1B1433) : kInk),
-                      Text(items[i].$2, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: i == index ? const Color(0xFF1B1433) : kInk)),
-                    ]),
+        child: NGlass(
+            radius: 26,
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+            child: Row(children: [
+              for (var i = 0; i < items.length; i++)
+                Expanded(
+                  child: InkWell(
+                    key: Key('earn-tab-$i'),
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => onTap(i),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration:
+                          BoxDecoration(borderRadius: BorderRadius.circular(20), color: i == index ? Colors.white : Colors.transparent),
+                      child: Column(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(items[i].$1, size: 20, color: i == index ? const Color(0xFF1B1433) : kInk),
+                        Text(items[i].$2,
+                            style:
+                                TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: i == index ? const Color(0xFF1B1433) : kInk)),
+                      ]),
+                    ),
                   ),
                 ),
-              ),
-          ]),
-        ),
+            ]),
+            blur: NTokens.cardBlur),
       );
 }
 
@@ -184,68 +203,84 @@ class _HomeTab extends StatelessWidget {
         child: KeyedSubtree(
           key: const Key('earn-rank-card'),
           child: MeditationCard(
-            top: ProgressRing(
-              size: 132,
-              value: d.progress,
-              color: c,
-              center: Container(
-                width: 104,
-                height: 104,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(center: const Alignment(-.3, -.4), colors: [Color.lerp(c, Colors.white, .5)!, c, Color.lerp(c, Colors.black, .4)!]),
-                ),
-                child: const Icon(Icons.workspace_premium_rounded, size: 54, color: Color(0xFF1B1433)),
-              ),
-            ),
-            title: d.rank.isEmpty ? 'New agent' : d.rank,
-            body: _rateLine(),
-            extra: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(_progressLine(), key: const Key('earn-next'), style: const TextStyle(color: kInk, fontSize: 13, fontWeight: FontWeight.w600)),
-              if (nr != null) ...[
-                const SizedBox(height: 8),
-                Row(children: [
-                  const Icon(Icons.trending_up_rounded, color: kMint, size: 16),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Next rank: ${nr.title}${nr.ratePct > 0 ? ' · keep ${nr.ratePct}%' : ''} at ${nr.minWords} words',
-                      key: const Key('earn-next-rank'),
-                      style: const TextStyle(color: kMint, fontSize: 12, fontWeight: FontWeight.w600),
-                    ),
+              circle: ProgressRing(
+                size: 132,
+                value: d.progress,
+                color: c,
+                center: Container(
+                  width: 104,
+                  height: 104,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                        center: const Alignment(-.3, -.4), colors: [Color.lerp(c, Colors.white, .5)!, c, Color.lerp(c, Colors.black, .4)!]),
                   ),
-                ]),
-              ],
-            ]),
-            link: 'How it works',
-            onLink: () => showEarnGuide(context),
-            cta: 'See targets',
-            onCta: () => goTab(1),
-          ),
+                  child: const Icon(Icons.workspace_premium_rounded, size: 54, color: Color(0xFF1B1433)),
+                ),
+              ),
+              title: d.rank.isEmpty ? 'New agent' : d.rank,
+              subtitle: '${_rateLine()}\n${_progressLine()}',
+              secondary: 'How it works',
+              onSkip: () => showEarnGuide(context),
+              cta: 'See targets',
+              onCta: () => goTab(1),
+              dots: null),
         ),
       ),
+      if (nr != null) ...[
+        const SizedBox(height: 12),
+        Entrance(
+          index: i++,
+          child: NGlass(
+            blur: NTokens.cardBlur,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(children: [
+              const Icon(Icons.trending_up_rounded, color: kMint, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Next rank: ${nr.title}${nr.ratePct > 0 ? ' · keep ${nr.ratePct}%' : ''} at ${nr.minWords} words',
+                    key: const Key('earn-next-rank'), style: const TextStyle(color: kMint, fontSize: 12.5, fontWeight: FontWeight.w700)),
+              ),
+            ]),
+          ),
+        ),
+      ],
       const SectionTitle('Your numbers'),
       Entrance(
         index: i++,
         child: Row(children: [
-          Expanded(child: _Stat(key: const Key('earn-stat-words'), icon: Icons.auto_awesome_rounded, label: 'Words sold', value: '${d.words}', hint: d.words == 0 ? 'Share your link to sell your first' : 'All time', onTap: () => goTab(3))),
+          Expanded(
+              child: _Stat(
+                  key: const Key('earn-stat-words'),
+                  icon: Icons.auto_awesome_rounded,
+                  label: 'Words sold',
+                  value: '${d.words}',
+                  hint: d.words == 0 ? 'Share your link to sell your first' : 'All time',
+                  onTap: () => goTab(3))),
           const SizedBox(width: 12),
-          Expanded(child: _Stat(key: const Key('earn-stat-team'), icon: Icons.groups_rounded, label: 'Your team', value: '${d.team.length}', hint: d.team.isEmpty ? 'Invite a friend to start' : '${d.direct.length} direct · ${d.second.length} level 2', onTap: () => goTab(2))),
+          Expanded(
+              child: _Stat(
+                  key: const Key('earn-stat-team'),
+                  icon: Icons.groups_rounded,
+                  label: 'Your team',
+                  value: '${d.team.length}',
+                  hint: d.team.isEmpty ? 'Invite a friend to start' : '${d.direct.length} direct · ${d.second.length} level 2',
+                  onTap: () => goTab(2))),
         ]),
       ),
       const SizedBox(height: 12),
       Entrance(
         index: i++,
-        child: TicketCard(
-          key: const Key('earn-stat-money'),
-          leading: const RoundIcon(Icons.account_balance_wallet_rounded, color: Color(0xFFF5C451)),
-          pill: 'Money earned',
-          label: d.earned > 0 ? 'Pending ${earnMoney(context, d.pending, d.currency)} · Available ${earnMoney(context, d.available, d.currency)}' : 'Nothing earned yet',
-          headline: d.earned > 0 ? earnMoney(context, d.earned, d.currency) : 'Make your first sale',
-          link: d.earned > 0 ? 'See your money' : 'See how',
-          accent: const Color(0xFFF5C451),
-          onTap: () => d.earned > 0 ? Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())) : goTab(3),
-        ),
+        child: NTicketCard(
+            key: const Key('earn-stat-money'),
+            rarity: earnRarity('Money earned'),
+            label: d.earned > 0
+                ? 'Pending ${earnMoney(context, d.pending, d.currency)} · Available ${earnMoney(context, d.available, d.currency)}'
+                : 'Nothing earned yet',
+            title: d.earned > 0 ? earnMoney(context, d.earned, d.currency) : 'Make your first sale',
+            ctaLabel: d.earned > 0 ? 'See your money' : 'See how',
+            onTap: () =>
+                d.earned > 0 ? Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())) : goTab(3)),
       ),
       if (d.invites.isNotEmpty) ...[
         const SectionTitle('Invites'),
@@ -254,27 +289,41 @@ class _HomeTab extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: Entrance(
               index: i++,
-              child: TicketCard(
-                leading: const RoundIcon(Icons.mail_rounded, color: Color(0xFFE879F9)),
-                pill: 'Invite',
-                badge: 'NEW',
-                label: 'From ${inv.from}',
-                headline: 'Join as ${inv.rank}',
-                link: 'View invite',
-                accent: const Color(0xFFE879F9),
-                onTap: () => _invite(context, inv),
-              ),
+              child: NTicketCard(
+                  rarity: earnRarity('Invite'),
+                  isNew: true,
+                  label: 'From ${inv.from}',
+                  title: 'Join as ${inv.rank}',
+                  ctaLabel: 'View invite',
+                  onTap: () => _invite(context, inv)),
             ),
           ),
       ],
       const SectionTitle('Quick links'),
       for (final (k, photo, pill, label, head, link, onTap) in [
-        ('payout', 0, 'Payout', 'Your country', 'Set up payouts', 'Open', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EarnPayoutPage(country: d.payoutCountry)))),
+        (
+          'payout',
+          0,
+          'Payout',
+          'Your country',
+          'Set up payouts',
+          'Open',
+          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EarnPayoutPage(country: d.payoutCountry)))
+        ),
         ('tasks', 2, 'Tasks', 'Simple steps', 'Ways to earn', 'See tasks', () => goTab(3)),
       ])
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: Entrance(index: i++, child: TicketCard(key: Key('earn-go-$k'), leading: RoundPhoto(kEarnPhotos[photo]), pill: pill, label: label, headline: head, link: link, onTap: onTap)),
+          child: Entrance(
+              index: i++,
+              child: NTicketCard(
+                  key: Key('earn-go-$k'),
+                  image: AssetImage(kEarnPhotos[photo]),
+                  rarity: earnRarity(pill),
+                  label: label,
+                  title: head,
+                  ctaLabel: link,
+                  onTap: onTap)),
         ),
       const SizedBox(height: 8),
       const Text(kEarnDisclaimer, key: Key('earn-honesty'), textAlign: TextAlign.center, style: TextStyle(color: kGrey, fontSize: 12)),
@@ -284,14 +333,14 @@ class _HomeTab extends StatelessWidget {
   void _invite(BuildContext context, EarnInvite i) => showEarnCard<void>(
         context,
         (ctx) => MeditationCard(
-          photo: kEarnPhotos[3],
-          title: 'Join as ${i.rank}',
-          body: '${i.from} invited you. You can say yes or no. Nothing is charged.',
-          link: 'Not now',
-          onLink: () => _answer(ctx, i, false),
-          cta: 'Accept',
-          onCta: () => _answer(ctx, i, true),
-        ),
+            image: AssetImage(kEarnPhotos[3]),
+            title: 'Join as ${i.rank}',
+            subtitle: '${i.from} invited you. You can say yes or no. Nothing is charged.',
+            secondary: 'Not now',
+            onSkip: () => _answer(ctx, i, false),
+            cta: 'Accept',
+            onCta: () => _answer(ctx, i, true),
+            dots: null),
       );
 
   Future<void> _answer(BuildContext ctx, EarnInvite i, bool yes) async {
@@ -312,17 +361,21 @@ class _Stat extends StatelessWidget {
   final String label, value, hint;
   final VoidCallback? onTap;
   @override
-  Widget build(BuildContext context) => Frost(
-        radius: 22,
-        padding: const EdgeInsets.all(14),
-        onTap: onTap,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Icon(icon, color: kMint, size: 16), const SizedBox(width: 6), Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kGrey, fontSize: 12)))]),
-          const SizedBox(height: 6),
-          Text(value, style: const TextStyle(color: kInk, fontSize: 26, fontWeight: FontWeight.w800)),
-          Text(hint, maxLines: 2, style: const TextStyle(color: kGrey, fontSize: 11)),
+  Widget build(BuildContext context) => NGlass(
+      radius: 22,
+      padding: const EdgeInsets.all(14),
+      onTap: onTap,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(icon, color: kMint, size: 16),
+          const SizedBox(width: 6),
+          Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kGrey, fontSize: 12)))
         ]),
-      );
+        const SizedBox(height: 6),
+        Text(value, style: const TextStyle(color: kInk, fontSize: 26, fontWeight: FontWeight.w800)),
+        Text(hint, maxLines: 2, style: const TextStyle(color: kGrey, fontSize: 11)),
+      ]),
+      blur: NTokens.cardBlur);
 }
 
 /// One look per tier, in ladder order.
@@ -355,28 +408,41 @@ class _TargetsTab extends StatelessWidget {
     return _list([
       Entrance(
         index: 0,
-        child: Frost(
-          padding: const EdgeInsets.all(16),
-          child: Row(children: [
-            ProgressRing(value: d.progress, color: kMint, center: Text('${(d.progress * 100).round()}%', style: const TextStyle(color: kInk, fontWeight: FontWeight.w800))),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${d.words} words sold', style: const TextStyle(color: kInk, fontSize: 18, fontWeight: FontWeight.w800)),
-                Text(next == null ? (d.targets.isEmpty ? 'Targets will appear soon.' : 'Every target reached.') : 'Next target: ${next.words} words',
-                    style: const TextStyle(color: kGrey, fontSize: 12)),
-              ]),
-            ),
-          ]),
-        ),
+        child: NGlass(
+            padding: const EdgeInsets.all(16),
+            child: Row(children: [
+              ProgressRing(
+                  value: d.progress,
+                  color: kMint,
+                  center: Text('${(d.progress * 100).round()}%', style: const TextStyle(color: kInk, fontWeight: FontWeight.w800))),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('${d.words} words sold', style: const TextStyle(color: kInk, fontSize: 18, fontWeight: FontWeight.w800)),
+                  Text(
+                      next == null
+                          ? (d.targets.isEmpty ? 'Targets will appear soon.' : 'Every target reached.')
+                          : 'Next target: ${next.words} words',
+                      style: const TextStyle(color: kGrey, fontSize: 12)),
+                ]),
+              ),
+            ]),
+            blur: NTokens.cardBlur),
       ),
       const SectionTitle('Targets'),
       if (d.targets.isEmpty)
-        MeditationCard(photo: kEarnPhotos[1], title: 'No targets yet', body: 'Targets will show here when they are ready.', cta: 'OK')
+        MeditationCard(
+            image: AssetImage(kEarnPhotos[1]),
+            title: 'No targets yet',
+            subtitle: 'Targets will show here when they are ready.',
+            cta: 'OK',
+            secondary: null,
+            dots: null)
       else
         for (var i = 0; i < d.targets.length; i++) _card(context, i),
       const SizedBox(height: 6),
-      const Text('Rewards are set by NowssB and can change. You get them only for real, completed sales.', textAlign: TextAlign.center, style: TextStyle(color: kGrey, fontSize: 11)),
+      const Text('Rewards are set by NowssB and can change. You get them only for real, completed sales.',
+          textAlign: TextAlign.center, style: TextStyle(color: kGrey, fontSize: 11)),
     ]);
   }
 
@@ -394,47 +460,53 @@ class _TargetsTab extends StatelessWidget {
         index: i + 1,
         child: Opacity(
           opacity: state == _TState.locked ? .72 : 1,
-          child: Frost(
-            key: Key('earn-target-${t.words}'),
-            radius: 24,
-            tint: tier.$1,
-            padding: const EdgeInsets.all(14),
-            onTap: () => _detail(context, i, state, p),
-            child: Row(children: [
-              ProgressRing(
-                value: p,
-                color: color,
-                size: 62,
-                center: Icon(state == _TState.locked ? Icons.lock_rounded : (state == _TState.achieved ? Icons.check_rounded : tier.$2), color: color, size: 24),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Text(tier.$3.toUpperCase(), style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4)),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), color: color.withValues(alpha: .2), border: Border.all(color: color.withValues(alpha: .6))),
-                      child: Text(status, style: const TextStyle(color: kInk, fontSize: 10, fontWeight: FontWeight.w700)),
-                    ),
+          child: NGlass(
+              key: Key('earn-target-${t.words}'),
+              radius: 24,
+              tint: tier.$1,
+              padding: const EdgeInsets.all(14),
+              onTap: () => _detail(context, i, state, p),
+              child: Row(children: [
+                ProgressRing(
+                  value: p,
+                  color: color,
+                  size: 62,
+                  center: Icon(state == _TState.locked ? Icons.lock_rounded : (state == _TState.achieved ? Icons.check_rounded : tier.$2),
+                      color: color, size: 24),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Text(tier.$3.toUpperCase(),
+                          style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.4)),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(99),
+                            color: color.withValues(alpha: .2),
+                            border: Border.all(color: color.withValues(alpha: .6))),
+                        child: Text(status, style: const TextStyle(color: kInk, fontSize: 10, fontWeight: FontWeight.w700)),
+                      ),
+                    ]),
+                    const SizedBox(height: 4),
+                    Text('${t.words} words', style: const TextStyle(color: kInk, fontSize: 19, fontWeight: FontWeight.w800)),
+                    Text(_reward(context, t), maxLines: 2, style: const TextStyle(color: kGrey, fontSize: 12)),
+                    if (state == _TState.inProgress) ...[
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                            value: p, minHeight: 5, backgroundColor: Colors.white12, valueColor: AlwaysStoppedAnimation(color)),
+                      ),
+                      const SizedBox(height: 3),
+                      Text('${t.words - d.words} to go', style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
+                    ],
                   ]),
-                  const SizedBox(height: 4),
-                  Text('${t.words} words', style: const TextStyle(color: kInk, fontSize: 19, fontWeight: FontWeight.w800)),
-                  Text(_reward(context, t), maxLines: 2, style: const TextStyle(color: kGrey, fontSize: 12)),
-                  if (state == _TState.inProgress) ...[
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(value: p, minHeight: 5, backgroundColor: Colors.white12, valueColor: AlwaysStoppedAnimation(color)),
-                    ),
-                    const SizedBox(height: 3),
-                    Text('${t.words - d.words} to go', style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
-                  ],
-                ]),
-              ),
-            ]),
-          ),
+                ),
+              ]),
+              blur: NTokens.cardBlur),
         ),
       ),
     );
@@ -446,24 +518,23 @@ class _TargetsTab extends StatelessWidget {
     showEarnCard<void>(
       context,
       (ctx) => MeditationCard(
-        key: const Key('earn-target-card'),
-        top: ProgressRing(
-          size: 132,
-          value: p,
-          color: tier.$1,
-          center: Icon(state == _TState.locked ? Icons.lock_rounded : tier.$2, color: tier.$1, size: 54),
-        ),
-        title: '${tier.$3} · ${t.words} words',
-        body: switch (state) {
-          _TState.achieved => 'You reached this target. Its reward is added to your account.',
-          _TState.inProgress => 'You have sold ${d.words}. Sell ${t.words - d.words} more words to reach it.',
-          _TState.locked => 'Reach the earlier targets first. This one unlocks after ${i == 0 ? 0 : d.targets[i - 1].words} words.',
-        },
-        extra: Text('Reward: ${_reward(context, t)}', style: const TextStyle(color: kMint, fontSize: 12.5, fontWeight: FontWeight.w700)),
-        link: 'Rewards can change',
-        cta: 'Close',
-        onCta: () => Navigator.of(ctx).pop(),
-      ),
+          key: const Key('earn-target-card'),
+          circle: ProgressRing(
+            size: 132,
+            value: p,
+            color: tier.$1,
+            center: Icon(state == _TState.locked ? Icons.lock_rounded : tier.$2, color: tier.$1, size: 54),
+          ),
+          title: '${tier.$3} · ${t.words} words',
+          subtitle: '${switch (state) {
+            _TState.achieved => 'You reached this target. Its reward is added to your account.',
+            _TState.inProgress => 'You have sold ${d.words}. Sell ${t.words - d.words} more words to reach it.',
+            _TState.locked => 'Reach the earlier targets first. This one unlocks after ${i == 0 ? 0 : d.targets[i - 1].words} words.',
+          }}\n\nReward: ${_reward(context, t)}',
+          secondary: 'Rewards can change',
+          cta: 'Close',
+          onCta: () => Navigator.of(ctx).pop(),
+          dots: null),
     );
   }
 }
@@ -477,55 +548,58 @@ class _TeamTab extends StatelessWidget {
       return _list([
         const SizedBox(height: 20),
         MeditationCard(
-          key: const Key('earn-team-empty'),
-          photo: kEarnPhotos[2],
-          title: 'No team yet',
-          body: 'People who join through your link show up here, up to 2 levels.',
-          cta: 'Share link',
-          onCta: () => shareEarnLink(context),
-        ),
+            key: const Key('earn-team-empty'),
+            image: AssetImage(kEarnPhotos[2]),
+            title: 'No team yet',
+            subtitle: 'People who join through your link show up here, None: up to 2 levels.',
+            cta: 'Share link',
+            onCta: () => shareEarnLink(context),
+            secondary: null,
+            dots: null),
       ]);
     }
     Widget row(EarnMember m, int i) => Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: Entrance(index: i + 1, child: TicketCard(
-            key: Key('earn-member-${m.id}'),
-            leading: RoundIcon(Icons.person_rounded, text: m.name.isEmpty ? '?' : m.name.characters.first.toUpperCase(), color: m.level == 1 ? const Color(0xFF8B5CF6) : kMint),
-            pill: m.level == 1 ? 'Direct' : 'Level 2',
-            label: m.rank.isEmpty ? 'Team member' : m.rank,
-            headline: m.name,
-            link: '${m.words} words',
-            accent: m.level == 1 ? const Color(0xFF8B5CF6) : kMint,
-            onTap: () => showEarnCard<void>(
-              context,
-              (ctx) => MeditationCard(
-                key: const Key('earn-member-card'),
-                photo: kEarnPhotos[i % kEarnPhotos.length],
-                title: m.name,
-                body: 'Rank: ${m.rank.isEmpty ? '—' : m.rank}\nWords sold: ${m.words}\nLevel: ${m.level == 1 ? 'Direct (1)' : 'Through your team (2)'}',
-                cta: 'Close',
-                onCta: () => Navigator.of(ctx).pop(),
-              ),
-            ),
-          )),
+          child: Entrance(
+              index: i + 1,
+              child: NTicketCard(
+                  key: Key('earn-member-${m.id}'),
+                  rarity: earnRarity(m.level == 1 ? 'Direct' : 'Level 2'),
+                  label: m.rank.isEmpty ? 'Team member' : m.rank,
+                  title: m.name,
+                  ctaLabel: '${m.words} words',
+                  onTap: () => showEarnCard<void>(
+                        context,
+                        (ctx) => MeditationCard(
+                            key: const Key('earn-member-card'),
+                            image: AssetImage(kEarnPhotos[i % kEarnPhotos.length]),
+                            title: m.name,
+                            subtitle:
+                                'Rank: ${m.rank.isEmpty ? '—' : m.rank}\nWords sold: ${m.words}\nLevel: ${m.level == 1 ? 'Direct (1)' : 'Through your team (2)'}',
+                            cta: 'Close',
+                            onCta: () => Navigator.of(ctx).pop(),
+                            secondary: null,
+                            dots: null),
+                      ))),
         );
     return _list([
       Entrance(
         index: 0,
-        child: Frost(
-          padding: const EdgeInsets.all(16),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: _Big('${d.direct.length}', 'Direct')),
-              Container(width: 1, height: 40, color: Colors.white24),
-              Expanded(child: _Big('${d.second.length}', 'Level 2')),
-              Container(width: 1, height: 40, color: Colors.white24),
-              Expanded(child: _Big('${d.team.fold<int>(0, (a, m) => a + m.words)}', 'Team words')),
+        child: NGlass(
+            padding: const EdgeInsets.all(16),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Expanded(child: _Big('${d.direct.length}', 'Direct')),
+                Container(width: 1, height: 40, color: Colors.white24),
+                Expanded(child: _Big('${d.second.length}', 'Level 2')),
+                Container(width: 1, height: 40, color: Colors.white24),
+                Expanded(child: _Big('${d.team.fold<int>(0, (a, m) => a + m.words)}', 'Team words')),
+              ]),
+              const SizedBox(height: 8),
+              Text('${d.direct.length} direct · ${d.second.length} level 2',
+                  key: const Key('earn-team-counts'), style: const TextStyle(color: kGrey, fontSize: 12)),
             ]),
-            const SizedBox(height: 8),
-            Text('${d.direct.length} direct · ${d.second.length} level 2', key: const Key('earn-team-counts'), style: const TextStyle(color: kGrey, fontSize: 12)),
-          ]),
-        ),
+            blur: NTokens.cardBlur),
       ),
       const SectionTitle('Direct'),
       for (var i = 0; i < d.direct.length; i++) row(d.direct[i], i),
@@ -544,25 +618,48 @@ class _TasksTab extends StatelessWidget {
         Entrance(
           index: 0,
           child: MeditationCard(
-            photo: kEarnPhotos[3],
-            title: 'Start with one share',
-            body: 'Most sales start with a friend. Copy your link and send it to one person today.',
-            link: 'How it works',
-            onLink: () => showEarnGuide(context),
-            cta: 'Copy link',
-            onCta: () => shareEarnLink(context),
-          ),
+              image: AssetImage(kEarnPhotos[3]),
+              title: 'Start with one share',
+              subtitle: 'Most sales start with a friend. Copy your link and send it to one person today.',
+              secondary: 'How it works',
+              onSkip: () => showEarnGuide(context),
+              cta: 'Copy link',
+              onCta: () => shareEarnLink(context),
+              dots: null),
         ),
         const SectionTitle('Ways to earn'),
         for (final (k, photo, pill, label, head, link, onTap) in [
           ('share', 0, 'Share', 'Your link', 'Share your link', 'Copy link', () => shareEarnLink(context)),
-          ('sell', 1, 'Sell', 'Words and plans', 'Open the word store', 'Open store', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WordAtelierScreen()))),
+          (
+            'sell',
+            1,
+            'Sell',
+            'Words and plans',
+            'Open the word store',
+            'Open store',
+            () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const WordAtelierScreen()))
+          ),
           ('team', 2, 'Team', 'Up to 2 levels', 'Grow your team', 'See team', () => goTab(2)),
-          ('money', 3, 'Money', 'Pending and available', 'See your money', 'Open', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen()))),
+          (
+            'money',
+            3,
+            'Money',
+            'Pending and available',
+            'See your money',
+            'Open',
+            () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen()))
+          ),
         ])
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: TicketCard(key: Key('earn-task-$k'), leading: RoundPhoto(kEarnPhotos[photo]), pill: pill, label: label, headline: head, link: link, onTap: onTap),
+            child: NTicketCard(
+                key: Key('earn-task-$k'),
+                image: AssetImage(kEarnPhotos[photo]),
+                rarity: earnRarity(pill),
+                label: label,
+                title: head,
+                ctaLabel: link,
+                onTap: onTap),
           ),
       ]);
 }
@@ -593,17 +690,16 @@ class _GuideState extends State<_Guide> {
   Widget build(BuildContext context) {
     final last = _i == kGuide.length - 1;
     return MeditationCard(
-      key: Key('earn-guide-$_i'),
-      photo: kEarnPhotos[_i % kEarnPhotos.length],
-      title: kGuide[_i].$1,
-      body: kGuide[_i].$2,
-      link: last ? null : 'Skip',
-      onLink: () => Navigator.of(context).pop(),
-      cta: last ? 'Done' : 'Next',
-      onCta: () => last ? Navigator.of(context).pop() : setState(() => _i++),
-      dots: kGuide.length,
-      dotIndex: _i,
-    );
+        key: Key('earn-guide-$_i'),
+        image: AssetImage(kEarnPhotos[_i % kEarnPhotos.length]),
+        title: kGuide[_i].$1,
+        subtitle: kGuide[_i].$2,
+        secondary: last ? null : 'Skip',
+        onSkip: () => Navigator.of(context).pop(),
+        cta: last ? 'Done' : 'Next',
+        onCta: () => last ? Navigator.of(context).pop() : setState(() => _i++),
+        dots: kGuide.length,
+        dotIndex: _i);
   }
 }
 
@@ -619,9 +715,25 @@ class EarnPayoutPage extends StatefulWidget {
 class _EarnPayoutPageState extends State<EarnPayoutPage> {
   late String _country = widget.country;
   static const countries = {
-    'AE': 'United Arab Emirates', 'AU': 'Australia', 'BR': 'Brazil', 'CA': 'Canada', 'DE': 'Germany', 'ES': 'Spain', 'FR': 'France',
-    'GB': 'United Kingdom', 'ID': 'Indonesia', 'IN': 'India', 'IT': 'Italy', 'JP': 'Japan', 'MX': 'Mexico', 'NG': 'Nigeria',
-    'NL': 'Netherlands', 'PH': 'Philippines', 'SG': 'Singapore', 'US': 'United States', 'ZA': 'South Africa',
+    'AE': 'United Arab Emirates',
+    'AU': 'Australia',
+    'BR': 'Brazil',
+    'CA': 'Canada',
+    'DE': 'Germany',
+    'ES': 'Spain',
+    'FR': 'France',
+    'GB': 'United Kingdom',
+    'ID': 'Indonesia',
+    'IN': 'India',
+    'IT': 'Italy',
+    'JP': 'Japan',
+    'MX': 'Mexico',
+    'NG': 'Nigeria',
+    'NL': 'Netherlands',
+    'PH': 'Philippines',
+    'SG': 'Singapore',
+    'US': 'United States',
+    'ZA': 'South Africa',
   };
 
   @override
@@ -631,33 +743,45 @@ class _EarnPayoutPageState extends State<EarnPayoutPage> {
           child: SafeArea(
             child: Column(children: [
               Row(children: [
-                IconButton(tooltip: 'Back', onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_ios_new_rounded, color: kInk, size: 20)),
-                const Expanded(child: Text('Payouts', textAlign: TextAlign.center, style: TextStyle(color: kInk, fontSize: 18, fontWeight: FontWeight.w700))),
+                IconButton(
+                    tooltip: 'Back',
+                    onPressed: () => Navigator.of(context).maybePop(),
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: kInk, size: 20)),
+                const Expanded(
+                    child: Text('Payouts',
+                        textAlign: TextAlign.center, style: TextStyle(color: kInk, fontSize: 18, fontWeight: FontWeight.w700))),
                 const SizedBox(width: 48),
               ]),
               Expanded(
                 child: _list([
                   MeditationCard(
-                    key: const Key('earn-payout-card'),
-                    photo: kEarnPhotos[3],
-                    title: 'Get paid where you live',
-                    body: 'Payouts go through a global payout provider. They check your identity and tax details for your country, and pay in your local currency.',
-                    extra: DropdownButtonFormField<String>(
-                      key: const Key('earn-country'),
-                      isExpanded: true,
-                      value: countries.containsKey(_country) ? _country : null,
-                      dropdownColor: const Color(0xFF241C4A),
-                      style: const TextStyle(color: kInk),
-                      decoration: const InputDecoration(labelText: 'Country', labelStyle: TextStyle(color: kGrey)),
-                      items: [for (final e in countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))],
-                      onChanged: (v) => setState(() => _country = v ?? ''),
-                    ),
-                    cta: 'Continue',
-                    onCta: _country.isEmpty ? null : _continue,
-                  ),
+                      key: const Key('earn-payout-card'),
+                      image: AssetImage(kEarnPhotos[3]),
+                      title: 'Get paid where you live',
+                      subtitle:
+                          'Payouts go through a global payout provider. They check your identity and tax details for your country, None: and pay in your local currency.',
+                      cta: 'Continue',
+                      onCta: _country.isEmpty ? null : _continue,
+                      secondary: null,
+                      dots: null),
+                  const SizedBox(height: 12),
+                  NGlass(
+                      blur: NTokens.cardBlur,
+                      child: DropdownButtonFormField<String>(
+                        key: const Key('earn-country'),
+                        isExpanded: true,
+                        value: countries.containsKey(_country) ? _country : null,
+                        dropdownColor: const Color(0xFF241C4A),
+                        style: const TextStyle(color: kInk),
+                        decoration: const InputDecoration(labelText: 'Country', labelStyle: TextStyle(color: kGrey)),
+                        items: [for (final e in countries.entries) DropdownMenuItem(value: e.key, child: Text(e.value))],
+                        onChanged: (v) => setState(() => _country = v ?? ''),
+                      )),
                   const SizedBox(height: 14),
-                  const Text('Money you earn shows as Pending first, then Available. You can withdraw Available money once you pass the provider checks.',
-                      textAlign: TextAlign.center, style: TextStyle(color: kGrey, fontSize: 12)),
+                  const Text(
+                      'Money you earn shows as Pending first, then Available. You can withdraw Available money once you pass the provider checks.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: kGrey, fontSize: 12)),
                 ]),
               ),
             ]),
@@ -668,13 +792,15 @@ class _EarnPayoutPageState extends State<EarnPayoutPage> {
   void _continue() => showEarnCard<void>(
         context,
         (ctx) => MeditationCard(
-          key: const Key('earn-payout-pending'),
-          photo: kEarnPhotos[0],
-          title: 'Almost ready',
-          body: 'Payouts for ${countries[_country]} open when NowssB connects its payout provider. We saved nothing yet and will tell you when it is live.',
-          cta: 'OK',
-          onCta: () => Navigator.of(ctx).pop(),
-        ),
+            key: const Key('earn-payout-pending'),
+            image: AssetImage(kEarnPhotos[0]),
+            title: 'Almost ready',
+            subtitle:
+                'Payouts for ${countries[_country]} open when NowssB connects its payout provider. We saved nothing yet and will tell you when it is live.',
+            cta: 'OK',
+            onCta: () => Navigator.of(ctx).pop(),
+            secondary: null,
+            dots: null),
       );
 }
 

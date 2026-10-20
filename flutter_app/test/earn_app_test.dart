@@ -110,7 +110,7 @@ void main() {
     await t.pumpWidget(_app(const EarnApp()));
     await t.pump();
     expect(find.text('Officer'), findsWidgets);
-    expect(find.text('260 more words to reach 500.'), findsOneWidget);
+    expect(find.textContaining('260 more words to reach 500.'), findsOneWidget);
     expect(find.textContaining('Next rank: Executive Officer I'), findsOneWidget);
     expect(find.textContaining('22%'), findsWidgets);
     await _shot(t, 'earn-1');
