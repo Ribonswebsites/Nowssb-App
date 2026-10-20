@@ -183,7 +183,17 @@ class NotifRouter {
       _goTab?.call(tab);
       return;
     }
-    if (screen == null) return;
+    if (screen == null) {
+      // Never a dead tap: a practice ping with no word yet lands on the
+      // Practice tab, anything unknown lands in the inbox.
+      if (route.startsWith('practice')) {
+        _goTab?.call(1);
+        return;
+      }
+      _popToRoot?.call();
+      Navigator.of(ctx).push(MaterialPageRoute<void>(builder: (_) => const InboxScreen()));
+      return;
+    }
     _popToRoot?.call();
     Navigator.of(ctx).push(MaterialPageRoute<void>(builder: (_) => screen));
   }
