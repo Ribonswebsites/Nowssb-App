@@ -2,10 +2,8 @@
 /// Leagues · Wallet · Spend · Badges. Every number is the server's.
 library;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../admin/layout/layout_sections.dart';
@@ -14,6 +12,7 @@ import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
 import 'rewards_more.dart';
+import '../coins/coins_wallet_screen.dart';
 import 'program_heroes.dart';
 import '../vault/vault_screen.dart';
 
@@ -39,7 +38,6 @@ const kRewardsSpec = ProgramSpec(
     ProgramTab('mastery', 'Mastery', _mastery),
     ProgramTab('season', 'Season', _season),
     ProgramTab('leagues', 'Leagues', _leagues),
-    ProgramTab('wallet', 'Coin history', _wallet),
     ProgramTab('spend', 'Spend', _spend),
     ProgramTab('badges', 'Badges', _badges),
   ],
@@ -53,7 +51,8 @@ class RewardsTabPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = tab == 'today' || tab == 'wallet' ? 'Coins' : 'Rewards';
+    if (isCoinHistoryTab(tab)) return const CoinsWalletScreen(initialTab: CoinsTab.history);
+    final title = tab == 'today' ? 'Coins' : 'Rewards';
     return Scaffold(
       backgroundColor: const Color(0xFF07070C),
       appBar: AppBar(
@@ -83,10 +82,19 @@ class RewardsProgramPage extends StatelessWidget {
   final int? initialTab;
 
   @override
-  Widget build(BuildContext context) => VaultScreen(
-        initialTab: initialTab == null ? null : _legacyTabs[initialTab!.clamp(0, _legacyTabs.length - 1)],
-      );
+  Widget build(BuildContext context) {
+    final id = initialTab == null ? null : _legacyTabs[initialTab!.clamp(0, _legacyTabs.length - 1)];
+    if (isCoinHistoryTab(id)) return const CoinsWalletScreen(initialTab: CoinsTab.history);
+    return VaultScreen(initialTab: id);
+  }
 }
+
+/// Coin history now lives on the Coins page; old Rewards links go there.
+bool isCoinHistoryTab(String? id) => id == 'wallet' || id == 'history' || id == 'ledger';
+
+/// Opens the Coins page on its History tab.
+void openCoinHistory(BuildContext context) =>
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen(initialTab: CoinsTab.history)));
 
 // Older callers pass the pre-14.3 tab index; keep those landing where they did.
 const _legacyTabs = ['today', 'quests', 'streaks', 'mastery', 'season', 'leagues', 'wallet', 'spend', 'badges'];
@@ -104,6 +112,19 @@ List<Widget> _today(BuildContext context, Map<String, dynamic> s) {
   return [
     const RewardsGuide(),
     LSection('balance', 'Balance', PBalance(coins: sInt(w['coins']), caption: 'Streak ${sInt(w['streak'])} days · best ${sInt(w['bestStreak'])}')),
+    LSection('history', 'Coin history', PCard(children: [
+      PRow(
+        title: 'Coin history',
+        sub: 'Every coin in or out, on the Coins page.',
+        coin: true,
+        trailing: TextButton(
+          key: const ValueKey('rewards-coin-history'),
+          onPressed: () => openCoinHistory(context),
+          style: TextButton.styleFrom(backgroundColor: Colors.white, shape: const StadiumBorder()),
+          child: const Text('Open', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 12)),
+        ),
+      ),
+    ])),
     LSection.group('login', 'Daily login', [
       const PHeading('Every day', 'Daily login', slot: 'rewards_program.today'),
       PCard(children: [
@@ -343,52 +364,6 @@ List<Widget> _leagues(BuildContext context, Map<String, dynamic> s) {
       'Prizes for places 1–10: ${((L['prizes'] as List?) ?? const []).join(', ')} coins.',
     ], slot: 'rewards_program.leagues')),
   ];
-}
-
-List<Widget> _wallet(BuildContext context, Map<String, dynamic> s) {
-  final w = sMap(s['wallet']);
-  final uid = EconomyMirror.instance.uid;
-  return [
-    LSection('balance', 'Balance', PBalance(coins: sInt(w['coins']), caption: 'Lifetime ${sInt(w['lifetimeCoins'])} coins · coins back bonus +${sInt(w['coinsBackBonusPct'])}%')),
-    LSection('ledger', 'Coin ledger', PCard(children: [
-      const PHeading('Append-only', 'Coin ledger', slot: 'rewards_program.wallet'),
-      if (!NwsbFirebase.ready || uid == null)
-        const PEmpty('Sign in to see the ledger.')
-      else
-        StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: _ledger(uid),
-          builder: (context, snap) {
-            final docs = [...?snap.data?.docs]..sort((a, b) => sInt(b.data()['at']).compareTo(sInt(a.data()['at'])));
-            if (docs.length > 40) docs.removeRange(40, docs.length);
-            if (docs.isEmpty) return const PEmpty('Nothing here yet. Every coin in or out shows here.');
-            return Column(children: [
-              for (final d in docs)
-                PRow(
-                  title: _reason('${d.data()['reason'] ?? ''}'),
-                  sub: shortDate(d.data()['at']),
-                  trailing: Text('${sInt(d.data()['delta']) > 0 ? '+' : ''}${sInt(d.data()['delta'])}', style: TextStyle(color: sInt(d.data()['delta']) >= 0 ? NwsbColors.goldLight : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
-                ),
-            ]);
-          },
-        ),
-    ])),
-  ];
-}
-
-// One ledger stream per account, not a new listener on every rebuild.
-final _ledgers = <String, Stream<QuerySnapshot<Map<String, dynamic>>>>{};
-Stream<QuerySnapshot<Map<String, dynamic>>> _ledger(String uid) => _ledgers.putIfAbsent(
-    uid, () => FirebaseFirestore.instance.collection('coinLedger').where('uid', isEqualTo: uid).limit(200).snapshots().asBroadcastStream());
-
-String _reason(String r) {
-  if (r.startsWith('act:')) return 'Activity · ${r.substring(4).replaceAll('_', ' ')}';
-  if (r.startsWith('spend:')) return 'Spent · ${r.substring(6).replaceAll('_', ' ')}';
-  if (r.startsWith('season')) return 'Season reward';
-  if (r.startsWith('league')) return 'League prize';
-  if (r.startsWith('time-')) return 'Time ladder';
-  if (r.startsWith('reverse')) return 'Refund reversal';
-  if (r.isEmpty) return 'Coins';
-  return r.replaceAll('-', ' ').replaceAll('_', ' ').replaceAll(':', ' · ');
 }
 
 List<Widget> _spend(BuildContext context, Map<String, dynamic> s) {

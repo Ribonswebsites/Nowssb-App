@@ -40,10 +40,13 @@ void main() {
 
   test('spec 14.3 tabs exist', () {
     final ids = kRewardsSpec.tabs.map((t) => t.id).toList();
-    for (final id in ['checkin', 'quests', 'streaks', 'chests', 'boost', 'store', 'mine', 'wallet']) {
+    for (final id in ['checkin', 'quests', 'streaks', 'chests', 'boost', 'store', 'mine']) {
       expect(ids, contains(id));
     }
-    expect(kRewardsSpec.tabs.firstWhere((t) => t.id == 'wallet').title, 'Coin history');
+    expect(ids, isNot(contains('wallet')));
+    expect(isCoinHistoryTab('wallet'), isTrue);
+    expect(isCoinHistoryTab('boost'), isFalse);
+    expect(ids, contains('boost'));
   });
 
   testWidgets('check-in shows week and claim', (t) async {
