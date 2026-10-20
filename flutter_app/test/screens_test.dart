@@ -113,7 +113,11 @@ void main() {
 
     expect(VideoPool.instance.liveCount, 0,
         reason: 'a still background must not hold a decoder');
-  });
+  },
+      // Stale: NwsbVideo stopped gating on the motion switch in 2e4c2ff9
+      // (synchronized playback), and Ribon's rule keeps the original
+      // background video on every page. Re-enable if the gate comes back.
+      skip: true);
 
   testWidgets('Flutter Store exposes the WebView Store departments',
       (tester) async {

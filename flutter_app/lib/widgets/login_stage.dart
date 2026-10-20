@@ -484,6 +484,8 @@ class _LoginFilmState extends State<_LoginFilm> {
       if (!mounted) return;
       _film.play();
       setState(() => _ready = true);
+    }).catchError((Object _) {
+      // No video decoder (or a bad file): the login stays on its still.
     });
   }
 
