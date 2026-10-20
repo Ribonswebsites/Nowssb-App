@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/store_catalog.dart';
+import 'package:nowssb/features/economy/money.dart';
 import 'package:nowssb/features/ebooks_v2/ebooks_data.dart';
 import 'package:nowssb/features/ebooks_v2/ebooks_pages.dart';
 
@@ -68,6 +69,9 @@ Future<void> shot(String n) => expectLater(find.byType(MaterialApp), matchesGold
 
 void main() {
   setUpAll(_fonts);
+  // Pin FX so prices render converted and deterministic (main shows
+  // FxBook.pricePending until config/fx loads).
+  setUp(() => FxBook.instance.rates = const {'USD': 1, 'INR': 83.5});
 
   testWidgets('library: discover carousel + rows', (t) async {
     await pumpPage(t, FakeData());
@@ -191,6 +195,18 @@ void main() {
   });
 
   test('price uses FxBook: converted when rates load, never relabelled', () {
+    expect(catalogPriceLabel(499), isNot(contains('499')));
+    expect(catalogPriceLabel(835), contains('10'));
+  });
+
+  test('price waits for FX instead of guessing', () {
+    FxBook.instance.rates = const {'USD': 1};
     expect(catalogPriceLabel(499), isNot(contains(r'$499')));
+  });
+
+  testWidgets('library shows converted local prices, not a placeholder', (t) async {
+    await pumpPage(t, FakeData());
+    expect(find.text(FxBook.pricePending), findsNothing);
+    expect(find.text(catalogPriceLabel(b0.price)), findsWidgets);
   });
 }
