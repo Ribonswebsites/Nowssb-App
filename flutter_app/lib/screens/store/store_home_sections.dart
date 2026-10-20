@@ -4,6 +4,7 @@
 /// Shared by Word Atelier, Meaning Store, and Ebooks.
 library;
 
+import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -2384,27 +2385,38 @@ class _SaleFlipState extends State<_SaleFlip> with SingleTickerProviderStateMixi
   late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 420));
   bool _showingFront = true;
   bool _run = true;
+  Timer? _wait;
 
   @override
   void initState() {
     super.initState();
-    if (widget.front != widget.back) _loop();
+    if (widget.front != widget.back) _schedule();
   }
 
-  Future<void> _loop() async {
-    while (_run && mounted) {
-      await Future<void>.delayed(const Duration(seconds: 1));
-      if (!_run || !mounted || widget.front == widget.back) return;
-      await _c.forward(from: 0);
-      if (!_run || !mounted) return;
-      setState(() => _showingFront = !_showingFront);
-      _c.value = 0;
+  // A cancellable Timer rather than Future.delayed, so leaving the page
+  // never leaves a pending timer behind.
+  void _schedule() {
+    _wait?.cancel();
+    _wait = Timer(const Duration(seconds: 1), () => unawaited(_flip()));
+  }
+
+  Future<void> _flip() async {
+    if (!_run || !mounted || widget.front == widget.back) return;
+    try {
+      await _c.forward(from: 0).orCancel;
+    } on TickerCanceled {
+      return;
     }
+    if (!_run || !mounted) return;
+    setState(() => _showingFront = !_showingFront);
+    _c.value = 0;
+    _schedule();
   }
 
   @override
   void dispose() {
     _run = false;
+    _wait?.cancel();
     _c.dispose();
     super.dispose();
   }
