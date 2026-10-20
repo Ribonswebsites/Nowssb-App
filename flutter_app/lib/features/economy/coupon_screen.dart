@@ -22,6 +22,7 @@ import '../../widgets/hub_rails.dart';
 import '../../widgets/routine_deck.dart';
 import '../../widgets/sections/coupon_banner_section.dart';
 import 'economy_api.dart';
+import 'money.dart';
 import 'reward_fx.dart';
 import 'economy_theme.dart';
 import 'scratch_card.dart';
@@ -31,6 +32,7 @@ import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../programs/coupons_program.dart';
 import '../../admin/template/editable.dart';
+import '../coupons/coupon_pages.dart';
 
 class CouponScreen extends StatefulWidget {
   const CouponScreen({super.key, this.initialTab});
@@ -44,7 +46,6 @@ class CouponScreen extends StatefulWidget {
 
 class _CouponScreenState extends State<CouponScreen> {
   final _go = ValueNotifier<void Function(String)?>(null);
-  final _scratch = GlobalKey();
 
   @override
   void initState() {
@@ -54,23 +55,28 @@ class _CouponScreenState extends State<CouponScreen> {
 
   Future<void> _guide() async {
     if (!mounted) return;
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool('nwsb.guide.coupons') == true) return;
-    if (!mounted) return;
-    await PageGuide.show(context, title: 'My Coupons', lines: const [
-      'A coupon is a scratch or a code. It is not cash.',
-      'Tap Scratch to reveal today’s card.',
-      'Add a code, then use it at checkout. Coins cover only part of the price.',
-    ]);
-    await prefs.setBool('nwsb.guide.coupons', true);
+    if (widget.initialTab != null) {
+      _openTabs(widget.initialTab!);
+      return;
+    }
+    await runCouponsFirstUse(context);
   }
 
   void _help() {
-    PageGuide.show(context, title: 'My Coupons', lines: const [
-      'A coupon is a scratch or a code. It is not cash.',
-      'Tap Scratch to reveal today’s card.',
-      'Add a code, then use it at checkout. Coins cover only part of the price.',
-    ]);
+    showCouponSheet<void>(context, title: 'Help', body: (ctx) => [
+          ListTile(key: const Key('help_hiw'), leading: const Icon(Icons.slideshow, color: Colors.white), title: const Text('How it works', style: TextStyle(color: Colors.white)), onTap: () {
+            Navigator.pop(ctx);
+            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponHowItWorks()));
+          }),
+          ListTile(key: const Key('help_guide'), leading: const Icon(Icons.touch_app_outlined, color: Colors.white), title: const Text('Button guide', style: TextStyle(color: Colors.white)), onTap: () {
+            Navigator.pop(ctx);
+            showCouponButtonGuide(context);
+          }),
+          ListTile(key: const Key('help_terms'), leading: const Icon(Icons.gavel_outlined, color: Colors.white), title: const Text('Terms', style: TextStyle(color: Colors.white)), onTap: () {
+            Navigator.pop(ctx);
+            Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponTermsPage()));
+          }),
+        ]);
   }
 
   @override
@@ -82,66 +88,15 @@ class _CouponScreenState extends State<CouponScreen> {
   void _tab(String id) => _go.value?.call(id);
 
   void _openTabs(String id) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
-      backgroundColor: const Color(0xFF07070C),
-      body: SafeArea(child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const _CodeBox(),
-          const SizedBox(height: 12),
-          ProgramTabsBlock(spec: kCouponsSpec, initialTab: id, scrollTo: true, goRef: _go, showDisclaimer: false),
-        ],
-      )),
-    )));
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CouponHubPage(initialTab: id)));
   }
 
   void _showScratch() {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(
-      backgroundColor: Color(0xFF07070C),
-      body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: DailyScratchCard())),
-    )));
-  }
-
-  void _detail(WideCouponData d) {
-    showModalBottomSheet<void>(
-      context: context,
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
       backgroundColor: Colors.transparent,
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(12),
-        child: GlassWrapper(
-          radius: 36,
-          blur: true,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: const Color(0xFF0B0B12), borderRadius: BorderRadius.circular(28)),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(d.banner, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 6),
-                Text(d.line, style: const TextStyle(color: Color(0xB3FFFFFF))),
-                const SizedBox(height: 8),
-                Text(d.copy, style: const TextStyle(color: kTileGold, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 8),
-                const Text('Coins cover only part of the price. A coupon is not cash.', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () async {
-                      Navigator.pop(ctx);
-                      await NowssbLoader.run(context, EconomyApi.call('claimTicket', {'code': d.copy}));
-                    },
-                    child: const Text('Apply now'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+      appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: Colors.white, title: const Text('Daily scratch')),
+      body: const SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: DailyScratchCard())),
+    )));
   }
 
   @override
@@ -152,7 +107,8 @@ class _CouponScreenState extends State<CouponScreen> {
       mark: NwsbMarks.coupon,
       showBalance: false,
       header: CouponsPageHeader(trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-        IconButton(onPressed: _help, icon: const Icon(Icons.help_outline, color: Colors.white)),
+        IconButton(key: const Key('coupons_help'), onPressed: _help, icon: const Icon(Icons.help_outline, color: Colors.white)),
+        IconButton(key: const Key('coupons_history'), onPressed: () => _openTabs('history'), icon: const Icon(Icons.history, color: Colors.white)),
         const CoinBalancePill(),
       ])),
       child: Column(
@@ -174,9 +130,22 @@ class _CouponScreenState extends State<CouponScreen> {
                       WorkCard(category: 'Scratch', title: 'Daily scratch', meta: 'One card on this account', action: 'Scratch', image: 'assets/rails/art-scratch.jpg', onTap: _showScratch),
                       WorkCard(category: 'Shop', title: 'Coupon shop', meta: 'Paid cards', action: 'Open shop', image: 'assets/rails/coupons-01.jpg', onTap: () => _openTabs('shop')),
                       WorkCard(category: 'Mine', title: 'My coupons', meta: 'Codes already on the account', action: 'Open mine', image: 'assets/rails/coupons-02.jpg', onTap: () => _openTabs('mine')),
-                      WorkCard(category: 'Help', title: 'How a coupon works', meta: 'It comes off the price. It is not cash.', action: 'Read', image: 'assets/rails/coupons-03.jpg', onTap: _help),
+                      WorkCard(category: 'Use', title: 'Apply a coupon', meta: 'Pick one you hold', action: 'Apply', image: 'assets/rails/coupons-02.jpg', onTap: () => showApplyCoupon(context)),
+                      WorkCard(category: 'Help', title: 'How a coupon works', meta: 'It comes off the price. It is not cash.', action: 'Read', image: 'assets/rails/coupons-03.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponHowItWorks()))),
                     ],
                   ),
+                  const SizedBox(height: 12),
+                  Wrap(spacing: 8, runSpacing: 8, children: [
+                    for (final t in kCouponsSpec.tabs)
+                      ActionChip(key: Key('chip_${t.id}'), label: Text(t.title), onPressed: () => _openTabs(t.id)),
+                  ]),
+                  const SizedBox(height: 12),
+                  LayoutBuilder(builder: (context, c) => Column(children: [
+                    for (final d in kWideCoupons) ...[
+                      WideCoupon(data: d, width: c.maxWidth, expires: couponExpiry(d.copy), scissorsLeft: d == kWideCoupons.first),
+                      Align(alignment: Alignment.centerRight, child: TextButton(key: Key('details_${d.code}'), onPressed: () => showCouponDetail(context, d), child: const Text('View details >', style: TextStyle(color: Color(0xFF8EC5FF))))),
+                    ],
+                  ])),
                 ],
               ),
             ),
@@ -390,7 +359,7 @@ class _PaidPeek extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Text(inr(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
+                        Text(FxBook.instance.formatRupees(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
                         const SizedBox(width: 6),
                         const Icon(Icons.chevron_right, color: NwsbColors.goldLight),
                       ],
