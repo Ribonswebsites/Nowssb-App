@@ -55,16 +55,23 @@ class FxBook extends ChangeNotifier {
         .format((cents / 100) * rate);
   }
 
+  /// Shown instead of a price while `config/fx` hasn't loaded.
+  static const pricePending = 'Price loading…';
+
   /// Legacy store amounts were written as rupees. Convert through the USD rate.
+  /// Until FX loads, only an India locale sees the rupee amount; everyone
+  /// else gets a neutral placeholder rather than a foreign currency.
   String formatRupees(num rupees, {String? locale}) {
+    final loc = (locale ?? Platform.localeName).replaceAll('-', '_');
     final perDollar = rates['INR'];
     if (perDollar == null || perDollar <= 0) {
-      // FX not loaded: show the stored amount in its own base currency.
-      final loc = (locale ?? Platform.localeName).replaceAll('-', '_');
-      return NumberFormat.simpleCurrency(name: 'INR', locale: loc, decimalDigits: 0)
-          .format(rupees);
+      if (codeFor(loc) == 'INR') {
+        return NumberFormat.simpleCurrency(name: 'INR', locale: loc, decimalDigits: 0)
+            .format(rupees);
+      }
+      return pricePending;
     }
     final cents = ((rupees / perDollar) * 100).round();
-    return formatCents(cents, locale: locale);
+    return formatCents(cents, locale: loc);
   }
 }

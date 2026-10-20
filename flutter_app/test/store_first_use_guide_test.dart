@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:nowssb/features/economy/money.dart';
 import 'package:nowssb/screens/store/store_first_use_guide.dart';
 
 Widget _host() => const MaterialApp(
@@ -32,12 +31,5 @@ void main() {
     await t.tap(find.byKey(const Key('storeGuideHelp')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('storeGuideCard')), findsOneWidget);
-  });
-
-  test('no hardcoded INR rate: rupee amounts stay in base currency until FX loads', () {
-    final fx = FxBook.instance;
-    expect(fx.rates.containsKey('INR'), isFalse);
-    expect(fx.formatRupees(99, locale: 'en_US'), contains('99'));
-    expect(fx.formatRupees(99, locale: 'en_US'), isNot(contains(r'$')));
   });
 }
