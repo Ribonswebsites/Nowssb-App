@@ -9,6 +9,8 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
 import 'earnings_screen.dart';
+import 'app/earn_app.dart' show EarnApp;
+import '../../data/app_control.dart';
 import '../social/echo_wall_screen.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
@@ -31,8 +33,19 @@ import '../programs/program_kit.dart';
 import '../programs/reference_program.dart';
 import '../programs/rewards_program.dart';
 
+/// Entry: the rebuilt Earn app for everyone; remote `newui_earn: false` is the kill switch.
 class EarnHubScreen extends StatelessWidget {
   const EarnHubScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: AppControl.instance,
+        builder: (_, __) => AppControl.instance.flag('newui_earn') ? const EarnApp() : const EarnHubLegacyScreen(),
+      );
+}
+
+class EarnHubLegacyScreen extends StatelessWidget {
+  const EarnHubLegacyScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
