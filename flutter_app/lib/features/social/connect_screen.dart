@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/practice_progress.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
+import '../../widgets/n_motion.dart';
 
 const _gold = Color(0xFFE8D5A3);
 const _ink = Color(0xFF060C18);
@@ -438,7 +439,7 @@ class _SetupState extends State<_Setup> {
   }
 
   Future<void> _pickBanner() async {
-    final picked = await showModalBottomSheet<String>(
+    final picked = await showNSheet<String>(
       context: context,
       backgroundColor: const Color(0xFFF0F2F7),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
@@ -1062,7 +1063,7 @@ class _Profile extends StatelessWidget {
     final name = TextEditingController(text: data.name);
     final bio = TextEditingController(text: data.bio);
     var focus = data.focus;
-    final ok = await showModalBottomSheet<bool>(
+    final ok = await showNSheet<bool>(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF10141C),
@@ -1349,7 +1350,7 @@ class _ThreadState extends State<_Thread> {
 
   Future<void> _rate() async {
     var stars = 5;
-    await showModalBottomSheet<void>(
+    await showNSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF141820),
       builder: (ctx) => StatefulBuilder(

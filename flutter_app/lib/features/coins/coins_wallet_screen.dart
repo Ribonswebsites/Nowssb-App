@@ -11,6 +11,7 @@ import '../economy/daily_claim_sheet.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../programs/program_router.dart';
+import '../../widgets/n_motion.dart';
 
 /// Coin cap: coins can cover at most this share of a price (spec 18.1: 30-40%).
 const double kCoinCapFraction = EarnWallet.maxCoinFraction;
@@ -248,7 +249,7 @@ class _HeroCard extends StatelessWidget {
 }
 
 void _coinInfo(BuildContext context) {
-  showModalBottomSheet<void>(
+  showNSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     builder: (_) => Padding(
@@ -498,7 +499,7 @@ class _History extends StatelessWidget {
             title: Text(a.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             subtitle: Text('${a.detail.isEmpty ? '' : '${a.detail} · '}${_date(a.at)}', style: _body2),
             trailing: Text(a.coins > 0 ? '+${a.coins}' : '${a.coins}', style: TextStyle(color: a.coins > 0 ? Colors.white : const Color(0xFFFFB4B4), fontWeight: FontWeight.w800)),
-            onTap: () => showDialog<void>(
+            onTap: () => showNDialog<void>(
               context: context,
               builder: (c) => AlertDialog(
                 title: Text(a.title),
@@ -559,7 +560,7 @@ Future<void> maybeShowCoinsGuide(BuildContext context) async {
   } catch (_) {}
 }
 
-Future<void> showCoinsGuide(BuildContext context) => showDialog<void>(context: context, barrierColor: const Color(0x66000000), builder: (_) => const CoinsGuide());
+Future<void> showCoinsGuide(BuildContext context) => showNDialog<void>(context: context, barrierColor: const Color(0x66000000), builder: (_) => const CoinsGuide());
 
 class CoinsGuide extends StatefulWidget {
   const CoinsGuide({super.key});

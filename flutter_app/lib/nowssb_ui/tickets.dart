@@ -6,6 +6,7 @@ import 'cards.dart';
 import 'glass_core.dart';
 import 'pills_chips.dart';
 import 'tokens.dart';
+import '../widgets/n_motion.dart';
 
 /// Frosted coupon ticket: rarity-tinted glass, circular side notches, a
 /// vertical dashed tear line, optional round image, rarity pill (+ NEW),
@@ -75,11 +76,12 @@ class NCardCarousel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SizedBox(height: height, child: ListView.separated(
       controller: controller, scrollDirection: Axis.horizontal, padding: padding, itemCount: items.length,
+      physics: SnapRailPhysics(itemExtent: cardWidth + spacing, parent: const BouncingScrollPhysics()),
       separatorBuilder: (_, __) => SizedBox(width: spacing),
       itemBuilder: (_, i) {
         final it = items[i];
-        return SizedBox(width: cardWidth, child: MeditationCard(title: it.title, subtitle: it.subtitle, image: it.image,
+        return GestureDetector(behavior: HitTestBehavior.opaque, onTap: it.onCta, child: SizedBox(width: cardWidth, child: MeditationCard(title: it.title, subtitle: it.subtitle, image: it.image,
             cta: it.cta, secondary: it.secondary, onCta: it.onCta, onSecondary: it.onSecondary,
-            dots: items.length, dotIndex: i, statusBar: statusBar, homeBar: false));
+            dots: items.length, dotIndex: i, statusBar: statusBar, homeBar: false)));
       }));
 }

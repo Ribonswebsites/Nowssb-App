@@ -10,6 +10,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../admin/layout/layout_sections.dart';
 import 'program_kit.dart';
+import '../../widgets/n_motion.dart';
 
 Map<String, dynamic> _r(Map<String, dynamic> s) => sMap(sMap(s['config'])['rewards']);
 
@@ -188,7 +189,7 @@ class _ConfirmSpend extends StatelessWidget {
       key: ValueKey('spend-$item'),
       onPressed: !can
           ? null
-          : () => showDialog<void>(
+          : () => showNDialog<void>(
                 context: context,
                 builder: (_) => AlertDialog(
                   backgroundColor: const Color(0xEE111118),
@@ -275,7 +276,7 @@ class _Tile extends StatelessWidget {
     final off = kind == 'Expired';
     final title = '${x['title'] ?? x['code'] ?? kind}';
     return GestureDetector(
-      onTap: () => showModalBottomSheet<void>(
+      onTap: () => showNSheet<void>(
         context: context,
         backgroundColor: const Color(0xEE111118),
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),

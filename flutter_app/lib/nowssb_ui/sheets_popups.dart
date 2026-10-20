@@ -6,6 +6,7 @@ import 'cards.dart';
 import 'glass_core.dart';
 import 'pills_chips.dart';
 import 'tokens.dart';
+import '../widgets/n_motion.dart';
 
 /// Black card inside glass wrapper. This is the planned shared GlassBlackCard.
 class GlassBlackCard extends StatelessWidget {
@@ -43,7 +44,7 @@ Future<T?> showGlassPopup<T>(BuildContext context, {required WidgetBuilder build
 
 /// Bottom glass sheet (claim sheet, filters, apply coupon, terms).
 Future<T?> showGlassSheet<T>(BuildContext context, {required WidgetBuilder builder, Color accent = NTokens.violet}) =>
-    showModalBottomSheet<T>(context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
+    showNSheet<T>(context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
         barrierColor: Colors.black54,
         builder: (ctx) => SafeArea(child: Padding(padding: const EdgeInsets.all(10), child: GlassBlackCard(accent: accent,
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [

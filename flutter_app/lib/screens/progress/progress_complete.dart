@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/practice_progress.dart';
 import 'progress_feedback.dart';
+import '../../widgets/n_motion.dart';
 
 const kProgressGuideSeenKey = 'nowssb_progress_guide_seen_v1';
 
@@ -269,7 +270,7 @@ class ProgressCompleteViewState extends State<ProgressCompleteView> {
 
   void showDay(String ymd) {
     final list = sessionsByDay(p)[ymd] ?? const [];
-    showModalBottomSheet<void>(
+    showNSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (_) => Padding(
@@ -535,7 +536,7 @@ void showSessionDialog(BuildContext context, Map<String, dynamic> s) {
   final at = DateTime.tryParse('${s['completedAt'] ?? ''}');
   final time = at == null ? '' : '${at.hour.toString().padLeft(2, '0')}:${at.minute.toString().padLeft(2, '0')}';
   final source = switch ('${s['source'] ?? ''}') { 'native-player' => 'Practice player', 'coin-restore' => 'Streak restore', '' => 'Synced', final o => o };
-  showDialog<void>(
+  showNDialog<void>(
     context: context,
     builder: (ctx) => Dialog(
       backgroundColor: Colors.transparent,

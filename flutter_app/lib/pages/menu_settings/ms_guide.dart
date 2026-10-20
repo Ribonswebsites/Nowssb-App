@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../nowssb_ui/nowssb_ui.dart';
 import 'ms_widgets.dart';
+import '../../widgets/n_motion.dart';
 
 const _kSeen = 'ms_guide_seen_v1';
 
@@ -26,7 +27,7 @@ Future<void> showMsGuideOnce(BuildContext context) async {
   if (context.mounted) await showMsGuide(context);
 }
 
-Future<void> showMsGuide(BuildContext context) => showDialog<void>(
+Future<void> showMsGuide(BuildContext context) => showNDialog<void>(
       context: context,
       barrierColor: Colors.black54,
       builder: (_) => const MsGuideDialog(),

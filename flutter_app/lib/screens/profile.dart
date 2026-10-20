@@ -55,6 +55,7 @@ import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_router.dart';
 import '../widgets/course_face.dart';
 import '../widgets/routine_deck.dart';
+import '../widgets/n_motion.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -264,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _editName() async {
     final controller = TextEditingController(text: _nameController.text);
-    final result = await showDialog<String>(
+    final result = await showNDialog<String>(
       context: context,
       barrierColor: Colors.black.withOpacity(.72),
       builder: (context) => Dialog(
@@ -353,7 +354,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickPhoto() async {
-    final source = await showModalBottomSheet<ImageSource>(
+    final source = await showNSheet<ImageSource>(
       context: context,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -798,7 +799,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required Future<void> Function() onPrebuilt,
     required Future<void> Function() onPhone,
   }) async {
-    final choice = await showModalBottomSheet<String>(
+    final choice = await showNSheet<String>(
       context: context,
       backgroundColor: const Color(0xF0101014),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
@@ -845,7 +846,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickBannerPhoto() async {
-    final source = await showModalBottomSheet<ImageSource>(
+    final source = await showNSheet<ImageSource>(
       context: context,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -868,7 +869,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _openPrebuiltBanners() async {
-    final url = await showModalBottomSheet<String>(
+    final url = await showNSheet<String>(
       context: context,
       backgroundColor: const Color(0xF0101014),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
@@ -901,7 +902,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _openPrebuiltAvatars() async {
-    final url = await showModalBottomSheet<String>(
+    final url = await showNSheet<String>(
       context: context,
       backgroundColor: const Color(0xF2161024),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
@@ -957,7 +958,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickBanner() async {
-    final chosen = await showModalBottomSheet<String>(
+    final chosen = await showNSheet<String>(
       context: context,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -1451,7 +1452,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Future<void> _doSignOut() async {
-    final ok = await showDialog<bool>(
+    final ok = await showNDialog<bool>(
       context: context,
       barrierColor: const Color(0xB3000000),
       builder: (ctx) => AlertDialog(

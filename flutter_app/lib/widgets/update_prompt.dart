@@ -14,6 +14,7 @@ import '../theme/tokens.dart';
 import 'app_thinking_loader.dart';
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
+import 'n_motion.dart';
 
 const _panel = Color(0xFF000000);
 const _bannerHeight = 52.0;
@@ -156,7 +157,7 @@ Future<void> showNwsbUpdateDialog(BuildContext context) async {
   _dialogOpen = true;
   NwsbUpdater.instance.prompted();
   try {
-    await showDialog<void>(
+    await showNDialog<void>(
       context: context,
       barrierDismissible: true,
       builder: (context) => const _UpdateDialog(),

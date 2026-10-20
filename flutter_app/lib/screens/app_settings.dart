@@ -43,6 +43,7 @@ import 'quotes_live.dart';
 import 'store/request_words.dart';
 import 'widgets_page.dart';
 import '../admin/template/editable.dart';
+import '../widgets/n_motion.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
@@ -394,7 +395,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _openAbout() async {
-    await showDialog<void>(
+    await showNDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
@@ -438,7 +439,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _deleteAccount() async {
-    final ok = await showDialog<bool>(
+    final ok = await showNDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
@@ -478,7 +479,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _signOut() async {
-    final ok = await showDialog<bool>(
+    final ok = await showNDialog<bool>(
       context: context,
       barrierColor: const Color(0xB3000000),
       builder: (ctx) => const _SignOutDialog(),
@@ -513,7 +514,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _confirmClearHistory() async {
-    final ok = await showDialog<bool>(
+    final ok = await showNDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),

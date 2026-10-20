@@ -16,6 +16,7 @@ import 'echo_moderation_screen.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../admin/template/editable.dart';
+import '../../widgets/n_motion.dart';
 
 class EchoWallScreen extends StatefulWidget {
   const EchoWallScreen({super.key});
@@ -290,7 +291,7 @@ class _PostCard extends StatelessWidget {
 
   Future<void> _comment(BuildContext context) async {
     final controller = TextEditingController();
-    final text = await showDialog<String>(
+    final text = await showNDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: NwsbColors.plate,

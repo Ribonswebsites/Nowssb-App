@@ -24,6 +24,7 @@ import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../programs/gifts_program.dart';
+import '../../widgets/n_motion.dart';
 
 class GiftItem {
   const GiftItem(this.id, this.label, this.cents, {this.productId = ''});
@@ -132,7 +133,7 @@ class GiftBook extends ChangeNotifier {
 Future<void> showGiftCardSheet(BuildContext context, String cardId) async {
   final cards = kGiftCatalog;
   final card = cards.firstWhere((c) => c.id == cardId, orElse: () => cards.first);
-  await showModalBottomSheet<void>(
+  await showNSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -475,7 +476,7 @@ Future<void> maybeShowGiftsGuide(BuildContext context) async {
   } catch (_) {}
 }
 
-Future<void> showGiftsGuide(BuildContext context) => showDialog<void>(
+Future<void> showGiftsGuide(BuildContext context) => showNDialog<void>(
       context: context,
       barrierColor: const Color(0x99000000),
       builder: (_) => const GiftsGuide(),

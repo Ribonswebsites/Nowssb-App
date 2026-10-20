@@ -28,6 +28,7 @@ import 'store_terms_sheet.dart';
 import 'request_words.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/layout_sections.dart';
+import '../../widgets/n_motion.dart';
 
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
@@ -137,7 +138,7 @@ class _SignatureBodyState extends State<SignatureBody> {
   }
 
   void _openDrop((String, String, String) d) {
-    showModalBottomSheet<void>(
+    showNSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Padding(

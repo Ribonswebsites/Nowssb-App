@@ -21,6 +21,7 @@ import 'program_kit.dart';
 import 'program_heroes.dart';
 import '../economy/coupon_screen.dart';
 import '../../admin/template/editable.dart';
+import '../../widgets/n_motion.dart';
 
 const kCouponsDisclaimer =
     'Coupon prizes are random. The odds for every coupon are shown before you buy. Paid coupons are for users aged 18 '
@@ -256,7 +257,7 @@ class _PaidBuyState extends State<_PaidBuy> {
       await EconomyMirror.instance.refresh();
     } on EconomyException catch (e) {
       if (e.extra['needsAdult'] == true && mounted) {
-        final ok = await showDialog<bool>(
+        final ok = await showNDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: Colors.black,

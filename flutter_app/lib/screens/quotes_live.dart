@@ -31,6 +31,7 @@ import 'store.dart';
 import 'subscription.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
+import '../widgets/n_motion.dart';
 
 const _days = <String>[
   'Monday',
@@ -583,7 +584,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
   }
 
   void _openMonth() {
-    showModalBottomSheet<void>(
+    showNSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -593,7 +594,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
 
   void _openCalendar() {
     final today = DateTime.now().weekday - 1;
-    showModalBottomSheet<void>(
+    showNSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

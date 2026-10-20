@@ -16,6 +16,7 @@ import '../economy/economy_api.dart';
 import '../economy/money.dart';
 import '../../nowssb_ui/nowssb_ui.dart' show NGlass, NTokens, MeditationCard;
 import '../programs/reference_program.dart' show SellersBoard;
+import '../../widgets/n_motion.dart';
 
 /// Injectable data source (tests swap these).
 class PartnerData {
@@ -169,7 +170,7 @@ class PartnerShell extends StatelessWidget {
 
 // ───────────────────────── sheets and pop-ups ─────────────────────────
 
-Future<T?> _sheet<T>(BuildContext context, Widget child) => showModalBottomSheet<T>(
+Future<T?> _sheet<T>(BuildContext context, Widget child) => showNSheet<T>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
@@ -214,7 +215,7 @@ Future<void> showShareSheet(BuildContext context, String url, String title) => _
     );
 
 Future<bool> confirmClaim(BuildContext context, Map<String, dynamic> level) async =>
-    await showDialog<bool>(
+    await showNDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
         key: const Key('partner.confirm'),
@@ -246,7 +247,7 @@ class PartnerGuide extends StatefulWidget {
   }
 
   static Future<void> show(BuildContext context) async {
-    await showDialog<void>(
+    await showNDialog<void>(
         context: context, barrierDismissible: false, builder: (_) => const Dialog(backgroundColor: Colors.transparent, child: PartnerGuide()));
     final p = await SharedPreferences.getInstance();
     await p.setBool(kGuideKey, true);

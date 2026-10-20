@@ -12,6 +12,7 @@ import '../economy/coupon_tickets.dart';
 import '../economy/economy_api.dart';
 import '../programs/coupons_program.dart';
 import '../programs/program_kit.dart';
+import '../../widgets/n_motion.dart';
 
 const _card = Color(0xFF0B0B12);
 const _gold = Color(0xFFE4C56A);
@@ -19,7 +20,7 @@ const _gold = Color(0xFFE4C56A);
 /// Shared glass pop-up shell (section 6): glass wrapper + black card.
 Future<T?> showCouponSheet<T>(BuildContext context, {required String title, required List<Widget> Function(BuildContext) body}) {
   HapticFeedback.lightImpact();
-  return showModalBottomSheet<T>(
+  return showNSheet<T>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

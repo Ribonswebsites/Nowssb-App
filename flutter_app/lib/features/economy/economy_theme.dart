@@ -17,6 +17,7 @@ import 'money.dart';
 import 'reward_fx.dart';
 import 'reward_overlay.dart';
 import '../../admin/template/editable.dart';
+import '../../widgets/n_motion.dart';
 
 /// The shell every NowssB program page shares (PDF-2 §9): the app's
 /// backdrop and brand back control, the page title, and the coin balance in
@@ -157,7 +158,7 @@ class _GoodToKnowBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => showModalBottomSheet<void>(
+      onTap: () => showNSheet<void>(
         context: context,
         backgroundColor: const Color(0xFF0B0F16),
         builder: (context) => SafeArea(

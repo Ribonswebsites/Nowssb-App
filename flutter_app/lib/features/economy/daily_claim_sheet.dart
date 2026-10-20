@@ -14,6 +14,7 @@ import 'economy_api.dart';
 import 'reward_fx.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../admin/template/editable.dart';
+import '../../widgets/n_motion.dart';
 
 class DailyClaimSheet {
   DailyClaimSheet._();
@@ -32,7 +33,7 @@ class DailyClaimSheet {
       if (!mirror.capsReady || mirror.uid == null || mirror.loginToday) return;
       _open = true;
       mirror.removeListener(tick);
-      showModalBottomSheet<void>(
+      showNSheet<void>(
         context: context,
         backgroundColor: Colors.transparent,
         isScrollControlled: true,

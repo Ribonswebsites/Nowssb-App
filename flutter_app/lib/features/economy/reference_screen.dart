@@ -15,6 +15,7 @@ import '../programs/program_router.dart';
 import '../../widgets/four_banners.dart';
 import '../../widgets/hub_rails.dart';
 import '../../widgets/routine_deck.dart';
+import '../../widgets/n_motion.dart';
 
 class ReferenceScreen extends StatefulWidget {
   const ReferenceScreen({super.key, this.initialTab});
@@ -74,7 +75,7 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
   }
 
   void _applySheet(BuildContext context) {
-    showModalBottomSheet<void>(
+    showNSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF10141C),
       builder: (ctx) => Padding(

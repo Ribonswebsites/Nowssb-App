@@ -16,6 +16,7 @@ import 'package:flutter/services.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import 'reward_fx.dart';
 import '../../admin/template/editable.dart';
+import '../../widgets/n_motion.dart';
 
 class NwsbScratchCard extends StatefulWidget {
   const NwsbScratchCard({
@@ -127,7 +128,7 @@ class _NwsbScratchCardState extends State<NwsbScratchCard> with TickerProviderSt
   }
 
   void _showOdds() {
-    showDialog<void>(
+    showNDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.black,
