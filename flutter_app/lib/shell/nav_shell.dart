@@ -11,6 +11,7 @@ import '../data/settings.dart';
 import '../data/content.dart';
 import '../data/home_widget_sync.dart';
 import '../data/models.dart';
+import 'first_use_guide.dart';
 import '../screens/home_fashion.dart';
 import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
@@ -173,33 +174,22 @@ class _NavShellState extends State<NavShell> {
 
   Future<void> _offerGuide() async {
     if (!mounted || _coach != null) return;
-    final prefs = await SharedPreferences.getInstance();
-    final welcome = prefs.getBool('nwsb_guide_welcome_v1') ?? false;
-    if (!mounted) return;
-    if (!welcome) {
-      setState(() => _coach = 'welcome');
-      return;
-    }
-    final seen = prefs.getStringList('nwsb_tab_guide_v1') ?? const <String>[];
-    final id = '$_i';
-    if (seen.contains(id)) return;
+    final id = await FirstUseGuide.next(_i);
+    if (!mounted || id == null || _coach != null) return;
     setState(() => _coach = id);
+  }
+
+  Future<void> _skipGuide() async {
+    if (!mounted) return;
+    setState(() => _coach = null);
+    await FirstUseGuide.skipAll();
   }
 
   Future<void> _dismissCoach() async {
     final id = _coach;
     if (id == null || !mounted) return;
     setState(() => _coach = null);
-    final prefs = await SharedPreferences.getInstance();
-    if (id == 'welcome') {
-      await prefs.setBool('nwsb_guide_welcome_v1', true);
-    } else {
-      final seen = List<String>.from(prefs.getStringList('nwsb_tab_guide_v1') ?? const <String>[]);
-      if (!seen.contains(id)) {
-        seen.add(id);
-        await prefs.setStringList('nwsb_tab_guide_v1', seen);
-      }
-    }
+    await FirstUseGuide.markDone(id);
     if (!mounted) return;
     await _offerGuide();
   }
@@ -287,100 +277,26 @@ class _NavShellState extends State<NavShell> {
   }
 
   static const _navFeatures = <String, Map<String, String>>{
-    'connect': {
-      'label': 'Connect',
-      'img':
-          'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'
-    },
-    'practice': {
-      'label': 'Practice',
-      'img':
-          'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'
-    },
-    'library': {
-      'label': 'Library',
-      'img':
-          'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'
-    },
-    'store': {
-      'label': 'Store',
-      'img':
-          'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'
-    },
-    'profile': {
-      'label': 'Profile',
-      'img':
-          'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
-    },
-    'progress': {
-      'label': 'Progress',
-      'img':
-          'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'
-    },
-    'wordscience': {
-      'label': 'Word Sci',
-      'img':
-          'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'
-    },
-    'meaningstore': {
-      'label': 'Meaning',
-      'img':
-          'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'
-    },
-    'search': {
-      'label': 'Search',
-      'img':
-          'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'
-    },
-    'cart': {
-      'label': 'Cart',
-      'img':
-          'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'
-    },
-    'wishlist': {
-      'label': 'Wishlist',
-      'img':
-          'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'
-    },
-    'routines': {
-      'label': 'Routines',
-      'img':
-          'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'
-    },
-    'chat': {
-      'label': 'Chat',
-      'img':
-          'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'
-    },
-    'ai': {
-      'label': 'AI Rx',
-      'img':
-          'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'
-    },
-    'streak': {
-      'label': 'Streak',
-      'img':
-          'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'
-    },
+    'connect': {'label': 'Connect', 'img': 'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'},
+    'practice': {'label': 'Practice', 'img': 'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'},
+    'library': {'label': 'Library', 'img': 'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'},
+    'store': {'label': 'Store', 'img': 'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'},
+    'profile': {'label': 'Profile', 'img': 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'},
+    'progress': {'label': 'Progress', 'img': 'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'},
+    'wordscience': {'label': 'Word Sci', 'img': 'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'},
+    'meaningstore': {'label': 'Meaning', 'img': 'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'},
+    'search': {'label': 'Search', 'img': 'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'},
+    'cart': {'label': 'Cart', 'img': 'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'},
+    'wishlist': {'label': 'Wishlist', 'img': 'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'},
+    'routines': {'label': 'Routines', 'img': 'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'},
+    'chat': {'label': 'Chat', 'img': 'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'},
+    'ai': {'label': 'AI Rx', 'img': 'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'},
+    'streak': {'label': 'Streak', 'img': 'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'},
     'journal': {'label': 'Journal', 'img': 'asset:assets/icons/qa-journal.png'},
-    'settings': {
-      'label': 'Settings',
-      'img':
-          'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
-    },
-    'everything': {
-      'label': 'Everything',
-      'img':
-          'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
-    },
+    'settings': {'label': 'Settings', 'img': 'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'},
+    'everything': {'label': 'Everything', 'img': 'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'},
   };
-  int? _primaryTab(String id) => const {
-        'connect': 0,
-        'practice': 1,
-        'library': 2,
-        'store': 3,
-        'profile': 4
-      }[id];
+  int? _primaryTab(String id) => const {'connect': 0, 'practice': 1, 'library': 2, 'store': 3, 'profile': 4}[id];
   void _goToSlot(String id) {
     final tab = _primaryTab(id);
     if (tab != null) {
@@ -392,8 +308,7 @@ class _NavShellState extends State<NavShell> {
       // Progress is NOT a tab root — push the dedicated screen only.
       _popShellOverlays();
       Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) =>
-            PracticeProgressScreen(words: ContentStore.instance.library),
+        builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
       ));
       return;
     }
@@ -408,8 +323,7 @@ class _NavShellState extends State<NavShell> {
       _ => null,
     };
     _popShellOverlays();
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => page ?? const QuickAccessScreen()));
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => page ?? const QuickAccessScreen()));
   }
 
   /// Keep inactive tabs mounted (IndexedStack) but off-stage so their videos
@@ -446,10 +360,8 @@ class _NavShellState extends State<NavShell> {
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: lightHome ? Brightness.dark : Brightness.light,
-        systemNavigationBarColor:
-            lightHome ? NwsbColors.surface : NwsbColors.deep,
-        systemNavigationBarIconBrightness:
-            lightHome ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: lightHome ? NwsbColors.surface : NwsbColors.deep,
+        systemNavigationBarIconBrightness: lightHome ? Brightness.dark : Brightness.light,
         systemNavigationBarDividerColor: Colors.transparent,
       ),
       child: Scaffold(
@@ -467,8 +379,7 @@ class _NavShellState extends State<NavShell> {
                 // Offstage + TickerMode: inactive IndexedStack tabs still layout,
                 // so without this their NwsbVideos keep claiming VideoPool seats
                 // and the visible tab (and player overlays) starve — "playing 1".
-                _tabAlive(
-                    0, _fashion ? const HomeFashion() : const HomeNormal()),
+                _tabAlive(0, _fashion ? const HomeFashion() : const HomeNormal()),
                 _tabAlive(1, const PracticeScreen()),
                 // Bottom-nav Library must be the media-rich Sound Library (website
                 // SLM), NOT the old plain letter list in library.dart.
@@ -511,8 +422,7 @@ class _NavShellState extends State<NavShell> {
             // Debug only, and compiled out of a release build: the decoder
             // count, live, so the ceiling is something you can watch rather
             // than something you have to take on trust.
-            const Positioned(
-                top: 4, right: 8, child: SafeArea(child: PoolHud())),
+            const Positioned(top: 4, right: 8, child: SafeArea(child: PoolHud())),
             Positioned(
               left: 0,
               right: 0,
@@ -521,8 +431,7 @@ class _NavShellState extends State<NavShell> {
                 top: false,
                 child: Center(
                   child: ConstrainedBox(
-                    constraints:
-                        const BoxConstraints(maxWidth: double.infinity),
+                    constraints: const BoxConstraints(maxWidth: double.infinity),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       child: Builder(builder: (context) {
@@ -532,9 +441,7 @@ class _NavShellState extends State<NavShell> {
                             : settings.navShape == 'rect'
                                 ? (settings.navCorner == 'rounded' ? 20.0 : 2.0)
                                 : 33.0;
-                        final background = settings.navColor == 'black'
-                            ? const Color(0xF5000000)
-                            : const Color(0xF5182033);
+                        final background = settings.navColor == 'black' ? const Color(0xF5000000) : const Color(0xF5182033);
                         final slots = settings.navSlots;
                         final found = slots.indexWhere((s) => _primaryTab(s) == 0);
                         final homeSlot = found >= 0 ? found : 0;
@@ -551,8 +458,7 @@ class _NavShellState extends State<NavShell> {
                                 Container(
                                   width: 1,
                                   height: 18,
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  margin: const EdgeInsets.symmetric(horizontal: 2),
                                   color: const Color(0x33FFFFFF),
                                 ),
                               Expanded(
@@ -561,9 +467,7 @@ class _NavShellState extends State<NavShell> {
                                   asHome: _i != 0 && i == homeSlot,
                                   image: _navFeatures[slots[i]]?['img'] ?? '',
                                   label: _navFeatures[slots[i]]?['label'] ?? slots[i],
-                                  onTap: () => _i != 0 && i == homeSlot
-                                      ? _goToTab(0)
-                                      : _goToSlot(slots[i]),
+                                  onTap: () => _i != 0 && i == homeSlot ? _goToTab(0) : _goToSlot(slots[i]),
                                 ),
                               ),
                             ],
@@ -581,6 +485,7 @@ class _NavShellState extends State<NavShell> {
                   coach: _coach!,
                   tab: _i,
                   onDone: () => unawaited(_dismissCoach()),
+                  onSkip: () => unawaited(_skipGuide()),
                 ),
               ),
           ],
@@ -651,11 +556,12 @@ class _NavSlot extends StatelessWidget {
 }
 
 class _RoomGuide extends StatelessWidget {
-  const _RoomGuide({required this.coach, required this.tab, required this.onDone});
+  const _RoomGuide({required this.coach, required this.tab, required this.onDone, required this.onSkip});
 
   final String coach;
   final int tab;
   final VoidCallback onDone;
+  final VoidCallback onSkip;
 
   static const _rooms = <(String, String)>[
     ('Home', 'This is the day. The session sits up here. The other rooms are on the bar.'),
@@ -670,97 +576,111 @@ class _RoomGuide extends StatelessWidget {
     final welcome = coach == 'welcome';
     final room = _rooms[tab.clamp(0, _rooms.length - 1)];
     final title = welcome ? 'Five rooms' : room.$1;
-    final body = welcome
-        ? 'Home, Practice, Library, Store, and Profile. Each one gets a short mark the first time you open it.'
-        : room.$2;
+    final body = welcome ? 'Home, Practice, Library, Store, and Profile. Each one gets a short mark the first time you open it.' : room.$2;
     final x = ((tab.clamp(0, 4) + 0.5) / 5) * 2 - 1;
-    return Material(
-      color: const Color(0x66000000),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: GestureDetector(onTap: onDone, behavior: HitTestBehavior.opaque),
-          ),
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: 0,
-            child: SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 84),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: const Color(0xF0141418),
-                        borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0x33E8D5A3)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'GUIDE',
-                              style: TextStyle(
-                                color: Color(0xFFE8D5A3),
-                                fontSize: 11,
-                                letterSpacing: 2.2,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              title,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              body,
-                              style: const TextStyle(
-                                color: Color(0xCCFFFFFF),
-                                fontSize: 14,
-                                height: 1.35,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: FilledButton(
-                                onPressed: onDone,
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFFE8D5A3),
-                                  foregroundColor: const Color(0xFF14110A),
-                                  minimumSize: const Size(96, 40),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    final still = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: still ? 1 : 0, end: 1),
+      duration: still ? Duration.zero : const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, child) => Opacity(
+        opacity: t,
+        child: Transform.translate(offset: Offset(0, (1 - t) * 18), child: child),
+      ),
+      child: Material(
+        color: const Color(0x66000000),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(onTap: onDone, behavior: HitTestBehavior.opaque),
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 0,
+              child: SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 84),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: const Color(0xF0141418),
+                          borderRadius: BorderRadius.circular(22),
+                          border: Border.all(color: const Color(0x33E8D5A3)),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'GUIDE',
+                                style: TextStyle(
+                                  color: Color(0xFFE8D5A3),
+                                  fontSize: 11,
+                                  letterSpacing: 2.2,
+                                  fontWeight: FontWeight.w800,
                                 ),
-                                child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.w800)),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 6),
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                body,
+                                style: const TextStyle(
+                                  color: Color(0xCCFFFFFF),
+                                  fontSize: 14,
+                                  height: 1.35,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Row(
+                                children: [
+                                  TextButton(
+                                    onPressed: onSkip,
+                                    child: const Text('Skip guide', style: TextStyle(color: Color(0xCCFFFFFF))),
+                                  ),
+                                  const Spacer(),
+                                  FilledButton(
+                                    onPressed: onDone,
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: const Color(0xFFE8D5A3),
+                                      foregroundColor: const Color(0xFF14110A),
+                                      minimumSize: const Size(96, 40),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                    ),
+                                    child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.w800)),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    Align(
-                      alignment: Alignment(x, 0),
-                      child: CustomPaint(
-                        size: const Size(16, 9),
-                        painter: const _GuideTail(),
+                      Align(
+                        alignment: Alignment(x, 0),
+                        child: CustomPaint(
+                          size: const Size(16, 9),
+                          painter: const _GuideTail(),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
