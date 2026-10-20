@@ -18,22 +18,18 @@ abstract class EbooksData {
   Future<List<EbBook>> load();
   bool get offline;
   bool owns(EbBook b);
-  int priceCents(EbBook b);
+  String priceLabel(EbBook b);
   Future<bool> guideSeen();
   Future<void> markGuideSeen();
   int progressOf(EbBook b); // last chapter index opened
   void saveProgress(EbBook b, int chapter);
 }
 
-/// Catalog prices are stored in their original unit (INR). Convert once to
-/// USD cents with the app's FxBook rates; the UI only formats cents in the
-/// user's local currency (no India-only pricing).
-int catalogToCents(num catalogPrice) {
-  final perUsd = FxBook.instance.rates['INR'] ?? 83.5;
-  return ((catalogPrice / perUsd) * 100).round();
-}
-
-String money(int cents) => FxBook.instance.formatCents(cents);
+/// Catalog prices are stored in their legacy base unit. FxBook converts them
+/// to the user's local currency once `config/fx` loads (no hardcoded rate);
+/// before that it shows the stored amount in its own currency, never a
+/// mislabelled one.
+String catalogPriceLabel(num catalogPrice) => FxBook.instance.formatRupees(catalogPrice);
 
 class LiveEbooksData implements EbooksData {
   LiveEbooksData();
@@ -70,7 +66,7 @@ class LiveEbooksData implements EbooksData {
   bool owns(EbBook b) => Entitlements.instance.canOpenEbook(b.title, price: _price(b));
 
   @override
-  int priceCents(EbBook b) => catalogToCents(_price(b));
+  String priceLabel(EbBook b) => catalogPriceLabel(_price(b));
 
   @override
   Future<bool> guideSeen() async {

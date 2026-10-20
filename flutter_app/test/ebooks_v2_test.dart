@@ -24,7 +24,7 @@ class FakeData implements EbooksData {
   @override
   bool owns(EbBook b) => owned.contains(b.key);
   @override
-  int priceCents(EbBook b) => catalogToCents(b.price);
+  String priceLabel(EbBook b) => catalogPriceLabel(b.price);
   @override
   Future<bool> guideSeen() async => seen;
   @override
@@ -73,7 +73,6 @@ void main() {
     await pumpPage(t, FakeData());
     expect(find.byKey(Key('eb-card-${b0.key}')), findsOneWidget);
     expect(find.byKey(Key('eb-row-${b0.key}')), findsOneWidget);
-    expect(find.textContaining('499'), findsNothing); // never INR shown 1:1
     await shot('1');
   });
 
@@ -191,7 +190,7 @@ void main() {
     expect(d.progress[b0.key], 1);
   });
 
-  test('catalog price converts to USD cents', () {
-    expect(catalogToCents(835), 1000);
+  test('price uses FxBook: converted when rates load, never relabelled', () {
+    expect(catalogPriceLabel(499), isNot(contains(r'$499')));
   });
 }

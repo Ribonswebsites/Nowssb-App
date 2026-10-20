@@ -37,7 +37,7 @@ class EbooksScope {
 }
 
 Color _accent(int i) => EbTok.accents[i % EbTok.accents.length];
-String _price(EbooksScope s, EbBook b) => s.data.owns(b) ? 'Yours' : money(s.data.priceCents(b));
+String _price(EbooksScope s, EbBook b) => s.data.owns(b) ? 'Yours' : s.data.priceLabel(b);
 
 class _Frame extends StatelessWidget {
   const _Frame({required this.scope, required this.title, required this.body, this.actions = const [], this.bottom});
@@ -408,7 +408,7 @@ class EbookDetailV2 extends StatelessWidget {
             tag: 'E-BOOK',
             badge: owned ? 'OWNED' : null,
             label: book.sub,
-            value: owned ? 'Yours' : money(scope.data.priceCents(book)),
+            value: owned ? 'Yours' : scope.data.priceLabel(book),
             action: owned ? 'Open in Reader >' : 'Buy >',
             onTap: () => owned ? openReader(context, scope, book) : scope.actions.doBuy(context, book),
           ),
