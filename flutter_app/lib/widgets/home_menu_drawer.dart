@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/app_control.dart';
+import '../pages/menu_settings/ms_glass.dart';
+import '../pages/menu_settings/ms_menu_page.dart';
 import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
@@ -128,8 +130,51 @@ class HomeMenuDrawer extends StatelessWidget {
     );
   }
 
+  List<MsGroup> _msGroups(BuildContext context) {
+    void go(Widget page) => _push(context, page);
+    void hub(String title, String sub, List<MsEntry> e) =>
+        go(MsHubPage(title: title, subtitle: sub, entries: e));
+    final nav = Navigator.of(context);
+    void sub(Widget page) => nav.push(MaterialPageRoute<void>(builder: (_) => page));
+    return [
+      MsGroup('Practice', [
+        MsEntry('home', Icons.home_outlined, 'Home', 'Your daily start', () => _goTab(context, 0)),
+        MsEntry('practice', Icons.self_improvement_rounded, 'Daily practice', 'Morning ritual and routines', () => _goTab(context, 1)),
+        MsEntry('library', Icons.graphic_eq_rounded, 'Sound library', 'Root frequencies', () => go(const SoundLibraryScreen())),
+        MsEntry('progress', Icons.spa_outlined, 'My progress', 'Your healing journey', () => go(PracticeProgressScreen(words: ContentStore.instance.library))),
+      ]),
+      MsGroup('Learn', [
+        MsEntry('science', Icons.auto_stories_outlined, 'Word science', 'How NowssB works', () => go(const AboutNowssbScreen(science: true))),
+        MsEntry('reader', Icons.menu_book_outlined, 'Shabdapathy reader', 'Foundations', () => go(const ReaderHubScreen())),
+        MsEntry('store', Icons.shopping_bag_outlined, 'Store', 'Words, meanings, plans', () => _goTab(context, 3)),
+      ]),
+      MsGroup('Rewards', [
+        MsEntry('rewards', Icons.card_giftcard_rounded, 'Rewards & gifts', 'Coins, gifts, coupons', () => hub('Rewards & gifts', 'Small joys for showing up.', [
+          MsEntry('vault', Icons.stars_rounded, 'Rewards', 'Coins, quests, invite', () => sub(const VaultScreen())),
+          MsEntry('gifts', Icons.redeem_rounded, 'Gifts', 'Boxes and gift cards', () => sub(const GiftsScreen())),
+          MsEntry('coupons', Icons.confirmation_number_outlined, 'Coupons', 'Scratch and codes', () => sub(const CouponScreen())),
+        ])),
+        MsEntry('earn', Icons.volunteer_activism_outlined, 'Earn & payouts', 'Agents, codes, earnings', () => hub('Earn & payouts', 'Share NowssB, see what you earned.', [
+          MsEntry('earnhub', Icons.handshake_outlined, 'Earn', 'Agents, codes, activity', () => sub(const EarnHubScreen())),
+          MsEntry('earnings', Icons.account_balance_wallet_outlined, 'Earnings', 'Payouts and commissions', () => sub(const EarningsScreen())),
+        ])),
+      ]),
+      MsGroup('You', [
+        MsEntry('profile', Icons.person_outline_rounded, 'Profile', 'Account and Word Print', () => _goTab(context, 4)),
+        MsEntry('community', Icons.forum_outlined, 'Community', 'Connect, Echo Wall, Word Print', () => hub('Community', 'Gentle company on the path.', [
+          MsEntry('connect', Icons.people_outline_rounded, 'NowssB Connect', 'Community', () => sub(const ConnectScreen())),
+          MsEntry('echo', Icons.waves_rounded, 'Echo Wall', 'Reflections', () => sub(const EchoWallScreen())),
+          MsEntry('print', Icons.fingerprint_rounded, 'Word Print', 'Public profile', () => sub(const WordPrintScreen())),
+        ])),
+        MsEntry('plans', Icons.workspace_premium_outlined, 'Plans', 'Resonance, Frequency, Frequency X', () => go(const SubscriptionScreen())),
+        MsEntry('settings', Icons.settings_outlined, 'Settings', 'Sound, look, privacy, help', () => go(const AppSettingsScreen())),
+      ]),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (MenuSettingsFlag.isOn) return MsMenuPage(groups: _msGroups(context));
     final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
     // Fashion menu mirrors AppSettingsScreen exactly (solid deep + gold wash,

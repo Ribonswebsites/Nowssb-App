@@ -8,6 +8,8 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../pages/menu_settings/ms_glass.dart';
+import '../pages/menu_settings/ms_settings_page.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -328,8 +330,36 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     );
   }
 
+  MsSettingsActions _msActions() => MsSettingsActions(
+        openPlayer: () => _push(const PlayerSettingsScreen()),
+        openNotifications: () => _push(const NotificationsSettingsPage()),
+        screenAwake: () => _screenWake,
+        setScreenAwake: (v) { setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); },
+        motionBackground: () => Settings.instance.fashionPlus,
+        setMotionBackground: (v) => Settings.instance.setFashionPlus(v),
+        navGlass: () => Settings.instance.navColor == 'glass',
+        setNavGlass: (v) => Settings.instance.setNavConfig(color: v ? 'glass' : 'black'),
+        openBackgroundPicker: () => _push(const FashionPlusScreen()),
+        appearInDiscover: () => _appearDiscover,
+        setAppearInDiscover: (v) => _setDiscover(v),
+        openProfile: () => NavScope.goTo(context, 4),
+        openPrivacy: () => _openUrl('https://nowssb.com/privacy'),
+        openTerms: () => _openUrl('https://nowssb.com/terms'),
+        signOut: _signOut,
+        deleteAccount: _deleteAccount,
+        clearCache: () { _clearCache(); },
+        clearHistory: () { _confirmClearHistory(); },
+        openPlayerGuide: () => _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())),
+        requestWords: () => openRequestWords(context),
+        openAbout: () { _openAbout(); },
+        isAdmin: AdminState.instance.isAdmin,
+        openAdmin: () => openAdminHome(context),
+      );
+
   @override
   Widget build(BuildContext context) {
+    // newui_menu_settings: ON for all; remote false = kill switch.
+    if (MenuSettingsFlag.isOn) return MsSettingsPage(actions: _msActions());
     UiScope.watch(context); // the Admin row follows the admin flag live
     final s = Settings.instance;
     final bottom = MediaQuery.paddingOf(context).bottom;
