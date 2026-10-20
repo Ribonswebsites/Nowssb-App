@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../bazaar/bazaar_screen.dart';
+import '../coins/coins_wallet_screen.dart';
 import '../circle/circle_screen.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
@@ -69,7 +70,7 @@ class EarnHubLegacyScreen extends StatelessWidget {
                   if (w.uid == null)
                     WorkCard(category: 'Account', title: 'Sign in', meta: 'See coins and cash', action: 'Sign in', image: 'assets/rails/earn-01.jpg', onTap: () => NwsbSignInPage.open(context))
                   else
-                    WorkCard(category: 'Balance', title: '${w.coins} coins', meta: FxBook.instance.formatCents(w.cash), action: 'Open ranks', image: 'assets/rails/earn-01.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnProgramPage()))),
+                    WorkCard(category: 'Balance', title: '${w.coins} coins', meta: FxBook.instance.formatCents(w.cash), action: 'Open coins', image: 'assets/rails/earn-01.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen()))),
                   WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Daily coins, streaks, quests', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
                   WorkCard(category: 'Coupons', title: 'NowssB Coupons', meta: 'Scratch cards and codes', action: 'Open coupons', image: 'assets/gifts/coupon-hero.png', onTap: () => Programmes.open(context, Programme.coupons)),
                   WorkCard(category: 'Gifts', title: 'NowssB Gifts', meta: 'Send a real purchase as a code', action: 'Open gifts', image: 'assets/gifts/box-gold.webp', onTap: () => Programmes.open(context, Programme.gifts)),
