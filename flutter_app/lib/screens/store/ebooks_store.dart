@@ -28,13 +28,17 @@ import '../../widgets/routine_deck.dart';
 import 'store_terms_sheet.dart';
 import '../../shell/nwsb_links.dart';
 import '../../admin/template/editable.dart';
+import '../../features/ebooks_v2/ebooks_data.dart';
+import '../../features/ebooks_v2/ebooks_pages.dart';
 import '../../admin/layout/layout_sections.dart';
 
 class EbooksStoreScreen extends StatelessWidget {
   const EbooksStoreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) => StoreTermsHost(
+  Widget build(BuildContext context) => ebooksV2On() ? EbooksV2Page() : _legacy(context);
+
+  Widget _legacy(BuildContext context) => StoreTermsHost(
         which: 'ebooks',
         head: 'Ebooks described by sound',
         child: PageShell(
