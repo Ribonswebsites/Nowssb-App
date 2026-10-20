@@ -13,6 +13,7 @@ import '../economy/economy_api.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
+import 'rewards_more.dart';
 import 'program_heroes.dart';
 import '../vault/vault_screen.dart';
 
@@ -28,12 +29,17 @@ const kRewardsSpec = ProgramSpec(
   accent: ProgramAccent.rewards,
   tabs: [
     ProgramTab('today', 'Today', _today),
+    ProgramTab('checkin', 'Daily check-in', rewardsCheckin),
     ProgramTab('quests', 'Quests', _quests),
     ProgramTab('streaks', 'Streaks', _streaks),
+    ProgramTab('chests', 'Chests', rewardsChests),
+    ProgramTab('boost', 'Coin Boost', rewardsBoost),
+    ProgramTab('store', 'Coin Store', rewardsStore),
+    ProgramTab('mine', 'My Rewards', rewardsMine),
     ProgramTab('mastery', 'Mastery', _mastery),
     ProgramTab('season', 'Season', _season),
     ProgramTab('leagues', 'Leagues', _leagues),
-    ProgramTab('wallet', 'Wallet', _wallet),
+    ProgramTab('wallet', 'Coin history', _wallet),
     ProgramTab('spend', 'Spend', _spend),
     ProgramTab('badges', 'Badges', _badges),
   ],
@@ -78,9 +84,12 @@ class RewardsProgramPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => VaultScreen(
-        initialTab: initialTab == null ? null : kRewardsSpec.tabs[initialTab!.clamp(0, kRewardsSpec.tabs.length - 1)].id,
+        initialTab: initialTab == null ? null : _legacyTabs[initialTab!.clamp(0, _legacyTabs.length - 1)],
       );
 }
+
+// Older callers pass the pre-14.3 tab index; keep those landing where they did.
+const _legacyTabs = ['today', 'quests', 'streaks', 'mastery', 'season', 'leagues', 'wallet', 'spend', 'badges'];
 
 Map<String, dynamic> _cfg(Map<String, dynamic> s) => sMap(s['config']);
 Map<String, dynamic> _r(Map<String, dynamic> s) => sMap(_cfg(s)['rewards']);
@@ -93,6 +102,7 @@ List<Widget> _today(BuildContext context, Map<String, dynamic> s) {
   final free = sInt(t['freeCoins']);
   final ceiling = sInt(t['ceiling']);
   return [
+    const RewardsGuide(),
     LSection('balance', 'Balance', PBalance(coins: sInt(w['coins']), caption: 'Streak ${sInt(w['streak'])} days · best ${sInt(w['bestStreak'])}')),
     LSection.group('login', 'Daily login', [
       const PHeading('Every day', 'Daily login', slot: 'rewards_program.today'),
