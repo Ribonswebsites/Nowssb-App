@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/firebase.dart';
 import '../../data/notifications.dart';
+import 'notif_router.dart';
 import '../../theme/tokens.dart';
 import '../economy/economy_api.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
@@ -71,7 +72,15 @@ class InboxScreen extends StatelessWidget {
                     title: Text(data.title, style: const TextStyle(color: Colors.white)),
                     subtitle: Text(data.body, style: const TextStyle(color: NwsbColors.mist)),
                     trailing: unread ? const NwsbIcon(NwsbMarks.bell, size: 16, color: NwsbColors.gold) : null,
-                    onTap: unread ? () => store.markRead(i) : null,
+                    // Same as the bell sheet: a row opens what it is about.
+                    // Plain inbox notes just get marked read.
+                    onTap: () {
+                      if (NotifRouter.routeFor(data) == 'inbox') {
+                        if (unread) store.markRead(i);
+                        return;
+                      }
+                      NotifRouter.instance.openItem(data);
+                    },
                   );
                 },
               );
