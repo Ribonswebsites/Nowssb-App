@@ -620,7 +620,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _progressCard({required int streak, required int score, required int words, required int coins, required String photo}) {
-    const arts = ['assets/rails/02.png', 'assets/rails/04.png', 'assets/rails/06.png', 'assets/rails/08.png'];
+    const arts = ['assets/rails/mean-fire.jpg', 'assets/rails/ui-practice.jpg', 'assets/rails/ui-words.jpg', 'assets/rails/ui-coins.jpg'];
     final slides = [
       (title: '$streak day streak', meta: 'One sit a day keeps the circle.', art: arts[0]),
       (title: '$score sessions', meta: 'Sessions you have finished.', art: arts[1]),
@@ -1139,11 +1139,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       bannerSub: 'Earn, rewards, coupons, gifts',
       onBanner: () => Programmes.open(context, Programme.earn),
       cards: [
-        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/member-card.png', onTap: () => Programmes.open(context, Programme.earn)),
-        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open coins', image: 'assets/rails/rewards-coins.png', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen()))),
-        WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', image: 'assets/rails/coupons-02.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
-        WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', image: 'assets/rails/gifts-02.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
-        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/earnings-02.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
+        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/ui-earn.jpg', onTap: () => Programmes.open(context, Programme.earn)),
+        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open coins', image: 'assets/rails/ui-coins.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen()))),
+        WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', image: 'assets/rails/ui-coupon.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
+        WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', image: 'assets/rails/ui-gift.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
+        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/ui-ledger.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
       ],
     );
       },

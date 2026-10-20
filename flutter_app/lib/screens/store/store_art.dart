@@ -170,6 +170,43 @@ String storeWaveFor(String name) => _fromSet(name, kStoreWaveFrames, 'waves', kN
 /// Meaning icon edited for this word.
 String storeMeaningFlip(String name) => _fromSet(name, kMeaningFlipFrames, 'meaning-flips', kMeaningsIcon);
 
+/// Second face of a meaning card. White meditation still life of that meaning.
+/// The first face stays [kMeaningsIcon].
+String meaningFlipArt(String word) {
+  const named = <String, String>{
+    'earth': 'assets/rails/mean-earth.jpg',
+    'water': 'assets/rails/mean-water.jpg',
+    'fire': 'assets/rails/mean-fire.jpg',
+    'sun': 'assets/rails/mean-sun.jpg',
+    'moon': 'assets/rails/mean-moon.jpg',
+    'light': 'assets/rails/mean-light.jpg',
+    'dark': 'assets/rails/mean-dark.jpg',
+    'body': 'assets/rails/mean-body.jpg',
+    'mind': 'assets/rails/mean-mind.jpg',
+    'soul': 'assets/rails/mean-soul.jpg',
+    'blood': 'assets/rails/mean-blood.jpg',
+    'breath': 'assets/rails/mean-breath.jpg',
+    'love': 'assets/rails/mean-love.jpg',
+    'fear': 'assets/rails/mean-fear.jpg',
+    'joy': 'assets/rails/mean-joy.jpg',
+    'god': 'assets/rails/mean-god.jpg',
+    'time': 'assets/rails/mean-time.jpg',
+    'space': 'assets/rails/mean-space.jpg',
+    'truth': 'assets/rails/mean-truth.jpg',
+    'country': 'assets/rails/mean-country.jpg',
+    'india': 'assets/rails/mean-india.jpg',
+    'mother': 'assets/rails/mean-mother.jpg',
+    'father': 'assets/rails/mean-father.jpg',
+    'name': 'assets/rails/mean-name.jpg',
+  };
+  final key = word.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '');
+  final hit = named[key];
+  if (hit != null) return hit;
+  final values = named.values.toList();
+  final h = key.codeUnits.fold<int>(0, (a, b) => (a + b) % values.length);
+  return values[h];
+}
+
 /// Ebook icon edited for this book.
 String storeEbookFlip(String name, {String? alt}) {
   final hit = _fromSet(name, kEbookFlipFrames, 'ebook-flips', '');

@@ -93,17 +93,17 @@ const kEarningsArt = <String>[
 ];
 
 const kGlassArt = <String>[
-  'assets/rails/glass-01.jpg',
-  'assets/rails/glass-02.jpg',
-  'assets/rails/glass-03.jpg',
-  'assets/rails/glass-04.jpg',
+  'assets/rails/mean-moon.jpg',
+  'assets/rails/mean-love.jpg',
+  'assets/rails/ui-science.jpg',
+  'assets/rails/ui-fashion.jpg',
 ];
 
 const kClearArt = <String>[
-  'assets/rails/clear-01.jpg',
-  'assets/rails/clear-02.jpg',
-  'assets/rails/clear-03.jpg',
-  'assets/rails/clear-04.jpg',
+  'assets/rails/ui-progress.jpg',
+  'assets/rails/mean-water.jpg',
+  'assets/rails/mean-dark.jpg',
+  'assets/rails/mean-sun.jpg',
 ];
 const _dur = ['18h 9m', '12h 24m', '4 min', '8 min', '21 min'];
 const _rate = ['4.7', '4.8', '4.9', '4.6', '5.0'];
@@ -163,17 +163,21 @@ class IdentityRails extends StatelessWidget {
       RailKind.menu => (
           labels: const ['Open', 'Go', 'Today'],
           arts: const [
-            'assets/rails/06.png',
-            'assets/rails/07.png',
-            'assets/rails/08.png',
-            'assets/rails/09.png',
-            'assets/rails/10.png',
-            'assets/rails/11.png',
-            'assets/rails/01.png',
-            'assets/rails/02.png',
-            'assets/rails/03.png',
-            'assets/rails/04.png',
-            'assets/rails/05.png',
+            'assets/rails/ui-earn.jpg',
+            'assets/rails/ui-trophy.jpg',
+            'assets/rails/ui-gift.jpg',
+            'assets/rails/ui-coupon.jpg',
+            'assets/rails/ui-profile.jpg',
+            'assets/rails/ui-library.jpg',
+            'assets/rails/ui-store.jpg',
+            'assets/rails/ui-practice.jpg',
+            'assets/rails/ui-settings.jpg',
+            'assets/rails/ui-words.jpg',
+            'assets/rails/ui-progress.jpg',
+            'assets/rails/ui-home.jpg',
+            'assets/rails/ui-saved.jpg',
+            'assets/rails/ui-connect.jpg',
+            'assets/rails/ui-plans.jpg',
           ],
           a: _pack(const ['Earn', 'Rewards', 'Gifts', 'Coupons', 'Profile'], const ['Open', 'Open', 'Open', 'Open', 'You']),
           b: _pack(const ['Library', 'Store', 'Practice', 'Settings', 'Words'], const ['Sounds', 'Shop', 'Sit', 'Gear', 'Roots']),
@@ -188,7 +192,23 @@ class IdentityRails extends StatelessWidget {
         ),
       RailKind.rewards => (
           labels: const ['Active', 'Wallet', 'Streaks'],
-          arts: kRewardsArt,
+          arts: const [
+            'assets/rails/ui-coins.jpg',
+            'assets/rails/ui-quests.jpg',
+            'assets/rails/mean-fire.jpg',
+            'assets/rails/mean-sun.jpg',
+            'assets/rails/ui-print.jpg',
+            'assets/rails/ui-ledger.jpg',
+            'assets/rails/ui-store.jpg',
+            'assets/rails/ui-history.jpg',
+            'assets/rails/ui-plans.jpg',
+            'assets/rails/ui-science.jpg',
+            'assets/rails/ui-progress.jpg',
+            'assets/rails/ui-routines.jpg',
+            'assets/rails/ui-bell.jpg',
+            'assets/rails/ui-gift.jpg',
+            'assets/rails/ui-connect.jpg',
+          ],
           a: _pack(const ['Daily login', 'Quest board', 'Streak flame', 'Season', 'Badges'], const ['Today', 'Quests', 'Fire', 'Season', 'Marks']),
           b: _pack(const ['Wallet', 'Spend', 'Freezes', 'League', 'Mastery'], const ['Coins', 'Shop', 'Saved days', 'Table', 'Skill']),
           c: _pack(const ['Day 7 streak', 'First quest', 'Come back', 'Claim box', 'Invite'], const ['A week of logins', 'One finished quest', 'Tomorrow’s coin', 'Open the box', 'One friend']),
@@ -220,7 +240,7 @@ class IdentityRails extends StatelessWidget {
       b: spec.b,
       c: spec.c,
       d: _pack(const ['Fog Practice', 'Lotus Hour', 'Sound Rings', 'Soft Cloth'], const ['A glass seat', 'Still water', 'In circles', 'Morning']),
-      e: _pack(const ['30 days of breath', 'Forest pool', 'Night shore', 'The case'], const ['A month of sitting', 'One still hour', 'After dark', 'Keep it close']),
+      e: _pack(const ['30 days of breath', 'Forest pool', 'Night shore', 'Morning light'], const ['A month of sitting', 'One still hour', 'After dark', 'Start the day']),
       arts: spec.arts,
       labels: [...spec.labels, 'Glass', 'Clear'],
     );

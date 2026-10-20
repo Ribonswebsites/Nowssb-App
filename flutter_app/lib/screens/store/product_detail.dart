@@ -20,6 +20,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../word_detail.dart';
 import 'bag_ui.dart';
 import 'store_actions.dart';
+import 'store_art.dart';
 import 'store_cards.dart';
 import '../../admin/template/editable.dart';
 
@@ -83,7 +84,7 @@ void openMeaningDetail(
         title: signature ? m.word : m.word,
         root: m.root,
         // Always prefer catalogue / caller img — do not let live overlay swap art.
-        img: signature ? kMsSignatureImg : m.img,
+        img: signature ? kMsSignatureImg : meaningFlipArt(m.key),
         price: signature ? kMsSignaturePrice : m.price,
         about: blurb,
         heroVideo: nwsbVideo(kMsMeaningVidFile),
