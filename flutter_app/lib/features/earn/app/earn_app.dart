@@ -317,7 +317,7 @@ class _Stat extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         onTap: onTap,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Icon(icon, color: kMint, size: 16), const SizedBox(width: 6), Text(label, style: const TextStyle(color: kGrey, fontSize: 12))]),
+          Row(children: [Icon(icon, color: kMint, size: 16), const SizedBox(width: 6), Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kGrey, fontSize: 12)))]),
           const SizedBox(height: 6),
           Text(value, style: const TextStyle(color: kInk, fontSize: 26, fontWeight: FontWeight.w800)),
           Text(hint, maxLines: 2, style: const TextStyle(color: kGrey, fontSize: 11)),
