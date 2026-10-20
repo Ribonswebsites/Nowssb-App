@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../coins/coins_wallet_screen.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
@@ -125,9 +127,7 @@ class _CoinBalancePillState extends State<CoinBalancePill> {
       builder: (context, _) {
         final m = EconomyMirror.instance;
         return GestureDetector(
-          onTap: widget.onRewardsPage
-              ? null
-              : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RewardsProgramPage(initialTab: 6))),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen())),
           behavior: HitTestBehavior.opaque,
           child: Container(
             key: _anchor,

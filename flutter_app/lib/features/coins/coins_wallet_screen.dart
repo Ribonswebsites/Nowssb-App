@@ -322,7 +322,8 @@ class _Overview extends StatelessWidget {
       children: [
         CoinsGlass(
           key: const Key('coinBoost'),
-          onTap: () => Programmes.open(context, Programme.rewards),
+          // Coin Boost lives in Rewards (its owner); this banner only links there.
+          onTap: () => Programmes.open(context, Programme.rewards, tab: 'boost'),
           child: Row(children: [
             const Icon(Icons.bolt_rounded, color: Colors.white, size: 30),
             const SizedBox(width: 12),
@@ -330,7 +331,7 @@ class _Overview extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(boostLive ? 'Coin Boost +${data.boostPct}%' : 'Coin Boost', style: _title),
                 const SizedBox(height: 4),
-                Text(boostLive ? 'Every coin you earn counts extra until ${_date(data.boostUntil)}.' : 'No boost running right now. Boosts appear here when they go live.', style: _body2),
+                Text(boostLive ? 'Every coin you earn counts extra until ${_date(data.boostUntil)}.' : 'No boost running right now. Tap to open Coin Boost in Rewards.', style: _body2),
               ]),
             ),
           ]),
@@ -520,7 +521,7 @@ class CoinRulesPage extends StatelessWidget {
     ('Earning', 'Daily check-ins, streaks, quests and scratch cards add coins. Amounts are set by NowssB and shown before you claim.'),
     ('Using', 'At checkout, coins can cover part of a price, up to the cap shown in the calculator.'),
     ('Expiry', 'Some coins expire. Any coins close to expiring are listed on the Overview tab.'),
-    ('Coin Boost', 'During a boost, earned coins count extra. The boost and its end date are always shown.'),
+    ('Coin Boost', 'Coin Boost is part of NowssB Rewards. During a boost, earned coins count extra; it never raises the spend cap.'),
   ];
 
   @override

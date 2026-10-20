@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+
+import '../features/coins/coins_wallet_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -568,7 +570,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const rows = ['NowssB coins', 'Cart', 'Wishlist', 'Order history'];
         final counts = [coins, cart, wish, orders];
         final openers = <VoidCallback>[
-          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())),
+          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen())),
           () => _openShop('Cart'),
           () => _openShop('Wishlist'),
           () => _openShop('Order history'),
@@ -1137,7 +1139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onBanner: () => Programmes.open(context, Programme.earn),
       cards: [
         WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/member-card.png', onTap: () => Programmes.open(context, Programme.earn)),
-        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', image: 'assets/rails/rewards-coins.png', onTap: () => Programmes.open(context, Programme.rewards)),
+        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open coins', image: 'assets/rails/rewards-coins.png', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen()))),
         WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', image: 'assets/rails/coupons-02.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
         WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', image: 'assets/rails/gifts-02.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
         WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/earnings-02.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
@@ -1186,7 +1188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Row(
             children: [
               GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen())),
                 child: _TeaserStat(
                   '${EconomyMirror.instance.coins}',
                   'Coins',
