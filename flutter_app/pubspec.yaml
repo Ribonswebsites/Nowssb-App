@@ -184,6 +184,7 @@ flutter:
     - assets/video/word-acts.mp4
     - assets/video/word-acts-poster.webp
     - assets/videos/
+    - assets/images/circles/
     - assets/notifications/
 
     # The app's own artwork and Store intro-page paintings.
