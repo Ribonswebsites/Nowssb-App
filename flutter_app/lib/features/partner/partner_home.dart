@@ -6,7 +6,6 @@ library;
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../economy/economy_api.dart';
 import '../economy/money.dart';
+import '../../nowssb_ui/nowssb_ui.dart' show NGlass, NTokens, MeditationCard;
 import '../programs/reference_program.dart' show SellersBoard;
 
 /// Injectable data source (tests swap these).
@@ -55,30 +55,6 @@ String perkLine(Map<String, dynamic> l) => [
 bool _isOffline(Object e) => e is SocketException || e is TimeoutException || '$e'.toLowerCase().contains('network') || '$e'.toLowerCase().contains('offline');
 
 // ───────────────────────── glass pieces (approved cards) ─────────────────
-
-class PGlass extends StatelessWidget {
-  const PGlass({super.key, required this.child, this.radius = 28, this.padding = const EdgeInsets.all(16), this.opacity = .14});
-  final Widget child;
-  final double radius;
-  final EdgeInsets padding;
-  final double opacity;
-  @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: opacity),
-              borderRadius: BorderRadius.circular(radius),
-              border: Border.all(color: Colors.white.withValues(alpha: .35)),
-            ),
-            child: child,
-          ),
-        ),
-      );
-}
 
 class PPillButton extends StatelessWidget {
   const PPillButton(this.label, {super.key, required this.onTap, this.light = true});
@@ -121,43 +97,6 @@ class PCoin extends StatelessWidget {
   Widget build(BuildContext context) => Image.asset(_coinAsset, width: size, height: size, errorBuilder: (_, __, ___) => SizedBox(width: size, height: size));
 }
 
-/// Meditation-style card (approved-1): round art top, inner frosted panel.
-class PMeditationCard extends StatelessWidget {
-  const PMeditationCard({super.key, required this.icon, required this.title, required this.body, required this.cta, required this.onTap, this.onSkip});
-  final IconData icon;
-  final String title, body, cta;
-  final VoidCallback onTap;
-  final VoidCallback? onSkip;
-  @override
-  Widget build(BuildContext context) => PGlass(
-        padding: const EdgeInsets.all(12),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Container(
-            width: 84,
-            height: 84,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: .16), border: Border.all(color: Colors.white54, width: 2)),
-            child: Icon(icon, color: Colors.white, size: 38),
-          ),
-          const SizedBox(height: 12),
-          PGlass(
-            radius: 20,
-            opacity: .12,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              Text(title, maxLines: 2, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18, height: 1.15)),
-              const SizedBox(height: 6),
-              Text(body, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-              const SizedBox(height: 10),
-              Row(children: [
-                if (onSkip != null) GestureDetector(onTap: onSkip, child: const Text('Info', style: TextStyle(color: Colors.white70, fontSize: 12))),
-                const Spacer(),
-                PPillButton(cta, onTap: onTap),
-              ]),
-            ]),
-          ),
-        ]),
-      );
-}
-
 /// Coupon-ticket card (approved-2): art circle, dashed divider, tags, title.
 class PTicket extends StatelessWidget {
   const PTicket(
@@ -176,7 +115,8 @@ class PTicket extends StatelessWidget {
           opacity: dim ? .55 : 1,
           child: GestureDetector(
             onTap: onTap,
-            child: PGlass(
+            child: NGlass(
+              blur: NTokens.cardBlur,
               radius: 18,
               padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
               child: Row(children: [
@@ -233,7 +173,7 @@ Future<T?> _sheet<T>(BuildContext context, Widget child) => showModalBottomSheet
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (c) => Padding(padding: const EdgeInsets.all(12), child: PGlass(opacity: .2, child: SafeArea(top: false, child: child))),
+      builder: (c) => Padding(padding: const EdgeInsets.all(12), child: NGlass(blur: NTokens.cardBlur, child: SafeArea(top: false, child: child))),
     );
 
 Future<void> showPartnerInfo(BuildContext context, String title, List<String> lines) => _sheet(
@@ -322,9 +262,9 @@ class _PartnerGuideState extends State<PartnerGuide> {
   Widget build(BuildContext context) {
     final s = PartnerGuide.steps[i];
     final last = i == PartnerGuide.steps.length - 1;
-    return PGlass(
+    return NGlass(
+      blur: NTokens.cardBlur,
       key: const Key('partner.guide'),
-      opacity: .2,
       child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(
             width: 90,
@@ -403,15 +343,16 @@ class _PLoadState extends State<PLoad> {
         key: k,
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: PGlass(
+          child: NGlass(
+              blur: NTokens.cardBlur,
               child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, color: Colors.white, size: 40),
-            const SizedBox(height: 8),
-            Text(t, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-            Text(b, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
-            const SizedBox(height: 12),
-            PPillButton(cta, onTap: on),
-          ])),
+                Icon(icon, color: Colors.white, size: 40),
+                const SizedBox(height: 8),
+                Text(t, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                Text(b, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
+                const SizedBox(height: 12),
+                PPillButton(cta, onTap: on),
+              ])),
         ),
       );
 }
@@ -439,10 +380,11 @@ class _PartnerHomeState extends State<PartnerHome> {
   @override
   void initState() {
     super.initState();
-    if (widget.showGuide)
+    if (widget.showGuide) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) PartnerGuide.showIfNeeded(context);
       });
+    }
   }
 
   void go(int i) => setState(() => tab = i);
@@ -506,22 +448,23 @@ class _PartnerHomeState extends State<PartnerHome> {
     final next = _next(d);
     final conf = _i(d['confirmed']);
     return [
-      PGlass(
+      NGlass(
+          blur: NTokens.cardBlur,
           child: Row(children: [
-        const PCoin(size: 40),
-        const SizedBox(width: 12),
-        Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('${d['title'] ?? 'Starter'} partner', style: const TextStyle(color: Colors.white70)),
-          Text('$conf points', key: const Key('partner.points'), style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800)),
-          Text('${_i(d['pending'])} pending · confirmed after ${_i(d['confirmDays'])} days', style: const TextStyle(color: Colors.white60, fontSize: 12)),
-        ])),
-      ])),
+            const PCoin(size: 40),
+            const SizedBox(width: 12),
+            Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('${d['title'] ?? 'Starter'} partner', style: const TextStyle(color: Colors.white70)),
+              Text('$conf points', key: const Key('partner.points'), style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800)),
+              Text('${_i(d['pending'])} pending · confirmed after ${_i(d['confirmDays'])} days', style: const TextStyle(color: Colors.white60, fontSize: 12)),
+            ])),
+          ])),
       const SizedBox(height: 14),
       SizedBox(
-        height: 290,
+        height: 470,
         child: PageView(controller: PageController(viewportFraction: .78), padEnds: false, children: [
-          _pad(PMeditationCard(
+          _pad(_medCard(0,
               key: const Key('partner.card.target'),
               icon: Icons.self_improvement,
               title: next == null ? 'Top level reached' : 'Next: ${next['title']}',
@@ -530,14 +473,14 @@ class _PartnerHomeState extends State<PartnerHome> {
               onTap: () => go(1),
               onSkip: () =>
                   showPartnerInfo(c, 'Targets', const ['Points come from cleared purchases through your links.', 'Each level unlocks a perk bundle.']))),
-          _pad(PMeditationCard(
+          _pad(_medCard(1,
               key: const Key('partner.card.share'),
               icon: Icons.ios_share,
               title: 'Share your link',
               body: 'Buyers save, you collect perk points.',
               cta: 'Link tools',
               onTap: () => _push(c, const PartnerLinkToolsPage()))),
-          _pad(PMeditationCard(
+          _pad(_medCard(2,
               key: const Key('partner.card.discount'),
               icon: Icons.local_offer_outlined,
               title: 'Buyer discount',
@@ -670,18 +613,19 @@ class PartnerLevelPage extends StatelessWidget {
     return PartnerShell(
       title: '${level['title']}',
       child: ListView(key: const Key('partner.page.level'), padding: const EdgeInsets.all(16), children: [
-        PGlass(
+        NGlass(
+            blur: NTokens.cardBlur,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Level ${_i(level['level'])}', style: const TextStyle(color: Colors.white70)),
-          Text('$confirmed / ${_i(level['points'])} points', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 10),
-          ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(value: v, minHeight: 8, color: Colors.white, backgroundColor: Colors.white24)),
-          const SizedBox(height: 14),
-          const Text('Perks at this level', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-          Text(perkLine(level).isEmpty ? 'No perks listed' : perkLine(level), style: const TextStyle(color: Colors.white70)),
-        ])),
+              Text('Level ${_i(level['level'])}', style: const TextStyle(color: Colors.white70)),
+              Text('$confirmed / ${_i(level['points'])} points', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+              ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(value: v, minHeight: 8, color: Colors.white, backgroundColor: Colors.white24)),
+              const SizedBox(height: 14),
+              const Text('Perks at this level', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+              Text(perkLine(level).isEmpty ? 'No perks listed' : perkLine(level), style: const TextStyle(color: Colors.white70)),
+            ])),
         const SizedBox(height: 12),
         PTicket(
             icon: Icons.ios_share,
@@ -729,9 +673,10 @@ class _LinkToolsState extends State<PartnerLinkToolsPage> {
       });
       await showShareSheet(context, url, title);
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.maybeOf(context)
             ?.showSnackBar(SnackBar(content: Text(_isOffline(e) ? 'You are offline. Try again when connected.' : 'Could not make a link')));
+      }
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -741,33 +686,34 @@ class _LinkToolsState extends State<PartnerLinkToolsPage> {
   Widget build(BuildContext context) => PartnerShell(
         title: 'Link tools',
         child: ListView(key: const Key('partner.page.links'), padding: const EdgeInsets.all(16), children: [
-          PGlass(
+          NGlass(
+              blur: NTokens.cardBlur,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('What do you want to share?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-            const SizedBox(height: 10),
-            Wrap(spacing: 8, children: [
-              for (final k in const ['app', 'word', 'plan'])
-                PPillButton(k[0].toUpperCase() + k.substring(1), key: Key('partner.kind.$k'), light: kind == k, onTap: () => setState(() => kind = k)),
-            ]),
-            if (kind != 'app')
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: TextField(
-                    key: const Key('partner.linkField'),
-                    controller: c,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                        hintText: kind == 'word' ? 'Word, e.g. Serenity' : 'Plan, e.g. Plus',
-                        hintStyle: const TextStyle(color: Colors.white54),
-                        filled: true,
-                        fillColor: Colors.white10,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none))),
-              ),
-            const SizedBox(height: 12),
-            Align(
-                alignment: Alignment.centerRight,
-                child: busy ? const CircularProgressIndicator(color: Colors.white) : PPillButton('Make link', key: const Key('partner.make'), onTap: make)),
-          ])),
+                const Text('What do you want to share?', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
+                const SizedBox(height: 10),
+                Wrap(spacing: 8, children: [
+                  for (final k in const ['app', 'word', 'plan'])
+                    PPillButton(k[0].toUpperCase() + k.substring(1), key: Key('partner.kind.$k'), light: kind == k, onTap: () => setState(() => kind = k)),
+                ]),
+                if (kind != 'app')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: TextField(
+                        key: const Key('partner.linkField'),
+                        controller: c,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                            hintText: kind == 'word' ? 'Word, e.g. Serenity' : 'Plan, e.g. Plus',
+                            hintStyle: const TextStyle(color: Colors.white54),
+                            filled: true,
+                            fillColor: Colors.white10,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none))),
+                  ),
+                const SizedBox(height: 12),
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: busy ? const CircularProgressIndicator(color: Colors.white) : PPillButton('Make link', key: const Key('partner.make'), onTap: make)),
+              ])),
           _sectionLabel('Your links this session'),
           if (made.isEmpty) const Text('No links yet. Make one above.', style: TextStyle(color: Colors.white60)),
           for (final m in made) PTicket(icon: Icons.link, kicker: m.$2, title: m.$1, link: 'Copy or share', onTap: () => showShareSheet(context, m.$2, m.$1)),
@@ -799,7 +745,8 @@ class PartnerDiscountPage extends StatelessWidget {
             kicker: 'Plans (Google Play offer)',
             title: '${_i(fd['subscriptionPct'])}% off the first period',
             tags: const [PTag('Plan', color: Color(0xFFC08BFF))]),
-        PGlass(
+        NGlass(
+            blur: NTokens.cardBlur,
             child: Text(
                 'Example: on a ${PartnerData.money(example)} word your buyer saves ${PartnerData.money(save)}. Prices show in the buyer\'s local currency. Partner points count on what they actually paid.',
                 key: const Key('partner.discount.example'),
@@ -821,10 +768,14 @@ class PartnerActivityPage extends StatelessWidget {
       child: ListView(key: const Key('partner.page.activity'), padding: const EdgeInsets.all(16), children: [
         Row(children: [
           Expanded(
-              child: PGlass(child: Text('Word track\n${_i(tracks['word'])} pts', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)))),
+              child: NGlass(
+                  blur: NTokens.cardBlur,
+                  child: Text('Word track\n${_i(tracks['word'])} pts', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)))),
           const SizedBox(width: 10),
           Expanded(
-              child: PGlass(child: Text('Plan track\n${_i(tracks['plan'])} pts', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)))),
+              child: NGlass(
+                  blur: NTokens.cardBlur,
+                  child: Text('Plan track\n${_i(tracks['plan'])} pts', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)))),
         ]),
         _sectionLabel('Recent'),
         if (recent.isEmpty)
@@ -857,11 +808,12 @@ class PartnerRulesPage extends StatelessWidget {
   Widget build(BuildContext context) => PartnerShell(
         title: 'Partner rules',
         child: ListView(key: const Key('partner.page.rules'), padding: const EdgeInsets.all(16), children: [
-          PGlass(
+          NGlass(
+              blur: NTokens.cardBlur,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            for (var i = 0; i < rules.length; i++)
-              Padding(padding: const EdgeInsets.only(bottom: 10), child: Text('${i + 1}.  ${rules[i]}', style: const TextStyle(color: Colors.white70))),
-          ])),
+                for (var i = 0; i < rules.length; i++)
+                  Padding(padding: const EdgeInsets.only(bottom: 10), child: Text('${i + 1}.  ${rules[i]}', style: const TextStyle(color: Colors.white70))),
+              ])),
           const SizedBox(height: 12),
           PPillButton('Replay the guide', key: const Key('partner.replayGuide'), onTap: () => PartnerGuide.show(context)),
         ]),
@@ -872,7 +824,7 @@ class PartnerBoard extends StatelessWidget {
   const PartnerBoard({super.key});
   @override
   Widget build(BuildContext context) => PartnerData.board == null
-      ? const PGlass(child: SellersBoard())
+      ? const NGlass(blur: NTokens.cardBlur, child: SellersBoard())
       : SizedBox(
           height: 520,
           child: PLoad(
@@ -897,3 +849,26 @@ class PartnerBoard extends StatelessWidget {
           ),
         );
 }
+
+Widget _medCard(int index,
+        {Key? key,
+        required IconData icon,
+        required String title,
+        required String body,
+        required String cta,
+        required VoidCallback onTap,
+        VoidCallback? onSkip}) =>
+    MeditationCard(
+      key: key,
+      title: title,
+      subtitle: body,
+      circle: ColoredBox(color: Colors.white.withValues(alpha: .12), child: Center(child: Icon(icon, color: Colors.white, size: 56))),
+      cta: cta,
+      onCta: onTap,
+      secondary: onSkip == null ? null : 'Info',
+      onSkip: onSkip,
+      dots: 3,
+      dotIndex: index,
+      statusBar: false,
+      homeBar: false,
+    );
