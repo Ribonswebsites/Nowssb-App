@@ -154,7 +154,10 @@ void main() {
     expect(hits, ['home', 'settings']);
   });
 
-  group('screenshots', () {
+  // Goldens are machine-specific (fonts, blur). Recorded on the shared box;
+  // skipped on CI runners (CI=true) and tagged so they can be run alone:
+  // flutter test --tags golden
+  group('screenshots', skip: Platform.environment['CI'] == 'true' ? 'goldens are box-only' : null, () {
     setUp(() async {});
     Future<void> settings(WidgetTester t) async {
       await t.runAsync(_fonts);
@@ -162,7 +165,7 @@ void main() {
       await t.pumpWidget(_wrap(MsSettingsPage(actions: _Fake().actions, showGuide: false)));
     }
 
-    testWidgets('1 menu', (t) async {
+    testWidgets('1 menu', tags: 'golden', (t) async {
       await t.runAsync(_fonts);
       await t.binding.setSurfaceSize(const Size(412, 892));
       MsEntry e(String id, IconData i, String s) => MsEntry(id, i, id, s, () {});
@@ -173,27 +176,27 @@ void main() {
       ])));
       await _shot(t, '1');
     });
-    testWidgets('2 settings', (t) async {
+    testWidgets('2 settings', tags: 'golden', (t) async {
       await settings(t);
       await _shot(t, '2');
     });
-    testWidgets('3 settings privacy', (t) async {
+    testWidgets('3 settings privacy', tags: 'golden', (t) async {
       await settings(t);
       await t.drag(find.byType(Scrollable).first, const Offset(0, -600));
       await t.pumpAndSettle();
       await _shot(t, '3');
     });
-    testWidgets('4 look', (t) async {
+    testWidgets('4 look', tags: 'golden', (t) async {
       await settings(t);
       await _tap(t, 'ms_look');
       await _shot(t, '4');
     });
-    testWidgets('5 storage', (t) async {
+    testWidgets('5 storage', tags: 'golden', (t) async {
       await settings(t);
       await _tap(t, 'ms_data');
       await _shot(t, '5');
     });
-    testWidgets('6 guide', (t) async {
+    testWidgets('6 guide', tags: 'golden', (t) async {
       await t.runAsync(_fonts);
       await t.binding.setSurfaceSize(const Size(412, 892));
       SharedPreferences.setMockInitialValues({});

@@ -99,9 +99,11 @@ class MsSection extends StatelessWidget {
   final List<Widget> rows;
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 14),
+        padding: const EdgeInsets.only(bottom: 22),
         child: NGlass(
           blur: kMsBlur,
+          // Low elevation: the kit glow spread into the neighbouring card.
+          elevation: .35,
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
