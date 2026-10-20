@@ -1,11 +1,11 @@
 // Earn UI pieces in Ribon's approved design: frosted meditation card and
 // frosted ticket card, on the app's original background video.
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
-const kEarnVideo = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b.mp4';
+import '../../../nowssb_ui/app_video_backdrop.dart';
+
 const kEarnPoster = 'assets/video/7e4d709136dc254a_grok_video_2026-07-18-15-53-02_ubjx5b-poster.webp';
 
 /// Round photos: the app's own video posters (no new art).
@@ -23,47 +23,18 @@ const kInk = Colors.white;
 const kGrey = Color(0xB3FFFFFF);
 const kMint = Color(0xFF7FE7D6);
 
-class EarnBackground extends StatefulWidget {
+/// The app's original background (shared kit [NAppBackdrop], the same video
+/// as every page). The old Earn-only video had a warm sunset on its right
+/// side that the cards' backdrop blur smeared into a yellow-red blob.
+class EarnBackground extends StatelessWidget {
   const EarnBackground({super.key, required this.child});
   final Widget child;
   @override
-  State<EarnBackground> createState() => _EarnBackgroundState();
-}
-
-class _EarnBackgroundState extends State<EarnBackground> {
-  VideoPlayerController? _c;
-
-  @override
-  void initState() {
-    super.initState();
-    if (earnNoVideo) return;
-    final c = VideoPlayerController.asset(kEarnVideo, videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true));
-    _c = c;
-    c.setLooping(true);
-    c.setVolume(0);
-    c.initialize().then((_) {
-      if (mounted) setState(c.play);
-    }).catchError((_) {});
-  }
-
-  @override
-  void dispose() {
-    _c?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = _c;
-    return Stack(fit: StackFit.expand, children: [
-      if (!earnNoVideo) Image.asset(kEarnPoster, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF14102A))),
-      if (earnNoVideo) const ColoredBox(color: Color(0xFF241C4A)),
-      if (c != null && c.value.isInitialized)
-        FittedBox(fit: BoxFit.cover, child: SizedBox(width: c.value.size.width, height: c.value.size.height, child: VideoPlayer(c))),
-      const ColoredBox(color: Color(0x55000000)),
-      widget.child,
-    ]);
-  }
+  Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
+        const NAppBackdrop(),
+        const ColoredBox(color: Color(0x40000000)),
+        child,
+      ]);
 }
 
 /// Frosted translucent glass with a soft white border and large radius.
@@ -78,33 +49,109 @@ class Frost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = BorderRadius.circular(radius);
-    return ClipRRect(
-      borderRadius: r,
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: r,
-            child: Ink(
-              padding: padding,
-              decoration: BoxDecoration(
-                borderRadius: r,
-                border: Border.all(color: const Color(0x55FFFFFF)),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [(tint ?? Colors.white).withValues(alpha: .24), (tint ?? Colors.white).withValues(alpha: .08)],
-                ),
-              ),
-              child: child,
-            ),
+    final t = tint ?? Colors.white;
+    return Pressable(
+      onTap: onTap,
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          borderRadius: r,
+          border: Border.all(color: const Color(0x4DFFFFFF)),
+          // Even, cool frost with a dark base so text reads over any frame.
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color.alphaBlend(t.withValues(alpha: .18), const Color(0x8C1A1530)), Color.alphaBlend(t.withValues(alpha: .06), const Color(0x991A1530))],
           ),
+          boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 18, offset: Offset(0, 8))],
         ),
+        child: child,
       ),
     );
   }
+}
+
+/// Scales down a touch on press; plain when reduced motion is on.
+class Pressable extends StatefulWidget {
+  const Pressable({super.key, required this.child, this.onTap});
+  final Widget child;
+  final VoidCallback? onTap;
+  @override
+  State<Pressable> createState() => _PressableState();
+}
+
+class _PressableState extends State<Pressable> {
+  bool _down = false;
+  @override
+  Widget build(BuildContext context) {
+    if (widget.onTap == null) return widget.child;
+    final still = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => setState(() => _down = true),
+        onTapCancel: () => setState(() => _down = false),
+        onTapUp: (_) => setState(() => _down = false),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          widget.onTap!();
+        },
+        child: AnimatedScale(scale: _down && !still ? .97 : 1, duration: const Duration(milliseconds: 120), child: widget.child),
+      ),
+    );
+  }
+}
+
+/// Fade + rise in, staggered by [index]. Instant under reduced motion.
+class Entrance extends StatelessWidget {
+  const Entrance({super.key, required this.index, required this.child});
+  final int index;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.maybeOf(context)?.disableAnimations ?? false) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 420 + 60 * index.clamp(0, 8)),
+      curve: Curves.easeOutCubic,
+      builder: (_, v, c) => Opacity(opacity: v, child: Transform.translate(offset: Offset(0, 18 * (1 - v)), child: c)),
+      child: child,
+    );
+  }
+}
+
+/// Progress ring with a value in the middle.
+class ProgressRing extends StatelessWidget {
+  const ProgressRing({super.key, required this.value, required this.color, required this.center, this.size = 60});
+  final double value;
+  final Color color;
+  final Widget center;
+  final double size;
+  @override
+  Widget build(BuildContext context) {
+    final still = MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    return SizedBox.square(
+      dimension: size,
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: still ? value : 0, end: value),
+        duration: const Duration(milliseconds: 900),
+        curve: Curves.easeOutCubic,
+        builder: (_, v, __) => Stack(alignment: Alignment.center, children: [
+          SizedBox.expand(child: CircularProgressIndicator(value: v, strokeWidth: 5, backgroundColor: Colors.white12, valueColor: AlwaysStoppedAnimation(color))),
+          center,
+        ]),
+      ),
+    );
+  }
+}
+
+/// Money in the balance's own currency, formatted for the user's locale.
+/// Empty currency means the server sent none: show the number only.
+String earnMoney(BuildContext context, num amount, String currency) {
+  final locale = Localizations.maybeLocaleOf(context)?.toString();
+  if (currency.isEmpty) return NumberFormat.decimalPattern(locale).format(amount);
+  return NumberFormat.simpleCurrency(locale: locale, name: currency).format(amount);
 }
 
 class WhitePill extends StatelessWidget {

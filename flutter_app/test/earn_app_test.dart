@@ -14,9 +14,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 final _summary = <String, dynamic>{
   'enabled': true,
   'standing': {'title': 'Officer', 'metal': 'Silver', 'ratePct': 22},
+  'ranks': [{'title': 'Officer', 'metal': 'Silver', 'minWords': 100, 'ratePct': 22}, {'title': 'Executive Officer I', 'metal': 'Gold', 'minWords': 500, 'ratePct': 30}],
+  'balances': {'lifetimeINR': 1250, 'pendingINR': 250, 'availableINR': 1000},
   'words': 240,
   'targets': [
-    {'words': 100}, {'words': 500}, {'words': 1000}, {'words': 2000},
+    {'words': 100, 'coins': 300, 'coupon': 'rare'}, {'words': 500, 'coins': 1000, 'coupon': 'epic'}, {'words': 1000}, {'words': 2000}, {'words': 3000},
   ],
   'team': [
     {'uid': 'a', 'name': 'Asha', 'rank': 'Officer', 'words': 112, 'level': 1},
@@ -82,11 +84,20 @@ void main() {
     addTearDown(t.view.reset);
   }
 
+  test('zero rate never shows 0%', () {
+    final d = EarnData.fromSummary({'standing': {'title': 'Assistant Officer', 'ratePct': 0}, 'words': 0, 'targets': [{'words': 100}]});
+    expect(d.ratePct, 0);
+    expect(d.next!.words, 100);
+  });
+
   test('summary maps honestly', () {
     final d = EarnData.fromSummary(_summary);
     expect(d.rank, 'Officer');
     expect(d.next!.words, 500);
     expect(d.progress, closeTo(140 / 400, 1e-9));
+    expect(d.nextRank!.title, 'Executive Officer I');
+    expect(d.currency, 'INR');
+    expect(d.earned, 1250);
     expect(d.direct.length, 2);
     expect(d.second.length, 1);
     expect(EarnData.fromSummary(const {}).targets, isEmpty);
@@ -99,7 +110,9 @@ void main() {
     await t.pumpWidget(_app(const EarnApp()));
     await t.pump();
     expect(find.text('Officer'), findsWidgets);
-    expect(find.text('260 more words to 500'), findsOneWidget);
+    expect(find.text('260 more words to reach 500.'), findsOneWidget);
+    expect(find.textContaining('Next rank: Executive Officer I'), findsOneWidget);
+    expect(find.textContaining('22%'), findsWidgets);
     await _shot(t, 'earn-1');
     await t.tap(find.byKey(const Key('earn-tab-1')));
     await t.pump();
@@ -108,16 +121,17 @@ void main() {
     await t.tap(find.byKey(const Key('earn-target-500')));
     await t.pump(const Duration(milliseconds: 400));
     expect(find.textContaining('Sell 260 more words'), findsOneWidget);
+    await _shot(t, 'earn-3');
     await t.tap(find.text('Close'));
     await t.pump(const Duration(milliseconds: 400));
     await t.tap(find.byKey(const Key('earn-tab-2')));
     await t.pump();
     expect(find.text('2 direct · 1 level 2'), findsOneWidget);
-    await _shot(t, 'earn-3');
+    await _shot(t, 'earn-4');
     await t.tap(find.byKey(const Key('earn-member-a')));
     await t.pump(const Duration(milliseconds: 400));
     expect(find.textContaining('Words sold: 112'), findsOneWidget);
-    await _shot(t, 'earn-4');
+    await _shot(t, 'earn-6');
     await t.tap(find.text('Close'));
     await t.pump(const Duration(milliseconds: 400));
     await t.tap(find.byKey(const Key('earn-tab-3')));
@@ -133,7 +147,7 @@ void main() {
     await t.pump();
     await t.pump(const Duration(milliseconds: 400));
     expect(find.text('Join as an agent'), findsOneWidget);
-    await _shot(t, 'earn-6');
+    await _shot(t, 'earn-7');
     await t.tap(find.text('Next'));
     await t.pump(const Duration(milliseconds: 300));
     expect(find.text('Sell words and plans'), findsOneWidget);
@@ -150,11 +164,11 @@ void main() {
     await t.pump(const Duration(milliseconds: 400));
     await t.tap(find.text('Germany').last);
     await t.pump(const Duration(milliseconds: 400));
-    await _shot(t, 'earn-7');
+    await _shot(t, 'earn-8');
     await t.tap(find.text('Continue'));
     await t.pump(const Duration(milliseconds: 400));
     expect(find.textContaining('Payouts for Germany open when'), findsOneWidget);
-    await _shot(t, 'earn-8');
+    await _shot(t, 'earn-9');
   });
 
   testWidgets('invite pop-up and states', (t) async {
@@ -163,7 +177,7 @@ void main() {
     await t.pumpWidget(_app(const EarnApp()));
     await t.pump();
     expect(find.byKey(const Key('earn-offline')), findsOneWidget);
-    await _shot(t, 'earn-9');
+    await _shot(t, 'earn-10');
     earnLoader = () async => const EarnData(load: EarnLoad.error, message: 'Boom');
     await t.tap(find.text('Try again'));
     await t.pump();
@@ -174,6 +188,6 @@ void main() {
     await t.tap(find.byKey(const Key('earn-tab-2')));
     await t.pump();
     expect(find.byKey(const Key('earn-team-empty')), findsOneWidget);
-    await _shot(t, 'earn-10');
+    await _shot(t, 'earn-11');
   });
 }

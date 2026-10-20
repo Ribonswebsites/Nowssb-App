@@ -5,10 +5,21 @@ import '../../economy/economy_api.dart';
 enum EarnLoad { loading, ready, error, offline, signedOut }
 
 class EarnTarget {
-  const EarnTarget(this.words, this.reached, this.title);
+  const EarnTarget(this.words, this.reached, this.title, {this.coins = 0, this.coupon = '', this.cash = 0});
   final int words;
   final bool reached;
   final String title;
+  final int coins;
+  final String coupon;
+
+  /// Bonus money in [EarnData.currency] units (0 = none / unknown).
+  final num cash;
+}
+
+class EarnRank {
+  const EarnRank(this.title, this.metal, this.minWords, this.ratePct);
+  final String title, metal;
+  final int minWords, ratePct;
 }
 
 class EarnMember {
@@ -35,7 +46,23 @@ class EarnData {
     this.team = const [],
     this.invites = const [],
     this.payoutCountry = '',
+    this.ranks = const [],
+    this.currency = '',
+    this.earned = 0,
+    this.pending = 0,
+    this.available = 0,
   });
+  final List<EarnRank> ranks;
+  final String currency;
+  final num earned, pending, available;
+
+  /// The next rank above the current one, from the server's ladder.
+  EarnRank? get nextRank {
+    for (final r in ranks) {
+      if (r.minWords > words) return r;
+    }
+    return null;
+  }
   final EarnLoad load;
   final String message;
   final bool enabled;
@@ -51,10 +78,18 @@ class EarnData {
     final words = (s['words'] as num?)?.toInt() ?? 0;
     List<Map> list(String k) => (s[k] is List ? s[k] as List : const []).whereType<Map>().toList();
     final targets = list('targets')
-        .map((t) => EarnTarget((t['words'] as num?)?.toInt() ?? 0, t['reached'] == true || words >= ((t['words'] as num?) ?? 1 << 30), '${t['title'] ?? ''}'))
+        .map((t) => EarnTarget((t['words'] as num?)?.toInt() ?? 0, t['reached'] == true || words >= ((t['words'] as num?) ?? 1 << 30), '${t['title'] ?? ''}',
+            coins: (t['coins'] as num?)?.toInt() ?? 0, coupon: '${t['coupon'] ?? ''}', cash: (t['cash'] ?? t['cashINR'] ?? 0) as num))
         .where((t) => t.words > 0)
         .toList()
       ..sort((a, b) => a.words.compareTo(b.words));
+    final bal = s['balances'] is Map ? s['balances'] as Map : const {};
+    // The server still names INR fields; [currency] says what unit they are.
+    final currency = '${bal['currency'] ?? (bal.containsKey('lifetimeINR') ? 'INR' : '')}';
+    final ranks = list('ranks')
+        .map((r) => EarnRank('${r['title'] ?? ''}', '${r['metal'] ?? ''}', (r['minWords'] as num?)?.toInt() ?? 0, (r['ratePct'] as num?)?.round() ?? 0))
+        .toList()
+      ..sort((a, b) => a.minWords.compareTo(b.minWords));
     final pa = s['payoutAccount'] is Map ? s['payoutAccount'] as Map : const {};
     return EarnData(
       load: EarnLoad.ready,
@@ -76,6 +111,11 @@ class EarnData {
       ],
       invites: [for (final i in list('invites')) EarnInvite('${i['id'] ?? ''}', '${i['rank'] ?? ''}', '${i['fromName'] ?? 'A NowssB officer'}')],
       payoutCountry: '${pa['country'] ?? ''}',
+      ranks: ranks,
+      currency: currency,
+      earned: (bal['lifetime'] ?? bal['lifetimeINR'] ?? 0) as num,
+      pending: (bal['pending'] ?? bal['pendingINR'] ?? 0) as num,
+      available: (bal['available'] ?? bal['availableINR'] ?? 0) as num,
     );
   }
 
