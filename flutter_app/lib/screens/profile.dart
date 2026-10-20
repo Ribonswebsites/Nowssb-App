@@ -39,6 +39,8 @@ import '../widgets/app_thinking_loader.dart';
 import 'app_settings.dart';
 import 'auth_gate.dart';
 import 'saved_words.dart';
+import 'profile_parts/edit_profile.dart';
+import 'profile_parts/profile_guide.dart';
 import 'sound_library.dart';
 import '../features/notifications/inbox_screen.dart';
 import 'progress/progress_screen.dart';
@@ -112,6 +114,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TimeOfDay _reminder = const TimeOfDay(hour: 7, minute: 0);
   bool _loading = true;
   bool _recentOpen = false;
+  bool _guide = false;
+  String _mottoText = '';
   int _face = 0;
   int _chip = 0;
   int _prog = 0;
@@ -191,7 +195,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _avatarUrl = _prefs.getString('nwsb_local_photo');
     final localPath = _prefs.getString('nwsb_photo_path');
     if (localPath != null && File(localPath).existsSync()) _photo = File(localPath);
-    if (mounted) setState(() => _loading = false);
+    _mottoText = _prefs.getString('nowssb_motto') ?? '';
+    final showGuide = await ProfileGuide.shouldShow();
+    if (mounted) setState(() { _loading = false; _guide = showGuide; });
+  }
+
+  Future<void> _openEditProfile() async {
+    final res = await Navigator.of(context).push<EditProfileResult>(MaterialPageRoute(
+      builder: (_) => EditProfileScreen(name: _nameController.text, motto: _mottoText, avatar: _avatarBubble(), onChangePhoto: _openPhotoChoices),
+    ));
+    if (res == null || !mounted) return;
+    _nameController.text = res.name;
+    _mottoText = res.motto;
+    await _prefs.setString('nowssb_name', res.name);
+    await _prefs.setString('nowssb_motto', res.motto);
+    if (!mounted) return;
+    setState(() {});
+    _showToast('Profile saved');
+    await _saveAccountName(res.name);
+  }
+
+  Future<void> _replayGuide() async {
+    await ProfileGuide.reset();
+    if (mounted) setState(() => _guide = true);
   }
 
   @override
@@ -519,6 +545,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
             if (_recentOpen) _recentSheet(),
+            if (_guide) Positioned.fill(child: ProfileGuide(onDone: () => setState(() => _guide = false))),
           ],
         ),
       ),
@@ -1315,9 +1342,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 26, color: _accent)), const SizedBox(width: 8), const EditableLabel('profile.ProfileScreen', 'MY MOTTO', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _dim, fontWeight: FontWeight.w600))]),
           const SizedBox(height: 16),
-          const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
+          if (_mottoText.isNotEmpty) FractionallySizedBox(widthFactor: .8, child: Text(_mottoText, style: const TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))) else const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', _durationText, 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21)))]),
+          Row(children: [Expanded(child: InkWell(onTap: () => _stepDuration(15), child: _compactQuick('Practice', _durationText, 15))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: _pickReminder, child: _compactQuick('Reminder', _reminderText, 17))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21))))]),
         ]),
       );
 
@@ -1402,6 +1429,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _account() => ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) => _sectionList('Account', [
+          InkWell(key: const Key('profile-edit-row'), onTap: _openEditProfile, child: _listRow('Edit profile', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
+          InkWell(onTap: () => _openQuick('Saved'), child: _listRow('Saved words', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
+          InkWell(onTap: () => _openQuick('Settings'), child: _listRow('Settings', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
+          InkWell(onTap: () => setState(() => _recentOpen = true), child: _listRow('Activity library', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
+          InkWell(key: const Key('profile-guide-row'), onTap: _replayGuide, child: _listRow('Show guide again', trailing: const Icon(Icons.help_outline, color: _dim, size: 18))),
           _listRow('Member Since', trailing: Text(_memberSince, style: const TextStyle(fontSize: 13, color: _dim))),
           _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
         ]),
