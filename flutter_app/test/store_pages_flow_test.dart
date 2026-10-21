@@ -39,6 +39,9 @@ void main() {
   tearDown(VideoPool.instance.debugDropAll);
 
   testWidgets('Store home renders offline with title, bag and guide button', (t) async {
+    t.view.physicalSize = const Size(1170, 2532);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
     await t.pumpWidget(const MaterialApp(home: StoreScreen()));
     await _settle(t);
     expect(find.text('NowssB Store'), findsWidgets);
@@ -48,6 +51,9 @@ void main() {
   });
 
   testWidgets('Meaning Store renders offline without crashing', (t) async {
+    t.view.physicalSize = const Size(1170, 2532);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
     await t.pumpWidget(const MaterialApp(home: MeaningStoreScreen()));
     await t.pump();
     expect(find.byType(MeaningStoreScreen), findsOneWidget);
@@ -59,6 +65,9 @@ void main() {
   });
 
   testWidgets('meaning detail opens with title and price page', (t) async {
+    t.view.physicalSize = const Size(1170, 2532);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
     const m = MsMeaning(word: 'Om', key: 'om', root: 'Sanskrit', category: 'Sacred', price: 49, img: '');
     await t.pumpWidget(MaterialApp(
       home: Builder(

@@ -9,6 +9,9 @@ Widget _host() => const MaterialApp(
 
 void main() {
   testWidgets('guide shows once, steps through, and stays dismissed', (t) async {
+    t.view.physicalSize = const Size(1170, 2532);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
     SharedPreferences.setMockInitialValues({});
     await t.pumpWidget(_host());
     await t.pumpAndSettle();
