@@ -57,7 +57,6 @@ void main() {
       for (final path in [
         'lib/screens/store/word_atelier.dart',
         'lib/screens/store/meaning_store.dart',
-        'lib/screens/store/signature_store.dart',
         'lib/screens/store/ebooks_store.dart',
       ]) {
         final src = File(path).readAsStringSync();
