@@ -32,6 +32,11 @@ Map<String, Object> _seed({bool guideSeen = true}) {
 }
 
 var practiced = 0;
+final _ov = find.descendant(of: find.byKey(const ValueKey('progress-overview')), matching: find.byType(Scrollable)).first;
+Future<void> _reveal(WidgetTester t, Finder f) async {
+  await t.scrollUntilVisible(f, 150, scrollable: _ov);
+  await t.pumpAndSettle();
+}
 Widget _app() => MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Roboto', brightness: Brightness.dark),
@@ -74,26 +79,70 @@ void main() {
     await t.pumpAndSettle();
     await t.tap(find.byKey(const ValueKey('progress-tab-0')));
     await t.pumpAndSettle();
+    await _reveal(t, find.text('YOUR NUMBERS'));
+    await t.pumpAndSettle();
     await t.tap(find.text('YOUR NUMBERS'));
     await t.pumpAndSettle();
     expect(find.text('MOST PRACTICED'), findsOneWidget);
     expect(find.text('2×'), findsOneWidget); // Calm twice
     await t.tap(find.byTooltip('Back'));
     await t.pumpAndSettle();
+    await t.scrollUntilVisible(find.text('Details'), -150, scrollable: _ov);
+    await t.pumpAndSettle();
     await t.tap(find.text('Details'));
     await t.pumpAndSettle();
-    expect(find.text('4 day streak'), findsOneWidget);
+    expect(find.text('4 day streak'), findsWidgets);
     expect(find.text('LAST 28 DAYS'), findsOneWidget);
     await t.tap(find.byTooltip('Back'));
     await t.pumpAndSettle();
     final todayIdx = (DateTime.now().weekday + 6) % 7;
+    await _reveal(t, find.byKey(ValueKey('progress-day-$todayIdx')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(ValueKey('progress-day-$todayIdx')));
     await t.pumpAndSettle();
     expect(find.text('Today'), findsWidgets);
     await t.tapAt(const Offset(20, 20));
     await t.pumpAndSettle();
+    await t.scrollUntilVisible(find.text('Practice'), -150, scrollable: _ov);
+    await t.pumpAndSettle();
     await t.tap(find.text('Practice'));
     expect(practiced, 1);
+  });
+
+  testWidgets('Home-style decks: real data, arrows, snapping cards and badges', (t) async {
+    await _phone(t);
+    SharedPreferences.setMockInitialValues(_seed());
+    await t.pumpWidget(_app());
+    await t.pumpAndSettle();
+    expect(find.text('NowssB'), findsOneWidget); // Home's top bar
+    await _reveal(t, find.textContaining('4 day streak')); // streak banner
+    for (final k in ['deck-streaks', 'deck-history', 'deck-milestones']) {
+      await _reveal(t, find.byKey(ValueKey(k)));
+      expect(find.byKey(ValueKey(k)), findsOneWidget);
+    }
+    await t.scrollUntilVisible(find.textContaining('4 sessions'), -150, scrollable: _ov); // history banner
+    await t.pumpAndSettle();
+    // History deck: snap to the next card, then open its day pop-up.
+    final hist = find.byKey(const ValueKey('deck-history'));
+    await _reveal(t, hist);
+    await t.pumpAndSettle();
+    final pv = find.descendant(of: hist, matching: find.byType(PageView));
+    await t.drag(pv, const Offset(-300, 0));
+    await t.pumpAndSettle();
+    expect(find.descendant(of: hist, matching: find.text('Focus')), findsOneWidget);
+    // Milestone arrow switches to the Milestones tab.
+    await _reveal(t, find.byTooltip('Open Milestones'));
+    await t.pumpAndSettle();
+    await t.tap(find.byTooltip('Open Milestones'));
+    await t.pumpAndSettle();
+    expect(find.text('First sit'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('progress-tab-0')));
+    await t.pumpAndSettle();
+    await _reveal(t, find.byTooltip('Open History'));
+    await t.pumpAndSettle();
+    await t.tap(find.byTooltip('Open History'));
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('deck-history')), findsNothing);
   });
 
   testWidgets('first-use guide shows once, steps through and is remembered', (t) async {
@@ -118,9 +167,9 @@ void main() {
     expect(find.byKey(const ValueKey('progress-guide')), findsNothing);
   });
 
-  // Screenshots: 1 overview, 2 history, 3 milestones, 4 streak, 5 stats, 6 guide, 7 empty.
-  for (final n in [1, 2, 3, 4, 5, 6, 7]) {
-    testWidgets('progress-complete shot $n', (t) async {
+  // Screenshots: 1 overview, 2 history, 3 milestones, 4 streak, 5 stats, 6 guide, 7 empty, 8 history deck, 9 milestones deck.
+  for (final n in [1, 2, 3, 4, 5, 6, 8, 9, 7]) {
+    testWidgets('progress-home shot $n', (t) async {
       await _phone(t);
       SharedPreferences.setMockInitialValues(_seed(guideSeen: n != 6));
       if (n == 7) await PracticeProgress.instance.clearAll();
@@ -131,7 +180,15 @@ void main() {
       if (n == 2) await t.tap(find.byKey(const ValueKey('progress-tab-1')));
       if (n == 3) await t.tap(find.byKey(const ValueKey('progress-tab-2')));
       if (n == 4) await t.tap(find.text('Details'));
-      if (n == 5) await t.tap(find.text('YOUR NUMBERS'));
+      if (n == 5) {
+        await _reveal(t, find.text('YOUR NUMBERS'));
+        await t.pumpAndSettle();
+        await t.tap(find.text('YOUR NUMBERS'));
+      }
+      if (n == 8 || n == 9) {
+        await t.scrollUntilVisible(find.byKey(ValueKey(n == 8 ? 'deck-history' : 'deck-milestones')), 200, scrollable: _ov);
+        await t.drag(_ov, const Offset(0, -260));
+      }
       await t.pumpAndSettle();
       expect(t.takeException(), isNull);
       final dir = Directory('/workspace/screens');
@@ -140,7 +197,7 @@ void main() {
         final b = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
         final img = await b.toImage(pixelRatio: 3.0);
         final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
-        File('${dir.path}/progress-complete-$n.png').writeAsBytesSync(bytes!.buffer.asUint8List());
+        File('${dir.path}/progress-home-$n.png').writeAsBytesSync(bytes!.buffer.asUint8List());
       });
     });
   }
