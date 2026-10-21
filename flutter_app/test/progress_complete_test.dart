@@ -167,12 +167,14 @@ void main() {
     expect(find.byKey(const ValueKey('progress-guide')), findsNothing);
   });
 
-  // Screenshots: 1 overview, 2 history, 3 milestones, 4 streak, 5 stats, 6 guide, 7 empty, 8 history deck, 9 milestones deck.
-  for (final n in [1, 2, 3, 4, 5, 6, 8, 9, 7]) {
+  // Screenshots: 1 overview, 2 history, 3 milestones, 4 streak, 5 stats, 6 guide, 8 history deck, 9 milestones deck (7 empty: progress_empty_shot_test.dart).
+  for (final n in [1, 2, 3, 4, 5, 6, 8, 9]) {
     testWidgets('progress-home shot $n', (t) async {
       await _phone(t);
       SharedPreferences.setMockInitialValues(_seed(guideSeen: n != 6));
-      if (n == 7) await PracticeProgress.instance.clearAll();
+      // PracticeProgress is a process-wide singleton that loads prefs once, so
+      // the empty state lives in its own file (own isolate) and can't leak here.
+      expect(PracticeProgress.instance.totalSessions, 4);
       final key = GlobalKey();
       await t.pumpWidget(RepaintBoundary(key: key, child: _app()));
       await t.runAsync(() => precacheImage((_bg.child as Image).image, key.currentContext!));
