@@ -11,6 +11,7 @@
 library;
 
 import 'store_first_use_guide.dart';
+import '../../nowssb_ui/app_video_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -74,10 +75,11 @@ class MeaningStoreScreen extends StatelessWidget {
         head: 'Meanings described by sound',
         child: PageShell(
         eyebrow: '',
-        title: 'NowssB Store',
+        title: 'Meanings',
         subtitle: 'The Meaning Store',
         film: 'assets/video/subscription-bg.mp4',
-        usePageFilm: true,
+        // Shared app background (Oct 21 style order).
+        background: const NAppBackdrop(),
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,

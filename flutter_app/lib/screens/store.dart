@@ -123,6 +123,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
               ),
             ),
             const SizedBox(width: 8),
+            const StoreGuideButton(),
             const StoreBagBar(),
           ],
         ),
@@ -401,7 +402,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           SafeArea(child: ListView(key: const Key('storeHomeList'), children: shown)),
         ],
       ),
-    ).withStoreGuide();
+    ).withStoreGuide('store_home', false);
   }
 
   static void _push(BuildContext context, Widget page) {
@@ -983,7 +984,8 @@ class _MiniStoreCard extends StatelessWidget {
                       style: const TextStyle(
                           fontSize: 9,
                           letterSpacing: 1.2,
-                          color: Color(0x99FFFFFF))),
+                          fontWeight: FontWeight.w700,
+                          color: NwsbColors.gold)),
                   const SizedBox(height: 3),
                   EditableLabel('store.MiniStoreCard', title,
                       style: const TextStyle(
@@ -997,7 +999,8 @@ class _MiniStoreCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward, size: 16, color: Color(0xB3FFFFFF)),
+            const SizedBox(width: 8),
+            StoreEnterPill(onTap: editing ? null : onTap),
           ],
         ),
       );

@@ -3,6 +3,7 @@
 library;
 
 import 'store_first_use_guide.dart';
+import '../../nowssb_ui/app_video_backdrop.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
@@ -39,10 +40,11 @@ class WordAtelierScreen extends StatelessWidget {
         head: 'Words described by sound',
         child: PageShell(
         eyebrow: '',
-        title: 'NowssB Store',
+        title: 'Words',
         subtitle: 'The Word Atelier',
         film: 'assets/video/subscription-bg.mp4',
-        usePageFilm: true,
+        // Shared app background (Oct 21 style order).
+        background: const NAppBackdrop(),
         onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,

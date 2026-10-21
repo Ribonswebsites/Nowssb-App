@@ -234,3 +234,36 @@ class _SpotlightCard extends StatelessWidget {
         ),
       );
 }
+
+/// Home's white round-arrow "Enter →" pill.
+class StoreEnterPill extends StatelessWidget {
+  const StoreEnterPill({super.key, this.label = 'Enter', this.onTap});
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: label,
+        child: ExcludeSemantics(
+          child: GestureDetector(
+            onTap: onTap,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(label,
+                    style: const TextStyle(color: Color(0xFF0B0B0D), fontSize: 12, fontWeight: FontWeight.w800)),
+                const SizedBox(width: 6),
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF0B0B0D)),
+                  child: const Icon(Icons.arrow_forward, size: 13, color: Colors.white),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      );
+}

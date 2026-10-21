@@ -31,7 +31,11 @@ class StoreFirstUseGuide extends StatefulWidget {
     required this.guideKey,
     required this.child,
     this.steps = storeGuideSteps,
+    this.helpButton = true,
   });
+
+  /// False when the page puts a [StoreGuideButton] in its own header.
+  final bool helpButton;
 
   final String guideKey;
   final Widget child;
@@ -82,6 +86,7 @@ class StoreFirstUseGuideState extends State<StoreFirstUseGuide> {
     final last = _step >= steps.length - 1;
     return Stack(children: [
       widget.child,
+      if (widget.helpButton)
       Positioned(
         bottom: MediaQuery.paddingOf(context).bottom + 96,
         left: 8,
@@ -172,6 +177,22 @@ class StoreFirstUseGuideState extends State<StoreFirstUseGuide> {
 }
 
 extension StoreGuideWrap on Widget {
-  Widget withStoreGuide([String key = 'store_home']) =>
-      StoreFirstUseGuide(guideKey: key, child: this);
+  Widget withStoreGuide([String key = 'store_home', bool helpButton = true]) =>
+      StoreFirstUseGuide(guideKey: key, helpButton: helpButton, child: this);
+}
+
+/// Header "?" that reopens the nearest first-use guide.
+class StoreGuideButton extends StatelessWidget {
+  const StoreGuideButton({super.key});
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: 'Open store guide',
+        child: IconButton(
+          key: const Key('storeGuideHelp'),
+          icon: const Icon(Icons.help_outline_rounded, color: Colors.white70),
+          onPressed: () => context.findAncestorStateOfType<StoreFirstUseGuideState>()?.open(),
+        ),
+      );
 }
