@@ -62,6 +62,7 @@ void main() {
     }
     expect(find.byType(HomeHeader), findsOneWidget);
     expect(find.byKey(const Key('storeGuideHelp')), findsOneWidget, reason: 'guide ? lives in the header');
+    expect(find.bySemanticsLabel('Open store guide'), findsOneWidget);
     expect(src0(), contains('StoreEnterPill('), reason: 'Enter pill on department cards');
     expect(find.byType(StoreCategoryTabs), findsOneWidget);
     for (final l in ['All', 'Words', 'Meanings']) {
@@ -88,7 +89,16 @@ void main() {
       addTearDown(t.view.reset);
       await t.pumpWidget(MaterialApp(home: page));
       await t.runAsync(() async {
-        await Future<void>.delayed(const Duration(milliseconds: 300));
+        await Future<void>.delayed(const Duration(seconds: 3));
+        for (final e in find.byType(Image).evaluate()) {
+          await precacheImage((e.widget as Image).image, e).catchError((_) {});
+        }
+      });
+      for (var i = 0; i < 30; i++) {
+        await t.pump(const Duration(milliseconds: 200));
+      }
+      await t.runAsync(() async {
+        await Future<void>.delayed(const Duration(seconds: 3));
         for (final e in find.byType(Image).evaluate()) {
           await precacheImage((e.widget as Image).image, e).catchError((_) {});
         }
@@ -96,7 +106,10 @@ void main() {
       for (var i = 0; i < 10; i++) {
         await t.pump(const Duration(milliseconds: 200));
       }
-      expect(find.byIcon(Icons.arrow_back), findsWidgets);
+      expect(find.byType(HomeHeader), findsOneWidget);
+      expect(find.bySemanticsLabel('Back'), findsOneWidget);
+      expect(find.bySemanticsLabel('Open store guide'), findsOneWidget);
+      expect(find.bySemanticsLabel('All stores'), findsOneWidget);
       // Screenshot only (animated page; not a pixel gate): --update-goldens.
       if (autoUpdateGoldenFiles) {
         await expectLater(find.byType(page.runtimeType), matchesGoldenFile('goldens/$name-style-1.png'));

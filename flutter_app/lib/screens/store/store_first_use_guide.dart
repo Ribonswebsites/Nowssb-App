@@ -189,6 +189,8 @@ class StoreGuideButton extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
         button: true,
         label: 'Open store guide',
+        excludeSemantics: true,
+        onTap: () => context.findAncestorStateOfType<StoreFirstUseGuideState>()?.open(),
         child: IconButton(
           key: const Key('storeGuideHelp'),
           icon: const Icon(Icons.help_outline_rounded, color: Colors.white70),
