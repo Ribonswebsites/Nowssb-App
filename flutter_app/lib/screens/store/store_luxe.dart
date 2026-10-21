@@ -10,7 +10,7 @@ const kStoreGoldDeep = Color(0xFFB8862B);
 const kStoreGoldGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFFFFE6A3), kStoreGold, kStoreGoldDeep],
+  colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)],
 );
 
 /// Solid gold pill, e.g. "Shop Now".
@@ -132,8 +132,28 @@ class StoreSpotlightPicks extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 8),
             child: Semantics(
               header: true,
-              child: const Text('Spotlight Picks',
-                  style: TextStyle(color: kStoreGold, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: .2)),
+              label: 'Spotlight Picks',
+              child: ExcludeSemantics(
+                child: Row(children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+                    child: const Icon(Icons.auto_awesome, size: 18, color: Color(0xFF0B0B0D)),
+                  ),
+                  const SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0x33000000),
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: const Color(0x33FFFFFF)),
+                    ),
+                    child: const Text('Spotlight Picks',
+                        style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                  ),
+                ]),
+              ),
             ),
           ),
           SizedBox(
@@ -164,8 +184,9 @@ class _SpotlightCard extends StatelessWidget {
           child: Container(
             width: 280,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: const Color(0x99E9C46A)),
+              color: const Color(0xFF0B0B0D),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0x33FFFFFF)),
             ),
             clipBehavior: Clip.antiAlias,
             child: Stack(fit: StackFit.expand, children: [

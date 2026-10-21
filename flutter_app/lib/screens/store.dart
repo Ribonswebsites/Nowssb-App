@@ -7,6 +7,7 @@ library;
 
 import 'store/store_first_use_guide.dart';
 import 'store/store_luxe.dart';
+import '../nowssb_ui/app_video_backdrop.dart';
 import 'store/store_select_sheet.dart';
 import 'store/store_routes.dart';
 import 'fashion/header.dart';
@@ -357,16 +358,8 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       backgroundColor: NwsbColors.deep,
       body: Stack(
         children: [
-          const Positioned.fill(
-            child: NwsbVideo(
-              asset: 'assets/video/normal-glass-background.mp4',
-              priority: ClipPriority.decoration,
-              autoplay: true,
-              loop: true,
-              fit: BoxFit.cover,
-              slot: 'store.StoreHomeContent',
-            ),
-          ),
+          // One shared app background (same source as Home and every page).
+          const Positioned.fill(child: NAppBackdrop()),
           const Positioned.fill(
             child: IgnorePointer(
               child: DecoratedBox(
