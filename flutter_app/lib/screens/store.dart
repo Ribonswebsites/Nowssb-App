@@ -6,6 +6,12 @@
 library;
 
 import 'store/store_first_use_guide.dart';
+import 'store/store_luxe.dart';
+import 'store/store_select_sheet.dart';
+import 'store/store_routes.dart';
+import 'fashion/header.dart';
+import 'app_settings.dart';
+import 'notifications_sheet.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -80,8 +86,20 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          HomeHeader(
+            onSettings: () => _push(context, const AppSettingsScreen()),
+            onNotifications: () => showNotificationsSheet(context),
+            onMenu: () => showStoreSelectSheet(
+              context,
+              current: 'home',
+              onSelect: (id) => openStoreFromPicker(context, id, current: 'home'),
+            ),
+          ),
       Padding(
-        padding: const EdgeInsets.fromLTRB(20, 22, 12, 2),
+        padding: const EdgeInsets.fromLTRB(20, 12, 12, 2),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -107,6 +125,42 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             const StoreBagBar(),
           ],
         ),
+      ),
+          StoreCategoryTabs(categories: [
+            const StoreCategory('All', null),
+            StoreCategory('Words', () => _push(context, const WordAtelierScreen())),
+            StoreCategory('Meanings', () => _push(context, const MeaningStoreScreen())),
+            StoreCategory('Signature', () => _push(context, const SignatureStoreScreen())),
+            StoreCategory('E-books', () => _push(context, const EbooksStoreScreen())),
+            StoreCategory('Plans', () => _push(context, const SubscriptionScreen())),
+          ]),
+          StoreSpotlightPicks(picks: [
+            SpotlightPick(
+              title: 'Word Atelier',
+              sub: 'Own the sound of a word, level by level.',
+              image: 'assets/video/hero-word-store-poster.webp',
+              onTap: () => _push(context, const WordAtelierScreen()),
+            ),
+            SpotlightPick(
+              title: 'Meaning Store',
+              sub: 'Unlock the origin behind each sound.',
+              image: 'assets/video/hero-meaning-store-poster.webp',
+              onTap: () => _push(context, const MeaningStoreScreen()),
+            ),
+            SpotlightPick(
+              title: 'Signature Words',
+              sub: 'Limited signature drops.',
+              image: 'assets/video/signature-store-hero-poster.webp',
+              onTap: () => _push(context, const SignatureStoreScreen()),
+            ),
+            SpotlightPick(
+              title: 'E-books',
+              sub: 'Read deeper on words and sound.',
+              image: 'assets/video/hero-ebooks-poster.webp',
+              onTap: () => _push(context, const EbooksStoreScreen()),
+            ),
+          ]),
+        ],
       ),
       // Resale is paused (both programme PDFs): the Resell tab shows only
       // when an admin turns on config/app flags.resale.
@@ -305,7 +359,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
         children: [
           const Positioned.fill(
             child: NwsbVideo(
-              asset: 'assets/video/subscription-bg.mp4',
+              asset: 'assets/video/normal-glass-background.mp4',
               priority: ClipPriority.decoration,
               autoplay: true,
               loop: true,

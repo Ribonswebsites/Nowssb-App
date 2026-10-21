@@ -1744,7 +1744,8 @@ class StoreViewMoreTap extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0x330C0C0E),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0x22FFFFFF)),
+                border: Border.all(color: const Color(0xAAE9C46A), width: 1.2),
+                boxShadow: const [BoxShadow(color: Color(0x33B8862B), blurRadius: 14)],
               ),
               child: Row(
                 children: [
