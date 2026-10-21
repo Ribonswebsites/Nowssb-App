@@ -42,7 +42,7 @@ void main() {
     await t.pumpWidget(const MaterialApp(home: StoreScreen()));
     await _settle(t);
     expect(find.text('NowssB Store'), findsWidgets);
-    expect(find.bySemanticsLabel('Open store guide'), findsOneWidget);
+    expect(find.byKey(const Key('storeGuideHelp')), findsOneWidget);
     expect(t.takeException(), isNull);
     await _drop(t);
   });
