@@ -13,6 +13,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/practice_progress.dart';
 import 'progress_feedback.dart';
 import '../../widgets/n_motion.dart';
+import '../../widgets/app_backdrop.dart';
+import '../../widgets/black_glass_banner.dart';
+import '../../widgets/home_skin.dart';
+import '../../widgets/routine_deck.dart' show kRoutineArts;
+import '../fashion/header.dart';
 
 const kProgressGuideSeenKey = 'nowssb_progress_guide_seen_v1';
 
@@ -46,8 +51,9 @@ class PgCard extends StatelessWidget {
               padding: padding,
               decoration: BoxDecoration(
                 borderRadius: r,
-                color: const Color(0x1FFFFFFF),
-                border: Border.all(color: const Color(0x52FFFFFF)),
+                // Home's dark glass over the film.
+                color: const Color(0x8C0B0F17),
+                border: Border.all(color: const Color(0x29FFFFFF)),
               ),
               child: child,
             ),
@@ -85,7 +91,8 @@ const _label = TextStyle(color: _dim, fontSize: 11, letterSpacing: 1.4, fontWeig
 /// Original background video (the app's subscription-bg film) plus a soft
 /// dark shade. [backdrop] lets tests and screenshots pass a still frame.
 class PgScaffold extends StatelessWidget {
-  const PgScaffold({super.key, required this.title, required this.body, this.backdrop, this.actions = const []});
+  const PgScaffold({super.key, required this.title, required this.body, this.backdrop, this.actions = const [], this.onSettings});
+  final VoidCallback? onSettings;
   final String title;
   final Widget body;
   final Widget? backdrop;
@@ -93,14 +100,17 @@ class PgScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = backdrop ?? ProgressBackdropScope.of(context);
+    final bg = backdrop ?? ProgressBackdropScope.of(context) ?? const Positioned.fill(child: AppBackdrop());
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(fit: StackFit.expand, children: [
-        if (bg != null) bg,
-        const IgnorePointer(child: ColoredBox(color: Color(0x59000000))),
-        SafeArea(
+        bg,
+        const IgnorePointer(child: ColoredBox(color: Color(0x40000000))),
+        HomeSkinScope(
+          skin: HomeSkin.fashion,
           child: Column(children: [
+            // Home's own top bar (white glass, logo, bell, gear, menu).
+            HomeHeader(onSettings: onSettings, onMenu: () => Navigator.of(context).maybePop()),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
               child: Row(children: [
@@ -110,7 +120,7 @@ class PgScaffold extends StatelessWidget {
                 ...actions,
               ]),
             ),
-            Expanded(child: body),
+            Expanded(child: MediaQuery.removePadding(context: context, removeTop: true, child: body)),
           ]),
         ),
       ]),
@@ -266,6 +276,7 @@ class ProgressCompleteViewState extends State<ProgressCompleteView> {
   void openStreak() => _push(StreakDetailPage(progress: p, onPractice: _practice));
   void openStats() => _push(StatsDetailPage(progress: p));
   void openHistory() => setState(() => tab = 1);
+  void openTab(int i) => setState(() => tab = i);
   void openMilestone(Milestone m) => _push(MilestoneDetailPage(progress: p, milestone: m, onPractice: _practice));
 
   void showDay(String ymd) {
@@ -363,7 +374,7 @@ class _Overview extends StatelessWidget {
     final week = p.thisWeekDays;
     final empty = p.totalSessions == 0;
     const dayL = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    return ListView(padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
+    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
       PgCard(
         onTap: state.openStreak,
         child: Column(children: [
@@ -388,6 +399,46 @@ class _Overview extends StatelessWidget {
             ]),
           ),
         ]),
+      ),
+      const SizedBox(height: 16),
+      // Home's My Routine pattern, on real data.
+      HomeDeck(
+        key: const ValueKey('deck-streaks'),
+        title: 'Streaks',
+        onArrow: state.openStreak,
+        banner: '${p.streak} day streak',
+        bannerSub: '${p.weekConsistencyPercent}% of this week',
+        cards: [
+          DeckCard('STREAK', '${p.streak}', p.streak == 1 ? 'Day in a row' : 'Days in a row', 'Streak details', state.openStreak),
+          DeckCard('THIS WEEK', '${p.thisWeekDays.where((d) => d.done).length}', 'Days practiced · ${p.weekTimeLabel}', 'See the week', state.openStreak),
+          DeckCard('TODAY', '${p.todaySessions}', p.todaySessions == 1 ? 'Session today' : 'Sessions today', p.todaySessions == 0 ? 'Practice now' : 'Practice again', state._practice),
+        ],
+      ),
+      const SizedBox(height: 16),
+      HomeDeck(
+        key: const ValueKey('deck-history'),
+        title: 'History',
+        onArrow: state.openHistory,
+        banner: empty ? 'No sessions yet' : '${p.totalSessions} sessions',
+        bannerSub: empty ? 'Your practice appears here' : '${p.timeLabel} in total',
+        cards: empty
+            ? [DeckCard('HISTORY', '0', 'Finish a session to begin', 'Practice now', state._practice)]
+            : [
+                for (final s in p.sessionsSnapshot.take(6))
+                  DeckCard(prettyDay('${s['date']}').toUpperCase(), durationLabel(s) == 'Time not recorded' ? '–' : durationLabel(s), '${s['word']}', 'Open day', () => state.showDay('${s['date']}')),
+              ],
+      ),
+      const SizedBox(height: 16),
+      HomeDeck(
+        key: const ValueKey('deck-milestones'),
+        title: 'Milestones',
+        onArrow: () => state.openTab(2),
+        banner: '${kMilestones.where((m) => m.done(p)).length} of ${kMilestones.length} reached',
+        bannerSub: 'From real practice',
+        cards: [
+          for (final m in kMilestones)
+            DeckCard(m.done(p) ? 'REACHED' : 'IN PROGRESS', m.done(p) ? '✓' : '${(m.ratio(p) * 100).round()}%', m.title, 'View milestone', () => state.openMilestone(m)),
+        ],
       ),
       const SizedBox(height: 16),
       PgCard(
@@ -432,20 +483,6 @@ class _Overview extends StatelessWidget {
       ),
       const SizedBox(height: 16),
       PgCard(
-        onTap: state.openHistory,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Row(children: [Text('RECENT PRACTICE', style: _label), Spacer(), Icon(Icons.chevron_right_rounded, color: _grey)]),
-          const SizedBox(height: 10),
-          if (empty) const Text('No sessions yet.', style: _body),
-          for (final s in p.sessionsSnapshot.take(3))
-            Padding(padding: const EdgeInsets.only(top: 6), child: Row(children: [
-              Expanded(child: Text('${s['word']}', style: const TextStyle(color: _white, fontSize: 15, fontWeight: FontWeight.w600))),
-              Text(prettyDay('${s['date']}'), style: _body),
-            ])),
-        ]),
-      ),
-      const SizedBox(height: 16),
-      PgCard(
         onTap: () => state._push(const FeedbackPage()),
         child: const Row(children: [
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -457,6 +494,140 @@ class _Overview extends StatelessWidget {
         ]),
       ),
     ]);
+  }
+}
+
+/// One card in a Home "My Routine"-style deck. Real values only.
+class DeckCard {
+  const DeckCard(this.category, this.badge, this.title, this.action, this.onTap);
+  final String category, badge, title, action;
+  final VoidCallback onTap;
+}
+
+/// Home's My Routine section: a title row with an arrow button, the black
+/// routine banner, an orange and grey step-dot track, and snapping image
+/// cards with a circle badge. Art is the app's existing routine images.
+class HomeDeck extends StatefulWidget {
+  const HomeDeck({super.key, required this.title, required this.banner, required this.bannerSub, required this.cards, required this.onArrow});
+  final String title, banner, bannerSub;
+  final List<DeckCard> cards;
+  final VoidCallback onArrow;
+  @override
+  State<HomeDeck> createState() => _HomeDeckState();
+}
+
+class _HomeDeckState extends State<HomeDeck> {
+  final _pc = PageController(viewportFraction: 0.84);
+  int _i = 0;
+  @override
+  void dispose() {
+    _pc.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final n = widget.cards.length;
+    return SectionPane(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Expanded(child: Text(widget.title, style: const TextStyle(color: _white, fontSize: 21, fontWeight: FontWeight.w700))),
+          Tooltip(
+            message: 'Open ${widget.title}',
+            child: GestureDetector(
+              onTap: widget.onArrow,
+              child: Container(width: 38, height: 38, decoration: const BoxDecoration(color: _white, shape: BoxShape.circle), child: const Icon(Icons.arrow_forward_rounded, color: Color(0xFF060C18), size: 20)),
+            ),
+          ),
+        ]),
+        const SizedBox(height: 12),
+        RoutineStyleBlackBanner(title: widget.banner, subtitle: widget.bannerSub, onTap: widget.onArrow),
+        const SizedBox(height: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Row(children: [
+            for (var i = 0; i < n; i++) ...[
+              if (i > 0) Expanded(child: Container(height: 2, color: i <= _i ? const Color(0xFFFF8A2A) : const Color(0x33FFFFFF))),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: i == _i ? 14 : 10,
+                height: i == _i ? 14 : 10,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: i <= _i ? const Color(0xFFFF8A2A) : const Color(0xFFD7D7DE)),
+              ),
+            ],
+          ]),
+        ),
+        const SizedBox(height: 14),
+        SizedBox(
+          height: 300,
+          child: PageView.builder(
+            controller: _pc,
+            padEnds: false,
+            itemCount: n,
+            onPageChanged: (i) => setState(() => _i = i),
+            itemBuilder: (_, i) => Padding(padding: const EdgeInsets.only(right: 12), child: _DeckFace(card: widget.cards[i], art: kRoutineArts[i % kRoutineArts.length])),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class _DeckFace extends StatelessWidget {
+  const _DeckFace({required this.card, required this.art});
+  final DeckCard card;
+  final String art;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: card.onTap,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Expanded(
+          child: Stack(clipBehavior: Clip.none, children: [
+            Positioned.fill(
+              child: PgCard(
+                radius: 24,
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(card.category, maxLines: 1, style: const TextStyle(color: Color(0xC6FFFFFF), fontSize: 12)),
+                  const SizedBox(height: 8),
+                  Expanded(child: ClipRRect(borderRadius: BorderRadius.circular(16), child: Image.asset(art, width: double.infinity, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)))),
+                  const SizedBox(height: 30),
+                  Text(card.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _white, fontSize: 16, fontWeight: FontWeight.w800)),
+                ]),
+              ),
+            ),
+            // Circle badge (Home's store-dot shape) holding the real value.
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 38,
+              child: Center(
+                child: Container(
+                  width: 52,
+                  height: 52,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: const Color(0xFFE9C1A5), shape: BoxShape.circle, border: Border.all(color: _white, width: 3)),
+                  child: FittedBox(child: Padding(padding: const EdgeInsets.all(6), child: Text(card.badge, style: const TextStyle(color: Color(0xFF060C18), fontSize: 16, fontWeight: FontWeight.w800)))),
+                ),
+              ),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18)),
+          child: Row(children: [
+            Expanded(child: Text(card.action, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _white, fontSize: 13, fontWeight: FontWeight.w600))),
+            // Home's Enter pill.
+            const Text('Enter', style: TextStyle(color: _white, fontSize: 13, fontWeight: FontWeight.w700)),
+            const SizedBox(width: 8),
+            Container(width: 26, height: 26, decoration: const BoxDecoration(color: _white, shape: BoxShape.circle), child: const Icon(Icons.arrow_forward_rounded, size: 15, color: Color(0xFF111111))),
+          ]),
+        ),
+      ]),
+    );
   }
 }
 
@@ -511,7 +682,7 @@ class HistoryList extends StatelessWidget {
         ])),
       ]);
     }
-    return ListView(padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
+    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
       for (final e in byDay.entries) ...[
         Padding(padding: const EdgeInsets.fromLTRB(4, 12, 4, 8), child: Text(prettyDay(e.key).toUpperCase(), style: _label)),
         PgCard(
@@ -564,7 +735,7 @@ class _MilestonesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final done = kMilestones.where((m) => m.done(progress)).length;
-    return ListView(padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
+    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
       Padding(padding: const EdgeInsets.fromLTRB(4, 4, 4, 12), child: Text('$done of ${kMilestones.length} reached', style: _body)),
       for (final m in kMilestones) ...[
         PgCard(
