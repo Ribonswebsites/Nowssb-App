@@ -18,6 +18,8 @@ import '../../widgets/black_glass_banner.dart';
 import '../../widgets/home_skin.dart';
 import '../../widgets/routine_deck.dart' show kRoutineArts;
 import '../fashion/header.dart';
+import '../../shell/nav_shell.dart';
+import '../../widgets/nwsb_icon.dart';
 
 const kProgressGuideSeenKey = 'nowssb_progress_guide_seen_v1';
 
@@ -86,12 +88,15 @@ class PgPill extends StatelessWidget {
 
 const _title = TextStyle(color: _white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.15);
 const _body = TextStyle(color: _grey, fontSize: 13, height: 1.4);
-const _label = TextStyle(color: _dim, fontSize: 11, letterSpacing: 1.4, fontWeight: FontWeight.w600);
+const _gold = Color(0xFFE9C987);
+/// Home's small gold uppercase eyebrow.
+const _label = TextStyle(color: _gold, fontSize: 11, letterSpacing: 1.4, fontWeight: FontWeight.w700);
 
 /// Original background video (the app's subscription-bg film) plus a soft
 /// dark shade. [backdrop] lets tests and screenshots pass a still frame.
 class PgScaffold extends StatelessWidget {
-  const PgScaffold({super.key, required this.title, required this.body, this.backdrop, this.actions = const [], this.onSettings});
+  const PgScaffold({super.key, required this.title, required this.body, this.backdrop, this.actions = const [], this.onSettings, this.bottom});
+  final Widget? bottom;
   final VoidCallback? onSettings;
   final String title;
   final Widget body;
@@ -123,6 +128,7 @@ class PgScaffold extends StatelessWidget {
             Expanded(child: MediaQuery.removePadding(context: context, removeTop: true, child: body)),
           ]),
         ),
+        if (bottom != null) Positioned(left: 14, right: 14, bottom: 0, child: SafeArea(top: false, child: Padding(padding: const EdgeInsets.only(bottom: 10), child: bottom!))),
       ]),
     );
   }
@@ -210,7 +216,8 @@ String durationLabel(Map<String, dynamic> s) {
 // ── Main view ─────────────────────────────────────────────────────────────
 
 class ProgressCompleteView extends StatefulWidget {
-  const ProgressCompleteView({super.key, this.backdrop, this.onPractice, this.progress});
+  const ProgressCompleteView({super.key, this.backdrop, this.onPractice, this.progress, this.onNav});
+  final ValueChanged<int>? onNav;
   final Widget? backdrop;
   final VoidCallback? onPractice;
   final PracticeProgress? progress;
@@ -256,6 +263,13 @@ class ProgressCompleteViewState extends State<ProgressCompleteView> {
 
   void _changed() {
     if (mounted) setState(() {});
+  }
+
+  void _goTab(int i) {
+    if (widget.onNav != null) return widget.onNav!(i);
+    final nav = Navigator.of(context);
+    if (nav.canPop()) nav.pop();
+    NavScope.goTo(context, i);
   }
 
   void _practice() {
@@ -304,6 +318,7 @@ class ProgressCompleteViewState extends State<ProgressCompleteView> {
   Widget build(BuildContext context) {
     final page = PgScaffold(
       title: 'My Progress',
+      bottom: ProgressNav(onTab: _goTab),
       backdrop: widget.backdrop,
       actions: [
         _RoundIcon(icon: Icons.help_outline_rounded, tooltip: 'Show guide', onTap: () => setState(() {
@@ -374,7 +389,7 @@ class _Overview extends StatelessWidget {
     final week = p.thisWeekDays;
     final empty = p.totalSessions == 0;
     const dayL = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
+    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 110), children: [
       PgCard(
         onTap: state.openStreak,
         child: Column(children: [
@@ -401,10 +416,22 @@ class _Overview extends StatelessWidget {
         ]),
       ),
       const SizedBox(height: 16),
+      // Home's wide 3D render (existing Home art) with an outlined Begin Practice pill.
+      Banner3D(
+        key: const ValueKey('progress-banner'),
+        art: 'assets/video/store-orb-box-poster.webp',
+        eyebrow: 'DAILY PRACTICE',
+        title: p.todaySessions == 0 ? 'Today is still open' : 'Today is done',
+        sub: p.todaySessions == 0 ? 'One session keeps your streak going.' : '${p.todaySessions} session${p.todaySessions == 1 ? '' : 's'} today. Go again any time.',
+        cta: OutlinePill('Begin Practice', onTap: state._practice),
+      ),
+      const SizedBox(height: 16),
       // Home's My Routine pattern, on real data.
       HomeDeck(
         key: const ValueKey('deck-streaks'),
         title: 'Streaks',
+        eyebrow: 'KEEP IT GOING',
+        mark: NwsbMarks.flame,
         onArrow: state.openStreak,
         banner: '${p.streak} day streak',
         bannerSub: '${p.weekConsistencyPercent}% of this week',
@@ -418,6 +445,8 @@ class _Overview extends StatelessWidget {
       HomeDeck(
         key: const ValueKey('deck-history'),
         title: 'History',
+        eyebrow: 'EVERY SESSION',
+        mark: NwsbMarks.hourglass,
         onArrow: state.openHistory,
         banner: empty ? 'No sessions yet' : '${p.totalSessions} sessions',
         bannerSub: empty ? 'Your practice appears here' : '${p.timeLabel} in total',
@@ -432,6 +461,8 @@ class _Overview extends StatelessWidget {
       HomeDeck(
         key: const ValueKey('deck-milestones'),
         title: 'Milestones',
+        eyebrow: 'WORKING TOWARD',
+        mark: NwsbMarks.crown,
         onArrow: () => state.openTab(2),
         banner: '${kMilestones.where((m) => m.done(p)).length} of ${kMilestones.length} reached',
         bannerSub: 'From real practice',
@@ -508,8 +539,8 @@ class DeckCard {
 /// routine banner, an orange and grey step-dot track, and snapping image
 /// cards with a circle badge. Art is the app's existing routine images.
 class HomeDeck extends StatefulWidget {
-  const HomeDeck({super.key, required this.title, required this.banner, required this.bannerSub, required this.cards, required this.onArrow});
-  final String title, banner, bannerSub;
+  const HomeDeck({super.key, required this.title, required this.banner, required this.bannerSub, required this.cards, required this.onArrow, this.eyebrow = 'PROGRESS', this.mark = NwsbMarks.flame});
+  final String title, banner, bannerSub, eyebrow, mark;
   final List<DeckCard> cards;
   final VoidCallback onArrow;
   @override
@@ -531,7 +562,15 @@ class _HomeDeckState extends State<HomeDeck> {
     return SectionPane(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
-          Expanded(child: Text(widget.title, style: const TextStyle(color: _white, fontSize: 21, fontWeight: FontWeight.w700))),
+          HomeSectionHeadMark(mark: widget.mark),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              EyebrowPill(widget.eyebrow),
+              const SizedBox(height: 4),
+              Text(widget.title, style: const TextStyle(color: _white, fontSize: 21, fontWeight: FontWeight.w700)),
+            ]),
+          ),
           Tooltip(
             message: 'Open ${widget.title}',
             child: GestureDetector(
@@ -684,20 +723,20 @@ class HistoryList extends StatelessWidget {
         ])),
       ]);
     }
-    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
+    return ListView(key: const ValueKey('progress-history'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 110), children: [
       for (final e in byDay.entries) ...[
-        Padding(padding: const EdgeInsets.fromLTRB(4, 12, 4, 8), child: Text(prettyDay(e.key).toUpperCase(), style: _label)),
-        PgCard(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Column(children: [
-            for (final s in e.value)
-              Material(color: Colors.transparent, child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text('${s['word']}', style: const TextStyle(color: _white, fontWeight: FontWeight.w600)),
-                subtitle: Text(durationLabel(s), style: _body),
-                trailing: const Icon(Icons.info_outline_rounded, color: _grey, size: 20),
-                onTap: () => showSessionDialog(context, s),
-              )),
+        const SizedBox(height: 12),
+        SectionPane(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(prettyDay(e.key).toUpperCase(), style: _label),
+            const SizedBox(height: 4),
+            for (var i = 0; i < e.value.length; i++)
+              TimelineEntry(
+                title: '${e.value[i]['word']}',
+                sub: durationLabel(e.value[i]),
+                last: i == e.value.length - 1,
+                onTap: () => showSessionDialog(context, e.value[i]),
+              ),
           ]),
         ),
       ],
@@ -737,7 +776,7 @@ class _MilestonesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final done = kMilestones.where((m) => m.done(progress)).length;
-    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), children: [
+    return ListView(key: const ValueKey('progress-overview'), padding: const EdgeInsets.fromLTRB(20, 0, 20, 110), children: [
       Padding(padding: const EdgeInsets.fromLTRB(4, 4, 4, 12), child: Text('$done of ${kMilestones.length} reached', style: _body)),
       for (final m in kMilestones) ...[
         PgCard(
@@ -958,4 +997,144 @@ class _Guide extends StatelessWidget {
       ),
     );
   }
+}
+
+// ── Home pieces (Home style order, Oct 21) ────────────────────────────────
+
+/// Home's section-head mark: a round white button holding the section icon.
+class HomeSectionHeadMark extends StatelessWidget {
+  const HomeSectionHeadMark({super.key, required this.mark});
+  final String mark;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 44,
+        height: 44,
+        decoration: const BoxDecoration(color: _white, shape: BoxShape.circle),
+        child: Center(child: NwsbIcon(mark, size: 20, color: const Color(0xFF1A1A2E))),
+      );
+}
+
+/// Small gold uppercase caption in a thin pill.
+class EyebrowPill extends StatelessWidget {
+  const EyebrowPill(this.text, {super.key});
+  final String text;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x66E9C987))),
+        child: Text(text.toUpperCase(), style: _label.copyWith(fontSize: 9.5)),
+      );
+}
+
+/// Home's outlined "Begin Practice" pill.
+class OutlinePill extends StatelessWidget {
+  const OutlinePill(this.label, {super.key, required this.onTap});
+  final String label;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Colors.transparent,
+        shape: const StadiumBorder(side: BorderSide(color: _white, width: 1.3)),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            child: Text(label, style: const TextStyle(color: _white, fontSize: 13, fontWeight: FontWeight.w700)),
+          ),
+        ),
+      );
+}
+
+/// Home's wide 3D banner: one of Home's own renders, bold white title.
+class Banner3D extends StatelessWidget {
+  const Banner3D({super.key, required this.art, required this.eyebrow, required this.title, required this.sub, required this.cta});
+  final String art, eyebrow, title, sub;
+  final Widget cta;
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Stack(fit: StackFit.expand, children: [
+            Image.asset(art, fit: BoxFit.cover, alignment: const Alignment(0.6, 0), errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
+            const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0xCC000000), Color(0x00000000)], stops: [0.3, 0.75]))),
+            DecoratedBox(decoration: BoxDecoration(borderRadius: BorderRadius.circular(24), border: Border.all(color: const Color(0x29FFFFFF)))),
+            Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(eyebrow, style: _label),
+                const SizedBox(height: 6),
+                SizedBox(width: 210, child: Text(title, style: const TextStyle(color: _white, fontSize: 24, fontWeight: FontWeight.w900, height: 1.1))),
+                const SizedBox(height: 6),
+                SizedBox(width: 200, child: Text(sub, maxLines: 2, overflow: TextOverflow.ellipsis, style: _body)),
+                const Spacer(),
+                cta,
+              ]),
+            ),
+          ]),
+        ),
+      );
+}
+
+/// Home's list row: purple dot on a vertical line, uppercase title, grey
+/// subtitle, thin divider.
+class TimelineEntry extends StatelessWidget {
+  const TimelineEntry({super.key, required this.title, required this.sub, this.last = false, this.onTap});
+  final String title, sub;
+  final bool last;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onTap,
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            SizedBox(
+              width: 22,
+              child: Column(children: [
+                const SizedBox(height: 16),
+                Container(width: 10, height: 10, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF9B6BFF))),
+                if (!last) Expanded(child: Container(width: 1.5, color: const Color(0x669B6BFF))) else const Spacer(),
+              ]),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                decoration: BoxDecoration(border: last ? null : const Border(bottom: BorderSide(color: Color(0x1FFFFFFF)))),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(title.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _white, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: .8)),
+                      Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: _body),
+                    ]),
+                  ),
+                  const Icon(Icons.chevron_right_rounded, color: _grey, size: 20),
+                ]),
+              ),
+            ),
+          ]),
+        ),
+      );
+}
+
+/// Home's floating pill nav (AppBottomNav) with Home's own nav art.
+class ProgressNav extends StatelessWidget {
+  const ProgressNav({super.key, required this.onTab});
+  final ValueChanged<int> onTab;
+  static const _items = <(String, String)>[
+    ('Connect', 'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'),
+    ('Practice', 'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'),
+    ('Library', 'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'),
+    ('Store', 'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'),
+    ('Profile', 'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'),
+  ];
+  @override
+  Widget build(BuildContext context) => AppBottomNav(
+        key: const ValueKey('progress-nav'),
+        items: [
+          for (var i = 0; i < _items.length; i++) AppNavItem(image: _items[i].$2, label: _items[i].$1, asHome: i == 0),
+        ],
+        onTap: onTab,
+      );
 }
