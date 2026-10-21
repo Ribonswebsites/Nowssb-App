@@ -33,7 +33,7 @@ class EarnHomeBar extends StatelessWidget {
             ),
           )
         else
-          ClipOval(child: Image.asset('assets/icons/logo-disc.webp', width: 44, height: 44, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.auto_awesome, color: kInk))),
+          const Text('EARN', style: TextStyle(color: kGold, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
         const SizedBox(width: 10),
         Expanded(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kInk, fontSize: 20, fontWeight: FontWeight.w800))),
         Container(
@@ -199,9 +199,9 @@ class FixedCta extends StatelessWidget {
           width: double.infinity,
           height: 52,
           child: FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF111111), shape: const StadiumBorder(), textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+            style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFF111111), shape: const StadiumBorder()),
             onPressed: onTap,
-            child: Text(label),
+            child: Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
           ),
         ),
       );
@@ -280,3 +280,45 @@ Future<void> showEarnSheet(
         );
       },
     );
+
+/// Home's list row: purple dot on a vertical line, uppercase title, grey
+/// subtitle, thin divider.
+class TimelineRow extends StatelessWidget {
+  const TimelineRow({super.key, required this.title, required this.sub, required this.trailing, this.last = false, this.onTap});
+  final String title, sub, trailing;
+  final bool last;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onTap,
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            SizedBox(
+              width: 22,
+              child: Column(children: [
+                const SizedBox(height: 16),
+                Container(width: 10, height: 10, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF9B6BFF))),
+                if (!last) Expanded(child: Container(width: 1.5, color: const Color(0x669B6BFF))) else const Spacer(),
+              ]),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 11),
+                decoration: BoxDecoration(border: last ? null : const Border(bottom: BorderSide(color: Color(0x1FFFFFFF)))),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(title.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kInk, fontSize: 14, fontWeight: FontWeight.w800, letterSpacing: .8)),
+                      Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kGrey, fontSize: 12)),
+                    ]),
+                  ),
+                  Text(trailing, style: const TextStyle(color: kGold, fontSize: 12, fontWeight: FontWeight.w700)),
+                  const Icon(Icons.chevron_right_rounded, color: kGrey, size: 20),
+                ]),
+              ),
+            ),
+          ]),
+        ),
+      );
+}

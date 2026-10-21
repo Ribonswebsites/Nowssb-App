@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../screens/store/word_atelier.dart';
 import '../../economy/economy_api.dart';
 import '../earnings_screen.dart';
+import '../../../widgets/app_chrome.dart' show AppTopBar;
 import 'earn_data.dart';
 import 'earn_home_style.dart';
 import 'earn_ui.dart';
@@ -59,6 +60,9 @@ class _EarnAppState extends State<EarnApp> {
       body: EarnBackground(
         child: SafeArea(
           child: Column(children: [
+            // Home's own wired top bar (logo, bell with live badge, gear,
+            // hamburger) on the root page; sub-pages get back + title.
+            if (!Navigator.of(context).canPop()) const AppTopBar(),
             EarnHomeBar(title: 'NowssB Earn', onHelp: () => showEarnGuide(context), onMenu: () => _menu(context)),
             Expanded(child: _content()),
             if (_d.load == EarnLoad.ready && _d.enabled && _tab == 0) FixedCta(key: const Key('earn-cta'), label: 'Share your link', onTap: () => shareEarnLink(context)),
@@ -528,28 +532,25 @@ class _TeamTab extends StatelessWidget {
         ),
       ]);
     }
-    Widget row(EarnMember m, int i) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Entrance(index: i + 1, child: TicketCard(
-            key: Key('earn-member-${m.id}'),
-            leading: RoundIcon(Icons.person_rounded, text: m.name.isEmpty ? '?' : m.name.characters.first.toUpperCase(), color: m.level == 1 ? const Color(0xFF8B5CF6) : kMint),
-            pill: m.level == 1 ? 'Direct' : 'Level 2',
-            label: m.rank.isEmpty ? 'Team member' : m.rank,
-            headline: m.name,
-            link: '${m.words} words',
-            accent: m.level == 1 ? const Color(0xFF8B5CF6) : kMint,
-            onTap: () => showEarnCard<void>(
-              context,
-              (ctx) => MeditationCard(
-                key: const Key('earn-member-card'),
-                photo: kEarnPhotos[i % kEarnPhotos.length],
-                title: m.name,
-                body: 'Rank: ${m.rank.isEmpty ? '—' : m.rank}\nWords sold: ${m.words}\nLevel: ${m.level == 1 ? 'Direct (1)' : 'Through your team (2)'}',
-                cta: 'Close',
-                onCta: () => Navigator.of(ctx).pop(),
-              ),
-            ),
-          )),
+    void open(EarnMember m, int i) => showEarnSheet(
+          context,
+          key: const Key('earn-member-card'),
+          hero: CircleAvatar(radius: 42, backgroundColor: m.level == 1 ? const Color(0xFF8B5CF6) : kMint, child: Text(m.name.isEmpty ? '?' : m.name.characters.first.toUpperCase(), style: const TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: Colors.white))),
+          title: m.name,
+          body: 'Rank: ${m.rank.isEmpty ? '—' : m.rank}\nWords sold: ${m.words}\nLevel: ${m.level == 1 ? 'Direct (1)' : 'Through your team (2)'}',
+          left: ('${m.words}', 'Words sold'),
+          right: ('${m.level}', 'Level'),
+          resume: 'Share link',
+          onResume: () => shareEarnLink(context),
+        );
+    Widget group(String cap, IconData icon, List<EarnMember> ms, int off) => DarkSection(
+          icon: icon,
+          caption: cap,
+          eyebrow: '${ms.length}',
+          child: Column(children: [
+            for (var i = 0; i < ms.length; i++)
+              TimelineRow(key: Key('earn-member-${ms[i].id}'), title: ms[i].name, sub: ms[i].rank.isEmpty ? 'Team member' : ms[i].rank, trailing: '${ms[i].words} words', last: i == ms.length - 1, onTap: () => open(ms[i], i + off)),
+          ]),
         );
     return _list([
       Entrance(
@@ -569,10 +570,9 @@ class _TeamTab extends StatelessWidget {
           ]),
         ),
       ),
-      const SectionTitle('Direct'),
-      for (var i = 0; i < d.direct.length; i++) row(d.direct[i], i),
-      if (d.second.isNotEmpty) const SectionTitle('Level 2'),
-      for (var i = 0; i < d.second.length; i++) row(d.second[i], i + 1),
+      const SizedBox(height: 14),
+      group('Direct', Icons.person_rounded, d.direct, 0),
+      if (d.second.isNotEmpty) group('Level 2', Icons.account_tree_rounded, d.second, 1),
     ]);
   }
 }
