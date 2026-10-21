@@ -259,12 +259,17 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
                           children: [
                             Row(children: [
                               EditableLabel('gifts_screen.GiftCardSheet', 'NOWSSB GIFT', style: TextStyle(color: colors[1], fontSize: 11, letterSpacing: 2.4, fontWeight: FontWeight.w800)),
-                              const Spacer(),
-                              FutureBuilder<String>(
-                                future: _price,
-                                builder: (context, snap) => Text(
-                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? 'Price on Google Play' : snap.data!,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: FutureBuilder<String>(
+                                  future: _price,
+                                  builder: (context, snap) => Text(
+                                    snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? 'Price on Google Play' : snap.data!,
+                                    textAlign: TextAlign.end,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
+                                  ),
                                 ),
                               ),
                             ]),
