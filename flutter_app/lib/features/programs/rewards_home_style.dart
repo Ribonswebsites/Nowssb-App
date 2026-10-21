@@ -16,6 +16,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
 import '../../widgets/home_menu_drawer.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../coupons/coupon_home_style.dart' show HomeTimelineRow;
 import 'program_kit.dart';
 
 /// Home's frame: the same film, Home's veil weight and Home's header
@@ -160,20 +161,15 @@ class _RewardsQuestBoardState extends State<RewardsQuestBoard> {
             ? Text(qs.isEmpty ? 'No quests right now. New ones arrive each week.' : 'Nothing in ${questFilterLabels[_f]!.toLowerCase()}.',
                 style: const TextStyle(color: NwsbColors.mist))
             : Column(children: [
-                for (final q in shown)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                      PRow(
-                        title: q.title,
-                        sub: '+${sInt(q.x['coins'])} coins · ${q.kind}',
-                        mark: NwsbMarks.rewards,
-                        trailing: q.claimed
-                            ? const PPill('Claimed', color: NwsbColors.goldLight)
-                            : PClaim(label: 'Claim', action: 'claimQuest', data: {'kind': q.kind, 'id': q.x['id']}, enabled: q.ready, title: q.title),
-                      ),
-                      PProgress(value: sNum(q.x['value']), goal: sNum(q.x['goal']) <= 0 ? 1 : sNum(q.x['goal'])),
-                    ]),
+                for (var i = 0; i < shown.length; i++)
+                  HomeTimelineRow(
+                    title: shown[i].title,
+                    subtitle: '+${sInt(shown[i].x['coins'])} coins · ${shown[i].kind} · ${sInt(shown[i].x['value'])} of ${sInt(shown[i].x['goal'])}',
+                    active: shown[i].ready,
+                    last: i == shown.length - 1,
+                    trailing: shown[i].claimed
+                        ? const PPill('Claimed', color: NwsbColors.goldLight)
+                        : PClaim(label: 'Claim', action: 'claimQuest', data: {'kind': shown[i].kind, 'id': shown[i].x['id']}, enabled: shown[i].ready, title: shown[i].title),
                   ),
               ]),
       ),

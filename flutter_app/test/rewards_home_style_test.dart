@@ -81,8 +81,8 @@ void main() {
     await _shot(t, 'rewards-home-2');
     await t.tap(find.byKey(const ValueKey('qf-completed')));
     await t.pump(const Duration(milliseconds: 300));
-    expect(find.text('Listen 30 minutes'), findsNothing);
-    expect(find.text('Five practice days'), findsOneWidget);
+    expect(find.text('LISTEN 30 MINUTES'), findsNothing);
+    expect(find.text('FIVE PRACTICE DAYS'), findsOneWidget);
   });
 
   testWidgets('hub in Home style with Enter/Shop pills', (t) async {
@@ -93,7 +93,7 @@ void main() {
     await _shot(t, 'rewards-home-1');
     await t.scrollUntilVisible(find.byKey(const ValueKey('hub-store')), 200, scrollable: find.byType(Scrollable).first);
     await t.pump(const Duration(milliseconds: 500));
-    expect(find.text('Shop'), findsOneWidget);
+    expect(find.text('Shop Now'), findsOneWidget);
     expect(find.byKey(const ValueKey('hub-mine')), findsOneWidget);
     await _shot(t, 'rewards-home-3');
   });

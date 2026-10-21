@@ -11,6 +11,7 @@ import '../economy/reward_fx.dart';
 import '../programs/program_kit.dart';
 import '../programs/rewards_program.dart';
 import '../programs/rewards_home_style.dart';
+import '../coupons/coupon_home_style.dart' show HomeTimelineRow, HomeShopPill;
 import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
 import '../programs/program_heroes.dart';
@@ -81,28 +82,29 @@ class _VaultBodyState extends State<_VaultBody> {
               ]),
             ),
             const SizedBox(height: 14),
-            for (final (id, title, sub, pill) in const [
-              ('checkin', 'Daily check-in', 'One tap a day keeps your streak', 'Enter'),
-              ('chests', 'Milestone chests', 'Unlock with streak days', 'Enter'),
-              ('boost', 'Coin Boost', 'Earn more coins for a while', 'Enter'),
-              ('store', 'Coin Store', 'Use coins on part of a price', 'Shop'),
-              ('mine', 'My Rewards', 'Coupons, gifts and chests', 'Enter'),
-            ])
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: SectionPane(
-                  child: Row(children: [
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(title, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 2),
-                        Text(sub, style: const TextStyle(color: NwsbColors.mist, fontSize: 12.5)),
-                      ]),
-                    ),
-                    EnterPill(key: ValueKey('hub-$id'), label: pill, onTap: () => _openTabs(id)),
-                  ]),
-                ),
-              ),
+            SectionPane(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                const PaneHead(eyebrow: 'Everything here', title: 'Rewards', mark: NwsbMarks.gift),
+                const SizedBox(height: 6),
+                for (final (i, (id, title, sub)) in const [
+                  ('checkin', 'Daily check-in', 'One tap a day keeps your streak'),
+                  ('chests', 'Milestone chests', 'Unlock with streak days'),
+                  ('boost', 'Coin Boost', 'Earn more coins for a while'),
+                  ('store', 'Coin Store', 'Use coins on part of a price'),
+                  ('mine', 'My Rewards', 'Coupons, gifts and chests'),
+                ].indexed)
+                  HomeTimelineRow(
+                    title: title,
+                    subtitle: sub,
+                    last: i == 4,
+                    onTap: () => _openTabs(id),
+                    trailing: id == 'store'
+                        ? HomeShopPill(key: ValueKey('hub-$id'), onTap: () => _openTabs(id))
+                        : EnterPill(key: ValueKey('hub-$id'), onTap: () => _openTabs(id)),
+                  ),
+              ]),
+            ),
+            const SizedBox(height: 14),
             const IdentityRails(RailKind.rewards),
             RoutineDeck(
               title: 'Rewards',
