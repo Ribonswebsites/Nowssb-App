@@ -17,6 +17,8 @@ import '../economy/money.dart';
 import '../../nowssb_ui/nowssb_ui.dart' show NGlass, NTokens;
 import '../../widgets/home_parts.dart' show EnterPill;
 import '../programs/reference_program.dart' show SellersBoard;
+import '../../nowssb_ui/app_video_backdrop.dart' show NAppBackdrop;
+import '../../screens/fashion/header.dart' show HomeHeader;
 
 /// Injectable data source (tests swap these).
 class PartnerData {
@@ -246,18 +248,45 @@ class PartnerShell extends StatelessWidget {
   final Widget child;
   final List<Widget> actions;
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final canPop = Navigator.of(context).canPop();
+    // Home's background video (shared NAppBackdrop) + Home's own top bar.
+    return NAppBackdrop(
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          foregroundColor: Colors.white,
-          title:
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
-          actions: actions,
+        body: SafeArea(
+          child: Column(children: [
+            HomeHeader(
+              onSettings: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const PartnerRulesPage())),
+              onMenu: () => PartnerGuide.show(context),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+              child: Row(children: [
+                if (canPop)
+                  IconButton(
+                      key: const Key('partner.back'),
+                      tooltip: 'Back',
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigator.of(context).maybePop())
+                else
+                  const SizedBox(width: 12),
+                Expanded(
+                    child: Text(title,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800))),
+                ...actions,
+              ]),
+            ),
+            Expanded(child: child),
+          ]),
         ),
-        body: SafeArea(top: false, child: child),
-      );
+      ),
+    );
+  }
 }
 
 // ───────────────────────── sheets and pop-ups ─────────────────────────
@@ -627,12 +656,12 @@ class _PartnerHomeState extends State<PartnerHome> {
         actions: [
           IconButton(
               key: const Key('partner.help'),
-              icon: const Icon(Icons.help_outline),
+              icon: const Icon(Icons.help_outline, color: Colors.white),
               tooltip: 'How it works',
               onPressed: () => PartnerGuide.show(context)),
           IconButton(
             key: const Key('partner.rulesBtn'),
-            icon: const Icon(Icons.gavel_outlined),
+            icon: const Icon(Icons.gavel_outlined, color: Colors.white),
             tooltip: 'Rules',
             onPressed: () => _push(context, const PartnerRulesPage()),
           ),

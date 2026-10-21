@@ -168,7 +168,7 @@ void main() {
     await _pump(t, _app());
     expect(find.byKey(const Key('partner.points')), findsOneWidget);
     expect(find.text('420 points'), findsOneWidget);
-    await _shot(t, 'partner-v3-1');
+    await _shot(t, 'partner-v4-1');
   });
 
   testWidgets('first-use guide shows once, steps through, then stays hidden',
@@ -176,7 +176,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
     await _pump(t, _app(guide: true));
     expect(find.byKey(const Key('partner.guide')), findsOneWidget);
-    await _shot(t, 'partner-v3-2');
+    await _shot(t, 'partner-v4-2');
     await t.tap(find.byKey(const Key('partner.guide.next')));
     await t.pumpAndSettle();
     expect(find.text('They save, you grow'), findsOneWidget);
@@ -206,25 +206,25 @@ void main() {
     await _pump(t, _app());
     await t.tap(find.byKey(const Key('partner.tab.targets')));
     await t.pumpAndSettle();
-    await _shot(t, 'partner-v3-3');
+    await _shot(t, 'partner-v4-3');
     await t.tap(find.byKey(const Key('partner.level.3')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.page.level')), findsOneWidget);
     expect(find.text('420 / 1200 points'), findsOneWidget);
-    await _shot(t, 'partner-v3-4');
+    await _shot(t, 'partner-v4-4');
   });
 
   testWidgets('perks: claim asks to confirm, then claims', (t) async {
     await _pump(t, _app());
     await t.tap(find.byKey(const Key('partner.tab.perks')));
     await t.pumpAndSettle();
-    await _shot(t, 'partner-v3-11');
+    await _shot(t, 'partner-v4-11');
     await t.ensureVisible(find.byKey(const Key('partner.claim.2')));
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.claim.2')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.confirm')), findsOneWidget);
-    await _shot(t, 'partner-v3-5');
+    await _shot(t, 'partner-v4-5');
     await t.tap(find.text('Claim').last);
     await t.pumpAndSettle();
     expect(claims, 1);
@@ -235,7 +235,7 @@ void main() {
     await _pump(t, _app());
     await t.tap(find.byKey(const Key('partner.tab.refer')));
     await t.pumpAndSettle();
-    await _shot(t, 'partner-v3-6');
+    await _shot(t, 'partner-v4-6');
     await t.scrollUntilVisible(find.byKey(const Key('partner.r.tools')), 200,
         scrollable: find.byType(Scrollable).last);
     await t.pumpAndSettle();
@@ -248,7 +248,7 @@ void main() {
     await t.tap(find.byKey(const Key('partner.make')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.share')), findsOneWidget);
-    await _shot(t, 'partner-v3-7');
+    await _shot(t, 'partner-v4-7');
     await t.tap(find.byKey(const Key('partner.shareNow')));
     await t.pumpAndSettle();
     expect(shared, contains('https://nowssb.com/r/ab12?k=word'));
@@ -264,7 +264,7 @@ void main() {
     expect(find.byKey(const Key('partner.page.discount')), findsOneWidget);
     expect(find.textContaining('€'), findsOneWidget);
     expect(find.textContaining('₹'), findsNothing);
-    await _shot(t, 'partner-v3-8');
+    await _shot(t, 'partner-v4-8');
   });
 
   testWidgets('activity and rules sub-pages, leaderboard tab', (t) async {
@@ -285,7 +285,7 @@ void main() {
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.board')), findsOneWidget);
     expect(find.text('Asha'), findsOneWidget);
-    await _shot(t, 'partner-v3-9');
+    await _shot(t, 'partner-v4-9');
   });
 
   testWidgets(
@@ -340,6 +340,6 @@ void main() {
     await t.pumpWidget(const SizedBox());
     await _pump(t, _app());
     expect(find.byKey(const Key('partner.offline')), findsOneWidget);
-    await _shot(t, 'partner-v3-10');
+    await _shot(t, 'partner-v4-10');
   });
 }
