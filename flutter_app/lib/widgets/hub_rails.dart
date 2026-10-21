@@ -107,10 +107,8 @@ const kClearArt = <String>[
   'assets/rails/ui-orders.jpg',
   'assets/rails/member-card.png',
 ];
-const _dur = ['18h 9m', '12h 24m', '4 min', '8 min', '21 min'];
-const _rate = ['4.7', '4.8', '4.9', '4.6', '5.0'];
-const _saves = ['16', '12', '8', '24', '31'];
-const _people = ['+12', '+8', '+2k', '+6', '+19'];
+/// "+12" style label for a real count; null hides the avatar pile.
+String? railPeople(int? n) => n == null || n <= 0 ? null : n >= 1000 ? '+${(n / 1000).floor()}k' : '+$n';
 
 ImageProvider<Object> railImage(String art) => art.startsWith('http') ? NetworkImage(art) : AssetImage(art);
 
@@ -123,11 +121,18 @@ Widget railPicture(String art, {double? width, double? height, Alignment alignme
 }
 
 class RailCard {
-  const RailCard(this.title, this.line, this.meta, {this.art = ''});
+  const RailCard(this.title, this.line, this.meta, {this.art = '', this.people, this.rating, this.duration, this.saves});
   final String title;
   final String line;
   final String meta;
   final String art;
+
+  /// Real numbers only. Each badge is hidden while its value is null — no
+  /// placeholder counts or ratings.
+  final int? people;
+  final double? rating;
+  final String? duration;
+  final int? saves;
 }
 
 List<RailCard> railSet(List<String> titles, String meta) => [
@@ -410,27 +415,35 @@ class RailFaces extends StatelessWidget {
 }
 
 class _MetaRow extends StatelessWidget {
-  const _MetaRow({required this.index, this.color = Colors.white});
-  final int index;
+  const _MetaRow({required this.card, this.color = Colors.white});
+  final RailCard card;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
     final style = TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600);
     final dim = color.withValues(alpha: 0.92);
+    if (card.duration == null && card.rating == null && card.saves == null) return const SizedBox.shrink();
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.access_time, size: 14, color: dim),
-        const SizedBox(width: 4),
-        Text(_dur[index % _dur.length], style: style),
-        const SizedBox(width: 8),
-        const Icon(Icons.star_rounded, size: 16, color: Color(0xFFFFC857)),
-        const SizedBox(width: 2),
-        Text(_rate[index % _rate.length], style: style),
-        const SizedBox(width: 8),
-        Icon(Icons.bookmark_border_rounded, size: 14, color: dim),
-        const SizedBox(width: 3),
-        Text(_saves[index % _saves.length], style: style),
+        if (card.duration != null) ...[
+          Icon(Icons.access_time, size: 14, color: dim),
+          const SizedBox(width: 4),
+          Text(card.duration!, style: style),
+          const SizedBox(width: 8),
+        ],
+        if (card.rating != null) ...[
+          const Icon(Icons.star_rounded, size: 16, color: Color(0xFFFFC857)),
+          const SizedBox(width: 2),
+          Text(card.rating!.toStringAsFixed(1), style: style),
+          const SizedBox(width: 8),
+        ],
+        if (card.saves != null) ...[
+          Icon(Icons.bookmark_border_rounded, size: 14, color: dim),
+          const SizedBox(width: 3),
+          Text('${card.saves}', style: style),
+        ],
       ],
     );
   }
@@ -472,7 +485,7 @@ class _FeatureCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      RailFaces(count: _people[index % _people.length]),
+                      if (railPeople(card.people) != null) RailFaces(count: railPeople(card.people)!),
                       const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -484,7 +497,7 @@ class _FeatureCard extends StatelessWidget {
                   const Spacer(),
                   Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700, height: 1.05, letterSpacing: -0.4)),
                   const SizedBox(height: 8),
-                  SizedBox(height: 18, width: double.infinity, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: _MetaRow(index: index))),
+                  SizedBox(height: 18, width: double.infinity, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: _MetaRow(card: card))),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -530,11 +543,11 @@ class _RowCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(alignment: Alignment.centerRight, child: RailFaces(count: _people[(index + 2) % _people.length], size: 24)),
+                  Align(alignment: Alignment.centerRight, child: railPeople(card.people) == null ? const SizedBox.shrink() : RailFaces(count: railPeople(card.people)!, size: 24)),
                   const SizedBox(height: 6),
                   Text(card.title, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, height: 1.05, letterSpacing: -0.3)),
                   const Spacer(),
-                  SizedBox(height: 16, width: double.infinity, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: _MetaRow(index: index))),
+                  SizedBox(height: 16, width: double.infinity, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: _MetaRow(card: card))),
                 ],
               ),
             ),
@@ -656,7 +669,7 @@ class _GlassCourseCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        RailFaces(count: _people[index % _people.length]),
+                        if (railPeople(card.people) != null) RailFaces(count: railPeople(card.people)!),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -668,7 +681,7 @@ class _GlassCourseCard extends StatelessWidget {
                     const Spacer(),
                     Text(card.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700, height: 1.05)),
                     const SizedBox(height: 8),
-                    _MetaRow(index: index),
+                    _MetaRow(card: card),
                     const SizedBox(height: 10),
                     Row(
                       children: [
