@@ -15,6 +15,7 @@ import '../economy/economy_api.dart';
 import '../economy/reward_fx.dart';
 import '../gifts/gifts_screen.dart';
 import 'program_kit.dart';
+import '../coupons/coupon_home_style.dart';
 import 'program_heroes.dart';
 import '../economy/economy_theme.dart';
 import '../../admin/template/editable.dart';
@@ -60,7 +61,7 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
   final boxes = sList(s['boxes']);
   final passes = sList(s['passes']).where((p) => p['status'] == 'banked').toList();
   return [
-    LSection('today', 'Today\u2019s box', PCard(glow: NwsbColors.gold, children: [
+    LSection('today', 'Today\u2019s box', HomeDarkSection(margin: EdgeInsets.zero, children: [
       PRow(
         title: t['boxOpened'] != null ? 'Today\u2019s box is open' : 'Today\u2019s free gift box',
         sub: '${sInt(t['minutes'])} minutes today. More minutes, a better box.',
@@ -75,7 +76,7 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
           trailing: st['claimed'] == true ? const PPill('Claimed', color: NwsbColors.goldLight) : PClaim(label: 'Claim', action: 'claimTimeStep', data: {'minutes': sInt(st['minutes'])}, enabled: st['reached'] == true, title: 'Time ladder'),
         ),
     ])),
-    LSection('boxes', 'Unopened boxes', PCard(children: [
+    LSection('boxes', 'Unopened boxes', HomeDarkSection(margin: EdgeInsets.zero, children: [
       const PHeading('Waiting for you', 'Unopened boxes', slot: 'gifts_program.free'),
       if (boxes.isEmpty) const PEmpty('No unopened boxes. Boxes come from quests, streaks, the season and the Partner Program.'),
       for (final b in boxes)
@@ -86,7 +87,7 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
           trailing: PClaim(label: 'Open', action: 'openBox', data: {'id': b['id']}, title: 'Gift box'),
         ),
     ])),
-    LSection('weekly', 'Weekly and monthly', PCard(children: [
+    LSection('weekly', 'Weekly and monthly', HomeDarkSection(margin: EdgeInsets.zero, children: [
       PRow(
         title: 'Weekly gift',
         sub: '${sInt(wg['daysAt20'])} days with 20+ minutes this week',
@@ -101,7 +102,7 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
       ),
     ])),
     if (passes.isNotEmpty)
-      LSection('passes', 'Banked passes', PCard(children: [
+      LSection('passes', 'Banked passes', HomeDarkSection(margin: EdgeInsets.zero, children: [
         const PHeading('Banked', 'Passes waiting for your plan to end', slot: 'gifts_program.free'),
         for (final p in passes) PRow(title: '${sInt(p['days'])}-day ${p['tier']} pass', sub: 'Starts on its own when your current plan ends.', mark: NwsbMarks.crown),
       ])),
@@ -148,7 +149,7 @@ class _SendPickerState extends State<_SendPicker> {
 List<Widget> _received(BuildContext context, Map<String, dynamic> s) {
   final rows = sList(sMap(s['gifts'])['received']).where((g) => g['status'] != 'expired').toList();
   return [
-    LSection('inbox', 'Inbox', PCard(children: [
+    LSection('inbox', 'Inbox', HomeDarkSection(margin: EdgeInsets.zero, children: [
       if (rows.isEmpty) const PEmpty('No gifts received yet. Redeem a code and it shows here.'),
       for (final g in rows)
         PRow(
@@ -163,7 +164,7 @@ List<Widget> _received(BuildContext context, Map<String, dynamic> s) {
 List<Widget> _sent(BuildContext context, Map<String, dynamic> s) {
   final rows = sList(sMap(s['gifts'])['sent']).where((g) => g['status'] != 'expired').toList();
   return [
-    LSection('sent', 'Sent', PCard(children: [
+    LSection('sent', 'Sent', HomeDarkSection(margin: EdgeInsets.zero, children: [
       if (rows.isEmpty) const PEmpty('No gifts sent yet.'),
       for (final g in rows)
         PRow(
@@ -195,7 +196,7 @@ List<Widget> _expired(BuildContext context, Map<String, dynamic> s) {
     for (final r in sList(g['sent'])) if (r['status'] == 'expired') ('Sent', r),
   ];
   return [
-    LSection('expired', 'Expired', PCard(children: [
+    LSection('expired', 'Expired', HomeDarkSection(margin: EdgeInsets.zero, children: [
       if (rows.isEmpty) const PEmpty('Nothing has expired. Open free boxes and redeem codes before their date.'),
       for (final (dir, r) in rows)
         PRow(
@@ -267,7 +268,7 @@ class _RedeemState extends State<_Redeem> {
   }
 
   @override
-  Widget build(BuildContext context) => PCard(children: [
+  Widget build(BuildContext context) => HomeDarkSection(margin: EdgeInsets.zero, children: [
         const PHeading('Got a code?', 'Redeem a gift', slot: 'gifts_program.redeem'),
         TextField(
           controller: _c,
