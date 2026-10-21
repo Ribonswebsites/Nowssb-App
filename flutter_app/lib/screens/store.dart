@@ -398,7 +398,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
               ),
             ),
           ),
-          SafeArea(child: ListView(children: shown)),
+          SafeArea(child: ListView(key: const Key('storeHomeList'), children: shown)),
         ],
       ),
     ).withStoreGuide();
