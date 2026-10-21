@@ -243,6 +243,8 @@ Future<void> showEarnSheet(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
               const SizedBox(height: 16),
+              // Content scrolls on short screens; Close / Resume always show.
+              Flexible(child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
               hero,
               const SizedBox(height: 14),
               Text(title, textAlign: TextAlign.center, style: const TextStyle(color: kInk, fontSize: 21, fontWeight: FontWeight.w800)),
@@ -251,6 +253,7 @@ Future<void> showEarnSheet(
               const SizedBox(height: 18),
               IntrinsicHeight(child: Row(children: [stat(left), const VerticalDivider(color: Color(0x40FFFFFF), width: 24, thickness: 1), stat(right)])),
               if (note != null) ...[const SizedBox(height: 12), Text(note, textAlign: TextAlign.center, style: const TextStyle(color: kMint, fontSize: 12.5, fontWeight: FontWeight.w700))],
+              ]))),
               const SizedBox(height: 18),
               Row(children: [
                 Expanded(
