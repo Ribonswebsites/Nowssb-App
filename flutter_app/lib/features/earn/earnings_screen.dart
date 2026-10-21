@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../nowssb_ui/nowssb_ui.dart' show NGlass;
+import '../../nowssb_ui/nowssb_ui.dart' show NGlass, FilterChipRow;
+import '../../widgets/home_parts.dart' show EnterPill;
 import '../../widgets/n_motion.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/routine_deck.dart';
@@ -35,6 +36,7 @@ String _money(int cents) => FxBook.instance.formatCents(cents);
 
 class _EarningsScreenState extends State<EarningsScreen> {
   String _tab = 'words';
+  int _filter = 0;
   Stream<EarningsSnapshot>? _stream;
   String? _uid;
 
@@ -89,6 +91,23 @@ class _EarningsScreenState extends State<EarningsScreen> {
               return ListView(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
                 children: [
+                  _NowFilters(selected: _filter, onSelect: (i) => setState(() => _filter = i)),
+                  const SizedBox(height: 12),
+                  _NowCard(
+                    key: const Key('earnings.now'),
+                    eyebrow: _nowFilters[_filter].toUpperCase(),
+                    title: _money(switch (_filter) { 1 => w.cash, 2 => data.pendingCents, 3 => data.paidCents, _ => w.cash + data.pendingCents + data.paidCents }),
+                    sub: switch (_filter) { 1 => 'Ready to withdraw', 2 => 'Clears after the hold period', 3 => 'Sent to your payout account', _ => 'All money you have earned' },
+                    image: 'assets/rails/earnings-01.jpg',
+                    onAction: _filter == 1 || _filter == 0 ? () => openWithdraw(context) : () => _push(context, EarningsStatementsPage(initialFilter: _filter)),
+                  ),
+                  const SizedBox(height: 12),
+                  _PromoSplit(
+                    title: w.payoutRail.isEmpty ? 'Link your payout account today' : 'See your monthly statements',
+                    pill: w.payoutRail.isEmpty ? 'Link now' : 'Open',
+                    onTap: () => w.payoutRail.isEmpty ? openPayoutAccount(context) : _push(context, const EarningsStatementsPage()),
+                  ),
+                  const SizedBox(height: 14),
                   _MoneyPanel(available: w.cash, pending: data.pendingCents, paid: data.paidCents, onWithdraw: () => openWithdraw(context)),
                   const SizedBox(height: 14),
                   RoutineDeck(
@@ -581,9 +600,25 @@ class _WithdrawSheetState extends State<WithdrawSheet> {
 
 // ---------- Statements sub-page ----------
 
-class EarningsStatementsPage extends StatelessWidget {
-  const EarningsStatementsPage({super.key, this.source = const FirestoreEarningsSource()});
+class EarningsStatementsPage extends StatefulWidget {
+  const EarningsStatementsPage({super.key, this.source = const FirestoreEarningsSource(), this.initialFilter = 0});
   final EarningsSource source;
+  final int initialFilter;
+
+  @override
+  State<EarningsStatementsPage> createState() => _EarningsStatementsPageState();
+}
+
+class _EarningsStatementsPageState extends State<EarningsStatementsPage> {
+  late int _filter = widget.initialFilter;
+  EarningsSource get source => widget.source;
+
+  bool _keep(EarningRow r) => switch (_filter) {
+        1 => r.status == 'Available',
+        2 => r.status == 'Pending' || r.status == 'Requested' || r.status == 'Processing',
+        3 => r.status == 'Paid',
+        _ => true,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -600,12 +635,17 @@ class EarningsStatementsPage extends StatelessWidget {
                 if (snap.hasError) return const EconomyMessage(title: 'Could not load statements', body: 'Check your connection and try again.');
                 if (!snap.hasData) return const EconomySkeleton();
                 final months = <String, List<EarningRow>>{};
-                for (final r in [...snap.data!.rows, ...snap.data!.payouts]) {
+                for (final r in [...snap.data!.rows, ...snap.data!.payouts].where(_keep)) {
                   final d = r.at;
                   months.putIfAbsent(d == null ? 'Undated' : '${d.year}-${d.month.toString().padLeft(2, '0')}', () => []).add(r);
                 }
                 final keys = months.keys.toList()..sort((a, b) => b.compareTo(a));
+                final all = [...snap.data!.rows, ...snap.data!.payouts].where(_keep).fold<int>(0, (a, r) => a + r.cents);
                 return ListView(padding: const EdgeInsets.all(16), children: [
+                  _NowFilters(selected: _filter, onSelect: (i) => setState(() => _filter = i)),
+                  const SizedBox(height: 12),
+                  _NowCard(key: const Key('statements.now'), eyebrow: 'STATEMENTS · ${_nowFilters[_filter].toUpperCase()}', title: _money(all), sub: '${keys.length} month${keys.length == 1 ? '' : 's'}', image: 'assets/rails/earnings-05.jpg'),
+                  const SizedBox(height: 12),
                   const _EFrostCard(title: 'Download PDF or CSV', body: 'Export files are coming soon. They will be made by our server.', next: 'Soon'),
                   const SizedBox(height: 12),
                   if (keys.isEmpty) const _EFrostCard(title: 'No statements yet', body: 'Your first monthly summary appears after your first sale.', next: 'OK'),
@@ -713,3 +753,118 @@ Future<void> showEarningsHelp(BuildContext context) {
     ),
   );
 }
+
+
+// ---------- Library "Now playing" pieces (Oct 21 style order) ----------
+
+const _nowFilters = ['All', 'Available', 'Pending', 'Paid'];
+
+class _NowFilters extends StatelessWidget {
+  const _NowFilters({required this.selected, required this.onSelect});
+  final int selected;
+  final ValueChanged<int> onSelect;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0),
+        child: FilterChipRow(labels: _nowFilters, selected: {selected}, onSelect: onSelect),
+      );
+}
+
+/// Big rounded dark card: square art left, gold eyebrow, bold title, round white action right.
+class _NowCard extends StatelessWidget {
+  const _NowCard({super.key, required this.eyebrow, required this.title, required this.sub, required this.image, this.onAction});
+  final String eyebrow, title, sub, image;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xE60D0B12),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Row(children: [
+        ClipRRect(borderRadius: BorderRadius.circular(16), child: Image.asset(image, width: 92, height: 92, fit: BoxFit.cover)),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(eyebrow, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFE8C77A), fontSize: 11, letterSpacing: 1.2, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 6),
+            FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900))),
+            const SizedBox(height: 4),
+            Text(sub, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 12.5)),
+          ]),
+        ),
+        if (onAction != null)
+          Semantics(
+            button: true,
+            label: 'Open',
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () { HapticFeedback.selectionClick(); onAction!(); },
+              child: Container(
+                width: 52, height: 52,
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                child: const Icon(Icons.arrow_forward_rounded, color: Color(0xFF0D0B12)),
+              ),
+            ),
+          ),
+      ]),
+    );
+  }
+}
+
+/// Teal promo split card: dark text block with outline pill left, teal block with the app coin in a circle right.
+class _PromoSplit extends StatelessWidget {
+  const _PromoSplit({required this.title, required this.pill, required this.onTap});
+  final String title, pill;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      key: const Key('earnings.promo'),
+      borderRadius: BorderRadius.circular(24),
+      child: SizedBox(
+        height: 132,
+        child: Row(children: [
+          Expanded(
+            flex: 6,
+            child: Container(
+              color: const Color(0xE60D0B12),
+              padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.2, fontWeight: FontWeight.w800)),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: onTap,
+                  style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Colors.white70), shape: const StadiumBorder(), visualDensity: VisualDensity.compact),
+                  child: Text(pill),
+                ),
+              ]),
+            ),
+          ),
+          Expanded(
+            flex: 4,
+            child: Container(
+              color: const Color(0xFF1FB5A6),
+              alignment: Alignment.center,
+              child: Container(
+                width: 84, height: 84,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: 0.22)),
+                child: Image.asset('assets/icons/nwsb-coin.webp', fit: BoxFit.contain),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Home's Enter pill, reused for the dashboard footer.
+Widget earningsEnter(VoidCallback onTap) => EnterPill(label: 'Withdraw', onTap: onTap);

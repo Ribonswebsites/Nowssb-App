@@ -67,7 +67,7 @@ Future<void> _shot(WidgetTester tester, int n) async {
     final b = _key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
     final img = await b.toImage(pixelRatio: 1);
     final bytes = await img.toByteData(format: ImageByteFormat.png);
-    File('/workspace/screens/earnings-v2-$n.png').writeAsBytesSync(bytes!.buffer.asUint8List());
+    File('/workspace/screens/earnings-v3-$n.png').writeAsBytesSync(bytes!.buffer.asUint8List());
   });
 }
 
@@ -213,6 +213,21 @@ void main() {
     await t.tap(find.byKey(const Key('help.replay')));
     await t.pumpAndSettle();
     expect(find.text('Share your link'), findsOneWidget);
+  });
+
+  testWidgets('now-playing dashboard: chips switch the money card', (t) async {
+    await phone(t);
+    await t.pumpWidget(_app(EarningsScreen(source: FakeSource(Stream.value(_sample)), showGuide: false)));
+    await t.pump();
+    await t.pump();
+    expect(find.byKey(const Key('earnings.now')), findsOneWidget);
+    expect(find.byKey(const Key('earnings.promo')), findsOneWidget);
+    await _shot(t, 6);
+    await t.tap(find.text('Pending').first);
+    await t.pump();
+    expect(find.text('PENDING'), findsOneWidget);
+    expect(find.text('Clears after the hold period'), findsOneWidget);
+    await _shot(t, 7);
   });
 
   testWidgets('info pop-up explains a number', (t) async {
