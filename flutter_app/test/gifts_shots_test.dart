@@ -9,7 +9,6 @@ import 'package:nowssb/features/gifts/gifts_screen.dart';
 import 'package:nowssb/widgets/colored_split_promo_banner.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/features/programs/gifts_program.dart';
-import 'package:nowssb/features/programs/program_kit.dart';
 import 'package:nowssb/features/coupons/coupon_home_style.dart';
 
 final _key = GlobalKey();
@@ -79,7 +78,7 @@ void main() {
     };
     var n = 3;
     for (final tab in ['free', 'send', 'received', 'sent', 'expired', 'redeem']) {
-      await t.pumpWidget(_app([HomeDarkSection(children: [ProgramTabsBlock(key: ValueKey(tab), spec: kGiftsSpec, initialTab: tab, showDisclaimer: false)])]));
+      await t.pumpWidget(_app([HomeDarkSection(children: [GiftsTabsBlock(key: ValueKey(tab), initialTab: tab, signedInForTest: true)])]));
       await t.pump(const Duration(milliseconds: 300));
       await _shot(t, 'gifts-${n++}.png');
     }
@@ -101,5 +100,12 @@ void main() {
     await t.tap(find.text('go'));
     await t.pumpAndSettle();
     await _shot(t, 'gifts-11.png');
+    await t.tap(find.text('Done').evaluate().isEmpty ? find.text('Skip') : find.text('Skip'));
+    await t.pumpAndSettle();
+    await t.pumpWidget(_app([Builder(builder: (c) => TextButton(onPressed: () => showGiftCardSheet(c, 'word'), child: const Text('pay')))]));
+    await t.tap(find.text('pay'));
+    await t.pump(const Duration(milliseconds: 800));
+    expect(find.byKey(const Key('gift_pay')), findsOneWidget);
+    await _shot(t, 'gifts-12.png');
   });
 }

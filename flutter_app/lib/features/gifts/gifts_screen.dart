@@ -219,14 +219,15 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: inset),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          filter: ImageFilter.blur(sigmaX: 13, sigmaY: 13),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(18, 10, 18, 26),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 26),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xE6101010), Color(0xF5000000)]),
-              border: Border(top: BorderSide(color: Color(0x55E4C56A))),
+              color: Color(0xD9000000),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              border: Border(top: BorderSide(color: Color(0x24FFFFFF)), left: BorderSide(color: Color(0x24FFFFFF)), right: BorderSide(color: Color(0x24FFFFFF))),
             ),
             child: SingleChildScrollView(
               child: Column(
@@ -314,7 +315,13 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
                       'The code exists only after Google Play accepts the payment. It is valid for a year. Unopened cards can be cancelled within 7 days. Coins cannot be gifted.',
                       style: TextStyle(color: NwsbColors.mist, fontSize: 11.5, height: 1.4)),
                   const SizedBox(height: 14),
-                  GoldButton(label: _busy ? 'Waiting for Google Play…' : 'Pay on Play and create the code', onTap: _busy ? null : _buy),
+                  HomeActionRow(
+                    icon: Icons.lock_outline,
+                    eyebrow: 'Google Play checkout',
+                    title: widget.card.label,
+                    onTap: _busy ? null : _buy,
+                    pill: HomeShopPill(key: const Key('gift_pay'), label: _busy ? 'Waiting…' : 'Pay on Play', onTap: _busy ? null : _buy),
+                  ),
                   if (_note != null) ...[const SizedBox(height: 10), EconomyNote(_note!)],
                 ],
               ),
@@ -338,9 +345,9 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
             counterText: '',
             prefixIcon: Icon(icon, color: const Color(0xFFE4C56A), size: 18),
             filled: true,
-            fillColor: const Color(0x14FFFFFF),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x33FFFFFF))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x33FFFFFF))),
+            fillColor: Colors.black,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x24FFFFFF))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x24FFFFFF))),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE4C56A))),
           ),
         ),
@@ -404,7 +411,7 @@ class _GiftsScreenState extends State<GiftsScreen> {
         children: [
           HomeDarkSection(children: [
             HomeHeaderBox(icon: Icons.card_giftcard, title: 'NowssB Gifts', subtitle: kGiftsDisclaimer),
-            ProgramTabsBlock(spec: kGiftsSpec, initialTab: id, scrollTo: true, showDisclaimer: false),
+            GiftsTabsBlock(initialTab: id),
           ]),
         ],
       ),
