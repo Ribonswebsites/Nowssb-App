@@ -696,7 +696,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return CourseFace(
           avatar: _avatarBubble(),
           onAvatar: _openPhotoChoices,
-          onBell: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const InboxScreen())),
           segments: const ['You', 'Progress'],
           segment: _face,
           onSegment: (i) => setState(() => _face = i),
