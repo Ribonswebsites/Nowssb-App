@@ -204,6 +204,8 @@ void main() {
 
   testWidgets('targets tab and level sub-page', (t) async {
     await _pump(t, _app());
+    await t.ensureVisible(find.byKey(const Key('partner.tab.targets')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.tab.targets')));
     await t.pumpAndSettle();
     await _shot(t, 'partner-v4-3');
@@ -216,6 +218,8 @@ void main() {
 
   testWidgets('perks: claim asks to confirm, then claims', (t) async {
     await _pump(t, _app());
+    await t.ensureVisible(find.byKey(const Key('partner.tab.perks')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.tab.perks')));
     await t.pumpAndSettle();
     await _shot(t, 'partner-v4-11');
@@ -233,11 +237,17 @@ void main() {
   testWidgets('refer tab: link tools make a link and open share sheet',
       (t) async {
     await _pump(t, _app());
+    await t.ensureVisible(find.byKey(const Key('partner.tab.refer')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.tab.refer')));
     await t.pumpAndSettle();
     await _shot(t, 'partner-v4-6');
     await t.scrollUntilVisible(find.byKey(const Key('partner.r.tools')), 200,
-        scrollable: find.byType(Scrollable).last);
+        scrollable: find
+            .descendant(
+                of: find.byKey(const Key('partner.list')),
+                matching: find.byType(Scrollable))
+            .first);
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.r.tools')));
     await t.pumpAndSettle();
@@ -257,7 +267,11 @@ void main() {
   testWidgets('buyer discount sub-page shows local currency', (t) async {
     await _pump(t, _app(tab: 'discount'));
     await t.scrollUntilVisible(find.byKey(const Key('partner.r.discount')), 200,
-        scrollable: find.byType(Scrollable).last);
+        scrollable: find
+            .descendant(
+                of: find.byKey(const Key('partner.list')),
+                matching: find.byType(Scrollable))
+            .first);
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.r.discount')));
     await t.pumpAndSettle();
@@ -272,12 +286,14 @@ void main() {
     await t.tap(find.byKey(const Key('partner.q.activity')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.page.activity')), findsOneWidget);
-    await t.pageBack();
+    await t.tap(find.byKey(const Key('home-header-back')));
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.rulesBtn')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.page.rules')), findsOneWidget);
-    await t.pageBack();
+    await t.tap(find.byKey(const Key('home-header-back')));
+    await t.pumpAndSettle();
+    await t.ensureVisible(find.byKey(const Key('partner.tab.board')));
     await t.pumpAndSettle();
     await t.ensureVisible(find.byKey(const Key('partner.tab.board')));
     await t.pumpAndSettle();
@@ -299,19 +315,21 @@ void main() {
     await t.tap(find.byKey(const Key('partner.perkRail.0')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.page.level')), findsOneWidget);
-    await t.pageBack();
+    await t.tap(find.byKey(const Key('home-header-back')));
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.spot.perk')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.confirm')), findsOneWidget);
     await t.tap(find.text('Not now'));
     await t.pumpAndSettle();
+    await t.ensureVisible(find.byKey(const Key('partner.tab.refer')));
+    await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.tab.refer')));
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.spot.links')));
     await t.pumpAndSettle();
     expect(find.byKey(const Key('partner.page.links')), findsOneWidget);
-    await t.pageBack();
+    await t.tap(find.byKey(const Key('home-header-back')));
     await t.pumpAndSettle();
     await t.tap(find.byKey(const Key('partner.spot.discount')));
     await t.pumpAndSettle();

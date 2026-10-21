@@ -256,31 +256,19 @@ class PartnerShell extends StatelessWidget {
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Column(children: [
-            HomeHeader(
-              onSettings: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const PartnerRulesPage())),
-              onMenu: () => PartnerGuide.show(context),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
-              child: Row(children: [
-                if (canPop)
-                  IconButton(
-                      key: const Key('partner.back'),
-                      tooltip: 'Back',
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.of(context).maybePop())
-                else
-                  const SizedBox(width: 12),
-                Expanded(
-                    child: Text(title,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800))),
-                ...actions,
-              ]),
-            ),
+            if (canPop)
+              HomeHeader.sub(title: title)
+            else
+              HomeHeader(
+                onSettings: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => const PartnerRulesPage())),
+                onMenu: () => PartnerGuide.show(context),
+              ),
+            if (!canPop && actions.isNotEmpty)
+              Align(
+                  alignment: Alignment.centerRight,
+                  child:
+                      Row(mainAxisSize: MainAxisSize.min, children: actions)),
             Expanded(child: child),
           ]),
         ),
@@ -653,41 +641,43 @@ class _PartnerHomeState extends State<PartnerHome> {
   @override
   Widget build(BuildContext context) => PartnerShell(
         title: 'Partner Program',
-        actions: [
-          IconButton(
-              key: const Key('partner.help'),
-              icon: const Icon(Icons.help_outline, color: Colors.white),
-              tooltip: 'How it works',
-              onPressed: () => PartnerGuide.show(context)),
-          IconButton(
-            key: const Key('partner.rulesBtn'),
-            icon: const Icon(Icons.gavel_outlined, color: Colors.white),
-            tooltip: 'Rules',
-            onPressed: () => _push(context, const PartnerRulesPage()),
-          ),
-        ],
         child: Column(
           children: [
-            SizedBox(
-              height: 44,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    for (var i = 0; i < PartnerHome.tabs.length; i++)
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(right: 8, top: 4, bottom: 4),
-                        child: PPillButton(PartnerHome.labels[i],
-                            key: Key('partner.tab.${PartnerHome.tabs[i]}'),
-                            light: i == tab,
-                            onTap: () => go(i)),
-                      ),
-                  ],
+            Row(children: [
+              Expanded(
+                child: SizedBox(
+                  height: 44,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        for (var i = 0; i < PartnerHome.tabs.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                right: 8, top: 4, bottom: 4),
+                            child: PPillButton(PartnerHome.labels[i],
+                                key: Key('partner.tab.${PartnerHome.tabs[i]}'),
+                                light: i == tab,
+                                onTap: () => go(i)),
+                          ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+              IconButton(
+                  key: const Key('partner.help'),
+                  icon: const Icon(Icons.help_outline, color: Colors.white),
+                  tooltip: 'How it works',
+                  onPressed: () => PartnerGuide.show(context)),
+              IconButton(
+                key: const Key('partner.rulesBtn'),
+                icon: const Icon(Icons.gavel_outlined, color: Colors.white),
+                tooltip: 'Rules',
+                onPressed: () => _push(context, const PartnerRulesPage()),
+              ),
+            ]),
             Expanded(
               child: PLoad(
                 key: _key,
@@ -696,6 +686,7 @@ class _PartnerHomeState extends State<PartnerHome> {
                 builder: (c, d, reload) => RefreshIndicator(
                   onRefresh: () async => reload(),
                   child: ListView(
+                    key: const Key('partner.list'),
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                     children: switch (tab) {
                       0 => _hub(c, d),
