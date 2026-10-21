@@ -33,6 +33,8 @@ import '../programs/program_router.dart';
 import '../programs/coupons_program.dart';
 import '../../admin/template/editable.dart';
 import '../coupons/coupon_pages.dart';
+import '../coupons/coupon_home_style.dart';
+import '../../nowssb_ui/app_video_backdrop.dart';
 
 class CouponScreen extends StatefulWidget {
   const CouponScreen({super.key, this.initialTab});
@@ -92,16 +94,15 @@ class _CouponScreenState extends State<CouponScreen> {
   }
 
   void _showScratch() {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: Colors.white, title: const Text('Daily scratch')),
-      body: const SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: DailyScratchCard())),
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponSubPage(
+      title: 'Daily scratch',
+      body: SingleChildScrollView(padding: EdgeInsets.all(16), child: HomeDarkSection(children: [DailyScratchCard()])),
     )));
   }
 
   @override
   Widget build(BuildContext context) {
-    return EconomyPage(
+    return NAppBackdrop(child: EconomyPage(
       goodToKnow: kCouponsDisclaimer,
       title: 'NowssB Coupons',
       mark: NwsbMarks.coupon,
@@ -135,24 +136,33 @@ class _CouponScreenState extends State<CouponScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    for (final t in kCouponsSpec.tabs)
-                      ActionChip(key: Key('chip_${t.id}'), label: Text(t.title), onPressed: () => _openTabs(t.id)),
+                  HomeDarkSection(children: [
+                    const HomeHeaderBox(icon: Icons.confirmation_number_outlined, title: 'Your coupons', subtitle: 'Every tab: mine, scratch, shop, history, rules.'),
+                    HomeBlackBox(
+                      padding: const EdgeInsets.fromLTRB(12, 4, 14, 4),
+                      child: Column(children: [
+                        for (var i = 0; i < kCouponsSpec.tabs.length; i++)
+                          HomeTimelineRow(
+                            key: Key('chip_${kCouponsSpec.tabs[i].id}'),
+                            title: kCouponsSpec.tabs[i].title,
+                            subtitle: const {'mine': 'Discounts, tokens and codes on your account', 'scratch': 'Sealed cards waiting for you', 'shop': 'Paid cards with their odds', 'history': 'Cards you have scratched', 'odds': 'How every card is drawn'}[kCouponsSpec.tabs[i].id] ?? '',
+                            last: i == kCouponsSpec.tabs.length - 1,
+                            onTap: () => _openTabs(kCouponsSpec.tabs[i].id),
+                            trailing: const Icon(Icons.chevron_right, color: kHomeGrey, size: 20),
+                          ),
+                      ]),
+                    ),
+                    HomeActionRow(icon: Icons.auto_awesome, eyebrow: 'Daily scratch', title: 'Today’s card', onTap: _showScratch, pill: HomeEnterPill(key: const Key('coupons_enter_scratch'), onTap: _showScratch)),
                   ]),
                   const SizedBox(height: 12),
-                  LayoutBuilder(builder: (context, c) => Column(children: [
-                    for (final d in kWideCoupons) ...[
-                      WideCoupon(data: d, width: c.maxWidth, expires: couponExpiry(d.copy), scissorsLeft: d == kWideCoupons.first),
-                      Align(alignment: Alignment.centerRight, child: TextButton(key: Key('details_${d.code}'), onPressed: () => showCouponDetail(context, d), child: const Text('View details >', style: TextStyle(color: Color(0xFF8EC5FF))))),
-                    ],
-                  ])),
+                  CouponOfferSection(onDetail: (d) => showCouponDetail(context, d), onShop: () => _openTabs('shop')),
                 ],
               ),
             ),
           ),
         ],
       ),
-    );
+    ));
   }
 }
 

@@ -13,6 +13,8 @@ import '../economy/economy_api.dart';
 import '../programs/coupons_program.dart';
 import '../programs/program_kit.dart';
 import '../../widgets/n_motion.dart';
+import '../../nowssb_ui/app_video_backdrop.dart';
+import 'coupon_home_style.dart';
 
 const _card = Color(0xFF0B0B12);
 const _gold = Color(0xFFE4C56A);
@@ -57,17 +59,6 @@ Future<T?> showCouponSheet<T>(BuildContext context, {required String title, requ
   );
 }
 
-Widget _box(String label, String value, {Color tint = const Color(0x22E4C56A)}) => Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x22FFFFFF))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(label, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 11, letterSpacing: 1.2, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 4),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.35)),
-      ]),
-    );
-
 Widget _pill(String label, VoidCallback? onTap, {bool filled = true, Key? key}) => SizedBox(
       height: 46,
       child: TextButton(
@@ -96,39 +87,52 @@ Future<void> claimCouponCode(BuildContext context, String code) async {
   }
 }
 
-/// Pop-up 1: Coupon Detail.
+/// Pop-up 1: Coupon Detail, in Home's "Today's offer" pattern.
 Future<void> showCouponDetail(BuildContext context, WideCouponData d) => showCouponSheet<void>(context, title: d.banner, body: (ctx) => [
-      Text(d.kicker, style: const TextStyle(color: _gold, fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.w800)),
+      HomeHeaderBox(icon: Icons.local_offer_outlined, title: d.kicker.isEmpty ? 'Coupon' : '${d.kicker[0]}${d.kicker.substring(1).toLowerCase()}', subtitle: d.line),
       const SizedBox(height: 10),
-      Container(
-        key: const Key('detail_code'),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), border: Border.all(color: const Color(0x66E4C56A))),
-        child: Row(children: [
-          Expanded(child: Text(d.copy, style: const TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 1.4, fontWeight: FontWeight.w800))),
-          TextButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: d.copy));
-              ScaffoldMessenger.maybeOf(ctx)?.showSnackBar(const SnackBar(content: Text('Code copied')));
+      HomeBlackBox(
+        padding: const EdgeInsets.fromLTRB(12, 4, 14, 4),
+        child: Column(children: [
+          HomeTimelineRow(
+            key: const Key('detail_code'),
+            title: d.copy,
+            subtitle: 'Your code. Tap Copy to keep it.',
+            active: true,
+            trailing: TextButton(
+              key: const Key('detail_copy'),
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: d.copy));
+                ScaffoldMessenger.maybeOf(ctx)?.showSnackBar(const SnackBar(content: Text('Code copied')));
+              },
+              child: const Text('Copy', style: TextStyle(color: _gold, fontWeight: FontWeight.w800)),
+            ),
+          ),
+          HomeTimelineRow(title: 'Applies to', subtitle: d.foot.isEmpty ? d.line : '${d.foot[0]}${d.foot.substring(1).toLowerCase()}.'),
+          const HomeTimelineRow(title: 'Stacks with coins', subtitle: 'Coins cover only part of the price. A coupon is not cash.'),
+          HomeTimelineRow(
+            key: const Key('detail_terms'),
+            title: 'Validity',
+            subtitle: 'One coupon per order. Expires 30 days after you claim it. Tap for terms.',
+            last: true,
+            trailing: const Icon(Icons.chevron_right, color: kHomeGrey, size: 20),
+            onTap: () {
+              Navigator.pop(ctx);
+              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponTermsPage()));
             },
-            child: const Text('Copy', style: TextStyle(color: _gold, fontWeight: FontWeight.w800)),
           ),
         ]),
       ),
       const SizedBox(height: 10),
-      _box('APPLIES TO', d.foot.isEmpty ? d.line : '${d.foot[0]}${d.foot.substring(1).toLowerCase()}. ${d.line}'),
-      _box('STACKS WITH COINS', 'Coins cover only part of the price. A coupon is not cash.', tint: const Color(0x2266C6FF)),
-      _box('VALIDITY', 'One coupon per order. Expires 30 days after you claim it.', tint: const Color(0x22B07CFF)),
-      const SizedBox(height: 6),
-      _pill('Apply now', () async {
-        Navigator.pop(ctx);
-        await claimCouponCode(context, d.copy);
-      }, key: const Key('detail_apply')),
-      const SizedBox(height: 8),
-      _pill('View terms', () {
-        Navigator.pop(ctx);
-        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponTermsPage()));
-      }, filled: false, key: const Key('detail_terms')),
+      HomeActionRow(
+        icon: Icons.shopping_bag_outlined,
+        eyebrow: 'Checkout',
+        title: 'Use it',
+        pill: HomeShopPill(key: const Key('detail_apply'), label: 'Apply now', icon: Icons.check_rounded, onTap: () async {
+          Navigator.pop(ctx);
+          await claimCouponCode(context, d.copy);
+        }),
+      ),
     ]);
 
 /// Pop-up 3: Apply Coupon. Pick one coupon from the list, then apply it.
@@ -184,28 +188,27 @@ class CouponHubPage extends StatelessWidget {
     return DefaultTabController(
       length: tabs.length,
       initialIndex: start < 0 ? 0 : start,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          title: const Text('My Coupons'),
-          actions: [
-            IconButton(tooltip: 'Apply a coupon', onPressed: () => showApplyCoupon(context), icon: const Icon(Icons.local_offer_outlined)),
-            IconButton(tooltip: 'Terms', onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponTermsPage())), icon: const Icon(Icons.gavel_outlined)),
-          ],
-          bottom: TabBar(
-            isScrollable: true,
-            indicatorColor: _gold,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white60,
-            tabs: [for (final t in tabs) Tab(text: t.title)],
-          ),
+      child: CouponSubPage(
+        title: 'My Coupons',
+        actions: [
+          IconButton(tooltip: 'Apply a coupon', onPressed: () => showApplyCoupon(context), icon: const Icon(Icons.local_offer_outlined, color: Colors.white, size: 20)),
+          IconButton(tooltip: 'Terms', onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponTermsPage())), icon: const Icon(Icons.gavel_outlined, color: Colors.white, size: 20)),
+        ],
+        bottom: TabBar(
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          dividerColor: Colors.transparent,
+          indicatorColor: _gold,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white60,
+          tabs: [for (final t in tabs) Tab(text: t.title)],
         ),
         body: TabBarView(children: [
           for (final t in tabs)
             ListView(padding: const EdgeInsets.all(16), children: [
-              ProgramTabsBlock(key: ValueKey('hub_${t.id}'), spec: kCouponsSpec, initialTab: t.id, showDisclaimer: false),
+              HomeDarkSection(children: [
+                ProgramTabsBlock(key: ValueKey('hub_${t.id}'), spec: kCouponsSpec, initialTab: t.id, showDisclaimer: false),
+              ]),
             ]),
         ]),
       ),
@@ -228,13 +231,19 @@ class CouponTermsPage extends StatelessWidget {
   ];
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: Colors.white, title: const Text('Terms')),
+  Widget build(BuildContext context) => CouponSubPage(
+        title: 'Terms',
         body: ListView(padding: const EdgeInsets.all(16), children: [
-          for (final (k, v) in items) _box(k, v),
-          const SizedBox(height: 8),
-          Text(kCouponsDisclaimer, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.4)),
+          HomeDarkSection(children: [
+            const HomeHeaderBox(icon: Icons.gavel_outlined, title: 'Coupon terms', subtitle: 'What every coupon and card on NowssB follows.'),
+            HomeBlackBox(
+              padding: const EdgeInsets.fromLTRB(12, 4, 14, 4),
+              child: Column(children: [
+                for (var i = 0; i < items.length; i++) HomeTimelineRow(title: items[i].$1, subtitle: items[i].$2, active: i == 0, last: i == items.length - 1),
+              ]),
+            ),
+            Text(kCouponsDisclaimer, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12, height: 1.4)),
+          ]),
         ]),
       );
 }
@@ -266,7 +275,7 @@ class _CouponHowItWorksState extends State<CouponHowItWorks> {
   @override
   Widget build(BuildContext context) {
     final last = _i == CouponHowItWorks.slides.length - 1;
-    return Scaffold(
+    return NAppBackdrop(child: Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Column(children: [
@@ -319,7 +328,7 @@ class _CouponHowItWorksState extends State<CouponHowItWorks> {
           ),
         ]),
       ),
-    );
+    ));
   }
 }
 
