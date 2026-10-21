@@ -435,6 +435,9 @@ class _GiftsScreenState extends State<GiftsScreen> {
         cacheExtent: 1600,
         children: [
           const IdentityRails(RailKind.gifts),
+          GiftSplitCard(index: 1, title: 'Send a gift\nsomeone keeps.', cta: 'Send a gift', onTap: () => _openTabs('send')),
+          GiftSplitCard(index: 3, title: 'Got a code?\nOpen it here.', cta: 'Redeem', onTap: () => _openTabs('redeem')),
+          GiftSplitCard(index: 2, title: 'Free gifts for\nyour time today.', cta: 'Open free gifts', onTap: () => _openTabs('free')),
           RoutineDeck(
             title: 'Gifts',
             banner: 'NowssB Gifts',
@@ -536,4 +539,20 @@ class _GiftsGuideState extends State<GiftsGuide> {
       ),
     );
   }
+}
+
+
+/// Home's promo split card ("A word for the body now"): dark block with a
+/// title and outline pill on the left, bright block with a model on the right.
+class GiftSplitCard extends StatelessWidget {
+  const GiftSplitCard({super.key, required this.index, required this.title, required this.cta, this.onTap});
+  final int index;
+  final String title;
+  final String cta;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => ColoredSplitPromoBanner(
+        spec: SplitPromoExtras.at(index).copyWith(title: title, cta: cta, onTap: onTap),
+        margin: const EdgeInsets.only(bottom: 12),
+      );
 }

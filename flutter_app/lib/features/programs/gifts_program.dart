@@ -130,14 +130,13 @@ class _SendPickerState extends State<_SendPicker> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final c in cards)
-          BlackOffer(
-            title: c.label,
-            mark: NwsbMarks.gift,
-            selected: c.id == id,
-            progress: c.id == id ? 1 : 0,
-            line: c.id == id ? 'Selected · price shown on Google Play' : 'Price shown on Google Play',
-            onTap: () => setState(() => _id = c.id),
+        for (final (i, c) in cards.indexed)
+          GiftSplitCard(
+            key: ValueKey('giftcard-${c.id}'),
+            index: i,
+            title: '${c.label}\n${c.id == id ? 'Selected' : 'Price on Google Play'}',
+            cta: c.id == id ? 'Write the card' : 'Choose',
+            onTap: () => c.id == id ? showGiftCardSheet(context, c.id) : setState(() => _id = c.id),
           ),
         const SizedBox(height: 6),
         if (id != null) GoldButton(label: 'Write the card and pay on Play', onTap: () => showGiftCardSheet(context, id)),
