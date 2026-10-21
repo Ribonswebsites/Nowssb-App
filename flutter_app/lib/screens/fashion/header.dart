@@ -14,6 +14,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
+import '../../data/notifications.dart';
+import '../notifications_sheet.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -22,7 +24,7 @@ import '../../admin/template/editable.dart';
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
-    this.notifications = 0,
+    this.notifications,
     this.onNotifications,
     this.onSettings,
     this.onMenu,
@@ -36,7 +38,7 @@ class HomeHeader extends StatelessWidget {
     super.key,
     required String this.title,
     this.onBack,
-    this.notifications = 0,
+    this.notifications,
     this.onNotifications,
     this.onSettings,
     this.onMenu,
@@ -46,7 +48,8 @@ class HomeHeader extends StatelessWidget {
   final String? title;
   final VoidCallback? onBack;
 
-  final int notifications;
+  /// Bell badge count. Null reads the live unread count from NotifStore.
+  final int? notifications;
   final VoidCallback? onNotifications;
   final VoidCallback? onSettings;
   final VoidCallback? onMenu;
@@ -146,12 +149,17 @@ class HomeHeader extends StatelessWidget {
                 ),
                 ],
                 if (title == null) const Spacer(),
-                if (title == null || onNotifications != null)
-                  _HdrIcon(
+                // The bell works on every page with no wiring: it defaults to
+                // the shared notifications panel and the live unread count.
+                ListenableBuilder(
+                  listenable: NotifStore.instance,
+                  builder: (context, _) => _HdrIcon(
+                    key: const Key('home-header-bell'),
                     mark: NwsbMarks.bell,
-                    badge: notifications,
-                    onTap: onNotifications,
+                    badge: notifications ?? NotifStore.instance.unreadRaw,
+                    onTap: onNotifications ?? () => showNotificationsSheet(context),
                   ),
+                ),
                 if (title == null || onSettings != null) ...[
                   const _HdrRule(),
                   _HdrIcon(mark: NwsbMarks.gear, onTap: onSettings),
@@ -182,6 +190,7 @@ class _HdrRule extends StatelessWidget {
 
 class _HdrIcon extends StatelessWidget {
   const _HdrIcon({
+    super.key,
     required this.mark,
     this.badge = 0,
     this.stroke = 1.7,

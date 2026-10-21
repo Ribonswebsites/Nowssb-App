@@ -10,6 +10,7 @@ import 'package:nowssb/screens/shared_sections.dart';
 import 'package:nowssb/widgets/tv_frame.dart';
 import 'package:nowssb/widgets/tv_split_header.dart';
 import 'package:nowssb/screens/fashion/header.dart';
+import 'package:nowssb/screens/notifications_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_video_platform.dart';
@@ -155,5 +156,14 @@ void main() {
     await t.tap(find.byKey(const Key('home-header-back')));
     await t.pumpAndSettle();
     expect(find.text('go'), findsOneWidget);
+  });
+
+  testWidgets('HomeHeader.sub bell opens the notifications panel by default', (t) async {
+    await t.pumpWidget(const MaterialApp(home: Scaffold(body: HomeHeader.sub(title: 'Gifts'))));
+    await t.pump();
+    await t.tap(find.byKey(const Key('home-header-bell')));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.byType(NotificationsSheet), findsOneWidget);
   });
 }
