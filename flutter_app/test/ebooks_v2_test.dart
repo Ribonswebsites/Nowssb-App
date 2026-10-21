@@ -154,6 +154,7 @@ void main() {
     await t.pump();
     await t.tap(find.widgetWithText(ListTile, b0.title));
     await settle(t);
+    await t.scrollUntilVisible(find.byKey(const Key('eb-chapters')), 150, scrollable: find.byType(Scrollable).last);
     expect(find.byKey(const Key('eb-chapters')), findsOneWidget);
   });
 
