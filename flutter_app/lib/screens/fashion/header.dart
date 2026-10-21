@@ -14,8 +14,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
-import '../../data/notifications.dart';
-import '../notifications_sheet.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -24,32 +22,13 @@ import '../../admin/template/editable.dart';
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
-    this.notifications,
-    this.onNotifications,
-    this.onSettings,
-    this.onMenu,
-  })  : title = null,
-        onBack = null;
-
-  /// Sub-page variant: back arrow + [title] in the same glass bar. The
-  /// bell / gear / menu show only when their callbacks are given. [onBack]
-  /// defaults to Navigator.maybePop.
-  const HomeHeader.sub({
-    super.key,
-    required String this.title,
-    this.onBack,
-    this.notifications,
+    this.notifications = 0,
     this.onNotifications,
     this.onSettings,
     this.onMenu,
   });
 
-  /// Non-null on the sub-page variant.
-  final String? title;
-  final VoidCallback? onBack;
-
-  /// Bell badge count. Null reads the live unread count from NotifStore.
-  final int? notifications;
+  final int notifications;
   final VoidCallback? onNotifications;
   final VoidCallback? onSettings;
   final VoidCallback? onMenu;
@@ -84,37 +63,6 @@ class HomeHeader extends StatelessWidget {
             width: double.infinity,
             child: Row(
               children: [
-                if (title != null) ...[
-                  Semantics(
-                    button: true,
-                    label: 'Back',
-                    child: GestureDetector(
-                      key: const Key('home-header-back'),
-                      behavior: HitTestBehavior.opaque,
-                      onTap: onBack ?? () => Navigator.maybePop(context),
-                      child: const SizedBox(
-                        width: 42,
-                        height: 42,
-                        child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      title!,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.05,
-                        shadows: [Shadow(color: Color(0x80000000), blurRadius: 8, offset: Offset(0, 1))],
-                      ),
-                    ),
-                  ),
-                ] else ...[
                 SizedBox(
                   width: 42,
                   height: 42,
@@ -147,27 +95,16 @@ class HomeHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-                ],
-                if (title == null) const Spacer(),
-                // The bell works on every page with no wiring: it defaults to
-                // the shared notifications panel and the live unread count.
-                ListenableBuilder(
-                  listenable: NotifStore.instance,
-                  builder: (context, _) => _HdrIcon(
-                    key: const Key('home-header-bell'),
-                    mark: NwsbMarks.bell,
-                    badge: notifications ?? NotifStore.instance.unreadRaw,
-                    onTap: onNotifications ?? () => showNotificationsSheet(context),
-                  ),
+                const Spacer(),
+                _HdrIcon(
+                  mark: NwsbMarks.bell,
+                  badge: notifications,
+                  onTap: onNotifications,
                 ),
-                if (title == null || onSettings != null) ...[
-                  const _HdrRule(),
-                  _HdrIcon(mark: NwsbMarks.gear, onTap: onSettings),
-                ],
-                if (title == null || onMenu != null) ...[
-                  const _HdrRule(),
-                  _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
-                ],
+                const _HdrRule(),
+                _HdrIcon(mark: NwsbMarks.gear, onTap: onSettings),
+                const _HdrRule(),
+                _HdrIcon(mark: NwsbMarks.menu, stroke: 1.9, onTap: onMenu),
               ],
             ),
           ),
@@ -190,7 +127,6 @@ class _HdrRule extends StatelessWidget {
 
 class _HdrIcon extends StatelessWidget {
   const _HdrIcon({
-    super.key,
     required this.mark,
     this.badge = 0,
     this.stroke = 1.7,

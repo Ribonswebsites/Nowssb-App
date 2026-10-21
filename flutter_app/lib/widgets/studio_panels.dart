@@ -47,6 +47,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
   var _progress = false;
   var _chip = 0;
 
+  static const _profile = 'assets/profile_source/img-about.jpeg';
 
   @override
   void initState() {
@@ -167,6 +168,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                               children: [
                                 Row(
                                   children: [
+                                    _faces('+12'),
                                     const Spacer(),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -261,6 +263,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                Align(alignment: Alignment.centerRight, child: _faces('+2k')),
                                 Text(
                                   _lower[_chip].$2,
                                   style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.02, fontWeight: FontWeight.w700),
@@ -337,6 +340,21 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
             Container(height: 2, margin: const EdgeInsets.symmetric(horizontal: 8), color: on ? Colors.white : Colors.transparent),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _faces(String extra) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(4, 3, 8, 3),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(99)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ClipOval(child: EditableImage.asset(_profile, width: 22, height: 22, fit: BoxFit.cover, slot: 'studio_panels.PracticeCoursesPanel')),
+          const SizedBox(width: 4),
+          Text(extra, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11)),
+        ],
       ),
     );
   }

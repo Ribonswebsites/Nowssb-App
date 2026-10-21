@@ -41,14 +41,6 @@ import '../widgets/app_thinking_loader.dart';
 import 'app_settings.dart';
 import 'auth_gate.dart';
 import 'saved_words.dart';
-import 'fashion/header.dart' show HomeHeader;
-import 'notifications_sheet.dart' show showNotificationsSheet;
-import '../data/notifications.dart' show NotifStore;
-import '../nowssb_ui/nowssb_ui.dart' show NAppBackdrop;
-import '../widgets/glass_wrap.dart' show GlassWrap;
-import '../widgets/home_parts.dart' show EnterPill;
-import '../widgets/home_menu_drawer.dart' show showHomeMenuDrawer;
-import '../widgets/nwsb_icon.dart';
 import 'profile_parts/edit_profile.dart';
 import 'profile_parts/profile_guide.dart';
 import 'sound_library.dart';
@@ -70,8 +62,8 @@ const _text = Color(0xFFF5F5F3);
 const _dim = Color(0xFF8C8C8C);
 const _faint = Color(0xFF565656);
 const _border = Color(0x24FFFFFF);
-const _borderSoft = Color(0x1FFFFFFF);
-const _surface = Color(0x8C0A0A0C); // Home dark glass
+const _borderSoft = Color(0x14FFFFFF);
+const _surface = Color(0x14FFFFFF);
 const _mono = 'Roboto Mono';
 
 /// Same prebuilt banner library as `nowssb-nm.js` `NWSB_BANNERS`.
@@ -524,26 +516,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           const Positioned.fill(child: _Background()),
           Positioned.fill(child: IgnorePointer(child: CustomPaint(painter: _GrainPainter()))),
-          Column(children: [
-            ListenableBuilder(
-              listenable: NotifStore.instance,
-              builder: (context, _) => HomeHeader(
-                notifications: NotifStore.instance.unreadRaw,
-                onNotifications: () => showNotificationsSheet(context),
-                onSettings: () => _openQuick('Settings'),
-                onMenu: () => showHomeMenuDrawer(context, goTab: (t) => NavScope.goTo(context, t)),
-              ),
-            ),
-            Expanded(child: MediaQuery.removePadding(context: context, removeTop: true, child: Center(
+          SafeArea(
+            bottom: false,
+            child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: double.infinity),
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
                     LSection('face', 'Profile', _courseFace()),
-                    LSection('programs', 'Your profile grid', _homeGrid()),
-                    LSection('banner3d', '3D banner', _banner3d()),
                     LSection('earn', 'Earn hub', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
                     LSection('about', 'About', _about()),
@@ -563,8 +545,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ]),
                 ),
               ),
-            ))),
-          ]),
+            ),
+          ),
             if (_recentOpen) _recentSheet(),
             if (_guide) Positioned.fill(child: ProfileGuide(onDone: () => setState(() => _guide = false))),
           ],
@@ -572,105 +554,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
-  /// Home's 'Your programs' layout: a big dark-glass container, a tall
-  /// photo tile on the left and black icon tiles on the right.
-  Widget _homeGrid() => ListenableBuilder(
-        listenable: Listenable.merge([EconomyMirror.instance, PracticeProgress.instance]),
-        builder: (context, _) {
-          final streak = EconomyMirror.instance.live ? EconomyMirror.instance.streak : PracticeProgress.instance.streak;
-          final tiles = <(String, String, String, VoidCallback)>[
-            ('Coins earned', '${EconomyMirror.instance.coins}', NwsbMarks.earn, () => Programmes.open(context, Programme.rewards, tab: 'wallet')),
-            ('Streak', '$streak days', NwsbMarks.flame, () => NavScope.goTo(context, 1)),
-            ('Score', '${PracticeProgress.instance.totalSessions}', NwsbMarks.rewards, () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const PracticeProgressScreen()))),
-            ('Saved words', '${PracticeProgress.instance.uniqueWords}', NwsbMarks.word, () => _openQuick('Saved')),
-            ('Your Earning', 'Open', NwsbMarks.piggy, () => Programmes.open(context, Programme.earnings)),
-            ('Edit profile', _nameController.text, NwsbMarks.user, _openEditProfile),
-          ];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 28),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Padding(padding: EdgeInsets.fromLTRB(4, 0, 4, 10), child: Text('Your profile', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.05))),
-              GlassWrap(
-                margin: EdgeInsets.zero,
-                padding: const EdgeInsets.all(8),
-                child: SizedBox(
-                  height: 176,
-                  child: Row(children: [
-                    GestureDetector(
-                      onTap: _openPhotoChoices,
-                      child: ClipRRect(borderRadius: BorderRadius.circular(16), child: SizedBox(width: 112, height: 176, child: Stack(fit: StackFit.expand, children: [
-                        const Image(image: AssetImage('assets/banners/earn/yoga-light.png'), fit: BoxFit.cover, alignment: Alignment(0, -0.15)),
-                        Positioned(left: 8, bottom: 8, child: Container(width: 40, height: 40, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)), child: ClipOval(child: _avatarBubble()))),
-                      ]))),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: SizedBox(
-                        height: 132,
-                        child: ListView(key: const Key('profile-grid'), scrollDirection: Axis.horizontal, children: [
-                          for (final t in tiles)
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: GestureDetector(
-                                onTap: t.$4,
-                                child: Container(
-                                  width: 104,
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                                  decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x33FFFFFF))),
-                                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                    Container(width: 42, height: 42, alignment: Alignment.center, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: NwsbIcon(t.$3, size: 20, color: const Color(0xFF0A0A0C), strokeWidth: 1.8)),
-                                    const SizedBox(height: 8),
-                                    Text(t.$1, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
-                                    const SizedBox(height: 2),
-                                    Text(t.$2, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 11)),
-                                  ]),
-                                ),
-                              ),
-                            ),
-                        ]),
-                      ),
-                    ),
-                  ]),
-                ),
-              ),
-            ]),
-          );
-        },
-      );
-
-  /// Wide 3D render banner with Home's white Enter pill and a gold Shop pill.
-  Widget _banner3d() => Padding(
-        padding: const EdgeInsets.only(bottom: 28),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Stack(fit: StackFit.expand, children: [
-              Image.asset('assets/banners/programs/rewards.png', fit: BoxFit.cover),
-              const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xCC000000), Color(0x00000000)]))),
-              Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('YOUR PRACTICE', style: TextStyle(color: Color(0xFFE3BD7D), fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 6),
-                  const Text('Keep your\nstreak glowing', style: TextStyle(color: Colors.white, fontSize: 24, height: 1.08, fontWeight: FontWeight.w800)),
-                  const Spacer(),
-                  Row(children: [
-                    EnterPill(key: const Key('profile-enter'), onTap: () => NavScope.goTo(context, 1)),
-                    const SizedBox(width: 10),
-                    GestureDetector(
-                      key: const Key('profile-shop'),
-                      onTap: () => _openShop('Shop'),
-                      child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), decoration: BoxDecoration(color: const Color(0xFFF1DDB2), borderRadius: BorderRadius.circular(999)), child: const Text('Shop Now', style: TextStyle(color: Color(0xFF1A1408), fontWeight: FontWeight.w700, fontSize: 13))),
-                    ),
-                  ]),
-                ]),
-              ),
-            ]),
-          ),
-        ),
-      );
 
   Widget _courseFace() {
     return ListenableBuilder(
@@ -696,6 +579,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return CourseFace(
           avatar: _avatarBubble(),
           onAvatar: _openPhotoChoices,
+          onBell: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const InboxScreen())),
           segments: const ['You', 'Progress'],
           segment: _face,
           onSegment: (i) => setState(() => _face = i),
@@ -1667,9 +1551,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 class _Background extends StatelessWidget {
   const _Background();
-  // Home's own background video (AppBackdrop via the shared kit wrapper).
   @override
-  Widget build(BuildContext context) => const NAppBackdrop();
+  Widget build(BuildContext context) => const Stack(
+        fit: StackFit.expand,
+        children: [
+          NwsbVideo(
+            asset: 'assets/video/subscription-bg.mp4',
+            priority: ClipPriority.decoration,
+            autoplay: true,
+            loop: true,
+            fit: BoxFit.cover,
+            slot: 'profile.Background',
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x66060C18), Color(0x44060C18), Color(0x99060C18)],
+              ),
+            ),
+          ),
+        ],
+      );
 }
 
 class _GrainPainter extends CustomPainter {
@@ -1695,7 +1599,7 @@ class GlassCard extends StatelessWidget {
   final Gradient? overlay;
   final Color? backgroundColor;
   final double? minHeight;
-  const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.margin, this.radius = 24, this.image, this.overlay, this.backgroundColor, this.minHeight});
+  const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.margin, this.radius = 22, this.image, this.overlay, this.backgroundColor, this.minHeight});
   @override
   Widget build(BuildContext context) => Container(
         margin: margin,

@@ -31,9 +31,7 @@ class EarnBackground extends StatelessWidget {
   final Widget child;
   @override
   Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
-        // Home's background video (AppBackdrop). Tests have no video plugin,
-        // so they draw that video's own poster frame.
-        if (earnNoVideo) Image.asset('assets/video/subscription-bg-poster.webp', fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF08090B))) else const NAppBackdrop(),
+        const NAppBackdrop(),
         const ColoredBox(color: Color(0x40000000)),
         child,
       ]);
@@ -58,12 +56,12 @@ class Frost extends StatelessWidget {
         padding: padding,
         decoration: BoxDecoration(
           borderRadius: r,
-          border: Border.all(color: const Color(0x33FFFFFF)),
-          // Home's dark glass:, cool frost with a dark base so text reads over any frame.
+          border: Border.all(color: const Color(0x4DFFFFFF)),
+          // Even, cool frost with a dark base so text reads over any frame.
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color.alphaBlend(t.withValues(alpha: .10), const Color(0x99101016)), Color.alphaBlend(t.withValues(alpha: .04), const Color(0xA60B0B10))],
+            colors: [Color.alphaBlend(t.withValues(alpha: .18), const Color(0x8C1A1530)), Color.alphaBlend(t.withValues(alpha: .06), const Color(0x991A1530))],
           ),
           boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 18, offset: Offset(0, 8))],
         ),

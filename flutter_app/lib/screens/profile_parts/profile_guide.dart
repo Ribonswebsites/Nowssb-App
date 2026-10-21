@@ -1,7 +1,7 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../nowssb_ui/nowssb_ui.dart';
 
 /// First-use guide for the Profile page: a frosted card with a photo-free
 /// icon, title, body, Skip link, page dots and a white Next pill.
@@ -40,17 +40,20 @@ class _ProfileGuideState extends State<ProfileGuide> {
     final s = _steps[_i];
     final last = _i == _steps.length - 1;
     return Material(
-      color: Colors.black.withValues(alpha: .55),
+      color: Colors.black.withOpacity(.55),
       child: SafeArea(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
-            child: NGlass(
-              key: const Key('profile-guide'),
-              radius: 36,
-              blur: 22,
-              padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(36),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                child: Container(
+                  key: const Key('profile-guide'),
+                  padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
+                  decoration: BoxDecoration(color: const Color(0x26FFFFFF), borderRadius: BorderRadius.circular(36), border: Border.all(color: const Color(0x4DFFFFFF))),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
                     Container(width: 84, height: 84, decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0x22FFFFFF), border: Border.all(color: const Color(0x55FFFFFF))), child: Icon(s.$1, color: Colors.white, size: 38)),
                     const SizedBox(height: 18),
                     Container(
@@ -76,6 +79,8 @@ class _ProfileGuideState extends State<ProfileGuide> {
                       ]),
                     ),
                   ]),
+                ),
+              ),
             ),
           ),
         ),

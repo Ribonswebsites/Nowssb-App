@@ -37,7 +37,6 @@ import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
-import '../../widgets/tv_split_header.dart';
 import 'follow_steps.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/carousel_fx.dart';
@@ -330,10 +329,8 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           TvFrame(
-            asset: 'assets/video/tv-split.mp4',
+            asset: 'assets/video/hero-tv.mp4',
             frame: DeviceFrame.tvLandscape,
-            // Poster still if the clip can't start.
-            showPoster: true,
             autoplay: live,
             onTap: onExplore,
             // `.hero-content` IS the screen — index.html:1705. The wordmark,
@@ -346,7 +343,7 @@ class _HeroCard extends StatelessWidget {
             // and the tagline, the word, the picture rail and the two
             // buttons go" (part084.js:398). The thing you tapped is the
             // thing that answers.
-            overlay: guide ? const FstTitle() : const TvSplitHeader(),
+            overlay: guide ? const FstTitle() : _Screen(live: live),
           ),
           const SizedBox(height: 10),
           // `.hs-foot` — Explore and App Guide on the left, then Learn and

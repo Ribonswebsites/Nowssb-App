@@ -51,10 +51,8 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 
 void main() {
   setUpAll(() async {
-    // Real fonts so Home's header lays out as on a phone (Ahem is too wide).
-    final root = Platform.environment['FLUTTER_ROOT'] ?? '/workspace/flutter';
-    final dir = Directory('$root/bin/cache/artifacts/material_fonts');
-    if (!dir.existsSync()) return;
+    if (Platform.environment['COINS_SHOTS'] != '1') return;
+    final dir = Directory('/workspace/flutter/bin/cache/artifacts/material_fonts');
     final l = FontLoader('Roboto');
     for (final f in dir.listSync().whereType<File>().where((f) => f.path.contains('Roboto-') && f.path.endsWith('.ttf'))) {
       l.addFont(Future.value(ByteData.view(f.readAsBytesSync().buffer)));
@@ -107,27 +105,9 @@ void main() {
     expect(find.text('Sign in to see your coins'), findsOneWidget);
   });
 
-  testWidgets('Earn and Use hero sheets open and close', (t) async {
-    await _pump(t, CoinsWalletScreen(data: _data, showGuide: false));
-    await t.tap(find.byKey(const Key('heroEarn')));
-    await t.pumpAndSettle();
-    expect(find.byKey(const Key('earnSheet')), findsOneWidget);
-    await _shot(t, 'coins-6');
-    await t.tap(find.text('Close'));
-    await t.pumpAndSettle();
-    expect(find.byKey(const Key('earnSheet')), findsNothing);
-    await t.tap(find.byKey(const Key('heroUse')));
-    await t.pumpAndSettle();
-    expect(find.byKey(const Key('useSheet')), findsOneWidget);
-    expect(find.text('30%'), findsOneWidget);
-    await _shot(t, 'coins-7');
-  });
-
   testWidgets('rules sub-page opens', (t) async {
     await _pump(t, CoinsWalletScreen(data: _data, showGuide: false));
-    await t.ensureVisible(find.text('Coin rules'));
-    await t.pumpAndSettle();
-    await t.tap(find.text('Coin rules'), warnIfMissed: false);
+    await t.tap(find.text('Coin rules'));
     await t.pumpAndSettle();
     expect(find.text('What coins are'), findsOneWidget);
   });

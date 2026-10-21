@@ -29,7 +29,7 @@ void main() {
   // Settings persist through SharedPreferences, which has no platform in a
   // test — getInstance() never completes and the whole file hangs rather
   // than failing. An in-memory store is the sanctioned stand-in.
-  SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1', 'guide_seen_store_home': true});
+  SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
 
   setUpAll(() {
     FakeVideoPlatform();
@@ -125,10 +125,7 @@ void main() {
     // a zero-opacity EditableLabel keeps the slot id for the template editor).
     // Terms for the hub are pre-accepted via SharedPreferences mock above.
     await pump(tester, const StoreScreen());
-    // The page list, not the horizontal category tabs / Spotlight rails.
-    final scrollable = find.descendant(
-        of: find.byKey(const Key('storeHomeList')),
-        matching: find.byType(Scrollable)).first;
+    final scrollable = find.byType(Scrollable).first;
     for (final label in [
       'WORD ATELIER',
       'MEANING STORE',

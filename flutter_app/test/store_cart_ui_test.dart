@@ -48,7 +48,7 @@ void main() {
       expect(atelier, contains('storeBuyNow('));
       expect(atelier, contains('openAtelierWord('));
       expect(atelier, contains('showStoreViewAllPanel('));
-      expect(atelier, contains("withStoreGuide('word_atelier', false)"));
+      expect(atelier, contains("withStoreGuide('word_atelier')"));
       expect(atelier, isNot(contains('Icons.shopping_cart_outlined')));
       expect(atelier, isNot(contains('storeMidRailBannerAt')));
       expect(atelier, isNot(contains('IntroGate')));
@@ -57,11 +57,12 @@ void main() {
       for (final path in [
         'lib/screens/store/word_atelier.dart',
         'lib/screens/store/meaning_store.dart',
+        'lib/screens/store/signature_store.dart',
         'lib/screens/store/ebooks_store.dart',
       ]) {
         final src = File(path).readAsStringSync();
         expect(src, isNot(contains('IntroGate')), reason: path);
-        expect(src.contains('PageShell(') || src.contains('StoreSubPage('), isTrue, reason: path);
+        expect(src, contains('PageShell('), reason: path);
       }
 
       final storeHome = File('lib/screens/store.dart').readAsStringSync();

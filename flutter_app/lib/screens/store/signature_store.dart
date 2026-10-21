@@ -12,11 +12,7 @@ import '../../data/store_catalog.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
 import '../../widgets/colored_split_promo_banner.dart';
-import '../../widgets/app_backdrop.dart';
-import '../../widgets/home_skin.dart';
-import '../../widgets/home_parts.dart';
-import '../../media/nwsb_video.dart';
-import '../fashion/header.dart';
+import '../../widgets/page_shell.dart';
 import 'product_detail.dart';
 import 'store_cards.dart';
 import 'store_home_sections.dart';
@@ -37,64 +33,29 @@ import '../../widgets/n_motion.dart';
 class SignatureStoreScreen extends StatelessWidget {
   const SignatureStoreScreen({super.key});
 
-  /// Styled like NowssB Home: Home's backdrop film and veil, Home's top bar,
-  /// dark-glass section panes, 3D banners and Enter/Shop pills.
   @override
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'signature',
         head: 'Signatures described by sound',
-        child: Scaffold(
-          backgroundColor: NwsbColors.deep,
-          body: Stack(
-            children: [
-              const Positioned.fill(child: AppBackdrop()),
-              const Positioned.fill(
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        center: Alignment(0, -0.1),
-                        radius: 0.88,
-                        colors: [Color(0x00000000), Color(0x24000000), Color(0x57000000), Color(0x94000000)],
-                        stops: [0.30, 0.58, 0.80, 1.0],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Column(
-                children: [
-                  HomeHeader(
-                    onMenu: () => showStoreSelectSheet(
-                      context,
-                      current: 'signature',
-                      onSelect: (id) => openStoreFromPicker(context, id, current: 'signature'),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 48),
-                      children: [
-                        Row(children: [
-                          IconButton(
-                            key: const ValueKey('sig-back'),
-                            onPressed: () => Navigator.of(context).maybePop(),
-                            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                          ),
-                          const Expanded(
-                            child: Text('The Signature Store',
-                                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-                          ),
-                        ]),
-                        const SizedBox(height: 6),
-                        const SignatureBody(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
+        child: PageShell(
+        eyebrow: '',
+        title: 'NowssB Store',
+        subtitle: 'The Signature Store',
+        film: 'assets/video/subscription-bg.mp4',
+        usePageFilm: true,
+        onBack: () => Navigator.of(context).pop(),
+        onStorePicker: () => showStoreSelectSheet(
+          context,
+          current: 'signature',
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'signature'),
+        ),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
+            sliver: SliverList.list(children: const [SignatureBody()]),
           ),
+        ],
         ),
       );
 }
@@ -124,10 +85,7 @@ Color signatureRarityColor(String rarity) => switch (rarity) {
     };
 
 class SignatureBody extends StatefulWidget {
-  const SignatureBody({super.key, this.autoGuide = true, this.showRooms = true, this.banners = true});
-
-  /// Plays the 3D banner films (off in tests).
-  final bool banners;
+  const SignatureBody({super.key, this.autoGuide = true, this.showRooms = true});
 
   /// The store room deck on top (off in isolated tests).
   final bool showRooms;
@@ -185,26 +143,23 @@ class _SignatureBodyState extends State<SignatureBody> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Padding(
         padding: const EdgeInsets.all(16),
-        child: Container(
+        child: GlassWrapper(
+          blur: true,
+          radius: 28,
           padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            color: const Color(0xF20B0B12),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: NwsbColors.goldLight.withValues(alpha: 0.55)),
-          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(children: [
-                const Icon(Icons.lock_rounded, color: NwsbColors.goldLight),
+                const Icon(Icons.lock_rounded, color: Colors.white70),
                 const SizedBox(width: 8),
                 _RarityPill(d.$2),
               ]),
               const SizedBox(height: 14),
               Text(d.$1,
                   style: const TextStyle(
-                      color: NwsbColors.goldLight,
+                      color: Colors.white,
                       fontSize: 24,
                       fontWeight: FontWeight.w700)),
               const SizedBox(height: 6),
@@ -247,23 +202,19 @@ class _SignatureBodyState extends State<SignatureBody> {
               for (final t in kSignatureTabs)
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: GestureDetector(
+                  child: ChoiceChip(
                     key: ValueKey('sig-tab-$t'),
-                    onTap: () => setState(() => _tab = t),
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                      decoration: BoxDecoration(
-                        color: _tab == t ? Colors.white : const Color(0xFF0B0B12),
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(color: _tab == t ? Colors.white : const Color(0x24FFFFFF)),
-                      ),
-                      child: Text(t,
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: _tab == t ? Colors.black : NwsbColors.goldLight)),
-                    ),
+                    label: Text(t),
+                    selected: _tab == t,
+                    showCheckmark: false,
+                    labelStyle: TextStyle(
+                        color: _tab == t ? Colors.black : Colors.white,
+                        fontWeight: FontWeight.w600),
+                    selectedColor: Colors.white,
+                    backgroundColor: Colors.white.withValues(alpha: 0.12),
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.35)),
+                    shape: const StadiumBorder(),
+                    onSelected: (_) => setState(() => _tab = t),
                   ),
                 ),
             ]),
@@ -290,6 +241,14 @@ class _SignatureBodyState extends State<SignatureBody> {
   Widget _upcoming() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 8, bottom: 10),
+            child: Text('Upcoming drops',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700)),
+          ),
           SizedBox(
             height: 236,
             child: ListView.separated(
@@ -303,7 +262,7 @@ class _SignatureBodyState extends State<SignatureBody> {
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 16),
         ],
       );
 
@@ -319,25 +278,10 @@ class _SignatureBodyState extends State<SignatureBody> {
       // Server-driven order (Admin → UI Editor); bundled order by default.
       children: [
         if (widget.showRooms) const StoreRoomDeck(current: 'signature'),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: SignatureRxCard(
-            banner: widget.banners,
-            words: [for (final w in words.take(2)) (w.name, 'Most exclusive')],
-            onWord: (i) => openAtelierWord(context, word: words[i].name, root: 'Most Exclusive', img: kNowssbStoreMark, signature: true),
-            onEnter: () => setState(() => _tab = 'Words'),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 14),
-          child: SectionPane(child: _header()),
-        ),
-        if (show('Upcoming')) SignaturePane(eyebrow: 'Upcoming drops', child: _upcoming()),
+        _header(),
+        if (show('Upcoming')) _upcoming(),
         if (show('Words'))
-        SignaturePane(
-          eyebrow: 'Signature words',
-          onShop: words.isEmpty ? null : () => storeBuyNow(context, wordBagItem(name: words.first.name, root: 'Most Exclusive', img: kNowssbStoreMark, signature: true)),
-          child: RoutineDeck(
+        RoutineDeck(
           title: 'Signature words',
           banner: 'Most exclusive',
           bannerSub: 'The mark on a word',
@@ -356,11 +300,8 @@ class _SignatureBodyState extends State<SignatureBody> {
               ),
           ],
         ),
-        ),
         if (show('Meanings'))
-        SignaturePane(
-          eyebrow: 'Signature meanings',
-          child: RoutineDeck(
+        RoutineDeck(
           title: 'Signature meanings',
           banner: 'Meanings',
           bannerSub: 'The mark on a meaning',
@@ -382,7 +323,6 @@ class _SignatureBodyState extends State<SignatureBody> {
                 onBuy: () => storeBuyNow(context, meaningBagItem(word: e.value.word, root: e.value.root, img: kNowssbStoreMark, price: kMsSignaturePrice, signature: true)),
               ),
           ],
-        ),
         ),
         if (show('Places'))
         for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
@@ -481,142 +421,4 @@ class _LockedCard extends StatelessWidget {
       ),
     );
   }
-}
-
-/// The Signature hero, built like Home's NowssB Prescription card: 3D fiery
-/// banner, gold eyebrow, italic quote, two black word tiles in gold and a
-/// "Tap word to practice" row with an Enter pill.
-class SignatureRxCard extends StatelessWidget {
-  const SignatureRxCard({super.key, required this.words, this.onWord, this.onEnter, this.banner = true});
-  final List<(String, String)> words;
-  final void Function(int index)? onWord;
-  final VoidCallback? onEnter;
-  final bool banner;
-
-  @override
-  Widget build(BuildContext context) => SectionPane(
-        padding: EdgeInsets.zero,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: ClipRect(
-                child: banner
-                    ? const NwsbVideo(asset: 'assets/video/rx-banner.mp4', slot: 'signature_store.SignatureRxCard')
-                    : const ColoredBox(color: Color(0xFF2A0E06)),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(children: [
-                    Container(width: 9, height: 9, color: NwsbColors.goldLight),
-                    const SizedBox(width: 10),
-                    const Expanded(
-                      child: Text('NOWSSB SIGNATURE',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 12, letterSpacing: 2, fontWeight: FontWeight.w700, color: NwsbColors.goldLight)),
-                    ),
-                    const Text('Most exclusive', style: TextStyle(fontSize: 12, color: Color(0x99FFFFFF))),
-                  ]),
-                  const SizedBox(height: 14),
-                  Container(height: 1, color: const Color(0x14FFFFFF)),
-                  const SizedBox(height: 14),
-                  const Text('"A word crafted only for you — your mark, delivered within 48 hours."',
-                      style: TextStyle(fontSize: 13.5, fontStyle: FontStyle.italic, color: Color(0xCCFFFFFF), height: 1.5)),
-                  const SizedBox(height: 16),
-                  Row(children: [
-                    for (var i = 0; i < words.length && i < 2; i++) ...[
-                      if (i > 0) const SizedBox(width: 10),
-                      Expanded(
-                        child: GestureDetector(
-                          key: ValueKey('sig-rx-word-$i'),
-                          onTap: () => onWord?.call(i),
-                          behavior: HitTestBehavior.opaque,
-                          child: Container(
-                            height: 96,
-                            padding: const EdgeInsets.all(14),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF0B0B12),
-                              border: Border.all(color: const Color(0x14FFFFFF)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(words[i].$1.toUpperCase(),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: NwsbColors.goldLight)),
-                                const SizedBox(height: 4),
-                                Text(words[i].$2,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 12, color: Color(0xB3FFFFFF))),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ]),
-                  const SizedBox(height: 14),
-                  Row(children: [
-                    const Expanded(
-                      child: Text('Tap word to practice',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 12, color: Color(0x8CFFFFFF))),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF14141C),
-                        border: Border.all(color: const Color(0x24FFFFFF)),
-                      ),
-                      child: EnterPill(key: const ValueKey('sig-rx-enter'), onTap: onEnter),
-                    ),
-                  ]),
-                ],
-              ),
-            ),
-          ],
-        ),
-      );
-}
-
-/// A dark-glass Home pane with a gold eyebrow and a Shop pill.
-class SignaturePane extends StatelessWidget {
-  const SignaturePane({super.key, required this.eyebrow, required this.child, this.onShop});
-  final String eyebrow;
-  final Widget child;
-  final VoidCallback? onShop;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: SectionPane(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(children: [
-                Container(width: 9, height: 9, color: NwsbColors.goldLight),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(eyebrow.toUpperCase(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12, letterSpacing: 2, fontWeight: FontWeight.w700, color: NwsbColors.goldLight)),
-                ),
-                if (onShop != null) EnterPill(label: 'Shop', onTap: onShop),
-              ]),
-              const SizedBox(height: 10),
-              child,
-            ],
-          ),
-        ),
-      );
 }

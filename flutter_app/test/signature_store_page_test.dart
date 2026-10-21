@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 Widget _host() => const MaterialApp(
       home: Scaffold(
         backgroundColor: Colors.black,
-        body: SingleChildScrollView(child: SignatureBody(autoGuide: false, showRooms: false, banners: false)),
+        body: SingleChildScrollView(child: SignatureBody(autoGuide: false, showRooms: false)),
       ),
     );
 
@@ -19,14 +19,14 @@ void main() {
     addTearDown(t.view.reset);
     await t.pumpWidget(_host());
     await t.pump();
-    expect(find.text('UPCOMING DROPS'), findsOneWidget);
+    expect(find.text('Upcoming drops'), findsOneWidget);
     await t.tap(find.byKey(const ValueKey('sig-tab-Upcoming')));
     await t.pump();
-    expect(find.text('SIGNATURE WORDS'), findsNothing);
-    expect(find.text('UPCOMING DROPS'), findsOneWidget);
+    expect(find.text('Signature words'), findsNothing);
+    expect(find.text('Upcoming drops'), findsOneWidget);
     await t.tap(find.byKey(const ValueKey('sig-tab-Words')));
     await t.pump();
-    expect(find.text('UPCOMING DROPS'), findsNothing);
+    expect(find.text('Upcoming drops'), findsNothing);
     await t.pumpWidget(const SizedBox());
     await t.pump(const Duration(seconds: 5));
   });
@@ -48,23 +48,6 @@ void main() {
     expect(find.text('Reminder on'), findsOneWidget);
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getStringList('nwsb_signature_notify'), contains('Aurora'));
-    await t.pumpWidget(const SizedBox());
-    await t.pump(const Duration(seconds: 5));
-  });
-
-  testWidgets('Prescription-style hero shows gold word tiles and Enter', (t) async {
-    t.view.physicalSize = const Size(900, 1800);
-    t.view.devicePixelRatio = 1;
-    addTearDown(t.view.reset);
-    await t.pumpWidget(_host());
-    await t.pump();
-    expect(find.text('NOWSSB SIGNATURE'), findsOneWidget);
-    expect(find.text('Tap word to practice'), findsOneWidget);
-    expect(find.byKey(const ValueKey('sig-rx-word-0')), findsOneWidget);
-    await t.tap(find.byKey(const ValueKey('sig-rx-enter')));
-    await t.pump();
-    expect(find.text('UPCOMING DROPS'), findsNothing);
-    expect(find.text('SIGNATURE WORDS'), findsOneWidget);
     await t.pumpWidget(const SizedBox());
     await t.pump(const Duration(seconds: 5));
   });

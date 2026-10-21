@@ -1,4 +1,4 @@
-/// Every primary page uses Home's film (normal-glass-background.mp4).
+/// Every primary page uses the profile film.
 library;
 
 import 'package:flutter/material.dart';
@@ -8,32 +8,20 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 
 class AppBackdrop extends StatelessWidget {
-  const AppBackdrop({super.key, this.base = NwsbColors.deep});
-
-  /// Colour under the film before its first frame (Home passes its pale one).
-  final Color base;
-
-  /// Home's film. Every page that uses AppBackdrop plays this same asset,
-  /// so swapping it here changes the background everywhere at once, and the
-  /// pool hands every page the same clip rather than a decoder each.
-  static const asset = 'assets/video/normal-glass-background.mp4';
+  const AppBackdrop({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return const Stack(
       fit: StackFit.expand,
       children: [
-        ColoredBox(color: base),
-        const IgnorePointer(
-          child: NwsbVideo(
-            asset: asset,
-            fit: BoxFit.cover,
-            priority: ClipPriority.feature,
-            autoplay: true,
-            loop: true,
-            showPoster: true,
-            slot: 'app_backdrop.AppBackdrop',
-          ),
+        ColoredBox(color: NwsbColors.deep),
+        NwsbVideo(
+          asset: 'assets/video/subscription-bg.mp4',
+          priority: ClipPriority.feature,
+          autoplay: true,
+          loop: true,
+          slot: 'app_backdrop.AppBackdrop',
         ),
       ],
     );

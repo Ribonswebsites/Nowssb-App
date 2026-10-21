@@ -15,9 +15,6 @@ Widget _host(Word w, {bool open = true}) =>
 
 void main() {
   testWidgets('changes between 10 levels with buttons and chips', (t) async {
-    t.view.physicalSize = const Size(1170, 2532);
-    t.view.devicePixelRatio = 3;
-    addTearDown(t.view.reset);
     await t.pumpWidget(_host(_w(const [
       WordStage(title: 'Breath', text: 'Slow in', audio: ''),
       WordStage(title: 'Hum', text: 'Low hum', audio: ''),
@@ -31,10 +28,7 @@ void main() {
     await t.tap(find.byKey(const Key('wordLevelPrev')));
     await t.pump();
     expect(find.text('Level 1 of 10'), findsOneWidget);
-    final rail = t.state<ScrollableState>(find.byType(Scrollable).last);
-    rail.position.jumpTo(rail.position.maxScrollExtent);
-    await t.pump();
-    await t.ensureVisible(find.byKey(const Key('wordLevel10')));
+    await t.drag(find.byType(ListView), const Offset(-400, 0));
     await t.pump();
     await t.tap(find.byKey(const Key('wordLevel10')));
     await t.pump();
@@ -44,17 +38,11 @@ void main() {
   });
 
   testWidgets('empty word: honest empty state', (t) async {
-    t.view.physicalSize = const Size(1170, 2532);
-    t.view.devicePixelRatio = 3;
-    addTearDown(t.view.reset);
     await t.pumpWidget(_host(_w(const [])));
     expect(find.textContaining("isn't available"), findsOneWidget);
   });
 
   testWidgets('locked word: higher levels ask to unlock', (t) async {
-    t.view.physicalSize = const Size(1170, 2532);
-    t.view.devicePixelRatio = 3;
-    addTearDown(t.view.reset);
     await t.pumpWidget(_host(_w(const [
       WordStage(title: 'A', text: 'a', audio: ''),
       WordStage(title: 'B', text: 'b', audio: ''),

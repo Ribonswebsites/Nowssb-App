@@ -11,8 +11,6 @@
 library;
 
 import 'store_first_use_guide.dart';
-import 'store_sub_page.dart';
-import '../../nowssb_ui/app_video_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -74,13 +72,18 @@ class MeaningStoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'meaning',
         head: 'Meanings described by sound',
-        child: StoreSubPage(
-        title: 'Meanings',
+        child: PageShell(
+        eyebrow: '',
+        title: 'NowssB Store',
         subtitle: 'The Meaning Store',
+        film: 'assets/video/subscription-bg.mp4',
+        usePageFilm: true,
+        onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
           current: 'meaning',
-          onSelect: (id) => openStoreFromPicker(context, id, current: 'meaning'),
+          onSelect: (id) =>
+              openStoreFromPicker(context, id, current: 'meaning'),
         ),
         slivers: [
           SliverPadding(
@@ -89,7 +92,7 @@ class MeaningStoreScreen extends StatelessWidget {
           ),
         ],
         ),
-      ).withStoreGuide('meaning_store', false);
+      ).withStoreGuide('meaning_store');
 }
 
 class _MeaningStoreBody extends StatefulWidget {

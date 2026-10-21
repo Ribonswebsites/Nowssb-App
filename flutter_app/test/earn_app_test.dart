@@ -120,7 +120,6 @@ void main() {
     await _shot(t, 'earn-2');
     await t.tap(find.byKey(const Key('earn-target-500')));
     await t.pump(const Duration(milliseconds: 400));
-    await t.pump(const Duration(milliseconds: 800)); // bottom sheet slide-in
     expect(find.textContaining('Sell 260 more words'), findsOneWidget);
     await _shot(t, 'earn-3');
     await t.tap(find.text('Close'));
@@ -130,7 +129,6 @@ void main() {
     expect(find.text('2 direct · 1 level 2'), findsOneWidget);
     await _shot(t, 'earn-4');
     await t.tap(find.byKey(const Key('earn-member-a')));
-    await t.pump(const Duration(milliseconds: 400));
     await t.pump(const Duration(milliseconds: 400));
     expect(find.textContaining('Words sold: 112'), findsOneWidget);
     await _shot(t, 'earn-6');

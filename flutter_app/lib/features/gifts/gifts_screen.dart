@@ -19,7 +19,6 @@ import '../../widgets/four_banners.dart';
 import '../../admin/template/editable.dart';
 import '../economy/reward_fx.dart';
 import 'gift_show.dart';
-import '../coupons/coupon_home_style.dart';
 import 'spin_wheel.dart';
 import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
@@ -219,15 +218,14 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: inset),
       child: ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 13, sigmaY: 13),
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
           child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 26),
+            padding: const EdgeInsets.fromLTRB(18, 10, 18, 26),
             decoration: const BoxDecoration(
-              color: Color(0xD9000000),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-              border: Border(top: BorderSide(color: Color(0x24FFFFFF)), left: BorderSide(color: Color(0x24FFFFFF)), right: BorderSide(color: Color(0x24FFFFFF))),
+              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xE6101010), Color(0xF5000000)]),
+              border: Border(top: BorderSide(color: Color(0x55E4C56A))),
             ),
             child: SingleChildScrollView(
               child: Column(
@@ -259,17 +257,12 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
                           children: [
                             Row(children: [
                               EditableLabel('gifts_screen.GiftCardSheet', 'NOWSSB GIFT', style: TextStyle(color: colors[1], fontSize: 11, letterSpacing: 2.4, fontWeight: FontWeight.w800)),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: FutureBuilder<String>(
-                                  future: _price,
-                                  builder: (context, snap) => Text(
-                                    snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? 'Price on Google Play' : snap.data!,
-                                    textAlign: TextAlign.end,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
-                                  ),
+                              const Spacer(),
+                              FutureBuilder<String>(
+                                future: _price,
+                                builder: (context, snap) => Text(
+                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? 'Price on Google Play' : snap.data!,
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
                                 ),
                               ),
                             ]),
@@ -320,13 +313,7 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
                       'The code exists only after Google Play accepts the payment. It is valid for a year. Unopened cards can be cancelled within 7 days. Coins cannot be gifted.',
                       style: TextStyle(color: NwsbColors.mist, fontSize: 11.5, height: 1.4)),
                   const SizedBox(height: 14),
-                  HomeActionRow(
-                    icon: Icons.lock_outline,
-                    eyebrow: 'Google Play checkout',
-                    title: widget.card.label,
-                    onTap: _busy ? null : _buy,
-                    pill: HomeShopPill(key: const Key('gift_pay'), label: _busy ? 'Waiting…' : 'Pay on Play', onTap: _busy ? null : _buy),
-                  ),
+                  GoldButton(label: _busy ? 'Waiting for Google Play…' : 'Pay on Play and create the code', onTap: _busy ? null : _buy),
                   if (_note != null) ...[const SizedBox(height: 10), EconomyNote(_note!)],
                 ],
               ),
@@ -350,9 +337,9 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
             counterText: '',
             prefixIcon: Icon(icon, color: const Color(0xFFE4C56A), size: 18),
             filled: true,
-            fillColor: Colors.black,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x24FFFFFF))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x24FFFFFF))),
+            fillColor: const Color(0x14FFFFFF),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x33FFFFFF))),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x33FFFFFF))),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE4C56A))),
           ),
         ),
@@ -398,127 +385,76 @@ class _GiftsScreenState extends State<GiftsScreen> {
   void _tab(String id) => _go.value?.call(id);
 
   void _openSpin(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CouponSubPage(
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EconomyPage(
       title: 'Daily spin',
-      body: SingleChildScrollView(padding: EdgeInsets.all(16), child: HomeDarkSection(children: [
-        HomeHeaderBox(icon: Icons.casino_outlined, title: 'Daily spin', subtitle: 'One free spin a day. Prizes come from the server.'),
-        GiftWheel(),
-      ])),
+      mark: NwsbMarks.gift,
+      child: SingleChildScrollView(padding: EdgeInsets.all(16), child: GiftWheel()),
     )));
   }
 
   void _openTabs(String id) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CouponSubPage(
-      title: switch (id) { 'free' => 'Free gifts', 'send' => 'Send a gift', 'received' || 'sent' || 'expired' => 'My gifts', 'redeem' => 'Redeem a gift', _ => 'NowssB Gifts' },
-      actions: [IconButton(tooltip: 'How gifts work', onPressed: () => showGiftsGuide(context), icon: const Icon(Icons.help_outline, color: Colors.white, size: 20))],
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-        children: [
-          HomeDarkSection(children: [
-            HomeHeaderBox(icon: Icons.card_giftcard, title: 'NowssB Gifts', subtitle: kGiftsDisclaimer),
-            GiftsTabsBlock(initialTab: id),
-          ]),
-        ],
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EconomyPage(
+      title: 'NowssB Gifts',
+      mark: NwsbMarks.gift,
+      goodToKnow: kGiftsDisclaimer,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [ProgramTabsBlock(spec: kGiftsSpec, initialTab: id, scrollTo: true, showDisclaimer: false)],
       ),
     )));
   }
 
   @override
-  Widget build(BuildContext context) => CouponSubPage(
-        title: 'NowssB Gifts',
-        actions: [
-          IconButton(key: const Key('gifts_history'), tooltip: 'History', onPressed: () => _openTabs('received'), icon: const Icon(Icons.history, color: Colors.white, size: 20)),
-          IconButton(tooltip: 'How gifts work', onPressed: () => showGiftsGuide(context), icon: const Icon(Icons.help_outline, color: Colors.white, size: 20)),
-          const Padding(padding: EdgeInsets.only(right: 6), child: CoinBalancePill()),
-        ],
-        body: GiftsHubBody(onTab: _openTabs, onSpin: () => _openSpin(context), onGuide: () => showGiftsGuide(context), onShop: () => _openTabs('send')),
-      );
-}
-
-/// The Gifts hub in Home's style: 3D banner, dark-glass sections with a
-/// purple-dot timeline and Enter pills, split promo cards, Shop Now row.
-class GiftsHubBody extends StatelessWidget {
-  const GiftsHubBody({super.key, required this.onTab, required this.onSpin, required this.onGuide, required this.onShop});
-  final void Function(String) onTab;
-  final VoidCallback onSpin;
-  final VoidCallback onGuide;
-  final VoidCallback onShop;
-
-  @override
   Widget build(BuildContext context) {
-    final rows = <(String, String, String)>[
-      ('free', 'Free gifts', 'Open a box for your time today'),
-      ('send', 'Send a gift', 'A real Play purchase, shared as a code'),
-      ('received', 'Received', 'Gifts on this account'),
-      ('sent', 'Sent', 'Codes you bought for others'),
-      ('expired', 'Expired', 'Gifts that ran out'),
-      ('redeem', 'Redeem', 'A code from someone else'),
-    ];
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-      children: [
-        GiftsBanner3d(title: 'NowssB Gifts', sub: 'Send, receive and open gifts.', onEnter: () => onTab('send')),
-        const SizedBox(height: 16),
-        HomeDarkSection(children: [
-          const HomeHeaderBox(icon: Icons.card_giftcard, title: 'Your gifts', subtitle: 'Everything gifts can do, in one place.'),
-          HomeBlackBox(
-            padding: const EdgeInsets.fromLTRB(12, 4, 14, 4),
-            child: Column(children: [
-              for (var i = 0; i < rows.length; i++)
-                HomeTimelineRow(
-                  key: Key('gifts_row_${rows[i].$1}'),
-                  title: rows[i].$2,
-                  subtitle: rows[i].$3,
-                  active: i == 0,
-                  last: i == rows.length - 1,
-                  onTap: () => onTab(rows[i].$1),
-                  trailing: HomeEnterPill(onTap: () => onTab(rows[i].$1)),
-                ),
-            ]),
+    return EconomyPage(
+      goodToKnow: kGiftsDisclaimer,
+      title: 'NowssB Gifts',
+      mark: NwsbMarks.gift,
+      action: GestureDetector(
+        // History: switch to Received and scroll the tabs into view.
+        onTap: () => _openTabs('received'),
+        onLongPress: () => showGiftsGuide(context),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0x66FFFFFF)),
           ),
-          HomeActionRow(icon: Icons.storefront_outlined, eyebrow: 'Gift shop', title: 'Gift cards', onTap: onShop, pill: HomeShopPill(key: const Key('gifts_shop_now'), onTap: onShop)),
-        ]),
-        GiftSplitCard(index: 1, title: 'Send a gift\nsomeone keeps.', cta: 'Send a gift', onTap: () => onTab('send')),
-        GiftSplitCard(index: 3, title: 'Got a code?\nOpen it here.', cta: 'Redeem', onTap: () => onTab('redeem')),
-        GiftSplitCard(index: 2, title: 'Free gifts for\nyour time today.', cta: 'Open free gifts', onTap: () => onTab('free')),
-        HomeDarkSection(children: [
-          HomeActionRow(icon: Icons.casino_outlined, eyebrow: 'Once a day', title: 'Daily spin', onTap: onSpin, pill: HomeEnterPill(label: 'Spin', onTap: onSpin)),
-          HomeActionRow(icon: Icons.help_outline, eyebrow: 'New here?', title: 'How gifts work', onTap: onGuide, pill: HomeEnterPill(label: 'Guide', onTap: onGuide)),
-        ]),
-      ],
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.history, color: Colors.white, size: 15),
+              SizedBox(width: 4),
+              EditableLabel('gifts_screen.GiftsScreen', 'History', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ),
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+        cacheExtent: 1600,
+        children: [
+          const IdentityRails(RailKind.gifts),
+          RoutineDeck(
+            title: 'Gifts',
+            banner: 'NowssB Gifts',
+            bannerSub: 'Send, redeem, history',
+            onBanner: () => showGiftCardSheet(context, 'word'),
+            cards: [
+              WorkCard(category: 'Send', title: 'Gift cards', meta: 'A real purchase, shared as a code', action: 'Send a gift', image: 'assets/rails/art-gift-red.jpg', onTap: () => showGiftCardSheet(context, 'word')),
+              WorkCard(category: 'History', title: 'Received', meta: 'Gifts on this account', action: 'Open history', image: 'assets/rails/art-gift-gold.jpg', onTap: () => _openTabs('received')),
+              WorkCard(category: 'Redeem', title: 'Redeem', meta: 'A code from someone else', action: 'Redeem', image: 'assets/rails/art-gift-black.jpg', onTap: () => _openTabs('redeem')),
+              WorkCard(category: 'Free', title: 'Free gifts', meta: 'Open a box for your time today', action: 'Open free gifts', image: 'assets/rails/art-gift-gold.jpg', onTap: () => _openTabs('free')),
+              WorkCard(category: 'Sent', title: 'Sent gifts', meta: 'Codes you bought for others', action: 'See sent', image: 'assets/rails/art-gift-red.jpg', onTap: () => _openTabs('sent')),
+              WorkCard(category: 'Expired', title: 'Expired', meta: 'Gifts that ran out', action: 'See expired', image: 'assets/rails/art-gift-black.jpg', onTap: () => _openTabs('expired')),
+              WorkCard(category: 'Help', title: 'How gifts work', meta: 'A 4-step guide', action: 'Show guide', image: 'assets/rails/art-gift-gold.jpg', onTap: () => showGiftsGuide(context)),
+              WorkCard(category: 'Spin', title: 'Daily spin', meta: 'One free spin', action: 'Spin', image: 'assets/rails/art-spin.jpg', onTap: () => _openSpin(context)),
+            ],
+          ),
+        ],
+      ),
     );
   }
-}
-
-/// Wide 3D banner (the app's own gift render) with a bold white title.
-class GiftsBanner3d extends StatelessWidget {
-  const GiftsBanner3d({super.key, required this.title, required this.sub, this.onEnter});
-  final String title;
-  final String sub;
-  final VoidCallback? onEnter;
-  @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: SizedBox(
-          height: 190,
-          child: Stack(fit: StackFit.expand, children: [
-            Image.asset('assets/gifts/gift-hero.png', fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
-            const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xCC000000), Color(0x00000000)]))),
-            Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('GIFTS', style: TextStyle(color: kHomeGold, fontSize: 11, letterSpacing: 2, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 6),
-                Text(title, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, height: 1.05)),
-                const SizedBox(height: 4),
-                Text(sub, style: const TextStyle(color: kHomeGrey, fontSize: 12.5)),
-                const Spacer(),
-                HomeEnterPill(onTap: onEnter),
-              ]),
-            ),
-          ]),
-        ),
-      );
 }
 
 
@@ -567,8 +503,8 @@ class _GiftsGuideState extends State<GiftsGuide> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Material(
-              color: const Color(0x8C000000),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: Color(0x24FFFFFF))),
+              color: const Color(0x33FFFFFF),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: const BorderSide(color: Color(0x66FFFFFF))),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -586,7 +522,11 @@ class _GiftsGuideState extends State<GiftsGuide> {
                   Row(children: [
                     TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Skip', style: TextStyle(color: Color(0xCCFFFFFF)))),
                     const Spacer(),
-                    HomeEnterPill(label: last ? 'Done' : 'Next', onTap: () => last ? Navigator.of(context).pop() : setState(() => _i++)),
+                    TextButton(
+                      onPressed: () => last ? Navigator.of(context).pop() : setState(() => _i++),
+                      style: TextButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(horizontal: 20)),
+                      child: Text(last ? 'Done' : 'Next', style: const TextStyle(fontWeight: FontWeight.w800)),
+                    ),
                   ]),
                 ]),
               ),
@@ -596,20 +536,4 @@ class _GiftsGuideState extends State<GiftsGuide> {
       ),
     );
   }
-}
-
-
-/// Home's promo split card ("A word for the body now"): dark block with a
-/// title and outline pill on the left, bright block with a model on the right.
-class GiftSplitCard extends StatelessWidget {
-  const GiftSplitCard({super.key, required this.index, required this.title, required this.cta, this.onTap});
-  final int index;
-  final String title;
-  final String cta;
-  final VoidCallback? onTap;
-  @override
-  Widget build(BuildContext context) => ColoredSplitPromoBanner(
-        spec: SplitPromoExtras.at(index).copyWith(title: title, cta: cta, onTap: onTap),
-        margin: const EdgeInsets.only(bottom: 12),
-      );
 }

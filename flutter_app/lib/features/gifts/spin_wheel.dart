@@ -20,8 +20,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-
-import '../coupons/coupon_home_style.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -187,7 +185,8 @@ class _GiftWheelState extends State<GiftWheel> {
                 ? 'Today\u2019s free spin is used. Come back tomorrow for the next one.'
                 : 'Last spin: $_last. Come back tomorrow for the next free spin.';
         final rare = slices.where((s) => s.weight <= 8).map((s) => '${s.label} ${_pct(slices, s)}').join('  ·  ');
-        return HomeBlackBox(
+        return GlassWrap(
+          margin: EdgeInsets.zero,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -284,9 +283,12 @@ class _GiftWheelState extends State<GiftWheel> {
                         duration: const Duration(milliseconds: 220),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: can ? kHomeGold : const Color(0x8C000000),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: can ? kHomeGold : const Color(0x24FFFFFF)),
+                          gradient: can
+                              ? const LinearGradient(colors: [Color(0xFFF6E7B2), Color(0xFFC6A15A), Color(0xFF9A7432)])
+                              : null,
+                          color: can ? null : const Color(0xFF4A3B22),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: can ? const [BoxShadow(color: Color(0x66E4C56A), blurRadius: 18)] : null,
                         ),
                         child: Column(
                           children: [

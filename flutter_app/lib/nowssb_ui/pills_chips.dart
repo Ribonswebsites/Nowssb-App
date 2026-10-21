@@ -65,18 +65,13 @@ class FilterChipRow extends StatelessWidget {
 }
 
 class RarityChip extends StatelessWidget {
-  const RarityChip(this.rarity, {super.key, this.label, this.color});
+  const RarityChip(this.rarity, {super.key});
   final Rarity rarity;
-  /// Optional overrides; default to the rarity's own name and colour.
-  final String? label; final Color? color;
   @override
-  Widget build(BuildContext context) {
-    final c = color ?? rarity.color;
-    return NGlass(radius: NTokens.rPill, accent: c, tint: c,
+  Widget build(BuildContext context) => NGlass(radius: NTokens.rPill, accent: rarity.color, tint: rarity.color,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      child: Text((label ?? rarity.name).toUpperCase(), style: TextStyle(color: Color.lerp(c, Colors.white, .5),
+      child: Text(rarity.name.toUpperCase(), style: TextStyle(color: Color.lerp(rarity.color, Colors.white, .5),
           fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1)));
-  }
 }
 
 /// "New", "100% CoinBack", "Best saving" etc.

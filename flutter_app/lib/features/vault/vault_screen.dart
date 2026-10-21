@@ -10,10 +10,6 @@ import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../programs/program_kit.dart';
 import '../programs/rewards_program.dart';
-import '../programs/rewards_home_style.dart';
-import '../coupons/coupon_home_style.dart' show HomeTimelineRow, HomeShopPill;
-import '../../widgets/home_parts.dart';
-import '../../widgets/home_skin.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../../data/practice_progress.dart';
@@ -29,17 +25,19 @@ import '../../widgets/nwsb_coin_fly.dart';
 import '../../admin/template/editable.dart';
 
 class VaultScreen extends StatelessWidget {
-  const VaultScreen({super.key, this.initialTab, this.backdrop});
-
-  /// Test hook for screenshots (video can't decode in tests).
-  final Widget? backdrop;
+  const VaultScreen({super.key, this.initialTab});
 
   /// Opens the Rewards page scrolled to one programme tab (e.g. 'wallet').
   final String? initialTab;
 
   @override
   Widget build(BuildContext context) {
-    return RewardsHomeShell(backdrop: backdrop, child: _VaultBody(initialTab: initialTab));
+    return EconomyPage(
+      goodToKnow: kRewardsDisclaimer,
+      title: 'NowssB Rewards',
+      mark: NwsbMarks.rewards,
+      child: _VaultBody(initialTab: initialTab),
+    );
   }
 }
 
@@ -67,47 +65,6 @@ class _VaultBodyState extends State<_VaultBody> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
-            // Home's 3D NowssB headphone-box banner art (same asset as Home).
-            BrandTopBanner(
-              title: 'NowssB Rewards',
-              mark: NwsbMarks.rewards,
-              art: 'assets/banners/brand-cleo.png',
-              artFit: BoxFit.cover,
-              artAlignment: Alignment.center,
-              onTap: () => _openTabs('today'),
-            ),
-            const SizedBox(height: 14),
-            SectionPane(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                const PaneHead(eyebrow: 'Keep going', title: 'Your quests', mark: NwsbMarks.rewards),
-                const SizedBox(height: 10),
-                RewardsQuestBoard(EconomyMirror.instance.summary, onContinue: () => _openTabs('quests')),
-              ]),
-            ),
-            const SizedBox(height: 14),
-            SectionPane(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                const PaneHead(eyebrow: 'Everything here', title: 'Rewards', mark: NwsbMarks.gift),
-                const SizedBox(height: 6),
-                for (final (i, (id, title, sub)) in const [
-                  ('checkin', 'Daily check-in', 'One tap a day keeps your streak'),
-                  ('chests', 'Milestone chests', 'Unlock with streak days'),
-                  ('boost', 'Coin Boost', 'Earn more coins for a while'),
-                  ('store', 'Coin Store', 'Use coins on part of a price'),
-                  ('mine', 'My Rewards', 'Coupons, gifts and chests'),
-                ].indexed)
-                  HomeTimelineRow(
-                    title: title,
-                    subtitle: sub,
-                    last: i == 4,
-                    onTap: () => _openTabs(id),
-                    trailing: id == 'store'
-                        ? HomeShopPill(key: ValueKey('hub-$id'), onTap: () => _openTabs(id))
-                        : EnterPill(key: ValueKey('hub-$id'), onTap: () => _openTabs(id)),
-                  ),
-              ]),
-            ),
-            const SizedBox(height: 14),
             const IdentityRails(RailKind.rewards),
             RoutineDeck(
               title: 'Rewards',
@@ -122,8 +79,6 @@ class _VaultBodyState extends State<_VaultBody> {
                 WorkCard(category: 'Store', title: 'Ebooks', meta: 'The ebook store', action: 'Open ebooks', image: 'assets/rails/ui-book.jpg', onTap: () => NwsbLinks.ebooks(context)),
               ],
             ),
-            const SizedBox(height: 18),
-            const PDisclaimer(kRewardsDisclaimer, slot: 'vault.rewards'),
           ],
         );
       },
@@ -162,11 +117,12 @@ class _VaultBodyState extends State<_VaultBody> {
   }
 
   void _openTabs(String id) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => RewardsHomeShell(
-      child: ListView(
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: SafeArea(child: ListView(
         padding: const EdgeInsets.all(16),
-        children: [const RewardsSubBanner(), ProgramTabsBlock(spec: kRewardsSpec, initialTab: id, scrollTo: true, goRef: _go)],
-      ),
+        children: [ProgramTabsBlock(spec: kRewardsSpec, initialTab: id, scrollTo: true, goRef: _go, showDisclaimer: false)],
+      )),
     )));
   }
 }
