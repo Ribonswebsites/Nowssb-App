@@ -12,6 +12,7 @@ import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
 import 'rewards_more.dart';
+import 'rewards_home_style.dart';
 import '../coins/coins_wallet_screen.dart';
 import 'program_heroes.dart';
 import '../vault/vault_screen.dart';
@@ -52,23 +53,14 @@ class RewardsTabPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isCoinHistoryTab(tab)) return const CoinsWalletScreen(initialTab: CoinsTab.history);
-    final title = tab == 'today' ? 'Coins' : 'Rewards';
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070C),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF07070C),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: Text(title),
-      ),
-      body: ListView(
+    return RewardsHomeShell(
+      child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           ProgramTabsBlock(
             spec: kRewardsSpec,
             initialTab: tab,
             scrollTo: true,
-            showDisclaimer: false,
           ),
         ],
       ),
@@ -199,16 +191,10 @@ List<Widget> _quests(BuildContext context, Map<String, dynamic> s) {
   }
 
   return [
-    if (starter.any((x) => x['claimed'] != true))
-      LSection.group('starter', 'Starter quests', [
-        const PHeading('New here', 'Starter quests', slot: 'rewards_program.quests'),
-        PCard(children: [for (final x in starter) quest(x, 'claimQuest', {'kind': 'starter', 'id': x['id']})]),
-      ]),
-    LSection.group('weekly', 'Weekly quests', [
-      const PHeading('This week', 'Weekly quests', slot: 'rewards_program.quests'),
+    LSection('board', 'Quest board', RewardsQuestBoard(s)),
+    LSection.group('weekly', 'Weekly chest and gift', [
+      const PHeading('This week', 'Weekly chest and gift', slot: 'rewards_program.quests'),
       PCard(children: [
-        for (final x in weekly) quest(x, 'claimQuest', {'kind': 'weekly', 'id': x['id']}),
-        const Divider(color: Color(0x22FFFFFF)),
         PRow(
           title: 'Weekly chest',
           sub: 'Finish every weekly quest to open it.',
@@ -226,7 +212,6 @@ List<Widget> _quests(BuildContext context, Map<String, dynamic> s) {
     LSection.group('monthly', 'Monthly', [
       const PHeading('This month', 'Monthly quest and gift', slot: 'rewards_program.quests'),
       PCard(children: [
-        if (mq.isNotEmpty) quest(mq, 'claimQuest', {'kind': 'monthly', 'id': mq['id']}),
         PRow(
           title: 'Monthly gift',
           sub: '${sInt(mg['activeDays'])} of ${sInt(mg['goal'])} active days',
