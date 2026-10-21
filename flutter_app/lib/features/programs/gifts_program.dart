@@ -314,14 +314,9 @@ class _RedeemState extends State<_Redeem> {
             TextButton(onPressed: () => setState(() => _peek = null), child: const EditableLabel('gifts_program.Redeem', 'Back', style: TextStyle(color: kHomeGrey))),
             const Spacer(),
             Flexible(
-              child: Opacity(
-                opacity: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? 0.45 : 1,
-                child: HomeShopPill(
-                  key: const Key('gift_redeem'),
-                  icon: Icons.redeem,
-                  label: _busy ? 'Opening…' : (_peek!['yours'] == true ? 'Send this code to your friend' : 'Redeem'),
-                  onTap: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? null : _go,
-                ),
+              child: GiftRedeemPill(
+                label: _busy ? 'Opening…' : (_peek!['yours'] == true ? 'Send this code to your friend' : 'Redeem'),
+                onTap: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? null : _go,
               ),
             ),
           ]),
@@ -474,4 +469,21 @@ class _GiftsTabsBlockState extends State<GiftsTabsBlock> {
       ]),
     );
   }
+}
+
+
+/// Redeem's cream pill. Long labels scale down so it never overflows.
+class GiftRedeemPill extends StatelessWidget {
+  const GiftRedeemPill({super.key, required this.label, this.onTap});
+  final String label;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => Opacity(
+        opacity: onTap == null ? 0.45 : 1,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerRight,
+          child: HomeShopPill(key: const Key('gift_redeem'), icon: Icons.redeem, label: label, onTap: onTap),
+        ),
+      );
 }
