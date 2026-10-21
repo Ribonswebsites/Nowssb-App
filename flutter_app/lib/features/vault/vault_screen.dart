@@ -67,10 +67,13 @@ class _VaultBodyState extends State<_VaultBody> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
-            SecBanner(
+            // Home's 3D NowssB headphone-box banner art (same asset as Home).
+            BrandTopBanner(
               title: 'NowssB Rewards',
-              sub: 'Check in, finish quests, open chests',
               mark: NwsbMarks.rewards,
+              art: 'assets/banners/brand-cleo.png',
+              artFit: BoxFit.cover,
+              artAlignment: Alignment.center,
               onTap: () => _openTabs('today'),
             ),
             const SizedBox(height: 14),
@@ -162,7 +165,7 @@ class _VaultBodyState extends State<_VaultBody> {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => RewardsHomeShell(
       child: ListView(
         padding: const EdgeInsets.all(16),
-        children: [ProgramTabsBlock(spec: kRewardsSpec, initialTab: id, scrollTo: true, goRef: _go)],
+        children: [const RewardsSubBanner(), ProgramTabsBlock(spec: kRewardsSpec, initialTab: id, scrollTo: true, goRef: _go)],
       ),
     )));
   }

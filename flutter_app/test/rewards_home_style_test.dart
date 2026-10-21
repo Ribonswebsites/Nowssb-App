@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/features/programs/rewards_home_style.dart';
 import 'package:nowssb/features/programs/rewards_more.dart';
+import 'package:nowssb/features/programs/rewards_program.dart';
 import 'package:nowssb/features/vault/vault_screen.dart';
 
 final _s = <String, dynamic>{
@@ -96,5 +97,18 @@ void main() {
     expect(find.text('Shop Now'), findsOneWidget);
     expect(find.byKey(const ValueKey('hub-mine')), findsOneWidget);
     await _shot(t, 'rewards-home-3');
+  });
+
+  testWidgets('sub-page uses Home frame and the Rewards 3D banner', (t) async {
+    EconomyMirror.instance.summary = _s;
+    EconomyMirror.instance.uid = 'shot';
+    addTearDown(() {
+      EconomyMirror.instance.summary = const {};
+      EconomyMirror.instance.uid = null;
+    });
+    await _pump(t, RewardsTabPage(tab: 'quests', backdrop: _still()));
+    expect(find.text('NowssB Rewards'), findsWidgets);
+    expect(find.text('All 5'), findsWidgets);
+    await _shot(t, 'rewards-home-4');
   });
 }

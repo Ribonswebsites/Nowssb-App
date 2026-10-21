@@ -14,6 +14,7 @@ import '../../screens/notifications_sheet.dart';
 import '../../shell/nwsb_links.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
+import '../../widgets/brand_top_banner.dart';
 import '../../widgets/home_menu_drawer.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../coupons/coupon_home_style.dart' show HomeTimelineRow;
@@ -268,4 +269,21 @@ class _CourseCard extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// Banner on Rewards sub-pages: the app's existing Rewards 3D coin art.
+class RewardsSubBanner extends StatelessWidget {
+  const RewardsSubBanner({super.key});
+  @override
+  Widget build(BuildContext context) => const Padding(
+        padding: EdgeInsets.only(bottom: 12),
+        child: BrandTopBanner(
+          compact: true,
+          title: 'NowssB Rewards',
+          mark: NwsbMarks.rewards,
+          art: 'assets/rails/rewards-coins.png',
+          artFit: BoxFit.cover,
+          artAlignment: Alignment.center,
+        ),
+      );
 }

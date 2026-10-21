@@ -47,16 +47,21 @@ const kRewardsSpec = ProgramSpec(
 /// Opens one Rewards tab on its own page, so a notification can land on
 /// Collect (today) or any other tab and you use it from there.
 class RewardsTabPage extends StatelessWidget {
-  const RewardsTabPage({super.key, required this.tab});
+  const RewardsTabPage({super.key, required this.tab, this.backdrop});
   final String tab;
+
+  /// Test hook for screenshots.
+  final Widget? backdrop;
 
   @override
   Widget build(BuildContext context) {
     if (isCoinHistoryTab(tab)) return const CoinsWalletScreen(initialTab: CoinsTab.history);
     return RewardsHomeShell(
+      backdrop: backdrop,
       child: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
+          const RewardsSubBanner(),
           ProgramTabsBlock(
             spec: kRewardsSpec,
             initialTab: tab,
