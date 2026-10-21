@@ -445,33 +445,19 @@ class _NavShellState extends State<NavShell> {
                         final slots = settings.navSlots;
                         final found = slots.indexWhere((s) => _primaryTab(s) == 0);
                         final homeSlot = found >= 0 ? found : 0;
-                        return Container(
-                          height: 58,
-                          decoration: BoxDecoration(
-                            color: background,
-                            borderRadius: BorderRadius.circular(radius),
-                            border: Border.all(color: const Color(0x22FFFFFF)),
-                          ),
-                          child: Row(children: [
-                            for (var i = 0; i < slots.length; i++) ...[
-                              if (i > 0)
-                                Container(
-                                  width: 1,
-                                  height: 18,
-                                  margin: const EdgeInsets.symmetric(horizontal: 2),
-                                  color: const Color(0x33FFFFFF),
-                                ),
-                              Expanded(
-                                child: _NavSlot(
-                                  active: _primaryTab(slots[i]) == _i,
-                                  asHome: _i != 0 && i == homeSlot,
-                                  image: _navFeatures[slots[i]]?['img'] ?? '',
-                                  label: _navFeatures[slots[i]]?['label'] ?? slots[i],
-                                  onTap: () => _i != 0 && i == homeSlot ? _goToTab(0) : _goToSlot(slots[i]),
-                                ),
+                        return AppBottomNav(
+                          radius: radius,
+                          background: background,
+                          items: [
+                            for (var i = 0; i < slots.length; i++)
+                              AppNavItem(
+                                image: _navFeatures[slots[i]]?['img'] ?? '',
+                                label: _navFeatures[slots[i]]?['label'] ?? slots[i],
+                                active: _primaryTab(slots[i]) == _i,
+                                asHome: _i != 0 && i == homeSlot,
                               ),
-                            ],
-                          ]),
+                          ],
+                          onTap: (i) => _i != 0 && i == homeSlot ? _goToTab(0) : _goToSlot(slots[i]),
                         );
                       }),
                     ),
@@ -491,6 +477,63 @@ class _NavShellState extends State<NavShell> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// One destination on [AppBottomNav].
+class AppNavItem {
+  const AppNavItem({required this.image, required this.label, this.active = false, this.asHome = false});
+  final String image;
+  final String label;
+  final bool active;
+  final bool asHome;
+}
+
+/// Home's floating pill nav (#ig-bottomnav), as a widget any page can use.
+/// NavShell draws it over every main tab.
+class AppBottomNav extends StatelessWidget {
+  const AppBottomNav({
+    super.key,
+    required this.items,
+    required this.onTap,
+    this.radius = 33,
+    this.background = const Color(0xF5182033),
+  });
+  final List<AppNavItem> items;
+  final ValueChanged<int> onTap;
+  final double radius;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 58,
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(color: const Color(0x22FFFFFF)),
+      ),
+      child: Row(children: [
+        for (var i = 0; i < items.length; i++) ...[
+          if (i > 0)
+            Container(
+              width: 1,
+              height: 18,
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              color: const Color(0x33FFFFFF),
+            ),
+          Expanded(
+            child: _NavSlot(
+              active: items[i].active,
+              asHome: items[i].asHome,
+              image: items[i].image,
+              label: items[i].label,
+              onTap: () => onTap(i),
+            ),
+          ),
+        ],
+      ]),
     );
   }
 }

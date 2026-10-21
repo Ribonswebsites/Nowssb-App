@@ -16,7 +16,14 @@ class NTicketCard extends StatelessWidget {
     super.key, required this.title, this.label, this.subtitle, this.image,
     this.rarity = Rarity.rare, this.isNew = false, this.ctaLabel = 'View products', this.onTap, this.onCta,
     this.expired = false, this.expiredLabel = 'Expired',
+    this.leading, this.chipLabel, this.chipColor, this.badge = 'NEW',
   });
+  /// Optional widget in place of the round [image] (e.g. a coin or icon).
+  final Widget? leading;
+  /// Optional chip text / colour instead of the rarity's name / colour.
+  final String? chipLabel; final Color? chipColor;
+  /// Badge text shown when [isNew] is true.
+  final String badge;
   final String title; final String? label, subtitle; final ImageProvider? image;
   final Rarity rarity; final bool isNew, expired; final String expiredLabel;
   /// CTA link text ('View products' by default). Pass null to hide the link.
@@ -32,14 +39,17 @@ class NTicketCard extends StatelessWidget {
       radius: radius, accent: rarity.color, tint: rarity.color, onTap: expired ? null : onTap,
       padding: const EdgeInsets.fromLTRB(20, 14, 18, 14),
       child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        if (image != null) ...[
+        if (leading != null) ...[
+          SizedBox(width: 64, height: 64, child: Center(child: leading)),
+          const SizedBox(width: 12),
+        ] else if (image != null) ...[
           CircleImage(image: image, size: 64, ring: rarity.color),
           const SizedBox(width: 12),
         ],
         const SizedBox(width: 1, height: 64, child: DashedLine(vertical: true)),
         const SizedBox(width: 12),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Wrap(spacing: 6, runSpacing: 4, children: [RarityChip(rarity), if (isNew) const GlassBadge('NEW')]),
+          Wrap(spacing: 6, runSpacing: 4, children: [RarityChip(rarity, label: chipLabel, color: chipColor), if (isNew) GlassBadge(badge)]),
           const SizedBox(height: 6),
           if (label != null) Text(label!, maxLines: 1, overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: NTokens.textLo, fontSize: 12)),

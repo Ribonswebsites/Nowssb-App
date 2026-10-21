@@ -1,5 +1,6 @@
 import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
+import '../../widgets/app_backdrop.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 
@@ -32,23 +33,8 @@ class NormalGlassBackground extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        const Positioned.fill(
-          child: ColoredBox(color: Color(0xFFF7FAFF)),
-        ),
-        const Positioned.fill(
-          child: IgnorePointer(
-            child: NwsbVideo(
-              asset: 'assets/video/normal-glass-background.mp4',
-              fit: BoxFit.cover,
-              // Feature so the pool never steals this slot for a banner.
-              priority: ClipPriority.feature,
-              loop: true,
-              autoplay: true,
-              showPoster: true,
-              slot: 'glassmorphism_theme.NormalGlassBackground',
-            ),
-          ),
-        ),
+        // The shared app background (Home's film): one source for every page.
+        const Positioned.fill(child: AppBackdrop(base: Color(0xFFF7FAFF))),
         child,
       ],
     );

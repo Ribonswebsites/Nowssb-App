@@ -64,11 +64,13 @@ class _NGlassState extends State<NGlass> {
       decoration: BoxDecoration(borderRadius: r, boxShadow: NTokens.glow(widget.accent, widget.elevation)),
       child: body);
     if (widget.onTap == null) return body;
+    // Press feedback is motion too: none when the phone asks for less.
+    final still = reduced || (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
     return GestureDetector(
       onTapDown: (_) => setState(() => _down = true),
       onTapCancel: () => setState(() => _down = false),
       onTapUp: (_) { setState(() => _down = false); HapticFeedback.selectionClick(); widget.onTap!(); },
-      child: AnimatedScale(scale: _down ? NTokens.press : 1, duration: const Duration(milliseconds: 120),
+      child: AnimatedScale(scale: _down && !still ? NTokens.press : 1, duration: still ? Duration.zero : const Duration(milliseconds: 120),
         curve: NwsbMotion.curve, child: body),
     );
   }

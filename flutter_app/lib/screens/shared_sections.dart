@@ -30,6 +30,7 @@ import '../widgets/home_parts.dart';
 import '../widgets/neu_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/tv_frame.dart';
+import '../features/notifications/notif_router.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/carousel_fx.dart';
 import '../admin/layout/layout_sections.dart' show CarouselAutoRotate;
@@ -834,6 +835,10 @@ class QuickAccessSection extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 12),
+          // Programs row: the same tiles, each opening the real page (the
+          // same screens a notification for that program opens).
+          const QuickProgramsRow(),
           const SizedBox(height: 14),
           // "Its contents cycle through Cart, Wishlist and Order" —
           // index.html:2329.
@@ -857,6 +862,54 @@ class QuickAccessSection extends StatelessWidget {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class QuickProgramsRow extends StatelessWidget {
+  const QuickProgramsRow({super.key});
+
+  static const tiles = <(String, String, String)>[
+    (NwsbMarks.rewards, 'Rewards', 'rewards'),
+    (NwsbMarks.earn, 'NowssB Earn', 'earn'),
+    (NwsbMarks.gift, 'Gifts', 'gifts'),
+    (NwsbMarks.coupon, 'Coupons', 'coupons'),
+  ];
+
+  static void open(BuildContext context, String route) {
+    final screen = NotifRouter.screenFor(route);
+    if (screen == null) return;
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => screen));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 78,
+      decoration: BoxDecoration(
+        color: const Color(0x14FFFFFF),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0x1AFFFFFF)),
+      ),
+      child: Row(
+        children: [
+          for (var i = 0; i < tiles.length; i++) ...[
+            if (i > 0) const _QuickRule(),
+            Expanded(
+              child: Semantics(
+                button: true,
+                label: tiles[i].$2,
+                child: _QuickButton(
+                  mark: tiles[i].$1,
+                  markViewBox: 24,
+                  label: tiles[i].$2,
+                  onTap: () => open(context, tiles[i].$3),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

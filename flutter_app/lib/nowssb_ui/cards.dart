@@ -34,7 +34,10 @@ class MeditationCard extends StatelessWidget {
   const MeditationCard({super.key, required this.title, this.subtitle, this.image,
     this.cta = 'Next', this.onCta, this.secondary = 'Skip', this.onSecondary, this.onSkip, this.circle, this.dots = 3, this.dotIndex = 0,
     this.blur = NTokens.cardBlur, this.statusBar = true, this.time = '9:41', this.onClose, this.onHeart, this.liked = false,
-    this.homeBar = true});
+    this.homeBar = true, this.extra});
+  /// Optional extra content inside the inner frosted panel, between the
+  /// subtitle and the Skip / CTA row. Null keeps the card as before.
+  final Widget? extra;
   final String title; final String? subtitle, secondary; final ImageProvider? image;
   final String cta; final VoidCallback? onCta, onSecondary, onClose, onHeart;
   /// Tap on the Skip link ([secondary]). Falls back to [onSecondary].
@@ -53,7 +56,7 @@ class MeditationCard extends StatelessWidget {
         w = w.clamp(0.0, kMeditationCardMaxWidth);
         if (c.maxHeight.isFinite) w = w.clamp(0.0, c.maxHeight / 1.8);
         final r = BorderRadius.circular(w * .10);
-        final reduced = NwsbEffects.instance.reduced;
+        final reduced = NwsbEffects.instance.reduced || (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
         Widget card = DecoratedBox(
           decoration: BoxDecoration(borderRadius: r, border: Border.all(color: NTokens.border),
               gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
@@ -96,6 +99,7 @@ class MeditationCard extends StatelessWidget {
                   Text(title, style: TextStyle(color: Colors.white, fontSize: w * .072, height: 1.18, fontWeight: FontWeight.w800)),
                   if (subtitle != null) ...[SizedBox(height: w * .035),
                     Text(subtitle!, style: TextStyle(color: NTokens.bodyGrey, fontSize: w * .031, height: 1.45))],
+                  if (extra != null) ...[SizedBox(height: w * .035), extra!],
                   SizedBox(height: w * .04),
                   Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                     Expanded(child: secondary == null ? const SizedBox.shrink() : GestureDetector(key: const Key('meditation-skip'),
