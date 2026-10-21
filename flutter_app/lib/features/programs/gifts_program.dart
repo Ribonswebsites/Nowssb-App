@@ -112,7 +112,7 @@ List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
 }
 
 List<Widget> _send(BuildContext context, Map<String, dynamic> s) => const [
-      LSection('intro', 'Send intro', _GEmpty('Pick a card, write a note, pay on Google Play. The NWSB code is created only after Play accepts the payment. Your link still earns on gift purchases.', slot: 'gifts_program.send')),
+      LSection('intro', 'Send intro', HomeHeaderBox(icon: Icons.card_giftcard, title: 'Send a gift', subtitle: 'Pick a card, write a note, pay on Google Play. The NWSB code is created only after Play accepts the payment. Your link still earns on gift purchases.')),
       LSection('cards', 'Gift cards', _SendPicker()),
     ];
 
@@ -276,19 +276,21 @@ class _RedeemState extends State<_Redeem> {
           controller: _c,
           textCapitalization: TextCapitalization.characters,
           style: const TextStyle(color: Colors.white, letterSpacing: 1.4),
-          decoration: const InputDecoration(hintText: 'NWSB-XXXX-XXXX', hintStyle: TextStyle(color: NwsbColors.mist)),
+          decoration: InputDecoration(
+            hintText: 'NWSB-XXXX-XXXX',
+            hintStyle: const TextStyle(color: kHomeGrey),
+            prefixIcon: const Icon(Icons.redeem, color: kHomeGold, size: 18),
+            filled: true,
+            fillColor: Colors.black,
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x24FFFFFF))),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: kHomeGold)),
+          ),
         ),
         const SizedBox(height: 10),
         if (_peek == null)
-          TextButton(
-            onPressed: _busy ? null : _look,
-            style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
-            child: Text(_busy ? 'Looking…' : 'Preview the gift', style: const TextStyle(fontWeight: FontWeight.w800)),
-          )
+          Align(alignment: Alignment.centerRight, child: HomeEnterPill(key: const Key('gift_preview'), label: _busy ? 'Looking…' : 'Preview the gift', onTap: _busy ? null : _look))
         else ...[
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0x14FFFFFF), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x66E4C56A))),
+          HomeBlackBox(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('${_peek!['title'] ?? 'A gift'}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
               const SizedBox(height: 4),
@@ -309,15 +311,19 @@ class _RedeemState extends State<_Redeem> {
           ),
           const SizedBox(height: 10),
           Row(children: [
-            Expanded(
-              child: TextButton(
-                onPressed: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? null : _go,
-                style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
-                child: Text(_busy ? 'Opening…' : (_peek!['yours'] == true ? 'Send this code to your friend' : 'Redeem'), style: const TextStyle(fontWeight: FontWeight.w800)),
+            TextButton(onPressed: () => setState(() => _peek = null), child: const EditableLabel('gifts_program.Redeem', 'Back', style: TextStyle(color: kHomeGrey))),
+            const Spacer(),
+            Flexible(
+              child: Opacity(
+                opacity: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? 0.45 : 1,
+                child: HomeShopPill(
+                  key: const Key('gift_redeem'),
+                  icon: Icons.redeem,
+                  label: _busy ? 'Opening…' : (_peek!['yours'] == true ? 'Send this code to your friend' : 'Redeem'),
+                  onTap: _busy || _peek!['status'] != 'ready' || _peek!['yours'] == true ? null : _go,
+                ),
               ),
             ),
-            const SizedBox(width: 8),
-            TextButton(onPressed: () => setState(() => _peek = null), child: const EditableLabel('gifts_program.Redeem', 'Back', style: TextStyle(color: Colors.white70))),
           ]),
         ],
         if (_err != null) _GEmpty(_err!),
