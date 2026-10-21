@@ -10,6 +10,9 @@ import '../../data/store_catalog.dart';
 import '../../screens/store/store_actions.dart';
 import '../../shell/nwsb_links.dart';
 import '../../widgets/app_backdrop.dart';
+import '../../widgets/home_parts.dart';
+import '../../widgets/home_skin.dart';
+import '../../widgets/nwsb_icon.dart';
 import 'ebooks_data.dart';
 import 'ebooks_glass.dart';
 
@@ -47,14 +50,17 @@ class _Frame extends StatelessWidget {
   final List<Widget> actions;
   final PreferredSizeWidget? bottom;
   @override
-  Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
+  // Home's fashion skin (dark glass panes, HomeSkinScope) over Home's film
+  // (AppBackdrop) with Home's #fpBgVeil, as home_fashion.dart draws it.
+  Widget build(BuildContext context) => HomeSkinScope(skin: HomeSkin.fashion, child: Stack(fit: StackFit.expand, children: [
         Positioned.fill(child: IgnorePointer(child: scope.background)),
+        const Positioned.fill(child: IgnorePointer(child: _HomeVeil())),
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(backgroundColor: Colors.transparent, foregroundColor: Colors.white, elevation: 0, title: Text(title, overflow: TextOverflow.ellipsis), actions: actions, bottom: bottom),
           body: body,
         ),
-      ]);
+      ]));
 }
 
 class EbooksV2Page extends StatefulWidget {
@@ -141,7 +147,7 @@ class _EbooksV2PageState extends State<EbooksV2Page> with SingleTickerProviderSt
               return const _StateCard(key: Key('eb-empty'), icon: Icons.auto_stories_outlined, title: 'No e-books yet', text: 'New titles arrive soon. Check back here.', cta: null);
             }
             return TabBarView(controller: _tabs, children: [
-              _Discover(scope: scope, books: books),
+              _Discover(scope: scope, books: books, onEnter: () => _tabs.animateTo(1)),
               _MyBooks(scope: scope, books: books, onBrowse: () => _tabs.animateTo(0)),
               _Saved(scope: scope, books: books, onBrowse: () => _tabs.animateTo(0)),
             ]);
@@ -156,9 +162,10 @@ void openReader(BuildContext context, EbooksScope scope, EbBook b, {int? chapter
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EbookReaderV2(scope: scope, book: b, start: chapter ?? scope.data.progressOf(b))));
 
 class _Discover extends StatefulWidget {
-  const _Discover({required this.scope, required this.books});
+  const _Discover({required this.scope, required this.books, required this.onEnter});
   final EbooksScope scope;
   final List<EbBook> books;
+  final VoidCallback onEnter;
   @override
   State<_Discover> createState() => _DiscoverState();
 }
@@ -176,6 +183,7 @@ class _DiscoverState extends State<_Discover> {
   Widget build(BuildContext context) {
     final s = widget.scope, books = widget.books;
     return ListView(padding: const EdgeInsets.only(top: 8, bottom: 40), children: [
+      HomeReaderSection(key: const Key('eb-home-reader'), onEnter: widget.onEnter, onEvery: () => openEbook(context, s, books.first, 0)),
       if (s.data.offline)
         const Padding(key: Key('eb-offline-banner'), padding: EdgeInsets.fromLTRB(20, 0, 20, 8), child: Text('Offline: showing your saved library', style: TextStyle(color: EbTok.gold))),
       SizedBox(
@@ -388,6 +396,17 @@ class EbookDetailV2 extends StatelessWidget {
             onLink: owned ? null : () => openReader(context, scope, book, chapter: 0),
             cta: owned ? 'Open in Reader' : 'Buy',
             onCta: () => owned ? openReader(context, scope, book) : scope.actions.doBuy(context, book),
+          ),
+          Padding(
+            key: const Key('eb-detail-sec'),
+            padding: const EdgeInsets.only(top: 14),
+            child: SectionPane(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _spaced([
+                Spill(label: 'NowssB eBook', mark: NwsbMarks.ebook, onTap: () => openReader(context, scope, book, chapter: 0)),
+                TitleWithGlassEnter(title: owned ? 'Read now' : scope.data.priceLabel(book), onTap: () => owned ? openReader(context, scope, book) : scope.actions.doBuy(context, book)),
+                SecBanner(title: owned ? 'Open in Reader' : 'Shop this eBook', sub: book.sub, mark: NwsbMarks.ebook, onTap: () => owned ? openReader(context, scope, book) : scope.actions.doBuy(context, book)),
+              ])),
+            ),
           ),
           if (!owned)
             const Padding(
@@ -656,4 +675,66 @@ class _GuideState extends State<_Guide> {
       dotIndex: _i,
     );
   }
+}
+
+
+/// Home's "Reader" section (normal/sections_top NmReader, fashion FashReader):
+/// header pill, the wide Reader film ("Every eBook" line), "NowssB", the big
+/// Reader title with its glass Enter pill, and the bar under it, on Home's
+/// SectionPane.
+class HomeReaderSection extends StatelessWidget {
+  const HomeReaderSection({super.key, required this.onEnter, required this.onEvery});
+  final VoidCallback onEnter, onEvery;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+        child: SectionPane(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _spaced([
+            Spill(label: 'Meanings and eBooks, in one place', mark: NwsbMarks.reader, onTap: onEnter),
+            GestureDetector(
+              onTap: onEvery,
+              behavior: HitTestBehavior.opaque,
+              child: ClipRRect(borderRadius: BorderRadius.circular(16), child: const ReaderFilm(slot: 'ebooks_v2.HomeReaderSection')),
+            ),
+            const Text('NowssB', style: TextStyle(fontSize: 14, color: EbTok.textLo)),
+            TitleWithGlassEnter(title: 'Reader', onTap: onEnter),
+            const Text('Read every meaning, and every eBook.', style: TextStyle(fontSize: 13, color: EbTok.textLo)),
+            SecBanner(title: 'Every eBook', sub: 'Meanings and eBooks, in one place', mark: NwsbMarks.ebook, onTap: onEvery),
+          ])),
+        ),
+      );
+}
+
+/// Home spaces a pane's rows 10 apart.
+List<Widget> _spaced(List<Widget> kids) => [
+      for (var i = 0; i < kids.length; i++) ...[if (i > 0) const SizedBox(height: 10), kids[i]],
+    ];
+
+/// Home's #fpBgVeil (home_fashion.dart): corners pulled down, light
+/// top/bottom weight, middle of the film left alone.
+class _HomeVeil extends StatelessWidget {
+  const _HomeVeil();
+  @override
+  Widget build(BuildContext context) => const Stack(fit: StackFit.expand, children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(0, -0.1),
+              radius: 0.88,
+              colors: [Color(0x00000000), Color(0x24000000), Color(0x57000000), Color(0x94000000)],
+              stops: [0.30, 0.58, 0.80, 1.0],
+            ),
+          ),
+        ),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x42000000), Color(0x00000000), Color(0x00000000), Color(0x57000000)],
+              stops: [0, 0.20, 0.76, 1.0],
+            ),
+          ),
+        ),
+      ]);
 }

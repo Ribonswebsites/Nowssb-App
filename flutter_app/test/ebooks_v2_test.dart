@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/features/economy/money.dart';
+import 'package:nowssb/media/video_pool.dart';
+
+import 'fake_video_platform.dart';
 import 'package:nowssb/features/ebooks_v2/ebooks_data.dart';
 import 'package:nowssb/features/ebooks_v2/ebooks_pages.dart';
 
@@ -65,10 +68,23 @@ Future<void> pumpPage(WidgetTester t, FakeData d, {EbooksActions a = const Ebook
   await t.pump();
 }
 
-Future<void> shot(String n) => expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/ebooks_v2/ebooks-v2-$n.png'));
+/// Home's Reader film rotates its line every 2 s and keeps painting, so the
+/// page never "settles"; advance 1.2 s (longer than every transition here).
+Future<void> settle(WidgetTester t) async {
+  for (var i = 0; i < 12; i++) {
+    await t.pump(const Duration(milliseconds: 100));
+  }
+}
+
+Future<void> shot(String n) => expectLater(find.byType(MaterialApp), matchesGoldenFile('goldens/ebooks_v2/ebooks-v3-$n.png'));
 
 void main() {
-  setUpAll(_fonts);
+  setUpAll(() async {
+    FakeVideoPlatform();
+    VideoPool.debugDeadlines = false;
+    await _fonts();
+  });
+  tearDown(VideoPool.instance.debugDropAll);
   // Pin FX so prices render converted and deterministic (main shows
   // FxBook.pricePending until config/fx loads).
   setUp(() => FxBook.instance.rates = const {'USD': 1, 'INR': 83.5});
@@ -76,8 +92,13 @@ void main() {
   testWidgets('library: discover carousel + rows', (t) async {
     await pumpPage(t, FakeData());
     expect(find.byKey(Key('eb-card-${b0.key}')), findsOneWidget);
-    expect(find.byKey(Key('eb-row-${b0.key}')), findsOneWidget);
+    expect(find.byKey(const Key('eb-home-reader')), findsOneWidget);
+    expect(find.text('Meanings and eBooks, in one place'), findsWidgets);
+    expect(find.text('Every eBook'), findsWidgets);
+    expect(find.text('Reader'), findsOneWidget);
     await shot('1');
+    await t.scrollUntilVisible(find.byKey(Key('eb-row-${b0.key}')), 200, scrollable: find.byType(Scrollable).at(1));
+    expect(find.byKey(Key('eb-row-${b0.key}')), findsOneWidget);
   });
 
   testWidgets('empty / error / offline states', (t) async {
@@ -95,7 +116,7 @@ void main() {
   testWidgets('first-use guide shows once and steps through', (t) async {
     final d = FakeData(seen: false);
     await pumpPage(t, d);
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(const Key('eb-guide')), findsOneWidget);
     await shot('6');
     await t.tap(find.text('Next'));
@@ -103,7 +124,7 @@ void main() {
     await t.tap(find.text('Next'));
     await t.pump();
     await t.tap(find.text('Done'));
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(const Key('eb-guide')), findsNothing);
     expect(d.seen, isTrue);
   });
@@ -111,28 +132,28 @@ void main() {
   testWidgets('tabs: My books and Saved', (t) async {
     await pumpPage(t, FakeData());
     await t.tap(find.text('My books'));
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(const Key('eb-mine-empty')), findsOneWidget);
     await t.tap(find.text('Discover'));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.tap(find.byTooltip('Save').first);
     await t.pump();
     await t.tap(find.text('Saved'));
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(Key('eb-row-${b0.key}')), findsOneWidget);
   });
 
   testWidgets('search filters and opens a book', (t) async {
     await pumpPage(t, FakeData());
     await t.tap(find.byTooltip('Search'));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.enterText(find.byKey(const Key('eb-search')), 'zzzz');
     await t.pump();
     expect(find.text('No books match. Try another word.'), findsOneWidget);
     await t.enterText(find.byKey(const Key('eb-search')), b0.title.split(' ').last);
     await t.pump();
     await t.tap(find.widgetWithText(ListTile, b0.title));
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(const Key('eb-chapters')), findsOneWidget);
   });
 
@@ -140,13 +161,13 @@ void main() {
     final calls = <String>[];
     await pumpPage(t, FakeData(), a: EbooksActions(buy: (_, __) => calls.add('buy'), gift: (_, __) => calls.add('gift'), coupon: (_, __) => calls.add('coupon')));
     await t.tap(find.byKey(Key('eb-card-${b0.key}')));
-    await t.pumpAndSettle();
+    await settle(t);
     await shot('2');
     await t.tap(find.text('Buy'));
     await t.tap(find.byTooltip('What is the price?'));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.tap(find.text('Got it'));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.scrollUntilVisible(find.text('Gift'), 100, scrollable: find.byType(Scrollable).last);
     await t.tap(find.text('Gift'));
     await t.tap(find.text('Add coupon'));
@@ -157,9 +178,9 @@ void main() {
     final calls = <String>[];
     await pumpPage(t, FakeData(), a: EbooksActions(buy: (_, __) => calls.add('buy')));
     await t.tap(find.byKey(Key('eb-card-${b0.key}')));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.tap(find.text('Read a sample'));
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(const Key('eb-reader')), findsOneWidget);
     expect(find.byKey(const Key('eb-locked')), findsNothing);
     await shot('4');
@@ -169,14 +190,14 @@ void main() {
     await t.tap(find.text('Buy to keep reading'));
     expect(calls, ['buy']);
     await t.tap(find.byTooltip('Text size'));
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(const Key('eb-size')), findsOneWidget);
     await t.tap(find.text('Done'));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.tap(find.byTooltip('Chapters'));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.tap(find.textContaining('1. '));
-    await t.pumpAndSettle();
+    await settle(t);
     expect(find.byKey(const Key('eb-locked')), findsNothing);
   });
 
@@ -184,9 +205,9 @@ void main() {
     final d = FakeData(owned: {b0.key});
     await pumpPage(t, d);
     await t.tap(find.text('My books'));
-    await t.pumpAndSettle();
+    await settle(t);
     await t.tap(find.byKey(Key('eb-row-${b0.key}')));
-    await t.pumpAndSettle();
+    await settle(t);
     await shot('3');
     await t.tap(find.text('Next'));
     await t.pump();
