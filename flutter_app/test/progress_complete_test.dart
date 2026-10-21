@@ -32,6 +32,7 @@ Map<String, Object> _seed({bool guideSeen = true}) {
 }
 
 var practiced = 0;
+final navs = <int>[];
 final _ov = find.descendant(of: find.byKey(const ValueKey('progress-overview')), matching: find.byType(Scrollable)).first;
 Future<void> _reveal(WidgetTester t, Finder f) async {
   await t.scrollUntilVisible(f, 150, scrollable: _ov);
@@ -40,7 +41,7 @@ Future<void> _reveal(WidgetTester t, Finder f) async {
 Widget _app() => MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Roboto', brightness: Brightness.dark),
-      home: ProgressCompleteView(backdrop: _bg, onPractice: () => practiced++),
+      home: ProgressCompleteView(backdrop: _bg, onPractice: () => practiced++, onNav: navs.add),
     );
 
 Future<void> _phone(WidgetTester t) async {
@@ -63,8 +64,8 @@ void main() {
     expect(find.byKey(const ValueKey('progress-guide')), findsNothing);
     await t.tap(find.byKey(const ValueKey('progress-tab-1')));
     await t.pumpAndSettle();
-    expect(find.text('Focus'), findsOneWidget);
-    await t.tap(find.text('Focus'));
+    expect(find.text('FOCUS'), findsOneWidget); // Home timeline: uppercase titles
+    await t.tap(find.text('FOCUS'));
     await t.pumpAndSettle();
     expect(find.text('Length: 10m'), findsOneWidget);
     await t.tap(find.text('Close'));
@@ -103,9 +104,9 @@ void main() {
     expect(find.text('Today'), findsWidgets);
     await t.tapAt(const Offset(20, 20));
     await t.pumpAndSettle();
-    await t.scrollUntilVisible(find.text('Practice'), -150, scrollable: _ov);
+    await t.scrollUntilVisible(find.widgetWithText(PgPill, 'Practice'), -150, scrollable: _ov);
     await t.pumpAndSettle();
-    await t.tap(find.text('Practice'));
+    await t.tap(find.widgetWithText(PgPill, 'Practice'));
     expect(practiced, 1);
   });
 
@@ -143,6 +144,23 @@ void main() {
     await t.tap(find.byTooltip('Open History'));
     await t.pumpAndSettle();
     expect(find.byKey(const ValueKey('deck-history')), findsNothing);
+  });
+
+  testWidgets('Home 3D banner, Begin Practice pill, gold eyebrows and bottom nav', (t) async {
+    await _phone(t);
+    SharedPreferences.setMockInitialValues(_seed());
+    await t.pumpWidget(_app());
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('progress-nav')), findsOneWidget);
+    await t.tap(find.text('Library'));
+    expect(navs.last, 2);
+    await _reveal(t, find.byKey(const ValueKey('progress-banner')));
+    expect(find.text('DAILY PRACTICE'), findsOneWidget);
+    final before = practiced;
+    await t.tap(find.text('Begin Practice'));
+    expect(practiced, before + 1);
+    await _reveal(t, find.text('KEEP IT GOING'));
+    expect(find.text('KEEP IT GOING'), findsOneWidget);
   });
 
   testWidgets('first-use guide shows once, steps through and is remembered', (t) async {
