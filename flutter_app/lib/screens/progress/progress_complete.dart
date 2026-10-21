@@ -608,7 +608,9 @@ class _DeckFace extends StatelessWidget {
                   height: 52,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(color: const Color(0xFFE9C1A5), shape: BoxShape.circle, border: Border.all(color: _white, width: 3)),
-                  child: FittedBox(child: Padding(padding: const EdgeInsets.all(6), child: Text(card.badge, style: const TextStyle(color: Color(0xFF060C18), fontSize: 16, fontWeight: FontWeight.w800)))),
+                  child: card.badge == '✓'
+                      ? const Icon(Icons.check_rounded, color: Color(0xFF060C18), size: 26, semanticLabel: 'Reached')
+                      : FittedBox(child: Padding(padding: const EdgeInsets.all(6), child: Text(card.badge, style: const TextStyle(color: Color(0xFF060C18), fontSize: 16, fontWeight: FontWeight.w800)))),
                 ),
               ),
             ),
