@@ -12,6 +12,12 @@ import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../programs/program_router.dart';
 import '../../widgets/n_motion.dart';
+import '../../screens/fashion/header.dart';
+import '../../widgets/black_glass_banner.dart';
+import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/nwsb_icon.dart';
+import '../../nowssb_ui/app_video_backdrop.dart';
+import '../../nowssb_ui/sheets_popups.dart';
 
 /// Coin cap: coins can cover at most this share of a price (spec 18.1: 30-40%).
 const double kCoinCapFraction = EarnWallet.maxCoinFraction;
@@ -104,16 +110,12 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return EconomyPage(
+    return NAppBackdrop(child: EconomyPage(
       title: 'Coins',
       goodToKnow: kCoinsNotMoney,
       showBalance: false,
-      action: IconButton(
-        key: const Key('coinsHelp'),
-        tooltip: 'How coins work',
-        icon: const Icon(Icons.help_outline_rounded, color: Colors.white),
-        onPressed: () => showCoinsGuide(context),
-      ),
+      // Home's own top bar; its menu button opens the coins guide here.
+      header: HomeHeader(key: const Key('coinsHelp'), onMenu: () => showCoinsGuide(context)),
       child: ListenableBuilder(
         listenable: Listenable.merge([EconomyMirror.instance, EarnWallet.instance]),
         builder: (context, _) {
@@ -133,7 +135,7 @@ class _CoinsWalletScreenState extends State<CoinsWalletScreen> {
           );
         },
       ),
-    );
+    ));
   }
 
   void _go(CoinsTab t) => setState(() => _tab = t);
@@ -167,10 +169,10 @@ class CoinsGlass extends StatelessWidget {
     return ClipRRect(
       borderRadius: r,
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+        filter: ImageFilter.blur(sigmaX: kNotifGlassSigma, sigmaY: kNotifGlassSigma),
         child: Material(
-          color: const Color(0x24FFFFFF),
-          shape: RoundedRectangleBorder(borderRadius: r, side: const BorderSide(color: Color(0x40FFFFFF))),
+          color: const Color(0x8C05060A),
+          shape: RoundedRectangleBorder(borderRadius: r, side: const BorderSide(color: Color(0x26FFFFFF))),
           child: InkWell(onTap: onTap, borderRadius: r, child: Padding(padding: padding, child: child)),
         ),
       ),
@@ -211,41 +213,125 @@ class _HeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final expiring = data.expiring.where((e) => e.$2 > now).fold<int>(0, (a, e) => a + e.$1);
     return CoinsGlass(
-      padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
+      padding: const EdgeInsets.fromLTRB(20, 26, 20, 20),
       child: Column(
         children: [
-          GestureDetector(
-            onTap: () => _coinInfo(context),
-            child: const NwsbCoinDisc(size: 84),
-          ),
-          const SizedBox(height: 12),
-          TweenAnimationBuilder<double>(
-            key: const Key('coinsBalance'),
-            tween: Tween(begin: 0, end: data.coins.toDouble()),
-            duration: MediaQuery.of(context).disableAnimations ? Duration.zero : const Duration(milliseconds: 1100),
-            curve: Curves.easeOutCubic,
-            builder: (_, v, __) => Text('${v.round()}', style: const TextStyle(color: Colors.white, fontSize: 44, fontWeight: FontWeight.w800)),
-          ),
-          Text(data.signedIn ? 'coins in your wallet' : 'Sign in to see your coins', style: _body2),
+          GestureDetector(onTap: () => _coinInfo(context), child: const NwsbCoinDisc(size: 128)),
+          const SizedBox(height: 18),
+          Text(data.signedIn ? 'Your NowssB coins' : 'Sign in to see your coins', style: _title),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(child: _Pill('Earn', key: const Key('heroEarn'), onTap: () => onTab(CoinsTab.earn))),
-              const SizedBox(width: 8),
-              Expanded(child: _Pill('Use', key: const Key('heroUse'), filled: false, onTap: () => onTab(CoinsTab.use))),
-              const SizedBox(width: 8),
-              Expanded(child: _Pill('History', key: const Key('heroHistory'), filled: false, onTap: () => onTab(CoinsTab.history))),
-            ],
+          IntrinsicHeight(
+            child: Row(children: [
+              Expanded(
+                child: _BigStat(
+                  label: 'Balance',
+                  child: TweenAnimationBuilder<double>(
+                    key: const Key('coinsBalance'),
+                    tween: Tween(begin: 0, end: data.coins.toDouble()),
+                    duration: MediaQuery.of(context).disableAnimations ? Duration.zero : const Duration(milliseconds: 1100),
+                    curve: Curves.easeOutCubic,
+                    builder: (_, v, __) => Text('${v.round()}', style: _huge),
+                  ),
+                ),
+              ),
+              const VerticalDivider(color: Color(0x33FFFFFF), thickness: 1, width: 24),
+              Expanded(child: _BigStat(label: 'Expiring soon', child: Text('$expiring', key: const Key('heroExpiring'), style: _huge))),
+            ]),
           ),
-          if (!data.signedIn) ...[
-            const SizedBox(height: 12),
-            _Pill('Sign in', onTap: () => NwsbSignInPage.open(context)),
-          ],
+          const SizedBox(height: 20),
+          Row(children: [
+            Expanded(child: _Pill('Use', key: const Key('heroUse'), filled: false, onTap: () => showUseSheet(context, data.coins))),
+            const SizedBox(width: 10),
+            Expanded(child: _Pill('Earn', key: const Key('heroEarn'), onTap: () => showEarnSheet(context, data))),
+          ]),
+          const SizedBox(height: 8),
+          TextButton(key: const Key('heroHistory'), onPressed: () => onTab(CoinsTab.history), child: const Text('See history', style: TextStyle(color: Color(0xCCFFFFFF)))),
+          if (!data.signedIn) _Pill('Sign in', onTap: () => NwsbSignInPage.open(context)),
         ],
       ),
     );
   }
+}
+
+const _huge = TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800, height: 1.05);
+
+class _BigStat extends StatelessWidget {
+  const _BigStat({required this.label, required this.child});
+  final String label;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => Column(children: [
+        FittedBox(child: child),
+        const SizedBox(height: 4),
+        Text(label, style: _body2),
+      ]);
+}
+
+/// SBI-style sheet: big coin, huge stats split by a divider, Close / primary buttons.
+Future<void> _heroSheet(BuildContext context, {required String title, required String body, required (String, String) left, required (String, String) right, required String primary, required VoidCallback onPrimary, Key? key}) =>
+    showGlassSheet<void>(
+      context,
+      accent: const Color(0xFFE4C56A),
+      builder: (c) => Column(key: key, mainAxisSize: MainAxisSize.min, children: [
+        const NwsbCoinDisc(size: 120),
+        const SizedBox(height: 16),
+        Text(title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 6),
+        Text(body, textAlign: TextAlign.center, style: _body2),
+        const SizedBox(height: 18),
+        IntrinsicHeight(
+          child: Row(children: [
+            Expanded(child: _BigStat(label: left.$2, child: Text(left.$1, style: _huge))),
+            const VerticalDivider(color: Color(0x33FFFFFF), thickness: 1, width: 24),
+            Expanded(child: _BigStat(label: right.$2, child: Text(right.$1, style: _huge))),
+          ]),
+        ),
+        const SizedBox(height: 22),
+        Row(children: [
+          Expanded(child: _Pill('Close', filled: false, onTap: () => Navigator.of(c).pop())),
+          const SizedBox(width: 10),
+          Expanded(child: _Pill(primary, onTap: () {
+            Navigator.of(c).pop();
+            onPrimary();
+          })),
+        ]),
+      ]),
+    );
+
+Future<void> showEarnSheet(BuildContext context, CoinsData d) => _heroSheet(
+      context,
+      key: const Key('earnSheet'),
+      title: d.claimedToday ? 'Today is claimed' : 'Collect today\'s coins',
+      body: 'Check in daily and keep your streak to earn more.',
+      left: ('${d.streak}', 'Day streak'),
+      right: (d.claimedToday ? 'Done' : 'Ready', 'Check-in'),
+      primary: d.claimedToday ? 'More ways' : 'Claim',
+      onPrimary: () {
+        if (!d.signedIn) {
+          NwsbSignInPage.open(context);
+        } else if (!d.claimedToday) {
+          DailyClaimSheet.offer(context, mounted: () => context.mounted);
+        } else {
+          Programmes.open(context, Programme.rewards);
+        }
+      },
+    );
+
+Future<void> showUseSheet(BuildContext context, int coins) {
+  final pct = (kCoinCapFraction * 100).round();
+  return _heroSheet(
+    context,
+    key: const Key('useSheet'),
+    title: 'Use coins at checkout',
+    body: 'Coins cover up to $pct% of a price in the NowssB store. The rest is paid normally.',
+    left: ('$coins', 'Your coins'),
+    right: ('$pct%', 'Max per price'),
+    primary: 'Shop',
+    onPrimary: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen())),
+  );
 }
 
 void _coinInfo(BuildContext context) {
@@ -360,15 +446,15 @@ class _Overview extends StatelessWidget {
           ]),
         ),
         const SizedBox(height: 12),
-        CoinsGlass(
+        BlackGlassBanner(
+          title: 'Coin rules',
+          subtitle: 'What coins are and how the cap works.',
+          mark: NwsbMarks.book,
+          margin: EdgeInsets.zero,
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinRulesPage())),
-          child: const Row(children: [
-            Icon(Icons.menu_book_rounded, color: Colors.white),
-            SizedBox(width: 12),
-            Expanded(child: Text('Coin rules', style: _title)),
-            Icon(Icons.chevron_right_rounded, color: Colors.white),
-          ]),
         ),
+        const SizedBox(height: 12),
+        ColoredSplitPromoBanner.forSurface(SplitPromoSurface.normalHome, margin: EdgeInsets.zero, onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const StoreScreen()))),
       ],
     );
   }
