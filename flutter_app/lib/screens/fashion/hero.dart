@@ -329,7 +329,7 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           TvFrame(
-            asset: 'assets/video/hero-bg.mp4',
+            asset: 'assets/tv/home-words-tv.mp4',
             frame: DeviceFrame.tvLandscape,
             autoplay: live,
             onTap: onExplore,
@@ -764,168 +764,45 @@ class _Screen extends StatefulWidget {
 }
 
 class _ScreenState extends State<_Screen> {
-  /// HERO_WORDS — app/js/part012.js:1372.
-  static const _words = [
-    'VIBRATION',
-    'FREQUENCIES',
-    'MIND',
-    'NEURONS',
-    'RESONANCE',
-  ];
-
-  /// TAG_WORDS — :1429.
-  static const _tags = [
-    'VIBRATION',
-    'FREQUENCY',
-    'RESONANCE',
-    'AWAKENING',
-    'SOUND BIRTH',
-  ];
-
-  Timer? _wt;
-  Timer? _tt;
-  int _w = 0;
-  int _t = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    if (_flutterTest) return;
-    _wt = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || !TickerMode.of(context)) return;
-      setState(() => _w = (_w + 1) % _words.length);
-    });
-    _tt = Timer.periodic(const Duration(milliseconds: 2500), (_) {
-      if (!mounted || !TickerMode.of(context)) return;
-      setState(() => _t = (_t + 1) % _tags.length);
-    });
-  }
-
-  @override
-  void dispose() {
-    _wt?.cancel();
-    _tt?.cancel();
-    super.dispose();
-  }
-
+  // Minimal overlay on the left of the TV: a thick white NowssB and one
+  // short line. Nothing else on the screen.
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, c) {
-        // The screen is small and the type on it is sized against the
-        // television, not against the phone — so everything scales off the
-        // aperture's own width rather than carrying fixed points.
         final u = c.maxWidth / 100;
-        // Placed, not stacked in a Flex. The aperture is a FIXED box and
-        // a Column inside one overflows the moment the type is a line
-        // taller than expected — which is exactly what `.hero-content`
-        // avoids on the web by pinning its two groups to the top and the
-        // bottom of the screen.
+        const shadow = [Shadow(color: Color(0xCC000000), blurRadius: 12)];
         return Padding(
           padding: EdgeInsets.symmetric(horizontal: 5 * u, vertical: 4 * u),
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // `clamp(32px, 9vw, 52px)` — against the SCREEN, not
-                    // the phone, because the screen is what it is on.
-                    Text.rich(
-                      TextSpan(
-                        style: TextStyle(
-                          fontSize: 10 * u,
-                          color: Colors.white,
-                          height: 1.05,
-                          shadows: const [
-                            Shadow(color: Color(0xCC000000), blurRadius: 10),
-                          ],
-                        ),
-                        children: const [
-                          TextSpan(
-                            text: 'Nowss',
-                            style: TextStyle(fontWeight: FontWeight.w800),
-                          ),
-                          TextSpan(
-                            text: 'B',
-                            style: TextStyle(fontWeight: FontWeight.w200),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 1.5 * u),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      child: Text(
-                        _tags[_t],
-                        key: ValueKey(_t),
-                        style: TextStyle(
-                          fontSize: 2.9 * u,
-                          letterSpacing: 2,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          shadows: const [
-                            Shadow(color: Color(0xCC000000), blurRadius: 8),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'NowssB',
+                  style: TextStyle(
+                    fontSize: 11 * u,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    height: 1.0,
+                    letterSpacing: -0.5,
+                    shadows: shadow,
+                  ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.bottomLeft,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text.rich(
-                      TextSpan(
-                        style: TextStyle(
-                          fontSize: 3.3 * u,
-                          color: const Color(0xE6FFFFFF),
-                          shadows: const [
-                            Shadow(color: Color(0xCC000000), blurRadius: 12),
-                          ],
-                        ),
-                        children: const [
-                          TextSpan(text: 'Natural Origin of '),
-                          TextSpan(
-                            text: 'Word Science',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 1.5 * u),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: Text(
-                        _words[_w],
-                        key: ValueKey(_w),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 6.4 * u,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 3,
-                          height: 1.05,
-                          shadows: const [
-                            Shadow(color: Color(0xCC000000), blurRadius: 14),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                SizedBox(height: 1.5 * u),
+                Text(
+                  'Words & meanings',
+                  style: TextStyle(
+                    fontSize: 3.6 * u,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    shadows: shadow,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
