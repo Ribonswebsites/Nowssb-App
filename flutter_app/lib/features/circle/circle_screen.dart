@@ -20,7 +20,6 @@ import '../../admin/template/editable.dart';
 import '../programs/program_kit.dart';
 import '../programs/earn_program.dart';
 import '../programs/program_router.dart';
-import '../../widgets/n_motion.dart';
 
 class CircleScreen extends StatefulWidget {
   const CircleScreen({super.key, this.initialTab});
@@ -133,7 +132,7 @@ class _CircleScreenState extends State<CircleScreen> {
       return;
     }
     if (referredBy.isNotEmpty) return;
-    showNSheet<void>(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF10141C),
       builder: (ctx) => Padding(
@@ -151,7 +150,7 @@ class _CircleScreenState extends State<CircleScreen> {
   }
 
   void _welcome() {
-    showNDialog<void>(
+    showDialog<void>(
       context: context,
       barrierColor: const Color(0x99000000),
       builder: (ctx) => Dialog(

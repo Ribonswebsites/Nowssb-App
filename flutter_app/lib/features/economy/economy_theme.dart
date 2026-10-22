@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../coins/coins_wallet_screen.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
@@ -17,7 +15,6 @@ import 'money.dart';
 import 'reward_fx.dart';
 import 'reward_overlay.dart';
 import '../../admin/template/editable.dart';
-import '../../widgets/n_motion.dart';
 
 /// The shell every NowssB program page shares (PDF-2 §9): the app's
 /// backdrop and brand back control, the page title, and the coin balance in
@@ -128,7 +125,9 @@ class _CoinBalancePillState extends State<CoinBalancePill> {
       builder: (context, _) {
         final m = EconomyMirror.instance;
         return GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen())),
+          onTap: widget.onRewardsPage
+              ? null
+              : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RewardsProgramPage(initialTab: 6))),
           behavior: HitTestBehavior.opaque,
           child: Container(
             key: _anchor,
@@ -158,7 +157,7 @@ class _GoodToKnowBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => showNSheet<void>(
+      onTap: () => showModalBottomSheet<void>(
         context: context,
         backgroundColor: const Color(0xFF0B0F16),
         builder: (context) => SafeArea(

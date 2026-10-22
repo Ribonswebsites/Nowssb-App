@@ -11,8 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/app_control.dart';
-import '../pages/menu_settings/ms_widgets.dart';
-import '../pages/menu_settings/ms_menu_page.dart';
 import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
@@ -130,51 +128,8 @@ class HomeMenuDrawer extends StatelessWidget {
     );
   }
 
-  List<MsGroup> _msGroups(BuildContext context) {
-    void go(Widget page) => _push(context, page);
-    void hub(String title, String sub, List<MsEntry> e) =>
-        go(MsHubPage(title: title, subtitle: sub, entries: e));
-    final nav = Navigator.of(context);
-    void sub(Widget page) => nav.push(MaterialPageRoute<void>(builder: (_) => page));
-    return [
-      MsGroup('Practice', [
-        MsEntry('home', Icons.home_outlined, 'Home', 'Your daily start', () => _goTab(context, 0)),
-        MsEntry('practice', Icons.self_improvement_rounded, 'Daily practice', 'Morning ritual and routines', () => _goTab(context, 1)),
-        MsEntry('library', Icons.graphic_eq_rounded, 'Sound library', 'Root frequencies', () => go(const SoundLibraryScreen())),
-        MsEntry('progress', Icons.spa_outlined, 'My progress', 'Your healing journey', () => go(PracticeProgressScreen(words: ContentStore.instance.library))),
-      ]),
-      MsGroup('Learn', [
-        MsEntry('science', Icons.auto_stories_outlined, 'Word science', 'How NowssB works', () => go(const AboutNowssbScreen(science: true))),
-        MsEntry('reader', Icons.menu_book_outlined, 'Shabdapathy reader', 'Foundations', () => go(const ReaderHubScreen())),
-        MsEntry('store', Icons.shopping_bag_outlined, 'Store', 'Words, meanings, plans', () => _goTab(context, 3)),
-      ]),
-      MsGroup('Rewards', [
-        MsEntry('rewards', Icons.card_giftcard_rounded, 'Rewards & gifts', 'Coins, gifts, coupons', () => hub('Rewards & gifts', 'Small joys for showing up.', [
-          MsEntry('vault', Icons.stars_rounded, 'Rewards', 'Coins, quests, invite', () => sub(const VaultScreen())),
-          MsEntry('gifts', Icons.redeem_rounded, 'Gifts', 'Boxes and gift cards', () => sub(const GiftsScreen())),
-          MsEntry('coupons', Icons.confirmation_number_outlined, 'Coupons', 'Scratch and codes', () => sub(const CouponScreen())),
-        ])),
-        MsEntry('earn', Icons.volunteer_activism_outlined, 'Earn & payouts', 'Agents, codes, earnings', () => hub('Earn & payouts', 'Share NowssB, see what you earned.', [
-          MsEntry('earnhub', Icons.handshake_outlined, 'Earn', 'Agents, codes, activity', () => sub(const EarnHubScreen())),
-          MsEntry('earnings', Icons.account_balance_wallet_outlined, 'Earnings', 'Payouts and commissions', () => sub(const EarningsScreen())),
-        ])),
-      ]),
-      MsGroup('You', [
-        MsEntry('profile', Icons.person_outline_rounded, 'Profile', 'Account and Word Print', () => _goTab(context, 4)),
-        MsEntry('community', Icons.forum_outlined, 'Community', 'Connect, Echo Wall, Word Print', () => hub('Community', 'Gentle company on the path.', [
-          MsEntry('connect', Icons.people_outline_rounded, 'NowssB Connect', 'Community', () => sub(const ConnectScreen())),
-          MsEntry('echo', Icons.waves_rounded, 'Echo Wall', 'Reflections', () => sub(const EchoWallScreen())),
-          MsEntry('print', Icons.fingerprint_rounded, 'Word Print', 'Public profile', () => sub(const WordPrintScreen())),
-        ])),
-        MsEntry('plans', Icons.workspace_premium_outlined, 'Plans', 'Resonance, Frequency, Frequency X', () => go(const SubscriptionScreen())),
-        MsEntry('settings', Icons.settings_outlined, 'Settings', 'Sound, look, privacy, help', () => go(const AppSettingsScreen())),
-      ]),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (MenuSettingsFlag.isOn) return MsMenuPage(groups: _msGroups(context));
     final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
     // Fashion menu mirrors AppSettingsScreen exactly (solid deep + gold wash,
@@ -288,12 +243,12 @@ class HomeMenuDrawer extends StatelessWidget {
                         bannerSub: 'Home, practice, library',
                         onBanner: () => _goTab(context, 0),
                         cards: [
-                          WorkCard(category: 'Home', title: 'Home', meta: 'Dashboard', action: 'Open home', image: 'assets/rails/ui-home.jpg', onTap: () => _goTab(context, 0)),
-                          WorkCard(category: 'Practice', title: 'Daily Practice', meta: 'Morning ritual', action: 'Open practice', image: 'assets/rails/ui-practice.jpg', onTap: () => _goTab(context, 1)),
-                          WorkCard(category: 'Practice', title: 'My Routines', meta: 'Five routine slots', action: 'Open routines', image: 'assets/rails/ui-routines.jpg', onTap: () => _push(context, const _RoutinesPage())),
-                          WorkCard(category: 'Library', title: 'Sound Library', meta: 'Root frequencies', action: 'Open library', image: 'assets/rails/ui-library.jpg', onTap: () => _push(context, const SoundLibraryScreen())),
-                          WorkCard(category: 'Science', title: 'Word Science', meta: 'The NowssB system', action: 'Open science', image: 'assets/rails/ui-science.jpg', onTap: () => _push(context, const AboutNowssbScreen(science: true))),
-                          WorkCard(category: 'Read', title: 'Shabdapathy', meta: 'Foundations', action: 'Open reader', image: 'assets/rails/ui-book.jpg', onTap: () => _push(context, const ReaderHubScreen())),
+                          WorkCard(category: 'Home', title: 'Home', meta: 'Dashboard', action: 'Open home', image: 'assets/rails/gen-01.jpg', onTap: () => _goTab(context, 0)),
+                          WorkCard(category: 'Practice', title: 'Daily Practice', meta: 'Morning ritual', action: 'Open practice', image: 'assets/rails/gen-02.jpg', onTap: () => _goTab(context, 1)),
+                          WorkCard(category: 'Practice', title: 'My Routines', meta: 'Five routine slots', action: 'Open routines', image: 'assets/rails/gen-03.jpg', onTap: () => _push(context, const _RoutinesPage())),
+                          WorkCard(category: 'Library', title: 'Sound Library', meta: 'Root frequencies', action: 'Open library', image: 'assets/rails/gen-04.jpg', onTap: () => _push(context, const SoundLibraryScreen())),
+                          WorkCard(category: 'Science', title: 'Word Science', meta: 'The NowssB system', action: 'Open science', image: 'assets/rails/gen-05.jpg', onTap: () => _push(context, const AboutNowssbScreen(science: true))),
+                          WorkCard(category: 'Read', title: 'Shabdapathy', meta: 'Foundations', action: 'Open reader', image: 'assets/rails/gen-06.jpg', onTap: () => _push(context, const ReaderHubScreen())),
                         ],
                       ),
                       RoutineDeck(
@@ -302,22 +257,22 @@ class HomeMenuDrawer extends StatelessWidget {
                         bannerSub: 'Progress, store, settings',
                         onBanner: () => _goTab(context, 4),
                         cards: [
-                          WorkCard(category: 'Progress', title: 'My Progress', meta: 'Healing journey', action: 'Open progress', image: 'assets/rails/ui-progress.jpg', onTap: () => _push(context, PracticeProgressScreen(words: ContentStore.instance.library))),
-                          WorkCard(category: 'Store', title: 'NowssB Store', meta: 'Word and meaning libraries', action: 'Open store', image: 'assets/rails/ui-store.jpg', onTap: () => _goTab(context, 3)),
-                          WorkCard(category: 'Store', title: 'Meaning Store', meta: 'Hidden meanings', action: 'Open meanings', image: 'assets/rails/mean-mind.jpg', onTap: () => _push(context, const MeaningStoreScreen())),
-                          WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', image: 'assets/rails/ui-profile.jpg', onTap: () => _goTab(context, 4)),
-                          WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/ui-settings.jpg', onTap: () => _push(context, const AppSettingsScreen())),
-                          WorkCard(category: 'Plans', title: 'Plans', meta: 'Resonance, Frequency, Frequency X', action: 'Open plans', image: 'assets/rails/ui-plans.jpg', onTap: () => _push(context, const SubscriptionScreen())),
-                          WorkCard(category: 'Alerts', title: 'Notifications', meta: 'This phone', action: 'Open alerts', image: 'assets/rails/ui-bell.jpg', onTap: () => _push(context, const NotificationsSettingsPage())),
-                          WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/ui-earn.jpg', onTap: () => _push(context, const EarnHubScreen())),
-                          WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Coins, quests, invite', action: 'Open rewards', image: 'assets/rails/ui-trophy.jpg', onTap: () => _push(context, const VaultScreen())),
-                          WorkCard(category: 'Gifts', title: 'NowssB Gifts', meta: 'Boxes and gift cards', action: 'Open gifts', image: 'assets/rails/ui-gift.jpg', onTap: () => _push(context, const GiftsScreen())),
-                          WorkCard(category: 'Coupons', title: 'NowssB Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/ui-coupon.jpg', onTap: () => _push(context, const CouponScreen())),
-                          WorkCard(category: 'You', title: 'Word Print', meta: 'Public profile', action: 'Open print', image: 'assets/rails/ui-print.jpg', onTap: () => _push(context, const WordPrintScreen())),
-                          WorkCard(category: 'Wall', title: 'Echo Wall', meta: 'Reflections', action: 'Open the wall', image: 'assets/rails/ui-wall.jpg', onTap: () => _push(context, const EchoWallScreen())),
-                          WorkCard(category: 'Cash', title: 'Earnings', meta: 'Payouts and commissions', action: 'Open earnings', image: 'assets/rails/ui-ledger.jpg', onTap: () => _push(context, const EarningsScreen())),
-                          WorkCard(category: 'Ledger', title: 'Activity', meta: 'Coin and cash ledger', action: 'Open activity', image: 'assets/rails/ui-activity.jpg', onTap: () => _push(context, const EarnHubScreen())),
-                          WorkCard(category: 'Connect', title: 'NowssB Connect', meta: 'Community', action: 'Open connect', image: 'assets/rails/ui-connect.jpg', onTap: () => _push(context, const ConnectScreen())),
+                          WorkCard(category: 'Progress', title: 'My Progress', meta: 'Healing journey', action: 'Open progress', image: 'assets/rails/gen-07.jpg', onTap: () => _push(context, PracticeProgressScreen(words: ContentStore.instance.library))),
+                          WorkCard(category: 'Store', title: 'NowssB Store', meta: 'Word and meaning libraries', action: 'Open store', image: 'assets/rails/gen-08.jpg', onTap: () => _goTab(context, 3)),
+                          WorkCard(category: 'Store', title: 'Meaning Store', meta: 'Hidden meanings', action: 'Open meanings', image: 'assets/rails/gen-09.jpg', onTap: () => _push(context, const MeaningStoreScreen())),
+                          WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', image: 'assets/rails/gen-10.jpg', onTap: () => _goTab(context, 4)),
+                          WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/gen-11.jpg', onTap: () => _push(context, const AppSettingsScreen())),
+                          WorkCard(category: 'Plans', title: 'Plans', meta: 'Resonance, Frequency, Frequency X', action: 'Open plans', image: 'assets/rails/rewards-03.jpg', onTap: () => _push(context, const SubscriptionScreen())),
+                          WorkCard(category: 'Alerts', title: 'Notifications', meta: 'This phone', action: 'Open alerts', image: 'assets/rails/glass-01.jpg', onTap: () => _push(context, const NotificationsSettingsPage())),
+                          WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => _push(context, const EarnHubScreen())),
+                          WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Coins, quests, invite', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => _push(context, const VaultScreen())),
+                          WorkCard(category: 'Gifts', title: 'NowssB Gifts', meta: 'Boxes and gift cards', action: 'Open gifts', image: 'assets/rails/gifts-01.jpg', onTap: () => _push(context, const GiftsScreen())),
+                          WorkCard(category: 'Coupons', title: 'NowssB Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/coupons-01.jpg', onTap: () => _push(context, const CouponScreen())),
+                          WorkCard(category: 'You', title: 'Word Print', meta: 'Public profile', action: 'Open print', image: 'assets/rails/glass-02.jpg', onTap: () => _push(context, const WordPrintScreen())),
+                          WorkCard(category: 'Wall', title: 'Echo Wall', meta: 'Reflections', action: 'Open the wall', image: 'assets/rails/glass-03.jpg', onTap: () => _push(context, const EchoWallScreen())),
+                          WorkCard(category: 'Cash', title: 'Earnings', meta: 'Payouts and commissions', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => _push(context, const EarningsScreen())),
+                          WorkCard(category: 'Ledger', title: 'Activity', meta: 'Coin and cash ledger', action: 'Open activity', image: 'assets/rails/clear-04.jpg', onTap: () => _push(context, const EarnHubScreen())),
+                          WorkCard(category: 'Connect', title: 'NowssB Connect', meta: 'Community', action: 'Open connect', image: 'assets/rails/glass-04.jpg', onTap: () => _push(context, const ConnectScreen())),
                         ],
                       ),
                       Padding(

@@ -2,7 +2,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/banner_mix.dart';
@@ -24,7 +23,6 @@ import '../programs/program_kit.dart';
 import '../programs/program_heroes.dart';
 import '../programs/program_router.dart';
 import '../programs/gifts_program.dart';
-import '../../widgets/n_motion.dart';
 
 class GiftItem {
   const GiftItem(this.id, this.label, this.cents, {this.productId = ''});
@@ -133,7 +131,7 @@ class GiftBook extends ChangeNotifier {
 Future<void> showGiftCardSheet(BuildContext context, String cardId) async {
   final cards = kGiftCatalog;
   final card = cards.firstWhere((c) => c.id == cardId, orElse: () => cards.first);
-  await showNSheet<void>(
+  await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -261,7 +259,7 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
                               FutureBuilder<String>(
                                 future: _price,
                                 builder: (context, snap) => Text(
-                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? 'Price on Google Play' : snap.data!,
+                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? '\u20b9${widget.card.cents}' : snap.data!,
                                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
                                 ),
                               ),
@@ -365,15 +363,6 @@ class _GiftsScreenState extends State<GiftsScreen> {
   void initState() {
     super.initState();
     GiftBook.instance.load();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!mounted) return;
-      final start = widget.startOnRedeem ? 'redeem' : widget.initialTab;
-      if (start != null) {
-        _openTabs(start);
-        return;
-      }
-      await maybeShowGiftsGuide(context);
-    });
   }
 
   @override
@@ -385,22 +374,19 @@ class _GiftsScreenState extends State<GiftsScreen> {
   void _tab(String id) => _go.value?.call(id);
 
   void _openSpin(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EconomyPage(
-      title: 'Daily spin',
-      mark: NwsbMarks.gift,
-      child: SingleChildScrollView(padding: EdgeInsets.all(16), child: GiftWheel()),
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(
+      backgroundColor: Color(0xFF07070C),
+      body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: GiftWheel())),
     )));
   }
 
   void _openTabs(String id) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EconomyPage(
-      title: 'NowssB Gifts',
-      mark: NwsbMarks.gift,
-      goodToKnow: kGiftsDisclaimer,
-      child: ListView(
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: SafeArea(child: ListView(
         padding: const EdgeInsets.all(16),
         children: [ProgramTabsBlock(spec: kGiftsSpec, initialTab: id, scrollTo: true, showDisclaimer: false)],
-      ),
+      )),
     )));
   }
 
@@ -413,7 +399,6 @@ class _GiftsScreenState extends State<GiftsScreen> {
       action: GestureDetector(
         // History: switch to Received and scroll the tabs into view.
         onTap: () => _openTabs('received'),
-        onLongPress: () => showGiftsGuide(context),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
@@ -444,95 +429,10 @@ class _GiftsScreenState extends State<GiftsScreen> {
               WorkCard(category: 'Send', title: 'Gift cards', meta: 'A real purchase, shared as a code', action: 'Send a gift', image: 'assets/rails/art-gift-red.jpg', onTap: () => showGiftCardSheet(context, 'word')),
               WorkCard(category: 'History', title: 'Received', meta: 'Gifts on this account', action: 'Open history', image: 'assets/rails/art-gift-gold.jpg', onTap: () => _openTabs('received')),
               WorkCard(category: 'Redeem', title: 'Redeem', meta: 'A code from someone else', action: 'Redeem', image: 'assets/rails/art-gift-black.jpg', onTap: () => _openTabs('redeem')),
-              WorkCard(category: 'Free', title: 'Free gifts', meta: 'Open a box for your time today', action: 'Open free gifts', image: 'assets/rails/art-gift-gold.jpg', onTap: () => _openTabs('free')),
-              WorkCard(category: 'Sent', title: 'Sent gifts', meta: 'Codes you bought for others', action: 'See sent', image: 'assets/rails/art-gift-red.jpg', onTap: () => _openTabs('sent')),
-              WorkCard(category: 'Expired', title: 'Expired', meta: 'Gifts that ran out', action: 'See expired', image: 'assets/rails/art-gift-black.jpg', onTap: () => _openTabs('expired')),
-              WorkCard(category: 'Help', title: 'How gifts work', meta: 'A 4-step guide', action: 'Show guide', image: 'assets/rails/art-gift-gold.jpg', onTap: () => showGiftsGuide(context)),
               WorkCard(category: 'Spin', title: 'Daily spin', meta: 'One free spin', action: 'Spin', image: 'assets/rails/art-spin.jpg', onTap: () => _openSpin(context)),
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-
-const _kGuideKey = 'gifts.guide.seen.v1';
-const _kGuideSteps = <(String, String)>[
-  ('Free gifts', 'Spend time in NowssB each day. At 10, 20, 40 and 60 minutes you can open a better free box.'),
-  ('Send a gift', 'Pick a gift card, write a note and pay on Google Play. A NWSB code is made only after Play accepts the payment.'),
-  ('My gifts', 'Received, Sent and Expired keep every gift. Copy a code or cancel an unopened one from Sent.'),
-  ('Redeem', 'Got a code? Preview what is inside first, then redeem it. Coins cannot be gifted.'),
-];
-
-/// Shows the first-use guide once per install.
-Future<void> maybeShowGiftsGuide(BuildContext context) async {
-  try {
-    final p = await SharedPreferences.getInstance();
-    if (p.getBool(_kGuideKey) == true || !context.mounted) return;
-    await p.setBool(_kGuideKey, true);
-    if (context.mounted) await showGiftsGuide(context);
-  } catch (_) {}
-}
-
-Future<void> showGiftsGuide(BuildContext context) => showNDialog<void>(
-      context: context,
-      barrierColor: const Color(0x99000000),
-      builder: (_) => const GiftsGuide(),
-    );
-
-/// Frosted step-by-step guide card (meditation-card style: dots, Skip, Next).
-class GiftsGuide extends StatefulWidget {
-  const GiftsGuide({super.key});
-  @override
-  State<GiftsGuide> createState() => _GiftsGuideState();
-}
-
-class _GiftsGuideState extends State<GiftsGuide> {
-  var _i = 0;
-  @override
-  Widget build(BuildContext context) {
-    final (title, body) = _kGuideSteps[_i];
-    final last = _i == _kGuideSteps.length - 1;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-            child: Material(
-              color: const Color(0x33FFFFFF),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32), side: const BorderSide(color: Color(0x66FFFFFF))),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(22, 26, 22, 18),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  const CircleAvatar(radius: 34, backgroundColor: Color(0x22FFFFFF), child: NwsbIcon(NwsbMarks.gift, size: 34)),
-                  const SizedBox(height: 18),
-                  Text(title, key: const Key('giftsGuideTitle'), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 8),
-                  Text(body, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13.5, height: 1.4)),
-                  const SizedBox(height: 16),
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    for (var k = 0; k < _kGuideSteps.length; k++)
-                      Container(margin: const EdgeInsets.all(3), width: k == _i ? 16 : 6, height: 6, decoration: BoxDecoration(color: k == _i ? Colors.white : const Color(0x66FFFFFF), borderRadius: BorderRadius.circular(3))),
-                  ]),
-                  const SizedBox(height: 10),
-                  Row(children: [
-                    TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Skip', style: TextStyle(color: Color(0xCCFFFFFF)))),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () => last ? Navigator.of(context).pop() : setState(() => _i++),
-                      style: TextButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(horizontal: 20)),
-                      child: Text(last ? 'Done' : 'Next', style: const TextStyle(fontWeight: FontWeight.w800)),
-                    ),
-                  ]),
-                ]),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }

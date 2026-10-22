@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../admin/template/editable.dart';
-import 'n_motion.dart';
 
 const _surveySeenKey = 'hasSeenPronunciationSurvey';
 const _purple = Color(0xFF8B5CF6);
@@ -16,7 +15,7 @@ Future<bool> showPronunciationSurveyIfNeeded(BuildContext context) async {
   if (prefs.getBool(_surveySeenKey) ?? false) return false;
   await prefs.setBool(_surveySeenKey, true);
   if (!context.mounted) return false;
-  await showNSheet<bool>(
+  await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,

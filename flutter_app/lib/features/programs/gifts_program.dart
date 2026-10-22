@@ -34,7 +34,6 @@ const kGiftsSpec = ProgramSpec(
     ProgramTab('send', 'Send a Gift', _send),
     ProgramTab('received', 'Received', _received),
     ProgramTab('sent', 'Sent', _sent),
-    ProgramTab('expired', 'Expired', _expired),
     ProgramTab('redeem', 'Redeem', _redeem),
     ProgramTab('rules', 'Rules', _rules),
   ],
@@ -136,7 +135,7 @@ class _SendPickerState extends State<_SendPicker> {
             mark: NwsbMarks.gift,
             selected: c.id == id,
             progress: c.id == id ? 1 : 0,
-            line: c.id == id ? 'Selected · price shown on Google Play' : 'Price shown on Google Play',
+            line: c.id == id ? 'Selected · \u20b9${c.cents} on Google Play' : '\u20b9${c.cents} on Google Play',
             onTap: () => setState(() => _id = c.id),
           ),
         const SizedBox(height: 6),
@@ -147,7 +146,7 @@ class _SendPickerState extends State<_SendPicker> {
 }
 
 List<Widget> _received(BuildContext context, Map<String, dynamic> s) {
-  final rows = sList(sMap(s['gifts'])['received']).where((g) => g['status'] != 'expired').toList();
+  final rows = sList(sMap(s['gifts'])['received']);
   return [
     LSection('inbox', 'Inbox', PCard(children: [
       if (rows.isEmpty) const PEmpty('No gifts received yet. Redeem a code and it shows here.'),
@@ -162,7 +161,7 @@ List<Widget> _received(BuildContext context, Map<String, dynamic> s) {
 }
 
 List<Widget> _sent(BuildContext context, Map<String, dynamic> s) {
-  final rows = sList(sMap(s['gifts'])['sent']).where((g) => g['status'] != 'expired').toList();
+  final rows = sList(sMap(s['gifts'])['sent']);
   return [
     LSection('sent', 'Sent', PCard(children: [
       if (rows.isEmpty) const PEmpty('No gifts sent yet.'),
@@ -184,26 +183,6 @@ List<Widget> _sent(BuildContext context, Map<String, dynamic> s) {
                   PClaim(label: 'Cancel', action: 'cancelGift', data: {'code': g['code']}, filled: false),
                 ])
               : null,
-        ),
-    ])),
-  ];
-}
-
-List<Widget> _expired(BuildContext context, Map<String, dynamic> s) {
-  final g = sMap(s['gifts']);
-  final rows = [
-    for (final r in sList(g['received'])) if (r['status'] == 'expired') ('Received', r),
-    for (final r in sList(g['sent'])) if (r['status'] == 'expired') ('Sent', r),
-  ];
-  return [
-    LSection('expired', 'Expired', PCard(children: [
-      if (rows.isEmpty) const PEmpty('Nothing has expired. Open free boxes and redeem codes before their date.'),
-      for (final (dir, r) in rows)
-        PRow(
-          title: '${r['title'] ?? 'Gift'}',
-          sub: '$dir · expired${sInt(r['expiresAt']) > 0 ? ' ${shortDate(r['expiresAt'])}' : ''}',
-          mark: NwsbMarks.gift,
-          trailing: const PPill('Expired', color: NwsbColors.mist),
         ),
     ])),
   ];
@@ -319,7 +298,6 @@ class _RedeemState extends State<_Redeem> {
           ]),
         ],
         if (_err != null) PEmpty(_err!),
-        if (_peek == null && _err == null) const PEmpty('Codes look like NWSB-XXXX-XXXX. Nothing is used until you tap Redeem.'),
       ]);
 }
 

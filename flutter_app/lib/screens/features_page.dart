@@ -30,10 +30,10 @@ class _Feature {
 
 void _push(BuildContext c, Widget p) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => p));
 
-const _practiceArt = <String>['assets/rails/subj-feat-player.jpg', 'assets/rails/subj-feat-library.jpg', 'assets/rails/subj-feat-progress.jpg', 'assets/rails/subj-feat-healing.jpg', 'assets/rails/subj-feat-coach.jpg', 'assets/rails/subj-feat-reader.jpg'];
-const _storeArt = <String>['assets/rails/subj-feat-store.jpg', 'assets/rails/subj-feat-meanings.jpg', 'assets/rails/subj-feat-signatures.jpg', 'assets/rails/subj-feat-ebooks.jpg', 'assets/rails/subj-feat-plans.jpg', 'assets/rails/subj-feat-request.jpg'];
-const _programArt = <String>['assets/rails/subj-feat-rewards.jpg', 'assets/rails/subj-feat-coupons.jpg', 'assets/rails/subj-feat-gifts.jpg', 'assets/rails/subj-feat-reference.jpg', 'assets/rails/subj-feat-earn.jpg', 'assets/rails/subj-feat-partner.jpg'];
-const _youArt = <String>['assets/rails/subj-feat-customize.jpg', 'assets/rails/subj-feat-connect.jpg', 'assets/rails/subj-feat-saved.jpg', 'assets/rails/subj-feat-about.jpg'];
+const _practiceArt = <String>['assets/rails/gen-70.jpg', 'assets/rails/gen-71.jpg', 'assets/rails/gen-72.jpg', 'assets/rails/coupons-03.jpg', 'assets/rails/coupons-04.jpg', 'assets/rails/coupons-05.jpg'];
+const _storeArt = <String>['assets/rails/coupons-06.jpg', 'assets/rails/coupons-07.jpg', 'assets/rails/earn-03.jpg', 'assets/rails/earn-04.jpg', 'assets/rails/earn-05.jpg', 'assets/rails/earn-06.jpg'];
+const _programArt = <String>['assets/rails/earn-07.jpg', 'assets/rails/earnings-03.jpg', 'assets/rails/earnings-04.jpg', 'assets/rails/earnings-05.jpg', 'assets/rails/earnings-06.jpg', 'assets/rails/gifts-03.jpg'];
+const _youArt = <String>['assets/rails/gifts-04.jpg', 'assets/rails/gifts-05.jpg', 'assets/rails/gifts-06.jpg', 'assets/rails/gifts-07.jpg'];
 
 final _practice = <_Feature>[
   _Feature('player', 'Practice player', 'Listen to a word, say it aloud, sit with it. Each sitting counts toward your streak.', NwsbMarks.play24, (c) => NwsbLinks.tab(c, 1)),

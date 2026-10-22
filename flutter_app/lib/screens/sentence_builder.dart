@@ -26,7 +26,6 @@ import 'store.dart';
 import 'store/word_atelier.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
-import '../widgets/n_motion.dart';
 
 /// Subconscious tier → max words selectable when combining.
 /// Starts at 2 (free); highest tier caps at 6.
@@ -223,7 +222,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
 
   void _openRequest() {
     HapticFeedback.selectionClick();
-    showNSheet<void>(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

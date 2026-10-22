@@ -13,7 +13,6 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../admin/template/editable.dart';
-import '../../widgets/n_motion.dart';
 
 class StoreSelectEntry {
   const StoreSelectEntry({
@@ -63,7 +62,7 @@ Future<void> showStoreSelectSheet(
   for (final e in kStoreSelectEntries) {
     precacheImage(AssetImage(e.art), context, onError: (_, __) {});
   }
-  return showNSheet<void>(
+  return showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,

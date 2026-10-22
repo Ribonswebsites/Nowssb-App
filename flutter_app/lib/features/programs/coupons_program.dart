@@ -13,7 +13,6 @@ import '../../data/firebase.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
-import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../economy/scratch_card.dart';
@@ -21,7 +20,6 @@ import 'program_kit.dart';
 import 'program_heroes.dart';
 import '../economy/coupon_screen.dart';
 import '../../admin/template/editable.dart';
-import '../../widgets/n_motion.dart';
 
 const kCouponsDisclaimer =
     'Coupon prizes are random. The odds for every coupon are shown before you buy. Paid coupons are for users aged 18 '
@@ -77,7 +75,7 @@ List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
       for (final c in coupons)
         PRow(
           title: '${c['label'] ?? '${sInt(c['pct'])}% off'}',
-          sub: '${c['scope'] ?? 'any'} · discount is capped${sInt(c['expiresAt']) > 0 ? ' · until ${shortDate(c['expiresAt'])}' : ''}',
+          sub: '${c['scope'] ?? 'any'} · cap ${inr(sNum(c['capINR']))}${sInt(c['expiresAt']) > 0 ? ' · until ${shortDate(c['expiresAt'])}' : ''}',
           mark: NwsbMarks.bag,
           trailing: sInt(c['expiresAt']) > 0 && sInt(c['expiresAt']) < soon ? const PPill('Expiring soon', color: Color(0xFFFFA24C)) : null,
         ),
@@ -203,7 +201,7 @@ List<Widget> _shop(BuildContext context, Map<String, dynamic> s) {
         const SizedBox(height: 4),
         Row(children: [
           Expanded(child: Text('${c['title']}', style: TextStyle(color: rarityColor('${c['id']}'), fontSize: 18, fontWeight: FontWeight.w800))),
-          Text(FxBook.instance.formatRupees(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          Text(inr(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         ]),
         Text('Rarest prize: ${c['rarest'] ?? ''}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
         const SizedBox(height: 6),
@@ -257,7 +255,7 @@ class _PaidBuyState extends State<_PaidBuy> {
       await EconomyMirror.instance.refresh();
     } on EconomyException catch (e) {
       if (e.extra['needsAdult'] == true && mounted) {
-        final ok = await showNDialog<bool>(
+        final ok = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: Colors.black,
@@ -370,7 +368,7 @@ List<Widget> _odds(BuildContext context, Map<String, dynamic> s) {
     LSection('after', 'After a purchase', PCard(children: [
       const EditableLabel('coupons_program.shared', 'Rarity of the free card after a purchase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
       for (final b in after)
-        Text('Up to ${sNum(b['maxINR']) > 1e9 ? 'any amount' : FxBook.instance.formatRupees(sNum(b['maxINR']))}: ${sMap(b['odds']).entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
+        Text('Up to ${sNum(b['maxINR']) > 1e9 ? 'any amount' : inr(sNum(b['maxINR']))}: ${sMap(b['odds']).entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
       Text('Subscriptions: ${afterSub.entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
     ])),
     LSection('spin', 'Daily Spin odds', table('Daily Spin', spin)),

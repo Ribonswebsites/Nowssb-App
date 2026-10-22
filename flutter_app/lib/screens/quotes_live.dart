@@ -31,7 +31,6 @@ import 'store.dart';
 import 'subscription.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
-import '../widgets/n_motion.dart';
 
 const _days = <String>[
   'Monday',
@@ -48,7 +47,7 @@ const _kBuddhaQuote =
 
 const _kQuoteMarks = 'nwsb_quote_marks';
 const _kHomeQuoteHidden = 'nwsb_home_quote_hidden_day';
-const _kDailyQuoteShown = 'nwsb_daily_quote_popup_v4';
+const _kDailyQuoteShown = 'nwsb_daily_quote_popup_v3';
 
 /// Notifications wait until this day's quote has opened or been skipped.
 class DailyQuoteGate {
@@ -584,7 +583,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
   }
 
   void _openMonth() {
-    showNSheet<void>(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -594,7 +593,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
 
   void _openCalendar() {
     final today = DateTime.now().weekday - 1;
-    showNSheet<void>(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -1416,7 +1415,7 @@ Future<void> showDailyQuoteIfNeeded(BuildContext context) async {
       context: context,
       barrierDismissible: true,
       barrierLabel: 'Today quote',
-      barrierColor: const Color(0xE6050508),
+      barrierColor: const Color(0xC0000000),
       transitionDuration: const Duration(milliseconds: 280),
       pageBuilder: (dialogContext, _, __) {
         return _DailyQuotePopup(
@@ -1455,14 +1454,12 @@ class _DailyQuotePopup extends StatefulWidget {
   State<_DailyQuotePopup> createState() => _DailyQuotePopupState();
 }
 
-class _DailyQuotePopupState extends State<_DailyQuotePopup> with TickerProviderStateMixin {
-  late final AnimationController _rise = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..forward();
-  late final AnimationController _spin = AnimationController(vsync: this, duration: const Duration(seconds: 16))..repeat();
+class _DailyQuotePopupState extends State<_DailyQuotePopup> with SingleTickerProviderStateMixin {
+  late final AnimationController _rise = AnimationController(vsync: this, duration: const Duration(milliseconds: 700))..forward();
 
   @override
   void dispose() {
     _rise.dispose();
-    _spin.dispose();
     super.dispose();
   }
 
@@ -1475,131 +1472,108 @@ class _DailyQuotePopupState extends State<_DailyQuotePopup> with TickerProviderS
       child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 22),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 380),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: const Color(0xFF07070A),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: const Color(0x33FFFFFF)),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      height: 248,
-                      child: Stack(
-                        fit: StackFit.expand,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color(0x33FFFFFF),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0x66FFFFFF)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: ColoredBox(
+                      color: const Color(0xFF07070C),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const ColoredBox(color: Color(0xFF07070A)),
-                          Center(
-                            child: SizedBox(
-                              width: 168,
-                              height: 168,
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  RotationTransition(
-                                    turns: _spin,
-                                    child: const CustomPaint(
-                                      size: Size(168, 168),
-                                      painter: _QuoteRingPainter(),
+                          SizedBox(
+                            height: 168,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                const NwsbVideo(
+                                  asset: 'assets/video/healing-path-bg.mp4',
+                                  priority: ClipPriority.feature,
+                                  fit: BoxFit.cover,
+                                ),
+                                const DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [Color(0x00000000), Color(0xEE07070C)],
                                     ),
                                   ),
-                                  RotationTransition(
-                                    turns: ReverseAnimation(_spin),
-                                    child: const CustomPaint(
-                                      size: Size(148, 148),
-                                      painter: _QuoteRingPainter(inner: true),
+                                ),
+                                Positioned(
+                                  left: 16,
+                                  bottom: 12,
+                                  child: Text(
+                                    day,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      letterSpacing: 2.4,
+                                      fontWeight: FontWeight.w700,
+                                      decoration: TextDecoration.none,
                                     ),
                                   ),
-                                  const ClipOval(
-                                    child: SizedBox(
-                                      width: 124,
-                                      height: 124,
-                                      child: NwsbVideo(
-                                        asset: 'assets/video/orb-loop.mp4',
-                                        poster: 'assets/video/orb-loop-poster.webp',
-                                        priority: ClipPriority.feature,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(18, 4, 18, 16),
+                            child: FadeTransition(
+                              opacity: rise,
+                              child: SlideTransition(
+                                position: Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(rise),
+                                child: Text(
+                                  widget.quote,
+                                  style: GoogleFonts.libreBaskerville(
+                                    color: Colors.white,
+                                    fontSize: 22,
+                                    height: 1.35,
+                                    decoration: TextDecoration.none,
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                          Positioned(
-                            left: 18,
-                            bottom: 8,
-                            child: Text(
-                              'TODAY  ·  $day',
-                              style: const TextStyle(
-                                color: Color(0xFFE8D5A3),
-                                fontSize: 11,
-                                letterSpacing: 2.2,
-                                fontWeight: FontWeight.w700,
-                                decoration: TextDecoration.none,
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextButton(
+                                    onPressed: widget.onClose,
+                                    child: const Text('Close', style: TextStyle(color: Colors.white, fontSize: 15, decoration: TextDecoration.none)),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: FilledButton(
+                                    onPressed: widget.onQuotes,
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: const Color(0xFF07070C),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                    ),
+                                    child: const Text('Quotes', style: TextStyle(fontWeight: FontWeight.w800, decoration: TextDecoration.none)),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
-                      child: FadeTransition(
-                        opacity: rise,
-                        child: SlideTransition(
-                          position: Tween<Offset>(begin: const Offset(0, 0.16), end: Offset.zero).animate(rise),
-                          child: Text(
-                            widget.quote,
-                            style: GoogleFonts.libreBaskerville(
-                              color: Colors.white,
-                              fontSize: 20,
-                              height: 1.4,
-                              decoration: TextDecoration.none,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: widget.onClose,
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(color: Color(0x55FFFFFF)),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                              ),
-                              child: const Text('Close', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, decoration: TextDecoration.none)),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: widget.onQuotes,
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF07070A),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                              ),
-                              child: const Text('Quotes', style: TextStyle(fontWeight: FontWeight.w800, decoration: TextDecoration.none)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -1608,23 +1582,4 @@ class _DailyQuotePopupState extends State<_DailyQuotePopup> with TickerProviderS
       ),
     );
   }
-}
-
-class _QuoteRingPainter extends CustomPainter {
-  const _QuoteRingPainter({this.inner = false});
-  final bool inner;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = inner ? 1.2 : 1.6
-      ..color = inner ? const Color(0x66E8D5A3) : const Color(0xAAFFFFFF);
-    final rect = Offset.zero & size;
-    canvas.drawArc(rect.deflate(2), -1.2, 3.6, false, paint);
-    canvas.drawArc(rect.deflate(2), 2.4, 1.4, false, paint..color = const Color(0x55FFFFFF));
-  }
-
-  @override
-  bool shouldRepaint(covariant _QuoteRingPainter oldDelegate) => oldDelegate.inner != inner;
 }

@@ -52,11 +52,8 @@ List<_Slide> _slidesFromConfig(SectionConfig? config) {
           subtitle: (it.subtitle ?? '').trim().isEmpty
               ? 'Catalogue prize · not cash'
               : it.subtitle!.trim(),
-          ctaLabel: (it.ctaLabel ?? '').trim().isEmpty
-              ? 'Scratch now'
-              : it.ctaLabel!.trim(),
-          ctaLink:
-              (it.ctaLink ?? '').trim().isEmpty ? null : it.ctaLink!.trim(),
+          ctaLabel: (it.ctaLabel ?? '').trim().isEmpty ? 'Scratch now' : it.ctaLabel!.trim(),
+          ctaLink: (it.ctaLink ?? '').trim().isEmpty ? null : it.ctaLink!.trim(),
           badge: (it.meta['badge'] as String?)?.trim().isNotEmpty == true
               ? '${it.meta['badge']}'
               : 'LIMITED',
@@ -146,13 +143,9 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
       final next = _index + 1;
       if (next >= n) {
         if (!_loop) return;
-        _page.animateToPage(0,
-            duration: const Duration(milliseconds: 480),
-            curve: Curves.easeOutCubic);
+        _page.animateToPage(0, duration: const Duration(milliseconds: 480), curve: Curves.easeOutCubic);
       } else {
-        _page.animateToPage(next,
-            duration: const Duration(milliseconds: 480),
-            curve: Curves.easeOutCubic);
+        _page.animateToPage(next, duration: const Duration(milliseconds: 480), curve: Curves.easeOutCubic);
       }
     });
   }
@@ -278,9 +271,7 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
                   height: 7,
                   margin: const EdgeInsets.symmetric(horizontal: 3),
                   decoration: BoxDecoration(
-                    color: on
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.35),
+                    color: on ? Colors.white : Colors.white.withValues(alpha: 0.35),
                     borderRadius: BorderRadius.circular(99),
                   ),
                 );
@@ -311,158 +302,138 @@ class _TicketPage extends StatelessWidget {
     final slot = '$sectionId.${slide.id}';
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-      // Shrinks the ticket a little instead of overflowing when the slot is
-      // short (custom height, editor outlines, larger system text).
-      child: LayoutBuilder(
-        builder: (context, box) => FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.topCenter,
-          child: SizedBox(
-            width: box.maxWidth,
-            child: _content(slot),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _content(String slot) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            EditableLabel(
-              '$slot.brand',
-              'NOWSSB',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.2,
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              EditableLabel(
+                '$slot.brand',
+                'NOWSSB',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            const Text('✦',
-                style: TextStyle(color: NwsbColors.goldLight, fontSize: 14)),
-            const SizedBox(width: 8),
-            EditableLabel(
-              '$slot.brandSub',
-              'COUPONS',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 2.4,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        // Glow halo behind the ticket.
-        DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withValues(alpha: 0.35),
-                blurRadius: 28,
-                spreadRadius: 2,
+              const SizedBox(width: 8),
+              const Text('✦', style: TextStyle(color: NwsbColors.goldLight, fontSize: 14)),
+              const SizedBox(width: 8),
+              EditableLabel(
+                '$slot.brandSub',
+                'COUPONS',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2.4,
+                ),
               ),
             ],
           ),
-          child: ClipPath(
-            clipper: _TicketClip(),
-            child: ColoredBox(
-              color: const Color(0xFF0C0C0C),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2A2A2A),
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                      child: EditableLabel(
-                        '$slot.kicker',
-                        slide.kicker,
-                        style: const TextStyle(
-                          color: Color(0xCCFFFFFF),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
+          const SizedBox(height: 12),
+          // Glow halo behind the ticket.
+          DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withValues(alpha: 0.35),
+                  blurRadius: 28,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: ClipPath(
+              clipper: _TicketClip(),
+              child: ColoredBox(
+                color: const Color(0xFF0C0C0C),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 14, 22, 14),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2A2A2A),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: EditableLabel(
+                          '$slot.kicker',
+                          slide.kicker,
+                          style: const TextStyle(
+                            color: Color(0xCCFFFFFF),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    EditableLabel(
-                      '$slot.badge',
-                      slide.badge,
-                      style: const TextStyle(
-                        color: Color(0xFFE23B3B),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.6,
+                      const SizedBox(height: 6),
+                      EditableLabel(
+                        '$slot.badge',
+                        slide.badge,
+                        style: const TextStyle(
+                          color: Color(0xFFE23B3B),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.6,
+                        ),
                       ),
-                    ),
-                    EditableLabel(
-                      '$slot.offer',
-                      slide.offer,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: accent,
-                        fontSize: 36,
-                        fontWeight: FontWeight.w900,
-                        height: 1.05,
+                      EditableLabel(
+                        '$slot.offer',
+                        slide.offer,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 36,
+                          fontWeight: FontWeight.w900,
+                          height: 1.05,
+                        ),
                       ),
-                    ),
-                    EditableLabel(
-                      '$slot.subtitle',
-                      slide.subtitle,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Color(0xCCFFFFFF), fontSize: 13),
-                    ),
-                  ],
+                      EditableLabel(
+                        '$slot.subtitle',
+                        slide.subtitle,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 14),
-        GestureDetector(
-          onTap: onCta,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
-            decoration: BoxDecoration(
-              color: accent,
-              borderRadius: BorderRadius.circular(99),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                EditableLabel(
-                  '$slot.cta',
-                  slide.ctaLabel,
-                  style: const TextStyle(
-                    color: Color(0xFF1A1206),
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
+          const SizedBox(height: 14),
+          GestureDetector(
+            onTap: onCta,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
+              decoration: BoxDecoration(
+                color: accent,
+                borderRadius: BorderRadius.circular(99),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  EditableLabel(
+                    '$slot.cta',
+                    slide.ctaLabel,
+                    style: const TextStyle(
+                      color: Color(0xFF1A1206),
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 6),
-                const Icon(Icons.chevron_right,
-                    size: 18, color: Color(0xFF1A1206)),
-              ],
+                  const SizedBox(width: 6),
+                  const Icon(Icons.chevron_right, size: 18, color: Color(0xFF1A1206)),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -472,12 +443,9 @@ class _TicketClip extends CustomClipper<Path> {
   Path getClip(Size size) {
     const notch = 12.0;
     final mid = size.height / 2;
-    final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-          Offset.zero & size, const Radius.circular(16)));
+    final path = Path()..addRRect(RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(16)));
     path.addOval(Rect.fromCircle(center: Offset(0, mid), radius: notch));
-    path.addOval(
-        Rect.fromCircle(center: Offset(size.width, mid), radius: notch));
+    path.addOval(Rect.fromCircle(center: Offset(size.width, mid), radius: notch));
     path.fillType = PathFillType.evenOdd;
     return path;
   }

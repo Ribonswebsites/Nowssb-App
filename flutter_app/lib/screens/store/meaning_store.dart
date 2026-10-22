@@ -10,7 +10,6 @@
 /// Video banners stay unchanged.
 library;
 
-import 'store_first_use_guide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -56,7 +55,7 @@ const kMeaningWarmAssets = <String>[
 ];
 
 String _msOnlyArt(String key, String candidate) {
-  if (candidate.startsWith('assets/')) return candidate;
+  if (candidate.startsWith('assets/meanings/')) return candidate;
   const arts = <String>[
     kMsMeaningIntroArt,
     kMsMeaningProductArt,
@@ -92,7 +91,7 @@ class MeaningStoreScreen extends StatelessWidget {
           ),
         ],
         ),
-      ).withStoreGuide('meaning_store');
+      );
 }
 
 class _MeaningStoreBody extends StatefulWidget {
@@ -267,8 +266,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   title: m.word,
                   meta: m.root,
                   action: 'Open',
-                  image: meaningFlipArt(m.key),
-                  flip: kMeaningsIcon,
+                  image: kMeaningsIcon,
+                  flip: storeMeaningFlip(m.word),
                   onTap: () => openMeaningDetail(context, m),
                   onCart: () => storeAddToCart(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
                   onBuy: () => storeBuyNow(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
@@ -288,8 +287,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                     title: row.$1,
                     meta: row.$2,
                     action: 'Open',
-                    image: storeSubjectArt(row.$1),
-                    flip: kMeaningsIcon,
+                    image: kMeaningsIcon,
+                    flip: storeWaveFor(row.$1),
                     onTap: () => openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kNowssbStoreMark)),
                     onCart: () => storeAddToCart(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
                     onBuy: () => storeBuyNow(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),

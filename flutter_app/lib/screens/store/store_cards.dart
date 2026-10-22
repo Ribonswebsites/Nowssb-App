@@ -1048,7 +1048,7 @@ class RmWordCard extends StatelessWidget {
                             const SizedBox(height: 6),
                             if (price != null)
                               ListenableBuilder(
-                                listenable: Listenable.merge([StorePrices.instance, Entitlements.instance, FxBook.instance]),
+                                listenable: Listenable.merge([StorePrices.instance, Entitlements.instance]),
                                 builder: (context, _) {
                                   final id = _item.id;
                                   final real = StorePrices.instance.priceFor(id);
@@ -1191,8 +1191,7 @@ class _CenteredPrice extends StatelessWidget {
     final sale = owned ?? localizedMoney(context, price);
     final original =
         originalPrice == null ? null : localizedMoney(context, originalPrice!);
-    final pending = sale == FxBook.pricePending;
-    final showStrike = !pending && original != null && original != sale;
+    final showStrike = original != null && original != sale;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1210,10 +1209,8 @@ class _CenteredPrice extends StatelessWidget {
         Text(
           sale,
           textAlign: TextAlign.left,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            fontSize: pending ? 14 : 28,
+          style: const TextStyle(
+            fontSize: 28,
             fontWeight: FontWeight.w900,
             color: Colors.white,
             height: 1.0,

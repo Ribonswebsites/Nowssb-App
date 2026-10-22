@@ -22,7 +22,6 @@ import '../screens/store/cart_pages.dart';
 import '../screens/store/store_cards.dart' show inr;
 import '../screens/subscription.dart';
 import '../theme/tokens.dart';
-import 'n_motion.dart';
 
 /// The bag item a library word sells as.
 BagItem wordItemFor(Word w) => BagItem(
@@ -99,7 +98,7 @@ Future<void> showContentLock(
   required BagItem item,
   required String planNote,
 }) {
-  return showNSheet<void>(
+  return showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     barrierColor: const Color(0xB8060C18),

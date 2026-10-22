@@ -11,7 +11,6 @@ import '../../data/models.dart';
 import '../../data/practice_progress.dart';
 import '../../shell/nav_shell.dart';
 import 'progress_body_map.dart';
-import 'progress_complete.dart';
 import 'progress_feedback.dart';
 import 'progress_hero.dart';
 import 'progress_insight.dart';
@@ -89,13 +88,16 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ProgressCompleteView(
-      backdrop: const ProgressScrollBgVideo(),
-      onPractice: () {
-        final nav = Navigator.of(context);
-        if (nav.canPop()) nav.pop();
-        NavScope.goTo(context, 1);
-      },
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Center(
+          child: TextButton(
+            onPressed: () => NavScope.goTo(context, 4),
+            child: const Text('Progress is on your Profile', style: TextStyle(color: Colors.white, fontSize: 16)),
+          ),
+        ),
+      ),
     );
   }
 

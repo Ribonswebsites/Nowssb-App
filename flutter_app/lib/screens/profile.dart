@@ -4,8 +4,6 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-
-import '../features/coins/coins_wallet_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -41,8 +39,6 @@ import '../widgets/app_thinking_loader.dart';
 import 'app_settings.dart';
 import 'auth_gate.dart';
 import 'saved_words.dart';
-import 'profile_parts/edit_profile.dart';
-import 'profile_parts/profile_guide.dart';
 import 'sound_library.dart';
 import '../features/notifications/inbox_screen.dart';
 import 'progress/progress_screen.dart';
@@ -55,7 +51,6 @@ import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_router.dart';
 import '../widgets/course_face.dart';
 import '../widgets/routine_deck.dart';
-import '../widgets/n_motion.dart';
 
 const _accent = Color(0xFFE3BD7D);
 const _text = Color(0xFFF5F5F3);
@@ -117,8 +112,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TimeOfDay _reminder = const TimeOfDay(hour: 7, minute: 0);
   bool _loading = true;
   bool _recentOpen = false;
-  bool _guide = false;
-  String _mottoText = '';
   int _face = 0;
   int _chip = 0;
   int _prog = 0;
@@ -198,29 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _avatarUrl = _prefs.getString('nwsb_local_photo');
     final localPath = _prefs.getString('nwsb_photo_path');
     if (localPath != null && File(localPath).existsSync()) _photo = File(localPath);
-    _mottoText = _prefs.getString('nowssb_motto') ?? '';
-    final showGuide = await ProfileGuide.shouldShow();
-    if (mounted) setState(() { _loading = false; _guide = showGuide; });
-  }
-
-  Future<void> _openEditProfile() async {
-    final res = await Navigator.of(context).push<EditProfileResult>(MaterialPageRoute(
-      builder: (_) => EditProfileScreen(name: _nameController.text, motto: _mottoText, avatar: _avatarBubble(), onChangePhoto: _openPhotoChoices),
-    ));
-    if (res == null || !mounted) return;
-    _nameController.text = res.name;
-    _mottoText = res.motto;
-    await _prefs.setString('nowssb_name', res.name);
-    await _prefs.setString('nowssb_motto', res.motto);
-    if (!mounted) return;
-    setState(() {});
-    _showToast('Profile saved');
-    await _saveAccountName(res.name);
-  }
-
-  Future<void> _replayGuide() async {
-    await ProfileGuide.reset();
-    if (mounted) setState(() => _guide = true);
+    if (mounted) setState(() => _loading = false);
   }
 
   @override
@@ -265,7 +236,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _editName() async {
     final controller = TextEditingController(text: _nameController.text);
-    final result = await showNDialog<String>(
+    final result = await showDialog<String>(
       context: context,
       barrierColor: Colors.black.withOpacity(.72),
       builder: (context) => Dialog(
@@ -354,7 +325,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickPhoto() async {
-    final source = await showNSheet<ImageSource>(
+    final source = await showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -548,7 +519,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
             if (_recentOpen) _recentSheet(),
-            if (_guide) Positioned.fill(child: ProfileGuide(onDone: () => setState(() => _guide = false))),
           ],
         ),
       ),
@@ -571,7 +541,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const rows = ['NowssB coins', 'Cart', 'Wishlist', 'Order history'];
         final counts = [coins, cart, wish, orders];
         final openers = <VoidCallback>[
-          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen())),
+          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())),
           () => _openShop('Cart'),
           () => _openShop('Wishlist'),
           () => _openShop('Order history'),
@@ -620,7 +590,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _progressCard({required int streak, required int score, required int words, required int coins, required String photo}) {
-    const arts = ['assets/rails/mean-fire.jpg', 'assets/rails/ui-practice.jpg', 'assets/rails/ui-words.jpg', 'assets/rails/ui-coins.jpg'];
+    const arts = ['assets/rails/02.png', 'assets/rails/04.png', 'assets/rails/06.png', 'assets/rails/08.png'];
     final slides = [
       (title: '$streak day streak', meta: 'One sit a day keeps the circle.', art: arts[0]),
       (title: '$score sessions', meta: 'Sessions you have finished.', art: arts[1]),
@@ -799,7 +769,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required Future<void> Function() onPrebuilt,
     required Future<void> Function() onPhone,
   }) async {
-    final choice = await showNSheet<String>(
+    final choice = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: const Color(0xF0101014),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
@@ -846,7 +816,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickBannerPhoto() async {
-    final source = await showNSheet<ImageSource>(
+    final source = await showModalBottomSheet<ImageSource>(
       context: context,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -869,7 +839,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _openPrebuiltBanners() async {
-    final url = await showNSheet<String>(
+    final url = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: const Color(0xF0101014),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
@@ -902,7 +872,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _openPrebuiltAvatars() async {
-    final url = await showNSheet<String>(
+    final url = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: const Color(0xF2161024),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
@@ -958,7 +928,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickBanner() async {
-    final chosen = await showNSheet<String>(
+    final chosen = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -1139,11 +1109,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       bannerSub: 'Earn, rewards, coupons, gifts',
       onBanner: () => Programmes.open(context, Programme.earn),
       cards: [
-        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/ui-earn.jpg', onTap: () => Programmes.open(context, Programme.earn)),
-        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open coins', image: 'assets/rails/ui-coins.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen()))),
-        WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', image: 'assets/rails/ui-coupon.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
-        WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', image: 'assets/rails/ui-gift.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
-        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/ui-ledger.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
+        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/member-card.png', onTap: () => Programmes.open(context, Programme.earn)),
+        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', image: 'assets/rails/rewards-coins.png', onTap: () => Programmes.open(context, Programme.rewards)),
+        WorkCard(category: 'Coupons', title: 'Scratch and shop', meta: 'Cards on this account', action: 'Open coupons', image: 'assets/rails/coupons-02.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
+        WorkCard(category: 'Gifts', title: 'Send or redeem', meta: 'A real purchase, shared as a code', action: 'Open gifts', image: 'assets/rails/gifts-02.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
+        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/earnings-02.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
       ],
     );
       },
@@ -1189,7 +1159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Row(
             children: [
               GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsWalletScreen())),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
                 child: _TeaserStat(
                   '${EconomyMirror.instance.coins}',
                   'Coins',
@@ -1345,9 +1315,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 26, color: _accent)), const SizedBox(width: 8), const EditableLabel('profile.ProfileScreen', 'MY MOTTO', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _dim, fontWeight: FontWeight.w600))]),
           const SizedBox(height: 16),
-          if (_mottoText.isNotEmpty) FractionallySizedBox(widthFactor: .8, child: Text(_mottoText, style: const TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))) else const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
+          const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: InkWell(onTap: () => _stepDuration(15), child: _compactQuick('Practice', _durationText, 15))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: _pickReminder, child: _compactQuick('Reminder', _reminderText, 17))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21))))]),
+          Row(children: [Expanded(child: _compactQuick('Practice', _durationText, 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21)))]),
         ]),
       );
 
@@ -1432,11 +1402,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _account() => ListenableBuilder(
         listenable: EconomyMirror.instance,
         builder: (context, _) => _sectionList('Account', [
-          InkWell(key: const Key('profile-edit-row'), onTap: _openEditProfile, child: _listRow('Edit profile', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
-          InkWell(onTap: () => _openQuick('Saved'), child: _listRow('Saved words', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
-          InkWell(onTap: () => _openQuick('Settings'), child: _listRow('Settings', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
-          InkWell(onTap: () => setState(() => _recentOpen = true), child: _listRow('Activity library', trailing: const Icon(Icons.chevron_right, color: _dim, size: 18))),
-          InkWell(key: const Key('profile-guide-row'), onTap: _replayGuide, child: _listRow('Show guide again', trailing: const Icon(Icons.help_outline, color: _dim, size: 18))),
           _listRow('Member Since', trailing: Text(_memberSince, style: const TextStyle(fontSize: 13, color: _dim))),
           _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
         ]),
@@ -1452,7 +1417,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Future<void> _doSignOut() async {
-    final ok = await showNDialog<bool>(
+    final ok = await showDialog<bool>(
       context: context,
       barrierColor: const Color(0xB3000000),
       builder: (ctx) => AlertDialog(
@@ -1533,7 +1498,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             final all = _recentSessions;
             final cats = <String>['All', ...{for (final r in all) r.cat}.take(4)];
             final shown = [for (final r in all) if (_recentFilter == 'All' || r.cat == _recentFilter) r].take(8).toList();
-            const imgs = ['assets/profile_source/img-act1.jpeg', 'assets/profile_source/img-act2.jpeg', 'assets/profile_source/img-act3.jpeg', 'assets/rails/clear-03.jpg', 'assets/rails/clear-04.jpg', 'assets/rails/glass-04.jpg', 'assets/rails/glass-01.jpg', 'assets/rails/clear-02.jpg'];
+            const imgs = ['assets/profile_source/img-act1.jpeg', 'assets/profile_source/img-act2.jpeg', 'assets/profile_source/img-act3.jpeg', 'assets/profile_source/img-motto.jpeg'];
             return Column(mainAxisSize: MainAxisSize.min, children: [
               SizedBox(height: 38, child: ListView(scrollDirection: Axis.horizontal, children: cats.map((x) => Padding(padding: const EdgeInsets.only(right: 7), child: _SheetTab(label: x, active: x == _recentFilter, onTap: () => setState(() => _recentFilter = x)))).toList())),
               const SizedBox(height: 14),

@@ -8,7 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/content.dart';
 import '../../data/models.dart';
-import '../../features/coins/coins_wallet_screen.dart';
 import '../../features/earn/earn_hub_screen.dart';
 import '../../features/notifications/notif_preferences_screen.dart';
 import '../../features/programs/coupons_program.dart';
@@ -92,7 +91,6 @@ final List<AppPage> kAppPages = [
   AppPage('fashionplus', 'Fashion Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
   AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
   AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const EarnHubScreen()),
-  AppPage('coins', 'Coins wallet', 'Explore', Icons.toll_rounded, () => const CoinsWalletScreen(showGuide: false)), // no first-use dialog over the editor canvas
   AppPage('earn.program', 'NowssB Earn (program)', 'Programs', Icons.savings_rounded, () => const EarnProgramPage()),
   AppPage('rewards.program', 'NowssB Rewards', 'Programs', Icons.star_rounded, () => const RewardsProgramPage()),
   AppPage('coupons.program', 'NowssB Coupons', 'Programs', Icons.confirmation_number_rounded, () => const CouponsProgramPage()),

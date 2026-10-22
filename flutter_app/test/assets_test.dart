@@ -32,9 +32,6 @@ void main() {
       for (final m in re.allMatches(src)) {
         final path = m.group(1)!;
         if (!seen.add(path)) continue;
-        // Optional voice files: frequency_ritual.dart speaks the same line
-        // with text-to-speech until a recording is dropped on this path.
-        if (path.startsWith('assets/voice/cues/')) continue;
         if (!File(path).existsSync()) {
           missing.add('$path  (${f.path})');
         }

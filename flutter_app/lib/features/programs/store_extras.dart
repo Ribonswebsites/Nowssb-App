@@ -16,7 +16,6 @@ import '../economy/economy_api.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../../admin/template/editable.dart';
-import '../../widgets/n_motion.dart';
 
 /// Gets (or mints) my link for one item from the server.
 Future<String?> myLinkFor(BuildContext context, {required String kind, String id = '', String title = ''}) async {
@@ -288,7 +287,7 @@ class ShareChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => showNSheet<void>(
+      onTap: () => showModalBottomSheet<void>(
         context: context,
         backgroundColor: const Color(0xFF0B0F16),
         builder: (context) => SafeArea(

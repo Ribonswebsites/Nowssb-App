@@ -18,7 +18,6 @@ import '../programs/program_kit.dart';
 import '../programs/earn_program.dart';
 import '../programs/program_router.dart';
 import '../circle/circle_screen.dart';
-import '../../widgets/n_motion.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -89,7 +88,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   void _openAccount(BuildContext context, bool india, bool unsupported, bool canPay) {
-    showNSheet<void>(
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF10141C),

@@ -4,7 +4,6 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../widgets/hub_rails.dart';
-import 'store_art.dart';
 import 'store_cards.dart';
 
 class StorePiece {
@@ -82,12 +81,21 @@ class StoreShelf extends StatefulWidget {
 class _StoreShelfState extends State<StoreShelf> {
   @override
   Widget build(BuildContext context) {
+    const pool = [
+      'assets/rails/art-scratch.jpg',
+      'assets/rails/art-gift-red.jpg',
+      'assets/rails/art-gift-gold.jpg',
+      'assets/rails/art-gift-black.jpg',
+      'assets/rails/art-spin.jpg',
+      'assets/rails/art-coins.jpg',
+      'assets/rails/art-listen.jpg',
+      'assets/rails/art-book.jpg',
+    ];
     final seen = <String>{};
-    String artFor(String art, String title) {
-      final sub = storeSubjectArt(title);
-      if (seen.add(sub)) return sub;
+    var n = 0;
+    String artFor(String art) {
       if (art.isNotEmpty && seen.add(art)) return art;
-      return sub;
+      return pool[n++ % pool.length];
     }
 
     final byKey = <String, StorePiece>{};
@@ -96,7 +104,7 @@ class _StoreShelfState extends State<StoreShelf> {
       final p = widget.pieces[i];
       final key = '${p.title}|${p.line}';
       byKey[key] = p;
-      rails[i % 5].add(RailCard(p.title, p.line, p.group, art: artFor(p.art, p.title)));
+      rails[i % 5].add(RailCard(p.title, p.line, p.group, art: artFor(p.art)));
     }
     return HubRails(
       a: rails[0],

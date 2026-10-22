@@ -80,9 +80,9 @@ const _red = Color(0xFFD0122D);
 const _gold = Color(0xFFF5C518);
 
 const kWideCoupons = <WideCouponData>[
-  WideCouponData(big: '20', mark: '%', side: 'OFF', foot: '', kicker: 'WORD COUPON', banner: '20% OFF A WORD', line: 'Discount is capped. Does not stack.', code: 'SAVE20', copy: 'NWSB-SAVE20'),
+  WideCouponData(big: '20', mark: '%', side: 'OFF', foot: '', kicker: 'WORD COUPON', banner: '20% OFF A WORD', line: 'Cap ₹35. Does not stack.', code: 'SAVE20', copy: 'NWSB-SAVE20'),
   WideCouponData(big: '10', mark: '%', side: 'OFF', foot: 'ON A NAMED MEANING', kicker: 'MEANING COUPON', banner: '10% OFF A MEANING', line: 'Valid on one meaning.', code: 'MEAN10', copy: 'NWSB-MEAN10'),
-  WideCouponData(big: '15', mark: '%', side: 'OFF', foot: 'ON THE MEANING STORE', kicker: 'MEANING COUPON', banner: '15% OFF MEANINGS', line: 'Discount is capped. Catalogue, not cash.', code: 'MEAN15', copy: 'NWSB-MEAN15'),
+  WideCouponData(big: '15', mark: '%', side: 'OFF', foot: 'ON THE MEANING STORE', kicker: 'MEANING COUPON', banner: '15% OFF MEANINGS', line: 'Cap ₹80. Catalogue, not cash.', code: 'MEAN15', copy: 'NWSB-MEAN15'),
   WideCouponData(big: '7', mark: '', side: 'DAYS', foot: 'BASIC SUBSCRIPTION', kicker: 'SUBSCRIPTION', banner: '7-DAY BASIC PASS', line: 'A gifted pass is not a rank.', code: 'BASIC7', copy: 'NWSB-BASIC7'),
   WideCouponData(big: '30', mark: '', side: 'DAYS', foot: 'STANDARD SUBSCRIPTION', kicker: 'SUBSCRIPTION', banner: '30-DAY STANDARD', line: 'Catalogue prize, not cash.', code: 'STD30', copy: 'NWSB-STD30'),
   WideCouponData(big: '7', mark: '', side: 'DAYS', foot: 'EBOOK PASS', kicker: 'SUBSCRIPTION', banner: '7-DAY EBOOK', line: 'After the trial has ended.', code: 'EBOOK7', copy: 'NWSB-EBOOK7'),
@@ -91,7 +91,7 @@ const kWideCoupons = <WideCouponData>[
   WideCouponData(big: '1', mark: '', side: 'WORD', foot: 'A FULL WORD', kicker: 'WORD COUPON', banner: 'ONE FULL WORD', line: 'One named word. Not cash.', code: 'WORD1', copy: 'NWSB-WORD1'),
   WideCouponData(big: '1', mark: '', side: 'MEAN', foot: 'ONE NAMED WORD', kicker: 'MEANING COUPON', banner: 'ONE MEANING', line: 'One meaning of a named word.', code: 'MEAN1', copy: 'NWSB-MEAN1'),
   WideCouponData(big: '1', mark: '', side: 'STAGE', foot: 'A LOCKED STAGE', kicker: 'WORD COUPON', banner: 'ONE LOCKED STAGE', line: 'One stage of a named word.', code: 'STAGE', copy: 'NWSB-STAGE'),
-  WideCouponData(big: '20', mark: '%', side: 'OFF', foot: 'AN EPIC WORD', kicker: 'EPIC COUPON', banner: '20% OFF EPIC', line: 'Discount is capped. Does not stack.', code: 'EPIC20', copy: 'NWSB-EPIC20'),
+  WideCouponData(big: '20', mark: '%', side: 'OFF', foot: 'AN EPIC WORD', kicker: 'EPIC COUPON', banner: '20% OFF EPIC', line: 'Cap ₹150. Does not stack.', code: 'EPIC20', copy: 'NWSB-EPIC20'),
   WideCouponData(big: '5', mark: '', side: 'COINS', foot: 'OPEN THE APP', kicker: 'DISCOUNT COUPON', banner: '5 COINS TODAY', line: 'Once a day. Not cash.', code: 'OPEN5', copy: 'NWSB-OPEN5', coins: 5),
   WideCouponData(big: '8', mark: '', side: 'COINS', foot: 'READ ONE MEANING', kicker: 'MEANING COUPON', banner: '8 COINS A READ', line: 'Three a day.', code: 'READ8', copy: 'NWSB-READ8', coins: 8),
   WideCouponData(big: '50', mark: '', side: 'COINS', foot: 'A FIRST PURCHASE', kicker: 'DISCOUNT COUPON', banner: 'WELCOME SET', line: '50 coins and one scratch.', code: 'HELLO', copy: 'NWSB-HELLO', coins: 50),
@@ -99,7 +99,7 @@ const kWideCoupons = <WideCouponData>[
 
 const kFlipCoupons = <FlipCouponData>[
   FlipCouponData(ribbon: 'LIMITED TIME OFFER!', ribbonColor: _red, ribbonInk: Colors.white, big: '20', mark: '%', side: 'OFF', subtitle: 'YOUR NEXT WORD', code: 'SAVE20', copy: 'NWSB-SAVE20', codeColor: _red, fine: 'Valid on a word. Not cash. See the code again on the back.'),
-  FlipCouponData(ribbon: 'SPECIAL OFFER!', ribbonColor: _gold, ribbonInk: Colors.black, big: '10', mark: '%', side: 'OFF', subtitle: 'WHEN YOU OPEN A MEANING', code: 'SAVE10', copy: 'NWSB-SAVE10', codeColor: Color(0xFFC9A227), fine: 'Meaning coupon. Discount is capped. Does not stack.'),
+  FlipCouponData(ribbon: 'SPECIAL OFFER!', ribbonColor: _gold, ribbonInk: Colors.black, big: '10', mark: '%', side: 'OFF', subtitle: 'WHEN YOU OPEN A MEANING', code: 'SAVE10', copy: 'NWSB-SAVE10', codeColor: Color(0xFFC9A227), fine: 'Meaning coupon. Cap ₹35. Does not stack.'),
   FlipCouponData(ribbon: 'LIMITED TIME OFFER!', ribbonColor: _red, ribbonInk: Colors.white, big: '7', mark: '', side: 'DAY', subtitle: 'BASIC SUBSCRIPTION', code: 'SUB7', copy: 'NWSB-SUB7', codeColor: _red, fine: 'Subscription coupon. A gifted pass does not unlock a rank.'),
   FlipCouponData(ribbon: 'SPECIAL OFFER!', ribbonColor: _gold, ribbonInk: Colors.black, big: '30', mark: '', side: 'DAY', subtitle: 'STANDARD SUBSCRIPTION', code: 'SUB30', copy: 'NWSB-SUB30', codeColor: Color(0xFFC9A227), fine: '30-day Standard. Catalogue prize, not cash.'),
   FlipCouponData(ribbon: 'LIMITED TIME OFFER!', ribbonColor: _red, ribbonInk: Colors.white, big: '1', mark: '', side: 'WORD', subtitle: 'A FULL WORD', code: 'WORD1', copy: 'NWSB-FLIPWORD', codeColor: _red, fine: 'Word coupon. One named word on this account.'),

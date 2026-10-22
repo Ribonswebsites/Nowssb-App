@@ -11,10 +11,6 @@ library;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import '../../shell/nav_shell.dart';
-import '../personal_coach.dart';
-import '../../widgets/n_motion.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/black_glass_banner.dart';
@@ -148,39 +144,17 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
             child: ListView.separated(
               controller: _cardsController,
               scrollDirection: Axis.horizontal,
-              physics: const SnapRailPhysics(
-                  itemExtent: 344, parent: BouncingScrollPhysics()),
               padding: const EdgeInsets.only(right: 20, bottom: 4),
               itemCount: _cards.length,
               separatorBuilder: (_, __) => const SizedBox(width: 14),
-              itemBuilder: (context, index) => Semantics(
-                button: true,
-                label: _cards[index].action,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => openRoutineCard(context, _cards[index].category),
-                  child: _EssentialCard(
-                      card: _cards[index], glass: glass, fashion: widget.fashion),
-                ),
-              ),
+              itemBuilder: (context, index) => _EssentialCard(
+                  card: _cards[index], glass: glass, fashion: widget.fashion),
             ),
           ),
         ],
       ),
     );
   }
-}
-
-/// Where a routine card goes: life coaching has its own page, every
-/// listening card opens the Library tab where those sessions play.
-void openRoutineCard(BuildContext context, String category) {
-  HapticFeedback.selectionClick();
-  if (category == 'Life Coaching') {
-    Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const PersonalCoachScreen()));
-    return;
-  }
-  NavScope.goTo(context, 2);
 }
 
 class _EssentialCardData {

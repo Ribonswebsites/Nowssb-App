@@ -38,18 +38,14 @@ void main() {
 
       final atelier =
           File('lib/screens/store/word_atelier.dart').readAsStringSync();
+      expect(atelier, contains('StoreSubscribeBanner'));
+      expect(atelier, contains('RmRowHeader'));
       expect(atelier, contains('StorePrices'));
-      // Current Word Atelier design (Ribon's base): room deck, routine decks
-      // of WorkCards with real cart / buy actions, View-all panel and guide.
-      expect(atelier, contains('StoreRoomDeck('));
-      expect(atelier, contains('RoutineDeck('));
-      expect(atelier, contains('WorkCard('));
-      expect(atelier, contains('storeAddToCart('));
-      expect(atelier, contains('storeBuyNow('));
-      expect(atelier, contains('openAtelierWord('));
-      expect(atelier, contains('showStoreViewAllPanel('));
-      expect(atelier, contains("withStoreGuide('word_atelier')"));
-      expect(atelier, isNot(contains('Icons.shopping_cart_outlined')));
+      expect(atelier, contains('originalPrice'));
+      expect(atelier, contains('cats.take(10)'));
+      expect(atelier, contains('StoreViewMoreTap'));
+      expect(atelier, contains('StoreGlassFilmBanner'));
+      expect(atelier, contains('store-title-banner.mp4'));
       expect(atelier, isNot(contains('storeMidRailBannerAt')));
       expect(atelier, isNot(contains('IntroGate')));
       expect(atelier, isNot(contains('Enter The Word Atelier')));
@@ -75,6 +71,7 @@ void main() {
       expect(sections, contains('class StoreQuickMosaic'));
       expect(sections, contains('assets/video/store-orb-box.mp4'));
       expect(sections, contains('width: 180'));
+      expect(atelier, contains('StoreQuickMosaic('));
 
       final catalog = File('lib/data/store_catalog.dart').readAsStringSync();
       expect(catalog, contains("return 'assets/video/hero-word-store.mp4'"));

@@ -5,7 +5,6 @@
 /// Ebooks (part017).
 library;
 
-import 'store/store_first_use_guide.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -354,7 +353,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           SafeArea(child: ListView(children: shown)),
         ],
       ),
-    ).withStoreGuide();
+    );
   }
 
   static void _push(BuildContext context, Widget page) {

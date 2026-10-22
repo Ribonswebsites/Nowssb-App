@@ -1,3 +1,0 @@
-tags:
-  golden:
-    # Pixel goldens are recorded on the shared box; CI skips them (CI=true).

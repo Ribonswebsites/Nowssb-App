@@ -14,7 +14,6 @@ import '../data/notifications.dart';
 import '../features/notifications/notif_router.dart';
 import '../theme/tokens.dart';
 import 'notifications_settings.dart';
-import '../widgets/n_motion.dart';
 import '../admin/template/editable.dart';
 
 Future<void> showNotificationsSheet(BuildContext context) {
@@ -24,13 +23,32 @@ Future<void> showNotificationsSheet(BuildContext context) {
     barrierDismissible: true,
     barrierLabel: 'Notifications',
     barrierColor: const Color(0xB7040812), // rgba(4,8,18,0.72)
-    // Shared spring pop-in (~260ms in, 200ms out). The old version blurred
-    // the whole screen on every animation frame, which is what made it stutter.
-    transitionDuration: NMotion.still(context) ? Duration.zero : NMotion.enter,
+    transitionDuration: const Duration(milliseconds: 280),
     pageBuilder: (context, anim, secondary) {
       return const NotificationsSheet();
     },
-    transitionBuilder: (context, anim, secondary, child) => NMotion.popIn(anim, child),
+    transitionBuilder: (context, anim, secondary, child) {
+      final curved = CurvedAnimation(
+        parent: anim,
+        curve: const Cubic(0.4, 0, 0.2, 1),
+      );
+      return FadeTransition(
+        opacity: curved,
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.98, end: 1).animate(curved),
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.04),
+                end: Offset.zero,
+              ).animate(curved),
+              child: child,
+            ),
+          ),
+        ),
+      );
+    },
   );
 }
 
@@ -41,7 +59,7 @@ class NotificationsSheet extends StatelessWidget {
     final nav = Navigator.of(context);
     nav.pop();
     HapticFeedback.mediumImpact();
-    Future<void>.delayed(const Duration(milliseconds: 200), () {
+    Future<void>.delayed(const Duration(milliseconds: 280), () {
       nav.push(
         MaterialPageRoute<void>(
           builder: (_) => const NotificationsSettingsPage(),

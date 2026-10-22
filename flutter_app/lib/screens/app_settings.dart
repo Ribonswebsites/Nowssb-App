@@ -8,8 +8,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../pages/menu_settings/ms_widgets.dart';
-import '../pages/menu_settings/ms_settings_page.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,7 +41,6 @@ import 'quotes_live.dart';
 import 'store/request_words.dart';
 import 'widgets_page.dart';
 import '../admin/template/editable.dart';
-import '../widgets/n_motion.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
@@ -129,30 +126,30 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   Widget _settingsFace(Settings s) {
     final groups = <List<WorkCard>>[
       [
-        WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', image: 'assets/rails/ui-book.jpg', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
-        WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', image: 'assets/rails/ui-home.jpg', onTap: () => _push(const WidgetsPage())),
-        WorkCard(category: 'Look', title: 'Fashion Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Fashion Plus', image: 'assets/rails/ui-fashion.jpg', onTap: () => _push(const FashionPlusScreen())),
-        WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', image: 'assets/rails/ui-navbar.jpg', onTap: () => _push(const QuickAccessScreen())),
-        WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', image: 'assets/rails/ui-bell.jpg', onTap: () => _push(const NotificationsSettingsPage())),
-        WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', image: 'assets/rails/ui-sound.jpg', onTap: () => _push(const PlayerSettingsScreen())),
-        WorkCard(category: 'Words', title: "Today's quote", meta: s.todayQuote.trim().isEmpty ? 'Quotes to live by' : s.todayQuote.trim(), action: 'Open quotes', image: 'assets/rails/ui-journal.jpg', onTap: () => _push(const QuotesWeekScreen())),
+        WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', image: 'assets/rails/02.png', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
+        WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', image: 'assets/rails/03.png', onTap: () => _push(const WidgetsPage())),
+        WorkCard(category: 'Look', title: 'Fashion Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Fashion Plus', image: 'assets/rails/04.png', onTap: () => _push(const FashionPlusScreen())),
+        WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', image: 'assets/rails/05.png', onTap: () => _push(const QuickAccessScreen())),
+        WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', image: 'assets/rails/06.png', onTap: () => _push(const NotificationsSettingsPage())),
+        WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', image: 'assets/rails/07.png', onTap: () => _push(const PlayerSettingsScreen())),
+        WorkCard(category: 'Words', title: "Today's quote", meta: s.todayQuote.trim().isEmpty ? 'Quotes to live by' : s.todayQuote.trim(), action: 'Open quotes', image: 'assets/rails/08.png', onTap: () => _push(const QuotesWeekScreen())),
       ],
       [
-        WorkCard(category: 'Screen', title: 'Keep Screen Awake', meta: _screenWake ? 'Stays on' : 'Can sleep', action: _screenWake ? 'Turn off' : 'Turn on', image: 'assets/rails/ui-awake.jpg', onTap: () { final v = !_screenWake; setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); }),
-        WorkCard(category: 'Nav', title: 'Nav Bar', meta: s.navColor == 'glass' ? 'Glass' : 'Black', action: 'Switch', image: 'assets/rails/subj-navbar2.jpg', onTap: _cycleNav),
-        WorkCard(category: 'You', title: 'Your profile', meta: 'Account, plan, edit', action: 'Open profile', image: 'assets/rails/ui-profile.jpg', onTap: () => NavScope.goTo(context, 4)),
-        WorkCard(category: 'Discover', title: 'Appear in Discover', meta: _appearDiscover ? 'Others can find you' : 'Hidden', action: _appearDiscover ? 'Hide' : 'Show', image: 'assets/rails/ui-discover.jpg', onTap: () => _setDiscover(!_appearDiscover)),
+        WorkCard(category: 'Screen', title: 'Keep Screen Awake', meta: _screenWake ? 'Stays on' : 'Can sleep', action: _screenWake ? 'Turn off' : 'Turn on', image: 'assets/rails/01.png', onTap: () { final v = !_screenWake; setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); }),
+        WorkCard(category: 'Nav', title: 'Nav Bar', meta: s.navColor == 'glass' ? 'Glass' : 'Black', action: 'Switch', image: 'assets/rails/09.png', onTap: _cycleNav),
+        WorkCard(category: 'You', title: 'Your profile', meta: 'Account, plan, edit', action: 'Open profile', image: 'assets/rails/10.png', onTap: () => NavScope.goTo(context, 4)),
+        WorkCard(category: 'Discover', title: 'Appear in Discover', meta: _appearDiscover ? 'Others can find you' : 'Hidden', action: _appearDiscover ? 'Hide' : 'Show', image: 'assets/rails/11.png', onTap: () => _setDiscover(!_appearDiscover)),
       ],
       [
-        WorkCard(category: 'Privacy', title: 'Privacy Policy', meta: 'What NowssB keeps', action: 'Read', image: 'assets/rails/ui-privacy.jpg', onTap: () => _openUrl('https://nowssb.com/privacy')),
-        WorkCard(category: 'Account', title: 'Delete Account', meta: 'Erase this account', action: 'Delete', image: 'assets/rails/ui-delete.jpg', onTap: _deleteAccount),
-        WorkCard(category: 'Cache', title: 'Cached Data', meta: 'Temporary media', action: 'Clear cache', image: 'assets/rails/ui-cache.jpg', onTap: () { _clearCache(); }),
-        WorkCard(category: 'History', title: 'Clear Practice History', meta: 'Session logs', action: 'Clear history', image: 'assets/rails/ui-history.jpg', onTap: () { _confirmClearHistory(); }),
-        WorkCard(category: 'Words', title: 'Request Words', meta: 'Ask the atelier', action: 'Request', image: 'assets/rails/ui-request.jpg', onTap: () => openRequestWords(context)),
-        if (AdminState.instance.isAdmin) WorkCard(category: 'Admin', title: 'Admin', meta: 'Words, quotes, editor', action: 'Open admin', image: 'assets/rails/ui-admin.jpg', onTap: () => openAdminHome(context)),
-        WorkCard(category: 'About', title: 'About NowssB', meta: 'v9.5.0', action: 'About', image: 'assets/rails/ui-about.jpg', onTap: () { _openAbout(); }),
-        WorkCard(category: 'Terms', title: 'Terms of Service', meta: 'nowssb.com/terms', action: 'Read terms', image: 'assets/rails/ui-terms.jpg', onTap: () => _openUrl('https://nowssb.com/terms')),
-        WorkCard(category: 'Session', title: 'Sign Out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/ui-door.jpg', onTap: _signOut),
+        WorkCard(category: 'Privacy', title: 'Privacy Policy', meta: 'What NowssB keeps', action: 'Read', image: 'assets/rails/02.png', onTap: () => _openUrl('https://nowssb.com/privacy')),
+        WorkCard(category: 'Account', title: 'Delete Account', meta: 'Erase this account', action: 'Delete', image: 'assets/rails/03.png', onTap: _deleteAccount),
+        WorkCard(category: 'Cache', title: 'Cached Data', meta: 'Temporary media', action: 'Clear cache', image: 'assets/rails/04.png', onTap: () { _clearCache(); }),
+        WorkCard(category: 'History', title: 'Clear Practice History', meta: 'Session logs', action: 'Clear history', image: 'assets/rails/05.png', onTap: () { _confirmClearHistory(); }),
+        WorkCard(category: 'Words', title: 'Request Words', meta: 'Ask the atelier', action: 'Request', image: 'assets/rails/06.png', onTap: () => openRequestWords(context)),
+        if (AdminState.instance.isAdmin) WorkCard(category: 'Admin', title: 'Admin', meta: 'Words, quotes, editor', action: 'Open admin', image: 'assets/rails/07.png', onTap: () => openAdminHome(context)),
+        WorkCard(category: 'About', title: 'About NowssB', meta: 'v9.5.0', action: 'About', image: 'assets/rails/08.png', onTap: () { _openAbout(); }),
+        WorkCard(category: 'Terms', title: 'Terms of Service', meta: 'nowssb.com/terms', action: 'Read terms', image: 'assets/rails/09.png', onTap: () => _openUrl('https://nowssb.com/terms')),
+        WorkCard(category: 'Session', title: 'Sign Out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/10.png', onTap: _signOut),
       ],
     ];
     final names = ['Look', 'Phone', 'Account'];
@@ -331,36 +328,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     );
   }
 
-  MsSettingsActions _msActions() => MsSettingsActions(
-        openPlayer: () => _push(const PlayerSettingsScreen()),
-        openNotifications: () => _push(const NotificationsSettingsPage()),
-        screenAwake: () => _screenWake,
-        setScreenAwake: (v) { setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); },
-        motionBackground: () => Settings.instance.fashionPlus,
-        setMotionBackground: (v) => Settings.instance.setFashionPlus(v),
-        navGlass: () => Settings.instance.navColor == 'glass',
-        setNavGlass: (v) => Settings.instance.setNavConfig(color: v ? 'glass' : 'black'),
-        openBackgroundPicker: () => _push(const FashionPlusScreen()),
-        appearInDiscover: () => _appearDiscover,
-        setAppearInDiscover: (v) => _setDiscover(v),
-        openProfile: () => NavScope.goTo(context, 4),
-        openPrivacy: () => _openUrl('https://nowssb.com/privacy'),
-        openTerms: () => _openUrl('https://nowssb.com/terms'),
-        signOut: _signOut,
-        deleteAccount: _deleteAccount,
-        clearCache: () { _clearCache(); },
-        clearHistory: () { _confirmClearHistory(); },
-        openPlayerGuide: () => _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())),
-        requestWords: () => openRequestWords(context),
-        openAbout: () { _openAbout(); },
-        isAdmin: AdminState.instance.isAdmin,
-        openAdmin: () => openAdminHome(context),
-      );
-
   @override
   Widget build(BuildContext context) {
-    // newui_menu_settings: ON for all; remote false = kill switch.
-    if (MenuSettingsFlag.isOn) return MsSettingsPage(actions: _msActions());
     UiScope.watch(context); // the Admin row follows the admin flag live
     final s = Settings.instance;
     final bottom = MediaQuery.paddingOf(context).bottom;
@@ -395,7 +364,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _openAbout() async {
-    await showNDialog<void>(
+    await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
@@ -439,7 +408,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _deleteAccount() async {
-    final ok = await showNDialog<bool>(
+    final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),
@@ -479,7 +448,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _signOut() async {
-    final ok = await showNDialog<bool>(
+    final ok = await showDialog<bool>(
       context: context,
       barrierColor: const Color(0xB3000000),
       builder: (ctx) => const _SignOutDialog(),
@@ -514,7 +483,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _confirmClearHistory() async {
-    final ok = await showNDialog<bool>(
+    final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF14171E),

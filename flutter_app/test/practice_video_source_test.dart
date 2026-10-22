@@ -4,9 +4,9 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Fashion practice uses the shared home film via NwsbVideo', () {
+  test('Fashion practice uses website PRACTICE_VID via NwsbVideo', () {
     final src = File('lib/screens/fashion/sections_top.dart').readAsStringSync();
-    expect(src, contains('assets/video/practice-halo.mp4'));
+    expect(src, contains('09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4'));
     expect(src, contains('ClipPriority.feature'));
     expect(src, isNot(contains('player-liquid-splash.mp4')));
   });
