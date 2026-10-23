@@ -22,6 +22,7 @@ import 'firebase.dart';
 import 'models.dart';
 import '../features/economy/economy_api.dart';
 import '../features/economy/reward_fx.dart';
+import '../features/progress/progress_center.dart';
 
 class PracticeProgress extends ChangeNotifier {
   PracticeProgress._();
@@ -165,6 +166,9 @@ class PracticeProgress extends ChangeNotifier {
     return dates.isEmpty ? null : dates.last;
   }
 
+  /// Words a day that complete "Today's practice" on the Progress pop-up.
+  static const dailyPracticeGoal = 3;
+
   int get todaySessions {
     final today = _day(DateTime.now());
     return _sessions.values.where((session) => session['date'] == today).length;
@@ -302,6 +306,7 @@ class PracticeProgress extends ChangeNotifier {
     };
     await _save(); // the in-memory session stays even if storage fails
     notifyListeners();
+    ProgressCenter.instance.report(ProgressKind.routine, todaySessions, dailyPracticeGoal);
     // Profile > Sound Feedback: a short click when a word is completed.
     try {
       final preferences = await SharedPreferences.getInstance();

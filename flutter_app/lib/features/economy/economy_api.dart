@@ -7,6 +7,7 @@ import '../../data/app_control.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import '../progress/progress_center.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -85,7 +86,7 @@ class EconomyApi {
     }
     if (res.statusCode >= 200 && res.statusCode < 300) {
       if (switchingOn.value) switchingOn.value = false;
-      EconomyMirror.instance._afterAction(name, body);
+      EconomyMirror.instance._afterAction(name, body, data);
       return body;
     }
     final code = '${body['code'] ?? ''}';
@@ -399,7 +400,7 @@ class EconomyMirror extends ChangeNotifier {
 
   /// After any server action: refresh the summary in the background so
   /// every program page shows the new state.
-  void _afterAction(String name, Map<String, dynamic> body) {
+  void _afterAction(String name, Map<String, dynamic> body, [Map<String, dynamic>? data]) {
     if (name == 'summary' || name == 'ensureEconomyProfile') {
       _setSummary(body);
       return;
@@ -423,7 +424,22 @@ class EconomyMirror extends ChangeNotifier {
     if (name == 'reportAction' && ((body['coins'] as num?) ?? 0) == 0) return;
     if (name == 'claimDailyLogin') loginToday = true;
     if (name == 'dailyScratch' || name == 'scratchCoupon') scratchToday = true;
+    _reportProgress(name, body, data);
     _refreshSoon();
+  }
+
+  /// Progress pop-up: daily coins (login + scratch), check-in, quests.
+  void _reportProgress(String name, Map<String, dynamic> body, Map<String, dynamic>? data) {
+    final pc = ProgressCenter.instance;
+    if (name == 'claimDailyLogin' || name == 'dailyScratch') {
+      pc.report(ProgressKind.coins, (loginToday ? 1 : 0) + (scratchToday ? 1 : 0), 2);
+    }
+    if (name == 'claimDailyLogin') pc.report(ProgressKind.checkin, 1, 1);
+    if (name == 'claimQuest') {
+      final id = '${data?['kind'] ?? ''}:${data?['id'] ?? body['questId'] ?? body['id'] ?? DateTime.now().millisecondsSinceEpoch}';
+      final t = body['title'];
+      pc.report(ProgressKind.quest, 1, 1, key: id, subtitle: t is String && t.isNotEmpty ? t : '');
+    }
   }
 
   Timer? _refresh;

@@ -54,6 +54,7 @@ import 'widgets/app_control_layer.dart';
 import 'widgets/motion.dart';
 import 'widgets/notification_popup.dart';
 import 'widgets/update_prompt.dart';
+import 'features/progress/progress_popup.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
@@ -249,11 +250,13 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
               child: AdminEditFab(
                 navigatorKey: _navigatorKey,
                 child: NotificationPopupHost(
-                  child: Stack(
-                    children: [
-                      const Positioned.fill(child: FaintFilm()),
-                      child ?? const SizedBox(),
-                    ],
+                  child: ProgressPopupHost(
+                    child: Stack(
+                      children: [
+                        const Positioned.fill(child: FaintFilm()),
+                        child ?? const SizedBox(),
+                      ],
+                    ),
                   ),
                 ),
               ),

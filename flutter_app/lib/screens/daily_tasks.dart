@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../features/progress/progress_center.dart';
 import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
@@ -127,6 +128,9 @@ class DailyTasks {
       next.remove(id);
     }
     await prefs.setStringList(_doneKey, next.toList());
+    final tasks = await template();
+    final ids = {for (final t in tasks) t.id};
+    ProgressCenter.instance.report(ProgressKind.tasks, next.where(ids.contains).length, tasks.length);
     await publish();
   }
 
