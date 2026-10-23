@@ -251,6 +251,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
                 navigatorKey: _navigatorKey,
                 child: NotificationPopupHost(
                   child: ProgressPopupHost(
+                    render: false,
                     child: Stack(
                       children: [
                         const Positioned.fill(child: FaintFilm()),

@@ -64,9 +64,13 @@ class ProgressBarLine extends StatelessWidget {
 const _ink = TextStyle(color: Colors.white, decoration: TextDecoration.none);
 
 class ProgressPopupHost extends StatefulWidget {
-  const ProgressPopupHost({super.key, required this.child, this.center});
+  const ProgressPopupHost({super.key, required this.child, this.center, this.render = true});
   final Widget child;
   final ProgressCenter? center;
+
+  /// False when NotificationPopupHost shows the pop-up inside its one
+  /// horizontal row (the app shell); this host then only runs the timer.
+  final bool render;
   @override
   State<ProgressPopupHost> createState() => _ProgressPopupHostState();
 }
@@ -121,7 +125,7 @@ class _ProgressPopupHostState extends State<ProgressPopupHost> with SingleTicker
 
   @override
   Widget build(BuildContext context) {
-    final item = _shown;
+    final item = widget.render ? _shown : null;
     return Stack(children: [
       widget.child,
       if (item != null)
@@ -158,14 +162,14 @@ class _ProgressPopupHostState extends State<ProgressPopupHost> with SingleTicker
 
 /// The compact card itself (also used by screenshots/tests).
 class ProgressPopupCard extends StatelessWidget {
-  const ProgressPopupCard({super.key, required this.item});
+  const ProgressPopupCard({super.key, required this.item, this.bare = false});
   final ProgressItem item;
+
+  /// Without its own glass (inside the shared notification row).
+  final bool bare;
   @override
   Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      child: ProgressGlass(
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+    final body = Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
             Expanded(
               child: Text(item.line,
@@ -190,8 +194,12 @@ class ProgressPopupCard extends StatelessWidget {
               ),
             ]),
           ),
-        ]),
-      ),
+        ]);
+    return Material(
+      type: MaterialType.transparency,
+      child: bare
+          ? Padding(padding: const EdgeInsets.fromLTRB(12, 10, 12, 10), child: body)
+          : ProgressGlass(child: body),
     );
   }
 

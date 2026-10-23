@@ -1,4 +1,4 @@
-/// Glass card under the bell. The bell still opens the original sheet.
+/// Live in-app pop-ups: one horizontal glass row at the top.
 library;
 
 import 'dart:async';
@@ -11,22 +11,36 @@ import 'package:flutter/services.dart';
 import '../data/notifications.dart';
 import '../data/phone_notifications.dart';
 import '../features/notifications/notif_router.dart';
+import '../features/economy/reward_overlay.dart';
+import '../features/progress/progress_center.dart';
+import '../features/progress/progress_popup.dart';
+import '../screens/notifications_sheet.dart';
 import '../screens/quotes_live.dart';
 import '../screens/splash.dart';
 import '../theme/liquid_glass_theme.dart';
 
 class NotificationPopupHost extends StatefulWidget {
-  const NotificationPopupHost({super.key, required this.child});
+  const NotificationPopupHost({super.key, required this.child, this.center, this.navigatorKey});
   final Widget child;
+  final ProgressCenter? center;
+
+  /// Navigator under this host (it sits in MaterialApp.builder, above it).
+  final GlobalKey<NavigatorState>? navigatorKey;
 
   @override
   State<NotificationPopupHost> createState() => _NotificationPopupHostState();
 }
 
+/// Live pop-ups: ONE compact horizontal row at the top. Swipe left/right
+/// through them, flick one up to dismiss it, View all opens the inbox,
+/// Clear all dismisses every live one. Progress pop-ups ride in the same row.
 class _NotificationPopupHostState extends State<NotificationPopupHost> {
   Timer? _hide;
   Object? _token;
   var _hold = false;
+  final Set<String> _gone = {};
+
+  ProgressCenter get _pc => widget.center ?? ProgressCenter.instance;
 
   @override
   void initState() {
@@ -37,6 +51,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     NotifStore.instance.addListener(_on);
     SplashGate.done.addListener(_on);
     DailyQuoteGate.done.addListener(_on);
+    _pc.popup.addListener(_on);
   }
 
   @override
@@ -47,6 +62,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     NotifStore.instance.removeListener(_on);
     SplashGate.done.removeListener(_on);
     DailyQuoteGate.done.removeListener(_on);
+    _pc.popup.removeListener(_on);
     super.dispose();
   }
 
@@ -60,25 +76,32 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     if (!SplashGate.done.value || !DailyQuoteGate.done.value || !NotificationBanner.showPopups.value) {
       return const [];
     }
-    final unread = NotifStore.instance.feed.where((e) => !e.read).toList();
+    final unread = NotifStore.instance.feed.where((e) => !e.read && !_gone.contains(_id(e))).toList();
     if (unread.isEmpty) return const [];
     unread.sort((a, b) {
       if (a.type == 'coins' && b.type != 'coins') return -1;
       if (b.type == 'coins' && a.type != 'coins') return 1;
       return b.at.compareTo(a.at);
     });
-    return unread.take(5).toList();
+    return unread.take(12).toList();
   }
 
-  void _arm(List<NotifItem> items) {
-    final token = Object.hashAll(items.map(_id));
-    if (token == _token) return;
+  void _arm(Object token, {bool force = false}) {
+    if (!force && token == _token) return;
     _token = token;
     _hold = false;
     _hide?.cancel();
-    _hide = Timer(const Duration(seconds: 2), () {
+    // Long enough to reach View all / Clear all; any touch re-arms it.
+    _hide = Timer(const Duration(seconds: 6), () {
       if (mounted) setState(() => _hold = true);
     });
+  }
+
+  void _touch() => _arm(_token ?? Object(), force: true);
+
+  void _markRead(NotifItem item) {
+    final i = NotifStore.instance.feed.indexOf(item);
+    if (i >= 0) unawaited(NotifStore.instance.markRead(i));
   }
 
   void _open(NotifItem item) {
@@ -88,89 +111,234 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     NotifRouter.instance.openItem(item);
   }
 
+  void _dismissOne(NotifItem item) {
+    setState(() => _gone.add(_id(item)));
+    NotificationBanner.dismiss(item);
+    _markRead(item);
+    _touch();
+  }
+
+  void _clearAll(List<NotifItem> items) {
+    HapticFeedback.mediumImpact();
+    _hide?.cancel();
+    setState(() {
+      _gone.addAll(items.map(_id));
+      _hold = true;
+    });
+    for (final i in items) {
+      NotificationBanner.dismiss(i);
+    }
+    _pc.dismiss();
+    unawaited(NotifStore.instance.markAllRead());
+  }
+
+  void _viewAll() {
+    _hide?.cancel();
+    setState(() => _hold = true);
+    _pc.dismiss();
+    final ctx = (widget.navigatorKey ?? RewardOverlay.navigatorKey).currentContext;
+    if (ctx != null) showNotificationsSheet(ctx);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final progress = _pc.popup.value;
     final items = _hold ? const <NotifItem>[] : _items();
-    if (items.isNotEmpty) _arm(items);
-    final top = MediaQuery.paddingOf(context).top + 86;
-    final tailRight = 149.0 - 12 - 8;
+    final total = items.length + (progress != null ? 1 : 0);
+    if (total > 0) {
+      _arm(Object.hash(Object.hashAll(items.map(_id)), progress?.kind, progress?.value));
+    }
     return Stack(
       children: [
         widget.child,
-        if (items.isNotEmpty)
-          Positioned(
-            left: 12,
-            right: 12,
-            top: top,
-            child: _GlanceStack(
-              items: items,
-              tailRight: tailRight,
-              onOpen: _open,
+        Positioned(
+          left: 12,
+          right: 12,
+          top: MediaQuery.paddingOf(context).top + 8,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, a) => SlideTransition(
+              position: Tween(begin: const Offset(0, -0.4), end: Offset.zero).animate(a),
+              child: FadeTransition(opacity: a, child: child),
             ),
+            child: total == 0
+                ? const SizedBox.shrink()
+                : NotificationRow(
+                    key: const ValueKey('nwsb-notif-row'),
+                    items: items,
+                    progress: progress,
+                    onOpen: _open,
+                    onDismiss: _dismissOne,
+                    onDismissProgress: _pc.dismiss,
+                    onViewAll: _viewAll,
+                    onClearAll: () => _clearAll(items),
+                    onTouch: _touch,
+                  ),
           ),
+        ),
       ],
     );
   }
 }
 
-class _GlanceStack extends StatelessWidget {
-  const _GlanceStack({required this.items, required this.tailRight, required this.onOpen});
+/// Glass row: header (NOWSSB · +N · View all · Clear all) over one card-high
+/// horizontal pager.
+class NotificationRow extends StatefulWidget {
+  const NotificationRow({
+    super.key,
+    required this.items,
+    this.progress,
+    required this.onOpen,
+    required this.onDismiss,
+    this.onDismissProgress,
+    required this.onViewAll,
+    required this.onClearAll,
+    this.onTouch,
+  });
   final List<NotifItem> items;
-  final double tailRight;
+  final ProgressItem? progress;
   final void Function(NotifItem item) onOpen;
+  final void Function(NotifItem item) onDismiss;
+  final VoidCallback? onDismissProgress;
+  final VoidCallback onViewAll;
+  final VoidCallback onClearAll;
+  final VoidCallback? onTouch;
+
+  static const double cardHeight = 114;
+
+  @override
+  State<NotificationRow> createState() => _NotificationRowState();
+}
+
+class _NotificationRowState extends State<NotificationRow> {
+  final _pager = PageController();
+  var _page = 0;
+
+  @override
+  void dispose() {
+    _pager.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(right: tailRight),
-          child: CustomPaint(size: const Size(16, 9), painter: _TailPainter()),
+    final p = widget.progress;
+    final cards = <Widget>[
+      if (p != null)
+        _swipeUp(
+          ValueKey('progress-${p.kind}'),
+          widget.onDismissProgress ?? () {},
+          DecoratedBox(
+            decoration: BoxDecoration(color: const Color(0xF0000000), borderRadius: BorderRadius.circular(16)),
+            child: ProgressPopupCard(item: p, bare: true),
+          ),
         ),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(22),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: const Color(0x2EFFFFFF),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: const Color(0x66FFFFFF)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(8, 0, 8, 8),
-                      child: Text(
-                        'NOWSSB',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.6,
-                          decoration: TextDecoration.none,
+      for (final item in widget.items)
+        _swipeUp(
+          ValueKey('n-${item.type}|${item.at}|${item.title}'),
+          () => widget.onDismiss(item),
+          _BlackPill(item: item, onTap: () => widget.onOpen(item)),
+        ),
+    ];
+    final n = cards.length;
+    final page = _page.clamp(0, n - 1);
+    final rest = n - 1 - page;
+    const ink = TextStyle(color: Colors.white, decoration: TextDecoration.none);
+    return Material(
+      type: MaterialType.transparency,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: const Color(0x2EFFFFFF),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: const Color(0x66FFFFFF)),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: 30,
+                    child: Row(children: [
+                      const SizedBox(width: 8),
+                      Text('NOWSSB', style: ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+                      const SizedBox(width: 8),
+                      if (n > 1)
+                        Text('${page + 1}/$n', style: ink.copyWith(fontSize: 11.5, fontWeight: FontWeight.w600, color: const Color(0xB3FFFFFF))),
+                      if (rest > 0) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          key: const ValueKey('notif-more-chip'),
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(99)),
+                          child: Text('+$rest', style: ink.copyWith(fontSize: 11, fontWeight: FontWeight.w800)),
                         ),
-                      ),
+                      ],
+                      const Spacer(),
+                      _action('View all', widget.onViewAll),
+                      _action('Clear all', widget.onClearAll),
+                    ]),
+                  ),
+                  const SizedBox(height: 4),
+                  SizedBox(
+                    height: NotificationRow.cardHeight,
+                    child: PageView(
+                      controller: _pager,
+                      physics: const BouncingScrollPhysics(),
+                      onPageChanged: (i) {
+                        HapticFeedback.selectionClick();
+                        widget.onTouch?.call();
+                        setState(() => _page = i);
+                      },
+                      children: [
+                        for (final c in cards)
+                          Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: c),
+                      ],
                     ),
-                    for (final item in items) ...[
-                      _BlackPill(item: item, onTap: () => onOpen(item)),
-                      if (item != items.last) const SizedBox(height: 8),
-                    ],
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
         ),
-      ],
+      ),
     );
   }
+
+  Widget _action(String label, VoidCallback onTap) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Text(label,
+              style: const TextStyle(
+                  color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700, decoration: TextDecoration.none)),
+        ),
+      );
+
+  /// Fast flick-up dismiss for one card.
+  Widget _swipeUp(Key key, VoidCallback onGone, Widget child) => Dismissible(
+        key: key,
+        direction: DismissDirection.up,
+        movementDuration: const Duration(milliseconds: 160),
+        resizeDuration: null,
+        dismissThresholds: const {DismissDirection.up: 0.2},
+        onDismissed: (_) {
+          HapticFeedback.lightImpact();
+          onGone();
+        },
+        child: SizedBox.expand(child: child),
+      );
 }
 
 class _BlackPill extends StatelessWidget {
@@ -276,19 +444,4 @@ class _BlackPill extends StatelessWidget {
       ),
     );
   }
-}
-
-class _TailPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(0, size.height)
-      ..lineTo(size.width / 2, 0)
-      ..lineTo(size.width, size.height)
-      ..close();
-    canvas.drawPath(path, Paint()..color = const Color(0xB3FFFFFF));
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

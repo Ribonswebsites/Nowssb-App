@@ -439,6 +439,22 @@ class NotifStore extends ChangeNotifier {
     }
   }
 
+  /// Marks every unread item read (the inbox keeps them).
+  Future<void> markAllRead() async {
+    final unread = feed.where((e) => !e.read).toList();
+    if (unread.isEmpty) return;
+    for (final n in unread) {
+      n.read = true;
+    }
+    notifyListeners();
+    await _persistFeed();
+    for (final n in unread.where((e) => e.remotePath != null)) {
+      try {
+        await FirebaseFirestore.instance.doc(n.remotePath!).update({'read': true});
+      } catch (_) {}
+    }
+  }
+
   /// [index] into [feed] (the merged list).
   Future<void> markRead(int index) async {
     final list = feed;
