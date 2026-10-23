@@ -12,6 +12,7 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import '../../widgets/glass_wrap.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/tokens.dart';
@@ -208,22 +209,38 @@ class HeroGreeting extends StatelessWidget {
   static String mark([DateTime? at]) =>
       NwsbMarks.forHour((at ?? DateTime.now()).hour);
 
+  /// Circle colours by time of day (same bands as [hello]).
+  static LinearGradient skyFor([DateTime? at]) {
+    final h = (at ?? DateTime.now()).hour;
+    final c = h < 5 || h >= 21
+        ? const [Color(0xFF0B1A3A), Color(0xFF3B2A7A)] // night
+        : h < 12
+            ? const [Color(0xFFFFB86B), Color(0xFFFF6F91)] // morning
+            : h < 17
+                ? const [Color(0xFF3FA9F5), Color(0xFF7FE0D0)] // afternoon
+                : const [Color(0xFFFF7E5F), Color(0xFF6A3093)]; // evening
+    return LinearGradient(colors: c, begin: Alignment.topLeft, end: Alignment.bottomRight);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 18, 20, 4),
+    // Same glass as the Hero header (GlassWrap).
+    return GlassWrap(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(14, 14, 16, 14),
       child: Row(
         children: [
           Container(
             width: 62,
             height: 62,
             decoration: BoxDecoration(
-              color: const Color(0x14FFFFFF),
+              gradient: skyFor(),
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0x24FFFFFF)),
+              border: Border.all(color: Colors.white, width: 2),
+              boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))],
             ),
             child: Center(
-              child: NwsbIcon(mark(), size: 27, color: NwsbColors.goldLight),
+              child: NwsbIcon(mark(), size: 27, color: Colors.white),
             ),
           ),
           const SizedBox(width: 16),

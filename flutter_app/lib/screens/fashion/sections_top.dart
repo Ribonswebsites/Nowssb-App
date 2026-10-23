@@ -36,12 +36,10 @@ class FashGreeting extends StatelessWidget {
     // Same glass as the Fashion Hero header (fashion/hero.dart GlassWrap).
     final head = GlassWrap(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.fromLTRB(14, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: const [
-          ProgressIconButton(),
-          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,6 +70,8 @@ class FashGreeting extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(width: 14),
+          ProgressIconButton(),
         ],
       ),
     );

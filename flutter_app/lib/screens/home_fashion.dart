@@ -44,6 +44,11 @@ import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
+import 'fashion/hero_quick_row.dart';
+import '../features/programs/rewards_program.dart';
+import '../features/gifts/gifts_screen.dart';
+import '../features/economy/coupon_screen.dart';
+import '../features/progress/progress_popup.dart';
 import 'daily_tasks.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -352,6 +357,22 @@ class _HomeFashionState extends State<HomeFashion> {
     }
   }
 
+  /// Pool for the daily 8-card quick row; every entry opens a real page.
+  List<QuickCard> _quickPool() => [
+        QuickCard('rewards', 'Rewards', 'Your coins & perks', Icons.workspace_premium_rounded, () => _push(const RewardsProgramPage())),
+        QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const EarnHubScreen())),
+        QuickCard('gifts', 'Gifts', 'Send or redeem', Icons.card_giftcard_rounded, () => _push(const GiftsScreen())),
+        QuickCard('coupons', 'Coupons', 'Deals for you', Icons.local_offer_rounded, () => _push(const CouponScreen())),
+        QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
+        QuickCard('progress', 'Progress', 'Today at a glance', Icons.donut_large_rounded, () => ProgressPanel.open(context)),
+        QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1)),
+        QuickCard('tasks', 'Daily tasks', 'Tick off today', Icons.checklist_rounded, () => _push(const DailyTasksPage())),
+        QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen())),
+        QuickCard('meanings', 'Meanings', 'Signature words', Icons.auto_stories_rounded, () => _push(const MeaningStoreScreen())),
+        QuickCard('features', 'Features', 'Everything in NowssB', Icons.grid_view_rounded, () => _push(const FeaturesPage())),
+        QuickCard('inbox', 'Inbox', 'All notifications', Icons.notifications_rounded, () => showNotificationsSheet(context)),
+      ];
+
   /// The thirty, in `REG.fash.items` order. Keyed by the registry's own `k`
   /// so the two lists can be diffed by eye.
   List<(String, Widget)> _sections() => [
@@ -360,14 +381,6 @@ class _HomeFashionState extends State<HomeFashion> {
         ('greet', FashGreeting(below: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: ColoredSplitPromoBanner.forSurface(
-                  SplitPromoSurface.fashionHome,
-                  onTap: () => _go(1),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
               FashPractice(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -403,6 +416,15 @@ class _HomeFashionState extends State<HomeFashion> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // 'Start today's practice now' — moved mid-page (Ribon, Oct 24).
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: ColoredSplitPromoBanner.forSurface(
+                SplitPromoSurface.fashionHome,
+                onTap: () => _go(1),
+                margin: EdgeInsets.zero,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: ColoredSplitPromoBanner(
@@ -612,6 +634,7 @@ class _HomeFashionState extends State<HomeFashion> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               HeroGreeting(name: widget.name),
+              HeroQuickRow(pool: _quickPool()),
               FashionHero(
                 onExplore: () => _go(2),
                 onGuide: () => _push(const FeaturesPage()),
