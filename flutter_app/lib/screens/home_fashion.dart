@@ -355,10 +355,9 @@ class _HomeFashionState extends State<HomeFashion> {
   /// The thirty, in `REG.fash.items` order. Keyed by the registry's own `k`
   /// so the two lists can be diffed by eye.
   List<(String, Widget)> _sections() => [
-        ('greet', const FashGreeting()),
-        (
-          'practice',
-          Column(
+        // Today's Practice rides inside the greeting so it always sits
+        // directly under the heading (a saved layout can't split them).
+        ('greet', FashGreeting(below: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
@@ -377,8 +376,8 @@ class _HomeFashionState extends State<HomeFashion> {
                 ),
               ),
             ],
-          ),
-        ),
+          ))),
+        ('practice', const SizedBox.shrink()),
         (
           'herorow',
           FashHeroRow(

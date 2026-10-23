@@ -12,7 +12,9 @@ import '../../data/settings.dart';
 import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
+import '../../features/progress/progress_popup.dart';
 import '../../widgets/black_glass_banner.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../widgets/home_parts.dart';
 import '../../widgets/home_skin.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -23,39 +25,60 @@ import '../../admin/template/editable.dart';
 
 /// 1 · greet — index.html:1758. Not wrapped; it sits loose under the hero.
 class FashGreeting extends StatelessWidget {
-  const FashGreeting({super.key});
+  const FashGreeting({super.key, this.below});
+
+  /// Rendered directly under the glass heading (Today's Practice), so the
+  /// two always travel together even if a saved server layout reorders keys.
+  final Widget? below;
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(16, 22, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          EditableLabel('fashion_sections_top.FashGreeting',
-            'Begin Your\nHealing Path',
-            style: TextStyle(
-              fontSize: 34,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              height: 1.12,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text.rich(
-            TextSpan(
-              style: TextStyle(fontSize: 12, color: Color(0xA6FFFFFF)),
+    // Same glass as the Fashion Hero header (fashion/hero.dart GlassWrap).
+    final head = GlassWrap(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.fromLTRB(14, 16, 16, 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: const [
+          ProgressIconButton(),
+          SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                TextSpan(text: 'Natural Origin of '),
-                TextSpan(
-                  text: 'Word Science',
-                  style: TextStyle(fontWeight: FontWeight.w800),
+                EditableLabel('fashion_sections_top.FashGreeting',
+                  'Begin Your\nHealing Path',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    height: 1.12,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text.rich(
+                  TextSpan(
+                    style: TextStyle(fontSize: 12, color: Color(0xA6FFFFFF)),
+                    children: [
+                      TextSpan(text: 'Natural Origin of '),
+                      TextSpan(
+                        text: 'Word Science',
+                        style: TextStyle(fontWeight: FontWeight.w800),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+    if (below == null) return head;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [head, below!],
     );
   }
 }

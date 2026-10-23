@@ -16,6 +16,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../features/progress/progress_popup.dart';
 
 import '../../widgets/nwsb_icon.dart';
 
@@ -104,6 +105,12 @@ class NmGreeting extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          const SizedBox(width: 10),
+          // Progress center on the light home: dark disc so the glass icon reads.
+          const DecoratedBox(
+            decoration: BoxDecoration(color: Color(0xFF111111), shape: BoxShape.circle),
+            child: ProgressIconButton(),
           ),
         ],
       ),

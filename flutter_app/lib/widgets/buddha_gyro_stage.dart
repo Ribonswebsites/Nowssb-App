@@ -190,7 +190,19 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
                     ),
                   ),
                 ),
-                Positioned(left: 16, top: 16, child: _pill(week[_page], _page == 0)),
+                // Kept inside the black text column so it never touches the figure.
+                Positioned(
+                  left: 16,
+                  top: 16,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: w * 0.56 - 16),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: _pill(week[_page], _page == 0),
+                    ),
+                  ),
+                ),
                 Positioned(left: 20, bottom: 16, child: _dots(week.length)),
               ],
             ),

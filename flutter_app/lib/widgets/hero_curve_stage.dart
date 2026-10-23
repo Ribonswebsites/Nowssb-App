@@ -8,7 +8,6 @@ library;
 import 'dart:async';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
-import '../features/progress/progress_popup.dart';
 
 import 'package:flutter/material.dart';
 
@@ -606,8 +605,6 @@ class _HeroChrome extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               const Spacer(),
-              const ProgressIconButton(),
-              const SizedBox(width: 8),
               Flexible(
                 flex: 3,
                 child: FittedBox(
