@@ -390,7 +390,7 @@ class _PaidPeek extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Text(inr(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
+                        Text(money(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
                         const SizedBox(width: 6),
                         const Icon(Icons.chevron_right, color: NwsbColors.goldLight),
                       ],

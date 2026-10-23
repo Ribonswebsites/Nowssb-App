@@ -493,7 +493,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: double.infinity),
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 120 + MediaQuery.paddingOf(context).bottom),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
                     LSection('face', 'Profile', _courseFace()),

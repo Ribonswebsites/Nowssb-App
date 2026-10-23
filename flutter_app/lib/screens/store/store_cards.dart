@@ -25,9 +25,9 @@ import '../../data/store_prices.dart';
 import '../../admin/template/editable.dart';
 import '../../features/programs/store_extras.dart';
 
-String inr(num value) {
+String money(num value) {
   if (value <= 0) return 'Included';
-  return FxBook.instance.formatRupees(value);
+  return FxBook.instance.formatPrice(value);
 }
 
 /// Word price in rupees: the admin's default (Products & prices →
@@ -38,7 +38,7 @@ num get kWordSaleInr => kWordPriceInr;
 
 String localizedMoney(BuildContext context, num inrValue) {
   if (inrValue <= 0) return 'Included';
-  return FxBook.instance.formatRupees(inrValue);
+  return FxBook.instance.formatPrice(inrValue);
 }
 
 String saleOriginalMoney(BuildContext context, num salePrice) =>
@@ -1476,7 +1476,7 @@ class MsCard extends StatelessWidget {
                           final real = StorePrices.instance.priceFor(id, shown: price);
                           final open = Entitlements.instance.ownsOrIncluded(id, price: real);
                           return Text(
-                        open ? (Entitlements.instance.ownsItem(id) ? 'OWNED' : real <= 0 ? 'FREE' : 'IN YOUR PLAN') : inr(real),
+                        open ? (Entitlements.instance.ownsItem(id) ? 'OWNED' : real <= 0 ? 'FREE' : 'IN YOUR PLAN') : money(real),
                         style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w700,

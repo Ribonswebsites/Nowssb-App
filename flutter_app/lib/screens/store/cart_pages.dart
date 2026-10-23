@@ -20,9 +20,9 @@ import 'store_routes.dart';
 import 'store_select_sheet.dart';
 import '../../admin/template/editable.dart';
 
-String _inr(num value) {
+String _money(num value) {
   if (value <= 0) return 'Included';
-  return FxBook.instance.formatRupees(value);
+  return FxBook.instance.formatPrice(value);
 }
 
 class CartPage extends StatelessWidget {
@@ -50,7 +50,7 @@ class CartPage extends StatelessWidget {
             children: [
               for (final it in bag.cart) _CartTile(item: it),
               const SizedBox(height: 12),
-              _TotalRow(label: 'Subtotal', value: _inr(_payable(bag.cart))),
+              _TotalRow(label: 'Subtotal', value: _money(_payable(bag.cart))),
               const SizedBox(height: 16),
               _GoldBtn(
                 label: 'Checkout on Google Play',
@@ -136,7 +136,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   String _priceLabel(BagItem it) {
     final price = StorePrices.instance.priceFor(it.id, shown: it.price);
-    return price <= 0 ? 'Free' : _inr(price);
+    return price <= 0 ? 'Free' : _money(price);
   }
 
   /// Cart lines for the server checkout: {id, kind, title, price, qty}.
@@ -451,7 +451,7 @@ class _CartTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${item.kind} · ${_inr(StorePrices.instance.priceFor(item.id, shown: item.price))}',
+                  '${item.kind} · ${_money(StorePrices.instance.priceFor(item.id, shown: item.price))}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0x80FFFFFF),
@@ -532,7 +532,7 @@ class _WishTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${item.kind} · ${_inr(StorePrices.instance.priceFor(item.id, shown: item.price))}',
+                  '${item.kind} · ${_money(StorePrices.instance.priceFor(item.id, shown: item.price))}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0x80FFFFFF),

@@ -19,7 +19,7 @@ import '../data/store_catalog.dart';
 import '../data/store_prices.dart';
 import '../screens/nwsb_sign_in_sheet.dart';
 import '../screens/store/cart_pages.dart';
-import '../screens/store/store_cards.dart' show inr;
+import '../screens/store/store_cards.dart' show money;
 import '../screens/subscription.dart';
 import '../theme/tokens.dart';
 
@@ -151,7 +151,7 @@ class _LockSheet extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '${item.kind} · ${inr(item.price)} on Google Play. $planNote',
+                    '${item.kind} · ${money(item.price)} on Google Play. $planNote',
                     style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13, height: 1.45),
                   ),
                   const SizedBox(height: 18),

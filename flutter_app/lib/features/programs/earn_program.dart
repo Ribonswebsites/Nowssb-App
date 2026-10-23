@@ -9,6 +9,7 @@ import '../../admin/layout/layout_sections.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
+import '../economy/money.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
 import 'program_heroes.dart';
@@ -86,7 +87,7 @@ List<Widget> _overview(BuildContext context, Map<String, dynamic> s) => [
 
 Widget _money(String label, num v, String sub) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label.toUpperCase(), style: const TextStyle(color: NwsbColors.gold, fontSize: 10, letterSpacing: 1.3, fontWeight: FontWeight.w800)),
-      CountUp(v, prefix: '\u20b9', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+      Text(FxBook.instance.formatPrice(v), style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
       EditableLabel('earn_program.shared', sub, style: const TextStyle(color: NwsbColors.mist, fontSize: 11)),
     ]);
 
@@ -205,7 +206,7 @@ List<Widget> _targets(BuildContext context, Map<String, dynamic> s) => [
             Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               PRow(
                 title: '${sInt(x['words'])} words sold',
-                sub: '\u20b9${sInt(x['cashINR'])} bonus (pending 30 days) · ${sInt(x['coins'])} coins · ${rarityTitle('${x['coupon']}')} card',
+                sub: '${FxBook.instance.formatPrice(sNum(x['cashINR']))} bonus (pending 30 days) · ${sInt(x['coins'])} coins · ${rarityTitle('${x['coupon']}')} card',
                 mark: NwsbMarks.rewards,
                 trailing: x['reached'] == true ? const PPill('Reached', color: NwsbColors.goldLight) : null,
               ),
@@ -235,7 +236,7 @@ List<Widget> _payouts(BuildContext context, Map<String, dynamic> s) => [
         final acct = sMap(r['payoutAccount']);
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           PCard(glow: NwsbColors.gold, children: [
-            _money('Available', sNum(bal['availableINR']), 'Minimum \u20b9${sInt(bal['minPayoutINR'])} · paid by UPI after a person approves it'),
+            _money('Available', sNum(bal['availableINR']), 'Minimum ${FxBook.instance.formatPrice(sNum(bal['minPayoutINR']))} · paid out after a person approves it'),
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerLeft,

@@ -51,7 +51,7 @@ const _kDefaultChips = <SectionMediaItem>[
   SectionMediaItem(id: 'chip.coupons', title: 'Coupons', meta: {'kind': 'chip'}),
   SectionMediaItem(
     id: 'chip.under499',
-    title: 'Under ₹499',
+    title: 'Budget picks',
     meta: {'kind': 'chip'},
   ),
 ];

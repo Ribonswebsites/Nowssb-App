@@ -19,10 +19,14 @@ class BannerMix extends StatelessWidget {
     super.key,
     required this.seed,
     this.onTap,
+    this.barOnly = false,
   });
 
   final int seed;
   final VoidCallback? onTap;
+
+  /// Show only the black bar (the Store drops the glass and split promos).
+  final bool barOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +61,7 @@ class BannerMix extends StatelessWidget {
                 _ => NwsbLinks.tasks(context),
               },
     );
+    if (barOnly) return bar;
     final order = <Widget>[black, split, bar];
     final start = seed.abs() % order.length;
     return Column(

@@ -75,7 +75,7 @@ List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
       for (final c in coupons)
         PRow(
           title: '${c['label'] ?? '${sInt(c['pct'])}% off'}',
-          sub: '${c['scope'] ?? 'any'} · cap ${inr(sNum(c['capINR']))}${sInt(c['expiresAt']) > 0 ? ' · until ${shortDate(c['expiresAt'])}' : ''}',
+          sub: '${c['scope'] ?? 'any'} · cap ${money(sNum(c['capINR']))}${sInt(c['expiresAt']) > 0 ? ' · until ${shortDate(c['expiresAt'])}' : ''}',
           mark: NwsbMarks.bag,
           trailing: sInt(c['expiresAt']) > 0 && sInt(c['expiresAt']) < soon ? const PPill('Expiring soon', color: Color(0xFFFFA24C)) : null,
         ),
@@ -201,7 +201,7 @@ List<Widget> _shop(BuildContext context, Map<String, dynamic> s) {
         const SizedBox(height: 4),
         Row(children: [
           Expanded(child: Text('${c['title']}', style: TextStyle(color: rarityColor('${c['id']}'), fontSize: 18, fontWeight: FontWeight.w800))),
-          Text(inr(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          Text(money(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         ]),
         Text('Rarest prize: ${c['rarest'] ?? ''}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
         const SizedBox(height: 6),
@@ -368,7 +368,7 @@ List<Widget> _odds(BuildContext context, Map<String, dynamic> s) {
     LSection('after', 'After a purchase', PCard(children: [
       const EditableLabel('coupons_program.shared', 'Rarity of the free card after a purchase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
       for (final b in after)
-        Text('Up to ${sNum(b['maxINR']) > 1e9 ? 'any amount' : inr(sNum(b['maxINR']))}: ${sMap(b['odds']).entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
+        Text('Up to ${sNum(b['maxINR']) > 1e9 ? 'any amount' : money(sNum(b['maxINR']))}: ${sMap(b['odds']).entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
       Text('Subscriptions: ${afterSub.entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
     ])),
     LSection('spin', 'Daily Spin odds', table('Daily Spin', spin)),

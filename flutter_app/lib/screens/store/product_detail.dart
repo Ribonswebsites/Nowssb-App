@@ -271,7 +271,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          _open ? (price <= 0 ? 'Free' : (Entitlements.instance.ownsItem(_id) ? 'Owned' : 'Included in your plan')) : inr(price),
+                          _open ? (price <= 0 ? 'Free' : (Entitlements.instance.ownsItem(_id) ? 'Owned' : 'Included in your plan')) : money(price),
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,

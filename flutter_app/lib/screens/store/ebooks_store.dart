@@ -299,7 +299,7 @@ class _EbookRow extends StatelessWidget {
                         Text(
                           Entitlements.instance.canOpenEbook(book.title, price: StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price))
                               ? 'Yours'
-                              : inr(StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price)),
+                              : money(StorePrices.instance.priceFor('ebook:${book.title.toLowerCase()}', shown: book.price)),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,

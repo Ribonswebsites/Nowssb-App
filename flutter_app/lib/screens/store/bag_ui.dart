@@ -241,7 +241,7 @@ class _BagSheet extends StatelessWidget {
                               subtitle: cart
                                   ? (items.isEmpty
                                       ? 'Your bag is empty'
-                                      : '${bag.cartCount} item${bag.cartCount == 1 ? '' : 's'} · ${inr(bag.cartTotal)}')
+                                      : '${bag.cartCount} item${bag.cartCount == 1 ? '' : 's'} · ${money(bag.cartTotal)}')
                                   : (items.isEmpty
                                       ? 'Nothing saved yet'
                                       : '${bag.wishCount} saved'),
@@ -522,8 +522,8 @@ class _SheetRow extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   cart
-                      ? '${item.kind} · ×${item.qty} · ${inr(item.lineTotal)}'
-                      : '${item.kind} · ${inr(item.price)}',
+                      ? '${item.kind} · ×${item.qty} · ${money(item.lineTotal)}'
+                      : '${item.kind} · ${money(item.price)}',
                   style: const TextStyle(
                     fontSize: 11,
                     color: Color(0x80FFFFFF),

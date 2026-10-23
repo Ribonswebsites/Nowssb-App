@@ -13,6 +13,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../economy/economy_api.dart';
+import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../../admin/template/editable.dart';
@@ -194,9 +195,8 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
     }
   }
 
-  String _inr(Object? v) {
-    final n = (v as num?) ?? 0;
-    return n == n.roundToDouble() ? '₹${n.round()}' : '₹${n.toStringAsFixed(2)}';
+  String _money(Object? v) {
+    return FxBook.instance.formatPrice((v as num?) ?? 0);
   }
 
   @override
@@ -252,13 +252,13 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
         ),
       ],
       if (q != null) ...[
-        row('List price', _inr(q['listINR'])),
-        if (((q['linkOffINR'] as num?) ?? 0) > 0) row('Friend discount', '−${_inr(q['linkOffINR'])}'),
-        if (((q['couponOffINR'] as num?) ?? 0) > 0) row('Coupon', '−${_inr(q['couponOffINR'])}'),
-        if (((q['coinsINR'] as num?) ?? 0) > 0) row('Coins (${q['coins']})', '−${_inr(q['coinsINR'])}'),
-        if (((q['absorbedINR'] as num?) ?? 0) > 0) row('NowssB rounds down', '−${_inr(q['absorbedINR'])}'),
+        row('List price', _money(q['listINR'])),
+        if (((q['linkOffINR'] as num?) ?? 0) > 0) row('Friend discount', '−${_money(q['linkOffINR'])}'),
+        if (((q['couponOffINR'] as num?) ?? 0) > 0) row('Coupon', '−${_money(q['couponOffINR'])}'),
+        if (((q['coinsINR'] as num?) ?? 0) > 0) row('Coins (${q['coins']})', '−${_money(q['coinsINR'])}'),
+        if (((q['absorbedINR'] as num?) ?? 0) > 0) row('NowssB rounds down', '−${_money(q['absorbedINR'])}'),
         const Divider(color: Color(0x33FFFFFF)),
-        row('You pay on Google Play', _inr(q['payINR']), strong: true),
+        row('You pay on Google Play', _money(q['payINR']), strong: true),
         const SizedBox(height: 4),
         Text('Coins can cover up to ${q['coinCapPct'] ?? 30}% of this order. Play shows the final price with tax.', style: label.copyWith(fontSize: 11)),
       ],

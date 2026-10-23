@@ -23,6 +23,8 @@ import 'store_cards.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../admin/template/editable.dart';
 import 'store_art.dart';
+import 'daily_deals.dart';
+import 'product_detail.dart' show openAtelierWord;
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
 
@@ -2450,7 +2452,8 @@ class StoreHalfOffRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final words = kRmCategories.first.words.take(6).toList();
+    final deals = dailyDeals();
+    final top = deals.fold<int>(0, (m, e) => e.percent > m ? e.percent : m);
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: GlassWrap(
@@ -2466,7 +2469,7 @@ class StoreHalfOffRail extends StatelessWidget {
                 height: 188,
                 child: Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       flex: 6,
                       child: ColoredBox(
                         color: Color(0xFF1A0B2E),
@@ -2475,7 +2478,7 @@ class StoreHalfOffRail extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              EditableLabel('store_home_sections.StoreHalfOffRail',
+                              const EditableLabel('store_home_sections.StoreHalfOffRail',
                                 'Deal of the Day',
                                 style: TextStyle(
                                   color: Color(0xFFE8D5A3),
@@ -2483,14 +2486,14 @@ class StoreHalfOffRail extends StatelessWidget {
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
-                              SizedBox(height: 6),
+                              const SizedBox(height: 6),
                               Flexible(
                                 child: FittedBox(
                                   fit: BoxFit.scaleDown,
                                   alignment: Alignment.topLeft,
-                                  child: EditableLabel('store_home_sections.StoreHalfOffRail',
-                                    'Up To\n50% Off',
-                                    style: TextStyle(
+                                  child: Text(
+                                    'Up To\n$top% Off',
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 32,
                                       height: 0.95,
@@ -2499,9 +2502,9 @@ class StoreHalfOffRail extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Spacer(),
-                              EditableLabel('store_home_sections.StoreHalfOffRail',
-                                'Words at half price. Limited.',
+                              const Spacer(),
+                              const EditableLabel('store_home_sections.StoreHalfOffRail',
+                                'New words on sale every day.',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 12),
@@ -2558,12 +2561,15 @@ class StoreHalfOffRail extends StatelessWidget {
               height: 168,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: words.length,
+                itemCount: deals.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 10),
                 itemBuilder: (context, i) {
-                  final word = words[i];
+                  final word = deals[i];
                   return GestureDetector(
-                    onTap: () => onOpenWord?.call(word.word, word.root),
+                    key: ValueKey('deal-${word.word}'),
+                    onTap: () => onOpenWord != null
+                        ? onOpenWord!(word.word, word.root)
+                        : openAtelierWord(context, word: word.word, root: word.root, img: kNowssbStoreMark),
                     child: Container(
                       width: 124,
                       decoration: BoxDecoration(
@@ -2592,7 +2598,7 @@ class StoreHalfOffRail extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  word.word,
+                                  word.title,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
@@ -2601,9 +2607,11 @@ class StoreHalfOffRail extends StatelessWidget {
                                     fontSize: 13,
                                   ),
                                 ),
-                                const EditableLabel('store_home_sections.StoreHalfOffRail',
-                                  '50% OFF',
-                                  style: TextStyle(
+                                Text(
+                                  '${word.percent}% OFF · ${word.category}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
                                     color: Color(0xFFE8D5A3),
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800,

@@ -33,7 +33,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   final _email = TextEditingController();
   String _method = 'wise';
   String _filter = 'all';
-  String _country = 'IN';
+  late String _country = _countries.any((c) => c.$1 == FxBook.instance.country) ? FxBook.instance.country! : 'XX';
 
   static const _countries = <(String, String)>[
     ('IN', 'India — bank / UPI, INR'),

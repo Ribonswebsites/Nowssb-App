@@ -145,7 +145,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       const Opacity(opacity: 0, child: EditableLabel('store.StoreHomeContent', 'Enter Store')),
       const Padding(
         padding: EdgeInsets.fromLTRB(12, 4, 12, 10),
-        child: BannerMix(seed: 6),
+        child: BannerMix(seed: 6, barOnly: true),
       ),
       const _StoreDepartmentLabel('WORD ATELIER'),
       _StoreGlassSection(
@@ -199,14 +199,8 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ),
         ],
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-        child: ColoredSplitPromoBanner.forSurface(
-          SplitPromoSurface.storeHome,
-          onTap: editModeOn(context) ? null : () => NwsbLinks.subscription(context),
-          margin: EdgeInsets.zero,
-        ),
-      ),
+      // 'See every plan' split promo removed from the Store (Oct 23).
+      const SizedBox.shrink(),
       const _StoreDepartmentLabel('NOWSSB CONNECT'),
       _StoreGlassSection(
         children: [
@@ -350,7 +344,14 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
               ),
             ),
           ),
-          SafeArea(child: ListView(children: shown)),
+          // Bottom padding clears the floating nav bar (58 high, 14 off the
+          // safe area) plus the mini-player pill, so the disclaimer is never
+          // hidden under it. SafeArea adds the device inset.
+          SafeArea(
+              bottom: true,
+              child: ListView(
+                  padding: const EdgeInsets.only(bottom: 120),
+                  children: shown)),
         ],
       ),
     );
@@ -733,7 +734,7 @@ class _SignatureDoor extends StatelessWidget {
   const _SignatureDoor({required this.onTap});
   final VoidCallback onTap;
 
-  static const _clip = 'assets/video/signature-store-hero.mp4';
+  static const _clip = 'assets/flutter_video/signature_words.mp4';
 
   @override
   Widget build(BuildContext context) {
@@ -760,29 +761,10 @@ class _SignatureDoor extends StatelessWidget {
                 slot: 'store.SignatureDoor',
               ),
             ),
-            const IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x14060C18), Color(0x99060C18)],
-                  ),
-                ),
-              ),
-            ),
             // Words sit on the film, but they do not cover it. A tap on the
             // picture opens the video sheet. A tap on a word edits that word.
-            const Positioned(
-              left: 16,
-              right: 48,
-              top: 12,
-              child: EditableLabel('store.SignatureDoor', 'SHABDAPATHY · THE RAREST',
-                  style: TextStyle(
-                      fontSize: 10,
-                      letterSpacing: 2.2,
-                      color: NwsbColors.gold)),
-            ),
+            // No vignette: the film shows in full. A soft text shadow keeps
+            // the two short lines readable.
             const Positioned(
               left: 16,
               right: 16,
@@ -793,18 +775,18 @@ class _SignatureDoor extends StatelessWidget {
                 children: [
                   EditableLabel('store.SignatureDoor', 'Words & Meanings',
                       style: TextStyle(
-                          fontSize: 25,
+                          fontSize: 24,
                           color: Colors.white,
-                          fontWeight: FontWeight.w300)),
-                  SizedBox(height: 6),
-                  EditableLabel('store.SignatureDoor', 'One per category. Owned once, never restocked.',
-                      style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))),
-                  SizedBox(height: 12),
+                          fontWeight: FontWeight.w800,
+                          shadows: [Shadow(color: Color(0x99000000), blurRadius: 10)])),
+                  SizedBox(height: 4),
                   EditableLabel('store.SignatureDoor', '15 Words   ·   5 Meanings',
                       style: TextStyle(
                           fontSize: 10,
                           letterSpacing: 1.5,
-                          color: Color(0xCCFFFFFF))),
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          shadows: [Shadow(color: Color(0x99000000), blurRadius: 8)])),
                 ],
               ),
             ),

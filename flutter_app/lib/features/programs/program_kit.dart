@@ -17,6 +17,7 @@ import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
+import '../economy/money.dart';
 import '../economy/economy_theme.dart';
 import '../economy/reward_fx.dart';
 
@@ -32,7 +33,7 @@ Map<String, dynamic> sMap(Object? v) => v is Map ? v.map((k, v) => MapEntry('$k'
 List<Map<String, dynamic>> sList(Object? v) => v is List ? v.whereType<Map>().map(sMap).toList() : <Map<String, dynamic>>[];
 int sInt(Object? v) => v is num ? v.toInt() : v is Timestamp ? v.millisecondsSinceEpoch : v is DateTime ? v.millisecondsSinceEpoch : int.tryParse('${v ?? ''}') ?? 0;
 num sNum(Object? v) => v is num ? v : num.tryParse('${v ?? ''}') ?? 0;
-String inr(num v) => '\u20b9${v % 1 == 0 ? v.toInt() : v.toStringAsFixed(2)}';
+String money(num v) => FxBook.instance.formatPrice(v);
 String shortDate(Object? ms) {
   final n = sInt(ms);
   if (n <= 0) return '';

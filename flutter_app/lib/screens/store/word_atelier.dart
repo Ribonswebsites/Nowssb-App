@@ -24,6 +24,7 @@ import 'store_actions.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
 import 'store_shelf.dart';
+import 'daily_deals.dart';
 import '../../widgets/routine_deck.dart';
 import 'store_terms_sheet.dart';
 import '../../admin/template/editable.dart';
@@ -135,12 +136,38 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
 
   @override
   Widget build(BuildContext context) {
+    final deals = dailyDeals();
+    final topDeal = deals.fold<int>(0, (m, e) => e.percent > m ? e.percent : m);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const StoreRoomDeck(current: 'word'),
+        // Today's deals: a daily rotation across every category, with
+        // different discounts each day (replaces the fixed 50% OFF row).
+        if (deals.any((d) => _match(d.word, d.root)))
+          RoutineDeck(
+            title: 'Up to $topDeal% OFF',
+            banner: 'Up to $topDeal% OFF',
+            bannerSub: 'Deal of the Day · new words every day',
+            onBanner: () => _openViewAll('Deal of the Day'),
+            cards: [
+              for (final d in deals)
+                if (_match(d.word, d.root))
+                  WorkCard(
+                    category: d.category,
+                    title: d.title,
+                    meta: '${d.percent}% OFF · ${d.root}',
+                    action: 'Open',
+                    image: kNowssbStoreMark,
+                    flip: storeWaveFor(d.word),
+                    onTap: () => openAtelierWord(context, word: d.word, root: d.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
+                    onCart: () => storeAddToCart(context, wordBagItem(name: d.word, root: d.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'))),
+                    onBuy: () => storeBuyNow(context, wordBagItem(name: d.word, root: d.root, img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'))),
+                  ),
+            ],
+          ),
         for (final cat in kRmCategories)
-          if (cat.words.any((w) => _match(w.word, w.root)))
+          if (cat.id != 'off50' && cat.words.any((w) => _match(w.word, w.root)))
             RoutineDeck(
               title: cat.label,
               banner: cat.label,

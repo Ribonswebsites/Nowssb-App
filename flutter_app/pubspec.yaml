@@ -127,6 +127,7 @@ flutter:
     - assets/video/healing-path-bg-poster.webp
     - assets/video/hero-bg.mp4
     - assets/tv/home-words-tv.mp4
+    - assets/flutter_video/
     - assets/video/hero-bg-poster.webp
     - assets/video/hero-ebooks.mp4
     - assets/video/hero-ebooks-poster.webp
