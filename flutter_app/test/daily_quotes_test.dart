@@ -38,7 +38,7 @@ void main() {
     expect(o.first.quote.text, 'Pinned');
   });
 
-  testWidgets('quotes section renders both cards without overflow', (t) async {
+  testWidgets('quotes section renders the Daily Quote card without overflow', (t) async {
     await t.pumpWidget(MaterialApp(
       home: Scaffold(
         body: SingleChildScrollView(
@@ -48,7 +48,6 @@ void main() {
     ));
     await t.pump();
     expect(find.byType(DailyQuoteCard), findsOneWidget);
-    expect(find.byType(BreatheCard), findsOneWidget);
     expect(find.textContaining('TODAY'), findsOneWidget);
     await t.drag(find.byType(PageView), const Offset(-400, 0));
     await t.pump(const Duration(milliseconds: 600)); await t.pump(const Duration(milliseconds: 600));

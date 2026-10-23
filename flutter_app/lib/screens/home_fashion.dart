@@ -89,8 +89,8 @@ import 'store/meaning_store.dart';
 /// something they cannot name.
 const kFashionSectionOrder = <String>[
   'greet',
-  'herorow',
   'practice',
+  'herorow',
   'routineCards',
   'coachCards',
   // Not on the website's registry. Six doors on one panel so the app can
@@ -357,14 +357,6 @@ class _HomeFashionState extends State<HomeFashion> {
   List<(String, Widget)> _sections() => [
         ('greet', const FashGreeting()),
         (
-          'herorow',
-          FashHeroRow(
-            onCustomize: () => _push(const WidgetsPage()),
-            onFeatures: () => _push(const FeaturesPage()),
-            onEarn: () => _push(const EarnHubScreen()),
-          ),
-        ),
-        (
           'practice',
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -385,6 +377,14 @@ class _HomeFashionState extends State<HomeFashion> {
                 ),
               ),
             ],
+          ),
+        ),
+        (
+          'herorow',
+          FashHeroRow(
+            onCustomize: () => _push(const WidgetsPage()),
+            onFeatures: () => _push(const FeaturesPage()),
+            onEarn: () => _push(const EarnHubScreen()),
           ),
         ),
         ('routineCards', Column(
@@ -492,28 +492,13 @@ class _HomeFashionState extends State<HomeFashion> {
             FashTiles(onTile: _go, onOpen: _openEnter),
           ],
         )),
-        (
-          'storiesFind',
-          StoriesFindYouBanner(onTap: () => _go(2)),
-        ),
+        // Removed on Ribon's order (Oct 23): Sound That Finds You.
+        ('storiesFind', const SizedBox.shrink()),
         ('buddhaGyro', BuddhaGyroStage(
           onOpenQuotes: () => _push(const QuotesWeekScreen()),
         )),
-        (
-          'store',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(6, onTap: () => _go(3)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Removed on Ribon's order (Oct 23): 'Build a library' banner.
+        ('store', const SizedBox.shrink()),
         ('trendwd', FashTrending(onTap: () => _go(2))),
         (
           'custom',

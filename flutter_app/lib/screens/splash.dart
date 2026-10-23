@@ -18,8 +18,7 @@
 ///
 /// IT PLAYS ALL THE WAY THROUGH. No Skip, and no timer cutting it short —
 /// this is the app introducing itself and it is meant to be seen. It is
-/// played a little faster than recorded ([_speed]) so that "all the way
-/// through" is not a long wait.
+/// played at its recorded speed ([_speed] = 1.0), full length.
 ///
 /// There is still a ceiling, but it is a FAILSAFE rather than a limit: it is
 /// set from the clip's own duration once that is known, so it can only fire
@@ -58,9 +57,9 @@ class _SplashState extends State<Splash> {
 
   static const _asset = 'assets/video/start-animation.mp4';
 
-  /// Twice recorded speed. The clip still plays all the way through — it
-  /// just does not sit on the launch.
-  static const _speed = 2.0;
+  /// Recorded speed. Was 2.0 (since Aug 14), which made the start animation
+  /// look sped up; Ribon asked for normal speed on Oct 23.
+  static const _speed = 1.0;
 
   @override
   void initState() {

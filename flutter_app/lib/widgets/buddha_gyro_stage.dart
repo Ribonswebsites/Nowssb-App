@@ -3,9 +3,6 @@
 /// Card 1, "Daily Quote": black poster, the Buddha on the right, and a
 /// swipeable column of bold condensed type on the left. Today's quote first;
 /// swipe back through this week. Quotes live in `data/daily_quotes.dart`.
-///
-/// Card 2, "Breathe": a quiet, minimal meditation card. A soft circle
-/// breathes slowly, with one short line in a light serif.
 library;
 
 import 'dart:async';
@@ -79,11 +76,6 @@ class BuddhaGyroStage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: _shell(DailyQuoteCard(now: now, onOpen: onOpenQuotes), radius: 20),
-        ),
-        const SizedBox(height: 14),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: BreatheCard(now: now, light: neumorphic),
         ),
         const SizedBox(height: 8),
       ],
@@ -310,105 +302,3 @@ class _QuotePoster extends StatelessWidget {
   }
 }
 
-// ───────────────────────────── Card 2 ─────────────────────────────
-
-class BreatheCard extends StatefulWidget {
-  const BreatheCard({super.key, this.now, this.light = false});
-  final DateTime? now;
-  final bool light;
-
-  @override
-  State<BreatheCard> createState() => _BreatheCardState();
-}
-
-class _BreatheCardState extends State<BreatheCard> with SingleTickerProviderStateMixin {
-  late final AnimationController _breath = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 4),
-    value: 0.55,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    if (!_flutterTest) _breath.repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _breath.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final light = widget.light;
-    final bg = light ? const Color(0xFFF4F1EA) : const Color(0xFF0E1013);
-    final ink = light ? const Color(0xFF3A3A36) : const Color(0xFFE9E4D8);
-    final soft = light ? const Color(0xFF9A958A) : const Color(0xFF8C887E);
-    final glow = light ? const Color(0xFFD9CBB0) : const Color(0xFF8FA89A);
-    final line = breatheLineFor(widget.now ?? DateTime.now());
-    return Container(
-      height: 210,
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(28)),
-      padding: const EdgeInsets.fromLTRB(26, 22, 22, 22),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 104,
-            child: AnimatedBuilder(
-              animation: _breath,
-              builder: (_, __) {
-                final t = Curves.easeInOutSine.transform(_breath.value);
-                final inhale = _breath.status != AnimationStatus.reverse;
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 96,
-                      height: 96,
-                      child: Center(
-                        child: Container(
-                          width: 52 + 40 * t,
-                          height: 52 + 40 * t,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: RadialGradient(colors: [
-                              glow.withValues(alpha: 0.85),
-                              glow.withValues(alpha: 0.25),
-                              glow.withValues(alpha: 0.0),
-                            ], stops: const [0.0, 0.6, 1.0]),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(inhale ? 'breathe in' : 'breathe out',
-                        style: _serif(13, soft, style: FontStyle.italic)),
-                  ],
-                );
-              },
-            ),
-          ),
-          const SizedBox(width: 18),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('PAUSE', style: TextStyle(color: soft, fontSize: 10, letterSpacing: 3.2, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 10),
-                Flexible(
-                  child: Text(line,
-                      maxLines: 5,
-                      overflow: TextOverflow.fade,
-                      style: _serif(17, ink, style: FontStyle.italic)),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
