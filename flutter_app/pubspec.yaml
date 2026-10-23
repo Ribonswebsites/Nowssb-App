@@ -90,6 +90,15 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  # Bundled (SIL OFL) for the Home quotes cards; no runtime font download.
+  fonts:
+    - family: Anton
+      fonts:
+        - asset: assets/fonts/Anton-Regular.ttf
+    - family: CormorantGaramond
+      fonts:
+        - asset: assets/fonts/CormorantGaramond-Variable.ttf
+
   assets:
     # Only the clips the app actually plays, plus each clip's poster.
     # Other files in assets/video stay for the website and are not packed in.
