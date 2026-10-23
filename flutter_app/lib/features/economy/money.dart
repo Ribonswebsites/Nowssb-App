@@ -1,18 +1,19 @@
 /// Local currency display for a global app.
 ///
 /// Every price is shown in the user's own currency. The country comes from
-/// the device region (locale), then an IP country lookup refines it once at
-/// start. Exchange rates come from Firestore `config/fx` (`rates`: units per
+/// the device location (only when location permission is already granted;
+/// the app never prompts for it here), else the device locale region. No
+/// third-party IP lookup. Exchange rates come from Firestore `config/fx` (`rates`: units per
 /// 1 USD). Catalogue amounts are stored in "base units" (the Play price
 /// tier values); `config/fx.baseCurrency` + its rate convert them to USD.
 library;
 
-import 'dart:convert';
 import 'dart:ui' show PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 import '../../data/firebase.dart';
@@ -65,9 +66,14 @@ class FxBook extends ChangeNotifier {
 
   Future<void> _lookupCountry() async {
     try {
-      final r = await http.get(Uri.parse('https://ipapi.co/country/')).timeout(const Duration(seconds: 6));
-      final c = r.body.trim().toUpperCase();
-      if (r.statusCode == 200 && RegExp(r'^[A-Z]{2}$').hasMatch(c) && c != country) {
+      final perm = await Geolocator.checkPermission();
+      if (perm != LocationPermission.always && perm != LocationPermission.whileInUse) return;
+      final pos = await Geolocator.getLastKnownPosition() ??
+          await Geolocator.getCurrentPosition(
+              locationSettings: const LocationSettings(accuracy: LocationAccuracy.low, timeLimit: Duration(seconds: 8)));
+      final marks = await Geocoding().placemarkFromCoordinates(pos.latitude, pos.longitude);
+      final c = marks.isEmpty ? null : marks.first.isoCountryCode?.toUpperCase();
+      if (c != null && RegExp(r'^[A-Z]{2}$').hasMatch(c) && c != country) {
         country = c;
         notifyListeners();
       }

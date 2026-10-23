@@ -24,6 +24,7 @@ import '../../widgets/app_thinking_loader.dart';
 import '../../admin/template/editable.dart';
 import 'store_art.dart';
 import 'daily_deals.dart';
+import '../../data/store_prices.dart';
 import 'product_detail.dart' show openAtelierWord;
 
 // ─── #2 Store hero video (Ribons Original copy block removed) ────────────────
@@ -2453,7 +2454,7 @@ class StoreHalfOffRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deals = dailyDeals();
-    final top = deals.fold<int>(0, (m, e) => e.percent > m ? e.percent : m);
+    final top = deals.fold<int>(0, (m, e) => realDealPercent(e.word) > m ? realDealPercent(e.word) : m);
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
       child: GlassWrap(
@@ -2492,7 +2493,7 @@ class StoreHalfOffRail extends StatelessWidget {
                                   fit: BoxFit.scaleDown,
                                   alignment: Alignment.topLeft,
                                   child: Text(
-                                    'Up To\n$top% Off',
+                                    top > 0 ? 'Up To\n$top% Off' : 'Today\'s\nDeals',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 32,
@@ -2558,7 +2559,7 @@ class StoreHalfOffRail extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 168,
+              height: 184,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: deals.length,
@@ -2607,8 +2608,21 @@ class StoreHalfOffRail extends StatelessWidget {
                                     fontSize: 13,
                                   ),
                                 ),
+                                Text.rich(
+                                  TextSpan(children: [
+                                    TextSpan(text: '${money(StorePrices.instance.priceFor('word:${word.word.toLowerCase()}'))} '),
+                                    if (realDealPercent(word.word) > 0)
+                                      TextSpan(
+                                        text: money(StorePrices.instance.regularPriceFor('word:${word.word.toLowerCase()}')),
+                                        style: const TextStyle(decoration: TextDecoration.lineThrough, color: Color(0x99FFFFFF), fontWeight: FontWeight.w500),
+                                      ),
+                                  ]),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                                ),
                                 Text(
-                                  '${word.percent}% OFF · ${word.category}',
+                                  '${realDealPercent(word.word) > 0 ? '${realDealPercent(word.word)}% OFF · ' : ''}${word.category}',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(

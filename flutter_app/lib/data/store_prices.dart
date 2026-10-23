@@ -15,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import 'billing_config.dart';
+import '../screens/store/daily_deals.dart' show dailyPercentFor;
 import 'firebase.dart';
 
 class StorePrices extends ChangeNotifier {
@@ -61,6 +62,19 @@ class StorePrices extends ChangeNotifier {
   /// makes an item free.
   num priceFor(String itemId, {String? kind, num? shown}) {
     final k = kind ?? contentKindOfItem(itemId) ?? 'word';
+    final base = regularPriceFor(itemId, kind: k, shown: shown);
+    // Deal of the Day: today's rotating discount is charged for real. The
+    // sale price is snapped UP to a Play price point, so Play charges what
+    // the card says.
+    final pct = k == 'word' && base > 0 ? dailyPercentFor(itemId.substring(itemId.indexOf(':') + 1)) : null;
+    if (pct == null) return base;
+    final sale = contentTierFor(k, base * (100 - pct) / 100);
+    return sale < base ? sale : base;
+  }
+
+  /// The price before any Deal of the Day discount.
+  num regularPriceFor(String itemId, {String? kind, num? shown}) {
+    final k = kind ?? contentKindOfItem(itemId) ?? 'word';
     final set = _items[itemId];
     if (set != null) return set <= 0 ? 0 : contentTierFor(k, set);
     if (k == 'ebook' && shown != null && shown > 0) return contentTierFor(k, shown);
@@ -71,6 +85,9 @@ class StorePrices extends ChangeNotifier {
   /// below the kind default), else null — for the strike-through.
   num? regularIfOnSale(String itemId, {String? kind}) {
     final k = kind ?? contentKindOfItem(itemId) ?? 'word';
+    final now = priceFor(itemId, kind: k);
+    final regular = regularPriceFor(itemId, kind: k);
+    if (now > 0 && now < regular) return regular;
     final set = _items[itemId];
     if (set == null || set <= 0) return null;
     final d = defaultFor(k);

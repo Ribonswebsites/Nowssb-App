@@ -137,7 +137,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
   @override
   Widget build(BuildContext context) {
     final deals = dailyDeals();
-    final topDeal = deals.fold<int>(0, (m, e) => e.percent > m ? e.percent : m);
+    final topDeal = deals.fold<int>(0, (m, e) => realDealPercent(e.word) > m ? realDealPercent(e.word) : m);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -146,8 +146,8 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         // different discounts each day (replaces the fixed 50% OFF row).
         if (deals.any((d) => _match(d.word, d.root)))
           RoutineDeck(
-            title: 'Up to $topDeal% OFF',
-            banner: 'Up to $topDeal% OFF',
+            title: topDeal > 0 ? 'Up to $topDeal% OFF' : 'Deal of the Day',
+            banner: topDeal > 0 ? 'Up to $topDeal% OFF' : 'Deal of the Day',
             bannerSub: 'Deal of the Day · new words every day',
             onBanner: () => _openViewAll('Deal of the Day'),
             cards: [
@@ -156,7 +156,9 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                   WorkCard(
                     category: d.category,
                     title: d.title,
-                    meta: '${d.percent}% OFF · ${d.root}',
+                    meta: realDealPercent(d.word) > 0
+                        ? '${realDealPercent(d.word)}% OFF · ${money(StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'))} (was ${money(StorePrices.instance.regularPriceFor('word:${d.word.toLowerCase()}'))})'
+                        : d.root,
                     action: 'Open',
                     image: kNowssbStoreMark,
                     flip: storeWaveFor(d.word),

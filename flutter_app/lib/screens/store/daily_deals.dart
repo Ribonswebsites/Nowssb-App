@@ -9,6 +9,7 @@ import 'dart:math';
 
 import '../../data/store_catalog.dart';
 import 'store_shelf.dart';
+import '../../data/store_prices.dart';
 
 class DailyDeal {
   const DailyDeal({required this.word, required this.root, required this.category, required this.percent});
@@ -65,4 +66,15 @@ int? dailyPercentFor(String word, {DateTime? day, int count = 5}) {
     if (e.word.toLowerCase() == k) return e.percent;
   }
   return null;
+}
+
+/// The discount actually charged today on [word]: today's deal percent,
+/// after the sale price is snapped up to a real Google Play price point.
+/// Labels use this so the card never promises more than Play charges.
+int realDealPercent(String word) {
+  final id = 'word:${word.toLowerCase()}';
+  final regular = StorePrices.instance.regularPriceFor(id, kind: 'word');
+  final now = StorePrices.instance.priceFor(id, kind: 'word');
+  if (regular <= 0 || now >= regular) return 0;
+  return ((regular - now) * 100 / regular).round();
 }
