@@ -190,9 +190,18 @@ class AtelierDealsBanner extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(12, 8, 10, 8),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                   Row(children: [
-                    Text('Word Atelier', style: ink.copyWith(fontSize: 13.5, fontWeight: FontWeight.w800)),
-                    const Spacer(),
-                    Text('Today · Buy / Sell', style: ink.copyWith(fontSize: 10.5, color: const Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+                    Flexible(
+                      child: Text('Word Atelier', maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: ink.copyWith(fontSize: 13.5, fontWeight: FontWeight.w800)),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text('Today · Buy / Sell', maxLines: 1, overflow: TextOverflow.ellipsis,
+                            style: ink.copyWith(fontSize: 10.5, color: const Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+                      ),
+                    ),
                   ]),
                   const SizedBox(height: 5),
                   for (final (w, cat, pct, price, was) in deals.take(3))
@@ -217,7 +226,10 @@ class AtelierDealsBanner extends StatelessWidget {
                             decoration: BoxDecoration(color: const Color(0xFFFF4D4D), borderRadius: BorderRadius.circular(4)),
                             child: Text('-$pct%', style: ink.copyWith(fontSize: 9.5, fontWeight: FontWeight.w800)),
                           ),
-                        Text(price, style: ink.copyWith(fontSize: 12, fontWeight: FontWeight.w800)),
+                        Flexible(
+                          child: Text(price, maxLines: 1, overflow: TextOverflow.ellipsis,
+                              style: ink.copyWith(fontSize: 12, fontWeight: FontWeight.w800)),
+                        ),
                       ]),
                     ),
                 ]),
