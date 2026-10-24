@@ -24,16 +24,35 @@ class QuickCard {
 }
 
 /// Daily pick of [count] from [pool], date-seeded, with styles mixed.
+/// Rewards stays the small box. Daily tasks stays the wide rectangle.
 List<(QuickCard, QuickStyle)> dailyQuickCards(List<QuickCard> pool, {DateTime? day, int count = 8, Set<String> pinned = const {}}) {
   final d = day ?? DateTime.now();
   final seed = d.year * 10000 + d.month * 100 + d.day;
   final list = [...pool]..shuffle(math.Random(seed));
-  // Pinned cards (Rewards) are always in the row, first.
-  final pins = [for (final c in pool) if (pinned.contains(c.id)) c];
-  final pick = [...pins, ...list.where((c) => !pinned.contains(c.id))].take(count).toList();
-  const pattern = [QuickStyle.banner, QuickStyle.button, QuickStyle.colour, QuickStyle.button];
-  final off = seed % pattern.length;
-  return [for (var i = 0; i < pick.length; i++) (pick[i], pattern[(i + off) % pattern.length])];
+  final pins = <QuickCard>[];
+  for (final id in const ['rewards', 'tasks']) {
+    if (!pinned.contains(id)) continue;
+    for (final c in pool) {
+      if (c.id == id) pins.add(c);
+    }
+  }
+  for (final c in pool) {
+    if (pinned.contains(c.id) && !pins.any((p) => p.id == c.id)) pins.add(c);
+  }
+  final pick = [...pins, ...list.where((c) => !pins.any((p) => p.id == c.id))].take(count).toList();
+  // Rewards is the small box. Daily tasks is the wide rectangle. The rest rotate.
+  const rest = [QuickStyle.colour, QuickStyle.button, QuickStyle.banner];
+  return [
+    for (var i = 0; i < pick.length; i++)
+      (
+        pick[i],
+        pick[i].id == 'rewards'
+            ? QuickStyle.button
+            : pick[i].id == 'tasks'
+                ? QuickStyle.banner
+                : rest[(i + seed) % rest.length],
+      ),
+  ];
 }
 
 const kQuickColours = [
@@ -43,7 +62,7 @@ const kQuickColours = [
 ];
 
 class HeroQuickRow extends StatelessWidget {
-  const HeroQuickRow({super.key, required this.pool, this.day, this.squaresOnly = false, this.pinned = const {'rewards'}});
+  const HeroQuickRow({super.key, required this.pool, this.day, this.squaresOnly = false, this.pinned = const {'rewards', 'tasks'}});
   final Set<String> pinned;
   final List<QuickCard> pool;
   final DateTime? day;
@@ -78,23 +97,16 @@ class HeroQuickRow extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       padding: const EdgeInsets.all(8),
       radius: 12,
-      child: SizedBox(
+      child: AutoMarquee(
         height: h,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          itemCount: cards.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 8),
-          itemBuilder: (_, i) {
-            final (c, s) = cards[i];
-            final colour = s == QuickStyle.colour ? kQuickColours[colourIx++ % kQuickColours.length] : c.colour;
-            return _tap(c, switch (s) {
-              QuickStyle.banner => _banner(c),
-              QuickStyle.button => _button(c),
-              QuickStyle.colour => _colour(c, colour),
-            });
-          },
-        ),
+        children: [
+          for (var i = 0; i < cards.length; i++)
+            _tap(cards[i].$1, switch (cards[i].$2) {
+              QuickStyle.banner => _banner(cards[i].$1),
+              QuickStyle.button => _button(cards[i].$1),
+              QuickStyle.colour => _colour(cards[i].$1, kQuickColours[(colourIx + i) % kQuickColours.length]),
+            }),
+        ],
       ),
     );
   }

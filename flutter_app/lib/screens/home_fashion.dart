@@ -67,6 +67,7 @@ import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
+import 'normal/header_actions_sheet.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 import 'quick_access.dart';
@@ -498,6 +499,18 @@ class _HomeFashionState extends State<HomeFashion> {
         PracticeBannerSpec('Close with a sentence', 'Healing words from your session', () => _go(1)),
       ];
 
+  void _openQuickActions() {
+    showHeaderActionsSheet(
+      context,
+      glassMode: false,
+      onGlassToggle: () {},
+      onNotifications: () => showNotificationsSheet(context),
+      onFashionHome: () => Settings.instance.setFashionHome(false),
+      onStore: () => _go(3),
+      onPlayer: () => _go(1),
+    );
+  }
+
   /// The thirty, in `REG.fash.items` order. Keyed by the registry's own `k`
   /// so the two lists can be diffed by eye.
   List<(String, Widget)> _sections() => [
@@ -745,7 +758,7 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              HeroGreeting(name: widget.name, onQuickAccess: () => _push(const QuickAccessScreen())),
+              HeroGreeting(name: widget.name, onQuickAccess: _openQuickActions),
               HeroQuickRow(pool: _quickPool()),
               FashionHero(
                 onExplore: () => _go(2),

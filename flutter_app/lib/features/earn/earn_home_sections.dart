@@ -910,7 +910,6 @@ class ProgramTrioRail extends StatefulWidget {
 }
 
 class _ProgramTrioRailState extends State<ProgramTrioRail> {
-  late final PageController _page = PageController();
   Timer? _timer;
   var _i = 0;
   var _hold = false;
@@ -920,43 +919,42 @@ class _ProgramTrioRailState extends State<ProgramTrioRail> {
     super.initState();
     if (_flutterTest) return;
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || _hold || !_page.hasClients) return;
+      if (!mounted || _hold) return;
       if (!TickerMode.of(context)) return;
-      final next = (_i + 1) % 3;
-      _page.animateToPage(next, duration: const Duration(milliseconds: 480), curve: Curves.easeOutCubic);
+      setState(() => _i = (_i + 1) % 3);
     });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    _page.dispose();
     super.dispose();
   }
 
+  Widget _page() => switch (_i) {
+        0 => const YourRewardsSection(),
+        1 => const GiftsHomeSection(),
+        _ => const HomeCouponShelf(),
+      };
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          height: 620,
-          child: Listener(
-            onPointerDown: (_) => _hold = true,
-            onPointerUp: (_) => _hold = false,
-            onPointerCancel: (_) => _hold = false,
-            child: PageView(
-              controller: _page,
-              onPageChanged: (i) => setState(() => _i = i),
-              children: const [
-                Align(alignment: Alignment.topCenter, child: YourRewardsSection()),
-                Align(alignment: Alignment.topCenter, child: GiftsHomeSection()),
-                Align(alignment: Alignment.topCenter, child: HomeCouponShelf()),
-              ],
-            ),
-          ),
+    // Hug the card that is showing. A fixed tall box left a purple hole
+    // under the gifts card and above the coupon film.
+    return Listener(
+      onPointerDown: (_) => _hold = true,
+      onPointerUp: (_) => _hold = false,
+      onPointerCancel: (_) => _hold = false,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 420),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeOutCubic,
+        layoutBuilder: (current, previous) => Stack(
+          alignment: Alignment.topCenter,
+          children: [...previous, if (current != null) current],
         ),
-        const SizedBox.shrink(),
-      ],
+        child: KeyedSubtree(key: ValueKey(_i), child: _page()),
+      ),
     );
   }
 }

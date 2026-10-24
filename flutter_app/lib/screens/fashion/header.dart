@@ -194,7 +194,7 @@ class HeroGreeting extends StatelessWidget {
   const HeroGreeting({super.key, this.name = 'NowssB', this.onQuickAccess});
   final String name;
 
-  /// Opens the Quick Access page; the button shows only when given.
+  /// Opens the Quick action carousel. The button shows only when given.
   final VoidCallback? onQuickAccess;
 
   /// hello() — app/js/part083.js:153. Five bands, not three.
@@ -285,7 +285,7 @@ class HeroGreeting extends StatelessWidget {
             const SizedBox(width: 10),
             Semantics(
               button: true,
-              label: 'Quick Access',
+              label: 'Quick action',
               child: GestureDetector(
                 key: const Key('greeting-quick-access'),
                 behavior: HitTestBehavior.opaque,
@@ -299,7 +299,9 @@ class HeroGreeting extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 3))],
                     ),
-                    child: const Icon(Icons.bolt_rounded, color: Colors.black, size: 24),
+                    child: const Center(
+                      child: NwsbIcon(NwsbMarks.features, size: 22, color: Colors.black, strokeWidth: 1.8),
+                    ),
                   ),
                   const SizedBox(height: 5),
                   const ExcludeSemantics(
