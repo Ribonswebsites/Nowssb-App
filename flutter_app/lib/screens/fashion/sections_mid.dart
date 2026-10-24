@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import '../../widgets/neumorphic.dart';
 
 import '../../widgets/enter_curve_stage.dart';
-import '../../widgets/flip_brand_showcase.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 
@@ -25,199 +24,54 @@ import '../quick_access.dart';
 import '../fashion_plus.dart';
 import '../widgets_page.dart';
 import '../../admin/template/editable.dart';
-import '../../admin/layout/carousel_fx.dart';
-import '../../admin/layout/layout_sections.dart' show CarouselAutoRotate;
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
-/// 7 · tiles — tip rail + horizontal pages.
+/// 7 · tiles — the four destination buttons only.
 ///
-/// Page 0 = Flip glass brand showcase; pages 1+ = existing feature destination
-/// cards (Enter / nav preserved). Auto-swipes and loops while on-screen.
-class FashTiles extends StatefulWidget {
+/// Player, Sound Library, Store, Reader. The flip showcase and the
+/// Connect / Progress / Word Science / Profile page are gone.
+class FashTiles extends StatelessWidget {
   const FashTiles({super.key, this.onTile, this.onOpen});
 
-  /// Called with the tile's destination tab index (community card).
+  /// Unused. Kept so existing call sites still compile.
   final void Function(int)? onTile;
 
-  /// Player / Library / Store / Reader on the destination card.
+  /// Player / Library / Store / Reader.
   final void Function(String id)? onOpen;
 
   @override
-  State<FashTiles> createState() => _FashTilesState();
-}
-
-class _FashTilesState extends State<FashTiles> {
-  static const _pageCount = 3; // Flip + 2 existing feature panes
-  static const _autoMs = 5200;
-
-  late final PageController _pager;
-  Timer? _auto;
-  var _index = 0;
-  var _userPaging = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _pager = PageController(viewportFraction: 0.94);
-    _armAuto();
-  }
-
-  @override
-  void dispose() {
-    _auto?.cancel();
-    _pager.dispose();
-    super.dispose();
-  }
-
-  void _armAuto() {
-    _auto?.cancel();
-    // Flip page advances via onCycleComplete; other pages use a timer.
-    if (_index == 0) return;
-    _auto = Timer(const Duration(milliseconds: _autoMs), _autoAdvance);
-  }
-
-  void _autoAdvance() {
-    if (!mounted || _userPaging) return;
-    if (!TickerMode.of(context)) {
-      _armAuto();
-      return;
-    }
-    final next = (_index + 1) % _pageCount;
-    _pager.animateToPage(
-      next,
-      duration: const Duration(milliseconds: 480),
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  void _onFlipCycleComplete() {
-    if (!mounted || _index != 0 || _userPaging) return;
-    final next = (_index + 1) % _pageCount;
-    _pager.animateToPage(
-      next,
-      duration: const Duration(milliseconds: 520),
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  /// Destination card: Connect replaces Sound Library so the two cards never
-  /// share a button. (Preserved existing card — now page index 2.)
-  static const _tiles = [
-    (
-      'Connect',
-      'NowssB community',
-      '',
-      NwsbMarks.connectPair,
-      0,
-    ),
-    (
-      'My Progress',
-      'Healing journey',
-      '',
-      NwsbMarks.bars,
-      4,
-    ),
-    (
-      'Word Science',
-      'NowssB texts',
-      '',
-      NwsbMarks.wordBag,
-      2,
-    ),
-    (
-      'My Profile',
-      'Your settings',
-      '',
-      NwsbMarks.people,
-      4,
-    ),
-  ];
-
-  @override
   Widget build(BuildContext context) {
-    // +2 slack kills the 2.0px BOTTOM OVERFLOW on the feature panes
-    // (GlassWrap border + column math).
     const gridH = _tileHeight * 2 + 10;
     const railH = 22.0;
     const gap = 10.0;
     const padV = 22.0;
     const pageH = padV + railH + gap + gridH + 2;
-
-    Widget pane(List<Widget> tiles) {
-      final body = Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: railH, child: _TilesRail()),
-          const SizedBox(height: gap),
-          _TwoByTwo(children: tiles),
-        ],
-      );
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: _tilesShell(context, child: body),
-      );
-    }
-
-    // Same outer footprint as sibling panes (GlassWrap + horizontal inset).
-    // No tip-rail / demo labels — Flip fills the card body.
-    final flipPage = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      child: _tilesShell(
-        context,
-        child: FlipBrandShowcase(
-          active: _index == 0,
-          onCycleComplete: _onFlipCycleComplete,
-        ),
-      ),
-    );
-
     return SizedBox(
       height: pageH,
-      child: NotificationListener<ScrollNotification>(
-        onNotification: (n) {
-          if (n is ScrollStartNotification && n.dragDetails != null) {
-            _userPaging = true;
-            _auto?.cancel();
-          } else if (n is ScrollEndNotification) {
-            _userPaging = false;
-            _armAuto();
-          }
-          return false;
-        },
-        child: CarouselAutoRotate(controller: _pager, count: 3, child: PageView(
-          controller: _pager,
-          padEnds: true,
-          onPageChanged: (i) {
-            setState(() => _index = i);
-            _armAuto();
-          },
-          children: carouselFxChildren(context, _pager, [
-            // Card 0 — Flip glass brand showcase
-            flipPage,
-            // Card 1 — existing Player / Library / Store / Reader (Enter)
-            pane([
-              for (final d in EnterCurveAssets.destinations)
-                _BannerTile(
-                  dest: d,
-                  onTap: () => widget.onOpen?.call(d.id),
-                ),
-            ]),
-            // Card 2 — existing Connect / Progress / Word Science / Profile
-            pane([
-              for (final (title, sub, art, mark, dest) in _tiles)
-                _Tile(
-                  title: title,
-                  sub: sub,
-                  art: art,
-                  mark: mark,
-                  onTap: () => widget.onTile?.call(dest),
-                ),
-            ]),
-          ]),
-        )),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: _tilesShell(
+          context,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: railH, child: _TilesRail()),
+              const SizedBox(height: gap),
+              _TwoByTwo(
+                children: [
+                  for (final d in EnterCurveAssets.destinations)
+                    _BannerTile(
+                      dest: d,
+                      onTap: () => onOpen?.call(d.id),
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -294,146 +148,6 @@ class _TwoByTwo extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// `.home-tile` in its DEFAULT look — `fashtile-black`, which is what
-/// `savedFashStyle()` returns when nobody has chosen otherwise
-/// (app/js/part059.js:69).
-///
-/// The stylesheet describes it exactly (nowssb-nm.css:3965): "2x2, and built
-/// like the app's black banners: black card, icon puck, vertical rule, title
-/// + subtitle, Enter pill bottom-right." A row, not a stack — `grid-template
-/// -columns: auto 1px 1fr`, which is the puck, the rule, and the words.
-///
-/// What was here instead was the `fashtile-image` look, and only half of it:
-/// the cover artwork stretched over the whole tile with a scrim on top. That
-/// artwork has its own title painted into it, which is why every tile had a
-/// giant word lying across it, and it is exactly why the real `image` look
-/// hides the DOM text whenever it paints that layer.
-class _Tile extends StatelessWidget {
-  const _Tile({
-    required this.title,
-    required this.sub,
-    required this.art,
-    this.mark,
-    this.onTap,
-  });
-
-  final String title, sub, art;
-  final String? mark;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: Colors.black,
-          border: Border.all(color: const Color(0x14FFFFFF)),
-          // `body.fashcorner-rounded` is the default (part059.js:70) and it
-          // is 18px.
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x6B000000),
-              offset: Offset(0, 10),
-              blurRadius: 26,
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            // `padding: 12px 10px 38px` — the 38 at the foot is the room the
-            // Enter pill sits in, which is why the row is not centred in the
-            // card.
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 12, 10, 38),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // `.home-tile-icon` — 34px, a gold-tinted disc holding the
-                  // real feature artwork, cover-fit and clipped round.
-                  Container(
-                    width: 34,
-                    height: 34,
-                    clipBehavior: Clip.antiAlias,
-                    decoration: BoxDecoration(
-                      color: const Color(0x1AE8D5A3),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0x3DE8D5A3)),
-                    ),
-                    child: mark != null
-                        ? Center(
-                            child: NwsbIcon(
-                              mark!,
-                              size: 16,
-                              color: const Color(0xFFE8D5A3),
-                            ),
-                          )
-                        : (art.isEmpty
-                            ? const Center(
-                                child: NwsbIcon(
-                                  NwsbMarks.discover,
-                                  size: 16,
-                                  color: Color(0xFFE8D5A3),
-                                ),
-                              )
-                            : NwsbImage(
-                                url: art,
-                                fit: BoxFit.cover,
-                                fallback: const ColoredBox(
-                                  color: Color(0x1AE8D5A3),
-                                ),
-                                slot: 'sections_mid.Tile',
-                              )),
-                  ),
-                  const SizedBox(width: 8),
-                  // `.home-tile-rule` — 1px, `align-self: stretch`.
-                  Container(width: 1, color: const Color(0x2EFFFFFF)),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        EditableLabel('sections_mid.Tile',
-                          title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            height: 1.2,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        EditableLabel('sections_mid.Tile',
-                          sub,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 9.5,
-                            height: 1.35,
-                            color: Color(0x80FFFFFF),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // `.home-tile-enter` — absolute, bottom 8 right 8.
-            const Positioned(bottom: 8, right: 8, child: _TileEnter()),
-          ],
-        ),
-      ),
     );
   }
 }

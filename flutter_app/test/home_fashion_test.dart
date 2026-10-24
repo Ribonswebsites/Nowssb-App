@@ -207,27 +207,7 @@ void main() {
 
     expect(find.text('Tap to restyle'), findsWidgets);
 
-    // Photo banners are the first card; swipe to the Connect grid.
-    // The rail is now three cards (flip showcase, Enter destinations, the
-    // four tiles); page to the tile card. The carousel auto-rotates, so the
-    // tree never settles.
-    final rail = tester.widget<PageView>(find
-        .ancestor(
-          of: find.text('Tap to restyle').first,
-          matching: find.byType(PageView),
-        )
-        .first);
-    rail.controller!.jumpToPage(2);
-    for (var i = 0; i < 6; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
-
-    for (final t in [
-      'Connect',
-      'My Progress',
-      'Word Science',
-      'My Profile',
-    ]) {
+    for (final t in ['Enter']) {
       expect(find.text(t), findsWidgets, reason: '$t is not on the home');
     }
     expect(find.text('The Store'), findsNothing,

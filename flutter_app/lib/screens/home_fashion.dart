@@ -557,6 +557,7 @@ class _HomeFashionState extends State<HomeFashion> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MeditationFlipBanner(onTap: () => _go(1)),
+            FashTiles(onTile: _go, onOpen: _openEnter),
             // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
             const HomeRowHeading('Quick picks', sub: 'Tap a colour to jump in'),
             HeroQuickRow(pool: [for (final c in _quickPool()) if (c.id != 'rewards' && c.id != 'tasks') c], squaresOnly: true, pinned: const {}),
@@ -633,12 +634,7 @@ class _HomeFashionState extends State<HomeFashion> {
             FashStreak(onTap: () => _go(1)),
           ],
         )),
-        ('tiles', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            FashTiles(onTile: _go, onOpen: _openEnter),
-          ],
-        )),
+        ('tiles', const SizedBox.shrink()),
         // Removed on Ribon's order (Oct 23): Sound That Finds You.
         ('storiesFind', const SizedBox.shrink()),
         ('buddhaGyro', BuddhaGyroStage(
