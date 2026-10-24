@@ -49,6 +49,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
+import '../widgets/meditation_flip_banner.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -322,7 +323,13 @@ class _HomeNormalState extends State<HomeNormal> {
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
   List<(String, Widget?)> _sections() => [
-        ('greet', NmGreeting(name: widget.name)),
+        ('greet', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            NmGreeting(name: widget.name),
+            MeditationFlipBanner(onTap: () => _go(1)),
+          ],
+        )),
         ('search', NmSearch(onSearch: (_) => _go(2))),
         (
           'promoRail',

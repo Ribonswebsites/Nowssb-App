@@ -37,6 +37,7 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
+import '../widgets/meditation_flip_banner.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
@@ -756,6 +757,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 onStore: () => _go(3),
                 onRail: _go,
               ),
+              MeditationFlipBanner(onTap: () => _go(1)),
             ],
           ),
           carousel: true,
