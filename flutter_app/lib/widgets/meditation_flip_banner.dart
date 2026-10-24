@@ -25,21 +25,21 @@ class _Slide {
 const _slides = <_Slide>[
   _Slide(
     color: Color(0xFF692FCC),
-    asset: 'assets/banners/banner-sit.png',
+    asset: 'assets/banners/banner-sit.webp',
     word: 'MEDITATION',
     line: 'DAILY PRACTICE\nBEGIN ANYTIME',
     ink: Colors.white,
   ),
   _Slide(
     color: Color(0xFFC8102E),
-    asset: 'assets/banners/banner-store.png',
+    asset: 'assets/banners/banner-store.webp',
     word: 'STORE',
     line: 'WORDS AND MEANINGS\nOPEN ANYTIME',
     ink: Colors.white,
   ),
   _Slide(
     color: Color(0xFFF5C400),
-    asset: 'assets/banners/banner-gold.jpg',
+    asset: 'assets/banners/banner-gold.webp',
     word: 'PRACTICE',
     line: 'FIVE QUIET MINUTES\nONE WORD',
     ink: Color(0xFF1A1200),
@@ -191,23 +191,20 @@ class _Card extends StatelessWidget {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  Align(
-                    alignment: Alignment.centerRight,
+                  Positioned(
+                    right: 8,
+                    bottom: 0,
+                    width: 108,
+                    height: 132,
                     child: Opacity(
                       opacity: portraitOpacity,
                       child: Transform.translate(
                         offset: Offset((1 - portraitOpacity) * 28, 0),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 6, 8, 6),
-                          child: SizedBox(
-                            width: 108,
-                            height: 124,
-                            child: Image.asset(
-                              slide.asset,
-                              fit: BoxFit.contain,
-                              alignment: Alignment.centerRight,
-                            ),
-                          ),
+                        child: Image.asset(
+                          slide.asset,
+                          fit: BoxFit.contain,
+                          alignment: Alignment.bottomRight,
+                          filterQuality: FilterQuality.medium,
                         ),
                       ),
                     ),
