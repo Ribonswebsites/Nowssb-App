@@ -47,7 +47,7 @@ const _kBuddhaQuote =
 
 const _kQuoteMarks = 'nwsb_quote_marks';
 const _kHomeQuoteHidden = 'nwsb_home_quote_hidden_day';
-const _kDailyQuoteShown = 'nwsb_daily_quote_popup_v3';
+const _kDailyQuoteShown = 'nwsb_daily_quote_popup_v4';
 
 /// Notifications wait until this day's quote has opened or been skipped.
 class DailyQuoteGate {
@@ -1465,8 +1465,6 @@ class _DailyQuotePopupState extends State<_DailyQuotePopup> with SingleTickerPro
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final day = _days[now.weekday - 1].toUpperCase();
     final rise = CurvedAnimation(parent: _rise, curve: Curves.easeOutCubic);
     return SafeArea(
       child: Center(
@@ -1492,40 +1490,12 @@ class _DailyQuotePopupState extends State<_DailyQuotePopup> with SingleTickerPro
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          SizedBox(
-                            height: 168,
-                            child: Stack(
-                              fit: StackFit.expand,
-                              children: [
-                                const NwsbVideo(
-                                  asset: 'assets/video/healing-path-bg.mp4',
-                                  priority: ClipPriority.feature,
-                                  fit: BoxFit.cover,
-                                ),
-                                const DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [Color(0x00000000), Color(0xEE07070C)],
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 16,
-                                  bottom: 12,
-                                  child: Text(
-                                    day,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      letterSpacing: 2.4,
-                                      fontWeight: FontWeight.w700,
-                                      decoration: TextDecoration.none,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          const AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: const NwsbVideo(
+                              asset: 'assets/video/todays-quote.mp4',
+                              priority: ClipPriority.feature,
+                              fit: BoxFit.cover,
                             ),
                           ),
                           Padding(
