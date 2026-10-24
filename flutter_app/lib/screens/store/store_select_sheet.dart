@@ -1,10 +1,8 @@
-/// "Please select the store" bottom sheet — strong glassmorphism.
+/// "Please select the store" sheet. Same glass as the Fashion home hero.
 /// Active store: glowing ring + bottom bar (not a lone "Here" pill).
 /// Picker arts ONLY here — picker-words/meaning/signature/ebooks.
-/// Top film: assets/video/choose-store.mp4 (#1) — Choose Store page only.
+/// Top film: assets/video/choose-store.mp4 — this sheet only.
 library;
-
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -12,6 +10,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../widgets/glass_wrap.dart';
 import '../../admin/template/editable.dart';
 
 class StoreSelectEntry {
@@ -92,34 +91,12 @@ class StoreSelectSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottom = MediaQuery.paddingOf(context).bottom;
     return Padding(
-      padding: EdgeInsets.fromLTRB(12, 0, 12, 12 + bottom),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 48, sigmaY: 48),
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0x66FFFFFF),
-                  const Color(0x33FFFFFF),
-                  Colors.white.withValues(alpha: 0.12),
-                ],
-              ),
-              border: Border.all(color: const Color(0x77FFFFFF), width: 1.2),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x99000000),
-                  blurRadius: 40,
-                  offset: Offset(0, 16),
-                ),
-              ],
-            ),
-            child: Column(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 12 + bottom),
+      child: GlassWrap(
+        margin: EdgeInsets.zero,
+        radius: kGlassRadius,
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
+        child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -180,9 +157,7 @@ class StoreSelectSheet extends StatelessWidget {
                 ),
               ],
             ),
-          ),
         ),
-      ),
     );
   }
 }
