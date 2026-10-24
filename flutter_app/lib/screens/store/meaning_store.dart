@@ -10,6 +10,9 @@
 /// Video banners stay unchanged.
 library;
 
+import 'store_first_use_guide.dart';
+import 'store_sub_page.dart';
+import '../../nowssb_ui/app_video_backdrop.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -55,7 +58,7 @@ const kMeaningWarmAssets = <String>[
 ];
 
 String _msOnlyArt(String key, String candidate) {
-  if (candidate.startsWith('assets/meanings/')) return candidate;
+  if (candidate.startsWith('assets/')) return candidate;
   const arts = <String>[
     kMsMeaningIntroArt,
     kMsMeaningProductArt,
@@ -71,18 +74,13 @@ class MeaningStoreScreen extends StatelessWidget {
   Widget build(BuildContext context) => StoreTermsHost(
         which: 'meaning',
         head: 'Meanings described by sound',
-        child: PageShell(
-        eyebrow: '',
-        title: 'NowssB Store',
+        child: StoreSubPage(
+        title: 'Meanings',
         subtitle: 'The Meaning Store',
-        film: 'assets/video/subscription-bg.mp4',
-        usePageFilm: true,
-        onBack: () => Navigator.of(context).pop(),
         onStorePicker: () => showStoreSelectSheet(
           context,
           current: 'meaning',
-          onSelect: (id) =>
-              openStoreFromPicker(context, id, current: 'meaning'),
+          onSelect: (id) => openStoreFromPicker(context, id, current: 'meaning'),
         ),
         slivers: [
           SliverPadding(
@@ -91,7 +89,7 @@ class MeaningStoreScreen extends StatelessWidget {
           ),
         ],
         ),
-      );
+      ).withStoreGuide('meaning_store', false);
 }
 
 class _MeaningStoreBody extends StatefulWidget {
@@ -266,8 +264,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   title: m.word,
                   meta: m.root,
                   action: 'Open',
-                  image: kMeaningsIcon,
-                  flip: storeMeaningFlip(m.word),
+                  image: meaningFlipArt(m.key),
+                  flip: kMeaningsIcon,
                   onTap: () => openMeaningDetail(context, m),
                   onCart: () => storeAddToCart(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
                   onBuy: () => storeBuyNow(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
@@ -287,8 +285,8 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                     title: row.$1,
                     meta: row.$2,
                     action: 'Open',
-                    image: kMeaningsIcon,
-                    flip: storeWaveFor(row.$1),
+                    image: storeSubjectArt(row.$1),
+                    flip: kMeaningsIcon,
                     onTap: () => openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kNowssbStoreMark)),
                     onCart: () => storeAddToCart(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
                     onBuy: () => storeBuyNow(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),

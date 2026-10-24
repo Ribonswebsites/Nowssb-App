@@ -199,16 +199,18 @@ class StoreNowCarousel extends StatefulWidget {
 }
 
 class _StoreNowCarouselState extends State<StoreNowCarousel> with SingleTickerProviderStateMixin, AutoCycle {
-  final _page = PageController(viewportFraction: .92);
-  int _ix = 0;
+  // Endless: start deep in a virtual list so the drift never runs out.
+  static const _base = 1000;
+  late final _page = PageController(viewportFraction: .92, initialPage: _base * widget.items.length.clamp(1, 999));
+  late int _ix = _base * widget.items.length.clamp(1, 999);
 
   @override
-  Duration get period => const Duration(milliseconds: 3600);
+  Duration get period => const Duration(milliseconds: 3000);
 
   @override
   void onTick() {
     if (!mounted || !_page.hasClients || widget.items.length < 2) return;
-    _ix = (_ix + 1) % widget.items.length;
+    _ix = (_page.page ?? _ix.toDouble()).round() + 1;
     _page.animateToPage(_ix, duration: const Duration(milliseconds: 520), curve: Curves.easeOutCubic);
   }
 
@@ -255,10 +257,9 @@ class _StoreNowCarouselState extends State<StoreNowCarousel> with SingleTickerPr
             controller: _page,
             padEnds: false,
             onPageChanged: (i) => _ix = i,
-            itemCount: widget.items.length,
             itemBuilder: (_, i) => Padding(
               padding: const EdgeInsets.only(left: 12),
-              child: StoreNowCard(item: widget.items[i]),
+              child: StoreNowCard(item: widget.items[i % widget.items.length]),
             ),
           ),
         ),

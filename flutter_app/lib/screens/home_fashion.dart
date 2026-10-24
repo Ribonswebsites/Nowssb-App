@@ -510,6 +510,8 @@ class _HomeFashionState extends State<HomeFashion> {
                 // Today's Practice opens the Practice tab (Ribon, Oct 24).
                 onTap: () => _go(1),
               ),
+              // NowssB Store sits directly under Today's Practice (Ribon, Oct 24).
+              StoreNowCarousel(items: _storeItems(), onHeader: () => _push(const WordAtelierScreen())),
             ],
           ))),
         ('practice', const SizedBox.shrink()),
@@ -531,6 +533,8 @@ class _HomeFashionState extends State<HomeFashion> {
             const NmHorizontalRoutineCards(fashion: true),
             const EarthDayFilm(),
             PromoColorGrid(onOpen: _openGrid),
+            // Up next: coins, progress, profile, tasks — mid-page.
+            _progressRail(),
           ],
         )),
 
@@ -540,7 +544,7 @@ class _HomeFashionState extends State<HomeFashion> {
           children: [
             // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
             const HomeRowHeading('Quick picks', sub: 'Tap a colour to jump in'),
-            HeroQuickRow(pool: _quickPool(), squaresOnly: true),
+            HeroQuickRow(pool: [for (final c in _quickPool()) if (c.id != 'rewards' && c.id != 'tasks') c], squaresOnly: true, pinned: const {}),
             // 'Start today's practice now' — moved mid-page (Ribon, Oct 24).
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -548,20 +552,6 @@ class _HomeFashionState extends State<HomeFashion> {
                 SplitPromoSurface.fashionHome,
                 onTap: () => _go(1),
                 margin: EdgeInsets.zero,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: ColoredSplitPromoBanner(
-                margin: EdgeInsets.zero,
-                spec: SplitPromoSpec(
-                  title: 'NowssB',
-                  cta: 'Keep going',
-                  leftColor: const Color(0xFF3D2914),
-                  rightColor: const Color(0xFFE4C56A),
-                  art: SplitPromoArts.blondeLotus,
-                  onTap: () => _go(1),
-                ),
               ),
             ),
             MainOptionsSection(onGo: _go, onAction: _openMainOption),
@@ -754,10 +744,8 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              HeroGreeting(name: widget.name),
+              HeroGreeting(name: widget.name, onQuickAccess: () => _push(const QuickAccessScreen())),
               HeroQuickRow(pool: _quickPool()),
-              StoreNowCarousel(items: _storeItems(), onHeader: () => _push(const WordAtelierScreen())),
-              _progressRail(),
               FashionHero(
                 onExplore: () => _go(2),
                 onGuide: () => _push(const FeaturesPage()),

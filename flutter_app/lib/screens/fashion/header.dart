@@ -191,8 +191,11 @@ class _HdrIcon extends StatelessWidget {
 /// a disc holding a mark that reads the clock, a light line, a heavy one
 /// with your name, and one line under it.
 class HeroGreeting extends StatelessWidget {
-  const HeroGreeting({super.key, this.name = 'NowssB'});
+  const HeroGreeting({super.key, this.name = 'NowssB', this.onQuickAccess});
   final String name;
+
+  /// Opens the Quick Access page; the button shows only when given.
+  final VoidCallback? onQuickAccess;
 
   /// hello() — app/js/part083.js:153. Five bands, not three.
   static String hello([DateTime? at]) {
@@ -278,6 +281,34 @@ class HeroGreeting extends StatelessWidget {
               ],
             ),
           ),
+          if (onQuickAccess != null) ...[
+            const SizedBox(width: 10),
+            Semantics(
+              button: true,
+              label: 'Quick Access',
+              child: GestureDetector(
+                key: const Key('greeting-quick-access'),
+                behavior: HitTestBehavior.opaque,
+                onTap: onQuickAccess,
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 3))],
+                    ),
+                    child: const Icon(Icons.bolt_rounded, color: Colors.black, size: 24),
+                  ),
+                  const SizedBox(height: 5),
+                  const ExcludeSemantics(
+                    child: Text('Quick', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.white)),
+                  ),
+                ]),
+              ),
+            ),
+          ],
         ],
       ),
     );
