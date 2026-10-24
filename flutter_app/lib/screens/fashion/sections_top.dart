@@ -6,6 +6,8 @@
 /// can be read side by side. Line numbers on each class say where.
 library;
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../data/settings.dart';
@@ -13,6 +15,8 @@ import '../../media/nwsb_image.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../features/progress/progress_popup.dart';
+import '../../theme/tokens.dart';
+import '../../widgets/auto_cycle.dart';
 import '../../widgets/black_glass_banner.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/home_parts.dart';
@@ -39,39 +43,35 @@ class FashGreeting extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
+        children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                EditableLabel('fashion_sections_top.FashGreeting',
-                  'Begin Your\nHealing Path',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.12,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text.rich(
-                  TextSpan(
-                    style: TextStyle(fontSize: 12, color: Color(0xA6FFFFFF)),
-                    children: [
-                      TextSpan(text: 'Natural Origin of '),
-                      TextSpan(
-                        text: 'Word Science',
-                        style: TextStyle(fontWeight: FontWeight.w800),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Flexible(
+                      child: EditableLabel('fashion_sections_top.FashGreeting',
+                        'Begin Your\nHealing Path',
+                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Colors.white, height: 1.12),
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: NwsbIcon(NwsbMarks.sound, size: 22, color: NwsbColors.goldLight),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 8),
+                const RotatingSubtitle(),
               ],
             ),
           ),
-          SizedBox(width: 14),
-          ProgressIconButton(),
+          const SizedBox(width: 10),
+          const ProgressPillButton(),
         ],
       ),
     );
@@ -80,6 +80,126 @@ class FashGreeting extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [head, below!],
     );
+  }
+}
+
+/// Subtitles that slide/fade through under the heading.
+class RotatingSubtitle extends StatefulWidget {
+  const RotatingSubtitle({super.key});
+  static const lines = [
+    ('Natural Origin of ', 'Word Science'),
+    ('Every word carries a ', 'healing sound'),
+    ('Speak it, feel it, ', 'heal with it'),
+    ('Ancient roots, ', 'modern practice'),
+    ('One word a day ', 'changes the day'),
+  ];
+  @override
+  State<RotatingSubtitle> createState() => _RotatingSubtitleState();
+}
+
+class _RotatingSubtitleState extends State<RotatingSubtitle>
+    with SingleTickerProviderStateMixin, AutoCycle<RotatingSubtitle> {
+  var _i = 0;
+  @override
+  Duration get period => const Duration(milliseconds: 2800);
+  @override
+  void onTick() => setState(() => _i = (_i + 1) % RotatingSubtitle.lines.length);
+
+  @override
+  Widget build(BuildContext context) {
+    final (a, b) = RotatingSubtitle.lines[_i];
+    return SizedBox(
+      height: 18,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 420),
+        layoutBuilder: (cur, prev) => Stack(alignment: Alignment.centerLeft, children: [...prev, if (cur != null) cur]),
+        transitionBuilder: (c, an) => FadeTransition(
+          opacity: an,
+          child: SlideTransition(position: Tween(begin: const Offset(0, 0.6), end: Offset.zero).animate(an), child: c),
+        ),
+        child: Text.rich(
+          key: ValueKey(_i),
+          TextSpan(
+            style: const TextStyle(fontSize: 12, color: Color(0xA6FFFFFF)),
+            children: [TextSpan(text: a), TextSpan(text: b, style: const TextStyle(fontWeight: FontWeight.w800))],
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
+  }
+}
+
+/// Today's Practice: 3 same-size black banners, auto-scrolling, texts from a
+/// date-seeded pool; each opens a real page.
+class PracticeBannerSpec {
+  const PracticeBannerSpec(this.title, this.subtitle, this.onTap);
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+}
+
+List<PracticeBannerSpec> dailyPracticeBanners(List<PracticeBannerSpec> pool, {DateTime? day, int count = 3}) {
+  final d = day ?? DateTime.now();
+  final list = [...pool]..shuffle(math.Random(d.year * 10000 + d.month * 100 + d.day + 7));
+  return list.take(count).toList();
+}
+
+class PracticeBannerCarousel extends StatefulWidget {
+  const PracticeBannerCarousel({super.key, required this.banners});
+  final List<PracticeBannerSpec> banners;
+  @override
+  State<PracticeBannerCarousel> createState() => _PracticeBannerCarouselState();
+}
+
+class _PracticeBannerCarouselState extends State<PracticeBannerCarousel>
+    with SingleTickerProviderStateMixin, AutoCycle<PracticeBannerCarousel> {
+  final _pager = PageController();
+  var _page = 0;
+  @override
+  Duration get period => const Duration(seconds: 4);
+  @override
+  void onTick() {
+    if (!_pager.hasClients || widget.banners.length < 2) return;
+    _page = (_page + 1) % widget.banners.length;
+    _pager.animateToPage(_page, duration: const Duration(milliseconds: 520), curve: Curves.easeOutCubic);
+  }
+
+  @override
+  void dispose() {
+    _pager.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final b = widget.banners;
+    return Column(children: [
+      SizedBox(
+        height: 96,
+        child: PageView.builder(
+          controller: _pager,
+          itemCount: b.length,
+          onPageChanged: (i) => setState(() => _page = i),
+          itemBuilder: (_, i) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: RoutineStyleBlackBanner(title: b[i].title, subtitle: b[i].subtitle, onTap: b[i].onTap),
+          ),
+        ),
+      ),
+      const SizedBox(height: 6),
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        for (var i = 0; i < b.length; i++)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            width: i == _page ? 16 : 6,
+            height: 6,
+            decoration: BoxDecoration(color: i == _page ? Colors.white : const Color(0x55FFFFFF), borderRadius: BorderRadius.circular(3)),
+          ),
+      ]),
+    ]);
   }
 }
 
@@ -303,8 +423,11 @@ class _HhrButton extends StatelessWidget {
 /// Cleanup: no large practice-name headline over the film. Supporting ritual
 /// copy sits *below* the media. Glass Enter sits middle-right over the video.
 class FashPractice extends StatelessWidget {
-  const FashPractice({super.key, this.onTap});
+  const FashPractice({super.key, this.onTap, this.banners});
   final VoidCallback? onTap;
+
+  /// When given, the black banner becomes a 3-banner auto carousel.
+  final List<PracticeBannerSpec>? banners;
 
   /// Website `PRACTICE_VID` — part066.js. Bundled under assets/video/.
   static const practiceVid = 'assets/video/practice-halo.mp4';
@@ -324,14 +447,17 @@ class FashPractice extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
-          child: RoutineStyleBlackBanner(
-            title: "Today's Practice",
-            subtitle: 'Begin your healing path',
-            onTap: onTap,
+        if (banners != null && banners!.isNotEmpty)
+          Padding(padding: const EdgeInsets.only(top: 18), child: PracticeBannerCarousel(banners: banners!))
+        else
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
+            child: RoutineStyleBlackBanner(
+              title: "Today's Practice",
+              subtitle: 'Begin your healing path',
+              onTap: onTap,
+            ),
           ),
-        ),
         SectionPane(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -49,6 +49,10 @@ import '../features/programs/rewards_program.dart';
 import '../features/gifts/gifts_screen.dart';
 import '../features/economy/coupon_screen.dart';
 import '../features/progress/progress_popup.dart';
+import 'store/daily_deals.dart';
+import 'store/word_atelier.dart';
+import 'store/store_cards.dart' show money;
+import '../data/store_prices.dart';
 import 'daily_tasks.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
@@ -370,7 +374,33 @@ class _HomeFashionState extends State<HomeFashion> {
         QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen())),
         QuickCard('meanings', 'Meanings', 'Signature words', Icons.auto_stories_rounded, () => _push(const MeaningStoreScreen())),
         QuickCard('features', 'Features', 'Everything in NowssB', Icons.grid_view_rounded, () => _push(const FeaturesPage())),
-        QuickCard('inbox', 'Inbox', 'All notifications', Icons.notifications_rounded, () => showNotificationsSheet(context)),
+        QuickCard('atelier', 'Atelier', 'Word Atelier', Icons.spellcheck_rounded, () => _push(const WordAtelierScreen())),
+        QuickCard('healing', 'Healing', 'Your healing path', Icons.spa_rounded, () => _push(const HealingPathScreen())),
+      ];
+
+  /// Today's rotating Store deals, priced in local currency.
+  List<(String, String, int, String, String)> _atelierDeals() => [
+        for (final d in dailyDeals())
+          (
+            d.title,
+            d.category,
+            realDealPercent(d.word),
+            money(StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
+            money(StorePrices.instance.regularPriceFor('word:${d.word.toLowerCase()}')),
+          ),
+      ];
+
+  /// Daily pool for the Today's Practice carousel; each opens a real page.
+  List<PracticeBannerSpec> _practicePool() => [
+        PracticeBannerSpec("Today's Practice", 'Begin your healing path', () => _push(const DailyTasksPage())),
+        PracticeBannerSpec('Sit with one word', 'Five quiet minutes', () => _go(1)),
+        PracticeBannerSpec('Your healing path', 'Pick up where you left', () => _push(const HealingPathScreen())),
+        PracticeBannerSpec('Daily tasks', 'Tick off today, earn coins', () => _push(const DailyTasksPage())),
+        PracticeBannerSpec('Earn while you heal', 'Practice pays in coins', () => _push(const EarnHubScreen())),
+        PracticeBannerSpec('Check your progress', "See today's rings", () => ProgressPanel.open(context)),
+        PracticeBannerSpec('Words for today', 'Fresh from the atelier', () => _push(const WordAtelierScreen())),
+        PracticeBannerSpec('Breathe and repeat', 'Start a word session', () => _go(1)),
+        PracticeBannerSpec('Meanings to explore', 'Signature words', () => _push(const MeaningStoreScreen())),
       ];
 
   /// The thirty, in `REG.fash.items` order. Keyed by the registry's own `k`
@@ -382,6 +412,7 @@ class _HomeFashionState extends State<HomeFashion> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               FashPractice(
+                banners: dailyPracticeBanners(_practicePool()),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const DailyTasksPage(),
@@ -635,6 +666,8 @@ class _HomeFashionState extends State<HomeFashion> {
             children: [
               HeroGreeting(name: widget.name),
               HeroQuickRow(pool: _quickPool()),
+              HeroQuickRow(pool: _quickPool(), squaresOnly: true),
+              AtelierDealsBanner(deals: _atelierDeals(), onTap: () => _push(const WordAtelierScreen())),
               FashionHero(
                 onExplore: () => _go(2),
                 onGuide: () => _push(const FeaturesPage()),

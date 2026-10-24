@@ -364,6 +364,77 @@ class ProgressIconButton extends StatelessWidget {
   }
 }
 
+/// Obvious button: solid gold pill, icon + label, ripple, press scale and a
+/// soft pulse ring so it reads as tappable.
+class ProgressPillButton extends StatefulWidget {
+  const ProgressPillButton({super.key, this.label = 'Progress'});
+  final String label;
+  @override
+  State<ProgressPillButton> createState() => _ProgressPillButtonState();
+}
+
+class _ProgressPillButtonState extends State<ProgressPillButton> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..repeat();
+  var _down = false;
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pill = Material(
+      color: NwsbColors.gold,
+      shape: const StadiumBorder(),
+      elevation: 0,
+      child: InkWell(
+        customBorder: const StadiumBorder(),
+        splashColor: const Color(0x55FFFFFF),
+        onHighlightChanged: (v) => setState(() => _down = v),
+        onTap: () {
+          HapticFeedback.mediumImpact();
+          ProgressPanel.open(context);
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 13, 8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: 22,
+              height: 22,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+              child: SvgPicture.string(_progressSvg, width: 14, height: 14),
+            ),
+            const SizedBox(width: 6),
+            Text(widget.label,
+                style: const TextStyle(color: Colors.black, fontSize: 12.5, fontWeight: FontWeight.w800, decoration: TextDecoration.none)),
+          ]),
+        ),
+      ),
+    );
+    return Semantics(
+      button: true,
+      label: widget.label,
+      child: AnimatedBuilder(
+        animation: _pulse,
+        builder: (context, child) {
+          final t = _pulse.value;
+          return DecoratedBox(
+            decoration: ShapeDecoration(
+              shape: const StadiumBorder(),
+              shadows: [BoxShadow(color: NwsbColors.gold.withValues(alpha: 0.45 * (1 - t)), blurRadius: 4 + 14 * t, spreadRadius: 6 * t)],
+            ),
+            child: child,
+          );
+        },
+        child: AnimatedScale(scale: _down ? 0.92 : 1, duration: const Duration(milliseconds: 110), child: pill),
+      ),
+    );
+  }
+}
+
 /// Glass sheet: notification-glance header + Quick Access style grid of
 /// black tiles, each with its own bar.
 class ProgressPanel extends StatelessWidget {
