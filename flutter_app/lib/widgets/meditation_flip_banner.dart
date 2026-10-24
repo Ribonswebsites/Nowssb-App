@@ -13,7 +13,6 @@ class _Slide {
     required this.word,
     required this.line,
     required this.ink,
-    this.align = Alignment.center,
   });
 
   final Color color;
@@ -21,7 +20,6 @@ class _Slide {
   final String word;
   final String line;
   final Color ink;
-  final Alignment align;
 }
 
 const _slides = <_Slide>[
@@ -31,7 +29,6 @@ const _slides = <_Slide>[
     word: 'MEDITATION',
     line: 'DAILY PRACTICE\nBEGIN ANYTIME',
     ink: Colors.white,
-    align: Alignment(0, -0.05),
   ),
   _Slide(
     color: Color(0xFFC8102E),
@@ -39,7 +36,6 @@ const _slides = <_Slide>[
     word: 'STORE',
     line: 'WORDS AND MEANINGS\nOPEN ANYTIME',
     ink: Colors.white,
-    align: Alignment(-0.15, -0.25),
   ),
   _Slide(
     color: Color(0xFFF5C400),
@@ -47,7 +43,6 @@ const _slides = <_Slide>[
     word: 'PRACTICE',
     line: 'FIVE QUIET MINUTES\nONE WORD',
     ink: Color(0xFF1A1200),
-    align: Alignment.centerRight,
   ),
 ];
 
@@ -196,25 +191,22 @@ class _Card extends StatelessWidget {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  Opacity(
-                    opacity: portraitOpacity,
-                    child: Transform.translate(
-                      offset: Offset((1 - portraitOpacity) * 36, 0),
-                      child: Transform.scale(
-                        scale: 0.86 + 0.14 * portrait.clamp(0.0, 1.12),
-                        alignment: Alignment.centerRight,
-                        child: ShaderMask(
-                          blendMode: BlendMode.dstIn,
-                          shaderCallback: (rect) => const LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            colors: [Color(0x00000000), Color(0xFFFFFFFF), Color(0xFFFFFFFF)],
-                            stops: [0.0, 0.34, 1],
-                          ).createShader(rect),
-                          child: Image.asset(
-                            slide.asset,
-                            fit: BoxFit.cover,
-                            alignment: slide.align,
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Opacity(
+                      opacity: portraitOpacity,
+                      child: Transform.translate(
+                        offset: Offset((1 - portraitOpacity) * 28, 0),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 6, 8, 6),
+                          child: SizedBox(
+                            width: 108,
+                            height: 124,
+                            child: Image.asset(
+                              slide.asset,
+                              fit: BoxFit.contain,
+                              alignment: Alignment.centerRight,
+                            ),
                           ),
                         ),
                       ),
