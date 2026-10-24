@@ -556,6 +556,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            MeditationFlipBanner(onTap: () => _go(1)),
             // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
             const HomeRowHeading('Quick picks', sub: 'Tap a colour to jump in'),
             HeroQuickRow(pool: [for (final c in _quickPool()) if (c.id != 'rewards' && c.id != 'tasks') c], squaresOnly: true, pinned: const {}),
@@ -770,7 +771,6 @@ class _HomeFashionState extends State<HomeFashion> {
                 onStore: () => _go(3),
                 onRail: _go,
               ),
-              MeditationFlipBanner(onTap: () => _go(1)),
             ],
           ),
           carousel: true,

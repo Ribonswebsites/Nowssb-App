@@ -1,13 +1,55 @@
-/// Hotstar-style promo strip. Flat colour and a ring, then the group pops,
-/// then the left title, then the line under it. Holds, clears, and repeats.
+/// Three Hotstar-style promo strips. Flat colour, then the portrait pops
+/// on the right, then the title, then the line under it. The row scrolls
+/// sideways and advances on its own.
 library;
-
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const _purple = Color(0xFF692FCC);
+class _Slide {
+  const _Slide({
+    required this.color,
+    required this.asset,
+    required this.word,
+    required this.line,
+    required this.ink,
+    this.align = Alignment.center,
+  });
+
+  final Color color;
+  final String asset;
+  final String word;
+  final String line;
+  final Color ink;
+  final Alignment align;
+}
+
+const _slides = <_Slide>[
+  _Slide(
+    color: Color(0xFF692FCC),
+    asset: 'assets/banners/banner-sit.png',
+    word: 'MEDITATION',
+    line: 'DAILY PRACTICE\nBEGIN ANYTIME',
+    ink: Colors.white,
+    align: Alignment(0, -0.05),
+  ),
+  _Slide(
+    color: Color(0xFFC8102E),
+    asset: 'assets/banners/banner-store.png',
+    word: 'STORE',
+    line: 'WORDS AND MEANINGS\nOPEN ANYTIME',
+    ink: Colors.white,
+    align: Alignment(-0.15, -0.25),
+  ),
+  _Slide(
+    color: Color(0xFFF5C400),
+    asset: 'assets/banners/banner-gold.jpg',
+    word: 'PRACTICE',
+    line: 'FIVE QUIET MINUTES\nONE WORD',
+    ink: Color(0xFF1A1200),
+    align: Alignment.centerRight,
+  ),
+];
 
 class MeditationFlipBanner extends StatefulWidget {
   const MeditationFlipBanner({super.key, this.onTap});
@@ -19,7 +61,10 @@ class MeditationFlipBanner extends StatefulWidget {
 }
 
 class _MeditationFlipBannerState extends State<MeditationFlipBanner> with SingleTickerProviderStateMixin {
-  late final AnimationController _cycle = AnimationController(vsync: this, duration: const Duration(milliseconds: 4200));
+  late final AnimationController _cycle = AnimationController(vsync: this, duration: const Duration(milliseconds: 4600));
+  late final PageController _pager = PageController();
+  var _page = 0;
+  var _hold = false;
 
   bool get _quiet => WidgetsBinding.instance.runtimeType.toString().contains('Test');
 
@@ -30,18 +75,34 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
       _cycle.value = 0.55;
       return;
     }
-    _cycle.repeat();
+    _cycle.addStatusListener(_onStatus);
+    _cycle.forward();
+  }
+
+  void _onStatus(AnimationStatus status) {
+    if (status != AnimationStatus.completed || !mounted || _hold) {
+      if (status == AnimationStatus.completed && mounted && _hold) _cycle.forward(from: 0);
+      return;
+    }
+    final next = (_page + 1) % _slides.length;
+    setState(() => _page = next);
+    if (_pager.hasClients) {
+      _pager.animateToPage(next, duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic);
+    }
+    _cycle.forward(from: 0);
   }
 
   @override
   void dispose() {
+    _cycle.removeStatusListener(_onStatus);
     _cycle.dispose();
+    _pager.dispose();
     super.dispose();
   }
 
-  /// Hidden, then a pop that may overshoot 1, then a 2s hold, then gone.
+  /// Hidden, then a pop, then a hold, then gone before the page turns.
   double _amount(double t, double start, double end) {
-    const holdEnd = 0.814;
+    const holdEnd = 0.78;
     const fadeEnd = 0.92;
     if (t < start || t >= fadeEnd) return 0;
     final shown = t >= end ? 1.0 : Curves.easeOutBack.transform(((t - start) / (end - start)).clamp(0.0, 1.0));
@@ -53,77 +114,151 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        behavior: HitTestBehavior.opaque,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: ColoredBox(
-            color: _purple,
-            child: SizedBox(
-              height: 128,
-              width: double.infinity,
-              child: AnimatedBuilder(
-                animation: _cycle,
-                builder: (context, _) {
-                  final t = _cycle.value;
-                  final group = _amount(t, 0.09, 0.20);
-                  final title = _amount(t, 0.22, 0.33);
-                  final sub = _amount(t, 0.33, 0.44);
-                  final groupOpacity = group.clamp(0.0, 1.0);
-                  final titleOpacity = title.clamp(0.0, 1.0);
-                  final subOpacity = sub.clamp(0.0, 1.0);
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      const CustomPaint(painter: _OrbPainter()),
-                      Opacity(
-                        opacity: groupOpacity,
-                        child: Transform.translate(
-                          offset: Offset((1 - groupOpacity) * 28, 0),
-                          child: Transform.scale(
-                            scale: 0.82 + 0.18 * group.clamp(0.0, 1.15),
-                            alignment: Alignment.centerRight,
-                            child: Image.asset(
-                              'assets/banners/meditation-group.jpg',
-                              fit: BoxFit.cover,
-                              alignment: Alignment.centerRight,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 12,
-                        top: 16,
-                        child: Opacity(
-                          opacity: titleOpacity,
-                          child: Transform.translate(
-                            offset: Offset((1 - titleOpacity) * -16, 0),
-                            child: Transform.scale(
-                              scale: 0.86 + 0.14 * title.clamp(0.0, 1.12),
-                              alignment: Alignment.centerLeft,
-                              child: const _TitleBlock(),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        top: 78,
-                        child: Opacity(
-                          opacity: subOpacity,
-                          child: Transform.translate(
-                            offset: Offset(0, (1 - subOpacity) * 10),
-                            child: const _SubBlock(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 136,
+            child: Listener(
+              onPointerDown: (_) => _hold = true,
+              onPointerUp: (_) => _hold = false,
+              onPointerCancel: (_) => _hold = false,
+              child: PageView.builder(
+                controller: _pager,
+                itemCount: _slides.length,
+                onPageChanged: (i) {
+                  if (i == _page) return;
+                  setState(() => _page = i);
+                  if (!_quiet) _cycle.forward(from: 0);
                 },
+                itemBuilder: (_, i) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _Card(
+                    slide: _slides[i],
+                    cycle: _cycle,
+                    amount: _amount,
+                    onTap: widget.onTap,
+                  ),
+                ),
               ),
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < _slides.length; i++)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  width: i == _page ? 16 : 6,
+                  height: 6,
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  decoration: BoxDecoration(
+                    color: i == _page ? Colors.white : const Color(0x55FFFFFF),
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Card extends StatelessWidget {
+  const _Card({required this.slide, required this.cycle, required this.amount, this.onTap});
+
+  final _Slide slide;
+  final AnimationController cycle;
+  final double Function(double t, double start, double end) amount;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: ColoredBox(
+          color: slide.color,
+          child: AnimatedBuilder(
+            animation: cycle,
+            builder: (context, _) {
+              final t = cycle.value;
+              final portrait = amount(t, 0.08, 0.22);
+              final title = amount(t, 0.24, 0.36);
+              final sub = amount(t, 0.36, 0.48);
+              final portraitOpacity = portrait.clamp(0.0, 1.0);
+              final titleOpacity = title.clamp(0.0, 1.0);
+              final subOpacity = sub.clamp(0.0, 1.0);
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  Opacity(
+                    opacity: portraitOpacity,
+                    child: Transform.translate(
+                      offset: Offset((1 - portraitOpacity) * 36, 0),
+                      child: Transform.scale(
+                        scale: 0.86 + 0.14 * portrait.clamp(0.0, 1.12),
+                        alignment: Alignment.centerRight,
+                        child: ShaderMask(
+                          blendMode: BlendMode.dstIn,
+                          shaderCallback: (rect) => const LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [Color(0x00000000), Color(0xFFFFFFFF), Color(0xFFFFFFFF)],
+                            stops: [0.0, 0.34, 1],
+                          ).createShader(rect),
+                          child: Image.asset(
+                            slide.asset,
+                            fit: BoxFit.cover,
+                            alignment: slide.align,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 14,
+                    top: 18,
+                    child: Opacity(
+                      opacity: titleOpacity,
+                      child: Transform.translate(
+                        offset: Offset((1 - titleOpacity) * -18, 0),
+                        child: Transform.scale(
+                          scale: 0.88 + 0.12 * title.clamp(0.0, 1.1),
+                          alignment: Alignment.centerLeft,
+                          child: _Title(word: slide.word, ink: slide.ink),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 14,
+                    top: 78,
+                    right: 120,
+                    child: Opacity(
+                      opacity: subOpacity,
+                      child: Transform.translate(
+                        offset: Offset(0, (1 - subOpacity) * 12),
+                        child: Text(
+                          slide.line,
+                          style: GoogleFonts.oswald(
+                            color: slide.ink,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            height: 1.15,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -131,135 +266,48 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
   }
 }
 
-class _TitleBlock extends StatelessWidget {
-  const _TitleBlock();
+class _Title extends StatelessWidget {
+  const _Title({required this.word, required this.ink});
+
+  final String word;
+  final Color ink;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(width: 30, height: 30, child: CustomPaint(painter: _MarkPainter())),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'NOWSSB',
+        Text(
+          'NOWSSB',
+          style: GoogleFonts.oswald(
+            color: ink,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            height: 1,
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 6),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(3),
+            border: Border.all(color: ink, width: 1.2),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            child: Text(
+              word,
               style: GoogleFonts.oswald(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
+                color: ink,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
                 height: 1,
-                letterSpacing: 0.6,
+                letterSpacing: 1.1,
               ),
             ),
-            const SizedBox(height: 4),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(3),
-                border: Border.all(color: Colors.white, width: 1.2),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                child: Text(
-                  'MEDITATION',
-                  style: GoogleFonts.oswald(
-                    color: Colors.white,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    height: 1,
-                    letterSpacing: 1.1,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ],
     );
   }
-}
-
-class _SubBlock extends StatelessWidget {
-  const _SubBlock();
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      'DAILY PRACTICE\nBEGIN ANYTIME',
-      style: GoogleFonts.oswald(
-        color: Colors.white,
-        fontSize: 13,
-        fontWeight: FontWeight.w600,
-        height: 1.15,
-        letterSpacing: 0.4,
-      ),
-    );
-  }
-}
-
-class _OrbPainter extends CustomPainter {
-  const _OrbPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width - size.height * 0.08, size.height * 0.58);
-    final radius = size.height * 0.98;
-    canvas.drawCircle(center, radius, Paint()..color = Colors.white);
-    canvas.save();
-    canvas.clipPath(Path()..addOval(Rect.fromCircle(center: center, radius: radius - 1)));
-    final seam = Paint()
-      ..color = _purple
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.2
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(center, radius * 0.46, seam);
-    canvas.drawArc(
-      Rect.fromCircle(center: center.translate(-radius * 0.35, -radius * 0.15), radius: radius * 0.7),
-      -0.4,
-      2.4,
-      false,
-      seam,
-    );
-    canvas.drawArc(
-      Rect.fromCircle(center: center.translate(radius * 0.28, radius * 0.22), radius: radius * 0.62),
-      2.4,
-      2.1,
-      false,
-      seam,
-    );
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _MarkPainter extends CustomPainter {
-  const _MarkPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = Offset(size.width / 2, size.height / 2);
-    final p = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(c, size.width * 0.22, p);
-    for (var i = 0; i < 6; i++) {
-      final a = -math.pi / 2 + i * math.pi / 3;
-      final tip = c + Offset(math.cos(a), math.sin(a)) * size.width * 0.46;
-      final left = c + Offset(math.cos(a - 0.55), math.sin(a - 0.55)) * size.width * 0.18;
-      final right = c + Offset(math.cos(a + 0.55), math.sin(a + 0.55)) * size.width * 0.18;
-      final petal = Path()
-        ..moveTo(left.dx, left.dy)
-        ..quadraticBezierTo(tip.dx, tip.dy, right.dx, right.dy);
-      canvas.drawPath(petal, p);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

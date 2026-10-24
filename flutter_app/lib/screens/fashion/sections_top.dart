@@ -437,17 +437,6 @@ class FashPractice extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (banners != null && banners!.isNotEmpty)
-          Padding(padding: const EdgeInsets.only(top: 18), child: PracticeBannerCarousel(banners: banners!))
-        else
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
-            child: RoutineStyleBlackBanner(
-              title: "Today's Practice",
-              subtitle: 'Begin your healing path',
-              onTap: onTap,
-            ),
-          ),
         SectionPane(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -531,6 +520,17 @@ class FashPractice extends StatelessWidget {
             ],
           ),
         ),
+        if (banners != null && banners!.isNotEmpty)
+          Padding(padding: const EdgeInsets.only(top: 12), child: PracticeBannerCarousel(banners: banners!))
+        else
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: RoutineStyleBlackBanner(
+              title: "Today's Practice",
+              subtitle: 'Begin your healing path',
+              onTap: onTap,
+            ),
+          ),
       ],
     );
   }

@@ -323,13 +323,7 @@ class _HomeNormalState extends State<HomeNormal> {
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
   List<(String, Widget?)> _sections() => [
-        ('greet', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            NmGreeting(name: widget.name),
-            MeditationFlipBanner(onTap: () => _go(1)),
-          ],
-        )),
+        ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
         (
           'promoRail',
@@ -412,7 +406,13 @@ class _HomeNormalState extends State<HomeNormal> {
             NmPractice(onTap: () => _go(1)),
           ],
         )),
-        ('mainops', MainOptionsSection(onGo: _go, onAction: _openMainOption)),
+        ('mainops', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            MeditationFlipBanner(onTap: () => _go(1)),
+            MainOptionsSection(onGo: _go, onAction: _openMainOption),
+          ],
+        )),
         (
           'actionbar',
           NmSuppliedActionBar(
