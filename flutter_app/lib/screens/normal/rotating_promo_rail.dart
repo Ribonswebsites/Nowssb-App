@@ -140,27 +140,7 @@ class _NormalPromoRailState extends State<NormalPromoRail>
               );
             },
           ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < _pageCount; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    width: i == _page ? 16 : 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: i == _page
-                          ? NwsbColors.gold
-                          : const Color(0x332B2D33),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          const SizedBox.shrink(),
         ],
       ),
     );

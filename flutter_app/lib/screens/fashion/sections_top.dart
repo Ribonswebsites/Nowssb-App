@@ -188,17 +188,7 @@ class _PracticeBannerCarouselState extends State<PracticeBannerCarousel>
           ),
         ),
       ),
-      const SizedBox(height: 6),
-      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        for (var i = 0; i < b.length; i++)
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            width: i == _page ? 16 : 6,
-            height: 6,
-            decoration: BoxDecoration(color: i == _page ? Colors.white : const Color(0x55FFFFFF), borderRadius: BorderRadius.circular(3)),
-          ),
-      ]),
+      const SizedBox.shrink(),
     ]);
   }
 }

@@ -390,8 +390,6 @@ class _DailyTasksPageState extends State<DailyTasksPage> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const ProgramShelf(),
-                  const SizedBox(height: 14),
                   const GlassLine(
                     text: 'Tick a task and the line on the home moves. These belong to this account.',
                     mark: NwsbMarks.book,

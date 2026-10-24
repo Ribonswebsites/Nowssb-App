@@ -402,10 +402,6 @@ class _HomeNormalState extends State<HomeNormal> {
         ('practice', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(20, 8, 20, 8),
-              child: ProgramShelf(),
-            ),
             NmPractice(onTap: () => _go(1)),
           ],
         )),

@@ -91,8 +91,6 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               children: [
-                const ProgramShelf(),
-                const SizedBox(height: 12),
                 const CoinCollectCard(pageKey: 'echo', amount: 8, title: 'Echo coins'),
                 const SizedBox(height: 12),
                 const GlassLine(text: 'A short reflection. The wall is yours and the people you follow.'),

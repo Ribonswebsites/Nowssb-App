@@ -203,7 +203,6 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
                     ),
                   ),
                 ),
-                Positioned(left: 20, bottom: 16, child: _dots(week.length)),
               ],
             ),
           ),
@@ -229,21 +228,6 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
     );
   }
 
-  Widget _dots(int n) => Row(
-        children: [
-          for (var i = 0; i < n; i++)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              margin: const EdgeInsets.only(right: 5),
-              width: i == _page ? 18 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: i == _page ? Colors.white : const Color(0x55FFFFFF),
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-        ],
-      );
 }
 
 /// Poster type that always fits its box: tries big, shrinks until it fits.

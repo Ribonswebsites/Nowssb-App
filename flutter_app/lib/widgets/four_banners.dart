@@ -60,8 +60,6 @@ class FourBanners extends StatelessWidget {
           mark: NwsbMarks.rewards,
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())),
         ),
-        const SizedBox(height: 12),
-        ProgramShelf(current: current),
       ],
     );
   }

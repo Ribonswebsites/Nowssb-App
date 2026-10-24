@@ -955,22 +955,7 @@ class _ProgramTrioRailState extends State<ProgramTrioRail> {
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (var n = 0; n < 3; n++)
-              Container(
-                width: n == _i ? 16 : 7,
-                height: 7,
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                decoration: BoxDecoration(
-                  color: n == _i ? Colors.white : const Color(0x55FFFFFF),
-                  borderRadius: BorderRadius.circular(99),
-                ),
-              ),
-          ],
-        ),
+        const SizedBox.shrink(),
       ],
     );
   }

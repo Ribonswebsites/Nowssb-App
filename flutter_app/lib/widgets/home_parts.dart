@@ -469,26 +469,7 @@ class _NcbCarouselState extends State<NcbCarousel> {
           ),
         ),
         if (widget.slides.length > 1) ...[
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < widget.slides.length; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: Container(
-                    width: i == _i ? 16 : 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: i == _i
-                          ? NwsbColors.goldLight
-                          : const Color(0x33FFFFFF),
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          const SizedBox.shrink(),
         ],
       ],
     );

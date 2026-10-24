@@ -671,19 +671,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (var d = 0; d < slides.length; d++)
-                            Container(
-                              width: d == i ? 7 : 5,
-                              height: d == i ? 7 : 5,
-                              margin: const EdgeInsets.symmetric(horizontal: 3),
-                              decoration: BoxDecoration(color: d == i ? Colors.white : const Color(0x66FFFFFF), shape: BoxShape.circle),
-                            ),
-                        ],
-                      ),
+                      const SizedBox.shrink(),
                     ],
                   ),
                 ),

@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin/layout/layout_sections.dart';
 import '../data/content.dart';
@@ -45,6 +46,9 @@ import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/header.dart';
 import 'fashion/hero_quick_row.dart';
+import 'fashion/home_cards.dart';
+import 'store/product_detail.dart' show openAtelierWord;
+import '../features/progress/progress_center.dart';
 import '../features/programs/rewards_program.dart';
 import '../features/gifts/gifts_screen.dart';
 import '../features/economy/coupon_screen.dart';
@@ -204,6 +208,30 @@ class _HomeFashionState extends State<HomeFashion> {
     super.initState();
     ContentStore.instance.addListener(_onContent);
     Settings.instance.addListener(_onSettings);
+    _loadProfile();
+  }
+
+  /// Profile completion (name, photo, banner, reminder) — same keys the
+  /// Profile tab saves.
+  double _profileDone = 0;
+  int _profileLeft = 4;
+  Future<void> _loadProfile() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      bool has(String k) => (p.getString(k) ?? '').trim().isNotEmpty;
+      final checks = [
+        has('nowssb_name'),
+        has('nwsb_local_photo') || has('nwsb_photo_path'),
+        has('nwsb_local_banner') || has('nwsb_banner_path'),
+        has('nowssb_reminder'),
+      ];
+      final done = checks.where((e) => e).length;
+      if (!mounted) return;
+      setState(() {
+        _profileDone = done / checks.length;
+        _profileLeft = checks.length - done;
+      });
+    } catch (_) {}
   }
 
   @override
@@ -378,29 +406,95 @@ class _HomeFashionState extends State<HomeFashion> {
         QuickCard('healing', 'Healing', 'Your healing path', Icons.spa_rounded, () => _push(const HealingPathScreen())),
       ];
 
-  /// Today's rotating Store deals, priced in local currency.
-  List<(String, String, int, String, String)> _atelierDeals() => [
-        for (final d in dailyDeals())
-          (
-            d.title,
-            d.category,
-            realDealPercent(d.word),
-            money(StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
-            money(StorePrices.instance.regularPriceFor('word:${d.word.toLowerCase()}')),
+  /// Today's Store words (real deals), priced in local currency; each
+  /// opens that word in the store.
+  List<StoreNowItem> _storeItems() => [
+        for (final d in dailyDeals(count: 8))
+          StoreNowItem(
+            word: d.title,
+            category: d.category,
+            percent: realDealPercent(d.word),
+            price: money(StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
+            onTap: () => openAtelierWord(context,
+                word: d.word, root: d.root, img: kHomeStoreArt, price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
           ),
       ];
 
+  /// Currently Playing–style rail: coins, progress, profile, two tasks.
+  Widget _progressRail() => ListenableBuilder(
+        listenable: Listenable.merge([ProgressCenter.instance, DailyTasks.items]),
+        builder: (context, _) {
+          final pc = ProgressCenter.instance;
+          final coins = pc.itemOf(ProgressKind.coins);
+          final all = pc.items;
+          final done = all.fold<int>(0, (a, e) => a + e.done);
+          final total = all.fold<int>(0, (a, e) => a + e.total);
+          final tasks = DailyTasks.items.value;
+          final open = [...tasks.where((t) => !t.done), ...tasks.where((t) => t.done)].take(2).toList();
+          final tasksDone = tasks.where((t) => t.done).length;
+          const taskArt = ['assets/banners/earn/sit-dark.png', 'assets/banners/earn/hands-raise.png'];
+          final pct = (_profileDone * 100).round();
+          return NowProgressRail(items: [
+            NowProgressItem(
+              title: 'Next coins',
+              sub: coins == null || coins.done < coins.total ? 'Collect your next daily coins' : 'All daily coins collected',
+              caption: 'Coins',
+              image: 'assets/rails/rewards-coins.png',
+              value: coins?.value ?? 0,
+              left: '${coins?.done ?? 0}/${coins?.total ?? 2} coins',
+              right: '${((coins?.value ?? 0) * 100).round()}%',
+              icon: Icons.toll_rounded,
+              onTap: () => _push(const EarnHubScreen()),
+            ),
+            NowProgressItem(
+              title: 'Your progress',
+              sub: "Today's tasks, practice, coins and check-in",
+              caption: 'Progress',
+              image: 'assets/profile_source/img-progress.png',
+              value: total == 0 ? 0 : done / total,
+              left: '$done of $total today',
+              right: '${total == 0 ? 0 : (done * 100 / total).round()}%',
+              icon: Icons.donut_large_rounded,
+              onTap: () => ProgressPanel.open(context),
+            ),
+            NowProgressItem(
+              title: pct >= 100 ? 'Profile complete' : 'Profile not finished',
+              sub: pct >= 100 ? 'Everything is set' : '$_profileLeft step${_profileLeft == 1 ? '' : 's'} left: name, photo, banner, reminder',
+              caption: 'Profile',
+              image: 'assets/profile_source/img-ring.png',
+              value: _profileDone,
+              left: '$pct% complete',
+              right: '100%',
+              icon: Icons.person_rounded,
+              onTap: () => _go(4),
+            ),
+            for (var i = 0; i < open.length; i++)
+              NowProgressItem(
+                title: open[i].title,
+                sub: open[i].done ? 'Done today' : 'Daily task · tick it off',
+                caption: 'Task ${i + 1}',
+                image: taskArt[i % taskArt.length],
+                value: open[i].done ? 1 : 0,
+                left: '$tasksDone of ${tasks.length} done',
+                right: open[i].done ? 'Done' : 'To do',
+                icon: open[i].done ? Icons.check_rounded : Icons.checklist_rounded,
+                onTap: () => _push(const DailyTasksPage()),
+              ),
+          ]);
+        },
+      );
+
   /// Daily pool for the Today's Practice carousel; each opens a real page.
   List<PracticeBannerSpec> _practicePool() => [
-        PracticeBannerSpec("Today's Practice", 'Begin your healing path', () => _push(const DailyTasksPage())),
+        PracticeBannerSpec("Today's Practice", 'Begin your healing path', () => _go(1)),
         PracticeBannerSpec('Sit with one word', 'Five quiet minutes', () => _go(1)),
-        PracticeBannerSpec('Your healing path', 'Pick up where you left', () => _push(const HealingPathScreen())),
-        PracticeBannerSpec('Daily tasks', 'Tick off today, earn coins', () => _push(const DailyTasksPage())),
-        PracticeBannerSpec('Earn while you heal', 'Practice pays in coins', () => _push(const EarnHubScreen())),
-        PracticeBannerSpec('Check your progress', "See today's rings", () => ProgressPanel.open(context)),
-        PracticeBannerSpec('Words for today', 'Fresh from the atelier', () => _push(const WordAtelierScreen())),
+        PracticeBannerSpec('Your word ritual', 'Pick up where you left', () => _go(1)),
+        PracticeBannerSpec('Listen, then repeat', 'Three, seven or twenty-one reps', () => _go(1)),
+        PracticeBannerSpec('Morning practice', 'The card knows the hour', () => _go(1)),
+        PracticeBannerSpec('Speak it back', 'Scored from 0 to 100', () => _go(1)),
+        PracticeBannerSpec('Words for today', 'Queued and ready to play', () => _go(1)),
         PracticeBannerSpec('Breathe and repeat', 'Start a word session', () => _go(1)),
-        PracticeBannerSpec('Meanings to explore', 'Signature words', () => _push(const MeaningStoreScreen())),
+        PracticeBannerSpec('Close with a sentence', 'Healing words from your session', () => _go(1)),
       ];
 
   /// The thirty, in `REG.fash.items` order. Keyed by the registry's own `k`
@@ -413,11 +507,8 @@ class _HomeFashionState extends State<HomeFashion> {
             children: [
               FashPractice(
                 banners: dailyPracticeBanners(_practicePool()),
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const DailyTasksPage(),
-                  ),
-                ),
+                // Today's Practice opens the Practice tab (Ribon, Oct 24).
+                onTap: () => _go(1),
               ),
             ],
           ))),
@@ -447,6 +538,9 @@ class _HomeFashionState extends State<HomeFashion> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
+            const HomeRowHeading('Quick picks', sub: 'Tap a colour to jump in'),
+            HeroQuickRow(pool: _quickPool(), squaresOnly: true),
             // 'Start today's practice now' — moved mid-page (Ribon, Oct 24).
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -537,10 +631,6 @@ class _HomeFashionState extends State<HomeFashion> {
         ('tiles', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: ProgramShelf(),
-            ),
             FashTiles(onTile: _go, onOpen: _openEnter),
           ],
         )),
@@ -666,8 +756,8 @@ class _HomeFashionState extends State<HomeFashion> {
             children: [
               HeroGreeting(name: widget.name),
               HeroQuickRow(pool: _quickPool()),
-              HeroQuickRow(pool: _quickPool(), squaresOnly: true),
-              AtelierDealsBanner(deals: _atelierDeals(), onTap: () => _push(const WordAtelierScreen())),
+              StoreNowCarousel(items: _storeItems(), onHeader: () => _push(const WordAtelierScreen())),
+              _progressRail(),
               FashionHero(
                 onExplore: () => _go(2),
                 onGuide: () => _push(const FeaturesPage()),

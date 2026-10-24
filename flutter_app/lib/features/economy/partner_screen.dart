@@ -43,8 +43,6 @@ class _PartnerScreenState extends State<PartnerScreen> {
         children: [
           const PartnerHero(),
           const SizedBox(height: 12),
-          const ProgramShelf(current: Programme.partner),
-          const SizedBox(height: 12),
           const CoinCollectCard(pageKey: 'partner', amount: 10, title: 'Partner coins'),
           const SizedBox(height: 12),
           const GlassLine(

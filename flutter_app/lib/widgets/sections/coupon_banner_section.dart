@@ -260,23 +260,7 @@ class _CouponBannerSectionState extends State<CouponBannerSection> {
         children: [
           panel,
           if (slides.length > 1) ...[
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(slides.length, (i) {
-                final on = i == _index;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  width: on ? 16 : 7,
-                  height: 7,
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: BoxDecoration(
-                    color: on ? Colors.white : Colors.white.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                );
-              }),
-            ),
+            const SizedBox.shrink(),
           ],
         ],
       ),

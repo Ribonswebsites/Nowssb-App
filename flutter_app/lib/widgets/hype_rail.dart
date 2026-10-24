@@ -33,7 +33,6 @@ const kHypeCards = <HypeCard>[
   HypeCard('coupons', 'assets/gifts/coupon-hero.png', 'NowssB Coupons', 'Scratch today'),
   HypeCard('gifts', 'assets/gifts/gift-hero.png', 'NowssB Gifts', 'Daily spin'),
   HypeCard('earn', 'assets/banners/programs/earn.png', 'NowssB Earn', 'Coins on real sales'),
-  HypeCard('rewards', 'assets/banners/programs/rewards.png', 'Rewards', 'Spend coins here'),
   HypeCard('signature', 'assets/hero-curve/banner-store.webp', 'Signature', 'The rarest words'),
   HypeCard('library', 'assets/hero-curve/banner-library.webp', 'Sound Library', 'Hear a word'),
 ];

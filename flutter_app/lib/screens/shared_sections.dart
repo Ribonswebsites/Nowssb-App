@@ -1193,8 +1193,6 @@ class _HealingSectionState extends State<HealingSection> {
               )),
             ),
           ),
-          const SizedBox(height: 10),
-          _CarouselDots(count: _slideCount, index: _index),
         ],
       ),
     );
@@ -1493,36 +1491,6 @@ class _GenderSide extends StatelessWidget {
   }
 }
 
-class _CarouselDots extends StatelessWidget {
-  const _CarouselDots({required this.count, required this.index});
-  final int count;
-  final int index;
-
-  @override
-  Widget build(BuildContext context) {
-    final fashion = HomeSkinScope.of(context) == HomeSkin.fashion;
-    final active = fashion ? NwsbColors.goldLight : NwsbColors.gold;
-    final idle = fashion ? const Color(0x33FFFFFF) : const Color(0x332B2D33);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        for (var i = 0; i < count; i++)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              width: i == index ? 16 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: i == index ? active : idle,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
 
 /// 30 · footer — index.html Fashion `#homeFooter` / Normal `#homeFooterNm`.
 /// Restored website-style brand + tagline + link grid + copyright + 3D
@@ -1743,23 +1711,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
                         animation: _travel,
                         builder: (context, _) {
                           final shown = (_index + (_travel.value > 0.55 ? 1 : 0)) % _shots.length;
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              for (var i = 0; i < _shots.length; i++)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 240),
-                                    width: i == shown ? 20 : 4,
-                                    height: 4,
-                                    color: i == shown
-                                        ? const Color(0xE6C8E8F5)
-                                        : const Color(0x4DC8E8F5),
-                                  ),
-                                ),
-                            ],
-                          );
+                          return const SizedBox.shrink();
                         },
                       ),
                       const SizedBox(height: 16),

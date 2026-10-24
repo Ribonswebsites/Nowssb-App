@@ -345,32 +345,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < plans.length; i++)
-                GestureDetector(
-                  onTap: () => planController.animateToPage(
-                    i,
-                    duration: const Duration(milliseconds: 320),
-                    curve: Curves.easeOutCubic,
-                  ),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    width: i == selected ? 8 : 7,
-                    height: i == selected ? 8 : 7,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: i == selected
-                          ? Colors.white
-                          : const Color(0x4DFFFFFF),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+          const SizedBox.shrink(),
           _playFooter(),
           _legalBlock(context),
         ],

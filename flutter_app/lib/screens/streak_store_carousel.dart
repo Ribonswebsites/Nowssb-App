@@ -105,28 +105,7 @@ class _StreakStoreCarouselState extends State<StreakStoreCarousel> {
                 ]),
               )),
             ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_cardCount, (i) {
-                final on = i == _index;
-                return Container(
-                  width: on ? 16 : 7,
-                  height: 7,
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  decoration: BoxDecoration(
-                    color: on
-                        ? (fashion
-                            ? Colors.white
-                            : const Color(0xFF2B2D33))
-                        : (fashion
-                            ? Colors.white.withValues(alpha: 0.35)
-                            : const Color(0x552B2D33)),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                );
-              }),
-            ),
+            const SizedBox.shrink(),
           ],
         );
       },

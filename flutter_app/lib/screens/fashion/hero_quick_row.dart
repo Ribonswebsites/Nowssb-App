@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../widgets/glass_wrap.dart';
+import 'home_cards.dart' show AutoMarquee;
 
 enum QuickStyle { banner, button, colour }
 
@@ -23,11 +24,13 @@ class QuickCard {
 }
 
 /// Daily pick of [count] from [pool], date-seeded, with styles mixed.
-List<(QuickCard, QuickStyle)> dailyQuickCards(List<QuickCard> pool, {DateTime? day, int count = 8}) {
+List<(QuickCard, QuickStyle)> dailyQuickCards(List<QuickCard> pool, {DateTime? day, int count = 8, Set<String> pinned = const {}}) {
   final d = day ?? DateTime.now();
   final seed = d.year * 10000 + d.month * 100 + d.day;
   final list = [...pool]..shuffle(math.Random(seed));
-  final pick = list.take(count).toList();
+  // Pinned cards (Rewards) are always in the row, first.
+  final pins = [for (final c in pool) if (pinned.contains(c.id)) c];
+  final pick = [...pins, ...list.where((c) => !pinned.contains(c.id))].take(count).toList();
   const pattern = [QuickStyle.banner, QuickStyle.button, QuickStyle.colour, QuickStyle.button];
   final off = seed % pattern.length;
   return [for (var i = 0; i < pick.length; i++) (pick[i], pattern[(i + off) % pattern.length])];
@@ -40,7 +43,8 @@ const kQuickColours = [
 ];
 
 class HeroQuickRow extends StatelessWidget {
-  const HeroQuickRow({super.key, required this.pool, this.day, this.squaresOnly = false});
+  const HeroQuickRow({super.key, required this.pool, this.day, this.squaresOnly = false, this.pinned = const {'rewards'}});
+  final Set<String> pinned;
   final List<QuickCard> pool;
   final DateTime? day;
 
@@ -53,8 +57,23 @@ class HeroQuickRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final cards = squaresOnly
         ? [for (final (c, _) in dailyQuickCards(pool, day: (day ?? DateTime.now()).add(const Duration(days: 3)))) (c, QuickStyle.button)]
-        : dailyQuickCards(pool, day: day);
+        : dailyQuickCards(pool, day: day, pinned: pinned);
     var colourIx = (day ?? DateTime.now()).day;
+    if (squaresOnly) {
+      // Quick picks: every box its own bright colour, drifting slowly.
+      final n = cards.length;
+      return GlassWrap(
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+        padding: const EdgeInsets.all(8),
+        radius: 12,
+        child: AutoMarquee(
+          height: h,
+          children: [
+            for (var i = 0; i < n; i++) _tap(cards[i].$1, _square(cards[i].$1, kQuickColours[(i + colourIx) % kQuickColours.length])),
+          ],
+        ),
+      );
+    }
     return GlassWrap(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       padding: const EdgeInsets.all(8),
@@ -69,7 +88,6 @@ class HeroQuickRow extends StatelessWidget {
           itemBuilder: (_, i) {
             final (c, s) = cards[i];
             final colour = s == QuickStyle.colour ? kQuickColours[colourIx++ % kQuickColours.length] : c.colour;
-            if (squaresOnly) return _tap(c, _square(c, kQuickColours[(i + colourIx) % kQuickColours.length]));
             return _tap(c, switch (s) {
               QuickStyle.banner => _banner(c),
               QuickStyle.button => _button(c),
@@ -155,89 +173,3 @@ class HeroQuickRow extends StatelessWidget {
 }
 
 
-/// Slightly taller Word Atelier banner: the atelier art plus today's
-/// rotating deals with real local-currency prices. Tap opens the atelier.
-class AtelierDealsBanner extends StatelessWidget {
-  const AtelierDealsBanner({super.key, required this.deals, required this.onTap, this.image = 'assets/store/picker-words.png'});
-
-  /// (word, category, percent, price, was) — already formatted prices.
-  final List<(String, String, int, String, String)> deals;
-  final VoidCallback onTap;
-  final String image;
-
-  @override
-  Widget build(BuildContext context) {
-    const ink = TextStyle(color: Colors.white, decoration: TextDecoration.none);
-    return GlassWrap(
-      margin: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-      padding: const EdgeInsets.all(8),
-      radius: 12,
-      child: GestureDetector(
-        key: const ValueKey('quick-atelier'),
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
-        child: Container(
-          height: 104,
-          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10)),
-          clipBehavior: Clip.antiAlias,
-          child: Row(children: [
-            SizedBox(width: 104, height: 104, child: Image.asset(image, fit: BoxFit.cover)),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 8, 10, 8),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Row(children: [
-                    Flexible(
-                      child: Text('Word Atelier', maxLines: 1, overflow: TextOverflow.ellipsis,
-                          style: ink.copyWith(fontSize: 13.5, fontWeight: FontWeight.w800)),
-                    ),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text('Today · Buy / Sell', maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: ink.copyWith(fontSize: 10.5, color: const Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
-                      ),
-                    ),
-                  ]),
-                  const SizedBox(height: 5),
-                  for (final (w, cat, pct, price, was) in deals.take(3))
-                    Padding(
-                      padding: const EdgeInsets.only(top: 3),
-                      child: Row(children: [
-                        Expanded(
-                          child: Text.rich(
-                            TextSpan(children: [
-                              TextSpan(text: w, style: const TextStyle(fontWeight: FontWeight.w700)),
-                              TextSpan(text: '  $cat', style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 10.5)),
-                            ]),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: ink.copyWith(fontSize: 12.5),
-                          ),
-                        ),
-                        if (pct > 0)
-                          Container(
-                            margin: const EdgeInsets.only(right: 6),
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(color: const Color(0xFFFF4D4D), borderRadius: BorderRadius.circular(4)),
-                            child: Text('-$pct%', style: ink.copyWith(fontSize: 9.5, fontWeight: FontWeight.w800)),
-                          ),
-                        Flexible(
-                          child: Text(price, maxLines: 1, overflow: TextOverflow.ellipsis,
-                              style: ink.copyWith(fontSize: 12, fontWeight: FontWeight.w800)),
-                        ),
-                      ]),
-                    ),
-                ]),
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
