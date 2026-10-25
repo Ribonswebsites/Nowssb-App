@@ -251,7 +251,7 @@ class _NotificationRowState extends State<NotificationRow> {
     final page = _page.clamp(0, n - 1);
     final rest = n - 1 - page;
     const ink = TextStyle(color: Colors.white, decoration: TextDecoration.none);
-    final panel = Material(
+    return Material(
       type: MaterialType.transparency,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(22),
@@ -317,20 +317,6 @@ class _NotificationRowState extends State<NotificationRow> {
         ),
       ),
     );
-    // The icon circle is its own wrapper, straight over the app background,
-    // centred on the card row; the panel (strip + card) sits to its right.
-    final showing = (p != null && page == 0) ? null : widget.items[page - (p != null ? 1 : 0)];
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8 + (NotificationRow.cardHeight - 54) / 2),
-          child: NotifCategoryBadge(type: showing?.type ?? 'progress', size: 54),
-        ),
-        const SizedBox(width: 8),
-        Expanded(child: panel),
-      ],
-    );
   }
 
   Widget _action(String label, VoidCallback onTap) => GestureDetector(
@@ -389,7 +375,11 @@ class _BlackPill extends StatelessWidget {
         onTap();
       },
       behavior: HitTestBehavior.opaque,
+      // Two wrappers side by side: the glass icon circle (over the app
+      // background) on the left, the black card on the right.
       child: Row(children: [
+        NotifCategoryBadge(type: item.type, size: 54),
+        const SizedBox(width: 8),
         Expanded(
             child: DecoratedBox(
           decoration: BoxDecoration(
