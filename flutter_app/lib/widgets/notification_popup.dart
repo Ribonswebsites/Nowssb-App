@@ -375,85 +375,90 @@ class _BlackPill extends StatelessWidget {
         onTap();
       },
       behavior: HitTestBehavior.opaque,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: const Color(0xF0000000),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              NotifCategoryBadge(type: item.type),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 3,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFF2D2D),
-                            borderRadius: BorderRadius.circular(2),
+      // Two wrappers side by side: the glass icon circle (over the app
+      // background) on the left, the black card on the right.
+      child: Row(children: [
+        NotifCategoryBadge(type: item.type, size: 54),
+        const SizedBox(width: 8),
+        Expanded(
+            child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: const Color(0xF0000000),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 3,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF2D2D),
+                              borderRadius: BorderRadius.circular(2),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            _category,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700, height: 1),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              _category,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700, height: 1),
+                            ),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        item.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: ink.copyWith(fontSize: 13, fontWeight: FontWeight.w600, height: 1.2),
+                      ),
+                      if (item.body.isNotEmpty) ...[
+                        const SizedBox(height: 1),
+                        Text(
+                          item.body,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: ink.copyWith(
+                              fontSize: 12, fontWeight: FontWeight.w400, height: 1.25, color: const Color(0xE6FFFFFF)),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      item.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: ink.copyWith(fontSize: 13, fontWeight: FontWeight.w600, height: 1.2),
-                    ),
-                    if (item.body.isNotEmpty) ...[
-                      const SizedBox(height: 1),
-                      Text(
-                        item.body,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: ink.copyWith(
-                            fontSize: 12, fontWeight: FontWeight.w400, height: 1.25, color: const Color(0xE6FFFFFF)),
-                      ),
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: ColoredBox(
-                  color: const Color(0xFF1A1A1E),
-                  child: thumb != null
-                      ? Image.asset(thumb, width: 58, height: 52, fit: BoxFit.cover)
-                      : NotificationRow.networkThumbs == false
-                          ? const SizedBox(width: 58, height: 52)
-                          : CachedNetworkImage(
-                              imageUrl: NotifIcons.urlFor(item.type),
-                              width: 58,
-                              height: 52,
-                              fit: BoxFit.cover,
-                              errorWidget: (_, __, ___) => const SizedBox(width: 58, height: 52),
-                            ),
+                const SizedBox(width: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: ColoredBox(
+                    color: const Color(0xFF1A1A1E),
+                    child: thumb != null
+                        ? Image.asset(thumb, width: 58, height: 52, fit: BoxFit.cover)
+                        : NotificationRow.networkThumbs == false
+                            ? const SizedBox(width: 58, height: 52)
+                            : CachedNetworkImage(
+                                imageUrl: NotifIcons.urlFor(item.type),
+                                width: 58,
+                                height: 52,
+                                fit: BoxFit.cover,
+                                errorWidget: (_, __, ___) => const SizedBox(width: 58, height: 52),
+                              ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        )),
+      ]),
     );
   }
 }
@@ -487,7 +492,7 @@ class NotifCategoryBadge extends StatelessWidget {
     final white = size * 0.56;
     return ClipOval(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
           width: size,
           height: size,
