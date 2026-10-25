@@ -68,6 +68,7 @@ class _WordAtelierBody extends StatefulWidget {
 class _WordAtelierBodyState extends State<_WordAtelierBody> {
   final _search = TextEditingController();
   String _query = '';
+  // ignore: unused_field
   String _chip = 'ALL';
 
   @override

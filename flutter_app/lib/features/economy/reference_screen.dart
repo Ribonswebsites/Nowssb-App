@@ -28,6 +28,7 @@ class ReferenceScreen extends StatefulWidget {
 
 class _ReferenceScreenState extends State<ReferenceScreen> {
   final _code = TextEditingController();
+  // ignore: unused_field
   String? _note;
 
   @override

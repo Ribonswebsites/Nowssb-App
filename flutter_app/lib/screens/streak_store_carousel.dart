@@ -47,6 +47,7 @@ class StreakStoreCarousel extends StatefulWidget {
 
 class _StreakStoreCarouselState extends State<StreakStoreCarousel> {
   late final PageController _page;
+  // ignore: unused_field
   var _index = 0;
 
   static const _cardCount = 2;

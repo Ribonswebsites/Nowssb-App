@@ -106,6 +106,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
   var _ready = false;
 
   /// UI-6 artist row config, built once from the catalogue (stable identity).
+  // ignore: unused_field
   late final SectionConfig _artists =
       MeaningMix.artists(_base, (m) => _msOnlyArt(m.key, m.img));
 

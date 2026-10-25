@@ -44,6 +44,7 @@ class CouponScreen extends StatefulWidget {
 
 class _CouponScreenState extends State<CouponScreen> {
   final _go = ValueNotifier<void Function(String)?>(null);
+  // ignore: unused_field
   final _scratch = GlobalKey();
 
   @override

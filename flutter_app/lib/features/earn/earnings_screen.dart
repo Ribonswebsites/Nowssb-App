@@ -32,6 +32,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   final _pan = TextEditingController();
   final _email = TextEditingController();
   String _method = 'wise';
+  // ignore: unused_field
   String _filter = 'all';
   late String _country = _countries.any((c) => c.$1 == FxBook.instance.country) ? FxBook.instance.country! : 'XX';
 

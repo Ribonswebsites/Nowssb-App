@@ -205,6 +205,7 @@ flutter:
     - assets/frames/
     - assets/coach/
     - assets/icons/
+    - assets/icons/notif/
     - assets/progress/
     - assets/store/
     - assets/store/words/

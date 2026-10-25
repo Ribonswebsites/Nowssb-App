@@ -7,6 +7,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../data/notifications.dart';
 import '../data/phone_notifications.dart';
@@ -206,7 +207,11 @@ class NotificationRow extends StatefulWidget {
   final VoidCallback onClearAll;
   final VoidCallback? onTouch;
 
-  static const double cardHeight = 114;
+  static const double cardHeight = 86;
+
+  /// Tests switch the remote thumbnails off (no network or cache DB there).
+  @visibleForTesting
+  static bool networkThumbs = true;
 
   @override
   State<NotificationRow> createState() => _NotificationRowState();
@@ -265,13 +270,16 @@ class _NotificationRowState extends State<NotificationRow> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   SizedBox(
-                    height: 30,
+                    height: 26,
                     child: Row(children: [
                       const SizedBox(width: 8),
-                      Text('NOWSSB', style: ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+                      Text('NOWSSB',
+                          style: ink.copyWith(fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
                       const SizedBox(width: 8),
                       if (n > 1)
-                        Text('${page + 1}/$n', style: ink.copyWith(fontSize: 11.5, fontWeight: FontWeight.w600, color: const Color(0xB3FFFFFF))),
+                        Text('${page + 1}/$n',
+                            style: ink.copyWith(
+                                fontSize: 11.5, fontWeight: FontWeight.w600, color: const Color(0xB3FFFFFF))),
                       if (rest > 0) ...[
                         const SizedBox(width: 6),
                         Container(
@@ -286,7 +294,7 @@ class _NotificationRowState extends State<NotificationRow> {
                       _action('Clear all', widget.onClearAll),
                     ]),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 2),
                   SizedBox(
                     height: NotificationRow.cardHeight,
                     child: PageView(
@@ -298,8 +306,7 @@ class _NotificationRowState extends State<NotificationRow> {
                         setState(() => _page = i);
                       },
                       children: [
-                        for (final c in cards)
-                          Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: c),
+                        for (final c in cards) Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: c),
                       ],
                     ),
                   ),
@@ -319,10 +326,10 @@ class _NotificationRowState extends State<NotificationRow> {
           onTap();
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
           child: Text(label,
               style: const TextStyle(
-                  color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700, decoration: TextDecoration.none)),
+                  color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w700, decoration: TextDecoration.none)),
         ),
       );
 
@@ -374,10 +381,12 @@ class _BlackPill extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              NotifCategoryBadge(type: item.type),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,59 +395,125 @@ class _BlackPill extends StatelessWidget {
                       children: [
                         Container(
                           width: 3,
-                          height: 16,
+                          height: 12,
                           decoration: BoxDecoration(
                             color: const Color(0xFFFF2D2D),
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         Flexible(
                           child: Text(
                             _category,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: ink.copyWith(fontSize: 15.5, fontWeight: FontWeight.w700, height: 1),
+                            style: ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700, height: 1),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 5),
                     Text(
                       item.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: ink.copyWith(fontSize: 15, fontWeight: FontWeight.w600, height: 1.2),
+                      style: ink.copyWith(fontSize: 13, fontWeight: FontWeight.w600, height: 1.2),
                     ),
                     if (item.body.isNotEmpty) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         item.body,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: ink.copyWith(fontSize: 14, fontWeight: FontWeight.w400, height: 1.25, color: const Color(0xE6FFFFFF)),
+                        style: ink.copyWith(
+                            fontSize: 12, fontWeight: FontWeight.w400, height: 1.25, color: const Color(0xE6FFFFFF)),
                       ),
                     ],
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 child: ColoredBox(
                   color: const Color(0xFF1A1A1E),
                   child: thumb != null
-                      ? Image.asset(thumb, width: 72, height: 64, fit: BoxFit.cover)
-                      : CachedNetworkImage(
-                          imageUrl: NotifIcons.urlFor(item.type),
-                          width: 72,
-                          height: 64,
-                          fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => const SizedBox(width: 72, height: 64),
-                        ),
+                      ? Image.asset(thumb, width: 58, height: 52, fit: BoxFit.cover)
+                      : NotificationRow.networkThumbs == false
+                          ? const SizedBox(width: 58, height: 52)
+                          : CachedNetworkImage(
+                              imageUrl: NotifIcons.urlFor(item.type),
+                              width: 58,
+                              height: 52,
+                              fit: BoxFit.cover,
+                              errorWidget: (_, __, ___) => const SizedBox(width: 58, height: 52),
+                            ),
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Category icon: SVG in a white circle, in a black circle, in a glass circle.
+class NotifCategoryBadge extends StatelessWidget {
+  const NotifCategoryBadge({super.key, required this.type, this.size = 46});
+  final String type;
+  final double size;
+
+  /// Every kind NotifStore sends has its own icon; anything else gets [fallback].
+  static const known = <String>{
+    'routine',
+    'streak',
+    'reader',
+    'coins',
+    'rewards',
+    'gifts',
+    'spin',
+    'update',
+    'offers',
+    'subscription',
+    'orders',
+  };
+  static const fallback = 'assets/icons/notif/default.svg';
+  static String assetFor(String type) => known.contains(type) ? 'assets/icons/notif/$type.svg' : fallback;
+
+  @override
+  Widget build(BuildContext context) {
+    final black = size * 0.78;
+    final white = size * 0.56;
+    return ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: size,
+          height: size,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0x33FFFFFF),
+            border: Border.all(color: const Color(0x80FFFFFF), width: 0.8),
+          ),
+          child: Container(
+            width: black,
+            height: black,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.black),
+            child: Container(
+              width: white,
+              height: white,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+              child: SvgPicture.asset(
+                assetFor(type),
+                key: ValueKey('notif-icon-$type'),
+                width: white * 0.58,
+                height: white * 0.58,
+              ),
+            ),
           ),
         ),
       ),

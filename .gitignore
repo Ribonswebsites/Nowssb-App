@@ -45,7 +45,8 @@ flutter_app/pubspec.lock
 # directory that does not exist.
 flutter_app/assets/video/
 flutter_app/assets/frames/
-flutter_app/assets/icons/
+flutter_app/assets/icons/*
+!flutter_app/assets/icons/notif/
 flutter_app/assets/store/
 flutter_app/assets/fashion/
 flutter_app/assets/player/

@@ -99,6 +99,7 @@ class HomeMenuDrawer extends StatelessWidget {
   final void Function(int tab) goTab;
 
   // Drawn marks only — no remote icon photos.
+  // ignore: unused_field
   static const _mark = {
     'home': NwsbMarks.house,
     'practice': NwsbMarks.play,
