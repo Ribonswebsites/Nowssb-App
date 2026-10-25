@@ -48,7 +48,7 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/four_banners.dart';
+import '../widgets/home_banner_slot.dart';
 import '../widgets/meditation_flip_banner.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
@@ -347,14 +347,14 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         (
           'essentials',
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Padding(
+              Padding(
                 padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
-                child: TrioRail(),
+                child: NormalHomeBannerSlot(),
               ),
-              const NmSuppliedEssentials(),
+              NmSuppliedEssentials(),
             ],
           ),
         ),

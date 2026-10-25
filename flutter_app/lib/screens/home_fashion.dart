@@ -36,7 +36,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/four_banners.dart';
+import '../widgets/home_banner_slot.dart';
 import '../widgets/meditation_flip_banner.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
@@ -542,7 +542,7 @@ class _HomeFashionState extends State<HomeFashion> {
           children: [
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
-              child: TrioRail(),
+              child: FashionHomeBannerSlot(),
             ),
             const NmHorizontalRoutineCards(fashion: true),
             const EarthDayFilm(),
