@@ -1003,7 +1003,7 @@ class V4FashionSwitch extends StatelessWidget {
           const _Well(
             circle: true,
             size: Size.square(76),
-            child: V4Film('assets/video/nm-calm-stream.mp4', slot: 'fashion', circle: true),
+            child: V4Film('assets/video/practice-orb.mp4', slot: 'fashion', circle: true),
           ),
           const SizedBox(width: 14),
           const Expanded(
