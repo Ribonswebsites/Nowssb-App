@@ -268,7 +268,6 @@ class CalmToday extends StatelessWidget {
           final frac = active.isEmpty ? 0.0 : (done / active.length).clamp(0.0, 1.0);
           return _Calm(
             key: const ValueKey('cv3-today'),
-            image: 'assets/home/nm-calm-lotus.webp',
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('TODAY', style: _eyebrow),
               const SizedBox(height: 10),

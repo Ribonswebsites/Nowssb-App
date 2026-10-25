@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/home_normal.dart';
 import 'package:nowssb/shell/nav_shell.dart';
+import 'package:nowssb/widgets/buddha_gyro_stage.dart';
 import 'package:nowssb/widgets/four_banners.dart';
 
 import 'fake_video_platform.dart';
@@ -129,15 +130,20 @@ void main() {
     await finish(t);
   }, skip: !homeFontsReady); // needs real fonts, see support/home_render.dart
 
-  testWidgets('v3: the three flip banners each carry a full-height icon disc',
+  testWidgets('v4: the icon sits in its own white circle left of the banner',
       (t) async {
     await pumpAt(t, 390, 1);
-    final discs = find.byKey(const ValueKey('flip-icon-disc'));
-    expect(discs, findsWidgets);
-    final card = find.ancestor(of: discs.first, matching: find.byType(ClipRRect)).first;
-    final d = t.getSize(discs.first);
-    expect(d.width, d.height);
+    final disc = find.byKey(const ValueKey('flip-icon-disc'));
+    expect(disc, findsOneWidget);
+    final row = find.byKey(const ValueKey('flip-banner-row'));
+    final card = find.byKey(const ValueKey('flip-card')).first;
+    final d = t.getRect(disc);
+    expect(d.width, closeTo(d.height, 0.5));
+    expect(d.height, closeTo(t.getSize(row).height, 0.5));
     expect(d.height, closeTo(t.getSize(card).height, 0.5));
+    expect(d.right, lessThan(t.getRect(card).left),
+        reason: 'the circle sits outside the banner, to its left');
+    expect(find.descendant(of: card, matching: disc), findsNothing);
     await finish(t);
   }, skip: !homeFontsReady);
 
@@ -152,7 +158,17 @@ void main() {
       final errors = await pumpAt(t, w, dpr, h: 22000);
       if (homeFontsReady)
         expect(errors.where((e) => e.contains('overflow')), isEmpty);
+      // Today's Quotes is restored exactly as at bcb6baf (Ribon, v4), with
+      // its own original display size; only that card is exempt.
+      final quote = {
+        for (final e in find
+            .descendant(
+                of: find.byType(BuddhaGyroStage), matching: find.byType(RichText))
+            .evaluate())
+          e.renderObject,
+      };
       for (final r in paragraphs()) {
+        if (quote.contains(r)) continue;
         var max = 0.0;
         r.text.visitChildren((s) {
           final f = (s is TextSpan ? s.style?.fontSize : null) ?? 0;

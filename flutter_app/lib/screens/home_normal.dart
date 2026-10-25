@@ -51,6 +51,7 @@ import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
 import '../widgets/meditation_flip_banner.dart';
 import 'normal/calm_v3.dart';
+import 'normal/home_v4.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -358,50 +359,34 @@ class _HomeNormalState extends State<HomeNormal> {
                 padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: TrioRail(),
               ),
-              const NmSuppliedEssentials(),
+              const V4Essentials(),
             ],
           ),
         ),
+        // v4: everything from here to the footer is lib/screens/normal/home_v4.dart,
+        // apart from the flip banners and the Buddha quote card (kept as-is).
         ('routineCards', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
-              child: ColoredSplitPromoBanner.forSurface(
-                SplitPromoSurface.normalHome,
-                onTap: () => _go(2),
-                margin: EdgeInsets.zero,
-              ),
-            ),
-            const NmHorizontalRoutineCards(),
-            const EarthDayFilm(),
-            PromoColorGrid(onOpen: _openGrid),
+            V4SoundLibrary(onTap: () => _go(2)),
+            V4GetStarted(onPlay: () => _go(1)),
+            V4EarthDay(onTap: () => _go(1)),
+            V4Doors(onOpen: _openGrid),
           ],
         )),
-        (
-          'herovid',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              CalmStreakFilm(
-                onTap: () => _go(1),
-                onStoreTap: () => _go(3),
-              ),
-            ],
-          ),
-        ),
+        ('herovid', V4Streak(onPractice: () => _go(1), onOffers: () => _go(3))),
         ('streak', const SizedBox.shrink()),
         ('practice', const SizedBox.shrink()),
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
-            MainOptionsSection(onGo: _go, onAction: _openMainOption),
+            V4WhereToBegin(options: MainOptionsSection.options, onAction: _openMainOption),
           ],
         )),
         (
           'actionbar',
-          NmSuppliedActionBar(
+          V4HelpCoach(
               onSupport: () => _go(4),
               onCoach: () => _push(const PersonalCoachScreen()))
         ),
@@ -409,32 +394,26 @@ class _HomeNormalState extends State<HomeNormal> {
         ('spotlight', const SizedBox.shrink()),
         ('tiles', const SizedBox.shrink()),
         ('storiesFind', const SizedBox.shrink()),
-        // Same card as bcb6baf; the cap only holds the quote at 28px.
-        ('buddhaGyro', QuoteTypeCap(
-          maxSize: 28,
-          child: BuddhaGyroStage(
-            neumorphic: true,
-            onOpenQuotes: () => _push(const QuotesWeekScreen()),
-          ),
+        // Exactly as at bcb6baf.
+        ('buddhaGyro', BuddhaGyroStage(
+          neumorphic: true,
+          onOpenQuotes: () => _push(const QuotesWeekScreen()),
         )),
-        ('store', CalmStoreAndEarn(onStore: () => _go(3))),
+        ('store', V4StoreEarn(onStore: () => _go(3))),
         (
           'reader',
           // Signed out: 'Sign in to see your rewards'; signed in: coins.
-          CalmReaderRewards(onReader: () => _push(const ReaderHubScreen())),
+          V4ReaderRewards(onReader: () => _push(const ReaderHubScreen())),
         ),
-        (
-          'trendwd',
-          CalmTrending(onTap: () => _go(2)),
-        ),
+        ('trendwd', V4Trending(onTap: () => _go(2))),
         ('custom', null),
         ('rx', null),
         ('routines', const SizedBox.shrink()),
         ('condisc', const SizedBox.shrink()),
-        ('feed', CalmCommunity(onTap: () => NwsbLinks.connect(context))),
+        ('feed', V4Community(onTap: () => NwsbLinks.connect(context))),
         (
           'quickrow',
-          CalmQuickRow(
+          V4Quick(
             onCart: () => NwsbLinks.cart(context),
             onWishlist: () => NwsbLinks.wishlist(context),
             onOrders: () => _go(4),
@@ -442,12 +421,12 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('trendshop', const SizedBox.shrink()),
         ('subvid', const SizedBox.shrink()),
-        ('edition', CalmMembership(onEdition: () => _push(const SubscriptionScreen()))),
-        ('ebooks', CalmEbooks(onTap: () => _push(const EbooksStoreScreen()))),
+        ('edition', V4Edition(onEdition: () => _push(const SubscriptionScreen()))),
+        ('ebooks', V4Ebooks(onTap: () => _push(const EbooksStoreScreen()))),
         ('connectban', const SizedBox.shrink()),
         (
           'healing',
-          CalmHealing(
+          V4Healing(
             onTap: () => _push(const HealingPathScreen()),
             onFemale: () => _push(
                 const HealingPathScreen(initialGender: HealingGender.female)),
@@ -462,9 +441,9 @@ class _HomeNormalState extends State<HomeNormal> {
         ('msearch', null),
         (
           'fashsw',
-          CalmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
+          V4FashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
         ),
-        ('footer', CalmFooter(onLink: _footerLink)),
+        ('footer', V4Footer(onLink: _footerLink)),
       ];
 
   @override

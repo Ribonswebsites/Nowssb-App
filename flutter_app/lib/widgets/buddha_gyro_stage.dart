@@ -52,19 +52,6 @@ String _timeLabel(DateTime t) {
   final m = t.minute.toString().padLeft(2, '0');
   return '$h:$m ${t.hour < 12 ? 'AM' : 'PM'}';
 }
-/// Puts a ceiling (in logical px, before text scaling) on the poster quote's
-/// largest word. Only the Normal home sets one; without it nothing changes.
-class QuoteTypeCap extends InheritedWidget {
-  const QuoteTypeCap({super.key, required this.maxSize, required super.child});
-
-  final double maxSize;
-
-  static double? of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<QuoteTypeCap>()?.maxSize;
-
-  @override
-  bool updateShouldNotify(QuoteTypeCap old) => old.maxSize != maxSize;
-}
 
 class BuddhaGyroStage extends StatelessWidget {
   const BuddhaGyroStage({super.key, this.neumorphic = false, this.onOpenQuotes, this.now});
@@ -274,11 +261,6 @@ class _QuotePoster extends StatelessWidget {
     return LayoutBuilder(builder: (context, c) {
       final scale = MediaQuery.textScalerOf(context);
       var base = 34.0;
-      final cap = QuoteTypeCap.of(context);
-      if (cap != null) {
-        final ratio = quote.emphasis == null ? 1.0 : const [2.3, 1.9, 2.1, 1.7][variant];
-        base = math.min(base, (cap / ratio).floorToDouble());
-      }
       late TextSpan span;
       while (true) {
         span = TextSpan(children: _spans(base));

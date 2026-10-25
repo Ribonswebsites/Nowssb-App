@@ -17,8 +17,10 @@ class _Slide {
     required this.svg,
   });
 
-  final Color color;
+  /// The theme icon shown in the separate circle beside the banner.
   final String svg;
+
+  final Color color;
   final String asset;
   final String word;
   final String line;
@@ -28,27 +30,27 @@ class _Slide {
 const _slides = <_Slide>[
   _Slide(
     color: Color(0xFF692FCC),
-    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="15" r="6" fill="#692FCC"/><path d="M32 23c-5 0-8 4-8 9v6l-9 6c-2 1-1 4 1 4h32c2 0 3-3 1-4l-9-6v-6c0-5-3-9-8-9z" fill="#692FCC"/><path d="M10 52h44" stroke="#B79AF0" stroke-width="3" stroke-linecap="round"/><path d="M24 34l-8 5M40 34l8 5" stroke="#692FCC" stroke-width="3" stroke-linecap="round"/></svg>',
     asset: 'assets/banners/banner-sit.webp',
     word: 'MEDITATION',
     line: 'DAILY PRACTICE\nBEGIN ANYTIME',
     ink: Colors.white,
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="15" r="6" fill="#692FCC"/><path d="M32 23c-5 0-8 4-8 9v6l-9 6c-2 1-1 4 1 4h32c2 0 3-3 1-4l-9-6v-6c0-5-3-9-8-9z" fill="#692FCC"/><path d="M10 52h44" stroke="#B79AF0" stroke-width="3" stroke-linecap="round"/><path d="M24 34l-8 5M40 34l8 5" stroke="#692FCC" stroke-width="3" stroke-linecap="round"/></svg>',
   ),
   _Slide(
     color: Color(0xFFC8102E),
-    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M14 22h36l-3 32H17z" fill="#C8102E"/><path d="M24 24v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#C8102E" stroke-width="3.5" stroke-linecap="round"/><path d="M25 38h14M25 45h9" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>',
     asset: 'assets/banners/banner-store.webp',
     word: 'STORE',
     line: 'WORDS AND MEANINGS\nOPEN ANYTIME',
     ink: Colors.white,
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M14 22h36l-3 32H17z" fill="#C8102E"/><path d="M24 24v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#C8102E" stroke-width="3.5" stroke-linecap="round"/><path d="M25 38h14M25 45h9" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>',
   ),
   _Slide(
     color: Color(0xFFF5C400),
-    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M27 8h10M32 8v6" stroke="#1A1200" stroke-width="3.5" stroke-linecap="round"/><circle cx="32" cy="36" r="20" fill="#F5C400"/><circle cx="32" cy="36" r="20" fill="none" stroke="#1A1200" stroke-width="3"/><path d="M32 36V24" stroke="#1A1200" stroke-width="3.5" stroke-linecap="round"/><path d="M32 36l7 5" stroke="#1A1200" stroke-width="3" stroke-linecap="round"/></svg>',
     asset: 'assets/banners/banner-gold.webp',
     word: 'PRACTICE',
     line: 'FIVE QUIET MINUTES\nONE WORD',
     ink: Color(0xFF1A1200),
+    svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M27 8h10M32 8v6" stroke="#1A1200" stroke-width="3.5" stroke-linecap="round"/><circle cx="32" cy="36" r="20" fill="#F5C400"/><circle cx="32" cy="36" r="20" fill="none" stroke="#1A1200" stroke-width="3"/><path d="M32 36V24" stroke="#1A1200" stroke-width="3.5" stroke-linecap="round"/><path d="M32 36l7 5" stroke="#1A1200" stroke-width="3" stroke-linecap="round"/></svg>',
   ),
 ];
 
@@ -57,8 +59,10 @@ class MeditationFlipBanner extends StatefulWidget {
 
   final VoidCallback? onTap;
 
-  /// Normal home: a white circle on the left of each strip, as tall as the
-  /// strip, holding an SVG in the strip's colour. Fashion leaves it off.
+  /// Normal home: a separate white neumorphic circle to the LEFT of the
+  /// banner (diameter = banner height) holding the slide's theme SVG. The
+  /// banner is the original card, scaled down to share the row. Fashion
+  /// leaves it off and gets the original strip unchanged.
   final bool leadingIcons;
 
   @override
@@ -116,13 +120,83 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
     return shown * (1 - fade);
   }
 
+  /// Design size of one original card; it is scaled to fit beside the disc.
+  static const _cardW = 320.0;
+  static const _cardH = 136.0;
+  static const _gap = 10.0;
+
+  Widget _sideBySide() => LayoutBuilder(builder: (context, box) {
+        final avail = box.maxWidth - 32;
+        final s = ((avail - _gap) / (_cardH + _cardW)).clamp(0.0, 1.0);
+        final h = _cardH * s;
+        final slide = _slides[_page];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SizedBox(
+            key: const ValueKey('flip-banner-row'),
+            height: h,
+            child: Row(children: [
+              GestureDetector(
+                onTap: widget.onTap,
+                child: Container(
+                  key: const ValueKey('flip-icon-disc'),
+                  width: h,
+                  height: h,
+                  padding: EdgeInsets.all(h * 0.2),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: Color(0x24000000), offset: Offset(5, 5), blurRadius: 12),
+                      BoxShadow(color: Colors.white, offset: Offset(-5, -5), blurRadius: 12),
+                    ],
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 420),
+                    transitionBuilder: (c, a) => ScaleTransition(
+                        scale: a, child: FadeTransition(opacity: a, child: c)),
+                    child: SvgPicture.string(slide.svg, key: ValueKey(_page), fit: BoxFit.contain),
+                  ),
+                ),
+              ),
+              const SizedBox(width: _gap),
+              Expanded(
+                child: Listener(
+                  onPointerDown: (_) => _hold = true,
+                  onPointerUp: (_) => _hold = false,
+                  onPointerCancel: (_) => _hold = false,
+                  child: PageView.builder(
+                    controller: _pager,
+                    itemCount: _slides.length,
+                    onPageChanged: (i) {
+                      if (i == _page) return;
+                      setState(() => _page = i);
+                      if (!_quiet) _cycle.forward(from: 0);
+                    },
+                    itemBuilder: (_, i) => FittedBox(
+                      key: const ValueKey('flip-card'),
+                      fit: BoxFit.contain,
+                      child: SizedBox(
+                        width: _cardW,
+                        height: _cardH,
+                        child: _Card(slide: _slides[i], cycle: _cycle, amount: _amount, onTap: widget.onTap),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        );
+      });
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 4),
       child: Column(
         children: [
-          SizedBox(
+          if (widget.leadingIcons) _sideBySide() else SizedBox(
             height: 136,
             child: Listener(
               onPointerDown: (_) => _hold = true,
@@ -143,7 +217,6 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
                     cycle: _cycle,
                     amount: _amount,
                     onTap: widget.onTap,
-                    leadingIcon: widget.leadingIcons,
                   ),
                 ),
               ),
@@ -173,9 +246,7 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
 }
 
 class _Card extends StatelessWidget {
-  const _Card({required this.slide, required this.cycle, required this.amount, this.onTap, this.leadingIcon = false});
-
-  final bool leadingIcon;
+  const _Card({required this.slide, required this.cycle, required this.amount, this.onTap});
 
   final _Slide slide;
   final AnimationController cycle;
@@ -201,7 +272,6 @@ class _Card extends StatelessWidget {
               final portraitOpacity = portrait.clamp(0.0, 1.0);
               final titleOpacity = title.clamp(0.0, 1.0);
               final subOpacity = sub.clamp(0.0, 1.0);
-              if (leadingIcon) return _withIcon(context, portrait, title, sub);
               return Stack(
                 fit: StackFit.expand,
                 children: [
@@ -266,89 +336,6 @@ class _Card extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-extension on _Card {
-  Widget _withIcon(BuildContext context, double portrait, double title, double sub) {
-    final portraitOpacity = portrait.clamp(0.0, 1.0);
-    final titleOpacity = title.clamp(0.0, 1.0);
-    final subOpacity = sub.clamp(0.0, 1.0);
-    return LayoutBuilder(builder: (context, box) {
-      final d = box.maxHeight;
-      final textLeft = d + 12;
-      final scale = MediaQuery.textScalerOf(context).scale(13) / 13;
-      final textNeed = 100 * scale;
-      final room = box.maxWidth - textLeft - 8;
-      final portraitW = (room - textNeed).clamp(0.0, 108.0);
-      final showPortrait = portraitW >= 52;
-      final textW = room - (showPortrait ? portraitW : 0);
-      return Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            left: 0,
-            top: 0,
-            width: d,
-            height: d,
-            child: DecoratedBox(
-              key: const ValueKey('flip-icon-disc'),
-              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-              child: Padding(
-                padding: EdgeInsets.all(d * 0.2),
-                child: SvgPicture.string(slide.svg, fit: BoxFit.contain),
-              ),
-            ),
-          ),
-          if (showPortrait)
-            Positioned(
-              right: 8,
-              bottom: 0,
-              width: portraitW,
-              height: d - 4,
-              child: Opacity(
-                opacity: portraitOpacity,
-                child: Transform.translate(
-                  offset: Offset((1 - portraitOpacity) * 28, 0),
-                  child: Image.asset(slide.asset, fit: BoxFit.contain, alignment: Alignment.bottomRight, filterQuality: FilterQuality.medium),
-                ),
-              ),
-            ),
-          Positioned(
-            left: textLeft,
-            top: 18,
-            width: textW,
-            child: Opacity(
-              opacity: titleOpacity,
-              child: Transform.translate(
-                offset: Offset((1 - titleOpacity) * -18, 0),
-                child: Transform.scale(
-                  scale: 0.88 + 0.12 * title.clamp(0.0, 1.1),
-                  alignment: Alignment.centerLeft,
-                  child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: _Title(word: slide.word, ink: slide.ink)),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: textLeft,
-            top: 78,
-            width: textW,
-            child: Opacity(
-              opacity: subOpacity,
-              child: Transform.translate(
-                offset: Offset(0, (1 - subOpacity) * 12),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(slide.line, style: GoogleFonts.oswald(color: slide.ink, fontSize: 13, fontWeight: FontWeight.w600, height: 1.15, letterSpacing: 0.4)),
-                ),
-              ),
-            ),
-          ),
-        ],
-      );
-    });
   }
 }
 
