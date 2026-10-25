@@ -2,8 +2,7 @@
 ///
 /// Both homes open the same six programme doors the old three-card rail
 /// ([TrioRail]) did, with the same pictures. Only the shape differs:
-/// * Normal home: a calm neumorphic card — the tall portrait on the left and
-///   a quiet list of the six doors on the right.
+/// * Normal home: a raised neumorphic console of soft buttons.
 /// * Fashion home: a wide editorial poster with the doors as glass pills
 ///   along its foot.
 library;
@@ -73,109 +72,139 @@ Widget _tinted(HomeDoor d, {Alignment alignment = const Alignment(0, -0.2)}) => 
 
 // ---------------------------------------------------------------- Normal
 
-/// Normal home: portrait + a calm list of doors on one soft card.
+const _nmBg = NwsbColors.surface;
+
+/// Soft inset: darker on the top-left, lighter on the bottom-right, as if
+/// pressed into the surface (Flutter has no inner box-shadow).
+BoxDecoration _inset(BorderRadius r) => BoxDecoration(
+      borderRadius: r,
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [Color(0xFFD9DCE4), Color(0xFFEDEFF4), Color(0xFFFAFBFD)],
+        stops: [0, 0.45, 1],
+      ),
+      border: Border.all(color: const Color(0x0F000000)),
+    );
+
+BoxDecoration _raised(BorderRadius r, List<BoxShadow> s) => BoxDecoration(color: _nmBg, borderRadius: r, boxShadow: s);
+
+/// Normal home: one raised neumorphic console. A wide inset coin readout on
+/// top, then the other five doors as raised soft buttons with inset wells.
+/// A pressed button sinks into the surface.
 class NormalHomeBannerSlot extends StatelessWidget {
   const NormalHomeBannerSlot({super.key, this.onOpen = _defaultOpen});
   final HomeDoorOpener onOpen;
 
-  static const _row = 50.0;
-
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, box) => NeuCard(
-      padding: const EdgeInsets.all(10),
-      radius: 24,
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(18),
-              child: SizedBox(
-                width: (box.maxWidth * 0.24).clamp(64.0, 100.0),
-                child: const Image(
-                  image: AssetImage(_portrait),
-                  fit: BoxFit.cover,
-                  alignment: Alignment(0, -0.1),
-                ),
-              ),
-            ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  for (var i = 0; i < homeDoors.length; i++) ...[
-                    if (i > 0) const Divider(height: 1, thickness: 1, indent: 56, color: Color(0x14000000)),
-                    _NormalRow(door: homeDoors[i], height: _row, onOpen: onOpen),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
+    final coins = homeDoors.firstWhere((d) => d.isCoins);
+    final rest = homeDoors.where((d) => !d.isCoins).toList();
+    Widget btn(HomeDoor d) => Expanded(child: _NeuDoor(door: d, onOpen: onOpen));
+    const gap = SizedBox(width: 14);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: _raised(BorderRadius.circular(28), NwsbShadows.raised),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _NeuDoor(door: coins, onOpen: onOpen, readout: true),
+          const SizedBox(height: 14),
+          IntrinsicHeight(
+              child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [btn(rest[0]), gap, btn(rest[1]), gap, btn(rest[3])])),
+          const SizedBox(height: 14),
+          Row(children: [btn(rest[2]), gap, btn(rest[4])]),
+        ],
       ),
-    ));
+    );
   }
 }
 
-class _NormalRow extends StatelessWidget {
-  const _NormalRow({required this.door, required this.height, required this.onOpen});
+class _NeuDoor extends StatefulWidget {
+  const _NeuDoor({required this.door, required this.onOpen, this.readout = false});
   final HomeDoor door;
-  final double height;
   final HomeDoorOpener onOpen;
+  final bool readout;
+
+  @override
+  State<_NeuDoor> createState() => _NeuDoorState();
+}
+
+class _NeuDoorState extends State<_NeuDoor> {
+  bool _down = false;
+
+  void _set(bool v) {
+    if (_down != v) setState(() => _down = v);
+  }
+
+  Widget _well(double size) => Container(
+        width: size,
+        height: size,
+        padding: const EdgeInsets.all(4),
+        decoration: _inset(BorderRadius.circular(size)),
+        child: ClipOval(child: _tinted(widget.door)),
+      );
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      child: InkWell(
-        key: ValueKey('normal-door-${door.label}'),
-        borderRadius: BorderRadius.circular(14),
-        onTap: () => onOpen(context, door.programme, door.tab),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: height),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: Row(
-              children: [
-                SizedBox.square(
-                  dimension: 36,
-                  child: ClipOval(child: _tinted(door)),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    door.short,
-                    semanticsLabel: door.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xFF2A2D3A),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.1,
-                    ),
-                  ),
-                ),
-                if (door.isCoins)
-                  _coins((c) => Container(
-                        margin: const EdgeInsets.only(left: 6),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: door.tint.withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(99),
-                        ),
-                        child: Text(
-                          '$c',
-                          style: TextStyle(color: door.tint, fontSize: 12, fontWeight: FontWeight.w700),
-                        ),
-                      )),
-                const SizedBox(width: 4),
-                const Icon(Icons.chevron_right_rounded, size: 18, color: Color(0x662A2D3A)),
-              ],
-            ),
-          ),
+    final d = widget.door;
+    final r = BorderRadius.circular(widget.readout ? 20 : 18);
+    const ink = Color(0xFF2A2D3A);
+    final Widget body;
+    if (widget.readout) {
+      body = Row(children: [
+        _well(44),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Text(d.short,
+              maxLines: 2, style: const TextStyle(color: Color(0xFF6B6F7D), fontSize: 13, fontWeight: FontWeight.w600)),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: _inset(BorderRadius.circular(14)),
+          child: _coins((c) => Text('$c',
+              style: TextStyle(
+                  color: d.tint,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  fontFeatures: const [FontFeature.tabularFigures()]))),
+        ),
+      ]);
+    } else {
+      body = Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
+        _well(42),
+        const SizedBox(height: 8),
+        // One line, never broken mid-word: shrinks a touch when very tight.
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(d.short,
+              maxLines: 1,
+              softWrap: false,
+              style: const TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w600)),
+        ),
+      ]);
+    }
+    return Semantics(
+      button: true,
+      label: d.label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        key: ValueKey('normal-door-${d.label}'),
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => _set(true),
+        onTapCancel: () => _set(false),
+        onTapUp: (_) => _set(false),
+        onTap: () => widget.onOpen(context, d.programme, d.tab),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          padding: widget.readout
+              ? const EdgeInsets.fromLTRB(10, 10, 12, 10)
+              : const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
+          decoration: _down ? _inset(r) : _raised(r, NwsbShadows.raisedXs),
+          child: body,
         ),
       ),
     );
