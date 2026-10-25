@@ -10,6 +10,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
+import '../../admin/template/editable.dart' show EditableLabel;
 import '../../data/content.dart';
 import '../../data/firebase.dart';
 import '../../data/models.dart';
@@ -186,14 +187,14 @@ class CalmGreeting extends StatelessWidget {
         video: 'assets/video/nm-calm-clouds.mp4',
         slot: 'calm_v3.CalmGreeting',
         pad: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-        child: Row(children: [
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(nmGreetHello(), style: const TextStyle(fontSize: 16, color: _soft)),
               const SizedBox(height: 2),
               Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: _ink, height: 1.15)),
               const SizedBox(height: 6),
-              const Text('Breathe in for four, out for four.', style: _sub),
+              const EditableLabel('normal_sections_top.NmGreeting', "Ready for today's healing practice?", style: _sub),
             ]),
           ),
           const SizedBox(width: 8),
