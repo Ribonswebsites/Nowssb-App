@@ -68,6 +68,17 @@ import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'normal/rotating_promo_rail.dart';
 import 'shared_sections.dart';
+import 'normal/calm/calm_sections.dart';
+import 'daily_tasks.dart';
+import '../features/circle/circle_screen.dart';
+import '../features/vault/vault_screen.dart';
+import '../features/programs/reference_program.dart';
+import '../features/gifts/gifts_screen.dart';
+import '../features/programs/gifts_program.dart';
+import '../features/economy/coupon_screen.dart';
+import '../features/programs/coupons_program.dart';
+import '../features/programs/partner_program.dart';
+import '../widgets/hype_rail.dart';
 import 'fashion/sections_mid.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
@@ -319,6 +330,78 @@ class _HomeNormalState extends State<HomeNormal> {
     }
   }
 
+  /// Routes every calm-kit tap (essentials → footer) to its destination.
+  void _calm(String a) {
+    if (a.startsWith('grid:')) return _openGrid(a.substring(5));
+    if (a.startsWith('enter:')) return _openEnter(a.substring(6));
+    if (a.startsWith('footer:')) return _footerLink(a.substring(7));
+    if (a.startsWith('main:')) {
+      final p = a.split(':');
+      return _openMainOption(p[1], int.parse(p[2]));
+    }
+    if (a.startsWith('cta:')) return NwsbLinks.cta(context, a.substring(4));
+    if (a.startsWith('hype:')) {
+      final id = a.substring(5);
+      final open = openHypeCard;
+      if (open != null) return open(context, id);
+      return NwsbLinks.cta(context, id);
+    }
+    switch (a) {
+      case 'tasks':
+        _push(const DailyTasksPage());
+      case 'library-today' || 'stories' || 'trending':
+        _go(2);
+      case 'routine' || 'daypart' || 'today' || 'streak' || 'practice' || 'flip' || 'routines':
+        _go(1);
+      case 'streak-store' || 'raredrop' || 'trendshop':
+        _go(3);
+      case 'wayaround' || 'support' || 'orders':
+        _go(4);
+      case 'coach':
+        _push(const PersonalCoachScreen());
+      case 'quotes':
+        _push(const QuotesWeekScreen());
+      case 'earn':
+        _push(const CircleScreen());
+      case 'reader':
+        _push(const ReaderHubScreen());
+      case 'rewards':
+        _push(const VaultScreen());
+      case 'invite' || 'reference':
+        _push(const ReferenceProgramPage());
+      case 'gift-send':
+        _push(const GiftsScreen());
+      case 'gift-redeem':
+        _push(const GiftsScreen(startOnRedeem: true));
+      case 'gift-rules':
+        _push(const GiftsProgramPage());
+      case 'coupon-free':
+        _push(const CouponScreen());
+      case 'coupons':
+        _push(const CouponsProgramPage());
+      case 'connect':
+        NwsbLinks.connect(context);
+      case 'cart':
+        NwsbLinks.cart(context);
+      case 'wishlist':
+        NwsbLinks.wishlist(context);
+      case 'subscribe':
+        _push(const SubscriptionScreen());
+      case 'partner':
+        _push(const PartnerProgramPage());
+      case 'ebooks':
+        _push(const EbooksStoreScreen());
+      case 'healing':
+        _push(const HealingPathScreen());
+      case 'healing-f':
+        _push(const HealingPathScreen(initialGender: HealingGender.female));
+      case 'healing-m':
+        _push(const HealingPathScreen(initialGender: HealingGender.male));
+      case 'fashion':
+        Settings.instance.setFashionHome(true);
+    }
+  }
+
   /// The twenty-nine, in `REG.norm.items` order. A null widget is a row with
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
@@ -347,190 +430,49 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         (
           'essentials',
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 4),
                 child: NormalHomeBannerSlot(),
               ),
-              NmSuppliedEssentials(),
+              CalmEssentials(onAct: _calm),
             ],
           ),
         ),
-        ('routineCards', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
-              child: ColoredSplitPromoBanner.forSurface(
-                SplitPromoSurface.normalHome,
-                onTap: () => _go(2),
-                margin: EdgeInsets.zero,
-              ),
-            ),
-            const NmHorizontalRoutineCards(),
-            const EarthDayFilm(),
-            PromoColorGrid(onOpen: _openGrid),
-          ],
-        )),
-        (
-          'herovid',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
-                child: BlackGlassBanner(
-                  margin: EdgeInsets.zero,
-                  title: 'Today',
-                  subtitle: 'The line moves when a task is done.',
-                  mark: NwsbMarks.book,
-                  onTap: () => _go(1),
-                ),
-              ),
-              NmStreakVideo(
-                onTap: () => _go(1),
-                onStoreTap: () => _go(3),
-              ),
-            ],
-          ),
-        ),
-        (
-          'streak',
-          NmStreak(onTap: () => _go(1)),
-        ),
-        ('practice', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            NmPractice(onTap: () => _go(1)),
-          ],
-        )),
-        ('mainops', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            MeditationFlipBanner(onTap: () => _go(1)),
-            MainOptionsSection(onGo: _go, onAction: _openMainOption),
-          ],
-        )),
-        (
-          'actionbar',
-          NmSuppliedActionBar(
-              onSupport: () => _go(4),
-              onCoach: () => _push(const PersonalCoachScreen()))
-        ),
-        (
-          'catTiles',
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
-            child: CategoryTilesSection(),
-          ),
-        ),
-        (
-          'spotlight',
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 4, 20, 0),
-            child: SpotlightSection(),
-          ),
-        ),
-        // H-scroll: Flip glass brand showcase (card 0) + existing feature cards.
-        (
-          'tiles',
-          FashTiles(onTile: _go, onOpen: _openEnter),
-        ),
-        (
-          'storiesFind',
-          StoriesFindYouBanner(neumorphic: true, onTap: () => _go(2)),
-        ),
-        ('buddhaGyro', BuddhaGyroStage(
-          neumorphic: true,
-          onOpenQuotes: () => _push(const QuotesWeekScreen()),
-        )),
-        (
-          'store',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(8, onTap: () => _go(3)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const EarnUmbrellaSection(),
-            ],
-          ),
-        ),
-        (
-          'reader',
-          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            NmReader(onTap: () => _push(const ReaderHubScreen())),
-            const SizedBox(height: 24),
-            const ProgramTrioRail(),
-          ]),
-        ),
-        (
-          'trendwd',
-          NmTrending(onTap: () => _go(2)),
-        ),
+        ('routineCards', CalmRoutines(onAct: _calm)),
+        ('herovid', CalmToday(onAct: _calm)),
+        ('streak', NmStreak(onTap: () => _go(1))),
+        ('practice', CalmPractice(onAct: _calm)),
+        ('mainops', CalmWhereToBegin(onAct: _calm)),
+        ('actionbar', CalmHelp(onAct: _calm)),
+        ('catTiles', CalmCategories(onAct: _calm)),
+        ('spotlight', CalmSpotlight(onAct: _calm)),
+        ('tiles', CalmEnter(onAct: _calm)),
+        ('storiesFind', CalmStories(onAct: _calm)),
+        ('buddhaGyro', CalmQuote(onAct: _calm)),
+        ('store', CalmEarn(onAct: _calm)),
+        ('reader', CalmReader(onAct: _calm)),
+        ('trendwd', CalmTrending(onAct: _calm)),
         ('custom', null),
         ('rx', null),
-        ('routines', RoutinesSection(onTap: () => _go(1))),
-        (
-          'condisc',
-          NmPromoDisc(
-            gradient: NmPromoDisc.blue,
-            slides: NmPromoDisc.connectSlides,
-            onTap: () => NwsbLinks.connect(context),
-          )
-        ),
-        ('feed', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          NmFeed(onTap: () => NwsbLinks.connect(context)),
-          const SizedBox(height: 24),
-          const ReferenceHomeSection(),
-        ])),
-        (
-          'quickrow',
-          QuickAccessSection(
-            onCart: () => NwsbLinks.cart(context),
-            onWishlist: () => NwsbLinks.wishlist(context),
-            onOrders: () => _go(4),
-          )
-        ),
-        ('trendshop', NmTrendShop(onTap: () => _go(3))),
+        ('routines', CalmMyRoutines(onAct: _calm)),
+        ('condisc', CalmConnectNotes(onAct: _calm)),
+        ('feed', CalmFeed(onAct: _calm)),
+        ('quickrow', CalmQuick(onAct: _calm)),
+        ('trendshop', CalmTrendShop(onAct: _calm)),
         ('subvid', const SizedBox.shrink()),
-        (
-          'edition',
-          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            EditionSection(onTap: () => _push(const SubscriptionScreen())),
-            const SizedBox(height: 24),
-            const PartnerHomeSection(),
-          ])
-        ),
-        ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
-        ('connectban', ConnectBannerSection(onTap: () => NwsbLinks.connect(context))),
-        (
-          'healing',
-          HealingSection(
-            onTap: () => _push(const HealingPathScreen()),
-            onFemale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.female)),
-            onMale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.male)),
-          ),
-        ),
-        // Choose Your Path is slide 2 of HealingSection — do not inject a
-        // second banner/section (that caused stacked banners + blank pages).
+        ('edition', CalmEdition(onAct: _calm)),
+        ('ebooks', CalmEbooks(onAct: _calm)),
+        ('connectban', CalmConnectChips(onAct: _calm)),
+        ('healing', CalmHealing(onAct: _calm)),
+        // Choose Your Path lives inside the healing card.
         ('genderpath', const SizedBox.shrink()),
         ('wsearch', null),
         ('msearch', null),
-        (
-          'fashsw',
-          NmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
-        ),
-        ('footer', HomeFooterSection(onLink: _footerLink)),
+        ('fashsw', CalmFashionSwitch(onAct: _calm)),
+        ('footer', CalmFooter(onAct: _calm)),
       ];
 
   @override

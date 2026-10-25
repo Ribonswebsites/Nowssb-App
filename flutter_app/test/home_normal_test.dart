@@ -14,6 +14,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/screens/normal/calm/calm_kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/media/video_pool.dart';
@@ -182,12 +183,12 @@ void main() {
     // (its own heading was saying the same thing underneath it) and the
     // streak banner moved down the page, so the first screen carries none.
     final list = find.byType(Scrollable).first;
-    for (var i = 0; i < 40 && find.byType(WrapHead).evaluate().isEmpty; i++) {
+    for (var i = 0; i < 40 && find.byType(CalmHead).evaluate().isEmpty; i++) {
       await tester.drag(list, const Offset(0, -400));
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    final head = tester.widgetList<WrapHead>(find.byType(WrapHead));
+    final head = tester.widgetList<CalmHead>(find.byType(CalmHead));
     expect(head, isNotEmpty,
         reason: 'the Normal home should use the neumorphic head');
     expect(find.byType(SectionHead), findsNothing,

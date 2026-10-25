@@ -1066,3 +1066,9 @@ class PartnerHomeSection extends StatelessWidget {
     );
   }
 }
+
+/// Public, read-only view of the live NowssB Earn ranks (same source as the
+/// tier boxes above) for other home skins: (name, rate badge, detail line).
+List<(String, String, String)> earnTierSummaries() => [
+      for (final t in _earnTiers) (t.name, t.badge, t.detail),
+    ];
