@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/home_normal.dart';
+import 'package:nowssb/screens/normal/calm_v3.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/app_backdrop.dart';
@@ -153,6 +154,10 @@ void main() {
           in tester.widgetList<NcbCarousel>(find.byType(NcbCarousel))) {
         seen++;
         expect(c.onTap, isNotNull, reason: 'a carousel bar that goes nowhere');
+      }
+      for (final g in tester.widgetList<CalmGo>(find.byType(CalmGo))) {
+        seen++;
+        expect(g.onTap, isNotNull, reason: '"${g.label}" goes nowhere');
       }
       await tester.drag(list, const Offset(0, -600));
       await tester.pump(const Duration(milliseconds: 16));

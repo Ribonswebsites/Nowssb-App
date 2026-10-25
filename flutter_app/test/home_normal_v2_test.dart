@@ -129,6 +129,18 @@ void main() {
     await finish(t);
   }, skip: !homeFontsReady); // needs real fonts, see support/home_render.dart
 
+  testWidgets('v3: the three flip banners each carry a full-height icon disc',
+      (t) async {
+    await pumpAt(t, 390, 1);
+    final discs = find.byKey(const ValueKey('flip-icon-disc'));
+    expect(discs, findsWidgets);
+    final card = find.ancestor(of: discs.first, matching: find.byType(ClipRRect)).first;
+    final d = t.getSize(discs.first);
+    expect(d.width, d.height);
+    expect(d.height, closeTo(t.getSize(card).height, 0.5));
+    await finish(t);
+  }, skip: !homeFontsReady);
+
   for (final (w, dpr) in [
     (360.0, 2.0),
     (390.0, 3.0),

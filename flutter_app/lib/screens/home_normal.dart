@@ -49,7 +49,8 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
-import 'normal/promo_pair_banner.dart';
+import '../widgets/meditation_flip_banner.dart';
+import 'normal/calm_v3.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -323,15 +324,15 @@ class _HomeNormalState extends State<HomeNormal> {
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
   List<(String, Widget?)> _sections() => [
-        ('greet', NmGreeting(name: widget.name)),
-        ('search', NmSearch(onSearch: (_) => _go(2))),
+        ('greet', CalmGreeting(name: widget.name)),
+        ('search', CalmSearch(onTap: () => _go(2))),
         ('promoRail', const SizedBox.shrink()),
         (
           'dashboard',
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              NmSuppliedDashboard(
+              CalmToday(
                 onStart: _openDashboardSession,
                 onProgress: _openDashboardProgress,
               ),
@@ -382,7 +383,7 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              NmStreakVideo(
+              CalmStreakFilm(
                 onTap: () => _go(1),
                 onStoreTap: () => _go(3),
               ),
@@ -394,14 +395,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            PromoPairBanner(
-              onMeditation: () => _go(1),
-              onStore: () => _go(3),
-              onPractice: () => _go(1),
-              onQuotes: () => _push(const QuotesWeekScreen()),
-              onEarn: () => _push(const EarnHubScreen()),
-              onConnect: () => NwsbLinks.connect(context),
-            ),
+            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
             MainOptionsSection(onGo: _go, onAction: _openMainOption),
           ],
         )),
@@ -415,6 +409,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('spotlight', const SizedBox.shrink()),
         ('tiles', const SizedBox.shrink()),
         ('storiesFind', const SizedBox.shrink()),
+        // Same card as bcb6baf; the cap only holds the quote at 28px.
         ('buddhaGyro', QuoteTypeCap(
           maxSize: 28,
           child: BuddhaGyroStage(
@@ -422,46 +417,24 @@ class _HomeNormalState extends State<HomeNormal> {
             onOpenQuotes: () => _push(const QuotesWeekScreen()),
           ),
         )),
-        (
-          'store',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(8, onTap: () => _go(3)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const EarnUmbrellaSection(),
-            ],
-          ),
-        ),
+        ('store', CalmStoreAndEarn(onStore: () => _go(3))),
         (
           'reader',
-          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            NmReader(onTap: () => _push(const ReaderHubScreen())),
-            const SizedBox(height: 24),
-            // Signed out: 'Sign in to see your rewards'; signed in: the vault.
-            const YourRewardsSection(),
-          ]),
+          // Signed out: 'Sign in to see your rewards'; signed in: coins.
+          CalmReaderRewards(onReader: () => _push(const ReaderHubScreen())),
         ),
         (
           'trendwd',
-          NmTrending(onTap: () => _go(2)),
+          CalmTrending(onTap: () => _go(2)),
         ),
         ('custom', null),
         ('rx', null),
         ('routines', const SizedBox.shrink()),
         ('condisc', const SizedBox.shrink()),
-        ('feed', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          NmFeed(onTap: () => NwsbLinks.connect(context)),
-        ])),
+        ('feed', CalmCommunity(onTap: () => NwsbLinks.connect(context))),
         (
           'quickrow',
-          QuickAccessSection(
+          CalmQuickRow(
             onCart: () => NwsbLinks.cart(context),
             onWishlist: () => NwsbLinks.wishlist(context),
             onOrders: () => _go(4),
@@ -469,19 +442,12 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('trendshop', const SizedBox.shrink()),
         ('subvid', const SizedBox.shrink()),
-        (
-          'edition',
-          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            EditionSection(onTap: () => _push(const SubscriptionScreen())),
-            const SizedBox(height: 24),
-            const PartnerHomeSection(),
-          ])
-        ),
-        ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
+        ('edition', CalmMembership(onEdition: () => _push(const SubscriptionScreen()))),
+        ('ebooks', CalmEbooks(onTap: () => _push(const EbooksStoreScreen()))),
         ('connectban', const SizedBox.shrink()),
         (
           'healing',
-          HealingSection(
+          CalmHealing(
             onTap: () => _push(const HealingPathScreen()),
             onFemale: () => _push(
                 const HealingPathScreen(initialGender: HealingGender.female)),
@@ -496,9 +462,9 @@ class _HomeNormalState extends State<HomeNormal> {
         ('msearch', null),
         (
           'fashsw',
-          NmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
+          CalmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
         ),
-        ('footer', HomeFooterSection(onLink: _footerLink)),
+        ('footer', CalmFooter(onLink: _footerLink)),
       ];
 
   @override
