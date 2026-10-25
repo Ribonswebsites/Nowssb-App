@@ -184,7 +184,7 @@ class _PracticeBannerCarouselState extends State<PracticeBannerCarousel>
           onPageChanged: (i) => setState(() => _page = i),
           itemBuilder: (_, i) => Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: RoutineStyleBlackBanner(title: b[i].title, subtitle: b[i].subtitle, onTap: b[i].onTap),
+            child: RoutineStyleBlackBanner(title: b[i].title, subtitle: b[i].subtitle, onTap: b[i].onTap, heavy: true),
           ),
         ),
       ),
@@ -206,7 +206,19 @@ class FashHeroRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionPane(
-      child: TvFrame(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Same label style as the NowssB Store header (home_cards.dart).
+          const Padding(
+            padding: EdgeInsets.fromLTRB(2, 0, 2, 10),
+            child: Text('Make it yours',
+                key: ValueKey('fash-herorow-heading'),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, decoration: TextDecoration.none)),
+          ),
+          TvFrame(
         asset: 'assets/video/word-acts.mp4',
         frame: DeviceFrame.wordActs,
         priority: ClipPriority.feature,
@@ -247,6 +259,8 @@ class FashHeroRow extends StatelessWidget {
             ),
           ],
         ),
+      ),
+        ],
       ),
     );
   }

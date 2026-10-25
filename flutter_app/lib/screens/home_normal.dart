@@ -48,8 +48,8 @@ import '../data/settings.dart';
 import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/home_banner_slot.dart';
-import '../widgets/meditation_flip_banner.dart';
+import '../widgets/four_banners.dart';
+import 'normal/promo_pair_banner.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -68,20 +68,6 @@ import 'normal/sections_bottom.dart';
 import 'normal/sections_top.dart';
 import 'normal/rotating_promo_rail.dart';
 import 'shared_sections.dart';
-import 'normal/calm/calm_sections.dart';
-import 'daily_tasks.dart';
-import '../features/circle/circle_screen.dart';
-import '../features/vault/vault_screen.dart';
-import '../features/programs/reference_program.dart';
-import '../features/gifts/gifts_screen.dart';
-import '../features/programs/gifts_program.dart';
-import '../features/economy/coupon_screen.dart';
-import '../data/firebase.dart';
-import '../features/economy/economy_api.dart';
-import 'nwsb_sign_in_sheet.dart';
-import '../features/programs/coupons_program.dart';
-import '../features/programs/partner_program.dart';
-import '../widgets/hype_rail.dart';
 import 'fashion/sections_mid.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
@@ -333,97 +319,13 @@ class _HomeNormalState extends State<HomeNormal> {
     }
   }
 
-  /// Routes every calm-kit tap (essentials → footer) to its destination.
-  void _calm(String a) {
-    if (a.startsWith('grid:')) return _openGrid(a.substring(5));
-    if (a.startsWith('enter:')) return _openEnter(a.substring(6));
-    if (a.startsWith('footer:')) return _footerLink(a.substring(7));
-    if (a.startsWith('main:')) {
-      final p = a.split(':');
-      return _openMainOption(p[1], int.parse(p[2]));
-    }
-    if (a.startsWith('cta:')) return NwsbLinks.cta(context, a.substring(4));
-    if (a.startsWith('hype:')) {
-      final id = a.substring(5);
-      final open = openHypeCard;
-      if (open != null) return open(context, id);
-      return NwsbLinks.cta(context, id);
-    }
-    switch (a) {
-      case 'tasks':
-        _push(const DailyTasksPage());
-      case 'library-today' || 'stories' || 'trending':
-        _go(2);
-      case 'routine' || 'daypart' || 'today' || 'streak' || 'practice' || 'flip' || 'routines':
-        _go(1);
-      case 'streak-store' || 'raredrop' || 'trendshop':
-        _go(3);
-      case 'wayaround' || 'support' || 'orders':
-        _go(4);
-      case 'coach':
-        _push(const PersonalCoachScreen());
-      case 'quotes':
-        _push(const QuotesWeekScreen());
-      case 'earn':
-        _push(const CircleScreen());
-      case 'reader':
-        _push(const ReaderHubScreen());
-      case 'rewards':
-        // Same gate the old Rewards block used: no account, no vault.
-        if (NwsbFirebase.ready && EconomyMirror.instance.uid != null) {
-          _push(const VaultScreen());
-        } else {
-          NwsbSignInPage.open(context);
-        }
-      case 'invite' || 'reference':
-        _push(const ReferenceProgramPage());
-      case 'gift-send':
-        _push(const GiftsScreen());
-      case 'gift-redeem':
-        _push(const GiftsScreen(startOnRedeem: true));
-      case 'gift-rules':
-        _push(const GiftsProgramPage());
-      case 'coupon-free':
-        _push(const CouponScreen());
-      case 'coupons':
-        _push(const CouponsProgramPage());
-      case 'connect':
-        NwsbLinks.connect(context);
-      case 'cart':
-        NwsbLinks.cart(context);
-      case 'wishlist':
-        NwsbLinks.wishlist(context);
-      case 'subscribe':
-        _push(const SubscriptionScreen());
-      case 'partner':
-        _push(const PartnerProgramPage());
-      case 'ebooks':
-        _push(const EbooksStoreScreen());
-      case 'healing':
-        _push(const HealingPathScreen());
-      case 'healing-f':
-        _push(const HealingPathScreen(initialGender: HealingGender.female));
-      case 'healing-m':
-        _push(const HealingPathScreen(initialGender: HealingGender.male));
-      case 'fashion':
-        Settings.instance.setFashionHome(true);
-    }
-  }
-
   /// The twenty-nine, in `REG.norm.items` order. A null widget is a row with
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
   List<(String, Widget?)> _sections() => [
         ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
-        (
-          'promoRail',
-          NormalPromoRail(
-            onStore: () => _go(3),
-            onPlayer: () => _go(1),
-            onEarn: () => _push(const EarnHubScreen()),
-          ),
-        ),
+        ('promoRail', const SizedBox.shrink()),
         (
           'dashboard',
           Column(
@@ -441,46 +343,162 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Same look as the 'Your essentials' heading right below.
               const Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 4),
-                child: NormalHomeBannerSlot(),
+                padding: EdgeInsets.fromLTRB(24, 0, 20, 14),
+                child: EditableLabel('home_normal.TrioRail', 'Your programmes',
+                    key: ValueKey('nm-trio-heading'),
+                    style: TextStyle(
+                        fontSize: 21,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2B2D33))),
               ),
-              CalmEssentials(onAct: _calm),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
+                child: TrioRail(),
+              ),
+              const NmSuppliedEssentials(),
             ],
           ),
         ),
-        ('routineCards', CalmRoutines(onAct: _calm)),
-        ('herovid', CalmToday(onAct: _calm)),
-        ('streak', NmStreak(onTap: () => _go(1))),
-        ('practice', CalmPractice(onAct: _calm)),
-        ('mainops', CalmWhereToBegin(onAct: _calm)),
-        ('actionbar', CalmHelp(onAct: _calm)),
-        ('catTiles', CalmCategories(onAct: _calm)),
-        ('spotlight', CalmSpotlight(onAct: _calm)),
-        ('tiles', CalmEnter(onAct: _calm)),
-        ('storiesFind', CalmStories(onAct: _calm)),
-        ('buddhaGyro', CalmQuote(onAct: _calm)),
-        ('store', CalmEarn(onAct: _calm)),
-        ('reader', CalmReader(onAct: _calm)),
-        ('trendwd', CalmTrending(onAct: _calm)),
+        ('routineCards', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+              child: ColoredSplitPromoBanner.forSurface(
+                SplitPromoSurface.normalHome,
+                onTap: () => _go(2),
+                margin: EdgeInsets.zero,
+              ),
+            ),
+            const NmHorizontalRoutineCards(),
+            const EarthDayFilm(),
+            PromoColorGrid(onOpen: _openGrid),
+          ],
+        )),
+        (
+          'herovid',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              NmStreakVideo(
+                onTap: () => _go(1),
+                onStoreTap: () => _go(3),
+              ),
+            ],
+          ),
+        ),
+        ('streak', const SizedBox.shrink()),
+        ('practice', const SizedBox.shrink()),
+        ('mainops', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PromoPairBanner(
+              onMeditation: () => _go(1),
+              onStore: () => _go(3),
+              onPractice: () => _go(1),
+              onQuotes: () => _push(const QuotesWeekScreen()),
+              onEarn: () => _push(const EarnHubScreen()),
+              onConnect: () => NwsbLinks.connect(context),
+            ),
+            MainOptionsSection(onGo: _go, onAction: _openMainOption),
+          ],
+        )),
+        (
+          'actionbar',
+          NmSuppliedActionBar(
+              onSupport: () => _go(4),
+              onCoach: () => _push(const PersonalCoachScreen()))
+        ),
+        ('catTiles', const SizedBox.shrink()),
+        ('spotlight', const SizedBox.shrink()),
+        ('tiles', const SizedBox.shrink()),
+        ('storiesFind', const SizedBox.shrink()),
+        ('buddhaGyro', QuoteTypeCap(
+          maxSize: 28,
+          child: BuddhaGyroStage(
+            neumorphic: true,
+            onOpenQuotes: () => _push(const QuotesWeekScreen()),
+          ),
+        )),
+        (
+          'store',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                child: ColoredSplitPromoBanner(
+                  spec: SplitPromoExtras.at(8, onTap: () => _go(3)),
+                  margin: EdgeInsets.zero,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const EarnUmbrellaSection(),
+            ],
+          ),
+        ),
+        (
+          'reader',
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            NmReader(onTap: () => _push(const ReaderHubScreen())),
+            const SizedBox(height: 24),
+            // Signed out: 'Sign in to see your rewards'; signed in: the vault.
+            const YourRewardsSection(),
+          ]),
+        ),
+        (
+          'trendwd',
+          NmTrending(onTap: () => _go(2)),
+        ),
         ('custom', null),
         ('rx', null),
-        ('routines', CalmMyRoutines(onAct: _calm)),
-        ('condisc', CalmConnectNotes(onAct: _calm)),
-        ('feed', CalmFeed(onAct: _calm)),
-        ('quickrow', CalmQuick(onAct: _calm)),
-        ('trendshop', CalmTrendShop(onAct: _calm)),
+        ('routines', const SizedBox.shrink()),
+        ('condisc', const SizedBox.shrink()),
+        ('feed', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          NmFeed(onTap: () => NwsbLinks.connect(context)),
+        ])),
+        (
+          'quickrow',
+          QuickAccessSection(
+            onCart: () => NwsbLinks.cart(context),
+            onWishlist: () => NwsbLinks.wishlist(context),
+            onOrders: () => _go(4),
+          )
+        ),
+        ('trendshop', const SizedBox.shrink()),
         ('subvid', const SizedBox.shrink()),
-        ('edition', CalmEdition(onAct: _calm)),
-        ('ebooks', CalmEbooks(onAct: _calm)),
-        ('connectban', CalmConnectChips(onAct: _calm)),
-        ('healing', CalmHealing(onAct: _calm)),
-        // Choose Your Path lives inside the healing card.
+        (
+          'edition',
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            EditionSection(onTap: () => _push(const SubscriptionScreen())),
+            const SizedBox(height: 24),
+            const PartnerHomeSection(),
+          ])
+        ),
+        ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
+        ('connectban', const SizedBox.shrink()),
+        (
+          'healing',
+          HealingSection(
+            onTap: () => _push(const HealingPathScreen()),
+            onFemale: () => _push(
+                const HealingPathScreen(initialGender: HealingGender.female)),
+            onMale: () => _push(
+                const HealingPathScreen(initialGender: HealingGender.male)),
+          ),
+        ),
+        // Choose Your Path is slide 2 of HealingSection — do not inject a
+        // second banner/section (that caused stacked banners + blank pages).
         ('genderpath', const SizedBox.shrink()),
         ('wsearch', null),
         ('msearch', null),
-        ('fashsw', CalmFashionSwitch(onAct: _calm)),
-        ('footer', CalmFooter(onAct: _calm)),
+        (
+          'fashsw',
+          NmFashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
+        ),
+        ('footer', HomeFooterSection(onLink: _footerLink)),
       ];
 
   @override
@@ -521,10 +539,8 @@ class _HomeNormalState extends State<HomeNormal> {
         for (final (k, w) in built)
           if (w != null && (k != 'healing' || Settings.instance.showHealing))
             if (w is SizedBox && w.width == 0 && w.height == 0)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: KeyedSubtree(key: ValueKey('nm-$k'), child: w),
-              )
+              // Retired rows keep their key for the admin but take no room.
+              KeyedSubtree(key: ValueKey('nm-$k'), child: w)
             else
               LSection(
                 k,
@@ -533,6 +549,8 @@ class _HomeNormalState extends State<HomeNormal> {
                   padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
                   child: KeyedSubtree(key: ValueKey('nm-$k'), child: w),
                 ),
+                // No server-side duplicates of a Normal section.
+                copyable: false,
                 carousel: kNormalCarousels.contains(k),
               ),
       ],
@@ -669,18 +687,25 @@ class _TopRow extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        const EditableLabel('home_normal.TopRow',
-          'NowssB',
-          maxLines: 1,
-          softWrap: false,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.3,
-            color: Color(0xFF1A1A1A),
+        // Shrinks (never grows) on the narrowest phones so the right
+        // cluster keeps its room.
+        const Expanded(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: EditableLabel('home_normal.TopRow',
+              'NowssB',
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
           ),
         ),
-        const Spacer(),
         // Right cluster: Settings | Notifications | Hamburger
         // Quick access belongs in Fashion Hero — bell returns here.
         _HeaderButton(

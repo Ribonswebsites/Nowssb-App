@@ -392,11 +392,16 @@ class RoutineStyleBlackBanner extends StatelessWidget {
     required this.title,
     required this.subtitle,
     this.onTap,
+    this.heavy = false,
   });
 
   final String title;
   final String subtitle;
   final VoidCallback? onTap;
+
+  /// Fashion home: the heavy greeting weight (header name line), not the
+  /// default w700.
+  final bool heavy;
 
   @override
   Widget build(BuildContext context) {
@@ -418,12 +423,12 @@ class RoutineStyleBlackBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 '$title\n$subtitle',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   height: 1.08,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -.3,
+                  fontWeight: heavy ? FontWeight.w800 : FontWeight.w700,
+                  letterSpacing: heavy ? -.5 : -.3,
                 ),
               ),
             ),

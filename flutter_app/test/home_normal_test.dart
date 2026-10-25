@@ -14,12 +14,10 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nowssb/screens/normal/calm/calm_kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/home_normal.dart';
-import 'package:nowssb/screens/nwsb_sign_in_sheet.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/app_backdrop.dart';
@@ -133,6 +131,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
       expect(tester.takeException(), isNull, reason: 'threw scrolling back');
     }
+    // Let carousel timers settle once the tree is gone.
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(minutes: 2));
   });
 
   testWidgets('every black bar on the Normal home goes somewhere',
@@ -158,6 +159,9 @@ void main() {
     }
 
     expect(seen, greaterThan(0), reason: 'no bars were ever built');
+    // Let carousel timers settle once the tree is gone.
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(minutes: 2));
   });
 
   testWidgets('the pool ceiling holds while the page scrolls', (tester) async {
@@ -170,6 +174,9 @@ void main() {
       expect(VideoPool.instance.liveCount, lessThanOrEqualTo(VideoPool.maxLive),
           reason: 'the decoder ceiling broke at scroll $i');
     }
+    // Let carousel timers settle once the tree is gone.
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(minutes: 2));
   });
 
   testWidgets('a shared section wears each home\'s own language',
@@ -184,32 +191,15 @@ void main() {
     // (its own heading was saying the same thing underneath it) and the
     // streak banner moved down the page, so the first screen carries none.
     final list = find.byType(Scrollable).first;
-    for (var i = 0; i < 40 && find.byType(CalmHead).evaluate().isEmpty; i++) {
+    for (var i = 0; i < 40 && find.byType(WrapHead).evaluate().isEmpty; i++) {
       await tester.drag(list, const Offset(0, -400));
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    final head = tester.widgetList<CalmHead>(find.byType(CalmHead));
+    final head = tester.widgetList<WrapHead>(find.byType(WrapHead));
     expect(head, isNotEmpty,
         reason: 'the Normal home should use the neumorphic head');
     expect(find.byType(SectionHead), findsNothing,
         reason: 'the glass head has no business on the pale home');
-  });
-
-  testWidgets('Rewards asks you to sign in before it opens the vault',
-      (tester) async {
-    // Same gate the old Rewards block used: signed out, the tile goes to
-    // sign-in, never straight into the vault.
-    await pump(tester);
-    final tile = find.byKey(const ValueKey('calm:rewards'), skipOffstage: false);
-    await tester.scrollUntilVisible(tile, 400, scrollable: find.byType(Scrollable).first);
-    await tester.pump();
-    await tester.tap(tile, warnIfMissed: false);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 400));
-    // The sign-in page's own header row overflows under the test font; that
-    // page is not part of this change, so only the route is checked here.
-    tester.takeException();
-    expect(find.byType(NwsbSignInPage), findsOneWidget);
   });
 }

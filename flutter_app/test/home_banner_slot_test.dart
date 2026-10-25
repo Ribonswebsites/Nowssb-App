@@ -1,4 +1,5 @@
-// Home banner slot: every door opens its programme on both homes.
+// Fashion home banner slot: every door opens its programme. (The Normal
+// home keeps the original TrioRail; see home_normal_test.dart.)
 // Set HOME_BANNER_SHOTS=<dir> to also write the two phone-size renders.
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -66,7 +67,7 @@ void main() {
     await _font('CormorantGaramond', 'assets/fonts/CormorantGaramond-Variable.ttf');
   });
 
-  for (final fashion in [false, true]) {
+  for (final fashion in [true]) {
     final name = fashion ? 'fashion' : 'normal';
     testWidgets('$name slot: every door opens its programme', (t) async {
       t.view.physicalSize = const Size(390, 760);
@@ -76,7 +77,7 @@ void main() {
       void rec(BuildContext _, Programme p, String? tab) => opened.add((p, tab));
       await t.pumpWidget(_frame(
         fashion: fashion,
-        slot: fashion ? FashionHomeBannerSlot(onOpen: rec) : NormalHomeBannerSlot(onOpen: rec),
+        slot: FashionHomeBannerSlot(onOpen: rec),
       ));
       for (final d in homeDoors) {
         final f = find.byKey(ValueKey('$name-door-${d.label}'));
@@ -99,7 +100,7 @@ void main() {
         fashion: fashion,
         scale: 1.3,
         width: 320,
-        slot: fashion ? const FashionHomeBannerSlot() : const NormalHomeBannerSlot(),
+        slot: const FashionHomeBannerSlot(),
       ));
       await t.pump();
       expect(t.takeException(), isNull);
@@ -118,7 +119,7 @@ void main() {
             fashion: fashion,
             scale: scale,
             width: w,
-            slot: fashion ? const FashionHomeBannerSlot() : const NormalHomeBannerSlot(),
+            slot: const FashionHomeBannerSlot(),
           ),
         ));
         await _precache(t);

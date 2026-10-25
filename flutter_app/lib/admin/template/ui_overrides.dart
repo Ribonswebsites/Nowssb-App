@@ -314,6 +314,8 @@ class UiOverrides extends ChangeNotifier {
   double sectionZoomOf(String pageId, String sectionId) {
     final z = get(sectionZoomKey(pageId, sectionId))?.style['zoom'];
     if (z is! num) return 1;
+    // Normal home never scales a section up; shrinking is still allowed.
+    if (pageId == 'home.normal') return z.toDouble().clamp(0.55, 1.0);
     return z.toDouble().clamp(0.55, 1.85);
   }
 

@@ -1,10 +1,9 @@
-/// The banner slot just above 'Your essentials' — one design per home.
+/// The Fashion home's banner slot just above its routine cards.
 ///
-/// Both homes open the same six programme doors the old three-card rail
-/// ([TrioRail]) did, with the same pictures. Only the shape differs:
-/// * Normal home: a raised neumorphic console of soft buttons.
-/// * Fashion home: a wide editorial poster with the doors as glass pills
-///   along its foot.
+/// The Fashion home opens the same six programme doors the three-card rail
+/// ([TrioRail]) does, with the same pictures, as a wide editorial poster
+/// with the doors as glass pills along its foot. The Normal home keeps the
+/// original [TrioRail] itself.
 library;
 
 import 'dart:ui' show ImageFilter;
@@ -71,147 +70,6 @@ Widget _tinted(HomeDoor d, {Alignment alignment = const Alignment(0, -0.2)}) => 
     );
 
 // ---------------------------------------------------------------- Normal
-
-const _nmBg = NwsbColors.surface;
-
-/// Soft inset: darker on the top-left, lighter on the bottom-right, as if
-/// pressed into the surface (Flutter has no inner box-shadow).
-BoxDecoration _inset(BorderRadius r) => BoxDecoration(
-      borderRadius: r,
-      gradient: const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [Color(0xFFD9DCE4), Color(0xFFEDEFF4), Color(0xFFFAFBFD)],
-        stops: [0, 0.45, 1],
-      ),
-      border: Border.all(color: const Color(0x0F000000)),
-    );
-
-BoxDecoration _raised(BorderRadius r, List<BoxShadow> s) => BoxDecoration(color: _nmBg, borderRadius: r, boxShadow: s);
-
-/// Normal home: one raised neumorphic console. A wide inset coin readout on
-/// top, then the other five doors as raised soft buttons with inset wells.
-/// A pressed button sinks into the surface.
-class NormalHomeBannerSlot extends StatelessWidget {
-  const NormalHomeBannerSlot({super.key, this.onOpen = _defaultOpen});
-  final HomeDoorOpener onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    final coins = homeDoors.firstWhere((d) => d.isCoins);
-    final rest = homeDoors.where((d) => !d.isCoins).toList();
-    Widget btn(HomeDoor d) => Expanded(child: _NeuDoor(door: d, onOpen: onOpen));
-    const gap = SizedBox(width: 14);
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: _raised(BorderRadius.circular(28), NwsbShadows.raised),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _NeuDoor(door: coins, onOpen: onOpen, readout: true),
-          const SizedBox(height: 14),
-          IntrinsicHeight(
-              child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [btn(rest[0]), gap, btn(rest[1]), gap, btn(rest[3])])),
-          const SizedBox(height: 14),
-          Row(children: [btn(rest[2]), gap, btn(rest[4])]),
-        ],
-      ),
-    );
-  }
-}
-
-class _NeuDoor extends StatefulWidget {
-  const _NeuDoor({required this.door, required this.onOpen, this.readout = false});
-  final HomeDoor door;
-  final HomeDoorOpener onOpen;
-  final bool readout;
-
-  @override
-  State<_NeuDoor> createState() => _NeuDoorState();
-}
-
-class _NeuDoorState extends State<_NeuDoor> {
-  bool _down = false;
-
-  void _set(bool v) {
-    if (_down != v) setState(() => _down = v);
-  }
-
-  Widget _well(double size) => Container(
-        width: size,
-        height: size,
-        padding: const EdgeInsets.all(4),
-        decoration: _inset(BorderRadius.circular(size)),
-        child: ClipOval(child: _tinted(widget.door)),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    final d = widget.door;
-    final r = BorderRadius.circular(widget.readout ? 20 : 18);
-    const ink = Color(0xFF2A2D3A);
-    final Widget body;
-    if (widget.readout) {
-      body = Row(children: [
-        _well(44),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(d.short,
-              maxLines: 2, style: const TextStyle(color: Color(0xFF6B6F7D), fontSize: 13, fontWeight: FontWeight.w600)),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: _inset(BorderRadius.circular(14)),
-          child: _coins((c) => Text('$c',
-              style: TextStyle(
-                  color: d.tint,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  fontFeatures: const [FontFeature.tabularFigures()]))),
-        ),
-      ]);
-    } else {
-      body = Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
-        _well(42),
-        const SizedBox(height: 8),
-        // One line, never broken mid-word: shrinks a touch when very tight.
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(d.short,
-              maxLines: 1,
-              softWrap: false,
-              style: const TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w600)),
-        ),
-      ]);
-    }
-    return Semantics(
-      button: true,
-      label: d.label,
-      excludeSemantics: true,
-      child: GestureDetector(
-        key: ValueKey('normal-door-${d.label}'),
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (_) => _set(true),
-        onTapCancel: () => _set(false),
-        onTapUp: (_) => _set(false),
-        onTap: () => widget.onOpen(context, d.programme, d.tab),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          padding: widget.readout
-              ? const EdgeInsets.fromLTRB(10, 10, 12, 10)
-              : const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-          decoration: _down ? _inset(r) : _raised(r, NwsbShadows.raisedXs),
-          child: body,
-        ),
-      ),
-    );
-  }
-}
-
-// --------------------------------------------------------------- Fashion
 
 /// Fashion home: a wide editorial poster, the doors as glass pills on it.
 class FashionHomeBannerSlot extends StatelessWidget {

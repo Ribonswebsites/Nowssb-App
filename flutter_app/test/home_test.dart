@@ -71,13 +71,11 @@ void main() {
     // someone reading this later.
     expect(tester.takeException(), isNull);
 
-    // The calm Normal home carries no clips of its own any more; any clip
-    // that is built still has to hold a lease, which is the only way a clip
-    // gets a decoder in this app.
+    // The clips are real, and each took a lease — which is the only way a
+    // clip gets a decoder in this app.
     await scrollToClips(tester);
-    if (find.byType(NwsbVideo).evaluate().isNotEmpty) {
-      expect(VideoPool.instance.leaseCount, greaterThan(0));
-    }
+    expect(find.byType(NwsbVideo), findsWidgets);
+    expect(VideoPool.instance.leaseCount, greaterThan(0));
 
     debugPrint('home: ${tester.widgetList(find.byType(NwsbVideo)).length} '
         'clips built, ${VideoPool.instance.leaseCount} leases');
@@ -92,6 +90,7 @@ void main() {
     // pool has never heard of — exactly the hole the website had.
     await scrollToClips(tester);
     final clips = tester.widgetList<NwsbVideo>(find.byType(NwsbVideo));
+    expect(clips, isNotEmpty);
     for (final v in clips) {
       expect(v.asset, startsWith('assets/video/'));
       expect(v.asset, endsWith('.mp4'));
