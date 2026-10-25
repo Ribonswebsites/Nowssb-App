@@ -78,7 +78,25 @@ class FashionHomeBannerSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
+    // Heading sits in the wrapper, above the photo; the pills stay on it.
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+      Padding(
+          padding: const EdgeInsets.fromLTRB(4, 4, 4, 12),
+          child: Text(
+                'Words, rewards, and what you have earned.',
+                key: const ValueKey('fashion-poster-heading'),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontFamily: 'CormorantGaramond',
+                  color: Colors.white.withValues(alpha: 0.95),
+                  fontSize: 25,
+                  height: 1.05,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w500,
+                ),
+              )),
+      ClipRRect(
       borderRadius: BorderRadius.circular(28),
       child: SizedBox(
         height: 300,
@@ -102,24 +120,6 @@ class FashionHomeBannerSlot extends StatelessWidget {
               ),
             ),
             Positioned(
-              left: 20,
-              right: 20,
-              bottom: 74,
-              child: Text(
-                'Words, rewards, and what you have earned.',
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'CormorantGaramond',
-                  color: Colors.white.withValues(alpha: 0.95),
-                  fontSize: 25,
-                  height: 1.05,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            Positioned(
               left: 0,
               right: 0,
               bottom: 14,
@@ -135,7 +135,8 @@ class FashionHomeBannerSlot extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ),
+    ]);
   }
 }
 
