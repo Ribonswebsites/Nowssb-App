@@ -123,7 +123,7 @@ class CalmRoutines extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.$1.toUpperCase(), style: const TextStyle(fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w700, color: calmSoft)),
                 const SizedBox(height: 2),
-                Text(p.$2, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15.5, height: 1.25, fontWeight: FontWeight.w700, color: calmInk)),
+                Text(p.$2, style: const TextStyle(fontSize: 15.5, height: 1.25, fontWeight: FontWeight.w700, color: calmInk)),
                 const SizedBox(height: 10),
                 CalmPill('Start your practice', onTap: () => onAct('daypart')),
               ]),
@@ -260,8 +260,8 @@ class CalmWhereToBegin extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(w.$1, maxLines: 1, style: TextStyle(fontSize: 13, letterSpacing: 2, fontWeight: FontWeight.w800, color: w.$3.ink)),
-                    Text(w.$2, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: w.$3.ink.withValues(alpha: 0.75))),
+                    Text(w.$1, style: TextStyle(fontSize: 13, letterSpacing: 2, fontWeight: FontWeight.w800, color: w.$3.ink)),
+                    Text(w.$2, style: TextStyle(fontSize: 11.5, color: w.$3.ink.withValues(alpha: 0.75))),
                   ]),
                 ),
               ),
@@ -317,7 +317,7 @@ class CalmHelp extends StatelessWidget {
               child: Icon(icon, color: const Color(0xFF5B5BD6), size: 26),
             ),
             const SizedBox(height: 10),
-            Text(label, textAlign: TextAlign.center, maxLines: 2, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: calmInk)),
+            Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: calmInk)),
           ]),
         ),
       );
@@ -439,7 +439,7 @@ class CalmStories extends StatelessWidget {
                   padding: const EdgeInsets.all(14),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                     Text(s.$1, style: TextStyle(fontSize: 11, letterSpacing: 2.2, fontWeight: FontWeight.w800, color: s.$3.ink.withValues(alpha: 0.7))),
-                    Text(s.$2, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 15, height: 1.15, fontWeight: FontWeight.w700, color: s.$3.ink)),
+                    Text(s.$2, style: TextStyle(fontSize: 15, height: 1.15, fontWeight: FontWeight.w700, color: s.$3.ink)),
                   ]),
                 ),
               ),
@@ -486,8 +486,6 @@ class CalmQuote extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     const Text('“', style: TextStyle(fontSize: 44, height: 0.8, color: Color(0xFF8C7BC7))),
                     Text(q,
-                        maxLines: 6,
-                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(fontFamily: 'CormorantGaramond', fontSize: 21, height: 1.3, fontWeight: FontWeight.w600, color: Color(0xFF3B3366))),
                     const SizedBox(height: 14),
                     const Text('See the week  →', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: Color(0xFF4B3F8C))),
@@ -551,9 +549,9 @@ class CalmEarn extends StatelessWidget {
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(tiers[i].$2, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: Color.lerp(const Color(0xFF5FA88A), const Color(0xFF4B3F8C), i / 5)!)),
                         const SizedBox(height: 4),
-                        Text(tiers[i].$1, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, height: 1.2, fontWeight: FontWeight.w700, color: calmInk)),
+                        Text(tiers[i].$1, style: const TextStyle(fontSize: 12.5, height: 1.2, fontWeight: FontWeight.w700, color: calmInk)),
                         const Spacer(),
-                        Text(tiers[i].$3.split(' · ').first, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 11, color: calmSoft)),
+                        Text(tiers[i].$3.split(' · ').first, style: const TextStyle(fontSize: 11, color: calmSoft)),
                       ]),
                     ),
                   ),
@@ -655,7 +653,7 @@ class CalmTrending extends StatelessWidget {
             const SizedBox(width: 14),
             const Expanded(
               child: Text('See which words are healing the most people right now',
-                  maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 13, height: 1.3, color: calmSoft)),
+                  style: TextStyle(fontSize: 13, height: 1.3, color: calmSoft)),
             ),
             const NwsbIcon(NwsbMarks.trending, size: 22, color: Color(0xFF5FA88A)),
           ]),
@@ -698,7 +696,7 @@ class CalmMyRoutines extends StatelessWidget {
                       const SizedBox(height: 6),
                       FittedBox(
                         fit: BoxFit.scaleDown,
-                        child: Text(parts[i].$1, maxLines: 1, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: parts[i].$3.ink)),
+                        child: Text(parts[i].$1, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: parts[i].$3.ink)),
                       ),
                     ]),
                   ),
@@ -874,13 +872,16 @@ class CalmEdition extends StatelessWidget {
                   onTap: () => onAct('subscribe'),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Row(children: [
-                      const CalmDisc(NwsbMarks.crown, color: Color(0xFF3B3366), size: 42),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Text('Get your subscription today',
-                            maxLines: 2, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
-                      ),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      const Row(children: [
+                        CalmDisc(NwsbMarks.crown, color: Color(0xFF3B3366), size: 42),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text('Get your subscription today',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                        ),
+                      ]),
+                      const SizedBox(height: 12),
                       CalmPill('Upgrade Now', onTap: () => onAct('subscribe'), color: const Color(0xFF3B3366)),
                     ]),
                   ),
@@ -963,9 +964,9 @@ class CalmFashionSwitch extends StatelessWidget {
             child: const Row(children: [
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Discover the experience', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: calmSoft)),
+                  Text('Discover the experience', style: TextStyle(fontSize: 11.5, color: calmSoft)),
                   Text('Fashion Mode', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: calmInk)),
-                  Text('Dark · Cinematic · Editorial', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11.5, color: calmSoft)),
+                  Text('Dark · Cinematic · Editorial', style: TextStyle(fontSize: 11.5, color: calmSoft)),
                 ]),
               ),
               CircleAvatar(radius: 20, backgroundColor: Color(0xFF1C1C24), child: Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20)),

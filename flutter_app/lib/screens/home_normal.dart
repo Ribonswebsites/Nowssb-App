@@ -76,6 +76,9 @@ import '../features/programs/reference_program.dart';
 import '../features/gifts/gifts_screen.dart';
 import '../features/programs/gifts_program.dart';
 import '../features/economy/coupon_screen.dart';
+import '../data/firebase.dart';
+import '../features/economy/economy_api.dart';
+import 'nwsb_sign_in_sheet.dart';
 import '../features/programs/coupons_program.dart';
 import '../features/programs/partner_program.dart';
 import '../widgets/hype_rail.dart';
@@ -366,7 +369,12 @@ class _HomeNormalState extends State<HomeNormal> {
       case 'reader':
         _push(const ReaderHubScreen());
       case 'rewards':
-        _push(const VaultScreen());
+        // Same gate the old Rewards block used: no account, no vault.
+        if (NwsbFirebase.ready && EconomyMirror.instance.uid != null) {
+          _push(const VaultScreen());
+        } else {
+          NwsbSignInPage.open(context);
+        }
       case 'invite' || 'reference':
         _push(const ReferenceProgramPage());
       case 'gift-send':

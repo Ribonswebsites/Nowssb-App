@@ -71,12 +71,8 @@ class CalmHead extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               if (eyebrow != null)
                 Text(eyebrow!.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w700, color: calmSoft)),
               Text(title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(fontSize: 19, height: 1.2, fontWeight: FontWeight.w700, color: calmInk)),
             ]),
           ),
@@ -150,13 +146,18 @@ class CalmTile extends StatelessWidget {
   final VoidCallback onTap;
   final bool dense;
 
-  /// One-word titles never break mid-word: they shrink to fit instead.
+  /// Titles never break mid-word: one-word titles shrink to fit, and small
+  /// grid tiles cap the text scale a little so their words stay whole.
   Widget _title() {
     final style = TextStyle(fontSize: dense ? 13 : 14.5, height: 1.2, fontWeight: FontWeight.w700, color: tone.ink);
     if (!title.contains(' ')) {
       return FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(title, maxLines: 1, style: style));
     }
-    return Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: style);
+    if (!dense) return Text(title, style: style);
+    return Builder(
+      builder: (context) => Text(title,
+          style: style, textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.1)),
+    );
   }
 
   @override
@@ -179,8 +180,6 @@ class CalmTile extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(99)),
                       child: Text(badge!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: tone.ink)),
                     ),
                   ),
@@ -190,8 +189,6 @@ class CalmTile extends StatelessWidget {
               if (sub != null) ...[
                 const SizedBox(height: 3),
                 Text(sub!,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 11.5, height: 1.25, color: tone.ink.withValues(alpha: 0.72))),
               ],
             ]),
@@ -237,15 +234,23 @@ class CalmRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = calmScale(context);
-    return SizedBox(
-      height: height * (s < 1 ? 1 : s) + 16,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.symmetric(horizontal: inWrap ? 0 : 16, vertical: inWrap ? 0 : 6),
-        clipBehavior: inWrap ? Clip.hardEdge : Clip.none,
-        itemCount: children.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
-        itemBuilder: (_, i) => SizedBox(width: width * (s < 1 ? 1 : (1 + (s - 1) * 0.5)), child: children[i]),
+    final w = width * (s < 1 ? 1 : (1 + (s - 1) * 0.5));
+    // The row is as tall as its tallest card, so labels wrap instead of
+    // being cut; [height] is only the floor.
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: EdgeInsets.symmetric(horizontal: inWrap ? 0 : 16, vertical: inWrap ? 0 : 6),
+      clipBehavior: inWrap ? Clip.hardEdge : Clip.none,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: height),
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0) const SizedBox(width: 10),
+              SizedBox(width: w, child: children[i]),
+            ],
+          ]),
+        ),
       ),
     );
   }
@@ -269,8 +274,6 @@ class CalmPill extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
             child: Text(label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: color)),
           ),
         ),
@@ -317,19 +320,13 @@ class CalmBand extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(eyebrow!.toUpperCase(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 10, letterSpacing: 1.5, fontWeight: FontWeight.w700, color: tone.ink.withValues(alpha: 0.7))),
                       ),
                     Text(title,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 17, height: 1.22, fontWeight: FontWeight.w700, color: tone.ink)),
                     if (sub != null) ...[
                       const SizedBox(height: 4),
                       Text(sub!,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 12.5, height: 1.3, color: tone.ink.withValues(alpha: 0.75))),
                     ],
                     if (cta != null) ...[
@@ -374,9 +371,9 @@ class CalmRow extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: calmInk)),
+                Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: calmInk)),
                 if (sub != null)
-                  Text(sub!, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, height: 1.25, color: calmSoft)),
+                  Text(sub!, style: const TextStyle(fontSize: 12, height: 1.25, color: calmSoft)),
               ]),
             ),
             const Icon(Icons.chevron_right_rounded, size: 20, color: calmSoft),

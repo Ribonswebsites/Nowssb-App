@@ -146,6 +146,13 @@ void main() {
         scale: 1.3, width: 320, height: 9000));
     await t.pump();
     expect(t.takeException(), isNull);
+    // No label may be cut short with an ellipsis at this size.
+    final cut = <String>[];
+    for (final e in find.byType(RichText, skipOffstage: false).evaluate()) {
+      final r = e.renderObject! as RenderParagraph;
+      if (r.overflow == TextOverflow.ellipsis && r.didExceedMaxLines) cut.add(r.text.toPlainText());
+    }
+    expect(cut, isEmpty, reason: 'ellipsised at 320 × 1.3: $cut');
   });
 
   final dir = Platform.environment['HOME_NORMAL_SHOTS'];

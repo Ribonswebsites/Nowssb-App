@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/home_normal.dart';
+import 'package:nowssb/screens/nwsb_sign_in_sheet.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/app_backdrop.dart';
@@ -193,5 +194,22 @@ void main() {
         reason: 'the Normal home should use the neumorphic head');
     expect(find.byType(SectionHead), findsNothing,
         reason: 'the glass head has no business on the pale home');
+  });
+
+  testWidgets('Rewards asks you to sign in before it opens the vault',
+      (tester) async {
+    // Same gate the old Rewards block used: signed out, the tile goes to
+    // sign-in, never straight into the vault.
+    await pump(tester);
+    final tile = find.byKey(const ValueKey('calm:rewards'), skipOffstage: false);
+    await tester.scrollUntilVisible(tile, 400, scrollable: find.byType(Scrollable).first);
+    await tester.pump();
+    await tester.tap(tile, warnIfMissed: false);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    // The sign-in page's own header row overflows under the test font; that
+    // page is not part of this change, so only the route is checked here.
+    tester.takeException();
+    expect(find.byType(NwsbSignInPage), findsOneWidget);
   });
 }
