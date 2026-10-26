@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
+import '../store/store_shelf.dart' show kPlaceRows;
 import 'poster_kit.dart';
 
 const _slot = 'concept.PosterSignature';
@@ -26,6 +27,12 @@ String sigTitle(MsSignatureEntry e) => e.word.replaceAll(RegExp(r'\s*signature\s
 
 /// The line above a signature card's title: the category, unless it would
 /// just repeat the title ("Elements / Elements") — then the real root line.
+/// Live price of a place-row signature word (Countries / Capitals / ...).
+num sigPlacePrice(String name) => StorePrices.instance.priceFor('signature:${name.toLowerCase()}', kind: 'signature');
+
+/// The four place decks, in the store's order.
+const kSigPlaceGroups = ['Countries', 'Capitals', 'Currency', 'Language'];
+
 String sigKicker(String cat, MsSignatureEntry e) => cat.toLowerCase() == sigTitle(e).toLowerCase() ? e.root : cat;
 
 String _blurb(String key) => (kMsWordBlurb[key] ?? '').replaceAll('&rsquo;', '’');
@@ -40,6 +47,10 @@ class PosterSignature extends StatelessWidget {
     required this.onBuySignatureWord,
     required this.onOpenSignatureMeaning,
     required this.onBuySignatureMeaning,
+    required this.onOpenPlace,
+    required this.onCartPlace,
+    required this.onBuyPlace,
+    required this.onRequest,
     this.controller,
   });
   final VoidCallback onBack, onOpenStores, onOpenBag;
@@ -55,6 +66,18 @@ class PosterSignature extends StatelessWidget {
 
   /// Card "Own" → storeBuyNow(meaningBagItem(.. signature: true)).
   final void Function(String category, MsSignatureEntry e) onBuySignatureMeaning;
+
+  /// Place card "Open" → openAtelierWord(word: name, root: row root).
+  final void Function((String, String, String) row) onOpenPlace;
+
+  /// Place card "Add to cart" → storeAddToCart(wordBagItem(.. signature: true)) + cart hint.
+  final void Function((String, String, String) row, num price) onCartPlace;
+
+  /// Place card "Own" → storeBuyNow(wordBagItem(.. signature: true)).
+  final void Function((String, String, String) row, num price) onBuyPlace;
+
+  /// "Request a Signature" → openRequestWords.
+  final VoidCallback onRequest;
   final ScrollController? controller;
 
   @override
@@ -91,6 +114,22 @@ class PosterSignature extends StatelessWidget {
         const Kicker(_slot, 'Signature meanings'),
         for (final e in meanings)
           _Card(cat: e.key, e: e.value, onOpen: () => onOpenSignatureMeaning(e.key, e.value), onBuy: () => onBuySignatureMeaning(e.key, e.value)),
+        for (final g in kSigPlaceGroups) ...[
+          Kicker(_slot, 'Signature $g'),
+          _PlaceDeck(
+            rows: [for (final r in kPlaceRows) if (r.$3 == g) r],
+            onOpen: onOpenPlace,
+            onCart: onCartPlace,
+            onBuy: onBuyPlace,
+          ),
+        ],
+        PosterRequest(
+          tag: 'Signature · Request',
+          title: 'Request a Signature',
+          body: 'Personally crafted & delivered within 48 hours.',
+          action: 'Request',
+          onTap: onRequest,
+        ),
       ],
     );
   }
@@ -349,4 +388,64 @@ class _Card extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// A sideways deck of gold-edged place tickets (Countries, Capitals, ...).
+class _PlaceDeck extends StatelessWidget {
+  const _PlaceDeck({required this.rows, required this.onOpen, required this.onCart, required this.onBuy});
+  final List<(String, String, String)> rows;
+  final void Function((String, String, String)) onOpen;
+  final void Function((String, String, String), num) onCart, onBuy;
+  @override
+  Widget build(BuildContext context) => SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.fromLTRB(16, 0, 6, 12),
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (var i = 0; i < rows.length; i++)
+              _Place(row: rows[i], i: i, onOpen: () => onOpen(rows[i]), onCart: (p) => onCart(rows[i], p), onBuy: (p) => onBuy(rows[i], p)),
+          ]),
+        ),
+      );
+}
+
+class _Place extends StatelessWidget {
+  const _Place({required this.row, required this.i, required this.onOpen, required this.onCart, required this.onBuy});
+  final (String, String, String) row;
+  final int i;
+  final VoidCallback onOpen;
+  final void Function(num) onCart, onBuy;
+  @override
+  Widget build(BuildContext context) {
+    final p = sigPlacePrice(row.$1);
+    final id = 'signature:${row.$1.toLowerCase()}';
+    final shown = priceOrNull(id, p);
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: Semantics(
+        button: true,
+        label: 'Open ${row.$1}',
+        child: Tap(
+          onTap: onOpen,
+          child: Container(
+            width: 220,
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(6), border: Border.all(color: kPGold.withValues(alpha: .7))),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('No. ${(i + 1).toString().padLeft(2, '0')} · ${row.$2}', style: gSub(color: kPGoldSoft)),
+              const SizedBox(height: 6),
+              SizedBox(height: 44, child: GiantWord(row.$1.toUpperCase(), style: anton(48, color: kPGold))),
+              const Spacer(),
+              const SizedBox(height: 12),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                GoldPill(label: shown == null ? ownedLabel(id) : 'Own · $shown', onTap: shown == null ? onOpen : () => onBuy(p)),
+                if (shown != null) GoldPill(label: 'Add to cart', onTap: () => onCart(p), dark: true),
+                GoldPill(label: 'Open', onTap: onOpen, dark: true, arrow: true),
+              ]),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
 }

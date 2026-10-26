@@ -492,3 +492,91 @@ class Photo extends StatelessWidget {
   @override
   Widget build(BuildContext context) => EditableImage.asset(asset, slot: slot, id: id, fit: BoxFit.cover, alignment: align);
 }
+
+/// Poster search strip: ink field on a gold rule. [onGo] fires on the
+/// keyboard's search key with the current query.
+class PosterSearch extends StatelessWidget {
+  const PosterSearch({super.key, required this.controller, required this.hint, required this.onChanged, required this.onGo});
+  final TextEditingController controller;
+  final String hint;
+  final ValueChanged<String> onChanged, onGo;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
+        child: Container(
+          decoration: const BoxDecoration(color: Color(0xF20A0A0D), border: Border(bottom: BorderSide(color: kPGold, width: 2))),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: TextField(
+            controller: controller,
+            onChanged: onChanged,
+            onSubmitted: onGo,
+            textInputAction: TextInputAction.search,
+            cursorColor: kPGold,
+            style: gHello(color: Colors.white),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: hint,
+              hintStyle: gHello(color: const Color(0xFF9A95A8)),
+              icon: const Icon(Icons.search_rounded, color: kPGold),
+            ),
+          ),
+        ),
+      );
+}
+
+/// "Nothing matched" note under a poster search, with the request route.
+class PosterNoMatch extends StatelessWidget {
+  const PosterNoMatch(this.text, {super.key, required this.onRequest});
+  final String text;
+  final VoidCallback onRequest;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          InkTag(text),
+          const SizedBox(height: 12),
+          GoldPill(label: 'Request this word', onTap: onRequest, arrow: true),
+        ]),
+      );
+}
+
+/// A poster "request" bill: gold sticker, Anton headline, one line of copy
+/// and a pill — not a list row.
+class PosterRequest extends StatelessWidget {
+  const PosterRequest({super.key, required this.tag, required this.title, required this.body, required this.action, required this.onTap});
+  final String tag, title, body, action;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 26, 16, 8),
+        child: Tap(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+            decoration: BoxDecoration(color: kPPaper, borderRadius: BorderRadius.circular(4)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              GoldTag(tag),
+              const SizedBox(height: 10),
+              Text(title.toUpperCase(), style: anton(34, color: kPInk, height: 1.02)),
+              const SizedBox(height: 6),
+              Text(body, style: gSub(dark: false)),
+              const SizedBox(height: 14),
+              GoldPill(label: action, onTap: onTap, dark: true, arrow: true),
+            ]),
+          ),
+        ),
+      );
+}
+
+/// The cart hint after an add-to-cart (the Atelier's original wording).
+void posterCartHint(BuildContext context) {
+  final m = ScaffoldMessenger.maybeOf(context);
+  if (m == null) return;
+  m
+    ..hideCurrentSnackBar()
+    ..showSnackBar(const SnackBar(
+      content: Text('Your cart is waiting in Profile → Cart'),
+      behavior: SnackBarBehavior.floating,
+      duration: Duration(seconds: 2),
+    ));
+}

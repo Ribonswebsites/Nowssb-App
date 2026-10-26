@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import '../library.dart';
 import '../store/bag_ui.dart';
 import '../store/product_detail.dart';
+import '../store/request_words.dart';
+import '../../data/cart_bag.dart' show BagItem;
 import '../store/store_actions.dart';
 import '../store/store_art.dart';
 import '../../data/store_catalog.dart';
@@ -37,6 +39,12 @@ void posterBack(BuildContext x) => Navigator.of(x).maybePop();
 void posterBag(BuildContext x) => showBagSheet(x, BagKind.cart);
 void posterPush(BuildContext x, Widget page) => Navigator.of(x).push(MaterialPageRoute<void>(builder: (_) => page));
 
+/// Add to the cart, then the cart hint ("Your cart is waiting in Profile → Cart").
+Future<void> posterAddToCart(BuildContext x, BagItem item) async {
+  await storeAddToCart(x, item);
+  if (x.mounted) posterCartHint(x);
+}
+
 /// The store picker sheet (the same one every store page opens).
 void posterStores(BuildContext x, String current) => showStoreSelectSheet(
       x,
@@ -52,7 +60,7 @@ Widget posterAtelierPage(BuildContext x, {ScrollController? controller, DateTime
       onOpenStores: () => posterStores(x, 'word'),
       onOpenBag: () => posterBag(x),
       onOpenWord: (e, p) => openAtelierWord(x, word: e.word, root: e.root, img: kRmWordImg, price: p),
-      onAddToCart: (e, p) => storeAddToCart(x, wordBagItem(name: e.word, root: e.root, img: kRmWordImg, price: p)),
+      onAddToCart: (e, p) => posterAddToCart(x, wordBagItem(name: e.word, root: e.root, img: kRmWordImg, price: p)),
       onBuy: (e, p) => storeBuyNow(x, wordBagItem(name: e.word, root: e.root, img: kRmWordImg, price: p)),
       onOpenCategory: (cat) => showStoreViewAllPanel(
         x,
@@ -101,6 +109,10 @@ Widget posterSignaturePage(BuildContext x, {ScrollController? controller}) => Po
       ),
       onBuySignatureMeaning: (cat, e) =>
           storeBuyNow(x, meaningBagItem(word: e.word, root: e.root, img: kNowssbStoreMark, price: sigMeaningPrice(e), signature: true)),
+      onOpenPlace: (r) => openAtelierWord(x, word: r.$1, root: r.$2, img: kNowssbStoreMark, signature: true, price: sigPlacePrice(r.$1)),
+      onCartPlace: (r, p) => posterAddToCart(x, wordBagItem(name: r.$1, root: r.$2, img: kNowssbStoreMark, price: p, signature: true)),
+      onBuyPlace: (r, p) => storeBuyNow(x, wordBagItem(name: r.$1, root: r.$2, img: kNowssbStoreMark, price: p, signature: true)),
+      onRequest: () => openRequestWords(x),
     );
 
 /// The Ebooks Store poster (EbooksStoreScreen's page).
