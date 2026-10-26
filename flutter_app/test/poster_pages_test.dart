@@ -17,7 +17,9 @@ import 'package:nowssb/data/content.dart';
 import 'package:nowssb/data/entitlements.dart';
 import 'package:nowssb/features/economy/money.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/screens/poster/poster_pages.dart';
+import 'package:nowssb/screens/store/word_atelier.dart';
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/concept/stillwater.dart';
 
@@ -126,6 +128,10 @@ final specs = <PosterSpec>[
     final lib = ContentStore.instance.library;
     return {for (final i in PosterTrending.chart(lib, _now)) 'word:${lib[i].word.toLowerCase()}'};
   }, 'Own · ', 'Hear it'),
+  PosterSpec('atelier', () => WordAtelierScreen(now: _now), () => {
+        for (final c in kRmCategories)
+          for (final w in c.words) 'word:${w.word.toLowerCase()}',
+      }, 'Own · ', 'Open'),
 ];
 
 void main() {
@@ -143,6 +149,10 @@ void main() {
     Entitlements.instance.debugSet(uid: 'u1');
     // Ribon's region: India (the located country the IP lookup sets).
     FxBook.instance.country = 'IN';
+    // The store research sheet is agreed (it asks once per store).
+    SharedPreferences.setMockInitialValues({
+      for (final w in ['word', 'meaning', 'signature', 'ebook', 'ebooks']) 'nwsb_terms_$w': '1',
+    });
   });
   tearDown(() {
     Stillwater.debugPhase = null;

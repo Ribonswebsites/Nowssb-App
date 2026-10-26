@@ -214,7 +214,8 @@ class _TopBar extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                Text('NowssB.', maxLines: 1, style: gTitle()),
+                // Three round icons leave little room at 320@1.3: shrink, never clip.
+                FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text('NowssB.', maxLines: 1, style: gTitle())),
                 EditableLabel(widget.slot, widget.kicker.toUpperCase(), id: 'kicker', maxLines: 3, style: gSub(color: kPGoldSoft)),
               ]),
             ),
