@@ -472,10 +472,15 @@ class _HomeCouponShelfState extends State<HomeCouponShelf> {
                     onPageChanged: (i) => setState(() => _page = i),
                     itemBuilder: (context, i) {
                       final d = kWideCoupons[i];
-                      final w = c.maxWidth * 0.88 - 10;
+                      // Laid out at the full card width (so nothing on the
+                      // ticket is cut short) and scaled to fit its page.
                       return Padding(
                         padding: const EdgeInsets.only(right: 10),
-                        child: WideCoupon(data: d, width: w, expires: couponExpiry(d.copy), scissorsLeft: i.isEven),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: WideCoupon(data: d, width: c.maxWidth, expires: couponExpiry(d.copy), scissorsLeft: i.isEven),
+                        ),
                       );
                     },
                   ),

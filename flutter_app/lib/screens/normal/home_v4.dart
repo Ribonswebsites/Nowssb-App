@@ -245,6 +245,7 @@ class V4PillBlock extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
             Flexible(
+              flex: 3,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(14)),
@@ -253,7 +254,9 @@ class V4PillBlock extends StatelessWidget {
             ),
             if (aside != null) ...[
               const SizedBox(width: 8),
-              Expanded(
+              Flexible(
+                flex: 2,
+                fit: FlexFit.tight,
                 child: Text(aside!,
                     textAlign: TextAlign.right,
                     style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _accent)),
