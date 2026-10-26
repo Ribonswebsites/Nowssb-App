@@ -31,7 +31,7 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
       decoration: neu(r: 30), padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
-          const Text('Trending now', style: nHello),
+          const Flexible(child: Text('Trending now', style: nHello)),
           const SizedBox(width: 8),
           Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(color: nLink, borderRadius: BorderRadius.circular(10)),
