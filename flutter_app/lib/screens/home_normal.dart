@@ -53,6 +53,7 @@ import '../widgets/meditation_flip_banner.dart';
 import 'normal/calm_v3.dart';
 import 'normal/home_v4.dart';
 import 'normal/home_v5.dart';
+import '../widgets/concept/normal/fashion_switch.dart';
 import '../features/programs/partner_program.dart';
 import '../features/programs/reference_program.dart';
 import '../features/vault/vault_screen.dart';
@@ -440,7 +441,7 @@ class _HomeNormalState extends State<HomeNormal> {
             onPartner: () => _push(const PartnerProgramPage()),
           )
         ),
-        ('ebooks', V4Ebooks(onTap: () => _push(const EbooksStoreScreen()))),
+        ('ebooks', V5Ebooks(onBrowse: () => _push(const EbooksStoreScreen()))),
         ('connectban', const SizedBox.shrink()),
         (
           'healing',
@@ -459,7 +460,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('msearch', null),
         (
           'fashsw',
-          V4FashionSwitch(onTap: () => Settings.instance.setFashionHome(true))
+          NFashionSwitch(onSwitch: () => Settings.instance.setFashionHome(true))
         ),
         ('footer', V4Footer(onLink: _footerLink)),
       ];

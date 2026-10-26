@@ -14,7 +14,9 @@ import '../../data/content.dart';
 import '../../data/firebase.dart';
 import '../../data/models.dart';
 import '../../data/play_subscriptions.dart';
+import '../../data/store_catalog.dart';
 import '../../features/economy/economy_api.dart';
+import '../../widgets/concept/normal/ebooks.dart';
 import '../../widgets/concept/normal/edition.dart';
 import '../../widgets/concept/normal/invite.dart';
 import '../../widgets/concept/normal/own.dart';
@@ -149,3 +151,14 @@ class V5EditionPartner extends StatelessWidget {
       );
 }
 
+/// eBooks from the store catalogue (kEbBooks).
+class V5Ebooks extends StatelessWidget {
+  const V5Ebooks({super.key, required this.onBrowse});
+  final VoidCallback onBrowse;
+  @override
+  Widget build(BuildContext context) => NEbooks(
+        key: const ValueKey('v5-ebooks'),
+        onBrowse: onBrowse,
+        books: [for (final b in kEbBooks) (b.key, b.title)],
+      );
+}

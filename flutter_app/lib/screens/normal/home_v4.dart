@@ -767,37 +767,6 @@ class V4Community extends StatelessWidget {
       );
 }
 
-// ───────────────────────── ebooks ─────────────────────────
-
-class V4Ebooks extends StatelessWidget {
-  const V4Ebooks({super.key, required this.onTap});
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => V4Card(
-        key: const ValueKey('v4-ebooks'),
-        onTap: onTap,
-        child: Row(children: [
-          const _Well(
-            size: Size(96, 120),
-            child: V4Film('assets/video/hero-ebooks.mp4', slot: 'ebooks', radius: 18),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Row(children: [
-                Expanded(child: Text('NOWSSB EBOOKS', style: _eyebrow)),
-                V4Lottie(_pages, size: 40),
-              ]),
-              const SizedBox(height: 6),
-              const Text('Word science and sound healing, read anywhere.', style: _h),
-              const SizedBox(height: 12),
-              CalmGo(label: 'Browse eBooks', onTap: onTap),
-            ]),
-          ),
-        ]),
-      );
-}
-
 // ───────────────────────── healing ─────────────────────────
 
 class V4Healing extends StatelessWidget {
@@ -823,36 +792,6 @@ class V4Healing extends StatelessWidget {
             CalmGo(label: 'Her path', onTap: onFemale),
             CalmGo(label: 'His path', light: true, onTap: onMale),
           ]),
-        ]),
-      );
-}
-
-// ───────────────────────── fashsw ─────────────────────────
-
-class V4FashionSwitch extends StatelessWidget {
-  const V4FashionSwitch({super.key, this.onTap});
-  final VoidCallback? onTap;
-  @override
-  Widget build(BuildContext context) => V4Card(
-        key: const ValueKey('v4-fashion'),
-        onTap: onTap,
-        child: Row(children: [
-          const _Well(
-            circle: true,
-            size: Size.square(76),
-            child: V4Film('assets/video/practice-orb.mp4', slot: 'fashion', circle: true),
-          ),
-          const SizedBox(width: 14),
-          const Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('DISCOVER THE EXPERIENCE', style: _eyebrow),
-              SizedBox(height: 6),
-              Text('Fashion Mode', style: _h),
-              SizedBox(height: 2),
-              Text('Dark · Cinematic · Editorial', style: _sub),
-            ]),
-          ),
-          CalmGo(label: 'Switch', onTap: onTap),
         ]),
       );
 }
