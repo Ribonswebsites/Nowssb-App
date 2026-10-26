@@ -1323,13 +1323,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // Days this account actually practiced (PracticeProgress), read-only.
           final done = week[i].done;
           final future = i > today;
-          return AnimatedContainer(
+          // Seven 42dp dots need 294dp; a 320dp screen leaves less, so
+          // each dot may shrink (staying round) instead of overflowing (B023).
+          return Flexible(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 42), child: AspectRatio(aspectRatio: 1, child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
-              width: 42,
-              height: 42,
               decoration: BoxDecoration(shape: BoxShape.circle, color: done ? const Color(0xFFF2F2F0) : Colors.transparent, border: Border.all(color: future ? _borderSoft : (i == today ? const Color(0xD9FFFFFF) : _borderSoft), width: i == today ? 1.5 : 1)),
               child: Center(child: Text(const ['M','T','W','T','F','S','S'][i], style: TextStyle(fontFamily: _mono, fontSize: 13, fontWeight: i == today ? FontWeight.w600 : FontWeight.w400, color: done ? Colors.black : (future ? _dim.withOpacity(.32) : _dim)))),
-          );
+          ))));
         })),
       );
   }
