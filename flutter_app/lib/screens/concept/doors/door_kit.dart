@@ -556,8 +556,8 @@ class DoorDock extends StatelessWidget {
                   TextSpan(text: line, style: doorGreet(color: Colors.white)),
                   if (extra != null) TextSpan(text: '  $extra', style: doorBody(13, color: doorGoldSoft, w: FontWeight.w800)),
                 ]),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                // Full size, never cut: a long name or price wraps.
+                softWrap: true,
               ),
             ]),
           ),
