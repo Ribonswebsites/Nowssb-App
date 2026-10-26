@@ -79,6 +79,7 @@ Widget posterAtelierPage(BuildContext x, {ScrollController? controller, DateTime
         ],
         onOpenWord: (w, r, img, p) => openAtelierWord(x, word: w, root: r, img: img, price: p),
       ),
+      onRequest: () => openRequestWords(x),
     );
 
 /// The Meaning Store poster (MeaningStoreScreen's page).

@@ -12,7 +12,13 @@ import 'poster_kit.dart';
 
 const _slot = 'concept.PosterAtelier';
 
-class PosterAtelier extends StatelessWidget {
+/// Search match on word or root (the Atelier's original filter).
+bool atelierMatches(RmWordEntry e, String q) {
+  final k = q.trim().toLowerCase();
+  return k.isEmpty || e.word.toLowerCase().contains(k) || e.root.toLowerCase().contains(k);
+}
+
+class PosterAtelier extends StatefulWidget {
   const PosterAtelier({
     super.key,
     required this.onBack,
@@ -22,6 +28,7 @@ class PosterAtelier extends StatelessWidget {
     required this.onAddToCart,
     required this.onBuy,
     required this.onOpenCategory,
+    required this.onRequest,
     this.controller,
     this.now,
   });
@@ -38,6 +45,9 @@ class PosterAtelier extends StatelessWidget {
 
   /// "All N words" under a category → the category's full rail.
   final void Function(RmCategory c) onOpenCategory;
+
+  /// Search "go" with an empty query or no match / the no-match note → openRequestWords.
+  final VoidCallback onRequest;
   final ScrollController? controller;
   final DateTime? now;
 
@@ -68,30 +78,57 @@ class PosterAtelier extends StatelessWidget {
   }
 
   @override
+  State<PosterAtelier> createState() => _PosterAtelierState();
+}
+
+class _PosterAtelierState extends State<PosterAtelier> {
+  final _search = TextEditingController();
+  String _q = '';
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final rails = PosterAtelier.rails();
-    final hero = pick(now ?? DateTime.now());
+    final w = widget;
+    final rails = [
+      for (final r in PosterAtelier.rails())
+        if (r.$2.any((e) => atelierMatches(e, _q))) (r.$1, r.$2.where((e) => atelierMatches(e, _q)).toList())
+    ];
+    final hero = PosterAtelier.pick(w.now ?? DateTime.now());
     final heroPrice = wordPrice(hero.word);
     return PosterScaffold(
       slot: _slot,
       kicker: 'Word Atelier · The cutting table',
-      controller: controller,
-      onBack: onBack,
-      onOpenStores: onOpenStores,
-      onOpenBag: onOpenBag,
+      controller: w.controller,
+      onBack: w.onBack,
+      onOpenStores: w.onOpenStores,
+      onOpenBag: w.onOpenBag,
       tint: kPGold,
-      dock: _Dock(word: hero, price: heroPrice, onBuy: () => onBuy(hero, heroPrice), onOpen: () => onOpenWord(hero, heroPrice)),
+      dock: _Dock(word: hero, price: heroPrice, onBuy: () => w.onBuy(hero, heroPrice), onOpen: () => w.onOpenWord(hero, heroPrice)),
       children: [
-        _Hero(word: hero, price: heroPrice, onBuy: () => onBuy(hero, heroPrice), onOpen: () => onOpenWord(hero, heroPrice)),
+        _Hero(word: hero, price: heroPrice, onBuy: () => w.onBuy(hero, heroPrice), onOpen: () => w.onOpenWord(hero, heroPrice)),
+        PosterSearch(
+          controller: _search,
+          hint: 'Search words or roots',
+          onChanged: (v) => setState(() => _q = v),
+          onGo: (v) {
+            if (v.trim().isEmpty || !kRmCategories.any((c) => c.words.any((e) => atelierMatches(e, v)))) w.onRequest();
+          },
+        ),
+        if (rails.isEmpty) PosterNoMatch('No words match this search in this collection.', onRequest: w.onRequest),
         for (var i = 0; i < rails.length; i++) ...[
-          _CategoryTile(cat: rails[i].$1, index: i, onTap: () => onOpenCategory(rails[i].$1)),
+          _CategoryTile(cat: rails[i].$1, index: i, onTap: () => w.onOpenCategory(rails[i].$1)),
           _Swatches(
             cat: rails[i].$1,
             words: rails[i].$2,
             index: i,
-            onOpen: (e, p) => onOpenWord(e, p),
-            onAdd: (e, p) => onAddToCart(e, p),
-            onAll: () => onOpenCategory(rails[i].$1),
+            onOpen: (e, p) => w.onOpenWord(e, p),
+            onAdd: (e, p) => w.onAddToCart(e, p),
+            onAll: () => w.onOpenCategory(rails[i].$1),
           ),
         ],
       ],
