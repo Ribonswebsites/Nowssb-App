@@ -279,10 +279,15 @@ class _HeroEssential extends StatelessWidget {
               colors: [Color(0xFFB794F6), Color(0xFF7E57C2)]),
           boxShadow: NwsbShadows.raised,
         ),
-        child: Stack(
+        // No LayoutBuilder here: the timeline row sizes us with
+        // IntrinsicHeight. B022: on narrow phones / large text the art moves
+        // into the top row and the words take the full card width.
+        child: Builder(builder: (context) {
+          final narrow = _narrow(context);
+          return Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(right: 88),
+              padding: EdgeInsets.only(right: narrow ? 0 : 88),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
@@ -294,27 +299,46 @@ class _HeroEssential extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: const Color(0x8CFFFFFF),
                             borderRadius: BorderRadius.circular(20)),
-                        child: const EditableLabel('neomorphic_essentials.HeroEssential', '● ● ●  543',
-                            style: TextStyle(
-                                fontSize: 12.5,
-                                color: _ink,
-                                fontWeight: FontWeight.w700)),
+                        // Real dots, not '●' glyphs the bundled fonts lack.
+                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                          for (var i = 0; i < 3; i++) ...[
+                            const Icon(Icons.circle, size: 7, color: _ink),
+                            const SizedBox(width: 3),
+                          ],
+                          const SizedBox(width: 4),
+                          const EditableLabel('neomorphic_essentials.HeroEssential', '543',
+                              style: TextStyle(
+                                  fontSize: 12.5,
+                                  color: _ink,
+                                  fontWeight: FontWeight.w700)),
+                        ]),
                       ),
                       const Spacer(),
-                      const EditableLabel('neomorphic_essentials.HeroEssential', '•••',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w800, color: _ink)),
+                      if (narrow)
+                        const V4Lottie(kMeditateLottie, size: 48)
+                      else
+                        const EditableLabel('neomorphic_essentials.HeroEssential', '•••',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w800, color: _ink)),
                     ]),
                     const SizedBox(height: 14),
                     Row(children: [
                       Icon(icon, size: 17, color: _ink),
                       const SizedBox(width: 8),
                       Expanded(
-                          child: EditableLabel('neomorphic_essentials.HeroEssential', title,
-                              style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: _ink)))
+                          child: narrow
+                              ? Text(title,
+                                  maxLines: 3,
+                                  softWrap: true,
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      color: _ink))
+                              : EditableLabel('neomorphic_essentials.HeroEssential', title,
+                                  style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      color: _ink)))
                     ]),
                     const SizedBox(height: 8),
                     Row(children: [
@@ -338,13 +362,15 @@ class _HeroEssential extends StatelessWidget {
                   ]),
             ),
             // The v4 'Your essentials' meditation Lottie (was the composing orb).
-            const Positioned(
-              right: 0,
-              bottom: 0,
-              child: V4Lottie(kMeditateLottie, size: 64),
-            ),
+            if (!narrow)
+              const Positioned(
+                right: 0,
+                bottom: 0,
+                child: V4Lottie(kMeditateLottie, size: 64),
+              ),
           ],
-        ),
+        );
+        }),
       );
 }
 
@@ -362,7 +388,11 @@ class _PillEssential extends StatelessWidget {
             color: const Color(0xFFECEEF2),
             borderRadius: BorderRadius.circular(20),
             boxShadow: NwsbShadows.raisedSm),
-        child: Row(children: [
+        // B022: on narrow phones / large text the circles go on top so the
+        // title gets the full width (no LayoutBuilder: IntrinsicHeight).
+        child: Builder(builder: (context) {
+          final narrow = _narrow(context);
+          final circles = <Widget>[
           Container(
               width: 44,
               height: 44,
@@ -381,23 +411,41 @@ class _PillEssential extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: NwsbShadows.raisedXs),
               child: Icon(icon, color: const Color(0xFF9AA0AB), size: 20)),
-          const SizedBox(width: 14),
-          Expanded(
-              child: Column(
+          ];
+          const titleStyle = TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF2B2D33));
+          final text = Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                EditableLabel('neomorphic_essentials.PillEssential', title,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF2B2D33))),
+                narrow
+                    ? Text(title, maxLines: 3, softWrap: true, style: titleStyle)
+                    : EditableLabel('neomorphic_essentials.PillEssential', title,
+                        style: titleStyle),
                 const SizedBox(height: 3),
                 Text(duration,
                     style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF8A8F9A)))
-              ])),
-        ]),
+              ]);
+          if (narrow) {
+            return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: circles),
+              const SizedBox(height: 10),
+              text,
+            ]);
+          }
+          return Row(children: [
+            ...circles,
+            const SizedBox(width: 14),
+            Expanded(child: text),
+          ]);
+        }),
       );
 }
+
+/// Narrow = the essentials cards would leave under ~ 18 em for the words.
+bool _narrow(BuildContext context) =>
+    MediaQuery.sizeOf(context).width < 400 * MediaQuery.textScalerOf(context).scale(1);
