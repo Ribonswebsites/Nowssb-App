@@ -190,7 +190,9 @@ void main() {
       expect(find.byType(DoorStartArtScreen), findsOneWidget);
       final picker = t.widget<DoorStartArtPicker>(find.byType(DoorStartArtPicker));
       expect(picker.stills.first.id, '-1');
-      expect(picker.stills.skip(1).map((x) => x.asset), Settings.fashionImages);
+      expect(picker.stills.skip(1).map((x) => x.asset), [
+        for (var i = 0; i < Settings.fashionImages.length; i++) doorStillArt(Settings.fashionImageName(i), Settings.fashionImages[i])
+      ]);
       for (final x in picker.stills.skip(1)) {
         expect(File(x.asset!).existsSync(), isTrue, reason: x.asset);
       }

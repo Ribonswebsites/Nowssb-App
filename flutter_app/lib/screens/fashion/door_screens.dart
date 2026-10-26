@@ -76,7 +76,7 @@ class DoorStartArtScreen extends StatelessWidget {
         stills: [
           const DoorStill(id: '-1', name: 'NowssB Black'),
           for (var i = 0; i < Settings.fashionImages.length; i++)
-            DoorStill(id: '$i', name: Settings.fashionImageName(i), asset: Settings.fashionImages[i]),
+            DoorStill(id: '$i', name: Settings.fashionImageName(i), asset: doorStillArt(Settings.fashionImageName(i), Settings.fashionImages[i])),
         ],
         selectedId: '${s.fashionImageIndex}',
         onPickImage: (id) {
@@ -89,27 +89,39 @@ class DoorStartArtScreen extends StatelessWidget {
   }
 }
 
+/// Start art tiles: the Meanings and eBooks stills show the text-free doors
+/// art (the real stills carry printed type); the others keep their own.
+String doorStillArt(String name, String asset) {
+  if (name.startsWith('Meanings')) return 'assets/doors/meanings.webp';
+  if (name.startsWith('eBooks')) return 'assets/doors/ebooks.webp';
+  return asset;
+}
+
 /// Per-feature rolodex art (local, text-free posters) and socket icons.
 const _accessArt = <String, String>{
-  'connect': 'assets/video/nm-calm-clouds-poster.webp',
-  'practice': 'assets/video/practice-halo-poster.webp',
-  'library': 'assets/video/player-box-rings-poster.webp',
-  'store': 'assets/video/choose-store-poster.webp',
-  'profile': 'assets/video/normal-glass-background-poster.webp',
-  'progress': 'assets/video/my-progress-scene-1-poster.webp',
-  'wordscience': 'assets/video/practice-orb-poster.webp',
-  'meaningstore': 'assets/video/nm-calm-stream-poster.webp',
-  'search': 'assets/video/earth-morning-poster.webp',
-  'cart': 'assets/video/earth-afternoon-poster.webp',
-  'wishlist': 'assets/video/player-aura-bg-poster.webp',
-  'routines': 'assets/video/earth-morning-poster.webp',
-  'chat': 'assets/hero-curve/listen.webp',
-  'ai': 'assets/video/orb-loop-poster.webp',
-  'streak': 'assets/video/earth-evening-poster.webp',
-  'journal': 'assets/hero-curve/stillness.webp',
-  'settings': 'assets/video/player-box-rings-poster.webp',
-  'everything': 'assets/video/hero-bg-poster.webp',
+  'connect': 'assets/doors/connect.webp',
+  'practice': 'assets/doors/practice.webp',
+  'library': 'assets/doors/library.webp',
+  'store': 'assets/doors/store.webp',
+  'profile': 'assets/doors/profile.webp',
+  'progress': 'assets/doors/progress.webp',
+  'wordscience': 'assets/doors/wordscience.webp',
+  'meaningstore': 'assets/doors/meaningstore.webp',
+  'search': 'assets/doors/search.webp',
+  'cart': 'assets/doors/cart.webp',
+  'wishlist': 'assets/doors/wishlist.webp',
+  'routines': 'assets/doors/routines.webp',
+  'chat': 'assets/doors/chat.webp',
+  'ai': 'assets/doors/ai.webp',
+  'streak': 'assets/doors/streak.webp',
+  'journal': 'assets/doors/journal.webp',
+  'settings': 'assets/doors/settings.webp',
+  'everything': 'assets/doors/everything.webp',
 };
+
+/// Every Access feature's own art (one file each), for the test.
+@visibleForTesting
+Map<String, String> get doorAccessArt => _accessArt;
 const _accessIcon = <String, IconData>{
   'connect': Icons.people_outline,
   'practice': Icons.mic_none_rounded,
@@ -178,6 +190,9 @@ class DoorFashionPlusScreen extends StatefulWidget {
   const DoorFashionPlusScreen({super.key, this.debugPhase});
   final double? debugPhase;
 
+  @visibleForTesting
+  static List<DoorJump> get jumps => _DoorFashionPlusScreenState.jumps;
+
   @override
   State<DoorFashionPlusScreen> createState() => _DoorFashionPlusScreenState();
 }
@@ -193,7 +208,7 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
     DoorJump('practice', 'Practice', "Today's word ritual", 'assets/video/practice-halo-poster.webp'),
     DoorJump('library', 'Sound Library', 'Every word you own', 'assets/video/player-box-rings-poster.webp'),
     DoorJump('progress', 'Progress', 'How far you have come', 'assets/video/my-progress-scene-1-poster.webp'),
-    DoorJump('store', 'Store', 'Words and frequencies', 'assets/video/choose-store-poster.webp'),
+    DoorJump('store', 'Store', 'Words and frequencies', 'assets/doors/fashion_plus_store.webp'),
     DoorJump('meaning', 'Meaning', 'What it truly means', 'assets/video/nm-calm-stream-poster.webp'),
     DoorJump('connect', 'Connect', 'The social space', 'assets/video/nm-calm-clouds-poster.webp'),
     DoorJump('notifications', 'Notifications', 'What reaches you', 'assets/video/earth-night-poster.webp'),

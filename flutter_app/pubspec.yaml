@@ -241,6 +241,29 @@ flutter:
     - assets/content/
     - assets/subscription/
     - assets/hero-curve/
+    # Doors art (text-free 3:4): Access features, Start art Meanings/eBooks, Fashion Plus Store + TV.
+    - assets/doors/ai.webp
+    - assets/doors/cart.webp
+    - assets/doors/chat.webp
+    - assets/doors/connect.webp
+    - assets/doors/ebooks.webp
+    - assets/doors/everything.webp
+    - assets/doors/fashion_plus_store.webp
+    - assets/doors/fashion_plus_tv.webp
+    - assets/doors/journal.webp
+    - assets/doors/library.webp
+    - assets/doors/meanings.webp
+    - assets/doors/meaningstore.webp
+    - assets/doors/practice.webp
+    - assets/doors/profile.webp
+    - assets/doors/progress.webp
+    - assets/doors/routines.webp
+    - assets/doors/search.webp
+    - assets/doors/settings.webp
+    - assets/doors/store.webp
+    - assets/doors/streak.webp
+    - assets/doors/wishlist.webp
+    - assets/doors/wordscience.webp
     - assets/flip_brand/
     # Admin thinking-orb Lottie gallery (CS-2). Gold-only; AE-flagged skipped.
     - assets/anim/orb_gallery.json
