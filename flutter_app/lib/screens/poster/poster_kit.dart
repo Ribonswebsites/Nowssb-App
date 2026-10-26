@@ -516,6 +516,7 @@ class PosterSearch extends StatelessWidget {
             decoration: InputDecoration(
               border: InputBorder.none,
               hintText: hint,
+              hintMaxLines: 2,
               hintStyle: gHello(color: const Color(0xFF9A95A8)),
               icon: const Icon(Icons.search_rounded, color: kPGold),
             ),
