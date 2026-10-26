@@ -3,9 +3,13 @@
 /// sideways and advances on its own.
 library;
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'glass_wrap.dart';
 
 class _Slide {
   const _Slide({
@@ -55,7 +59,7 @@ const _slides = <_Slide>[
 ];
 
 class MeditationFlipBanner extends StatefulWidget {
-  const MeditationFlipBanner({super.key, this.onTap, this.leadingIcons = false});
+  const MeditationFlipBanner({super.key, this.onTap, this.leadingIcons = false, this.glassIcon = false});
 
   final VoidCallback? onTap;
 
@@ -64,6 +68,11 @@ class MeditationFlipBanner extends StatefulWidget {
   /// banner is the original card, scaled down to share the row. Fashion
   /// leaves it off and gets the original strip unchanged.
   final bool leadingIcons;
+
+  /// Fashion: the same side-by-side row (needs [leadingIcons]), but the
+  /// circle is Fashion's frosted glass (GlassWrap's fill, line and blur)
+  /// with no neumorphic shadows. Off keeps the Normal home's white disc.
+  final bool glassIcon;
 
   @override
   State<MeditationFlipBanner> createState() => _MeditationFlipBannerState();
@@ -125,6 +134,45 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
   static const _cardH = 136.0;
   static const _gap = 10.0;
 
+  Widget _disc(double h, Widget icon) {
+    if (!widget.glassIcon) {
+      return Container(
+        key: const ValueKey('flip-icon-disc'),
+        width: h,
+        height: h,
+        padding: EdgeInsets.all(h * 0.2),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(color: Color(0x24000000), offset: Offset(5, 5), blurRadius: 12),
+            BoxShadow(color: Colors.white, offset: Offset(-5, -5), blurRadius: 12),
+          ],
+        ),
+        child: icon,
+      );
+    }
+    return ClipOval(
+      key: const ValueKey('flip-icon-disc'),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(
+            sigmaX: GlassWrap.blurSigma, sigmaY: GlassWrap.blurSigma),
+        child: Container(
+          key: const ValueKey('flip-icon-glass'),
+          width: h,
+          height: h,
+          padding: EdgeInsets.all(h * 0.2),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0x1AFFFFFF),
+            border: Border.all(color: const Color(0x40FFFFFF)),
+          ),
+          child: icon,
+        ),
+      ),
+    );
+  }
+
   Widget _sideBySide() => LayoutBuilder(builder: (context, box) {
         final avail = box.maxWidth - 32;
         final s = ((avail - _gap) / (_cardH + _cardW)).clamp(0.0, 1.0);
@@ -138,26 +186,12 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
             child: Row(children: [
               GestureDetector(
                 onTap: widget.onTap,
-                child: Container(
-                  key: const ValueKey('flip-icon-disc'),
-                  width: h,
-                  height: h,
-                  padding: EdgeInsets.all(h * 0.2),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: Color(0x24000000), offset: Offset(5, 5), blurRadius: 12),
-                      BoxShadow(color: Colors.white, offset: Offset(-5, -5), blurRadius: 12),
-                    ],
-                  ),
-                  child: AnimatedSwitcher(
+                child: _disc(h, AnimatedSwitcher(
                     duration: const Duration(milliseconds: 420),
                     transitionBuilder: (c, a) => ScaleTransition(
                         scale: a, child: FadeTransition(opacity: a, child: c)),
                     child: SvgPicture.string(slide.svg, key: ValueKey(_page), fit: BoxFit.contain),
-                  ),
-                ),
+                  )),
               ),
               const SizedBox(width: _gap),
               Expanded(

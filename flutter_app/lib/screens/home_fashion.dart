@@ -36,7 +36,7 @@ import '../shell/nav_shell.dart';
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
-import '../widgets/home_banner_slot.dart';
+import '../widgets/four_banners.dart';
 import '../widgets/meditation_flip_banner.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
@@ -542,7 +542,7 @@ class _HomeFashionState extends State<HomeFashion> {
           children: [
             const Padding(
               padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
-              child: FashionHomeBannerSlot(),
+              child: TrioRail(),
             ),
             const NmHorizontalRoutineCards(fashion: true),
             const EarthDayFilm(),
@@ -556,7 +556,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            MeditationFlipBanner(onTap: () => _go(1)),
+            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true, glassIcon: true),
             FashTiles(onTile: _go, onOpen: _openEnter),
             // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
             const HomeRowHeading('Quick picks', sub: 'Tap a colour to jump in'),
