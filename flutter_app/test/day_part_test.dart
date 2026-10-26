@@ -8,7 +8,11 @@ import 'package:nowssb/data/models.dart';
 import 'package:nowssb/data/practice_progress.dart';
 import 'package:nowssb/data/today_ritual.dart';
 import 'package:nowssb/screens/fashion/header.dart';
-import 'package:nowssb/screens/normal/sections_top.dart' show nmGreetHello, nmGreetSun, nmGreetMark;
+import 'package:nowssb/screens/normal/sections_top.dart' show nmGreetHello, nmGreetSun, nmGreetMark, NmGreetSubline, nmGreetSublines;
+import 'package:nowssb/admin/layout/scopes.dart';
+import 'package:nowssb/admin/template/editable.dart';
+import 'package:nowssb/admin/template/slot_keys.dart';
+import 'package:nowssb/admin/template/ui_overrides.dart';
 import 'package:nowssb/screens/practice.dart' show nwsbSlot;
 import 'package:nowssb/widgets/earth_day_film.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -178,6 +182,34 @@ void main() {
       expect(title, 'Afternoon Session');
       m.dispose();
       expect(DayClock.running, isFalse);
+    });
+  });
+
+  group('greeting subline', () {
+    for (final (h, m, want) in [
+      (7, 0, "Ready for today's healing practice?"),
+      (13, 0, 'Time for a midday reset?'),
+      (18, 30, 'Ready to slow down this evening?'),
+      (1, 22, 'Ready to wind down tonight?'),
+      (22, 0, 'Ready to wind down tonight?'),
+    ]) {
+      testWidgets('$h:$m → $want', (tester) async {
+        await tester.pumpWidget(MaterialApp(home: NmGreetSubline(at: ist(h, m))));
+        expect(find.text(want), findsOneWidget);
+        expect(nmGreetSublines[dayPartFor(ist(h, m))], want);
+      });
+    }
+
+    testWidgets("a user-edited subline is kept at night", (tester) async {
+      final preview = EditorPreviewController();
+      addTearDown(preview.dispose);
+      final k = '${NmGreetSubline.slot}.${slotSlug("Ready for today's healing practice?")}';
+      preview.draftOverrides[k] = const UiOverride(slot: NmGreetSubline.slot, type: SlotType.text, text: 'My own words');
+      await tester.pumpWidget(MaterialApp(
+        home: EditorPreviewScope(controller: preview, child: NmGreetSubline(at: ist(1, 22))),
+      ));
+      expect(find.text('My own words'), findsOneWidget);
+      expect(find.text('Ready to wind down tonight?'), findsNothing);
     });
   });
 }

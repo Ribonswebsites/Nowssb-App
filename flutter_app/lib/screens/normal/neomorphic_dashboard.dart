@@ -49,7 +49,7 @@ class NmSuppliedDashboard extends StatelessWidget {
         final progress = PracticeProgress.instance;
         final completed = progress.completedTodayFor(active);
         final goal = active.isEmpty ? 0 : (completed / active.length * 100).round().clamp(0, 100).toInt();
-        final launch = () => onStart?.call(active, title);
+        void launch() => onStart?.call(active, title);
         return Padding(
           padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
           child: Column(
@@ -101,7 +101,7 @@ class _FocusCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 EditableLabel('neomorphic_dashboard.FocusCard',
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.w700,
                     height: 1.2,

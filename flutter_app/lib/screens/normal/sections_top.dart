@@ -11,6 +11,7 @@
 /// on each class say where.
 library;
 
+import '../../admin/layout/scopes.dart' show effectiveOverride;
 import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie, kSunLottie;
 import 'dart:async';
@@ -48,6 +49,34 @@ IconData nmGreetMark([DateTime? at]) => switch (dayPartFor(at ?? DayClock.now())
       DayPart.evening => Icons.wb_twilight,
       DayPart.night => Icons.nightlight_outlined,
     };
+
+/// The greeting's subline for each part of the day.
+const nmGreetSublines = <DayPart, String>{
+  DayPart.morning: "Ready for today's healing practice?",
+  DayPart.afternoon: 'Time for a midday reset?',
+  DayPart.evening: 'Ready to slow down this evening?',
+  DayPart.night: 'Ready to wind down tonight?',
+};
+
+/// The subline under the greeting, following [dayPartFor]. Each variant is
+/// its own editable label; a user edit of the original label (the morning
+/// line, which every install had) wins at every hour.
+class NmGreetSubline extends StatelessWidget {
+  const NmGreetSubline({super.key, required this.at});
+  final DateTime at;
+  static const slot = 'normal_sections_top.NmGreeting';
+  static const _style = TextStyle(fontSize: 12.5, color: NwsbColors.inkFaint);
+
+  @override
+  Widget build(BuildContext context) {
+    const original = EditableLabel(slot, "Ready for today's healing practice?", style: _style);
+    final o = effectiveOverride(context, original.slotKey);
+    if (o != null && o.textSet) return original;
+    final part = dayPartFor(at);
+    if (part == DayPart.morning) return original;
+    return EditableLabel(slot, nmGreetSublines[part]!, style: _style);
+  }
+}
 
 /// The sun Lottie by day; the mark (twilight / moon) after.
 bool nmGreetSun([DateTime? at]) {
@@ -109,10 +138,7 @@ class NmGreeting extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                const EditableLabel('normal_sections_top.NmGreeting',
-                  "Ready for today's healing practice?",
-                  style: TextStyle(fontSize: 12.5, color: NwsbColors.inkFaint),
-                ),
+                NmGreetSubline(at: now),
               ],
             ),
           ),
@@ -441,7 +467,7 @@ class _NmPromoDiscState extends State<NmPromoDisc>
     if (_flutterTest) return;
     _spin.repeat();
     _t = Timer.periodic(const Duration(milliseconds: 1900), (_) {
-      if (!mounted || !TickerMode.of(context)) return;
+      if (!mounted || !TickerMode.valuesOf(context).enabled) return;
       setState(() {
         final lines = widget.slides[_slide].$2;
         if (_line + 1 < lines.length) {

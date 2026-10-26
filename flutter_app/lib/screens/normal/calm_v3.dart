@@ -99,7 +99,7 @@ class _BreatheState extends State<_Breathe> with SingleTickerProviderStateMixin 
 
 /// The round sage button every calm card ends with.
 class CalmGo extends StatelessWidget {
-  const CalmGo({required this.label, required this.onTap, this.light = false});
+  const CalmGo({super.key, required this.label, required this.onTap, this.light = false});
   final String label;
   final VoidCallback? onTap;
   final bool light;

@@ -4,6 +4,7 @@
 /// pill that can be moved out of the way and stay there.
 library;
 
+import 'package:nowssb/data/day_part.dart' show DayClock;
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -86,6 +87,10 @@ class _Page extends StatelessWidget {
 }
 
 void main() {
+  // The greeting copy follows the hour; pin a morning so the touch targets are stable.
+  setUp(() => DayClock.clock = () => DateTime(2026, 10, 27, 9));
+  tearDown(() => DayClock.clock = null);
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('a bigger or lower element pushes what is under it down (reflow); a deleted one takes no room',

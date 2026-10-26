@@ -7,6 +7,7 @@
 /// elements moved / resized / removed, and the one-time hint.
 library;
 
+import 'package:nowssb/data/day_part.dart' show DayClock;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -116,6 +117,10 @@ Future<void> _openDrawerTab(WidgetTester tester, String tab) async {
 int _live(EditorController c) => c.sections.where((s) => !s.entry.deleted).length;
 
 void main() {
+  // The greeting copy follows the hour; pin a morning so the touch targets are stable.
+  setUp(() => DayClock.clock = () => DateTime(2026, 10, 27, 9));
+  tearDown(() => DayClock.clock = null);
+
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('undo / redo', () {

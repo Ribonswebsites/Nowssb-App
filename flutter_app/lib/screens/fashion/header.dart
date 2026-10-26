@@ -66,7 +66,7 @@ class HomeHeader extends StatelessWidget {
             width: double.infinity,
             child: Row(
               children: [
-                SizedBox(
+                const SizedBox(
                   width: 42,
                   height: 42,
                   child: ClipOval(

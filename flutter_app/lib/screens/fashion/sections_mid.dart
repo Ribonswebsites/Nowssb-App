@@ -638,7 +638,7 @@ class _CustomizeCardPagerState extends State<_CustomizeCardPager> {
     if (_flutterTest) return;
     _auto = Timer.periodic(const Duration(milliseconds: 4200), (_) {
       if (!mounted || _userPaging) return;
-      if (!TickerMode.of(context)) return;
+      if (!TickerMode.valuesOf(context).enabled) return;
       if (!_pager.hasClients) return;
       final next = (_index + 1) % _pages(context).length;
       _pager.animateToPage(
