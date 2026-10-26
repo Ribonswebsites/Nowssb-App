@@ -295,7 +295,7 @@ class DoorTornClipper extends CustomClipper<Path> {
   bool shouldReclip(DoorTornClipper o) => o.seed != seed;
 }
 
-/// "NowssB. / DROP STUDIO"-style top bar with back + a trailing round icon.
+/// "NowssB / DROP STUDIO"-style top bar with back + a trailing round icon.
 class DoorTopBar extends StatelessWidget {
   const DoorTopBar({super.key, required this.slot, required this.sub, this.onBack, this.trailing});
   final String slot, sub;
@@ -309,7 +309,7 @@ class DoorTopBar extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              EditableLabel('$slot.brand', 'NowssB.',
+              EditableLabel('$slot.brand', 'NowssB',
                   maxLines: 1, style: doorBody(19, w: FontWeight.w800, ls: -.4).copyWith(height: 1)),
               const SizedBox(height: 3),
               EditableLabel('$slot.sub', sub.toUpperCase(),

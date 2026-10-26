@@ -140,6 +140,9 @@ void main() {
         expect(File('pubspec.yaml').readAsStringSync(), contains('- ${j.art}'), reason: 'not bundled: ${j.art}');
       }
       expect(page.make.where((j) => j.id == 'profile'), isEmpty, reason: 'Profile is already a jump');
+      // Door header brand reads 'NowssB' with no dot.
+      expect(find.descendant(of: find.byType(DoorTopBar), matching: find.text('NowssB')), findsOneWidget);
+      expect(find.descendant(of: find.byType(DoorTopBar), matching: find.text('NowssB.')), findsNothing);
       // Practise / Apply now / Applied pills are text only.
       var pills = 0;
       for (final label in ['Practise', 'Apply now', 'Applied']) {
