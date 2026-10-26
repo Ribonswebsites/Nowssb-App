@@ -7,6 +7,7 @@ import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:nowssb/screens/fashion/door_screens.dart';
 import 'package:nowssb/screens/concept/doors/door_background.dart';
+import 'package:nowssb/screens/concept/doors/door_start_art.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -160,24 +161,27 @@ void main() {
       expect(Settings.instance.fashionVideoIndex, i);
     });
 
-    testWidgets('Start art → FashionPlusScreen start-art mode, still saved', (t) async {
+    testWidgets('Start art → DoorStartArtScreen, still saved and Black clears', (t) async {
       // Even with motion on, the Start art door opens the stills, not the films.
       await t.runAsync(() => Settings.instance.setFashionPlus(true));
       await openDoor(t, 'Start art');
-      expect(find.byType(FashionPlusScreen), findsOneWidget);
-      expect((t.widget(find.byType(FashionPlusScreen)) as FashionPlusScreen).mode, FashionPlusMode.startArt);
-      expect(find.text(Settings.fashionVideoNames[0]), findsNothing);
-      final label = find.text(Settings.fashionImageName(0));
-      await reachIn(t, label, FashionPlusScreen);
-      await t.runAsync(() async {
-        await t.tap(label.hitTestable().first);
-      });
+      expect(find.byType(DoorStartArtScreen), findsOneWidget);
+      final picker = t.widget<DoorStartArtPicker>(find.byType(DoorStartArtPicker));
+      expect(picker.stills.first.id, '-1');
+      expect(picker.stills.skip(1).map((x) => x.asset), Settings.fashionImages);
+      for (final x in picker.stills.skip(1)) {
+        expect(File(x.asset!).existsSync(), isTrue, reason: x.asset);
+      }
+      await t.runAsync(() async => picker.onPickImage!('0'));
       await settle(t, 2);
       expect(Settings.instance.fashionImageIndex, 0);
       expect((await prefs(t)).getInt('nwsb_fashplus_image'), 0);
+      expect(t.widget<DoorStartArtPicker>(find.byType(DoorStartArtPicker)).selectedId, '0');
       await t.runAsync(Settings.instance.load);
       expect(Settings.instance.fashionImageIndex, 0);
-      await t.runAsync(() => Settings.instance.setFashionPlus(true));
+      await t.runAsync(() async => picker.onPickImage!('-1'));
+      await settle(t, 2);
+      expect(Settings.instance.fashionImageIndex, -1);
     });
 
     testWidgets('Access → QuickAccessScreen, nav saved', (t) async {

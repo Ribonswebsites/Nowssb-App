@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/settings.dart';
 import '../concept/doors/door_background.dart';
+import '../concept/doors/door_start_art.dart';
 
 /// Background door → film picker. Writes Settings.fashionVideoIndex and the
 /// Fashion Plus motion flag.
@@ -32,6 +33,32 @@ class DoorBackgroundScreen extends StatelessWidget {
         motionOn: s.fashionPlus,
         onPickVideo: (id) => s.setFashionVideo(int.parse(id)),
         onToggleMotion: s.setFashionPlus,
+        onBack: () => Navigator.of(context).maybePop(),
+      ),
+    );
+  }
+}
+
+/// Start art door → still picker. "Black" (-1) clears the saved still.
+class DoorStartArtScreen extends StatelessWidget {
+  const DoorStartArtScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Settings.instance;
+    return ListenableBuilder(
+      listenable: s,
+      builder: (context, _) => DoorStartArtPicker(
+        stills: [
+          const DoorStill(id: '-1', name: 'NowssB Black'),
+          for (var i = 0; i < Settings.fashionImages.length; i++)
+            DoorStill(id: '$i', name: Settings.fashionImageName(i), asset: Settings.fashionImages[i]),
+        ],
+        selectedId: '${s.fashionImageIndex}',
+        onPickImage: (id) {
+          final i = int.parse(id);
+          s.setFashionImage(i < 0 ? null : i);
+        },
         onBack: () => Navigator.of(context).maybePop(),
       ),
     );

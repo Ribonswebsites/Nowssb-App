@@ -94,7 +94,7 @@ class _DropStudioScreenState extends State<DropStudioScreen> {
       onOpenCart: () => NwsbLinks.cart(context),
       onOpenThemes: () => push(const WidgetsPage()),
       onOpenBackground: () => push(const DoorBackgroundScreen()),
-      onOpenStartArt: () => push(const FashionPlusScreen(mode: FashionPlusMode.startArt)),
+      onOpenStartArt: () => push(const DoorStartArtScreen()),
       onOpenAccess: () => push(const QuickAccessScreen()),
       controller: widget.controller,
       debugTilt: widget.debugTilt,
