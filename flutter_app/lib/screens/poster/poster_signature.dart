@@ -299,7 +299,15 @@ class _Stub extends StatelessWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                       // Full size, wrapping on word boundaries (never shrunk to fit).
                       Text('No. ${(i + 1).toString().padLeft(2, '0')} · ${cat.words.length} words inside', maxLines: 3, style: gSub(color: kPInk)),
-                      Text(s.name, maxLines: 3, style: gTitle(dark: false)),
+                      // Wraps between words; a single word wider than the stub shrinks whole (never split).
+                      // Wrap hands each word the stub's width as its max.
+                      Wrap(spacing: 8, children: [
+                        for (final w in s.name.split(' '))
+                          FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(w, maxLines: 1, softWrap: false, style: gTitle(dark: false))),
+                      ]),
                     ]),
                   ),
                 ),
