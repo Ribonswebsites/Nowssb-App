@@ -543,8 +543,9 @@ class PosterNoMatch extends StatelessWidget {
 /// A poster "request" bill: gold sticker, Anton headline, one line of copy
 /// and a pill — not a list row.
 class PosterRequest extends StatelessWidget {
-  const PosterRequest({super.key, required this.tag, required this.title, required this.body, required this.action, required this.onTap});
-  final String tag, title, body, action;
+  const PosterRequest({super.key, required this.tag, required this.title, this.body, required this.action, required this.onTap});
+  final String tag, title, action;
+  final String? body;
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => Padding(
@@ -558,8 +559,7 @@ class PosterRequest extends StatelessWidget {
               GoldTag(tag),
               const SizedBox(height: 10),
               Text(title.toUpperCase(), style: anton(34, color: kPInk, height: 1.02)),
-              const SizedBox(height: 6),
-              Text(body, style: gSub(dark: false)),
+              if (body != null) ...[const SizedBox(height: 6), Text(body!, style: gSub(dark: false))],
               const SizedBox(height: 14),
               GoldPill(label: action, onTap: onTap, dark: true, arrow: true),
             ]),

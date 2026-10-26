@@ -20,7 +20,14 @@ String _id(MsMeaning m) => 'meaning:${m.word.toLowerCase()}';
 
 String _blurb(String key) => (kMsWordBlurb[key] ?? '').replaceAll('&rsquo;', '’');
 
-class PosterMeaning extends StatelessWidget {
+/// Search match on word, root or category (the store's original filter).
+bool meaningMatches(MsMeaning m, String q) {
+  final k = q.trim().toLowerCase();
+  if (k.isEmpty) return true;
+  return m.word.toLowerCase().contains(k) || m.root.toLowerCase().contains(k) || m.category.toLowerCase().contains(k);
+}
+
+class PosterMeaning extends StatefulWidget {
   const PosterMeaning({
     super.key,
     required this.onBack,
@@ -28,6 +35,7 @@ class PosterMeaning extends StatelessWidget {
     required this.onOpenBag,
     required this.onOpenMeaning,
     required this.onBuy,
+    required this.onRequest,
     this.controller,
     this.now,
   });
@@ -38,28 +46,58 @@ class PosterMeaning extends StatelessWidget {
 
   /// "Own · ₹price" pill → storeBuyNow(meaningBagItem(...)).
   final void Function(MsMeaning m) onBuy;
+
+  /// Request promo / no-match → openRequestWords.
+  final VoidCallback onRequest;
   final ScrollController? controller;
   final DateTime? now;
 
   static MsMeaning pick(DateTime now) => kMsBaseMeanings[(now.day * 7) % kMsBaseMeanings.length];
 
   @override
+  State<PosterMeaning> createState() => _PosterMeaningState();
+}
+
+class _PosterMeaningState extends State<PosterMeaning> {
+  final _search = TextEditingController();
+  String _q = '';
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final m = pick(now ?? DateTime.now());
+    final w = widget;
+    final m = PosterMeaning.pick(w.now ?? DateTime.now());
+    final hits = kMsBaseMeanings.where((x) => meaningMatches(x, _q)).toList();
     return PosterScaffold(
       slot: _slot,
       kicker: 'Meanings · The root',
-      controller: controller,
-      onBack: onBack,
-      onOpenStores: onOpenStores,
-      onOpenBag: onOpenBag,
+      controller: w.controller,
+      onBack: w.onBack,
+      onOpenStores: w.onOpenStores,
+      onOpenBag: w.onOpenBag,
       tint: const Color(0xFF3E6B8C),
       children: [
-        _Hero(m: m, onOpen: () => onOpenMeaning(m), onBuy: () => onBuy(m)),
-        for (final cat in kMsCatSub.keys) ...[
-          _Letter(cat: cat),
-          _Deck(items: kMsBaseMeanings.where((x) => x.category == cat).toList(), onOpen: onOpenMeaning, onBuy: onBuy),
-        ],
+        _Hero(m: m, onOpen: () => w.onOpenMeaning(m), onBuy: () => w.onBuy(m)),
+        PosterSearch(
+          controller: _search,
+          hint: 'Search meanings',
+          onChanged: (v) => setState(() => _q = v),
+          onGo: (v) {
+            if (v.trim().isEmpty || !kMsBaseMeanings.any((x) => meaningMatches(x, v))) w.onRequest();
+          },
+        ),
+        if (hits.isEmpty) PosterNoMatch('No meanings match.', onRequest: w.onRequest),
+        for (final cat in kMsCatSub.keys)
+          if (hits.any((x) => x.category == cat)) ...[
+            _Letter(cat: cat),
+            _Deck(items: hits.where((x) => x.category == cat).toList(), onOpen: w.onOpenMeaning, onBuy: w.onBuy),
+          ],
+        PosterRequest(tag: 'Request words', title: 'Request a word made for you.', action: 'Request a word', onTap: w.onRequest),
       ],
     );
   }

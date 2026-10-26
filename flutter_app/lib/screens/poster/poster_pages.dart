@@ -90,6 +90,7 @@ Widget posterMeaningPage(BuildContext x, {ScrollController? controller, DateTime
       onOpenBag: () => posterBag(x),
       onOpenMeaning: (m) => openMeaningDetail(x, m),
       onBuy: (m) => storeBuyNow(x, meaningBagItem(word: m.word, root: m.root, img: m.img, price: meaningPrice(m))),
+      onRequest: () => openRequestWords(x),
     );
 
 /// The Signature Store poster (SignatureStoreScreen's page). Prices are the
