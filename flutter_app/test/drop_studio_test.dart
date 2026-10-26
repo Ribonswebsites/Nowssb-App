@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'package:nowssb/screens/concept/drop_v4_type.dart';
 import 'dart:math' as math;
 import 'package:nowssb/screens/concept/drop_v5.dart';
 import 'package:nowssb/screens/concept/drop_v4_concepts.dart' show DoorHooks, hourWord;
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
+import 'package:nowssb/screens/fashion/door_screens.dart';
+import 'package:nowssb/screens/concept/doors/door_background.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -132,21 +135,27 @@ void main() {
       expect(Settings.instance.heroStyle, next);
     });
 
-    testWidgets('Background → FashionPlusScreen, backdrop film saved', (t) async {
+    testWidgets('Background → DoorBackgroundScreen, film + motion saved', (t) async {
       await t.runAsync(() => Settings.instance.setFashionPlus(true));
       await openDoor(t, 'Background');
-      expect(find.byType(FashionPlusScreen), findsOneWidget);
-      expect((t.widget(find.byType(FashionPlusScreen)) as FashionPlusScreen).mode, FashionPlusMode.background);
-      expect(find.text(Settings.fashionImageName(0)), findsNothing);
+      expect(find.byType(DoorBackgroundScreen), findsOneWidget);
+      final picker = t.widget<DoorBackgroundPicker>(find.byType(DoorBackgroundPicker));
+      expect(picker.videos.map((v) => v.name), Settings.fashionVideoNames);
+      for (final v in picker.videos) {
+        expect(v.poster, endsWith('-poster.webp'));
+        expect(File(v.poster).existsSync(), isTrue, reason: v.poster);
+      }
+      expect(picker.motionOn, isTrue);
       final i = Settings.instance.fashionVideoIndex == 0 ? 2 : 0;
-      final label = find.text(Settings.fashionVideoNames[i]);
-      await reachIn(t, label, FashionPlusScreen);
-      await t.runAsync(() async {
-        await t.tap(label.hitTestable().first);
-      });
+      await t.runAsync(() async => picker.onPickVideo!('$i'));
       await settle(t, 2);
       expect(Settings.instance.fashionVideoIndex, i);
       expect((await prefs(t)).getInt('nwsb_fashplus_video'), i);
+      expect(t.widget<DoorBackgroundPicker>(find.byType(DoorBackgroundPicker)).selectedId, '$i');
+      await t.runAsync(() async => picker.onToggleMotion!(false));
+      await settle(t, 2);
+      expect(Settings.instance.fashionPlus, isFalse);
+      expect(t.widget<DoorBackgroundPicker>(find.byType(DoorBackgroundPicker)).motionOn, isFalse);
       await t.runAsync(Settings.instance.load);
       expect(Settings.instance.fashionVideoIndex, i);
     });

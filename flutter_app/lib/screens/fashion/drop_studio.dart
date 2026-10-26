@@ -32,6 +32,7 @@ import '../store/store_actions.dart';
 import '../store/store_art.dart';
 import '../store/store_cards.dart' show kWordPriceInr, localizedMoney;
 import '../widgets_page.dart';
+import 'door_screens.dart';
 import '../concept/drop_v4_concepts.dart' show DoorHooks;
 import '../concept/drop_v5.dart';
 import '../word_detail.dart';
@@ -92,7 +93,7 @@ class _DropStudioScreenState extends State<DropStudioScreen> {
       onBuy: _buy,
       onOpenCart: () => NwsbLinks.cart(context),
       onOpenThemes: () => push(const WidgetsPage()),
-      onOpenBackground: () => push(const FashionPlusScreen(mode: FashionPlusMode.background)),
+      onOpenBackground: () => push(const DoorBackgroundScreen()),
       onOpenStartArt: () => push(const FashionPlusScreen(mode: FashionPlusMode.startArt)),
       onOpenAccess: () => push(const QuickAccessScreen()),
       controller: widget.controller,
