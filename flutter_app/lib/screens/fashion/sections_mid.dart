@@ -4,6 +4,7 @@
 /// storeban
 library;
 
+import 'package:nowssb/widgets/home_text.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'dart:async';
 
@@ -1307,12 +1308,7 @@ class FashPrescription extends StatelessWidget {
                 Text(
                   '"Your $slot prescription — aligned to your current time '
                   'and healing goals."',
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontStyle: FontStyle.italic,
-                    color: Color(0xCCFFFFFF),
-                    height: 1.5,
-                  ),
+                  style: HomeText.subline.copyWith(color: const Color(0xCCFFFFFF), height: 1.5),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(

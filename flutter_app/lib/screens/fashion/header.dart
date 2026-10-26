@@ -9,6 +9,7 @@
 /// drawn here for the same reason.
 library;
 
+import 'package:nowssb/widgets/home_text.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'dart:ui' as ui;
 
@@ -252,29 +253,18 @@ class HeroGreeting extends StatelessWidget {
               children: [
                 Text(
                   '${hello(now)},',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0xA6FFFFFF),
-                    height: 1.15,
-                  ),
+                  style: HomeText.hello,
                 ),
                 Text(
                   name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.15,
-                    letterSpacing: -0.5,
-                  ),
+                  style: HomeText.heading,
                 ),
                 const SizedBox(height: 4),
                 const EditableLabel('header.HeroGreeting',
                   "Ready for today's healing practice?",
-                  style: TextStyle(fontSize: 13.5, color: Color(0x8CFFFFFF)),
+                  style: HomeText.subline,
                 ),
               ],
             ),

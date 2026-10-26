@@ -10,6 +10,7 @@
 /// all copy is EditableLabel, all words come from ContentStore.library.
 library;
 
+import 'package:nowssb/widgets/home_text.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -495,13 +496,7 @@ class _DropHero extends StatelessWidget {
           const _Kicker("Today's offers"),
           const SizedBox(height: 8),
           const EditableLabel(_slot, 'A featured drop\nfor this hour',
-              style: TextStyle(
-                  fontFamily: 'CormorantGaramond',
-                  fontStyle: FontStyle.italic,
-                  color: Colors.white,
-                  fontSize: 40,
-                  height: 1,
-                  letterSpacing: -.5)),
+              style: HomeText.heading),
           const SizedBox(height: 16),
           DepthTilt(
             rotate: .16,
@@ -1159,7 +1154,7 @@ class _BuyDock extends StatelessWidget {
                 Text(word?.word ?? '—',
                     key: const ValueKey('drop-dock-word'),
                     style:
-                        const TextStyle(fontFamily: 'CormorantGaramond', color: Colors.white, fontSize: 22, height: 1.1)),
+                        HomeText.heading.copyWith(fontSize: 22, height: 1.1)),
                 if (price != null) ...[
                   const SizedBox(width: 8),
                   Text(price!,
@@ -1230,14 +1225,9 @@ class _EmptyPoster extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 4),
               boxShadow: const [BoxShadow(color: Color(0xCC000000), blurRadius: 30, offset: Offset(0, 18))],
             ),
-            child: const EditableLabel(_slot, 'Words land\non the hour',
+            child: EditableLabel(_slot, 'Words land\non the hour',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontFamily: 'CormorantGaramond',
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF14100A),
-                    fontSize: 38,
-                    height: .95)),
+                style: HomeText.heading.copyWith(color: const Color(0xFF14100A))),
           ),
         ),
       );

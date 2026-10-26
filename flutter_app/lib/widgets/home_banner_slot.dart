@@ -6,6 +6,7 @@
 /// original [TrioRail] itself.
 library;
 
+import 'package:nowssb/widgets/home_text.dart';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -87,14 +88,7 @@ class FashionHomeBannerSlot extends StatelessWidget {
                 key: const ValueKey('fashion-poster-heading'),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontFamily: 'CormorantGaramond',
-                  color: Colors.white.withValues(alpha: 0.95),
-                  fontSize: 25,
-                  height: 1.05,
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: HomeText.heading.copyWith(fontSize: 25),
               )),
       ClipRRect(
       borderRadius: BorderRadius.circular(28),
