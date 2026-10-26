@@ -14,6 +14,7 @@
 /// switch moves, and through SharedPreferences so it survives a relaunch.
 library;
 
+import 'fashion_bg_dim.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -222,6 +223,7 @@ class Settings extends ChangeNotifier {
   }
 
   Future<void> load() async {
+    await FashionBgDim.instance.load();
     try {
       final p = await SharedPreferences.getInstance();
       _fashionPlus = p.getBool(_kPlus) ?? true;

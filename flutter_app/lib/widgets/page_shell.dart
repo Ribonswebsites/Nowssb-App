@@ -6,6 +6,7 @@
 /// which is the mistake the website's stylesheet is still paying for.
 library;
 
+import '../data/fashion_bg_dim.dart';
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
@@ -29,7 +30,11 @@ class PageShell extends StatefulWidget {
     this.onStorePicker,
     this.background,
     this.actions = const [],
+    this.fashionDim = false,
   });
+
+  /// Lay the saved [FashionBgDim] overlay over the background video.
+  final bool fashionDim;
 
   /// Extra controls at the end of the title row (e.g. Quick access Reset).
   final List<Widget> actions;
@@ -96,6 +101,7 @@ class _PageShellState extends State<PageShell> {
                   )
                 : (widget.background ?? const AppBackdrop()),
           ),
+          if (widget.fashionDim) const Positioned.fill(child: FashionBgDimOverlay()),
           // Fashion-home #fpBgVeil language so AppBackdrop / page film reads
           // clearly — never the old solid lid that hid the video.
           if (widget.usePageFilm)

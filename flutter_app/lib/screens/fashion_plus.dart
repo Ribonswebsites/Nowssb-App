@@ -73,6 +73,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
         eyebrow: 'Fashion Plus',
         title: video ? 'Background' : 'Start art',
         film: 'assets/video/fashion-plus-bg-6.mp4',
+        fashionDim: true,
         onBack: () => Navigator.of(context).maybePop(),
         slivers: [
           SliverPadding(
@@ -107,6 +108,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
         eyebrow: 'Experience',
         title: 'Fashion Plus',
         film: 'assets/video/fashion-plus-bg-6.mp4',
+        fashionDim: true,
         onBack: () => Navigator.of(context).maybePop(),
         slivers: [
           SliverPadding(

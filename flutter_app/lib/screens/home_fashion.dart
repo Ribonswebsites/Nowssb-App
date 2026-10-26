@@ -25,6 +25,7 @@
 /// further down come and go.
 library;
 
+import '../data/fashion_bg_dim.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -806,6 +807,7 @@ class _HomeFashionState extends State<HomeFashion> {
           // One selected Fashion Plus film is shared with every destination;
           // with motion off this resolves to the chosen still or black.
           const Positioned.fill(child: AppBackdrop()),
+          const Positioned.fill(child: FashionBgDimOverlay()),
           // `#fpBgVeil` — nowssb-nm.css:10853. TWO layers, and the point of
           // both is that the MIDDLE OF THE SCREEN IS LEFT ALONE: a radial
           // that pulls only the corners down, and a light top-and-bottom

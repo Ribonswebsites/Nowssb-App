@@ -11,6 +11,7 @@
 /// still `fp-intro` plate — same rule as `paintBg()` in part082.
 library;
 
+import '../data/fashion_bg_dim.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -77,6 +78,8 @@ class _WidgetsPageState extends State<WidgetsPage> {
       title: 'Hero header',
       film: 'assets/video/hero-bg.mp4',
       onBack: () => Navigator.of(context).maybePop(),
+      // Dark scrim over the Fashion film (Settings → Background dim).
+      fashionDim: filmOn,
       // #stBg — the page's own Fashion film / photo, kept.
       background: filmOn
           ? NwsbVideo(
@@ -132,10 +135,14 @@ class _WidgetsPageState extends State<WidgetsPage> {
                         ],
                       ),
                     )),
-                    LSection('homewidget', 'Home-screen widget', _Rail(
+                    const LSection('dim', 'Background dim', Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                      child: FashionBgDimControl(),
+                    )),
+                    const LSection('homewidget', 'Home-screen widget', _Rail(
                       title: 'Home-screen widget',
                       sub: 'Your streak and the word of the day, on your phone',
-                      child: const _HomeWidgetCard(),
+                      child: _HomeWidgetCard(),
                     )),
                     LSection('hero', 'Hero header styles', _Rail(
                       title: 'Hero header',
@@ -247,27 +254,45 @@ class _HeroRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 220,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 6),
-        itemCount: _heroes.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, i) {
-          final (v, t, s) = _heroes[i];
-          final on = current == v;
-          return _HeroCard(
+    return _HRail(
+      children: [
+        for (final (v, t, s) in _heroes)
+          _HeroCard(
             title: t,
             sub: s,
-            on: on,
             previewKind: v,
             onApply: () {
               HapticFeedback.mediumImpact();
               Settings.instance.setHeroStyle(v);
             },
-          );
-        },
+            on: current == v,
+          ),
+      ],
+    );
+  }
+}
+
+/// A horizontal rail whose cards share the height of the tallest one, so
+/// text can wrap (no fixed rail height, no ellipsis).
+class _HRail extends StatelessWidget {
+  const _HRail({required this.children});
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 6),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0) const SizedBox(width: 12),
+              children[i],
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -309,7 +334,8 @@ class _HeroCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
+          SizedBox(
+            height: 120,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
               child: Container(
@@ -391,16 +417,17 @@ class _HeroCard extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-            child: Row(
+            // Title above the button so a long name never squeezes mid-word.
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
+                SizedBox(
+                  width: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       EditableLabel('widgets_page.HeroCard',
                         title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 13.5,
                           fontWeight: FontWeight.w800,
@@ -410,8 +437,6 @@ class _HeroCard extends StatelessWidget {
                       const SizedBox(height: 3),
                       EditableLabel('widgets_page.HeroCard',
                         sub,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 11,
                           color: Color(0x85FFFFFF),
@@ -420,7 +445,7 @@ class _HeroCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(height: 10),
                 if (on)
                   Container(
                     padding:
@@ -440,6 +465,8 @@ class _HeroCard extends StatelessWidget {
                   )
                 else
                   GestureDetector(
+                    key: ValueKey('hero-apply-$previewKind'),
+                    behavior: HitTestBehavior.opaque,
                     onTap: onApply,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
@@ -516,19 +543,9 @@ class _JumpRail extends StatelessWidget {
       ),
       (Icons.person_outline, 'Profile', 'Your account', onProfile),
     ];
-    return SizedBox(
-      height: 118,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 6),
-        itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, i) {
-          final (ico, t, s, go) = items[i];
-          return _GoCard(icon: ico, title: t, sub: s, onTap: go);
-        },
-      ),
-    );
+    return _HRail(children: [
+      for (final (ico, t, s, go) in items) _GoCard(icon: ico, title: t, sub: s, onTap: go),
+    ]);
   }
 }
 
@@ -561,11 +578,7 @@ class _MakeRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 132,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 6),
+    return _HRail(
         children: [
           _GoCard(
             icon: Icons.auto_awesome_motion_outlined,
@@ -579,7 +592,6 @@ class _MakeRail extends StatelessWidget {
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
-          const SizedBox(width: 12),
           _GoCard(
             icon: Icons.dark_mode_outlined,
             title: 'Fashion home',
@@ -592,21 +604,18 @@ class _MakeRail extends StatelessWidget {
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
-          const SizedBox(width: 12),
           _GoCard(
             icon: Icons.graphic_eq_rounded,
             title: 'Player Settings',
             sub: 'AURA playback',
             onTap: onPlayer,
           ),
-          const SizedBox(width: 12),
           _GoCard(
             icon: Icons.tune,
             title: 'Home buttons',
             sub: 'Quick Access bar',
             onTap: onQuickAccess,
           ),
-          const SizedBox(width: 12),
           _GoCard(
             icon: Icons.spa_outlined,
             title: 'Personalised Healing',
@@ -619,7 +628,6 @@ class _MakeRail extends StatelessWidget {
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
-          const SizedBox(width: 12),
           _GoCard(
             icon: Icons.person_outline,
             title: 'Profile',
@@ -627,7 +635,6 @@ class _MakeRail extends StatelessWidget {
             onTap: onProfile,
           ),
         ],
-      ),
     );
   }
 }
@@ -650,6 +657,8 @@ class _GoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      key: ValueKey('go-card-$title'),
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         HapticFeedback.selectionClick();
         onTap();
@@ -696,8 +705,6 @@ class _GoCard extends StatelessWidget {
             ),
             EditableLabel('widgets_page.GoCard',
               title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -707,8 +714,6 @@ class _GoCard extends StatelessWidget {
             const SizedBox(height: 4),
             EditableLabel('widgets_page.GoCard',
               sub,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 8,
                 height: 1.1,
@@ -783,7 +788,8 @@ class _HomeWidgetCardState extends State<_HomeWidgetCard> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         // Mirrors res/layout/nowssb_widget.xml.
         Container(
-          height: 132,
+          key: const ValueKey('home-widget-card'),
+          constraints: const BoxConstraints(minHeight: 132),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(26),
@@ -795,7 +801,7 @@ class _HomeWidgetCardState extends State<_HomeWidgetCard> {
             ),
             boxShadow: const [BoxShadow(color: Color(0x80000000), blurRadius: 24, offset: Offset(0, 10))],
           ),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(
               constraints: const BoxConstraints(minWidth: 84),
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -815,55 +821,55 @@ class _HomeWidgetCardState extends State<_HomeWidgetCard> {
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Row(children: [
-                  Expanded(
-                    child: EditableLabel('widgets_page.HomeWidgetCard', 'WORD OF THE DAY',
-                        style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 9, letterSpacing: 2, fontWeight: FontWeight.w600)),
-                  ),
+                const Wrap(spacing: 8, runSpacing: 2, alignment: WrapAlignment.spaceBetween, children: [
+                  EditableLabel('widgets_page.HomeWidgetCard', 'WORD OF THE DAY',
+                      style: TextStyle(color: Color(0xFFE8D5A3), fontSize: 9, letterSpacing: 2, fontWeight: FontWeight.w600)),
                   EditableLabel('widgets_page.HomeWidgetCard', 'NOWSSB',
                       style: TextStyle(color: Color(0x66FFFFFF), fontSize: 8, letterSpacing: 2.4, fontWeight: FontWeight.w600)),
                 ]),
                 const SizedBox(height: 4),
                 Text(w?.word ?? 'NowssB',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600)),
-                Expanded(
-                  child: Text(w == null ? "Open NowssB once to load today's word" : HomeWidgetSync.lineFor(w),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, fontWeight: FontWeight.w300)),
-                ),
-                Row(children: [
-                  Expanded(
-                    child: Text(status,
-                        maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 10)),
-                  ),
-                  Container(
-                    height: 30,
-                    padding: const EdgeInsets.fromLTRB(10, 0, 14, 0),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
-                    child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.play_arrow_rounded, size: 16, color: NwsbColors.ink),
-                      SizedBox(width: 3),
-                      EditableLabel('widgets_page.HomeWidgetCard', 'Practise',
-                          style: TextStyle(color: NwsbColors.ink, fontSize: 11, fontWeight: FontWeight.w600)),
-                    ]),
+                Text(w == null ? "Open NowssB once to load today's word" : HomeWidgetSync.lineFor(w),
+                    style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, fontWeight: FontWeight.w300)),
+                const Spacer(),
+                const SizedBox(height: 6),
+                Wrap(spacing: 8, runSpacing: 6, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                  Text(status, style: const TextStyle(color: Color(0x80FFFFFF), fontSize: 10)),
+                  GestureDetector(
+                    key: const ValueKey('home-widget-practise'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.of(context)
+                        .push(MaterialPageRoute<void>(builder: (_) => const PracticeScreen())),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 30),
+                      padding: const EdgeInsets.fromLTRB(10, 4, 14, 4),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999)),
+                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.play_arrow_rounded, size: 16, color: NwsbColors.ink),
+                        SizedBox(width: 3),
+                        Flexible(
+                          child: EditableLabel('widgets_page.HomeWidgetCard', 'Practise',
+                              style: TextStyle(color: NwsbColors.ink, fontSize: 11, fontWeight: FontWeight.w600)),
+                        ),
+                      ]),
+                    ),
                   ),
                 ]),
               ]),
             ),
-          ]),
+          ])),
         ),
         const SizedBox(height: 12),
         Align(
           alignment: Alignment.centerLeft,
           child: GestureDetector(
+            key: const ValueKey('home-widget-add'),
             onTap: _busy ? null : _add,
             behavior: HitTestBehavior.opaque,
             child: Container(
-              height: 42,
-              padding: const EdgeInsets.symmetric(horizontal: 18),
+              constraints: const BoxConstraints(minHeight: 42),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(21),
                 color: const Color(0x33FFFFFF),
@@ -872,8 +878,10 @@ class _HomeWidgetCardState extends State<_HomeWidgetCard> {
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 const Icon(Icons.add_to_home_screen_rounded, size: 18, color: Colors.white),
                 const SizedBox(width: 8),
-                EditableLabel('widgets_page.HomeWidgetCard', _busy ? 'Adding…' : 'Add to home screen',
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                Flexible(
+                  child: EditableLabel('widgets_page.HomeWidgetCard', _busy ? 'Adding…' : 'Add to home screen',
+                      style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                ),
               ]),
             ),
           ),
