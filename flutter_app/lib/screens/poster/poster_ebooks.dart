@@ -8,6 +8,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../data/content.dart';
+import '../../data/models.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import 'poster_kit.dart';
@@ -17,6 +19,31 @@ const _slot = 'concept.PosterEbooks';
 /// Live ebook price (bag id ebook:<title>; catalogue price as the shown one).
 num bookPrice(EbBook b) => StorePrices.instance.priceFor('ebook:${b.title.toLowerCase()}', shown: b.price);
 String _id(EbBook b) => 'ebook:${b.title.toLowerCase()}';
+
+/// The real catalogue: the built-in volumes plus every live book the studio
+/// published (ContentStore.books), de-duplicated by key — same merge the
+/// old Ebooks store did.
+/// [live] overrides ContentStore.instance.books (tests).
+List<EbBook> posterBooks({List<Book>? live}) {
+  live ??= ContentStore.instance.books;
+  if (live.isEmpty) return kEbBooks;
+  final keys = {for (final b in kEbBooks) b.key};
+  final merged = [...kEbBooks];
+  for (final b in live) {
+    if (keys.add(b.key)) {
+      merged.add(EbBook(
+        key: b.key,
+        title: b.title,
+        sub: b.sub,
+        price: b.price,
+        cover: b.cover.isNotEmpty ? b.cover : kEbBooks.first.cover,
+        about: b.sub,
+        contents: const ['Published from the NowssB studio'],
+      ));
+    }
+  }
+  return merged;
+}
 
 const _spines = [kPPlum, kPGold, kPPaper, Color(0xFF1E3A4C)];
 
@@ -40,8 +67,10 @@ class PosterEbooks extends StatelessWidget {
   final ScrollController? controller;
 
   @override
-  Widget build(BuildContext context) {
-    final lead = kEbBooks.first;
+  Widget build(BuildContext context) => ListenableBuilder(listenable: ContentStore.instance, builder: (context, _) => _build(context, posterBooks()));
+
+  Widget _build(BuildContext context, List<EbBook> books) {
+    final lead = books.first;
     return PosterScaffold(
       slot: _slot,
       kicker: 'eBooks · The spine',
@@ -51,20 +80,21 @@ class PosterEbooks extends StatelessWidget {
       onOpenBag: onOpenBag,
       tint: const Color(0xFF8C5A2E),
       children: [
-        const _Hero(),
+        _Hero(count: books.length),
         const Kicker(_slot, 'The shelf'),
-        _Shelf(onOpen: onOpenBook),
+        _Shelf(books: books, onOpen: onOpenBook),
         const Kicker(_slot, 'Standing on the table'),
         _Book3D(b: lead, onOpen: () => onOpenBook(lead), onBuy: () => onBuyBook(lead)),
         const Kicker(_slot, 'Every volume, opened'),
-        for (var i = 0; i < kEbBooks.length; i++) _Jacket(b: kEbBooks[i], i: i, onOpen: () => onOpenBook(kEbBooks[i]), onBuy: () => onBuyBook(kEbBooks[i])),
+        for (var i = 0; i < books.length; i++) _Jacket(b: books[i], i: i, onOpen: () => onOpenBook(books[i]), onBuy: () => onBuyBook(books[i])),
       ],
     );
   }
 }
 
 class _Hero extends StatelessWidget {
-  const _Hero();
+  const _Hero({required this.count});
+  final int count;
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -103,7 +133,7 @@ class _Hero extends StatelessWidget {
                 height: H * .36,
                 child: GiantWord('READ', align: Alignment.bottomRight, style: anton(H * .4, color: kPPaper, w: FontWeight.w800, ls: -6)),
               ),
-              Positioned(right: 12, top: 12, child: GoldTag('${kEbBooks.length} volumes')),
+              Positioned(right: 12, top: 12, child: GoldTag('$count volumes')),
             ]),
           );
         }),
@@ -112,27 +142,34 @@ class _Hero extends StatelessWidget {
 
 /// The shelf: spines stand on a gold ledge, heights vary like real books.
 class _Shelf extends StatelessWidget {
-  const _Shelf({required this.onOpen});
+  const _Shelf({required this.books, required this.onOpen});
+  final List<EbBook> books;
   final void Function(EbBook) onOpen;
+  static const _perLedge = 3;
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
         child: Column(children: [
-          SizedBox(
-            height: 330,
-            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              for (var i = 0; i < kEbBooks.length; i++) ...[
-                if (i > 0) const SizedBox(width: 8),
-                Expanded(child: _Spine(b: kEbBooks[i], i: i, onTap: () => onOpen(kEbBooks[i]))),
-              ],
-            ]),
-          ),
-          Container(
-              height: 8,
-              decoration: BoxDecoration(
-                  color: kPGold,
-                  borderRadius: BorderRadius.circular(2),
-                  boxShadow: const [BoxShadow(color: Color(0xAA000000), blurRadius: 10, offset: Offset(0, 6))])),
+          // Three spines per ledge (the designed width); more live books
+          // stack another ledge instead of thinning the spines.
+          for (var s = 0; s < books.length; s += _perLedge) ...[
+            if (s > 0) const SizedBox(height: 18),
+            SizedBox(
+              height: 330,
+              child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                for (var i = s; i < s + _perLedge; i++) ...[
+                  if (i > s) const SizedBox(width: 8),
+                  Expanded(child: i < books.length ? _Spine(b: books[i], i: i, onTap: () => onOpen(books[i])) : const SizedBox()),
+                ],
+              ]),
+            ),
+            Container(
+                height: 8,
+                decoration: BoxDecoration(
+                    color: kPGold,
+                    borderRadius: BorderRadius.circular(2),
+                    boxShadow: const [BoxShadow(color: Color(0xAA000000), blurRadius: 10, offset: Offset(0, 6))])),
+          ],
         ]),
       );
 }
@@ -293,7 +330,7 @@ class _Cover extends StatelessWidget {
             right: 14,
             top: 18,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('NowssB · Volume ${kEbBooks.indexOf(b) + 1}', textScaler: TextScaler.noScaling, style: gSub(color: kPGoldSoft)),
+              Text('NowssB · Volume ${posterBooks().indexWhere((x) => x.key == b.key) + 1}', textScaler: TextScaler.noScaling, style: gSub(color: kPGoldSoft)),
               const SizedBox(height: 10),
               Container(height: 1, color: kPGold),
             ]),

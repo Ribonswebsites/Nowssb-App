@@ -20,6 +20,8 @@ import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/screens/poster/poster_pages.dart';
 import 'package:nowssb/screens/store/ebooks_store.dart';
+import 'package:nowssb/data/models.dart' show Book;
+import 'package:nowssb/screens/poster/poster_ebooks.dart' show posterBooks;
 import 'package:nowssb/screens/store/meaning_store.dart';
 import 'package:nowssb/screens/store/signature_store.dart';
 import 'package:nowssb/screens/store/word_atelier.dart';
@@ -284,4 +286,17 @@ void main() {
       });
     });
   }
+
+  test('eBooks keeps the live ContentStore books merged after the built-in volumes', () {
+    final base = posterBooks(live: const []);
+    expect(base.map((b) => b.key), kEbBooks.map((b) => b.key));
+    final merged = posterBooks(live: [
+      Book(key: kEbBooks.first.key, title: 'dup', sub: '', cover: '', price: 1, pages: 0),
+      const Book(key: 'studio-1', title: 'Studio Book', sub: 'Fresh', cover: '', price: 149, pages: 0),
+    ]);
+    expect(merged.length, kEbBooks.length + 1, reason: 'duplicate keys are not added twice');
+    expect(merged.last.title, 'Studio Book');
+    expect(merged.last.price, 149);
+    expect(merged.last.cover, kEbBooks.first.cover);
+  });
 }
