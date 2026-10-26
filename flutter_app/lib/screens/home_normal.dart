@@ -107,6 +107,7 @@ import '../shell/nwsb_links.dart';
 import '../widgets/home_keep_alive.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
+import 'poster/poster_pages.dart' show TrendingScreen;
 
 /// `REG.norm.items` — app/js/part062.js:41-100, key for key and in order.
 const kNormalSectionOrder = <String>[
@@ -418,7 +419,8 @@ class _HomeNormalState extends State<HomeNormal> {
             onInvite: () => _push(const ReferenceProgramPage()),
           ),
         ),
-        ('trendwd', V5Trending(onWord: (w) => _push(WordDetail(word: w)), onLibrary: () => _go(2))),
+        ('trendwd', V5Trending(onWord: (w) => _push(WordDetail(word: w)), onLibrary: () => _go(2),
+            onSeeAll: () => _push(const TrendingScreen()))),
         ('custom', null),
         ('rx', null),
         ('routines', const SizedBox.shrink()),

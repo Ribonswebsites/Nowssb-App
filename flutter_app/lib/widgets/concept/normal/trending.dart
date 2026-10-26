@@ -11,11 +11,13 @@ import 'package:flutter/material.dart';
 import 'surface.dart';
 
 class NTrending extends StatefulWidget {
-  const NTrending({super.key, required this.words, required this.onWord, required this.onLibrary});
+  const NTrending({super.key, required this.words, required this.onWord, required this.onLibrary, this.onSeeAll});
   /// Ranked words (ContentStore library pick), first = #1.
   final List<String> words;
   final void Function(String word) onWord;
   final VoidCallback onLibrary;
+  /// Opens the full Trending page; no link when null.
+  final VoidCallback? onSeeAll;
   @override
   State<NTrending> createState() => _NTrendingState();
 }
@@ -38,6 +40,12 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
             Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(color: nLink, borderRadius: BorderRadius.circular(10)),
                 child: const Text('#1', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white))),
+            // text-only link; as a Wrap child it drops to its own run at 320 x1.3
+            if (widget.onSeeAll case final onSeeAll?)
+              TextButton(key: const ValueKey('trending-see-all'), onPressed: onSeeAll,
+                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4), minimumSize: const Size(44, 44),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                  child: const Text('See all', softWrap: false, style: nLinkStyle)),
           ])),
           // small live equaliser (same loop as the poster), not a speaker icon
           ExcludeSemantics(child: SizedBox(width: 30, height: 24, child: AnimatedBuilder(animation: loop,

@@ -61,9 +61,11 @@ List<String> v5TrendingPick(List<Word> words, DateTime now) => [
     ];
 
 class V5Trending extends StatelessWidget {
-  const V5Trending({super.key, required this.onWord, required this.onLibrary});
+  const V5Trending({super.key, required this.onWord, required this.onLibrary, required this.onSeeAll});
   final void Function(Word word) onWord;
   final VoidCallback onLibrary;
+  /// Opens the poster TrendingScreen.
+  final VoidCallback onSeeAll;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: ContentStore.instance,
@@ -78,6 +80,7 @@ class V5Trending extends StatelessWidget {
               }
             },
             onLibrary: onLibrary,
+            onSeeAll: onSeeAll,
           );
         },
       );
