@@ -95,8 +95,12 @@ String doorStillArt(String name, String asset) {
   if (name == 'Fashion') return 'assets/doors/fashion_plus_tv.webp';
   if (name == 'Store') return 'assets/doors/store.webp';
   if (name.startsWith('Word')) return 'assets/doors/wordscience.webp';
-  if (name.startsWith('Meanings')) return 'assets/doors/meanings.webp';
-  if (name.startsWith('eBooks')) return 'assets/doors/ebooks.webp';
+  if (name == 'Meanings Clean') return 'assets/doors/meanings.webp';
+  if (name == 'Meanings Brand') return 'assets/doors/hour-shakti.webp';
+  if (name == 'Meanings Swirl') return 'assets/doors/hour-vata.webp';
+  if (name == 'Meanings Device') return 'assets/doors/hour-chandra.webp';
+  if (name == 'eBooks Headphones') return 'assets/doors/ebooks.webp';
+  if (name == 'eBooks Pair') return 'assets/doors/hour-kapha.webp';
   return asset;
 }
 
@@ -210,7 +214,7 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
   static String _poster(String mp4) => mp4.replaceFirst(RegExp(r'\.mp4$'), '-poster.webp');
 
   static const jumps = [
-    DoorJump('practice', 'Practice', "Today's word ritual", 'assets/video/practice-halo-poster.webp'),
+    DoorJump('practice', 'Practice', "Today's word ritual", 'assets/doors/practice.webp'),
     DoorJump('library', 'Sound Library', 'Every word you own', 'assets/video/player-box-rings-poster.webp'),
     DoorJump('progress', 'Progress', 'How far you have come', 'assets/video/my-progress-scene-1-poster.webp'),
     DoorJump('store', 'Store', 'Words and frequencies', 'assets/doors/fashion_plus_store.webp'),

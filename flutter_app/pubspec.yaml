@@ -252,6 +252,10 @@ flutter:
     - assets/doors/fashion_plus_tv.webp
     - assets/doors/hour-aarogya.webp
     - assets/doors/hour-ananda.webp
+    - assets/doors/hour-shakti.webp
+    - assets/doors/hour-vata.webp
+    - assets/doors/hour-chandra.webp
+    - assets/doors/hour-kapha.webp
     - assets/doors/hour-prana.webp
     - assets/doors/journal.webp
     - assets/doors/library.webp

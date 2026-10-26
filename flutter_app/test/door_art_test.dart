@@ -21,10 +21,16 @@ void main() {
 
   test('Start art Meanings/eBooks, Fashion Plus Store + TV use the doors art', () {
     expect(doorStillArt('Meanings Clean', 'x'), 'assets/doors/meanings.webp');
-    expect(doorStillArt('eBooks Pair', 'x'), 'assets/doors/ebooks.webp');
+    expect(doorStillArt('eBooks Pair', 'x'), 'assets/doors/hour-kapha.webp');
     expect(doorStillArt('Fashion', 'x'), 'assets/doors/fashion_plus_tv.webp');
     expect(doorStillArt('Store', 'x'), 'assets/doors/store.webp');
     expect(doorStillArt('Word Atelier', 'x'), 'assets/doors/wordscience.webp');
+    // Every Start art tile has its own art: no two tiles share a file.
+    final tiles = [
+      for (var i = 0; i < Settings.fashionImages.length; i++)
+        doorStillArt(Settings.fashionImageName(i), Settings.fashionImages[i])
+    ];
+    expect(tiles.toSet().length, tiles.length, reason: '$tiles');
     // Every Start art tile uses text-free doors art that exists.
     for (var i = 0; i < Settings.fashionImages.length; i++) {
       final a = doorStillArt(Settings.fashionImageName(i), Settings.fashionImages[i]);
@@ -39,6 +45,7 @@ void main() {
     }
     // Hero 'Full screen' + Store jump: no printed 'FASHION' / model face under the title.
     expect(DoorHeroStyle.all.firstWhere((h) => h.id == 'full').art, 'assets/doors/hour-ananda.webp');
+    expect(DoorFashionPlusScreen.jumps.firstWhere((j) => j.id == 'practice').art, 'assets/doors/practice.webp');
     // Make it yours: Player Settings + Healing carry no printed 'Chose Your Path'.
     final make = DoorFashionPlusScreen.make(Settings.instance);
     expect(make.firstWhere((j) => j.id == 'player').art, 'assets/doors/hour-prana.webp');
