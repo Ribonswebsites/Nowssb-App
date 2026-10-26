@@ -1200,8 +1200,8 @@ class FashPlusMini extends StatelessWidget {
                           ? 'On — the tiles, the practice card and every '
                               'photo background are playing'
                           : 'Off — pages keep their photographs',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      // Wraps on words; never ellipsised.
+                      softWrap: true,
                       style: const TextStyle(
                         fontSize: 11.5,
                         color: Color(0x8CFFFFFF),
