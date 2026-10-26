@@ -1144,35 +1144,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: GlassCard(
           margin: const EdgeInsets.only(bottom: 0),
           padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-          child: Row(
+          child: LayoutBuilder(builder: (context, box) {
+            final coins = GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
+              child: _TeaserStat(
+                '${EconomyMirror.instance.coins}',
+                'Coins',
+                expanded: false,
+                figure: CoinCount(
+                  value: EconomyMirror.instance.coins,
+                  style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text),
+                ),
+              ),
+            );
+            final streak = _TeaserStat('${p.streak}', 'Streak');
+            final sessions = _TeaserStat('${p.totalSessions}', 'Sessions');
+            final words = _TeaserStat('${p.uniqueWords}', 'Words');
+            // B024: keep one row only while every label still renders at
+            // 80% or more of full size; otherwise lay the same tiles 2x2.
+            final ts = MediaQuery.textScalerOf(context);
+            double tw(String t, TextStyle st) => (TextPainter(text: TextSpan(text: t, style: st), textDirection: TextDirection.ltr, textScaler: ts, maxLines: 1)..layout()).width;
+            final coinW = 20 + math.max(_TeaserStat.labelWidth('Coins', ts), 50 + tw('${EconomyMirror.instance.coins}', _TeaserStat.valueStyle));
+            final avail = box.maxWidth - 42; // chevron + gap
+            final rowTile = (avail - coinW - 10 - 20) / 3 - 20;
+            final need = [p.streak, p.totalSessions, p.uniqueWords].asMap().entries.map((e) {
+              final l = const ['Streak', 'Sessions', 'Words'][e.key];
+              return math.max(0.8 * _TeaserStat.labelWidth(l, ts), 0.8 * tw('${e.value}', _TeaserStat.valueStyle));
+            }).reduce(math.max);
+            final oneRow = rowTile >= need;
+            final tiles = oneRow
+                ? Row(children: [
+                    coins,
+                    const SizedBox(width: 10),
+                    Expanded(child: InkWell(onTap: openProgress, child: Row(children: [streak, const SizedBox(width: 10), sessions, const SizedBox(width: 10), words]))),
+                  ])
+                : Column(key: const ValueKey('stats-2x2'), children: [
+                    IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: coins), const SizedBox(width: 10), streak])),
+                    const SizedBox(height: 10),
+                    InkWell(onTap: openProgress, child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [sessions, const SizedBox(width: 10), words]))),
+                  ]);
+            return Row(
             children: [
-              GestureDetector(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
-                child: _TeaserStat(
-                  '${EconomyMirror.instance.coins}',
-                  'Coins',
-                  expanded: false,
-                  figure: CoinCount(
-                    value: EconomyMirror.instance.coins,
-                    style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: InkWell(
-                  onTap: openProgress,
-                  child: Row(
-                    children: [
-                      _TeaserStat('${p.streak}', 'Streak'),
-                      const SizedBox(width: 10),
-                      _TeaserStat('${p.totalSessions}', 'Sessions'),
-                      const SizedBox(width: 10),
-                      _TeaserStat('${p.uniqueWords}', 'Words'),
-                    ],
-                  ),
-                ),
-              ),
+              Expanded(child: tiles),
               const SizedBox(width: 8),
               Container(
                 width: 34,
@@ -1186,7 +1199,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: _svgIcon('assets/icons/icon_16.svg', 14, _dim),
               ),
             ],
-          ),
+          );
+          }),
         ),
       ),
     );
@@ -1582,6 +1596,10 @@ class _TeaserStat extends StatelessWidget {
   final bool expanded;
   final Widget? figure;
   const _TeaserStat(this.value, this.label, {this.expanded = true, this.figure});
+  static const valueStyle = TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text);
+  static const labelStyle = TextStyle(fontSize: 9, letterSpacing: 1.1, color: _dim);
+  static double labelWidth(String label, TextScaler ts) =>
+      (TextPainter(text: TextSpan(text: label.toUpperCase(), style: labelStyle), textDirection: TextDirection.ltr, textScaler: ts, maxLines: 1)..layout()).width;
   @override
   Widget build(BuildContext context) {
     final chip = Container(
@@ -1594,9 +1612,13 @@ class _TeaserStat extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              figure ?? Text(value, style: const TextStyle(fontFamily: _mono, fontSize: 22, fontWeight: FontWeight.w600, height: 1, color: _text)),
+              // Each figure and label stays whole on one line and only
+              // scales down when its tile is too narrow (B024: STRE/AK).
+              FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
+                  child: figure ?? Text(value, maxLines: 1, softWrap: false, style: valueStyle)),
               const SizedBox(height: 6),
-              Text(label.toUpperCase(), style: const TextStyle(fontSize: 9, letterSpacing: 1.1, color: _dim)),
+              FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
+                  child: Text(label.toUpperCase(), maxLines: 1, softWrap: false, style: labelStyle)),
             ],
           ),
         );
