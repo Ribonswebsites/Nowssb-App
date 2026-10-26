@@ -321,7 +321,10 @@ class _HeroCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const _Sep(),
-                    _SearchPill(onTap: onSearch),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: _SearchPill(onTap: onSearch),
+                    ),
                   ],
                 ),
               ],
@@ -570,7 +573,13 @@ class _ShopChip extends StatelessWidget {
           // Full size. Shrinking this was mine, not asked for — the strip
           // is tall enough to hold it, and if the width ever runs out it is
           // the one line that ellipsises, not the whole block that scales.
+          // The strip has an exact height, so at large text the two lines
+          // scale down together rather than spill onto the screen below
+          // (B016).
           const Flexible(
+            child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -588,7 +597,7 @@ class _ShopChip extends StatelessWidget {
                 EditableLabel('hero.ShopChip',
                   'Words & meanings',
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  softWrap: false,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -596,6 +605,7 @@ class _ShopChip extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
             ),
           ),
         ],
@@ -721,17 +731,22 @@ class _FootButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Scale the label to the room it has instead of cutting it to
+            // "EXPLO…" at large text on a narrow screen (B016).
             Flexible(
-              child: EditableLabel('hero.FootButton',
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: EditableLabel('hero.FootButton',
                 label,
                 maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                softWrap: false,
                 style: const TextStyle(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.2,
                   color: Colors.white,
                 ),
+              ),
               ),
             ),
             if (trailing != null) ...[
