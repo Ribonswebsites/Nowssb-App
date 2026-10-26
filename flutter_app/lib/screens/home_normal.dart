@@ -54,6 +54,7 @@ import 'normal/calm_v3.dart';
 import 'normal/home_v4.dart';
 import 'normal/home_v5.dart';
 import '../widgets/concept/normal/fashion_switch.dart';
+import '../widgets/concept/normal/footer.dart';
 import '../features/programs/partner_program.dart';
 import '../features/programs/reference_program.dart';
 import '../features/vault/vault_screen.dart';
@@ -462,7 +463,7 @@ class _HomeNormalState extends State<HomeNormal> {
           'fashsw',
           NFashionSwitch(onSwitch: () => Settings.instance.setFashionHome(true))
         ),
-        ('footer', V4Footer(onLink: _footerLink)),
+        ('footer', NFooter(onLink: _footerLink)),
       ];
 
   @override
