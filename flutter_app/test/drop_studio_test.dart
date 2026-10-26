@@ -4,6 +4,7 @@ import 'package:nowssb/data/home_widget_sync.dart';
 import 'package:nowssb/data/practice_progress.dart';
 import 'package:nowssb/screens/concept/doors/door_fashion_plus.dart';
 import 'package:nowssb/screens/concept/doors/door_checkout.dart';
+import 'package:nowssb/features/social/connect_screen.dart';
 import 'package:nowssb/screens/concept/drop_v4_type.dart';
 import 'dart:math' as math;
 import 'package:nowssb/screens/concept/drop_v5.dart';
@@ -137,6 +138,13 @@ void main() {
         expect(File(j.art).existsSync(), isTrue, reason: j.art);
         expect(File('pubspec.yaml').readAsStringSync(), contains('- ${j.art}'), reason: 'not bundled: ${j.art}');
       }
+      expect(page.make.where((j) => j.id == 'profile'), isEmpty, reason: 'Profile is already a jump');
+      expect(page.jumps.where((j) => j.id == 'profile'), hasLength(1));
+      page.onJump!('connect');
+      await settle(t, 2);
+      expect(find.byType(ConnectScreen), findsOneWidget);
+      t.state<NavigatorState>(find.byType(Navigator).first).pop();
+      await settle(t, 2);
       expect(page.heroStyle, Settings.instance.heroStyle);
       final next = Settings.instance.heroStyle == 'full' ? 'tv' : 'full';
       await t.runAsync(() async => page.onPickStyle!(next));

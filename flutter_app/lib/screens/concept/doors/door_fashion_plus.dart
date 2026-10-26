@@ -184,8 +184,8 @@ class _S extends State<DoorFashionPlusPage> with TickerProviderStateMixin, DoorP
               Wrap(spacing: 8, runSpacing: 8, children: [
                 _Pill(label: 'Practise', icon: Icons.play_arrow_rounded, onTap: widget.onPractise),
                 _Pill(
+                    // Text-only (no icon + title pill).
                     label: widget.addingToHome ? 'Adding…' : 'Add to home screen',
-                    icon: Icons.add_to_home_screen_rounded,
                     dark: true,
                     onTap: widget.onAddToHome),
               ]),
@@ -213,7 +213,12 @@ class _S extends State<DoorFashionPlusPage> with TickerProviderStateMixin, DoorP
             ]),
             const Spacer(),
             Text(s.title, style: doorGreet(color: Colors.white)),
-            Text(s.sub, style: doorSub()),
+            // Solid black scrim under the subline: ≥4.5:1 on any photograph.
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              color: Colors.black,
+              child: Text(s.sub, style: doorSub()),
+            ),
             const SizedBox(height: 10),
             _Pill(
               label: on ? 'Applied' : 'Apply now',

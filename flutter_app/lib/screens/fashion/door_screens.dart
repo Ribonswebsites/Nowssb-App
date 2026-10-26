@@ -210,7 +210,6 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
         DoorJump('healing', 'Personalised Healing', s.showHealing ? 'On your home' : 'Add it to home',
             'assets/video/healing-path-bg-poster.webp',
             toggle: s.showHealing),
-        const DoorJump('profile', 'Profile', 'Your account', 'assets/video/earth-night-poster.webp'),
       ];
 
   void _push(Widget page) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
@@ -228,7 +227,7 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
       case 'meaning':
         _push(const MeaningStoreScreen());
       case 'connect':
-        Navigator.of(context).maybePop();
+        NwsbLinks.connect(context);
       case 'notifications':
         _push(const NotificationsSettingsPage());
       case 'profile':
