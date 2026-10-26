@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../theme/tokens.dart';
+
 class CourseChip {
   const CourseChip(this.label, this.count);
   final String label;
@@ -163,7 +165,8 @@ class CourseFace extends StatelessWidget {
                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        child: Text('Active', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                        // Ink on the white pill reads at well over 4.5:1 (B026).
+                        child: Text('Active', style: TextStyle(color: NwsbColors.ink, fontWeight: FontWeight.w700, fontSize: 13)),
                       ),
                     ),
                   ),
