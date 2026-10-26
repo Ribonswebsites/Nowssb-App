@@ -1572,7 +1572,9 @@ class SectionLabel extends StatelessWidget {
 class SectionBlock extends StatelessWidget {
   final String title; final Widget child; final Widget? trailing; final double marginBottom;
   const SectionBlock({super.key, required this.title, required this.child, this.trailing, this.marginBottom = 38});
-  @override Widget build(BuildContext context) => Container(margin: EdgeInsets.only(bottom: marginBottom), child: Column(children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [SectionLabel(title, bottom: 14), if (trailing != null) trailing!]), child]));
+  // On a narrow screen with large text the title wraps and the trailing
+  // control shrinks to fit, instead of being pushed off the edge (B014).
+  @override Widget build(BuildContext context) => Container(margin: EdgeInsets.only(bottom: marginBottom), child: Column(children: [LayoutBuilder(builder: (_, box) => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Flexible(child: SectionLabel(title, bottom: 14)), if (trailing != null) ...[const SizedBox(width: 12), ConstrainedBox(constraints: BoxConstraints(maxWidth: box.maxWidth * 0.62), child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: trailing!))]])), child]));
 }
 
 class _TeaserStat extends StatelessWidget {
