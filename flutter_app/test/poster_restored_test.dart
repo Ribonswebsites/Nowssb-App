@@ -64,6 +64,19 @@ Future<_Obs> _pump(WidgetTester t, Widget Function(BuildContext) page, {double w
   return obs;
 }
 
+/// A Semantics widget by its label (no semantics tree needed).
+Finder _sem(Pattern label) => find.byWidgetPredicate((w) {
+      final l = w is Semantics ? w.properties.label : null;
+      return l != null && (label is RegExp ? label.hasMatch(l) : l == label);
+    });
+
+Future<void> _settleRoute(WidgetTester t) async {
+  await t.pump();
+  for (var i = 0; i < 10; i++) {
+    await t.pump(const Duration(milliseconds: 100));
+  }
+}
+
 Future<void> _reveal(WidgetTester t, Finder f) async {
   final s = find.byType(Scrollable).first;
   for (var i = 0; i < 80 && f.hitTestable().evaluate().isEmpty; i++) {
@@ -130,7 +143,7 @@ void main() {
       // First Countries card
       obs = await _pump(t, (x) => posterSignaturePage(x), key: key);
       final first = kPlaceRows.first;
-      final add = find.descendant(of: find.bySemanticsLabel('Open ${first.$1}'), matching: find.text('Add to cart'));
+      final add = find.descendant(of: _sem('Open ${first.$1}'), matching: find.text('Add to cart'));
       await _reveal(t, add);
       if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-restored-signature-places-390'));
       final before = CartBag.instance.cartCount;
@@ -138,17 +151,17 @@ void main() {
       await t.pump(const Duration(milliseconds: 300));
       expect(CartBag.instance.cartCount, before + 1);
       expect(find.text('Your cart is waiting in Profile → Cart'), findsOneWidget);
-      final own = find.descendant(of: find.bySemanticsLabel('Open ${first.$1}'), matching: find.textContaining('Own · ₹'));
+      final own = find.descendant(of: _sem('Open ${first.$1}'), matching: find.textContaining('Own · ₹'));
       expect(own, findsOneWidget);
       expect((t.widget<Text>(own)).data, matches(RegExp(r'^Own · ₹[0-9,]+$')), reason: 'whole-rupee Play signature price');
       await t.tap(own);
-      await t.pump(const Duration(milliseconds: 400));
+      await _settleRoute(t);
       expect(obs.pushed, isNotEmpty, reason: 'Own → checkout');
       obs = await _pump(t, (x) => posterSignaturePage(x));
-      final open = find.descendant(of: find.bySemanticsLabel('Open ${first.$1}'), matching: find.text('Open'));
+      final open = find.descendant(of: _sem('Open ${first.$1}'), matching: find.text('Open'));
       await _reveal(t, open);
       await t.tap(open);
-      await t.pump(const Duration(milliseconds: 400));
+      await _settleRoute(t);
       expect(obs.pushed, isNotEmpty, reason: 'Open → word page');
     });
 
@@ -156,7 +169,7 @@ void main() {
       final r = kPlaceRows.first;
       Entitlements.instance.debugSet(uid: 'u1', owned: {ownedDocId('signature:${r.$1.toLowerCase()}')});
       await _pump(t, (x) => posterSignaturePage(x));
-      final card = find.bySemanticsLabel('Open ${r.$1}');
+      final card = _sem('Open ${r.$1}');
       await _reveal(t, card);
       expect(find.descendant(of: card, matching: find.text('Owned')), findsOneWidget);
       expect(find.descendant(of: card, matching: find.textContaining('₹')), findsNothing);
@@ -171,7 +184,7 @@ void main() {
       expect(find.text('Personally crafted & delivered within 48 hours.'), findsOneWidget);
       if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-restored-signature-request-390'));
       await t.tap(find.text('Request'));
-      await t.pump(const Duration(milliseconds: 400));
+      await _settleRoute(t);
       expect(obs.pushed, isNotEmpty);
       expect(find.byType(RequestWordsScreen), findsOneWidget);
     });
@@ -183,7 +196,7 @@ void main() {
       expect(stub, findsWidgets);
       for (final e in stub.evaluate()) {
         final rb = e.renderObject! as RenderBox;
-        final s = rb.getTransformTo(null).getMaxScaleOnAxis() / t.view.devicePixelRatio;
+        final s = rb.getTransformTo(null).getMaxScaleOnAxis();
         expect(s, greaterThanOrEqualTo(.8), reason: 'stub line scaled to $s');
       }
       for (final m in kMsSignature.entries) {
@@ -208,7 +221,7 @@ void main() {
       expect(find.text('No meanings match.'), findsOneWidget);
       if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-restored-meaning-nomatch-390'));
       await t.tap(find.text('Request this word'));
-      await t.pump(const Duration(milliseconds: 400));
+      await _settleRoute(t);
       expect(obs.pushed, isNotEmpty);
       expect(t.widget(find.byType(RequestWordsScreen)), isA<RequestWordsScreen>());
     });
@@ -217,7 +230,7 @@ void main() {
       final obs = await _pump(t, (x) => posterMeaningPage(x));
       await _reveal(t, find.text('Request a word'));
       await t.tap(find.text('Request a word'));
-      await t.pump(const Duration(milliseconds: 400));
+      await _settleRoute(t);
       expect(obs.pushed, isNotEmpty);
       expect(find.byType(RequestWordsScreen), findsOneWidget);
     });
@@ -272,13 +285,13 @@ void main() {
       expect(find.text('No words match this search in this collection.'), findsOneWidget);
       if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-restored-atelier-nomatch-390'));
       await t.tap(find.text('Request this word'));
-      await t.pump(const Duration(milliseconds: 400));
+      await _settleRoute(t);
       expect(find.byType(RequestWordsScreen), findsOneWidget);
       obs = await _pump(t, (x) => posterAtelierPage(x, now: DateTime(2026, 10, 27, 9)));
       await _reveal(t, find.byType(TextField));
       await t.showKeyboard(find.byType(TextField));
       await t.testTextInput.receiveAction(TextInputAction.search);
-      await t.pump(const Duration(milliseconds: 400));
+      await _settleRoute(t);
       expect(obs.pushed, isNotEmpty);
       expect(find.byType(RequestWordsScreen), findsOneWidget);
     });
@@ -290,7 +303,7 @@ void main() {
       await t.enterText(find.byType(TextField), w.word);
       await t.pump();
       expect(find.text('No words match this search in this collection.'), findsNothing);
-      final plus = find.bySemanticsLabel(RegExp(r'^Add .* to bag$'));
+      final plus = _sem(RegExp(r'^Add .* to bag$'));
       await _reveal(t, plus);
       final before = CartBag.instance.cartCount;
       await t.tap(plus.first);
@@ -303,13 +316,13 @@ void main() {
       for (final sc in [1.0, 1.3]) {
         final key = GlobalKey();
         await _pump(t, (x) => posterAtelierPage(x, now: DateTime(2026, 10, 27, 9)), width: 320, scale: sc, key: key);
-        final tag = find.bySemanticsLabel(RegExp(r'^Add .* to bag$'));
+        final tag = _sem(RegExp(r'^Add .* to bag$'));
         await _reveal(t, tag);
         final prices = find.textContaining(RegExp(r'^₹[0-9,]+$'));
         expect(prices, findsWidgets);
         for (final e in prices.evaluate()) {
           final rb = e.renderObject! as RenderBox;
-          final s = rb.getTransformTo(null).getMaxScaleOnAxis() / t.view.devicePixelRatio;
+          final s = rb.getTransformTo(null).getMaxScaleOnAxis();
           expect(s, closeTo(1, .01), reason: 'price tag scaled to $s at 320@$sc');
           expect((e.widget as Text).style?.fontSize, greaterThanOrEqualTo(14));
         }
