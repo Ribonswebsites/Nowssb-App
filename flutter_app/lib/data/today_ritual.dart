@@ -76,6 +76,10 @@ class TodayRitualModel extends ChangeNotifier {
     onBegin?.call(v.words, v.title);
   }
 
+  /// 8/8 'Play again': restarts today's ritual from its first word in the
+  /// same Player route Begin uses.
+  void replay() => begin();
+
   void seeProgress() => onSeeProgress?.call();
 
   @override

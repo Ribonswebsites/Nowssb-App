@@ -7,7 +7,9 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/data/today_ritual.dart';
+import 'package:nowssb/widgets/concept/ritual_card.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'neomorphic_dashboard.dart' show FocusBlob;
@@ -273,69 +275,29 @@ class _CalmTodayState extends State<CalmToday> {
         listenable: _model,
         builder: (context, _) {
           final r = _model.value;
-          final active = r.words;
-          final title = r.title;
-          final done = r.done;
-          final frac = r.fraction;
-          final p = (todaySessions: r.todaySessions, totalSessions: r.totalSessions, streak: r.streak);
-          return _Calm(
+          return RitualCard(
             key: const ValueKey('cv3-today'),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // bcb6baf design: the overlapping purple circles on the right.
-              Stack(clipBehavior: Clip.none, children: [
-              Padding(
-              padding: const EdgeInsets.only(right: 96),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('TODAY', style: _eyebrow),
-              const SizedBox(height: 10),
-              Row(children: [
-                SizedBox.square(
-                  dimension: 76,
-                  child: _Breathe(
-                    child: Stack(alignment: Alignment.center, children: [
-                      SizedBox.expand(
-                        child: CircularProgressIndicator(
-                          value: frac,
-                          strokeWidth: 5,
-                          backgroundColor: Colors.white,
-                          color: _sage,
-                        ),
-                      ),
-                      Text('$done/${active.length}',
-                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _ink)),
-                    ]),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(title, style: _h),
-                    const SizedBox(height: 4),
-                    Text(active.isEmpty ? 'No words yet' : '${active.length} word${active.length == 1 ? '' : 's'} for now',
-                        style: _sub),
-                  ]),
-                ),
-              ]),
-              ]),
-              ),
-              const Positioned(right: -22, top: -22, child: FocusBlob()),
-              ]),
-              const SizedBox(height: 16),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                _Stat('${p.todaySessions}', 'today'),
-                _Stat('${p.totalSessions}', 'sessions'),
-                _Stat('${p.streak}', 'day streak'),
-              ]),
-              const SizedBox(height: 16),
-              Wrap(spacing: 10, runSpacing: 10, children: [
-                CalmGo(label: 'Begin', onTap: _model.begin),
-                CalmGo(label: 'See progress', light: true, onTap: _model.seeProgress),
-              ]),
-            ]),
+            completed: r.done,
+            total: r.total,
+            sessionCount: r.totalSessions,
+            streak: r.streak,
+            time: ritualTimeOf(r.part),
+            title: r.title,
+            onBegin: _model.begin,
+            onReplay: _model.replay,
+            onSeeProgress: _model.seeProgress,
           );
         },
       );
 }
+
+/// The shared day part (dayPartFor / DayClock) as the card's time.
+RitualTime ritualTimeOf(DayPart p) => switch (p) {
+      DayPart.morning => RitualTime.morning,
+      DayPart.afternoon => RitualTime.afternoon,
+      DayPart.evening => RitualTime.evening,
+      DayPart.night => RitualTime.night,
+    };
 
 class _Stat extends StatelessWidget {
   const _Stat(this.value, this.label);
