@@ -19,6 +19,7 @@ import 'package:nowssb/features/economy/money.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/screens/poster/poster_pages.dart';
+import 'package:nowssb/screens/store/ebooks_store.dart';
 import 'package:nowssb/screens/store/meaning_store.dart';
 import 'package:nowssb/screens/store/signature_store.dart';
 import 'package:nowssb/screens/store/word_atelier.dart';
@@ -99,6 +100,19 @@ Future<void> _shot(GlobalKey key, String name) async {
   File('$_shots/$name.png').writeAsBytesSync(data!.buffer.asUint8List());
 }
 
+/// Scroll the page until [f] is on screen (a pill below the first screen).
+Future<void> _reveal(WidgetTester t, Finder f) async {
+  if (f.hitTestable().evaluate().isNotEmpty) return;
+  final s = find.byType(Scrollable);
+  if (s.evaluate().isEmpty) return;
+  for (var i = 0; i < 30 && f.hitTestable().evaluate().isEmpty; i++) {
+    final st = t.state<ScrollableState>(s.first);
+    if (st.position.pixels >= st.position.maxScrollExtent) break;
+    st.position.jumpTo((st.position.pixels + 300).clamp(0, st.position.maxScrollExtent));
+    await t.pump(const Duration(milliseconds: 100));
+  }
+}
+
 /// Scroll the whole page, checking text at every screen.
 Future<void> _sweep(WidgetTester t, String label) async {
   _expectCleanText(t, label);
@@ -144,6 +158,8 @@ final specs = <PosterSpec>[
           if (c.signature != null) 'signature:${c.signature!.name.toLowerCase()}',
         for (final e in kMsSignature.values) 'meaning:${e.word.toLowerCase()}',
       }, 'Own · ', 'Look inside'),
+  PosterSpec('ebooks', () => const EbooksStoreScreen(), () => {for (final b in kEbBooks) 'ebook:${b.title.toLowerCase()}'}, 'Own · ',
+      'Look inside'),
 ];
 
 void main() {
@@ -193,6 +209,7 @@ void main() {
         expect(obs.pops, greaterThan(0), reason: 'back pops');
         // Buy pills (first screen) and every Open
         obs = await _pump(t, p.build());
+        await _reveal(t, find.textContaining(p.priced, findRichText: true));
         final buys = find.textContaining(p.priced, findRichText: true).hitTestable();
         expect(buys, findsWidgets, reason: 'a price pill is visible');
         final before = CartBag.instance.cartCount;
@@ -203,6 +220,7 @@ void main() {
         final after = CartBag.instance.cartCount;
         expect(obs.pushed.isNotEmpty || after > before, isTrue, reason: 'buy reaches checkout or bag');
         obs = await _pump(t, p.build());
+        await _reveal(t, find.textContaining(p.open, findRichText: true));
         final open = find.textContaining(p.open, findRichText: true).hitTestable();
         expect(open, findsWidgets, reason: '${p.open} is visible');
         await t.tap(open.first);
@@ -230,6 +248,7 @@ void main() {
         addTearDown(() => FxBook.instance.country = null);
         await load(t);
         await _pump(t, p.build());
+        await _reveal(t, find.textContaining(RegExp(r'Own · '), findRichText: true));
         final prices = find.textContaining(RegExp(r'Own · '), findRichText: true);
         expect(prices, findsWidgets);
         for (final e in prices.evaluate()) {

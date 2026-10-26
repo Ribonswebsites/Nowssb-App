@@ -17,12 +17,14 @@ import '../store/store_home_sections.dart';
 import '../store/store_routes.dart';
 import '../store/store_select_sheet.dart';
 import 'poster_atelier.dart';
+import 'poster_ebooks.dart';
 import 'poster_kit.dart';
 import 'poster_meaning.dart';
 import 'poster_signature.dart';
 import 'poster_trending.dart';
 
 export 'poster_atelier.dart';
+export 'poster_ebooks.dart';
 export 'poster_kit.dart';
 export 'poster_meaning.dart';
 export 'poster_signature.dart';
@@ -101,6 +103,16 @@ Widget posterSignaturePage(BuildContext x, {ScrollController? controller}) => Po
           storeBuyNow(x, meaningBagItem(word: e.word, root: e.root, img: kNowssbStoreMark, price: sigMeaningPrice(e), signature: true)),
     );
 
+/// The Ebooks Store poster (EbooksStoreScreen's page).
+Widget posterEbooksPage(BuildContext x, {ScrollController? controller}) => PosterEbooks(
+      controller: controller,
+      onBack: () => posterBack(x),
+      onOpenStores: () => posterStores(x, 'ebooks'),
+      onOpenBag: () => posterBag(x),
+      onOpenBook: (b) => openEbookDetail(x, b),
+      onBuyBook: (b) => storeBuyNow(x, ebookBagItem(title: b.title, sub: b.sub, img: b.cover, price: bookPrice(b))),
+    );
+
 /// Trending — the destination of the home Trending cards.
 class TrendingScreen extends StatelessWidget {
   const TrendingScreen({super.key, this.controller, this.now, this.debugAngle, this.debugTilt});
@@ -130,5 +142,6 @@ final Map<String, PosterBuild> kPosterPages = {
   'trending': (c, now) => TrendingScreen(controller: c, now: now, debugAngle: .5, debugTilt: const Offset(-.3, .12)),
   'atelier': (c, now) => Builder(builder: (x) => posterAtelierPage(x, controller: c, now: now)),
   'signature': (c, now) => Builder(builder: (x) => posterSignaturePage(x, controller: c)),
+  'ebooks': (c, now) => Builder(builder: (x) => posterEbooksPage(x, controller: c)),
   'meaning': (c, now) => Builder(builder: (x) => posterMeaningPage(x, controller: c, now: now)),
 };
