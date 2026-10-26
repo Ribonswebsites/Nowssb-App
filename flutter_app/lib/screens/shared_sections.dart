@@ -60,12 +60,17 @@ class SubscriptionSection extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const EditableLabel('shared_sections.SubscriptionSection', 'SUBSCRIPTION TIER UPGRADE',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.6)),
+                  // Wraps to a second line when large text leaves no
+                  // room, and keeps a gap to the arrow (B012).
+                  const Expanded(
+                    child: EditableLabel('shared_sections.SubscriptionSection', 'SUBSCRIPTION TIER UPGRADE',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.6)),
+                  ),
+                  const SizedBox(width: 12),
                   const Icon(Icons.arrow_forward_rounded,
                       color: Color(0xFFE8D5A3), size: 18),
                 ],
@@ -122,7 +127,10 @@ class EditionSection extends StatelessWidget {
             priority: ClipPriority.decoration,
             onTap: onTap,
             overlay: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+              // The copy keeps its own text size; the padding is a little
+              // tighter, and the empty 9px tail is gone, so it all fits the
+              // film at 320dp x1.3 without scaling the film (B012).
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -144,8 +152,6 @@ class EditionSection extends StatelessWidget {
                             TextStyle(color: Color(0xBBFFFFFF), fontSize: 11),
                         duration: Duration(milliseconds: 4200),
                       ),
-                      const SizedBox(height: 9),
-                      const SizedBox.shrink(),
                     ],
                   ),
                 ],
@@ -171,11 +177,15 @@ class EditionSection extends StatelessWidget {
   }
 }
 
-/// Gentle slide for subscription TV copy — matches web `nwsb-sub-marquee`.
-class _SubMarqueeText extends StatefulWidget {
+/// One line of subscription film copy. It used to sway, which slid the
+/// ends past its own clip ('Subscriptior', 'Join Nowss'). It now sits still
+/// and, only when large text leaves no room, that one label scales down to
+/// fit. The film itself keeps its size (B012).
+class _SubMarqueeText extends StatelessWidget {
   const _SubMarqueeText(
     this.text, {
     required this.style,
+    // ignore: unused_element_parameter
     this.duration = const Duration(milliseconds: 3800),
   });
   final String text;
@@ -183,44 +193,12 @@ class _SubMarqueeText extends StatefulWidget {
   final Duration duration;
 
   @override
-  State<_SubMarqueeText> createState() => _SubMarqueeTextState();
-}
-
-class _SubMarqueeTextState extends State<_SubMarqueeText>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-    vsync: this,
-    duration: widget.duration,
-  )..repeat(reverse: true);
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: AnimatedBuilder(
-        animation: _c,
-        builder: (_, child) {
-          final t = Curves.easeInOut.transform(_c.value);
-          return Transform.translate(
-            offset: Offset(5 - 15 * t, 0),
-            child: child,
-          );
-        },
-        child: EditableLabel('shared_sections.SubMarqueeText',
-          widget.text,
-          maxLines: 1,
-          softWrap: false,
-          overflow: TextOverflow.visible,
-          style: widget.style,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: EditableLabel('shared_sections.SubMarqueeText', text,
+            maxLines: 1, softWrap: false, style: style),
+      );
 }
 
 class _SubscriptionBanner extends StatelessWidget {
@@ -414,11 +392,17 @@ class _SubscriptionTierRow extends StatelessWidget {
                                   fontWeight: FontWeight.w800),
                             ),
                           ),
-                          EditableLabel('shared_sections.SubscriptionTierRow', detail,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                  color: Color(0xB3FFFFFF), fontSize: 10)),
+                          // Like the name: shown whole, scaled down only when
+                          // there is no room ('Price on Google Play') (B012).
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: EditableLabel('shared_sections.SubscriptionTierRow', detail,
+                                maxLines: 1,
+                                softWrap: false,
+                                style: const TextStyle(
+                                    color: Color(0xB3FFFFFF), fontSize: 10)),
+                          ),
                         ],
                       ),
                     ),
