@@ -39,7 +39,7 @@ void openAtelierWord(
   // already open it; otherwise the product page with its Buy button.
   final open = found.isNotEmpty &&
       (signature
-          ? Entitlements.instance.canOpenStoreWord(word, signature: true, price: kMsSignaturePrice)
+          ? Entitlements.instance.canOpenStoreWord(word, signature: true, price: price > 0 ? price : StorePrices.instance.priceFor('signature:$key', kind: 'signature'))
           : Entitlements.instance.canOpenWord(found.first));
   if (open) {
     Navigator.of(context).push(
@@ -54,7 +54,7 @@ void openAtelierWord(
         title: _titleCase(word),
         root: root,
         img: img,
-        price: signature ? kMsSignaturePrice : price,
+        price: signature && price <= 0 ? StorePrices.instance.priceFor('signature:$key', kind: 'signature') : price,
         about: signature
             ? 'The rarest word in its collection. One signature exists per collection, it is never discounted on its own, and it is never restocked.'
             : 'Every word carries a vibrational signature that predates its dictionary definition. Unlock the phonetic origin of ${_titleCase(word)} — what the sound does inside your body, and where it existed before anyone wrote it down.',
@@ -84,7 +84,7 @@ void openMeaningDetail(
         root: m.root,
         // Always prefer catalogue / caller img — do not let live overlay swap art.
         img: signature ? kMsSignatureImg : m.img,
-        price: signature ? kMsSignaturePrice : m.price,
+        price: signature ? StorePrices.instance.priceFor('meaning:${m.word.toLowerCase()}', kind: 'signature', shown: m.price > 0 ? m.price : null) : m.price,
         about: blurb,
         heroVideo: nwsbVideo(kMsMeaningVidFile),
         highlights: const [

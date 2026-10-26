@@ -93,6 +93,10 @@ flutter:
     - family: Anton
       fonts:
         - asset: assets/fonts/Anton-Regular.ttf
+    # PIE / root glyph fallback (₂ ḗ ʰ ̥ ǣ ǵ) for DM Sans — Noto Sans subset, OFL.
+    - family: NotoSansPIE
+      fonts:
+        - asset: assets/fonts/NotoSans-PIE.ttf
     - family: CormorantGaramond
       fonts:
         - asset: assets/fonts/CormorantGaramond-Variable.ttf

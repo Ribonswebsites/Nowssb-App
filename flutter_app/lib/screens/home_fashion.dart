@@ -25,6 +25,7 @@
 /// further down come and go.
 library;
 
+import 'poster/poster_pages.dart' show TrendingScreen, posterPush;
 import '../data/fashion_bg_dim.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -654,7 +655,7 @@ class _HomeFashionState extends State<HomeFashion> {
         )),
         // Removed on Ribon's order (Oct 23): 'Build a library' banner.
         ('store', const SizedBox.shrink()),
-        ('trendwd', FashTrending(onTap: () => _go(2))),
+        ('trendwd', FashTrending(onTap: () => posterPush(context, const TrendingScreen()))),
         // "Make this home yours" and "Today's offers" now live in Drop
         // Studio; this card is the one way in.
         ('custom', DropStudioEntry(onTap: () => _push(const DropStudioScreen()))),
