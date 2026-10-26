@@ -29,7 +29,7 @@ class DoorHeroStyle {
   final String id, title, sub, art;
   static const all = [
     DoorHeroStyle('tv', 'On the television', 'The set, on the page', 'assets/doors/fashion_plus_tv.webp'),
-    DoorHeroStyle('full', 'Full screen', 'The photographs, edge to edge', 'assets/fashion/fp-intro.webp'),
+    DoorHeroStyle('full', 'Full screen', 'The photographs, edge to edge', 'assets/doors/hour-ananda.webp'),
     DoorHeroStyle('plain', 'Plain header', 'No pictures, no set', 'assets/video/subscription-b-poster.webp'),
   ];
 }
