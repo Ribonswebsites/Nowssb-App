@@ -28,8 +28,18 @@ class _NRewardsState extends State<NRewards> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final fill = widget.signedIn ? (widget.streak.clamp(0, 7)) / 7 : 0.0;
-    final chest = SizedBox(width: 132, height: 120, child: AnimatedBuilder(animation: loop, builder: (_, __) =>
+    final day = widget.streak.clamp(0, 7);
+    final glass = SizedBox(width: 132, height: 120, child: AnimatedBuilder(animation: loop, builder: (_, __) =>
         CustomPaint(painter: _Chest(fill: fill, t: loop.value))));
+    // the fill is the real streak; say so under the chest
+    final chest = widget.signedIn
+        ? Column(mainAxisSize: MainAxisSize.min, children: [
+            glass,
+            const SizedBox(height: 4),
+            Text('Day $day of 7', key: const ValueKey('rewards-day'), textAlign: TextAlign.center,
+                style: nSub.copyWith(color: nInk, fontWeight: FontWeight.w700)),
+          ])
+        : glass;
     final beads = Row(mainAxisSize: MainAxisSize.min, children: [
       for (var i = 0; i < 7; i++)
         Container(width: 8, height: 8, margin: const EdgeInsets.only(right: 5), decoration: BoxDecoration(
