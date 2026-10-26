@@ -75,12 +75,14 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with SingleTicker
                 final dim = (widget.bgDim ?? 0).clamp(0.0, 1.0);
                 return Stack(fit: StackFit.expand, children: [
                   const ColoredBox(color: Color(0xFF0B0812)),
-                  CustomPaint(painter: _Rings(t: t)),
                   ClipPath(clipper: _PathClip(plus), child: Stack(fit: StackFit.expand, children: [
-                    _Still(w: w, h: h),
-                    if (dim > 0) ColoredBox(color: Colors.black.withValues(alpha: dim)),
+                    // Builder edit (Hunter H on 24d4e8d): the dim darkens the
+                    // photo only; the still's own neon plus is kept out of it.
+                    _Still(w: w, h: h, dim: dim),
                   ])),
-                  CustomPaint(painter: _Neon(path: rim, t: t, fade: 1 - open)),
+                  // Builder edit: ripples sit above the (dimmed) photo, below the neon.
+                  CustomPaint(key: const ValueKey('fp-entry-rings'), painter: _Rings(t: t)),
+                  CustomPaint(key: const ValueKey('fp-entry-neon'), painter: _Neon(path: rim, t: t, fade: 1 - open)),
                 ]);
               }));
           }))),
@@ -124,8 +126,8 @@ class _PathClip extends CustomClipper<Path> {
 /// The still, cropped to the model and the neon plus (x 0–.7 of the
 /// 941×1672 frame); the face sits inside the plus's horizontal arm.
 class _Still extends StatelessWidget {
-  const _Still({required this.w, required this.h});
-  final double w, h;
+  const _Still({required this.w, required this.h, this.dim = 0});
+  final double w, h, dim;
   static const _fy = .465, _span = .7;
   @override
   Widget build(BuildContext context) {
@@ -133,7 +135,10 @@ class _Still extends StatelessWidget {
     final iw = w / _span, ih = iw * 1672 / 941;
     return ClipRect(child: Stack(clipBehavior: Clip.hardEdge, children: [
       Positioned(left: 0, top: h / 2 - ih * _fy, width: iw, height: ih,
-          child: Image.asset(kNFashionPlusStill, fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox())),
+          child: Stack(fit: StackFit.expand, children: [
+            Image.asset(kNFashionPlusStill, fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox()),
+            if (dim > 0) CustomPaint(key: const ValueKey('fp-entry-dim'), painter: _PhotoDim(dim)),
+          ])),
     ]));
   }
 }
@@ -176,4 +181,25 @@ class _Neon extends CustomPainter {
   }
   @override
   bool shouldRepaint(_Neon o) => o.t != t || o.path != path || o.fade != fade;
+}
+
+/// Black at alpha [dim] over the photo, except the still's own neon plus
+/// (frame px: vertical bar x 218–273 / y 600–850, horizontal bar x 152–339 /
+/// y 700–800 of 941×1672), which stays at full brightness.
+class _PhotoDim extends CustomPainter {
+  _PhotoDim(this.dim);
+  final double dim;
+  @override
+  void paint(Canvas c, Size s) {
+    final sx = s.width / 941, sy = s.height / 1672;
+    Rect fr(double l, double t, double r, double b) => Rect.fromLTRB(l * sx, t * sy, r * sx, b * sy).inflate(6 * sx);
+    c.saveLayer(Offset.zero & s, Paint());
+    c.drawRect(Offset.zero & s, Paint()..color = Colors.black.withValues(alpha: dim));
+    final hole = Paint()..blendMode = BlendMode.dstOut..maskFilter = MaskFilter.blur(BlurStyle.normal, 10 * sx);
+    c.drawRect(fr(218, 600, 273, 850), hole);
+    c.drawRect(fr(152, 700, 339, 800), hole);
+    c.restore();
+  }
+  @override
+  bool shouldRepaint(_PhotoDim o) => o.dim != dim;
 }

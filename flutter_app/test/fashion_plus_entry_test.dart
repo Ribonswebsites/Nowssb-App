@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' show ImageByteFormat;
 
 import 'package:flutter/material.dart';
@@ -92,18 +93,55 @@ void main() {
     expect(hit, 1);
   });
 
+  testWidgets('dim overlay sits below the ripples and the neon', (t) async {
+    await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: .7)));
+    final order = [
+      for (final e in find.byWidgetPredicate((w) => w.key is ValueKey<String>).evaluate())
+        (e.widget.key! as ValueKey<String>).value
+    ].where((k) => k.startsWith('fp-entry-')).toList();
+    expect(order, ['fp-entry-dim', 'fp-entry-rings', 'fp-entry-neon']);
+  });
+
+  Future<Uint8List> grab(WidgetTester t, double dim) async {
+    await _size(t, 390);
+    await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: dim)));
+    await precacheAll(t);
+    await t.pump(const Duration(milliseconds: 300));
+    final b = t.renderObject<RenderRepaintBoundary>(find.byKey(const ValueKey('shot')));
+    late Uint8List out;
+    await t.runAsync(() async {
+      final img = await b.toImage(pixelRatio: 1);
+      out = (await img.toByteData(format: ImageByteFormat.rawRgba))!.buffer.asUint8List();
+    });
+    return out;
+  }
+
+  // Mean brightness of the brightest pixels = the neon plus and its outline.
+  double neon(Uint8List px) {
+    final v = <int>[for (var i = 0; i < px.length; i += 4) if (px[i + 2] > px[i + 1] + 40) px[i] + px[i + 1] + px[i + 2]]..sort();
+    final top = v.sublist(v.length - 300);
+    return top.reduce((a, b) => a + b) / top.length;
+  }
+
+  testWidgets('neon plus is as bright at dim 0.7 as at dim 0', (t) async {
+    final a = neon(await grab(t, 0)), b = neon(await grab(t, .7));
+    expect(b, greaterThan(a * .95), reason: 'dim 0: $a, dim .7: $b');
+  });
+
   for (final (name, w, s) in const [('390', 390.0, 1.0), ('320-1.3', 320.0, 1.3)]) {
-    testWidgets('shot $name', (t) async {
+    for (final d in const [45, 70]) {
+      testWidgets('shot $name dim$d', (t) async {
       await _size(t, w);
-      await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: FashionBgDim.defaultDim), scale: s));
+      await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: d / 100), scale: s));
       await precacheAll(t);
       await t.pump(const Duration(milliseconds: 300));
       final b = t.renderObject<RenderRepaintBoundary>(find.byKey(const ValueKey('shot')));
       await t.runAsync(() async {
         final img = await b.toImage(pixelRatio: 2);
         final bytes = await img.toByteData(format: ImageByteFormat.png);
-        File('/workspace/team-plan/shots/fpentry-build-$name.png').writeAsBytesSync(bytes!.buffer.asUint8List());
+        File('/workspace/team-plan/shots/fpentry-build-$name-dim$d.png').writeAsBytesSync(bytes!.buffer.asUint8List());
       });
     });
+    }
   }
 }
