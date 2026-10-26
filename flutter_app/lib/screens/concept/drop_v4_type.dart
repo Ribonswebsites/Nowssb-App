@@ -2,20 +2,23 @@
 /// greet 19/w300 (light grey "Good Evening"), title 26/w800 ("Healer"),
 /// sub 12.5/w400 (soft grey subline). Same DM Sans theme font, no italics.
 /// On dark surfaces the same sizes/weights use light equivalents.
-/// Only giant poster words keep the poster serif.
+/// Giant poster words use Anton.
 library;
 
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/home_text.dart';
 
 class V4Type {
+  // The shared home greeting styles (HomeText); light surfaces only swap
+  // the colour.
   static TextStyle greet({bool dark = true}) =>
-      TextStyle(fontSize: 19, fontWeight: FontWeight.w300, color: dark ? const Color(0xB3FFFFFF) : NwsbColors.inkSoft);
+      dark ? HomeText.hello : HomeText.hello.copyWith(color: NwsbColors.inkSoft);
   static TextStyle title({bool dark = true}) =>
-      TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: dark ? Colors.white : NwsbColors.ink, height: 1.1);
+      dark ? HomeText.heading : HomeText.heading.copyWith(color: NwsbColors.ink);
   static TextStyle sub({bool dark = true}) =>
-      TextStyle(fontSize: 12.5, fontWeight: FontWeight.w400, color: dark ? const Color(0xA6FFFFFF) : NwsbColors.inkFaint, height: 1.3);
+      dark ? HomeText.subline : HomeText.subline.copyWith(color: NwsbColors.inkFaint);
   /// sub size, bold — for action words (underlined, never a chip).
   static TextStyle action({bool dark = true}) => sub(dark: dark).copyWith(
       fontWeight: FontWeight.w800,

@@ -102,6 +102,13 @@ void main() {
         final para = t.renderObject<RenderParagraph>(find.descendant(of: wf, matching: find.byType(RichText)));
         final word = para.text.toPlainText();
         expect((para.text as TextSpan).style!.fontFamily, 'Anton');
+        final wh = find.byKey(const ValueKey('drop-entry-when'));
+        if (wh.evaluate().isNotEmpty) {
+          final wp = t.renderObject<RenderParagraph>(find.descendant(of: wh, matching: find.byType(RichText)));
+          expect(wp.getBoxesForSelection(TextSelection(baseOffset: 0, extentOffset: wp.text.toPlainText().length))
+                  .map((b) => b.top.round()).toSet().length, 1,
+              reason: 'greeting "${wp.text.toPlainText()}" on one line at h$h');
+        }
         final n = word.length;
         for (var i = 0; i < n; i++) {
           for (final b in para.getBoxesForSelection(TextSelection(baseOffset: i, extentOffset: i + 1))) {

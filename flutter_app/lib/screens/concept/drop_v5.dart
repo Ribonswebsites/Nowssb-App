@@ -534,7 +534,11 @@ class _Face2 extends StatelessWidget {
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
-          Text(when, key: const ValueKey('drop-entry-when'), style: V4Type.greet()),
+          // one line, never a lone 'AM': shrinks to fit at narrow / large text
+          FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(when, key: const ValueKey('drop-entry-when'), maxLines: 1, softWrap: false, style: V4Type.greet())),
           Text('Drop Studio', style: V4Type.title()),
           const SizedBox(height: 14),
           // giant word: Anton poster sans, always whole
