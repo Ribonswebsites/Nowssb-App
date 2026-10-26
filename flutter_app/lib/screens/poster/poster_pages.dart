@@ -17,10 +17,12 @@ import '../store/store_routes.dart';
 import '../store/store_select_sheet.dart';
 import 'poster_atelier.dart';
 import 'poster_kit.dart';
+import 'poster_meaning.dart';
 import 'poster_trending.dart';
 
 export 'poster_atelier.dart';
 export 'poster_kit.dart';
+export 'poster_meaning.dart';
 export 'poster_orbit.dart';
 export 'poster_trending.dart';
 
@@ -66,6 +68,17 @@ Widget posterAtelierPage(BuildContext x, {ScrollController? controller, DateTime
       ),
     );
 
+/// The Meaning Store poster (MeaningStoreScreen's page).
+Widget posterMeaningPage(BuildContext x, {ScrollController? controller, DateTime? now}) => PosterMeaning(
+      controller: controller,
+      now: now,
+      onBack: () => posterBack(x),
+      onOpenStores: () => posterStores(x, 'meaning'),
+      onOpenBag: () => posterBag(x),
+      onOpenMeaning: (m) => openMeaningDetail(x, m),
+      onBuy: (m) => storeBuyNow(x, meaningBagItem(word: m.word, root: m.root, img: m.img, price: meaningPrice(m))),
+    );
+
 /// Trending — the destination of the home Trending cards.
 class TrendingScreen extends StatelessWidget {
   const TrendingScreen({super.key, this.controller, this.now, this.debugAngle, this.debugTilt});
@@ -94,4 +107,5 @@ class TrendingScreen extends StatelessWidget {
 final Map<String, PosterBuild> kPosterPages = {
   'trending': (c, now) => TrendingScreen(controller: c, now: now, debugAngle: .5, debugTilt: const Offset(-.3, .12)),
   'atelier': (c, now) => Builder(builder: (x) => posterAtelierPage(x, controller: c, now: now)),
+  'meaning': (c, now) => Builder(builder: (x) => posterMeaningPage(x, controller: c, now: now)),
 };

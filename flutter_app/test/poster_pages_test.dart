@@ -19,6 +19,7 @@ import 'package:nowssb/features/economy/money.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/screens/poster/poster_pages.dart';
+import 'package:nowssb/screens/store/meaning_store.dart';
 import 'package:nowssb/screens/store/word_atelier.dart';
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/concept/stillwater.dart';
@@ -81,7 +82,10 @@ void _expectCleanText(WidgetTester t, String label) {
     expect(s.contains('…') || s.contains('...'), isFalse, reason: 'ellipsis text "$s" at $label');
     final full = rp.text.toPlainText();
     for (final m in RegExp(r'[^\s\u00B7·—-]{2,}').allMatches(full)) {
-      final tops = rp.getBoxesForSelection(TextSelection(baseOffset: m.start, extentOffset: m.end)).map((b) => b.top.round()).toSet();
+      final tops = rp
+          // Line-height boxes: a fallback glyph (₂, ē) has its own glyph box,
+          // so only a real line change moves `top`.
+          .getBoxesForSelection(TextSelection(baseOffset: m.start, extentOffset: m.end), boxHeightStyle: ui.BoxHeightStyle.max).map((b) => b.top.round()).toSet();
       expect(tops.length, 1, reason: 'mid-word break "${m[0]}" in "$s" at $label');
     }
   }
@@ -132,6 +136,8 @@ final specs = <PosterSpec>[
         for (final c in kRmCategories)
           for (final w in c.words) 'word:${w.word.toLowerCase()}',
       }, 'Own · ', 'Open'),
+  PosterSpec('meaning', () => MeaningStoreScreen(now: _now), () => {for (final m in kMsBaseMeanings) 'meaning:${m.word.toLowerCase()}'}, 'Own · ',
+      PosterMeaning.pick(_now).word),
 ];
 
 void main() {
@@ -152,6 +158,8 @@ void main() {
     // The store research sheet is agreed (it asks once per store).
     SharedPreferences.setMockInitialValues({
       for (final w in ['word', 'meaning', 'signature', 'ebook', 'ebooks']) 'nwsb_terms_$w': '1',
+      // The first-use guide has been seen (it shows once per store).
+      for (final g in ['meaning_store', 'signature_store', 'ebook_store', 'ebooks_store']) 'guide_seen_$g': true,
     });
   });
   tearDown(() {
