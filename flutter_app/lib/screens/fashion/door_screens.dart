@@ -192,6 +192,8 @@ class DoorFashionPlusScreen extends StatefulWidget {
 
   @visibleForTesting
   static List<DoorJump> get jumps => _DoorFashionPlusScreenState.jumps;
+  @visibleForTesting
+  static List<DoorJump> make(Settings s) => _DoorFashionPlusScreenState.make(s);
 
   @override
   State<DoorFashionPlusScreen> createState() => _DoorFashionPlusScreenState();
@@ -220,10 +222,10 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
             toggle: s.fashionPlus),
         DoorJump('fashionHome', 'Fashion home', 'Dark film home', 'assets/video/hero-bg-poster.webp',
             toggle: s.fashionHome),
-        const DoorJump('player', 'Player Settings', 'AURA playback', 'assets/video/player-aura-bg-poster.webp'),
+        const DoorJump('player', 'Player Settings', 'AURA playback', 'assets/doors/hour-prana.webp'),
         const DoorJump('homeButtons', 'Home buttons', 'Quick Access bar', 'assets/video/player-bg-loop-poster.webp'),
         DoorJump('healing', 'Personalised Healing', s.showHealing ? 'On your home' : 'Add it to home',
-            'assets/video/healing-path-bg-poster.webp',
+            'assets/doors/hour-aarogya.webp',
             toggle: s.showHealing),
       ];
 
