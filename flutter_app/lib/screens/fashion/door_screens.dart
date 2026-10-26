@@ -89,9 +89,12 @@ class DoorStartArtScreen extends StatelessWidget {
   }
 }
 
-/// Start art tiles: the Meanings and eBooks stills show the text-free doors
-/// art (the real stills carry printed type); the others keep their own.
+/// Start art tiles show the text-free doors art (the real stills carry
+/// printed type). Display only: [Settings.fashionImages] is unchanged.
 String doorStillArt(String name, String asset) {
+  if (name == 'Fashion') return 'assets/doors/fashion_plus_tv.webp';
+  if (name == 'Store') return 'assets/doors/store.webp';
+  if (name.startsWith('Word')) return 'assets/doors/wordscience.webp';
   if (name.startsWith('Meanings')) return 'assets/doors/meanings.webp';
   if (name.startsWith('eBooks')) return 'assets/doors/ebooks.webp';
   return asset;

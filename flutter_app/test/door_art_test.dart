@@ -22,7 +22,15 @@ void main() {
   test('Start art Meanings/eBooks, Fashion Plus Store + TV use the doors art', () {
     expect(doorStillArt('Meanings Clean', 'x'), 'assets/doors/meanings.webp');
     expect(doorStillArt('eBooks Pair', 'x'), 'assets/doors/ebooks.webp');
-    expect(doorStillArt('Fashion', 'x'), 'x');
+    expect(doorStillArt('Fashion', 'x'), 'assets/doors/fashion_plus_tv.webp');
+    expect(doorStillArt('Store', 'x'), 'assets/doors/store.webp');
+    expect(doorStillArt('Word Atelier', 'x'), 'assets/doors/wordscience.webp');
+    // Every Start art tile uses text-free doors art that exists.
+    for (var i = 0; i < Settings.fashionImages.length; i++) {
+      final a = doorStillArt(Settings.fashionImageName(i), Settings.fashionImages[i]);
+      expect(a, startsWith('assets/doors/'), reason: Settings.fashionImageName(i));
+      expect(File(a).existsSync(), isTrue, reason: a);
+    }
     final store = DoorFashionPlusScreen.jumps.firstWhere((j) => j.id == 'store').art;
     expect(store, 'assets/doors/fashion_plus_store.webp');
     expect(DoorHeroStyle.all.firstWhere((h) => h.id == 'tv').art, 'assets/doors/fashion_plus_tv.webp');
