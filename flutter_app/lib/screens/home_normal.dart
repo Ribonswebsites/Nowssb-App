@@ -56,6 +56,7 @@ import 'normal/home_v5.dart';
 import '../features/programs/reference_program.dart';
 import '../features/vault/vault_screen.dart';
 import 'nwsb_sign_in_sheet.dart';
+import 'word_detail.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -415,7 +416,7 @@ class _HomeNormalState extends State<HomeNormal> {
             ),
           ]),
         ),
-        ('trendwd', V4Trending(onTap: () => _go(2))),
+        ('trendwd', V5Trending(onWord: (w) => _push(WordDetail(word: w)), onLibrary: () => _go(2))),
         ('custom', null),
         ('rx', null),
         ('routines', const SizedBox.shrink()),
@@ -423,7 +424,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('feed', V4Community(onTap: () => NwsbLinks.connect(context))),
         (
           'quickrow',
-          V4Quick(
+          V5Own(
             onCart: () => NwsbLinks.cart(context),
             onWishlist: () => NwsbLinks.wishlist(context),
             onOrders: () => _go(4),

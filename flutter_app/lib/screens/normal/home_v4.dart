@@ -120,7 +120,6 @@ const kMeditateAltLottie = 'assets/home/nm-anim-meditate-line.json';
 const kBagLottie = 'assets/home/nm-anim-bag.json';
 const kHeadphonesLottie = 'assets/home/nm-anim-headphones.json';
 const kHeartLottie = 'assets/home/nm-anim-heart.json';
-const kTrendingLottie = 'assets/home/nm-anim-trending.json';
 const kSunLottie = 'assets/home/nm-anim-sun.json';
 
 /// A NowssB film cut to a rounded window.
@@ -721,41 +720,6 @@ class V4Reader extends StatelessWidget {
       );
 }
 
-// ───────────────────────── trendwd: typography-led ─────────────────────────
-
-class V4Trending extends StatelessWidget {
-  const V4Trending({super.key, required this.onTap});
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: ContentStore.instance,
-        builder: (context, _) {
-          final words = ContentStore.instance.library;
-          final pick = [
-            for (var i = 0; i < 3 && i < words.length; i++) words[(DateTime.now().day + 3 + i * 5) % words.length].word,
-          ];
-          return V4PillBlock(
-            key: const ValueKey('v4-trending'),
-            title: 'Trending Now',
-            aside: 'Healing right now',
-            children: [
-              V4RichRow(
-                art: const V4Lottie(kTrendingLottie, size: 52),
-                label: "TODAY'S TOP WORD",
-                title: pick.isEmpty ? 'The library' : pick.first,
-                sub: pick.length > 1
-                    ? 'Also rising: ${pick.skip(1).join(' · ')}'
-                    : 'See which words are healing the most people right now',
-                action: Icons.graphic_eq_rounded,
-                actionLabel: 'Open the library',
-                onTap: onTap,
-              ),
-            ],
-          );
-        },
-      );
-}
-
 // ───────────────────────── feed ─────────────────────────
 
 class V4Community extends StatelessWidget {
@@ -800,47 +764,6 @@ class V4Community extends StatelessWidget {
           const SizedBox(height: 12),
           Align(alignment: Alignment.centerLeft, child: CalmGo(label: 'Open Connect', onTap: onTap)),
         ]),
-      );
-}
-
-// ───────────────────────── quickrow ─────────────────────────
-
-class V4Quick extends StatelessWidget {
-  const V4Quick({super.key, this.onCart, this.onWishlist, this.onOrders});
-  final VoidCallback? onCart;
-  final VoidCallback? onWishlist;
-  final VoidCallback? onOrders;
-  @override
-  Widget build(BuildContext context) => V4PillBlock(
-        key: const ValueKey('v4-quick'),
-        title: 'Everything You Own',
-        aside: 'On one screen',
-        children: [
-          V4RichRow(
-            art: const V4Lottie(kCartLottie, size: 46),
-            label: 'YOUR CART',
-            title: 'Cart',
-            sub: 'Words waiting for checkout',
-            action: Icons.shopping_bag_rounded,
-            onTap: onCart,
-          ),
-          V4RichRow(
-            art: const V4Lottie(kWishlistLottie, size: 46),
-            label: 'SAVED FOR LATER',
-            title: 'Wishlist',
-            sub: 'Words you kept to come back to',
-            action: Icons.favorite_rounded,
-            onTap: onWishlist,
-          ),
-          V4RichRow(
-            art: const V4Lottie(kOrdersLottie, size: 46),
-            label: 'YOUR ORDERS',
-            title: 'Orders',
-            sub: 'Track what you have bought',
-            action: Icons.local_shipping_rounded,
-            onTap: onOrders,
-          ),
-        ],
       );
 }
 
