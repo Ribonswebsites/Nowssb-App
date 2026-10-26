@@ -81,25 +81,35 @@ class HomeHeader extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                const EditableLabel('header.HomeHeader',
-                  'NowssB',
-                  maxLines: 1,
-                  softWrap: false,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    height: 1.05,
-                    shadows: [
-                      Shadow(
-                        color: Color(0x80000000),
-                        blurRadius: 8,
-                        offset: Offset(0, 1),
+                // The word scales down rather than pushing the icons off a
+                // 320dp screen at large text (B010).
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: const EditableLabel('header.HomeHeader',
+                        'NowssB',
+                        maxLines: 1,
+                        softWrap: false,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          height: 1.05,
+                          shadows: [
+                            Shadow(
+                              color: Color(0x80000000),
+                              blurRadius: 8,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-                const Spacer(),
                 _HdrIcon(
                   mark: NwsbMarks.bell,
                   badge: notifications,
