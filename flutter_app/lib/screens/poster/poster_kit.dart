@@ -505,21 +505,34 @@ class PosterSearch extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 18, 16, 4),
         child: Container(
           decoration: const BoxDecoration(color: Color(0xF20A0A0D), border: Border(bottom: BorderSide(color: kPGold, width: 2))),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          child: TextField(
-            controller: controller,
-            onChanged: onChanged,
-            onSubmitted: onGo,
-            textInputAction: TextInputAction.search,
-            cursorColor: kPGold,
-            style: gHello(color: Colors.white),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: hint,
-              hintMaxLines: 2,
-              hintStyle: gHello(color: const Color(0xFF9A95A8)),
-              icon: const Icon(Icons.search_rounded, color: kPGold),
-            ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          // The hint may wrap to two lines (never ellipsized) while the field is
+          // empty; once there is text the field is one line. Text, hint and icon
+          // are all centred vertically.
+          child: ValueListenableBuilder<TextEditingValue>(
+            valueListenable: controller,
+            builder: (_, v, __) => Row(children: [
+              const Icon(Icons.search_rounded, color: kPGold),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Stack(alignment: AlignmentDirectional.centerStart, children: [
+                  if (v.text.isEmpty)
+                    IgnorePointer(child: Text(hint, maxLines: 2, style: gHello(color: const Color(0xFF9A95A8)))),
+                  TextField(
+                    key: const ValueKey('poster-search-field'),
+                    controller: controller,
+                    onChanged: onChanged,
+                    onSubmitted: onGo,
+                    maxLines: 1,
+                    textInputAction: TextInputAction.search,
+                    textAlignVertical: TextAlignVertical.center,
+                    cursorColor: kPGold,
+                    style: gHello(color: Colors.white),
+                    decoration: const InputDecoration(border: InputBorder.none, isCollapsed: true),
+                  ),
+                ]),
+              ),
+            ]),
           ),
         ),
       );

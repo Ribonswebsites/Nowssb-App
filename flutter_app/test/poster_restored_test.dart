@@ -70,6 +70,14 @@ Finder _sem(Pattern label) => find.byWidgetPredicate((w) {
       return l != null && (label is RegExp ? label.hasMatch(l) : l == label);
     });
 
+/// Let the hero photos decode before a shot.
+Future<void> _photos(WidgetTester t) async {
+  for (var i = 0; i < 3; i++) {
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 400)));
+    await t.pump(const Duration(milliseconds: 50));
+  }
+}
+
 Future<void> _settleRoute(WidgetTester t) async {
   await t.pump();
   for (var i = 0; i < 10; i++) {
@@ -219,8 +227,10 @@ void main() {
       await t.enterText(find.byType(TextField), 'qqzzxx');
       await t.pump();
       expect(find.text('No meanings match.'), findsOneWidget);
+      await _photos(t);
       if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-restored-meaning-nomatch-390'));
-      await t.tap(find.text('Request this word'));
+      await _reveal(t, find.text('Request this word'));
+      await t.tap(find.text('Request this word').hitTestable());
       await _settleRoute(t);
       expect(obs.pushed, isNotEmpty);
       expect(t.widget(find.byType(RequestWordsScreen)), isA<RequestWordsScreen>());
@@ -283,6 +293,7 @@ void main() {
       await t.enterText(find.byType(TextField), 'qqzzxx');
       await t.pump();
       expect(find.text('No words match this search in this collection.'), findsOneWidget);
+      await _photos(t);
       if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-restored-atelier-nomatch-390'));
       await t.tap(find.text('Request this word'));
       await _settleRoute(t);
@@ -330,6 +341,38 @@ void main() {
           await t.runAsync(() => _shotOf(key, 'poster-atelier-swatches-320${sc == 1 ? '' : '-1.3x'}'));
         }
       }
+    });
+  });
+
+  group('poster search field', () {
+    testWidgets('320@1.3: hint wraps unclipped; typed text is one line, centred with the icon', (t) async {
+      final key = GlobalKey();
+      await _pump(t, (x) => posterAtelierPage(x, now: DateTime(2026, 10, 27, 9)), width: 320, scale: 1.3, key: key);
+      final field = find.byKey(const ValueKey('poster-search-field'));
+      await _reveal(t, field);
+      final box = find.ancestor(of: field, matching: find.byType(Container)).first;
+      final icon = find.descendant(of: box, matching: find.byIcon(Icons.search_rounded));
+      final hint = find.descendant(of: box, matching: find.text('Search words or roots'));
+      expect(hint, findsOneWidget);
+      final hp = t.renderObject<RenderParagraph>(hint);
+      expect(hp.didExceedMaxLines, isFalse, reason: 'hint never ellipsized');
+      final emptyH = t.getSize(box).height;
+      expect((t.getCenter(hint).dy - t.getCenter(icon).dy).abs(), lessThan(2), reason: 'hint centred with icon');
+      await _photos(t);
+      if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-search-empty-320-1.3x'));
+
+      await t.enterText(field, 'qqzzxx');
+      await t.pump();
+      expect(hint, findsNothing);
+      final typedH = t.getSize(box).height;
+      expect(typedH, lessThan(emptyH), reason: 'drops to one line once typed');
+      final editable = find.descendant(of: field, matching: find.byType(EditableText));
+      final ep = t.state<EditableTextState>(editable).renderEditable;
+      final line = ep.preferredLineHeight;
+      expect(t.getSize(editable).height, lessThan(line * 1.5), reason: 'one line tall');
+      expect((t.getCenter(editable).dy - t.getCenter(icon).dy).abs(), lessThan(2), reason: 'typed text centred with icon');
+      expect(t.takeException(), isNull);
+      if (_shots.isNotEmpty) await t.runAsync(() => _shotOf(key, 'poster-search-typed-320-1.3x'));
     });
   });
 }
