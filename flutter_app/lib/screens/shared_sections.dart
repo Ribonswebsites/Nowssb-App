@@ -19,6 +19,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../data/billing_config.dart' show playPlanFor;
+import '../data/play_subscriptions.dart';
 import '../widgets/nwsb_icon.dart';
 
 import '../media/nwsb_image.dart';
@@ -305,29 +307,42 @@ class _SubscriptionTierStack extends StatelessWidget {
   const _SubscriptionTierStack({this.onTap});
   final VoidCallback? onTap;
 
-  static const _tiers = <(String, String, Color, String)>[
-    ('Free', 'NowssB Edition', Color(0xFFE8EAF0), NwsbMarks.crown),
-    ('Resonance', r'$4.99 / month', Color(0xFFC8E8F5), NwsbMarks.reader),
-    ('Frequency', r'$9.99 / month', Color(0xFFE8D5A3), NwsbMarks.sound),
-    ('Frequency X', r'$19.99 / month', Color(0xFFF0F0F0), NwsbMarks.signature),
+  // (name, Play tier, accent, mark). Prices come from Google Play in the
+  // buyer's currency, exactly as the Subscription screen shows them; never
+  // a hard-coded USD figure.
+  static const _tiers = <(String, String?, Color, String)>[
+    ('Free', null, Color(0xFFE8EAF0), NwsbMarks.crown),
+    ('Resonance', 'resonance', Color(0xFFC8E8F5), NwsbMarks.reader),
+    ('Frequency', 'frequency', Color(0xFFE8D5A3), NwsbMarks.sound),
+    ('Frequency X', 'frequencyX', Color(0xFFF0F0F0), NwsbMarks.signature),
   ];
+
+  static String _detail(String? tier) {
+    if (tier == null) return 'NowssB Edition';
+    final p = playPlanFor(tier, yearly: false);
+    final price = p == null ? null : PlaySubscriptions.instance.priceFor(p.productId);
+    return price == null ? 'Price on Google Play' : '$price / month';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < _tiers.length; i++) ...[
-          _SubscriptionTierRow(
-            name: _tiers[i].$1,
-            detail: _tiers[i].$2,
-            accent: _tiers[i].$3,
-            mark: _tiers[i].$4,
-            onTap: onTap,
-          ),
-          if (i != _tiers.length - 1) const SizedBox(height: 10),
+    return ListenableBuilder(
+      listenable: PlaySubscriptions.instance,
+      builder: (context, _) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (var i = 0; i < _tiers.length; i++) ...[
+            _SubscriptionTierRow(
+              name: _tiers[i].$1,
+              detail: _detail(_tiers[i].$2),
+              accent: _tiers[i].$3,
+              mark: _tiers[i].$4,
+              onTap: onTap,
+            ),
+            if (i != _tiers.length - 1) const SizedBox(height: 10),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -381,13 +396,23 @@ class _SubscriptionTierRow extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _SubMarqueeText(
-                            name,
-                            style: TextStyle(
-                                color: accent,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800),
-                            duration: const Duration(milliseconds: 3200),
+                          // A tier name is one short word or two. The sway
+                          // marquee slid it past its own clip and cut the
+                          // ends off, so it sits still and only scales down
+                          // when large text leaves no room (B004).
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: EditableLabel(
+                              'shared_sections.SubMarqueeText',
+                              name,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: TextStyle(
+                                  color: accent,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800),
+                            ),
                           ),
                           EditableLabel('shared_sections.SubscriptionTierRow', detail,
                               maxLines: 1,

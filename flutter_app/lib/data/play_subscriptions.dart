@@ -110,6 +110,15 @@ class PlaySubscriptions extends ChangeNotifier {
   /// Play's price for a product in the buyer's currency, when known.
   String? priceFor(String productId) => _base[productId]?.price;
 
+  /// Test hook: pretend Play returned these products.
+  @visibleForTesting
+  void debugSetProducts(List<ProductDetails> products) {
+    _base
+      ..clear()
+      ..addEntries(products.map((d) => MapEntry(d.id, d)));
+    notifyListeners();
+  }
+
   /// The eligible Play offer's first price (e.g. a free trial or intro
   /// price) when Play returned one that differs from the base plan.
   String? offerFor(String productId) {
