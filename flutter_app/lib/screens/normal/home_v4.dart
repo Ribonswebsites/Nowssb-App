@@ -68,6 +68,10 @@ class V4Lottie extends StatelessWidget {
   const V4Lottie(this.asset, {super.key, this.size = 56});
   final String asset;
   final double size;
+
+  /// Renders/tests only: hold every V4Lottie at this progress (0–1).
+  @visibleForTesting
+  static double? debugProgress;
   @override
   Widget build(BuildContext context) => Lottie.asset(
         asset,
@@ -75,7 +79,8 @@ class V4Lottie extends StatelessWidget {
         height: size,
         fit: BoxFit.contain,
         repeat: true,
-        animate: !_still(context),
+        controller: debugProgress == null ? null : AlwaysStoppedAnimation<double>(debugProgress!),
+        animate: debugProgress == null && !_still(context),
         errorBuilder: (_, __, ___) => SizedBox.square(dimension: size),
       );
 }

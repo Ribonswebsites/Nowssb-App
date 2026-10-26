@@ -273,7 +273,7 @@ class CalmToday extends StatelessWidget {
               // bcb6baf design: the overlapping purple circles on the right.
               Stack(clipBehavior: Clip.none, children: [
               Padding(
-              padding: const EdgeInsets.only(right: 78),
+              padding: const EdgeInsets.only(right: 96),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('TODAY', style: _eyebrow),
               const SizedBox(height: 10),
@@ -307,7 +307,7 @@ class CalmToday extends StatelessWidget {
               ]),
               ]),
               ),
-              const Positioned(right: -10, top: -10, child: FocusBlob()),
+              const Positioned(right: -22, top: -22, child: FocusBlob()),
               ]),
               const SizedBox(height: 16),
               Wrap(spacing: 8, runSpacing: 8, children: [
