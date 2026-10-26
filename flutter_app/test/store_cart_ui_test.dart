@@ -36,30 +36,49 @@ void main() {
       expect(cards, contains('StoreViewMoreTap'));
       expect(cards, contains('fontSize: 24'));
 
-      final atelier =
-          File('lib/screens/store/word_atelier.dart').readAsStringSync();
-      expect(atelier, contains('StoreSubscribeBanner'));
-      expect(atelier, contains('RmRowHeader'));
-      expect(atelier, contains('StorePrices'));
-      expect(atelier, contains('originalPrice'));
-      expect(atelier, contains('cats.take(10)'));
-      expect(atelier, contains('StoreViewMoreTap'));
-      expect(atelier, contains('StoreGlassFilmBanner'));
-      expect(atelier, contains('store-title-banner.mp4'));
-      expect(atelier, isNot(contains('storeMidRailBannerAt')));
-      expect(atelier, isNot(contains('IntroGate')));
-      expect(atelier, isNot(contains('Enter The Word Atelier')));
-
-      for (final path in [
-        'lib/screens/store/word_atelier.dart',
-        'lib/screens/store/meaning_store.dart',
-        'lib/screens/store/signature_store.dart',
-        'lib/screens/store/ebooks_store.dart',
-      ]) {
+      // The four store pages are poster pages now: thin wrappers (store
+      // terms host, no intro gate) around posterXPage, which wires every
+      // add / buy / bag / subscribe door to the real routes.
+      final wrappers = {
+        'lib/screens/store/word_atelier.dart': 'posterAtelierPage(',
+        'lib/screens/store/meaning_store.dart': 'posterMeaningPage(',
+        'lib/screens/store/signature_store.dart': 'posterSignaturePage(',
+        'lib/screens/store/ebooks_store.dart': 'posterEbooksPage(',
+      };
+      wrappers.forEach((path, page) {
         final src = File(path).readAsStringSync();
         expect(src, isNot(contains('IntroGate')), reason: path);
-        expect(src, contains('PageShell('), reason: path);
+        expect(src, contains('StoreTermsHost('), reason: path);
+        expect(src, contains(page), reason: path);
+      });
+
+      final pages =
+          File('lib/screens/poster/poster_pages.dart').readAsStringSync();
+      // Cart (add) and bag (buy) go through the shared store actions.
+      expect(pages, contains('storeAddToCart(x, wordBagItem('));
+      for (final item in ['wordBagItem(', 'meaningBagItem(', 'ebookBagItem(']) {
+        expect(pages, contains('storeBuyNow(x, $item'), reason: item);
       }
+      expect(pages, contains('showBagSheet(x, BagKind.cart)'));
+      expect('onOpenBag: () => posterBag(x)'.allMatches(pages).length,
+          greaterThanOrEqualTo(4),
+          reason: 'every poster page opens the bag');
+      // Prices are live (StorePrices / Play), never a hard-coded constant.
+      expect(pages, contains('StorePrices.instance.priceFor('));
+      expect(pages, isNot(contains('kMsSignaturePrice')));
+      final atelier =
+          File('lib/screens/poster/poster_atelier.dart').readAsStringSync();
+      expect(atelier, contains('StorePrices.instance.regularIfOnSale('),
+          reason: 'struck "was" price only for a real sale');
+      // Subscribe entry: every Own / buy pill lands on the checkout
+      // (storeBuyNow → CheckoutPage), which offers the plans.
+      final actions =
+          File('lib/screens/store/store_actions.dart').readAsStringSync();
+      expect(actions, contains('CheckoutPage(items: [item])'));
+      final checkout =
+          File('lib/screens/store/cart_pages.dart').readAsStringSync();
+      expect(checkout, contains("'See plans that include these'"));
+      expect(checkout, contains('const SubscriptionScreen()'));
 
       final storeHome = File('lib/screens/store.dart').readAsStringSync();
       expect(storeHome, contains('16 / 6.4'));
@@ -71,7 +90,6 @@ void main() {
       expect(sections, contains('class StoreQuickMosaic'));
       expect(sections, contains('assets/video/store-orb-box.mp4'));
       expect(sections, contains('width: 180'));
-      expect(atelier, contains('StoreQuickMosaic('));
 
       final catalog = File('lib/data/store_catalog.dart').readAsStringSync();
       expect(catalog, contains("return 'assets/video/hero-word-store.mp4'"));
