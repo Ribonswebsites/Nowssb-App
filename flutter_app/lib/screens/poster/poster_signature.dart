@@ -21,6 +21,13 @@ num sigWordPrice(RmSignatureEntry s) => StorePrices.instance.priceFor('signature
 /// Live price of a signature meaning (bag id meaning:<word>, signature kind).
 num sigMeaningPrice(MsSignatureEntry e) => StorePrices.instance.priceFor('meaning:${e.word.toLowerCase()}', kind: 'signature');
 
+/// A signature meaning's display title: "Elements Signature" → "Elements".
+String sigTitle(MsSignatureEntry e) => e.word.replaceAll(RegExp(r'\s*signature\s*', caseSensitive: false), ' ').trim();
+
+/// The line above a signature card's title: the category, unless it would
+/// just repeat the title ("Elements / Elements") — then the real root line.
+String sigKicker(String cat, MsSignatureEntry e) => cat.toLowerCase() == sigTitle(e).toLowerCase() ? e.root : cat;
+
 String _blurb(String key) => (kMsWordBlurb[key] ?? '').replaceAll('&rsquo;', '’');
 
 class PosterSignature extends StatelessWidget {
@@ -131,7 +138,7 @@ class _Hero extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                     Text(e.root, style: gHello(color: kPGoldSoft)),
-                    Text(e.word.replaceAll(RegExp(r'\s*signature\s*', caseSensitive: false), ' ').trim(), style: gTitle()),
+                    Text(sigTitle(e), style: gTitle()),
                     const SizedBox(height: 8),
                     InkTag(_blurb(e.key)),
                     const SizedBox(height: 12),
@@ -251,12 +258,9 @@ class _Stub extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
                     decoration: const BoxDecoration(color: kPGold, borderRadius: BorderRadius.horizontal(left: Radius.circular(6))),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                      FittedBox(
-                          fit: BoxFit.scaleDown,
-                          alignment: Alignment.centerLeft,
-                          child: Text('No. ${(i + 1).toString().padLeft(2, '0')} · ${cat.words.length} words inside',
-                              maxLines: 1, softWrap: false, style: gSub(color: kPInk))),
-                      FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(s.name, maxLines: 1, style: gTitle(dark: false))),
+                      // Full size, wrapping on word boundaries (never shrunk to fit).
+                      Text('No. ${(i + 1).toString().padLeft(2, '0')} · ${cat.words.length} words inside', maxLines: 3, style: gSub(color: kPInk)),
+                      Text(s.name, maxLines: 3, style: gTitle(dark: false)),
                     ]),
                   ),
                 ),
@@ -327,8 +331,8 @@ class _Card extends StatelessWidget {
                 ),
               ),
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(cat, style: gHello(color: kPGoldSoft)),
-                Text(e.word.replaceAll(RegExp(r'\s*signature\s*', caseSensitive: false), ' ').trim(), style: gTitle()),
+                Text(sigKicker(cat, e), style: gHello(color: kPGoldSoft)),
+                Text(sigTitle(e), style: gTitle()),
                 const SizedBox(height: 6),
                 Text(_blurb(e.key), style: gSub()),
                 const SizedBox(height: 12),
