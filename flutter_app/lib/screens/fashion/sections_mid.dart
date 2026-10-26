@@ -1316,7 +1316,7 @@ class FashPrescription extends StatelessWidget {
                     itemCount: picks.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 10),
                     itemBuilder: (context, i) => GestureDetector(
-                      onTap: () => onWord?.call(i),
+                      onTap: () => onWord?.call(all.indexOf(picks[i])),
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         width: 168,
