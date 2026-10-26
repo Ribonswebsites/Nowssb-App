@@ -25,10 +25,12 @@ num wordPrice(String word) => StorePrices.instance.priceFor('word:${word.toLower
 /// Store prices are rupees (config/store, Google Play INR points). Every
 /// poster price goes through the app's region money path: Play's own
 /// localized price when it is cached for [sku], else FxBook (₹ for India).
+/// Whole amounts print without decimals (₹99); paise show only when the
+/// price really has them (a Play label like ₹99.50 is kept as sent).
 String inr(num v, {String? sku}) {
   if (v <= 0) return 'Included';
   final play = sku == null ? null : PlayCheckout.cachedPrice(sku);
-  return play ?? FxBook.instance.formatPrice(v);
+  return play != null ? FxBook.wholeLabel(play) : FxBook.instance.formatPrice(v, whole: true);
 }
 
 /// Price label for a bag item id (word:/signature:/meaning:/ebook:) or null

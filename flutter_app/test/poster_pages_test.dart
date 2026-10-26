@@ -257,6 +257,7 @@ void main() {
           final s = (e.widget as RichText).text.toPlainText();
           expect(s, contains('₹'), reason: s);
           expect(s, isNot(contains(r'$')), reason: s);
+          expect(s, matches(RegExp(r'₹[0-9,]+(?![.0-9])')), reason: 'whole rupees, no .00: $s');
         }
       });
 
