@@ -20,21 +20,24 @@ class SubscriptionScreen extends StatefulWidget {
 
   /// Billing tier id (e.g. 'frequency') to open on; null keeps the first plan.
   final String? initialTier;
+
+  /// Index into the plan pager for a billing tier id; 0 when unknown or null.
+  static int indexForTier(String? tier) {
+    if (tier == null) return 0;
+    final i = _SubscriptionScreenState.plans.indexWhere((p) => tierForPlanName(p.name) == tier);
+    return i < 0 ? 0 : i;
+  }
+
+  /// Plan name shown at [indexForTier] (for tests and logs).
+  static String planNameAt(int i) => _SubscriptionScreenState.plans[i].name;
   @override
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   bool yearly = false;
-  late int selected = initialIndex(widget.initialTier);
+  late int selected = SubscriptionScreen.indexForTier(widget.initialTier);
   late final PageController planController;
-
-  /// Index into [plans] for a billing tier id; 0 when unknown or null.
-  static int initialIndex(String? tier) {
-    if (tier == null) return 0;
-    final i = plans.indexWhere((p) => tierForPlanName(p.name) == tier);
-    return i < 0 ? 0 : i;
-  }
 
   @override
   void initState() {
