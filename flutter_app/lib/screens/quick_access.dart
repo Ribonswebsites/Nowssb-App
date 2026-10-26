@@ -22,6 +22,119 @@ import '../widgets/tv_frame.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 
+/// Every feature that can sit in the bottom nav (id, label, img).
+const quickAccessFeatures = <Map<String, String>>[
+  {
+    'id': 'connect',
+    'label': 'Connect',
+    'img':
+        'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'
+  },
+  {
+    'id': 'practice',
+    'label': 'Practice',
+    'img':
+        'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'
+  },
+  {
+    'id': 'library',
+    'label': 'Library',
+    'img':
+        'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'
+  },
+  {
+    'id': 'store',
+    'label': 'Store',
+    'img':
+        'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'
+  },
+  {
+    'id': 'profile',
+    'label': 'Profile',
+    'img':
+        'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
+  },
+  {
+    'id': 'progress',
+    'label': 'Progress',
+    'img':
+        'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'
+  },
+  {
+    'id': 'wordscience',
+    'label': 'Word Sci',
+    'img':
+        'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'
+  },
+  {
+    'id': 'meaningstore',
+    'label': 'Meaning',
+    'img':
+        'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'
+  },
+  {
+    'id': 'search',
+    'label': 'Search',
+    'img':
+        'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'
+  },
+  {
+    'id': 'cart',
+    'label': 'Cart',
+    'img':
+        'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'
+  },
+  {
+    'id': 'wishlist',
+    'label': 'Wishlist',
+    'img':
+        'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'
+  },
+  {
+    'id': 'routines',
+    'label': 'Routines',
+    'img':
+        'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'
+  },
+  {
+    'id': 'chat',
+    'label': 'Chat',
+    'img':
+        'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'
+  },
+  {
+    'id': 'ai',
+    'label': 'AI Rx',
+    'img':
+        'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'
+  },
+  {
+    'id': 'streak',
+    'label': 'Streak',
+    'img':
+        'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'
+  },
+  {
+    // Journal = account activity (the one inbox: replies, purchases,
+    // rewards, messages) — same target as the Profile Journal shortcut.
+    'id': 'journal',
+    'label': 'Journal',
+    'img': 'asset:assets/icons/qa-journal.png'
+  },
+  {
+    'id': 'settings',
+    'label': 'Settings',
+    'img':
+        'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
+  },
+  {
+    'id': 'everything',
+    'label': 'Everything',
+    'img':
+        'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
+  },
+];
+
 class QuickAccessScreen extends StatefulWidget {
   const QuickAccessScreen({super.key});
   @override
@@ -47,117 +160,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
     slots = [...s.navSlots];
   }
 
-  static const features = <Map<String, String>>[
-    {
-      'id': 'connect',
-      'label': 'Connect',
-      'img':
-          'https://media.nowssb.com/migrated-images/ea559460014dd8d9_file_00000000b84c7209ab496862cacd6a7f_kagsie.png'
-    },
-    {
-      'id': 'practice',
-      'label': 'Practice',
-      'img':
-          'https://media.nowssb.com/migrated-images/44ed38a222535b9c_38538b80-56d8-11f1-8fad-095787cce754_xam2bb.png'
-    },
-    {
-      'id': 'library',
-      'label': 'Library',
-      'img':
-          'https://media.nowssb.com/migrated-images/62e5d0908e54a2a6_c500a990-56cf-11f1-8fad-095787cce754_1_zqzbal.png'
-    },
-    {
-      'id': 'store',
-      'label': 'Store',
-      'img':
-          'https://media.nowssb.com/migrated-images/86a1283688196499_ce4eb640-56cf-11f1-8fad-095787cce754_wf294m.png'
-    },
-    {
-      'id': 'profile',
-      'label': 'Profile',
-      'img':
-          'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
-    },
-    {
-      'id': 'progress',
-      'label': 'Progress',
-      'img':
-          'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'
-    },
-    {
-      'id': 'wordscience',
-      'label': 'Word Sci',
-      'img':
-          'https://media.nowssb.com/migrated-images/dd44cf9fc35b783c_file_0000000086d872089ce376674620d5f3_mtfftb.png'
-    },
-    {
-      'id': 'meaningstore',
-      'label': 'Meaning',
-      'img':
-          'https://media.nowssb.com/migrated-images/1a5f669e63dbae9d_file_00000000854881fa9a548a68fae59c15_w1utya.png'
-    },
-    {
-      'id': 'search',
-      'label': 'Search',
-      'img':
-          'https://media.nowssb.com/migrated-images/8d85320f63c3e176_file_00000000029c7208b5e915d9af2c480c_tuccwo.png'
-    },
-    {
-      'id': 'cart',
-      'label': 'Cart',
-      'img':
-          'https://media.nowssb.com/migrated-images/311c26afee2bc52c_file_00000000f02c72088cd128f3f4b08af5_vskoom.png'
-    },
-    {
-      'id': 'wishlist',
-      'label': 'Wishlist',
-      'img':
-          'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'
-    },
-    {
-      'id': 'routines',
-      'label': 'Routines',
-      'img':
-          'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'
-    },
-    {
-      'id': 'chat',
-      'label': 'Chat',
-      'img':
-          'https://media.nowssb.com/migrated-images/db15f3026ea179dc_1ae1b990-5bf2-11f1-8248-b91d5cd919c2_z3xi3j.png'
-    },
-    {
-      'id': 'ai',
-      'label': 'AI Rx',
-      'img':
-          'https://media.nowssb.com/migrated-images/41c9ed21b2822c90_file_0000000062a882089abd27eb90ea3945_ngqyu6.png'
-    },
-    {
-      'id': 'streak',
-      'label': 'Streak',
-      'img':
-          'https://media.nowssb.com/migrated-images/f82047a0e727766b_file_0000000010fc820891f9e15a38316d2b_ffffhq.png'
-    },
-    {
-      // Journal = account activity (the one inbox: replies, purchases,
-      // rewards, messages) — same target as the Profile Journal shortcut.
-      'id': 'journal',
-      'label': 'Journal',
-      'img': 'asset:assets/icons/qa-journal.png'
-    },
-    {
-      'id': 'settings',
-      'label': 'Settings',
-      'img':
-          'https://media.nowssb.com/migrated-images/523b5889d13cb14a_260480b0-56d8-11f1-8fad-095787cce754_rz6zbi.png'
-    },
-    {
-      'id': 'everything',
-      'label': 'Everything',
-      'img':
-          'https://media.nowssb.com/migrated-images/47f9e2c9fad5a78f_file_00000000be547207aaa56f43cfef4f67_nxhvw0.png'
-    },
-  ];
+  static const features = quickAccessFeatures;
 
   Map<String, String> getById(String id) =>
       features.firstWhere((x) => x['id'] == id, orElse: () => features.first);

@@ -95,7 +95,7 @@ class _DropStudioScreenState extends State<DropStudioScreen> {
       onOpenThemes: () => push(const WidgetsPage()),
       onOpenBackground: () => push(const DoorBackgroundScreen()),
       onOpenStartArt: () => push(const DoorStartArtScreen()),
-      onOpenAccess: () => push(const QuickAccessScreen()),
+      onOpenAccess: () => push(const DoorAccessScreen()),
       controller: widget.controller,
       debugTilt: widget.debugTilt,
       debugPage: widget.debugPage,

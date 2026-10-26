@@ -6,6 +6,7 @@ import 'package:nowssb/screens/concept/drop_v4_concepts.dart' show DoorHooks, ho
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:nowssb/screens/fashion/door_screens.dart';
+import 'package:nowssb/screens/concept/doors/door_access.dart';
 import 'package:nowssb/screens/concept/doors/door_background.dart';
 import 'package:nowssb/screens/concept/doors/door_start_art.dart';
 import 'package:flutter/rendering.dart';
@@ -184,18 +185,30 @@ void main() {
       expect(Settings.instance.fashionImageIndex, -1);
     });
 
-    testWidgets('Access → QuickAccessScreen, nav saved', (t) async {
+    testWidgets('Access → DoorAccessScreen, socket set + swap saved', (t) async {
       await openDoor(t, 'Access');
-      expect(find.byType(QuickAccessScreen), findsOneWidget);
-      final apply = find.text('Apply Changes');
-      await reachIn(t, apply, QuickAccessScreen);
-      await t.runAsync(() async {
-        await t.tap(apply.hitTestable().first);
-        await Future<void>.delayed(const Duration(milliseconds: 50));
-      });
+      expect(find.byType(DoorAccessScreen), findsOneWidget);
+      final picker = t.widget<DoorAccessPicker>(find.byType(DoorAccessPicker));
+      expect(picker.features.map((f) => f.id), quickAccessFeatures.map((f) => f['id']));
+      for (final f in picker.features) {
+        expect(f.art, isNotNull, reason: f.id);
+        expect(File(f.art!).existsSync(), isTrue, reason: f.art);
+      }
+      final before = [...Settings.instance.navSlots];
+      expect(picker.slots, before);
+      await t.runAsync(() async => picker.onSetSlot!(2, 'journal'));
       await settle(t, 2);
-      expect((await prefs(t)).getStringList('nwsb_nav_slots') ?? (await prefs(t)).getString('nwsb_nav_slots'),
-          isNotNull);
+      expect(Settings.instance.navSlots[2], 'journal');
+      expect((await prefs(t)).getStringList('nwsb_nav_slots')![2], 'journal');
+      // An id already in the bar swaps instead of duplicating.
+      final first = Settings.instance.navSlots[0];
+      await t.runAsync(() async => picker.onSetSlot!(0, 'journal'));
+      await settle(t, 2);
+      expect(Settings.instance.navSlots[0], 'journal');
+      expect(Settings.instance.navSlots[2], first);
+      expect(Settings.instance.navSlots.toSet().length, 5);
+      expect(t.widget<DoorAccessPicker>(find.byType(DoorAccessPicker)).slots, Settings.instance.navSlots);
+      await t.runAsync(() => Settings.instance.setNavConfig(slots: before));
     });
   });
 
