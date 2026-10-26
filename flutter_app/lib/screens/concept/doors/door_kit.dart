@@ -553,14 +553,35 @@ class DoorDock extends StatelessWidget {
           const SizedBox(height: 3),
           Row(children: [
           Expanded(
-            child: Text.rich(
-              TextSpan(children: [
-                TextSpan(text: line, style: doorGreet(color: Colors.white)),
-                if (extra != null) TextSpan(text: '  $extra', style: doorBody(13, color: doorGoldSoft, w: FontWeight.w800)),
-              ]),
-              // Full size, never cut: a long name or price wraps.
-              softWrap: true,
-            ),
+            child: LayoutBuilder(builder: (context, c) {
+              final text = Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: line, style: doorGreet(color: Colors.white)),
+                  if (extra != null) TextSpan(text: '  $extra', style: doorBody(13, color: doorGoldSoft, w: FontWeight.w800)),
+                ]),
+                // Full size, never cut: a long name or price wraps between words.
+                softWrap: true,
+              );
+              // A word is never broken ('Includ/ed'): when the longest word is
+              // wider than the room, the line scales down to keep it whole.
+              final scaler = MediaQuery.textScalerOf(context);
+              final style = DefaultTextStyle.of(context).style.merge(doorGreet(color: Colors.white));
+              var widest = 0.0;
+              for (final w in line.split(RegExp(r'\s+'))) {
+                final tp = TextPainter(
+                    text: TextSpan(text: w, style: style),
+                    textDirection: TextDirection.ltr,
+                    textScaler: scaler)
+                  ..layout();
+                if (tp.width > widest) widest = tp.width;
+                tp.dispose();
+              }
+              if (widest <= c.maxWidth) return text;
+              return FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(width: widest.ceilToDouble() + 2, child: text));
+            }),
           ),
           const SizedBox(width: 8),
           GestureDetector(

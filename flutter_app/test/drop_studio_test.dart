@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:nowssb/screens/concept/doors/door_kit.dart';
 import 'package:nowssb/data/fashion_bg_dim.dart';
 import 'package:nowssb/data/home_widget_sync.dart';
 import 'package:nowssb/data/practice_progress.dart';
@@ -311,6 +312,14 @@ void main() {
     expect(k, findsOneWidget);
     final para = t.renderObject<RenderParagraph>(find.descendant(of: k, matching: find.byType(RichText)).first);
     expect(para.size.height, lessThan(9.5 * 1.3 * 2), reason: 'kicker on one line at 320@1.3');
+    // The in-plan dock line keeps 'Included' whole (never 'Includ/ed').
+    final docks = find.descendant(
+        of: find.byType(DoorDock),
+        matching: find.byWidgetPredicate((w) => w is RichText && w.text.toPlainText() == 'Included'));
+    expect(docks, findsOneWidget);
+    final line = t.renderObject<RenderParagraph>(docks);
+    expect(line.getBoxesForSelection(const TextSelection(baseOffset: 0, extentOffset: 8)).length, 1,
+        reason: "'Included' on one line at 320@1.3");
     await t.pumpWidget(const SizedBox());
   });
 
