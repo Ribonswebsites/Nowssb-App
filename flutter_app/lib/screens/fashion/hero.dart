@@ -203,8 +203,9 @@ class _FashionHeroState extends State<FashionHero> {
         // padding, strip, gap, set, gap, strip, padding, the pane's own
         // vertical margin, and its 1px border top and bottom — which was
         // taken off the width and forgotten on the height.
-        final h =
-            12 + _topStripH + 10 + tv + 10 + _footStripH + 12 + (8 * 2) + 2;
+        final stacked = _footStacks(MediaQuery.textScalerOf(context), inner);
+        final h = 12 + _topStripH + 10 + tv + 10 +
+            (stacked ? _footStackedH : _footStripH) + 12 + (8 * 2) + 2;
         return SizedBox(
           height: h,
           child: CarouselAutoRotate(controller: _deck, count: _cells, child: PageView.builder(
@@ -216,16 +217,17 @@ class _FashionHeroState extends State<FashionHero> {
               _held = DateTime.now().add(_hold);
               setState(() => _i = i);
             },
-            itemBuilder: (context, i) => carouselFxItem(context, _deck, i, _cell(i)),
+            itemBuilder: (context, i) => carouselFxItem(context, _deck, i, _cell(i, stacked)),
           )),
         );
       },
     );
   }
 
-  Widget _cell(int i) {
+  Widget _cell(int i, bool footStacked) {
               if (i == 0) {
                 return _HeroCard(
+                  footStacked: footStacked,
                   onExplore: widget.onExplore,
                   onGuide: widget.onGuide,
                   onSearch: widget.onSearch,
@@ -266,11 +268,54 @@ class _FashionHeroState extends State<FashionHero> {
 /// 37, and the Learn disc at 34.
 const double _topStripH = 44;
 const double _footStripH = 42;
+const double _footStackedH = _footStripH * 2 + 6;
+
+/// B028: on one line the foot squeezes EXPLORE / APP GUIDE / LEARN until the
+/// labels are tiny at 320dp x1.3. When one line can't hold every label at
+/// 80% or more of full size, the foot takes two lines instead: the two
+/// buttons, then Learn and its disc against the right edge.
+bool _footStacks(TextScaler ts, double width) {
+  double tw(String t, double size, double ls) => (TextPainter(
+          text: TextSpan(text: t, style: TextStyle(fontSize: size, fontWeight: FontWeight.w700, letterSpacing: ls)),
+          textDirection: TextDirection.ltr,
+          textScaler: ts,
+          maxLines: 1)
+        ..layout())
+      .width;
+  // Each button: 9 + 9 padding and a 1px border each side.
+  final explore = 0.8 * tw('EXPLORE', 9.5, 0.2) + 20;
+  final guide = 0.8 * tw('APP GUIDE', 9.5, 0.2) + 20 + 4 + 12;
+  final learn = tw('LEARN', 10.5, 0.4) + 8 + 34;
+  const seps = 2 * 15.0;
+  return explore + guide + learn + seps > width;
+}
+
+Widget _footLayout(bool stacked, Row row) {
+  if (!stacked) return row;
+  final buttons = row.children.first;
+  final learn = row.children.last as Row;
+  return Column(
+    key: const ValueKey('hero-foot-stacked'),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      SizedBox(height: _footStripH, child: Row(children: [buttons])),
+      const SizedBox(height: 6),
+      SizedBox(
+        height: _footStripH,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: learn.children.skip(1).toList(),
+        ),
+      ),
+    ],
+  );
+}
 
 /// Cell 0 — `.hs-hero-cell`. The strip, the set, the strip.
 class _HeroCard extends StatelessWidget {
   const _HeroCard({
     required this.live,
+    this.footStacked = false,
     this.guide = false,
     this.onExplore,
     this.onGuide,
@@ -282,6 +327,8 @@ class _HeroCard extends StatelessWidget {
   });
 
   final bool live;
+  /// The foot runs on two lines (B028): see [_footStacks].
+  final bool footStacked;
 
   /// True when the guide has the rail. The set stays and keeps playing —
   /// what changes is what is ON its screen and what is in the strip under
@@ -351,8 +398,21 @@ class _HeroCard extends StatelessWidget {
           const SizedBox(height: 10),
           // `.hs-foot` — Explore and App Guide on the left, then Learn and
           // its disc hard against the right corner.
-          SizedBox(
-            height: _footStripH,
+          // B028: a light dark wash under the label row so the white
+          // EXPLORE / APP GUIDE / LEARN hold 4.5:1 on any backdrop, the
+          // bright flat-grey fallback included, not only on the dark film.
+          DecoratedBox(
+            key: const ValueKey('hero-foot-scrim'),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x47000000), Color(0x5C000000)],
+              ),
+            ),
+            child: SizedBox(
+            height: footStacked ? _footStackedH : _footStripH,
             // `footNav` — part084.js:394. "Explore and App Guide stand down
             // for as long as it is up, and come back the moment the guide
             // closes." The strip is the title card's own row, and it is the
@@ -366,7 +426,7 @@ class _HeroCard extends StatelessWidget {
                       onStep: onStep ?? (_) {},
                     ),
                   )
-                : Row(
+                : _footLayout(footStacked, Row(
                     // TWO GROUPS, pushed apart. The buttons keep to the left and
                     // Learn with its disc sits in the corner, which is where the
                     // markup puts them.
@@ -450,8 +510,8 @@ class _HeroCard extends StatelessWidget {
                         ],
                       ),
                     ],
-                  ),
-          ),
+                  )),
+          )),
         ],
       ),
     );
