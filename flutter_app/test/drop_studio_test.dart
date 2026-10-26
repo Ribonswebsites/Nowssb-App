@@ -297,6 +297,18 @@ void main() {
     await t.pump(const Duration(milliseconds: 300));
     expect(find.text('TOTAL'), findsOneWidget);
     expect(find.text('TOTAL · GOOGLE PLAY'), findsNothing);
+    await t.pumpWidget(MaterialApp(
+        home: MediaQuery(
+            data: const MediaQueryData(size: Size(320, 690), textScaler: TextScaler.linear(1.3)),
+            child: DoorCheckout(
+                items: const [DoorLine(id: 'word:surya', title: 'Surya', kind: 'Word', priceLabel: 'Included', image: 'assets/video/earth-night-poster.webp', included: true)],
+                totalLabel: 'Included',
+                debugPhase: 0))));
+    await t.pump(const Duration(milliseconds: 300));
+    final k = find.text('IN YOUR PLAN');
+    expect(k, findsOneWidget);
+    final para = t.renderObject<RenderParagraph>(find.descendant(of: k, matching: find.byType(RichText)).first);
+    expect(para.size.height, lessThan(9.5 * 1.3 * 2), reason: 'kicker on one line at 320@1.3');
     await t.pumpWidget(const SizedBox());
   });
 

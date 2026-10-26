@@ -527,7 +527,7 @@ class DoorKicker extends StatelessWidget {
 
 /// Bottom dock like Drop Studio's BuyDock: dark glass bar, serif line, gold pill.
 /// Rendered height of [DoorDock] at 1× text (margin + pill). Scale with the text scaler.
-const double doorDockHeight = 84;
+const double doorDockHeight = 100; // kicker row above the line + pill
 
 class DoorDock extends StatelessWidget {
   const DoorDock({super.key, required this.slot, required this.kicker, required this.line, required this.action, this.onTap, this.extra});
@@ -544,22 +544,23 @@ class DoorDock extends StatelessWidget {
           border: Border.all(color: doorGold.withValues(alpha: .55)),
           boxShadow: const [BoxShadow(color: Colors.black87, blurRadius: 20)],
         ),
-        child: Row(children: [
+        // The kicker spans the whole dock (one line where it fits); below it
+        // the line + gold pill row.
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          EditableLabel('$slot.dockKicker', kicker.toUpperCase(),
+              maxLines: 3, // full label, wraps on narrow phones
+              style: doorBody(9.5, color: doorGoldSoft, w: FontWeight.w700, ls: 1.2)),
+          const SizedBox(height: 3),
+          Row(children: [
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              EditableLabel('$slot.dockKicker', kicker.toUpperCase(),
-                  maxLines: 3, // full label, wraps on narrow phones
-                  style: doorBody(9.5, color: doorGoldSoft, w: FontWeight.w700, ls: 1.2)),
-              const SizedBox(height: 3),
-              Text.rich(
-                TextSpan(children: [
-                  TextSpan(text: line, style: doorGreet(color: Colors.white)),
-                  if (extra != null) TextSpan(text: '  $extra', style: doorBody(13, color: doorGoldSoft, w: FontWeight.w800)),
-                ]),
-                // Full size, never cut: a long name or price wraps.
-                softWrap: true,
-              ),
-            ]),
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(text: line, style: doorGreet(color: Colors.white)),
+                if (extra != null) TextSpan(text: '  $extra', style: doorBody(13, color: doorGoldSoft, w: FontWeight.w800)),
+              ]),
+              // Full size, never cut: a long name or price wraps.
+              softWrap: true,
+            ),
           ),
           const SizedBox(width: 8),
           GestureDetector(
@@ -574,6 +575,7 @@ class DoorDock extends StatelessWidget {
               ]),
             ),
           ),
+          ]),
         ]),
       );
 }

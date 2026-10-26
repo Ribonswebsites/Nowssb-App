@@ -146,11 +146,9 @@ class _S extends State<DoorCheckout> with TickerProviderStateMixin, DoorPhase {
                 DoorDock(
                   slot: _slot,
                   // 320@1.3 has no room for the long kicker: just "TOTAL".
-                  kicker: widget.allInPlan
-                      ? 'All in your plan'
-                      : (MediaQuery.sizeOf(context).width < 360 || MediaQuery.textScalerOf(context).scale(10) > 12
-                          ? 'Total'
-                          : 'Total · Google Play'),
+                  kicker: _narrow(context)
+                      ? (widget.allInPlan ? 'In your plan' : 'Total')
+                      : (widget.allInPlan ? 'All in your plan' : 'Total · Google Play'),
                   line: widget.allInPlan ? 'Included' : widget.totalLabel,
                   action: widget.allInPlan ? 'Add to library' : 'Place order',
                   onTap: items.isEmpty
@@ -167,6 +165,10 @@ class _S extends State<DoorCheckout> with TickerProviderStateMixin, DoorPhase {
       ),
     );
   }
+
+  /// 320@1.3 (or big text): short dock kickers that fit one line.
+  static bool _narrow(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 360 || MediaQuery.textScalerOf(context).scale(10) > 12;
 
   Widget _stack(double w, double t) {
     final items = widget.items;
