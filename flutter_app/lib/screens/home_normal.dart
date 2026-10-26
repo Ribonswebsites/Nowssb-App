@@ -53,6 +53,7 @@ import '../widgets/meditation_flip_banner.dart';
 import 'normal/calm_v3.dart';
 import 'normal/home_v4.dart';
 import 'normal/home_v5.dart';
+import '../features/programs/partner_program.dart';
 import '../features/programs/reference_program.dart';
 import '../features/vault/vault_screen.dart';
 import 'nwsb_sign_in_sheet.dart';
@@ -432,7 +433,13 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('trendshop', const SizedBox.shrink()),
         ('subvid', const SizedBox.shrink()),
-        ('edition', V4Edition(onEdition: () => _push(const SubscriptionScreen()))),
+        (
+          'edition',
+          V5EditionPartner(
+            onJoin: (_) => _push(const SubscriptionScreen()),
+            onPartner: () => _push(const PartnerProgramPage()),
+          )
+        ),
         ('ebooks', V4Ebooks(onTap: () => _push(const EbooksStoreScreen()))),
         ('connectban', const SizedBox.shrink()),
         (

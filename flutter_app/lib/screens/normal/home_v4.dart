@@ -767,55 +767,6 @@ class V4Community extends StatelessWidget {
       );
 }
 
-// ───────────────────────── edition ─────────────────────────
-
-class V4Edition extends StatelessWidget {
-  const V4Edition({super.key, required this.onEdition});
-  final VoidCallback onEdition;
-  @override
-  Widget build(BuildContext context) => Column(
-        key: const ValueKey('v4-edition'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          V4Card(
-            onTap: onEdition,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const AspectRatio(
-                aspectRatio: 2.4,
-                child: _Well(child: V4Film('assets/video/normal-glass-background.mp4', slot: 'edition', radius: 18)),
-              ),
-              const SizedBox(height: 14),
-              const Text('FREE PLAN · UPGRADE ANY TIME', style: _eyebrow),
-              const SizedBox(height: 6),
-              const Text('NowssB Edition', style: _h),
-              const SizedBox(height: 4),
-              const Text('Get your subscription today', style: _sub),
-              const SizedBox(height: 12),
-              Align(alignment: Alignment.centerLeft, child: CalmGo(label: 'Join NowssB', onTap: onEdition)),
-            ]),
-          ),
-          ListenableBuilder(
-            listenable: EconomyMirror.instance,
-            builder: (context, _) => V4Card(
-              onTap: () => _push(context, const PartnerProgramPage()),
-              child: Row(children: [
-                const _Knob(NwsbMarks.crown, lottie: kPartnerLottie),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('${EconomyMirror.instance.partnerPoints} partner points',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _ink)),
-                    const SizedBox(height: 2),
-                    const Text('Spark · Glow · Radiant. Points come only from real purchases through your links.', style: _sub),
-                  ]),
-                ),
-              ]),
-            ),
-          ),
-        ],
-      );
-}
-
 // ───────────────────────── ebooks ─────────────────────────
 
 class V4Ebooks extends StatelessWidget {

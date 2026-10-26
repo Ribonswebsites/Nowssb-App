@@ -8,13 +8,17 @@ library;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '../../data/billing_config.dart';
 import '../../data/cart_bag.dart';
 import '../../data/content.dart';
 import '../../data/firebase.dart';
 import '../../data/models.dart';
+import '../../data/play_subscriptions.dart';
 import '../../features/economy/economy_api.dart';
+import '../../widgets/concept/normal/edition.dart';
 import '../../widgets/concept/normal/invite.dart';
 import '../../widgets/concept/normal/own.dart';
+import '../../widgets/concept/normal/partner.dart';
 import '../../widgets/concept/normal/rewards.dart';
 import '../../widgets/concept/normal/trending.dart';
 
@@ -107,6 +111,40 @@ class V5Own extends StatelessWidget {
             wishlistThumbs: _thumbs(b.wishlist),
             orderThumbs: _thumbs(b.orders.expand((o) => o.items)),
           );
+        },
+      );
+}
+
+/// Edition (Play prices, availability, active tier) + Partner (points and
+/// the server's `config.partner.levels`).
+class V5EditionPartner extends StatelessWidget {
+  const V5EditionPartner({super.key, required this.onJoin, required this.onPartner});
+  final void Function(String tier) onJoin;
+  final VoidCallback onPartner;
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Listenable.merge([PlaySubscriptions.instance, EconomyMirror.instance]),
+        builder: (context, _) {
+          final ps = PlaySubscriptions.instance;
+          final w = EconomyMirror.instance;
+          final levels = <(String, int)>[
+            for (final l in (_map(_map(w.summary['config'])['partner'])['levels'] is List
+                ? _map(_map(w.summary['config'])['partner'])['levels'] as List
+                : const []))
+              if (l is Map && l['title'] != null && _int(l['points']) != null) ('${l['title']}', _int(l['points'])!),
+          ];
+          return Column(key: const ValueKey('v5-edition-partner'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            NEdition(
+              onJoin: onJoin,
+              prices: {
+                for (final p in NEdition.plans)
+                  p.$1: switch (playPlanFor(p.$1, yearly: false)) { final plan? => ps.priceFor(plan.productId), null => null },
+              },
+              playAvailable: ps.available,
+              currentTier: ps.activeTier,
+            ),
+            NPartner(points: w.partnerPoints, levels: levels.isEmpty ? null : levels, onPartner: onPartner),
+          ]);
         },
       );
 }
