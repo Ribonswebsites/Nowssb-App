@@ -1,7 +1,8 @@
 // Home Trending 'See all': a text-only header link that opens the poster
 // TrendingScreen, while the word taps and 'Open the library' keep working.
 // No ellipsis or overflow at 320, 360, 390, 412 and 320@1.3.
-// TRENDING_SHOTS=<dir> writes trending-link-{390,320-1.3x}.png and the page it opens.
+// Both read one ranking (trendingChart): the home #1-#3 are the chart's first three.
+// TRENDING_SHOTS=<dir> writes trending-link-{390,320-1.3x}-r2.png and the page it opens.
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -14,7 +15,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/data/content.dart';
 import 'package:nowssb/data/entitlements.dart';
 import 'package:nowssb/features/economy/money.dart';
+import 'package:nowssb/data/trending_chart.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/screens/normal/home_v5.dart';
 import 'package:nowssb/screens/poster/poster_pages.dart';
 import 'package:nowssb/widgets/concept/normal/surface.dart';
 import 'package:nowssb/widgets/concept/normal/trending.dart';
@@ -39,10 +42,15 @@ class _Obs extends NavigatorObserver {
 
 Finder _act(String l) => find.byWidgetPredicate((w) => w is NPress && w.label == l);
 
+final _now = DateTime(2026, 10, 27);
+List<String> _top3() => [for (final i in trendingChart(ContentStore.instance.library, _now, max: 3)) ContentStore.instance.library[i].word];
+
 final _boundary = GlobalKey();
 
-/// Same wiring as home_normal: words -> log, library -> log, See all -> TrendingScreen.
+/// Same wiring as home_normal on the loaded library: words -> log, library -> log, See all -> TrendingScreen.
 Future<_Obs> _pump(WidgetTester t, List<String> log, {double w = 390, double ts = 1}) async {
+  await t.runAsync(() => ContentStore.instance.start().timeout(const Duration(seconds: 5), onTimeout: () {}));
+  expect(ContentStore.instance.library, isNotEmpty);
   t.view.physicalSize = Size(w * 2, 844 * 2);
   t.view.devicePixelRatio = 2;
   addTearDown(t.view.reset);
@@ -52,11 +60,14 @@ Future<_Obs> _pump(WidgetTester t, List<String> log, {double w = 390, double ts 
     theme: ThemeData(fontFamily: 'DM Sans'),
     navigatorObservers: [obs],
     builder: (c, child) => MediaQuery(data: MediaQuery.of(c).copyWith(textScaler: TextScaler.linear(ts), disableAnimations: true), child: child!),
-    home: Builder(builder: (c) => Scaffold(body: SingleChildScrollView(child: NTrending(
-      words: const ['Om', 'Shanti', 'Prana'],
-      onWord: (s) => log.add('word:$s'),
+    // en_IN, as on Ribon's phone
+    locale: const Locale('en', 'IN'),
+    supportedLocales: const [Locale('en', 'IN')],
+    home: Builder(builder: (c) => Scaffold(body: SingleChildScrollView(child: V5Trending(
+      now: _now,
+      onWord: (w) => log.add('word:${w.word}'),
       onLibrary: () => log.add('library'),
-      onSeeAll: () => posterPush(c, const TrendingScreen()),
+      onSeeAll: () => posterPush(c, TrendingScreen(now: _now)),
     )))),
   )));
   await t.pump(const Duration(milliseconds: 300));
@@ -96,12 +107,11 @@ void main() {
 
   testWidgets("'See all' pushes the poster TrendingScreen", (t) async {
     final log = <String>[];
-    await t.runAsync(() => ContentStore.instance.start().timeout(const Duration(seconds: 5), onTimeout: () {}));
     final obs = await _pump(t, log);
     final link = find.byKey(const ValueKey('trending-see-all'));
     expect(find.descendant(of: link, matching: find.text('See all')), findsOneWidget);
     expect(find.descendant(of: link, matching: find.byType(Icon)), findsNothing);
-    await _shot(t, 'trending-link-390');
+    await _shot(t, 'trending-link-390-r2');
     await t.tap(link);
     for (var i = 0; i < 5; i++) {
       await t.pump(const Duration(milliseconds: 200));
@@ -115,20 +125,38 @@ void main() {
       await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 400)));
       await t.pump(const Duration(milliseconds: 50));
     }
-    await _shot(t, 'trending-link-opens-trendingscreen-390');
+    await _shot(t, 'trending-link-opens-trendingscreen-390-r2');
   });
 
   testWidgets('word taps and Open the library still work, and push nothing', (t) async {
     final log = <String>[];
     final obs = await _pump(t, log);
-    await t.tap(_act('Open Om').first, warnIfMissed: false);
+    final top = _top3();
+    await t.tap(_act('Open ${top[0]}').first, warnIfMissed: false);
     await t.pump(const Duration(milliseconds: 600));
-    await t.tap(_act('Open Shanti').first, warnIfMissed: false);
+    await t.tap(_act('Open ${top[1]}').first, warnIfMissed: false);
     await t.pump(const Duration(milliseconds: 600));
     await t.tap(find.text('Open the library  →'));
     await t.pump(const Duration(milliseconds: 600));
-    expect(log, ['word:Om', 'word:Shanti', 'library']);
+    expect(log, ['word:${top[0]}', 'word:${top[1]}', 'library']);
     expect(obs.pushed, isEmpty);
+  });
+
+  testWidgets('home #1-#3 equal the TrendingScreen chart\'s first three', (t) async {
+    final obs = await _pump(t, <String>[]);
+    final top = _top3();
+    expect(top, hasLength(3));
+    final card = t.widget<NTrending>(find.byType(NTrending));
+    expect(card.words, top);
+    await t.tap(find.byKey(const ValueKey('trending-see-all')));
+    for (var i = 0; i < 5; i++) {
+      await t.pump(const Duration(milliseconds: 200));
+    }
+    expect(obs.pushed, hasLength(1));
+    final lib = ContentStore.instance.library;
+    expect([for (final i in PosterTrending.chart(lib, _now).take(3)) lib[i].word], top);
+    // the screen's No. 1 is the home #1
+    expect(find.textContaining(top[0].toUpperCase()), findsWidgets);
   });
 
   testWidgets('no See all link without onSeeAll', (t) async {
@@ -149,7 +177,13 @@ void main() {
       expect(p.size.width, greaterThanOrEqualTo(p.getMaxIntrinsicWidth(p.size.height) - .5));
       final title = t.renderObject<RenderParagraph>(find.text('Trending now'));
       expect(title.didExceedMaxLines, isFalse);
-      if (w == 320 && ts == 1.3) await _shot(t, 'trending-link-320-1.3x');
+      // one line each, and 'See all' sits on the title's line at its right
+      expect(p.getBoxesForSelection(const TextSelection(baseOffset: 0, extentOffset: 7)).map((b) => b.top).toSet(), hasLength(1));
+      expect(title.getBoxesForSelection(const TextSelection(baseOffset: 0, extentOffset: 12)).map((b) => b.top).toSet(), hasLength(1));
+      final tr = t.getRect(find.text('Trending now')), sr = t.getRect(find.text('See all'));
+      expect(sr.center.dy, inInclusiveRange(tr.top, tr.bottom));
+      expect(sr.left, greaterThan(tr.right));
+      if (w == 320 && ts == 1.3) await _shot(t, 'trending-link-320-1.3x-r2');
     });
   }
 }

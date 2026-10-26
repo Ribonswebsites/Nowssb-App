@@ -1,7 +1,7 @@
 /// Trending Now — "Live poster": the #1 word is a giant poster word with a
 /// live equaliser rising behind it; #2/#3 sit on rank pebbles.
 ///
-/// Data: [words] is the home's V5Trending ContentStore library pick (v5TrendingPick), in its
+/// Data: [words] is the shared Trending ranking (trendingChart, first three via v5TrendingPick), in its
 /// order. No play counts exist on the phone, so the copy makes no
 /// "most played / healing the most" claim; it only says these are picks.
 library;
@@ -32,7 +32,7 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
     return Padding(padding: const EdgeInsets.fromLTRB(20, 10, 20, 10), child: Container(
       decoration: neu(r: 30), padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           // Wrap, not Flexible: at 320 x1.3 the badge drops below instead of
           // breaking 'Trending' mid-word.
           Expanded(child: Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
@@ -40,16 +40,17 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
             Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(color: nLink, borderRadius: BorderRadius.circular(10)),
                 child: const Text('#1', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white))),
-            // text-only link; as a Wrap child it drops to its own run at 320 x1.3
-            if (widget.onSeeAll case final onSeeAll?)
-              TextButton(key: const ValueKey('trending-see-all'), onPressed: onSeeAll,
-                  style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4), minimumSize: const Size(44, 44),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  child: const Text('See all', softWrap: false, style: nLinkStyle)),
           ])),
-          // small live equaliser (same loop as the poster), not a speaker icon
-          ExcludeSemantics(child: SizedBox(width: 30, height: 24, child: AnimatedBuilder(animation: loop,
-              builder: (_, __) => CustomPaint(painter: _Bars(loop.value))))),
+          // 'See all' takes the bars' place at the right of the title row, one line.
+          if (widget.onSeeAll case final onSeeAll?)
+            TextButton(key: const ValueKey('trending-see-all'), onPressed: onSeeAll,
+                style: TextButton.styleFrom(padding: const EdgeInsets.only(left: 8), minimumSize: const Size(44, 44),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                child: const Text('See all', softWrap: false, maxLines: 1, style: nLinkStyle))
+          else
+            // small live equaliser (same loop as the poster), not a speaker icon
+            ExcludeSemantics(child: SizedBox(width: 30, height: 24, child: AnimatedBuilder(animation: loop,
+                builder: (_, __) => CustomPaint(painter: _Bars(loop.value))))),
         ]),
         const SizedBox(height: 6),
         NPress(label: 'Open $top', onTap: () => widget.onWord(top), child: SizedBox(height: 120, child: Stack(children: [

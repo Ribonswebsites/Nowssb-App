@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import '../../admin/template/editable.dart';
 import '../../data/content.dart';
 import '../../data/models.dart';
+import '../../data/trending_chart.dart';
 import 'poster_kit.dart';
 import 'poster_orbit.dart';
 
@@ -49,16 +50,8 @@ class PosterTrending extends StatelessWidget {
     return i >= 0 && i < lib.length ? lib[i] : null;
   }
 
-  /// Same rotation the live FashTrending banner uses (day + 3), extended to 7.
-  static List<int> chart(List<Word> lib, DateTime now) {
-    if (lib.isEmpty) return const [];
-    final out = <int>[];
-    for (var i = 0; out.length < 7 && i < lib.length; i++) {
-      final k = (now.day + 3 + i * 5) % lib.length;
-      if (!out.contains(k) && lib[k].word.isNotEmpty) out.add(k);
-    }
-    return out;
-  }
+  /// The shared Trending ranking ([trendingChart]), up to 7.
+  static List<int> chart(List<Word> lib, DateTime now) => trendingChart(lib, now);
 
   @override
   Widget build(BuildContext context) {

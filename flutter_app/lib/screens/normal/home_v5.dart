@@ -15,6 +15,7 @@ import '../../data/firebase.dart';
 import '../../data/models.dart';
 import '../../data/play_subscriptions.dart';
 import '../../data/store_catalog.dart';
+import '../../data/trending_chart.dart';
 import '../../features/economy/economy_api.dart';
 import '../../widgets/concept/normal/ebooks.dart';
 import '../../widgets/concept/normal/edition.dart';
@@ -56,16 +57,17 @@ class V5RewardsInvite extends StatelessWidget {
 }
 
 /// The day's library pick (same rule as the old Trending row).
-List<String> v5TrendingPick(List<Word> words, DateTime now) => [
-      for (var i = 0; i < 3 && i < words.length; i++) words[(now.day + 3 + i * 5) % words.length].word,
-    ];
+/// The first three of the shared Trending ranking (same as TrendingScreen).
+List<String> v5TrendingPick(List<Word> words, DateTime now) => [for (final i in trendingChart(words, now, max: 3)) words[i].word];
 
 class V5Trending extends StatelessWidget {
-  const V5Trending({super.key, required this.onWord, required this.onLibrary, required this.onSeeAll});
+  const V5Trending({super.key, required this.onWord, required this.onLibrary, required this.onSeeAll, this.now});
   final void Function(Word word) onWord;
   final VoidCallback onLibrary;
   /// Opens the poster TrendingScreen.
   final VoidCallback onSeeAll;
+  /// Ranking day (tests); defaults to today.
+  final DateTime? now;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: ContentStore.instance,
@@ -73,7 +75,7 @@ class V5Trending extends StatelessWidget {
           final lib = ContentStore.instance.library;
           return NTrending(
             key: const ValueKey('v5-trending'),
-            words: v5TrendingPick(lib, DateTime.now()),
+            words: v5TrendingPick(lib, now ?? DateTime.now()),
             onWord: (s) {
               for (final w in lib) {
                 if (w.word == s) return onWord(w);
