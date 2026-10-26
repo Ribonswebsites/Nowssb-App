@@ -109,7 +109,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
                           TextSpan(text: current.label, style: doorTitle()),
                         ])),
                       ),
-                      const DoorKicker('$_slot.k2', 'Spin the rolodex · tap to drop in'),
+                      const DoorKicker('$_slot.k2', 'Spin the rolodex · tap to\u00A0drop\u00A0in'),
                     ]),
                     SliverToBoxAdapter(
                         child: SizedBox(
@@ -154,7 +154,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
                       ),
                     )),
                     // Below the rolodex: every door at a glance, so the page ends in content.
-                    const SliverToBoxAdapter(child: DoorKicker('$_slot.k3', 'Every door · tap to drop in')),
+                    const SliverToBoxAdapter(child: DoorKicker('$_slot.k3', 'Every door · tap to\u00A0drop\u00A0in')),
                     SliverPadding(
                       padding: const EdgeInsets.fromLTRB(14, 4, 14, 24),
                       sliver: SliverGrid.count(
