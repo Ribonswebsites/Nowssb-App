@@ -515,6 +515,9 @@ class _HomeFashionState extends State<HomeFashion> {
 
   /// The thirty, in `REG.fash.items` order. Keyed by the registry's own `k`
   /// so the two lists can be diffed by eye.
+  /// Vertical air between stacked Fashion home sections (Ribon, Oct 27).
+  static const double kFashSectionGap = 22;
+
   List<(String, Widget)> _sections() => [
         // Today's Practice rides inside the greeting so it always sits
         // directly under the heading (a saved layout can't split them).
@@ -547,8 +550,11 @@ class _HomeFashionState extends State<HomeFashion> {
               child: TrioRail(),
             ),
             const NmHorizontalRoutineCards(fashion: true),
+            SizedBox(height: kFashSectionGap),
             const EarthDayFilm(),
+            SizedBox(height: kFashSectionGap),
             PromoColorGrid(onOpen: _openGrid),
+            SizedBox(height: kFashSectionGap),
             // Up next: coins, progress, profile, tasks — mid-page.
             _progressRail(),
           ],
@@ -559,7 +565,9 @@ class _HomeFashionState extends State<HomeFashion> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true, glassIcon: true),
+            SizedBox(height: kFashSectionGap),
             FashTiles(onTile: _go, onOpen: _openEnter),
+            SizedBox(height: kFashSectionGap),
             // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
             const HomeRowHeading('Quick picks', sub: 'Tap a colour to jump in'),
             HeroQuickRow(pool: [for (final c in _quickPool()) if (c.id != 'rewards' && c.id != 'tasks') c], squaresOnly: true, pinned: const {}),
@@ -572,6 +580,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 margin: EdgeInsets.zero,
               ),
             ),
+            SizedBox(height: kFashSectionGap),
             MainOptionsSection(onGo: _go, onAction: _openMainOption),
           ],
         )),
@@ -659,7 +668,7 @@ class _HomeFashionState extends State<HomeFashion> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             StoreBannerSection(onTap: () => _go(3)),
-            const SizedBox(height: 16),
+            SizedBox(height: kFashSectionGap),
             const EarnUmbrellaSection(),
           ],
         )),
@@ -773,7 +782,7 @@ class _HomeFashionState extends State<HomeFashion> {
           if (k != 'healing' || Settings.instance.showHealing)
             if (w is SizedBox && w.width == 0 && w.height == 0)
               Padding(
-                padding: const EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.zero,
                 child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
               )
             else
@@ -781,7 +790,7 @@ class _HomeFashionState extends State<HomeFashion> {
                 k,
                 kFashionSectionTitles[k] ?? k,
                 Padding(
-                  padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : 8),
+                  padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : kFashSectionGap),
                   child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
                 ),
                 carousel: kFashionCarousels.contains(k),
