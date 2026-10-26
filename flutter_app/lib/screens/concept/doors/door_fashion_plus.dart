@@ -182,7 +182,7 @@ class _S extends State<DoorFashionPlusPage> with TickerProviderStateMixin, DoorP
               Text(widget.wordLine, style: doorSub()),
               const SizedBox(height: 10),
               Wrap(spacing: 8, runSpacing: 8, children: [
-                _Pill(label: 'Practise', icon: Icons.play_arrow_rounded, onTap: widget.onPractise),
+                _Pill(label: 'Practise', onTap: widget.onPractise),
                 _Pill(
                     // Text-only (no icon + title pill).
                     label: widget.addingToHome ? 'Adding…' : 'Add to home screen',
@@ -222,7 +222,6 @@ class _S extends State<DoorFashionPlusPage> with TickerProviderStateMixin, DoorP
             const SizedBox(height: 10),
             _Pill(
               label: on ? 'Applied' : 'Apply now',
-              icon: on ? Icons.check_rounded : Icons.arrow_forward_rounded,
               onTap: () {
                 HapticFeedback.mediumImpact();
                 widget.onPickStyle?.call(s.id);
@@ -377,9 +376,9 @@ class _HeroPreview extends StatelessWidget {
 }
 
 class _Pill extends StatelessWidget {
-  const _Pill({required this.label, this.icon, this.onTap, this.dark = false});
+  /// Text only: no icon on any pill.
+  const _Pill({required this.label, this.onTap, this.dark = false});
   final String label;
-  final IconData? icon;
   final VoidCallback? onTap;
   final bool dark;
   @override
@@ -395,10 +394,7 @@ class _Pill extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               border: Border.all(color: dark ? doorGold : doorGoldSoft),
             ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              if (icon != null) ...[Icon(icon, size: 18, color: dark ? doorGoldSoft : doorInk), const SizedBox(width: 6)],
-              Flexible(child: Text(label, style: doorBody(14.5, color: dark ? Colors.white : doorInk, w: FontWeight.w800))),
-            ]),
+            child: Text(label, style: doorBody(14.5, color: dark ? Colors.white : doorInk, w: FontWeight.w800)),
           ),
         ),
       );

@@ -140,6 +140,17 @@ void main() {
         expect(File('pubspec.yaml').readAsStringSync(), contains('- ${j.art}'), reason: 'not bundled: ${j.art}');
       }
       expect(page.make.where((j) => j.id == 'profile'), isEmpty, reason: 'Profile is already a jump');
+      // Practise / Apply now / Applied pills are text only.
+      var pills = 0;
+      for (final label in ['Practise', 'Apply now', 'Applied']) {
+        for (final e in find.text(label, skipOffstage: false).evaluate()) {
+          final pill = find.ancestor(of: find.byWidget(e.widget), matching: find.byWidgetPredicate((w) => w is Semantics && w.properties.label == label && w.properties.button == true));
+          if (pill.evaluate().isEmpty) continue; // the same word elsewhere, not a pill
+          pills++;
+          expect(find.descendant(of: pill.first, matching: find.byType(Icon), skipOffstage: false).evaluate(), isEmpty, reason: label);
+        }
+      }
+      expect(pills, greaterThanOrEqualTo(2));
       expect(page.jumps.where((j) => j.id == 'profile'), hasLength(1));
       page.onJump!('connect');
       await settle(t, 2);
