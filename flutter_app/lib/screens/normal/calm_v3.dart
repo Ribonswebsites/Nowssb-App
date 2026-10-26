@@ -7,6 +7,7 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
+import 'package:nowssb/data/today_ritual.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'neomorphic_dashboard.dart' show FocusBlob;
@@ -244,29 +245,39 @@ class CalmSearch extends StatelessWidget {
 
 typedef CalmLauncher = void Function(List<Word> words, String title);
 
-const _slotTitles = <String, String>{
-  'morning': 'Morning Ritual',
-  'afternoon': 'Afternoon Session',
-  'evening': 'Evening Practice',
-  'night': 'Night Restoration',
-};
-
-class CalmToday extends StatelessWidget {
+/// The Today card. All its data and both actions come from
+/// [TodayRitualModel]; this is only the look.
+class CalmToday extends StatefulWidget {
   const CalmToday({super.key, this.onStart, this.onProgress});
   final CalmLauncher? onStart;
   final VoidCallback? onProgress;
 
   @override
+  State<CalmToday> createState() => _CalmTodayState();
+}
+
+class _CalmTodayState extends State<CalmToday> {
+  late final TodayRitualModel _model = TodayRitualModel(
+    onBegin: (words, title) => widget.onStart?.call(words, title),
+    onSeeProgress: () => widget.onProgress?.call(),
+  );
+
+  @override
+  void dispose() {
+    _model.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) => ListenableBuilder(
-        listenable: Listenable.merge([ContentStore.instance, PracticeProgress.instance]),
+        listenable: _model,
         builder: (context, _) {
-          final slot = nwsbSlot();
-          final all = ContentStore.instance.library;
-          final active = all.where((w) => w.time == slot || w.time == 'any').toList();
-          final title = _slotTitles[slot] ?? 'Practice';
-          final p = PracticeProgress.instance;
-          final done = p.completedTodayFor(active);
-          final frac = active.isEmpty ? 0.0 : (done / active.length).clamp(0.0, 1.0);
+          final r = _model.value;
+          final active = r.words;
+          final title = r.title;
+          final done = r.done;
+          final frac = r.fraction;
+          final p = (todaySessions: r.todaySessions, totalSessions: r.totalSessions, streak: r.streak);
           return _Calm(
             key: const ValueKey('cv3-today'),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -317,8 +328,8 @@ class CalmToday extends StatelessWidget {
               ]),
               const SizedBox(height: 16),
               Wrap(spacing: 10, runSpacing: 10, children: [
-                CalmGo(label: 'Begin', onTap: () => onStart?.call(active, title)),
-                CalmGo(label: 'See progress', light: true, onTap: onProgress),
+                CalmGo(label: 'Begin', onTap: _model.begin),
+                CalmGo(label: 'See progress', light: true, onTap: _model.seeProgress),
               ]),
             ]),
           );

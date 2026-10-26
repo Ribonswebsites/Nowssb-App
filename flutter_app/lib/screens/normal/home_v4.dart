@@ -10,6 +10,7 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -420,8 +421,9 @@ class V4EarthDay extends StatelessWidget {
     'night': 'Rest is a practice. Stay with the tone.',
   };
   @override
-  Widget build(BuildContext context) {
-    final part = EarthDayFilm.slot();
+  Widget build(BuildContext context) => DayPartBuilder(builder: (context, p, _) => _build(context, p.slot));
+
+  Widget _build(BuildContext context, String part) {
     return V4Card(
       key: const ValueKey('v4-earth'),
       onTap: onTap,

@@ -5,6 +5,7 @@
 /// the bottom right.
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -19,13 +20,7 @@ class EarthDayFilm extends StatelessWidget {
 
   final double height;
 
-  static String slot([DateTime? at]) {
-    final h = (at ?? DateTime.now()).hour;
-    if (h < 12) return 'morning';
-    if (h < 17) return 'afternoon';
-    if (h < 21) return 'evening';
-    return 'night';
-  }
+  static String slot([DateTime? at]) => dayPartFor(at ?? DayClock.now()).slot;
 
   static const _label = {
     'morning': 'Morning',
@@ -44,8 +39,9 @@ class EarthDayFilm extends StatelessWidget {
   void _start(BuildContext context) => NavScope.goTo(context, 1);
 
   @override
-  Widget build(BuildContext context) {
-    final part = slot();
+  Widget build(BuildContext context) => DayPartBuilder(builder: (context, p, _) => _build(context, p.slot));
+
+  Widget _build(BuildContext context, String part) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: ClipRRect(

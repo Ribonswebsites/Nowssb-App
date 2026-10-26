@@ -10,6 +10,7 @@
 /// all copy is EditableLabel, all words come from ContentStore.library.
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -191,20 +192,13 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
   /// The deck's front card. The pinned bar reads the same index, so the
   /// bar's word, price and buy follow the swipe.
   late final ValueNotifier<int> _top = ValueNotifier(widget.debugPage?.round() ?? 0);
-  Timer? _hourly;
 
   DateTime _now() => (widget.clock ?? DateTime.now)();
 
-  /// Wake at the next top of the hour: new words land, the deck restarts.
-  void _armHour() {
-    _hourly?.cancel();
-    final now = _now();
-    final next = DateTime(now.year, now.month, now.day, now.hour + 1);
-    _hourly = Timer(next.difference(now), () {
-      if (!mounted) return;
-      setState(() => _top.value = 0);
-      _armHour();
-    });
+  /// New words land on the hour (the shared [DayClock] ticker, which also
+  /// fires on app resume): the deck restarts.
+  void _onHour() {
+    if (mounted) setState(() => _top.value = 0);
   }
 
   @override
@@ -212,7 +206,8 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
     super.initState();
     _scroll.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
-    _armHour();
+    DayClock.retain();
+    DayClock.tick.addListener(_onHour);
   }
 
   void _onScroll() {
@@ -223,7 +218,8 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
 
   @override
   void dispose() {
-    _hourly?.cancel();
+    DayClock.tick.removeListener(_onHour);
+    DayClock.release();
     _top.dispose();
     _scroll.removeListener(_onScroll);
     if (widget.controller == null) _scroll.dispose();
@@ -622,16 +618,7 @@ class _DropHero extends StatelessWidget {
     );
   }
 
-  static String _hourLabel() {
-    final h = DateTime.now().hour;
-    return h < 12
-        ? 'MORNING'
-        : h < 17
-            ? 'AFTERNOON'
-            : h < 21
-                ? 'EVENING'
-                : 'NIGHT';
-  }
+  static String _hourLabel() => DayClock.part.label.toUpperCase();
 }
 
 class _RingsPainter extends CustomPainter {

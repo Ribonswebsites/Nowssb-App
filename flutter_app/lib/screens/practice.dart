@@ -11,6 +11,7 @@
 /// with its live blur, word breakdown, and sound-ripple experience intact.
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
@@ -25,13 +26,8 @@ import 'word_detail.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 
-String nwsbSlot([DateTime? at]) {
-  final h = (at ?? DateTime.now()).hour;
-  if (h < 12) return 'morning';
-  if (h < 17) return 'afternoon';
-  if (h < 21) return 'evening';
-  return 'night';
-}
+/// 'morning' … 'night' for [at] (default: now, local). See [dayPartFor].
+String nwsbSlot([DateTime? at]) => dayPartFor(at ?? DayClock.now()).slot;
 
 const _slotTitle = {
   'morning': 'Morning Ritual',

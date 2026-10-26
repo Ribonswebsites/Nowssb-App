@@ -11,6 +11,7 @@
 /// on each class say where.
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie, kSunLottie;
 import 'dart:async';
 
@@ -38,18 +39,20 @@ import '../../admin/template/editable.dart';
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
 /// The time-of-day greeting the home renders — app/js/part012.js.
-String nmGreetHello([DateTime? at]) {
-  final h = (at ?? DateTime.now()).hour;
-  if (h < 12) return 'Good Morning';
-  if (h < 17) return 'Good Afternoon';
-  return 'Good Evening';
-}
+/// Bands from [dayPartFor]; local time via [DayClock].
+String nmGreetHello([DateTime? at]) => dayPartFor(at ?? DayClock.now()).greeting;
 
-IconData nmGreetMark([DateTime? at]) {
-  final h = (at ?? DateTime.now()).hour;
-  if (h < 12) return Icons.wb_twilight;
-  if (h < 17) return Icons.wb_sunny_outlined;
-  return Icons.nightlight_outlined;
+IconData nmGreetMark([DateTime? at]) => switch (dayPartFor(at ?? DayClock.now())) {
+      DayPart.morning => Icons.wb_twilight,
+      DayPart.afternoon => Icons.wb_sunny_outlined,
+      DayPart.evening => Icons.wb_twilight,
+      DayPart.night => Icons.nightlight_outlined,
+    };
+
+/// The sun Lottie by day; the mark (twilight / moon) after.
+bool nmGreetSun([DateTime? at]) {
+  final p = dayPartFor(at ?? DayClock.now());
+  return p == DayPart.morning || p == DayPart.afternoon;
 }
 
 /// 1 · greet — index.html:908. `.nmh-greet-block`: a raised disc holding a
@@ -59,7 +62,9 @@ class NmGreeting extends StatelessWidget {
   final String name;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => DayPartBuilder(builder: (context, part, now) => _build(context, now));
+
+  Widget _build(BuildContext context, DateTime now) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
@@ -73,9 +78,9 @@ class NmGreeting extends StatelessWidget {
               boxShadow: NwsbShadows.raisedXs,
             ),
             child: Center(
-              child: DateTime.now().hour < 17
+              child: nmGreetSun(now)
                   ? const V4Lottie(kSunLottie, size: 34)
-                  : Icon(nmGreetMark(), size: 26, color: WrapHead.markGold),
+                  : Icon(nmGreetMark(now), size: 26, color: WrapHead.markGold),
             ),
           ),
           const SizedBox(width: 14),
@@ -85,7 +90,7 @@ class NmGreeting extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  nmGreetHello(),
+                  nmGreetHello(now),
                   style: const TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w300,

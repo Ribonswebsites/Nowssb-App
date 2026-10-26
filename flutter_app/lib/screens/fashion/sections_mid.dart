@@ -4,6 +4,7 @@
 /// storeban
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -1228,25 +1229,13 @@ class FashPrescription extends StatelessWidget {
   final void Function(int index)? onWord;
 
   /// HOUR_LABELS — app/js/part037.js:8.
-  static String _slotLabel(DateTime at) {
-    final h = at.hour;
-    if (h < 12) return 'Morning Ritual';
-    if (h < 17) return 'Afternoon Session';
-    if (h < 21) return 'Evening Practice';
-    return 'Night Restoration';
-  }
-
-  static String _slotWord(DateTime at) {
-    final h = at.hour;
-    if (h < 12) return 'morning';
-    if (h < 17) return 'afternoon';
-    if (h < 21) return 'evening';
-    return 'night';
-  }
+  static String _slotLabel(DateTime at) => dayPartFor(at).ritualTitle;
+  static String _slotWord(DateTime at) => dayPartFor(at).slot;
 
   @override
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
+  Widget build(BuildContext context) => DayPartBuilder(builder: (context, _, now) => _build(context, now));
+
+  Widget _build(BuildContext context, DateTime now) {
     final all = ContentStore.instance.library;
     final slot = _slotWord(now);
     final picks =

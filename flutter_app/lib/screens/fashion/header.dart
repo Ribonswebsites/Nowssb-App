@@ -9,6 +9,7 @@
 /// drawn here for the same reason.
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -199,23 +200,17 @@ class HeroGreeting extends StatelessWidget {
   final VoidCallback? onQuickAccess;
 
   /// hello() — app/js/part083.js:153. Five bands, not three.
-  static String hello([DateTime? at]) {
-    final h = (at ?? DateTime.now()).hour;
-    if (h < 5) return 'Good night';
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    if (h < 21) return 'Good evening';
-    return 'Good night';
-  }
+  static String hello([DateTime? at]) =>
+      'Good ${dayPartFor(at ?? DayClock.now()).label.toLowerCase()}';
 
   /// timeMark() — :177. The sun climbing, the sun high, the sun setting,
   /// the moon. The paths are the app's own; see [NwsbMarks.forHour].
   static String mark([DateTime? at]) =>
-      NwsbMarks.forHour((at ?? DateTime.now()).hour);
+      NwsbMarks.forHour((at ?? DayClock.now()).hour);
 
   /// Circle colours by time of day (same bands as [hello]).
   static LinearGradient skyFor([DateTime? at]) {
-    final h = (at ?? DateTime.now()).hour;
+    final h = (at ?? DayClock.now()).hour;
     final c = h < 5 || h >= 21
         ? const [Color(0xFF0B1A3A), Color(0xFF3B2A7A)] // night
         : h < 12
@@ -227,7 +222,9 @@ class HeroGreeting extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => DayPartBuilder(builder: (context, _, now) => _build(context, now));
+
+  Widget _build(BuildContext context, DateTime now) {
     // Same glass as the Hero header (GlassWrap).
     return GlassWrap(
       margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -238,13 +235,13 @@ class HeroGreeting extends StatelessWidget {
             width: 62,
             height: 62,
             decoration: BoxDecoration(
-              gradient: skyFor(),
+              gradient: skyFor(now),
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white, width: 2),
               boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))],
             ),
             child: Center(
-              child: NwsbIcon(mark(), size: 27, color: Colors.white),
+              child: NwsbIcon(mark(now), size: 27, color: Colors.white),
             ),
           ),
           const SizedBox(width: 16),
@@ -254,7 +251,7 @@ class HeroGreeting extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '${hello()},',
+                  '${hello(now)},',
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w300,

@@ -4,6 +4,7 @@
 /// values and card order intentionally mirror the supplied dashboard file.
 library;
 
+import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/content.dart';
@@ -36,12 +37,13 @@ class NmSuppliedDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([ContentStore.instance, PracticeProgress.instance]),
+      animation: Listenable.merge([ContentStore.instance, PracticeProgress.instance, DayClock.tick]),
       builder: (context, _) {
-        final slot = nwsbSlot();
+        final part = DayClock.part;
+        final slot = part.slot;
         final all = ContentStore.instance.library;
         final active = all.where((word) => word.time == slot || word.time == 'any').toList();
-        final nextSlot = slot == 'morning' ? 'afternoon' : slot == 'afternoon' ? 'evening' : 'night';
+        final nextSlot = part.next.slot;
         final next = all.where((word) => word.time == nextSlot || word.time == 'any').toList();
         final title = _dashboardSlotTitles[slot] ?? 'Practice';
         final progress = PracticeProgress.instance;
