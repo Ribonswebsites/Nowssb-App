@@ -1200,7 +1200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         image: 'assets/profile_source/img-about.jpeg',
         overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xB8000000), Color(0x61000000), Color(0xBF000000)]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [EditableSvg.asset('assets/icons/icon_04.svg', width: 15, height: 15, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen'), const SizedBox(width: 9), const EditableLabel('profile.ProfileScreen', 'About NowssB', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600))]),
+          Row(children: [EditableSvg.asset('assets/icons/icon_04.svg', width: 15, height: 15, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen'), const SizedBox(width: 9), const Flexible(child: EditableLabel('profile.ProfileScreen', 'About NowssB', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600)))]), // Flexible: the 3.6px overflow at 320dp x1.3 (B015 trace)
           const SizedBox(height: 14),
           const FractionallySizedBox(widthFactor: .78, child: EditableLabel('profile.ProfileScreen', 'Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.', style: TextStyle(fontSize: 14, height: 1.65, color: _dim))),
         ]),

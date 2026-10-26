@@ -94,7 +94,11 @@ class CourseFace extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 18),
+        // The segment pill keeps its size and only scales down when large
+        // text on a narrow screen makes it wider than the card (B015).
         Center(
+          child: FittedBox(
+          fit: BoxFit.scaleDown,
           child: Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -126,6 +130,7 @@ class CourseFace extends StatelessWidget {
                   ),
               ],
             ),
+          ),
           ),
         ),
         const SizedBox(height: 16),
@@ -175,17 +180,21 @@ class CourseFace extends StatelessWidget {
                         const SizedBox(height: 10),
                         Row(
                           children: [
-                            Text(indexLabel, style: const TextStyle(color: Color(0xCCFFFFFF))),
-                            const Spacer(),
-                            GestureDetector(
+                            // Both sides give way at large text instead of
+                            // overflowing the picture (B015).
+                            Expanded(child: Text(indexLabel, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xCCFFFFFF)))),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: GestureDetector(
                               onTap: onContinue,
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Text(foot, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                                  Flexible(child: Text(foot, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))),
                                   const Icon(Icons.chevron_right, color: Colors.white, size: 18),
                                 ],
                               ),
+                            ),
                             ),
                           ],
                         ),
