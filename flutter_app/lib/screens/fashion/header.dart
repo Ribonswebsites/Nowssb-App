@@ -16,6 +16,7 @@ import '../../widgets/glass_wrap.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/tokens.dart';
+import '../normal/home_v4.dart' show V4Lottie, kSearchLottie;
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../admin/template/editable.dart';
@@ -379,15 +380,15 @@ class FashionGreetingSearch extends StatelessWidget {
                       border: Border.all(color: const Color(0x28FFFFFF)),
                     ),
                     padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-                    child: Row(
+                    child: const Row(
                       children: [
-                        const AppThinkingLoader(
+                        AppThinkingLoader(
                           size: 28,
                           state: OrbState.listening,
                           circlePad: 6,
                         ),
-                        const SizedBox(width: 10),
-                        const Expanded(
+                        SizedBox(width: 10),
+                        Expanded(
                           child: EditableLabel('header.FashionGreetingSearch',
                             'Search any word or meaning…',
                             maxLines: 1,
@@ -399,20 +400,11 @@ class FashionGreetingSearch extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         SizedBox(
                           width: 22,
                           height: 22,
-                          child: EditableImage.asset(
-                            'assets/icons/search.webp',
-                            color: Colors.white70,
-                            errorBuilder: (_, __, ___) => const Icon(
-                              Icons.search,
-                              size: 20,
-                              color: Colors.white70,
-                            ),
-                            slot: 'header.FashionGreetingSearch',
-                          ),
+                          child: V4Lottie(kSearchLottie, size: 22),
                         ),
                       ],
                     ),
