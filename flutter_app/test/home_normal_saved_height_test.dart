@@ -69,7 +69,7 @@ void main() {
       final reader = t.getRect(find.byKey(const ValueKey('nm-reader')));
       expect(reader.left, 0);
       expect(reader.right, w);
-      for (final label in ['NOWSSB REWARDS', 'Invite a friend', 'Sign in']) {
+      for (final label in ['NowssB Rewards', 'Invite a friend', 'Sign in for rewards']) {
         final f = find.text(label);
         expect(f, findsOneWidget, reason: label);
         final p = t.renderObject<RenderParagraph>(f);

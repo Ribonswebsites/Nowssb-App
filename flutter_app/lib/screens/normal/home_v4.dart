@@ -121,7 +121,6 @@ const kBagLottie = 'assets/home/nm-anim-bag.json';
 const kHeadphonesLottie = 'assets/home/nm-anim-headphones.json';
 const kHeartLottie = 'assets/home/nm-anim-heart.json';
 const kTrendingLottie = 'assets/home/nm-anim-trending.json';
-const kInviteLottie = 'assets/home/nm-anim-invite.json';
 const kSunLottie = 'assets/home/nm-anim-sun.json';
 
 /// A NowssB film cut to a rounded window.
@@ -695,71 +694,30 @@ class V4StoreEarn extends StatelessWidget {
 
 // ───────────────────────── reader + rewards ─────────────────────────
 
-class V4ReaderRewards extends StatelessWidget {
-  const V4ReaderRewards({super.key, required this.onReader});
+class V4Reader extends StatelessWidget {
+  const V4Reader({super.key, required this.onReader});
   final VoidCallback onReader;
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => V4Card(
         key: const ValueKey('v4-reader'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          V4Card(
-            onTap: onReader,
-            child: Row(children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('NOWSSB READER', style: _eyebrow),
-                  const SizedBox(height: 6),
-                  const Text('Read every meaning, and every eBook.', style: _h),
-                  const SizedBox(height: 12),
-                  CalmGo(label: 'Open Reader', onTap: onReader),
-                ]),
-              ),
-              const SizedBox(width: 12),
-              const _Well(
-                circle: true,
-                size: Size.square(88),
-                child: V4Film('assets/video/player-box-rings.mp4', slot: 'reader', circle: true),
-              ),
+        onTap: onReader,
+        child: Row(children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const Text('NOWSSB READER', style: _eyebrow),
+              const SizedBox(height: 6),
+              const Text('Read every meaning, and every eBook.', style: _h),
+              const SizedBox(height: 12),
+              CalmGo(label: 'Open Reader', onTap: onReader),
             ]),
           ),
-          ListenableBuilder(
-            listenable: EconomyMirror.instance,
-            builder: (context, _) {
-              final w = EconomyMirror.instance;
-              // The sign-in gate: no coins are shown until there is a real account.
-              final signedIn = NwsbFirebase.ready && w.uid != null;
-              final nextChest = 40 - (w.coins % 40);
-              return V4PillBlock(
-                title: 'NowssB Rewards',
-                aside: signedIn ? 'Streak ${w.streak}' : 'Members',
-                children: [
-                  V4RichRow(
-                    art: const V4Lottie(kRewardsLottie, size: 52),
-                    label: 'NOWSSB REWARDS',
-                    title: signedIn ? '${w.coins} coins' : 'Sign in',
-                    sub: signedIn
-                        ? '$nextChest coins to the next chest'
-                        : 'Sign in to see your rewards',
-                    action: signedIn ? Icons.redeem_rounded : Icons.login_rounded,
-                    actionLabel: signedIn ? 'Open rewards' : 'Open sign in',
-                    onTap: signedIn
-                        ? () => _push(context, const VaultScreen())
-                        : () => NwsbSignInPage.open(context),
-                  ),
-                  V4RichRow(
-                    art: const V4Lottie(kInviteLottie, size: 46),
-                    label: 'TRIBE · INVITE',
-                    title: 'Invite a friend',
-                    sub: 'Share your link. Your friend gets a discount; you earn when they buy for real.',
-                    action: Icons.person_add_alt_1_rounded,
-                    onTap: () => _push(context, const ReferenceProgramPage()),
-                  ),
-                ],
-              );
-            },
+          const SizedBox(width: 12),
+          const _Well(
+            circle: true,
+            size: Size.square(88),
+            child: V4Film('assets/video/player-box-rings.mp4', slot: 'reader', circle: true),
           ),
-        ],
+        ]),
       );
 }
 

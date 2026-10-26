@@ -126,7 +126,7 @@ void main() {
 
   testWidgets('signed out, rewards ask to sign in', (t) async {
     await pumpAt(t, 390, 1);
-    expect(find.text('Sign in to see your rewards'), findsOneWidget);
+    expect(find.text('Sign in for rewards'), findsOneWidget);
     await finish(t);
   }, skip: !homeFontsReady); // needs real fonts, see support/home_render.dart
 

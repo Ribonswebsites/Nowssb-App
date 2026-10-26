@@ -52,6 +52,10 @@ import '../widgets/four_banners.dart';
 import '../widgets/meditation_flip_banner.dart';
 import 'normal/calm_v3.dart';
 import 'normal/home_v4.dart';
+import 'normal/home_v5.dart';
+import '../features/programs/reference_program.dart';
+import '../features/vault/vault_screen.dart';
+import 'nwsb_sign_in_sheet.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
@@ -402,8 +406,14 @@ class _HomeNormalState extends State<HomeNormal> {
         ('store', V4StoreEarn(onStore: () => _go(3))),
         (
           'reader',
-          // Signed out: 'Sign in to see your rewards'; signed in: coins.
-          V4ReaderRewards(onReader: () => _push(const ReaderHubScreen())),
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            V4Reader(onReader: () => _push(const ReaderHubScreen())),
+            V5RewardsInvite(
+              onOpenRewards: () => _push(const VaultScreen()),
+              onSignIn: () => NwsbSignInPage.open(context),
+              onInvite: () => _push(const ReferenceProgramPage()),
+            ),
+          ]),
         ),
         ('trendwd', V4Trending(onTap: () => _go(2))),
         ('custom', null),
