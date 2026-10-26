@@ -9,6 +9,7 @@ import '../features/notifications/inbox_screen.dart';
 import '../features/programs/program_router.dart';
 import '../features/social/connect_screen.dart';
 import '../screens/daily_tasks.dart';
+import '../screens/fashion/drop_studio.dart';
 import '../screens/personal_coach.dart';
 import '../screens/reader/reader_hub.dart';
 import '../screens/saved_words.dart';
@@ -39,6 +40,7 @@ abstract final class NwsbLinks {
   static void coach(BuildContext context) => push(context, const PersonalCoachScreen());
   static void saved(BuildContext context) => push(context, const SavedWordsScreen());
   static void tasks(BuildContext context) => push(context, const DailyTasksPage());
+  static void dropStudio(BuildContext context) => push(context, const DropStudioScreen());
 
   /// The destination a banner's own button text promises.
   static void cta(BuildContext context, String cta) {

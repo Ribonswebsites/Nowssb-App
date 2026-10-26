@@ -17,6 +17,7 @@ import '../../features/programs/partner_program.dart';
 import '../../features/programs/reference_program.dart';
 import '../../features/programs/rewards_program.dart';
 import '../../screens/app_settings.dart';
+import '../../screens/fashion/drop_studio.dart';
 import '../../screens/fashion_plus.dart';
 import '../../screens/healing_path.dart';
 import '../../screens/home_fashion.dart';
@@ -88,6 +89,7 @@ final List<AppPage> kAppPages = [
   AppPage('settings', 'Settings', 'You', Icons.settings_rounded, () => const AppSettingsScreen()),
   AppPage('notifications', 'Notification settings', 'You', Icons.notifications_rounded, () => const NotificationsSettingsPage()),
   AppPage('notifications.preferences', 'Notification preferences', 'You', Icons.tune_rounded, () => const NotifPreferencesScreen()),
+  AppPage('fashion.dropstudio', 'Drop Studio', 'Explore', Icons.local_mall_rounded, () => const DropStudioScreen()),
   AppPage('fashionplus', 'Fashion Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
   AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
   AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const EarnHubScreen()),

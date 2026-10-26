@@ -45,6 +45,7 @@ import '../widgets/earth_day_film.dart';
 import '../widgets/promo_color_grid.dart';
 import 'quotes_live.dart';
 import 'player_settings.dart';
+import 'fashion/drop_studio.dart';
 import 'fashion/header.dart';
 import 'fashion/hero_quick_row.dart';
 import 'fashion/home_cards.dart';
@@ -644,18 +645,14 @@ class _HomeFashionState extends State<HomeFashion> {
         // Removed on Ribon's order (Oct 23): 'Build a library' banner.
         ('store', const SizedBox.shrink()),
         ('trendwd', FashTrending(onTap: () => _go(2))),
-        (
-          'custom',
-          FashCustomize(onTap: () => _push(const WidgetsPage())),
-        ),
+        // "Make this home yours" and "Today's offers" now live in Drop
+        // Studio; this card is the one way in.
+        ('custom', DropStudioEntry(onTap: () => _push(const DropStudioScreen()))),
         (
           'fashplus',
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
         ),
-        (
-          'enterCurve',
-          EnterCurveStage(onOpen: _openEnter),
-        ),
+        ('enterCurve', const SizedBox.shrink()),
         ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
         ('trendvid', FashShopNow(onTap: () => _go(3))),
         ('storeban', Column(
