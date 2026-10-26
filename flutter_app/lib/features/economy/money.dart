@@ -154,17 +154,14 @@ class FxBook extends ChangeNotifier {
   }
 
   /// [cents] are USD cents, shown in local currency with its local symbol.
-  String formatCents(int cents, {String? locale}) {
+  ///
+  /// [whole]: a whole amount drops its minor units (₹99, not ₹99.00); an
+  /// amount that really has paise / cents keeps them (₹99.50).
+  String formatCents(int cents, {String? locale, bool whole = false}) {
     final loc = _locale(locale);
     final code = codeFor(locale);
     final rate = rates[code];
-    NumberFormat fmt(String c) {
-      try {
-        return NumberFormat.simpleCurrency(name: c, locale: loc);
-      } catch (_) {
-        return NumberFormat.simpleCurrency(name: c);
-      }
-    }
+    _Money fmt(String c) => _Money(c, loc, whole);
     if (rate == null) {
       // No rate for the local currency: show the exact base amount rather
       // than a guessed conversion.
@@ -176,18 +173,38 @@ class FxBook extends ChangeNotifier {
   }
 
   /// A stored catalogue amount (base units) shown in local currency.
-  String formatPrice(num amount, {String? locale}) {
+  ///
+  /// [whole]: see [formatCents] — ₹99 rather than ₹99.00, paise kept when
+  /// the amount really has them.
+  String formatPrice(num amount, {String? locale, bool whole = false}) {
     // Same currency as the catalogue: show the stored amount exactly (no
     // round trip through USD cents, which turned ₹99 into ₹99.12).
     if (codeFor(locale) == baseCurrency) {
-      final loc = _locale(locale);
-      try {
-        return NumberFormat.simpleCurrency(name: baseCurrency, locale: loc).format(amount);
-      } catch (_) {
-        return NumberFormat.simpleCurrency(name: baseCurrency).format(amount);
-      }
+      return _Money(baseCurrency, _locale(locale), whole).format(amount);
     }
     final perUsd = rates[baseCurrency] ?? 1;
-    return formatCents(((amount / perUsd) * 100).round(), locale: locale);
+    return formatCents(((amount / perUsd) * 100).round(), locale: locale, whole: whole);
   }
+
+  static NumberFormat _fmt(String code, String loc, {int? decimalDigits}) {
+    try {
+      return NumberFormat.simpleCurrency(name: code, locale: loc, decimalDigits: decimalDigits);
+    } catch (_) {
+      return NumberFormat.simpleCurrency(name: code, decimalDigits: decimalDigits);
+    }
+  }
+
+  /// A store-provided price label (Google Play's localized string) with an
+  /// all-zero minor part dropped: '₹99.00' → '₹99', '€1.234,00' → '€1.234'.
+  /// '₹99.50' and grouping like '₹1,00,000' are left exactly as Play sent.
+  static String wholeLabel(String label) =>
+      label.replaceFirst(RegExp(r'[.,]00(?=[^0-9]*$)'), '');
+}
+
+/// One currency format; [whole] drops the minor digits of whole amounts only.
+class _Money {
+  const _Money(this.code, this.loc, this.whole);
+  final String code, loc;
+  final bool whole;
+  String format(num n) => FxBook._fmt(code, loc, decimalDigits: whole && n == n.roundToDouble() ? 0 : null).format(n);
 }

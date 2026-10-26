@@ -99,7 +99,10 @@ class WishlistPage extends StatelessWidget {
 
 /// The cart total as the checkout shows it (main's chip-inr money logic):
 /// what's still payable, or 'Included' when nothing is.
-String checkoutTotalLabel(List<BagItem> items) => _money(_payable(items));
+/// Whole rupees on the door (₹99, not ₹99.00; paise kept when real).
+String checkoutTotalLabel(List<BagItem> items) => _wholeMoney(_payable(items));
+
+String _wholeMoney(num value) => value <= 0 ? 'Included' : FxBook.instance.formatPrice(value, whole: true);
 
 /// True when [it] needs no payment (free, owned or in the plan).
 bool checkoutLineOpen(BagItem it) {
@@ -110,7 +113,7 @@ bool checkoutLineOpen(BagItem it) {
 /// One line's price, 'Free' when it costs nothing.
 String checkoutPriceLabel(BagItem it) {
   final price = StorePrices.instance.priceFor(it.id, shown: it.price);
-  return price <= 0 ? 'Free' : _money(price);
+  return price <= 0 ? 'Free' : _wholeMoney(price);
 }
 
 /// 'Free' / 'Owned' / 'In your plan' for an open line, else null.
