@@ -297,7 +297,7 @@ class _Swatch extends StatelessWidget {
             foregroundPainter: _Stitch(),
             child: Container(
               color: cloth,
-              padding: const EdgeInsets.fromLTRB(16, 18, 12, 16),
+              padding: const EdgeInsets.fromLTRB(12, 18, 10, 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
                   Container(
@@ -312,27 +312,24 @@ class _Swatch extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(e.root, style: gSub(color: kPGoldSoft)),
                 const SizedBox(height: 10),
-                Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                  Expanded(
+                // The tag keeps its natural width; at 320 / large text the "+"
+                // drops below it instead of squeezing the price.
+                Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 6, runSpacing: 6, children: [
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 56),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                       decoration: BoxDecoration(color: kPPaper, borderRadius: BorderRadius.circular(2)),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                        FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: Text(shown ?? ownedLabel(id),
-                                maxLines: 1, softWrap: false, style: gSub(dark: false, color: kPInk).copyWith(fontWeight: FontWeight.w700))),
+                        // Full-size type (never scaled down); "In your plan" wraps on a space.
+                        Text(shown ?? ownedLabel(id),
+                            maxLines: 2, style: gSub(dark: false, color: kPInk).copyWith(fontSize: 14, fontWeight: FontWeight.w700, height: 1.15)),
                         if (was != null)
-                          FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Text(inr(was, sku: id),
-                                  maxLines: 1, softWrap: false, style: gSub(dark: false).copyWith(decoration: TextDecoration.lineThrough))),
+                          Text(inr(was, sku: id),
+                              maxLines: 1, style: gSub(dark: false, color: kPInk).copyWith(decoration: TextDecoration.lineThrough)),
                       ]),
                     ),
                   ),
-                  const SizedBox(width: 6),
                   if (shown != null)
                     Semantics(
                       button: true,
