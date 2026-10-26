@@ -1,3 +1,4 @@
+import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -272,6 +273,8 @@ void main() {
 
     testWidgets('a new drop lands at the top of the hour (injected clock)', (t) async {
       var now = DateTime(2026, 10, 26, 15, 58);
+      DayClock.clock = () => now;
+      addTearDown(() => DayClock.clock = null);
       await boot(t, DropStudioScreen(clock: () => now));
       final all = ContentStore.instance.library;
       final before = dropWordsFor(all, now).first.word;
@@ -285,6 +288,62 @@ void main() {
       if (all.where((w) => w.meaning.isNotEmpty).length > kDropSize) expect(after, isNot(before));
       await finish(t);
     });
+    testWidgets('home entry turns over on the hour with Drop Studio (shared ticker)', (t) async {
+      var now = DateTime(2026, 10, 26, 11, 58);
+      DayClock.clock = () => now;
+      addTearDown(() => DayClock.clock = null);
+      await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {}, clock: () => now)])));
+      final all = ContentStore.instance.library;
+      String word() => t.widget<Text>(find.byKey(const ValueKey('drop-studio-entry-word'))).data!;
+      String chip() => (t.widget(find.byKey(const ValueKey('drop-studio-entry-chip'))) as dynamic).text as String;
+      expect(word(), dropWordsFor(all, now).first.word.toUpperCase());
+      expect(chip(), endsWith('MORNING'));
+      expect(DayClock.running, isTrue);
+      now = DateTime(2026, 10, 26, 12, 0, 1);
+      await t.pump(const Duration(minutes: 2, seconds: 1));
+      await t.pump();
+      expect(word(), dropWordsFor(all, now).first.word.toUpperCase());
+      expect(chip(), endsWith('AFTERNOON'));
+      await t.pumpWidget(const SizedBox());
+      expect(DayClock.running, isFalse, reason: 'last listener gone: the timer is cancelled');
+    });
+  });
+
+  group('Drop entry real-device fixes', () {
+    testWidgets('01:17 local reads NIGHT, not MORNING', (t) async {
+      final now = DateTime(2026, 10, 27, 1, 17);
+      DayClock.clock = () => now;
+      addTearDown(() => DayClock.clock = null);
+      await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {})])));
+      final chip = (t.widget(find.byKey(const ValueKey('drop-studio-entry-chip'))) as dynamic).text as String;
+      expect(chip, 'DROP STUDIO · NIGHT');
+      expect(dayPartFor(DateTime(2026, 1, 1, 1)), DayPart.night);
+      await t.pumpWidget(const SizedBox());
+    });
+    for (final w in [320.0, 360.0, 390.0, 412.0]) {
+      for (final s in [1.0, 1.3]) {
+        testWidgets('word whole + chip clear of STILLNESS at $w x$s', (t) async {
+          DayClock.clock = () => DateTime(2026, 10, 27, 1, 17);
+          addTearDown(() => DayClock.clock = null);
+          await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {})])), w: w, s: s);
+          final card = t.getRect(find.byKey(const ValueKey('drop-studio-entry')));
+          final wf = find.byKey(const ValueKey('drop-studio-entry-word'));
+          if (wf.evaluate().isNotEmpty) {
+            final fb = find.ancestor(of: wf, matching: find.byType(FittedBox)).first;
+            final r = t.getRect(fb);
+            expect(r.left >= card.left && r.right <= card.right && r.bottom <= card.bottom && r.top >= card.top, isTrue,
+                reason: 'word box $r inside card $card');
+          }
+          final chipBox = t.getRect(find.ancestor(
+              of: find.byKey(const ValueKey('drop-studio-entry-chip')), matching: find.byType(FittedBox)).first);
+          final still = find.byWidgetPredicate((x) => x.runtimeType.toString() == '_Poster' && (x as dynamic).id == 'entry.stillness');
+          final pr = t.getRect(still);
+          // poster tilts -0.14 rad: its raised corner sits ~11px above its box
+          expect(chipBox.bottom <= pr.top - 12, isTrue, reason: 'chip $chipBox vs poster $pr');
+          await t.pumpWidget(const SizedBox());
+        });
+      }
+    }
   });
 
   group('Fashion home', () {

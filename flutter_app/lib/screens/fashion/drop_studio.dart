@@ -246,7 +246,7 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
                 controller: _scroll,
                 padding: EdgeInsets.only(top: top + 64, bottom: dock + dockGap + safe + 28),
                 children: [
-                  _DropHero(scroll: _y, onTap: widget.onOpenDrop, debugTilt: widget.debugTilt),
+                  _DropHero(scroll: _y, onTap: widget.onOpenDrop, debugTilt: widget.debugTilt, now: _now()),
                   const SizedBox(height: 26),
                   _WordsDeck(
                     words: drop,
@@ -474,7 +474,8 @@ class _TypePoster extends StatelessWidget {
 }
 
 class _DropHero extends StatelessWidget {
-  const _DropHero({required this.scroll, this.onTap, this.debugTilt});
+  const _DropHero({required this.scroll, this.onTap, this.debugTilt, this.now});
+  final DateTime? now;
   final double scroll;
   final VoidCallback? onTap;
   final Offset? debugTilt;
@@ -593,7 +594,7 @@ class _DropHero extends StatelessWidget {
                     Positioned(
                       left: 14,
                       top: 14,
-                      child: _Chip(text: 'DROP · ${_hourLabel()}'),
+                      child: _Chip(text: 'DROP · ${_hourLabel(now)}'),
                     ),
                     Positioned(
                       right: 14,
@@ -618,7 +619,7 @@ class _DropHero extends StatelessWidget {
     );
   }
 
-  static String _hourLabel() => DayClock.part.label.toUpperCase();
+  static String _hourLabel([DateTime? at]) => dayPartFor(at ?? DayClock.now()).label.toUpperCase();
 }
 
 class _RingsPainter extends CustomPainter {
@@ -663,7 +664,7 @@ class _Kicker extends StatelessWidget {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({required this.text});
+  const _Chip({super.key, required this.text});
   final String text;
   @override
   Widget build(BuildContext context) => Container(
@@ -1428,10 +1429,30 @@ class _BuyDock extends StatelessWidget {
 /// yours" used to be: a small cut of the Drop hero — tilted posters behind
 /// the cut-out figure, the gold drop chip, and this hour's word in giant
 /// cropped type.
-class DropStudioEntry extends StatelessWidget {
+class DropStudioEntry extends StatefulWidget {
   const DropStudioEntry({super.key, this.onTap, this.clock});
   final VoidCallback? onTap;
   final DateTime Function()? clock;
+
+  @override
+  State<DropStudioEntry> createState() => _DropStudioEntryState();
+}
+
+class _DropStudioEntryState extends State<DropStudioEntry> {
+  @override
+  void initState() {
+    super.initState();
+    DayClock.retain();
+  }
+
+  @override
+  void dispose() {
+    DayClock.release();
+    super.dispose();
+  }
+
+  VoidCallback? get onTap => widget.onTap;
+  DateTime Function()? get clock => widget.clock;
 
   @override
   Widget build(BuildContext context) {
@@ -1458,15 +1479,16 @@ class DropStudioEntry extends StatelessWidget {
               boxShadow: const [BoxShadow(color: Color(0x80120428), blurRadius: 30, offset: Offset(0, 16))],
             ),
             child: ListenableBuilder(
-              listenable: ContentStore.instance,
+              listenable: Listenable.merge([ContentStore.instance, DayClock.tick]),
               builder: (context, _) {
-                final word = dropWordsFor(ContentStore.instance.library, (clock ?? DateTime.now)()).firstOrNull;
+                final now = clock?.call() ?? DayClock.now();
+                final word = dropWordsFor(ContentStore.instance.library, now).firstOrNull;
                 return Stack(clipBehavior: Clip.hardEdge, children: [
                   Positioned.fill(child: CustomPaint(painter: _RingsPainter(.42))),
                   // posters, far to near
                   const Positioned(
                     left: -22,
-                    top: 34,
+                    top: 66,
                     child: _Poster(asset: DropStudioAssets.stillness, id: 'entry.stillness', width: 150, angle: -.14),
                   ),
                   const Positioned(
@@ -1479,25 +1501,7 @@ class DropStudioEntry extends StatelessWidget {
                     bottom: 18,
                     child: _Poster(asset: DropStudioAssets.body, id: 'entry.body', width: 112, angle: .07),
                   ),
-                  // the word, giant and cropped by the card
-                  if (word != null)
-                    Positioned(
-                      left: -6,
-                      bottom: -26,
-                      child: Text(word.word.toUpperCase(),
-                          key: const ValueKey('drop-studio-entry-word'),
-                          softWrap: false,
-                          overflow: TextOverflow.visible,
-                          style: TextStyle(
-                              fontFamily: 'CormorantGaramond',
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white.withValues(alpha: .94),
-                              fontSize: 112,
-                              height: .8,
-                              letterSpacing: -3,
-                              shadows: const [Shadow(color: Color(0xAA000000), blurRadius: 18)])),
-                    ),
-                  // cut-out figure in front of everything
+                  // cut-out figure behind the word
                   const Positioned(
                     right: 6,
                     top: 14,
@@ -1510,7 +1514,42 @@ class DropStudioEntry extends StatelessWidget {
                         alignment: Alignment.bottomCenter,
                         filterQuality: FilterQuality.high),
                   ),
-                  Positioned(left: 14, top: 14, child: _Chip(text: 'DROP STUDIO · ${_DropHero._hourLabel()}')),
+                  // the word, giant: reads from its first letter and bleeds
+                  // off the right edge only
+                  if (word != null)
+                    Positioned(
+                      left: 14,
+                      right: 14,
+                      bottom: 10,
+                      child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.bottomLeft,
+                      child: Text(word.word.toUpperCase(),
+                          key: const ValueKey('drop-studio-entry-word'),
+                          softWrap: false,
+                          maxLines: 1,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.clip,
+                          style: TextStyle(
+                              fontFamily: 'CormorantGaramond',
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white.withValues(alpha: .94),
+                              fontSize: 112,
+                              height: .8,
+                              letterSpacing: -3,
+                              shadows: const [Shadow(color: Color(0xAA000000), blurRadius: 18)])),
+                    )),
+                  Positioned(
+                      left: 14,
+                      top: 14,
+                      right: 64,
+                      height: 34,
+                      child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.topLeft,
+                      child: _Chip(
+                          key: const ValueKey('drop-studio-entry-chip'),
+                          text: 'DROP STUDIO · ${_DropHero._hourLabel(now)}'))),
                   Positioned(
                     right: 14,
                     top: 14,
