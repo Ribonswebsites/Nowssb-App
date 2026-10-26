@@ -344,13 +344,14 @@ void main() {
           t,
           MediaQuery(
               data: const MediaQueryData(size: Size(390, 844), disableAnimations: true),
-              child: Scaffold(body: ListView(children: [DropStudioEntry(onTap: () => opened++)]))));
+              child: Scaffold(body: Align(alignment: Alignment.topCenter, child: DropStudioEntry(onTap: () => opened++)))));
       await t.tap(find.byKey(const ValueKey('drop-studio-entry-word')));
       await t.pump();
       expect(opened, 1);
       final entry = t.getRect(find.byKey(const ValueKey('drop-studio-entry')));
       await t.dragFrom(entry.bottomRight - const Offset(30, 30), const Offset(-60, -60));
-      expect(await t.pumpAndSettle(), lessThanOrEqualTo(6), reason: 'reduced motion: the peel snaps back, no spring');
+      await t.pump();
+      expect(t.binding.transientCallbackCount, 0, reason: 'reduced motion: no ticker runs after the peel is released');
       await t.pumpWidget(const SizedBox());
     });
     for (final w in [320.0, 360.0, 390.0, 412.0]) {
@@ -392,6 +393,8 @@ void main() {
         await t.ensureVisible(find.byKey(ValueKey('drop-prism-tab-$i')));
         await t.pump();
         await t.tap(find.byKey(ValueKey('drop-prism-tab-$i')));
+        await t.pump();
+        expect(t.binding.transientCallbackCount, 0, reason: 'reduced motion: the prism turns with no animation');
         await settle(t, 4);
         await t.tap(find.byKey(const ValueKey('drop-prism')));
         await t.pump();

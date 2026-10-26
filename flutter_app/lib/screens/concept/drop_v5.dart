@@ -181,7 +181,7 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                         behavior: HitTestBehavior.opaque,
                         onTap: () => _toFace(i),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 240),
+                          duration: Stillwater.still(context) ? Duration.zero : const Duration(milliseconds: 240),
                           constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
                           margin: const EdgeInsets.only(right: 8),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -191,8 +191,6 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                             border: Border.all(color: fr == i ? _gold : Colors.white24),
                           ),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
-                            Icon(_tabIcon(DoorKind.values[i]), size: 16, color: fr == i ? _gold : Colors.white54),
-                            const SizedBox(width: 6),
                             Text(doorTitle(DoorKind.values[i]),
                                 maxLines: 1,
                                 style: V4Type.sub().copyWith(
@@ -209,8 +207,6 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Container(width: 6, height: 6, decoration: const BoxDecoration(color: _gold, shape: BoxShape.circle)),
-                  const SizedBox(width: 8),
                   Text('Live now: ', style: V4Type.sub()),
                   Text(doorState(DoorKind.values[fr]), maxLines: 1, style: V4Type.sub().copyWith(color: Colors.white)),
                 ]),
@@ -223,12 +219,6 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
   }
 }
 
-IconData _tabIcon(DoorKind k) => switch (k) {
-      DoorKind.themes => Icons.dashboard_customize_rounded,
-      DoorKind.background => Icons.movie_filter_rounded,
-      DoorKind.startArt => Icons.image_rounded,
-      DoorKind.access => Icons.space_dashboard_rounded,
-    };
 
 class _Face extends StatelessWidget {
   const _Face({required this.kind, required this.w, required this.t, required this.isFront, required this.shade});
@@ -575,13 +565,13 @@ class _Face2 extends StatelessWidget {
           )),
           // bottom band: the only place the peel can reach. Meaning + link sit
           // left of the peel, so there is no dead gap under the word.
-          SizedBox(
-            height: _strip,
+          ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: _strip),
             child: Padding(
               padding: EdgeInsets.only(right: band - 4),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                 if (word != null)
-                  Flexible(child: Text(word!.meaning, maxLines: 3, overflow: TextOverflow.fade, style: V4Type.sub().copyWith(color: Colors.white))),
+                  Text(word!.meaning, style: V4Type.sub().copyWith(color: Colors.white)),
                 const SizedBox(height: 2),
                 ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 48),
