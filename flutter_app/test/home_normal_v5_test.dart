@@ -11,13 +11,15 @@ import 'package:nowssb/widgets/concept/normal/invite.dart';
 import 'package:nowssb/widgets/concept/normal/own.dart';
 import 'package:nowssb/widgets/concept/normal/partner.dart';
 import 'package:nowssb/widgets/concept/normal/rewards.dart';
+import 'package:nowssb/widgets/concept/normal/surface.dart';
 import 'package:nowssb/widgets/concept/normal/trending.dart';
 
 import 'support/home_render.dart';
 
+Finder _act(String l) => find.byWidgetPredicate(
+    (w) => (w is NPress && w.label == l) || (w is Semantics && w.properties.button == true && w.properties.label == l));
+
 Future<void> _pump(WidgetTester t, Widget child, {double w = 390, double ts = 1}) async {
-  final sem = t.ensureSemantics();
-  addTearDown(sem.dispose);
   t.view.physicalSize = Size(w * 3, 3000 * 3);
   t.view.devicePixelRatio = 3;
   addTearDown(t.view.reset);
@@ -48,15 +50,15 @@ void main() {
     final log = <String>[];
     await _pump(t, Column(children: _all(log)));
     Future<void> tap(String label) async {
-      final f = find.bySemanticsLabel(label);
+      final f = _act(label);
       await t.ensureVisible(f.first);
       await t.tap(f.first, warnIfMissed: false);
       await t.pump(const Duration(milliseconds: 600));
     }
 
     for (final l in ['Open rewards', 'Invite a friend', 'Open Om', 'Open Shanti', 'Everything you own',
-        'Join Resonance', 'Open partner program', 'Browse eBooks', 'Switch to Fashion Mode']) {
-      if (find.bySemanticsLabel(l).evaluate().isEmpty) continue;
+        'Join Frequency', 'Open partner program', 'Browse eBooks', 'Switch to Fashion Mode']) {
+      if (_act(l).evaluate().isEmpty) continue;
       await tap(l);
     }
     await t.ensureVisible(find.text('Open the library  →'));
@@ -65,7 +67,7 @@ void main() {
       await tap(l.$1);
     }
     await t.pump(const Duration(seconds: 1));
-    for (final want in ['rewards', 'invite', 'word:Om', 'word:Shanti', 'join:resonance', 'partner', 'ebooks', 'fashion', 'library',
+    for (final want in ['rewards', 'invite', 'word:Om', 'word:Shanti', 'join:frequency', 'partner', 'ebooks', 'fashion', 'library',
       for (final l in NFooter.links) 'foot:${l.$2}']) {
       expect(log, contains(want), reason: want);
     }
@@ -75,7 +77,7 @@ void main() {
     final log = <String>[];
     await _pump(t, NOwn(onCart: () => log.add('cart'), onWishlist: () => log.add('wish'), onOrders: () => log.add('orders')));
     for (final l in ['Cart', 'Wishlist', 'Orders']) {
-      await t.tap(find.bySemanticsLabel(l).first, warnIfMissed: false);
+      await t.tap(_act(l).first, warnIfMissed: false);
       await t.pump(const Duration(milliseconds: 600));
     }
     expect(log, ['cart', 'wish', 'orders']);
@@ -85,7 +87,7 @@ void main() {
     final log = <String>[];
     await _pump(t, NRewards(coins: 0, streak: 0, signedIn: false, onOpenRewards: () => log.add('r'), onSignIn: () => log.add('s')));
     expect(find.text('Sign in for rewards'), findsOneWidget);
-    await t.tap(find.bySemanticsLabel('Sign in').first, warnIfMissed: false);
+    await t.tap(_act('Sign in').first, warnIfMissed: false);
     await t.pump(const Duration(milliseconds: 600));
     expect(log, ['s']);
   });
