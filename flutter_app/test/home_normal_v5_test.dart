@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/widgets/concept/normal/ebooks.dart';
 import 'package:nowssb/widgets/concept/normal/edition.dart';
-import 'package:nowssb/widgets/concept/normal/fashion_switch.dart';
+import 'package:nowssb/widgets/concept/normal/fashion_plus_entry.dart';
 import 'package:nowssb/widgets/concept/normal/footer.dart';
 import 'package:nowssb/widgets/concept/normal/invite.dart';
 import 'package:nowssb/widgets/concept/normal/own.dart';
@@ -40,7 +40,7 @@ List<Widget> _all(List<String> log) => [
       NEdition(onJoin: (t) => log.add('join:$t'), prices: const {}, playAvailable: null),
       NPartner(points: 0, levels: null, onPartner: () => log.add('partner')),
       NEbooks(onBrowse: () => log.add('ebooks'), books: _books),
-      NFashionSwitch(onSwitch: () => log.add('fashion')),
+      NFashionPlusEntry(onEnter: () => log.add('fashion')),
       NFooter(onLink: (k) => log.add('foot:$k')),
     ];
 
@@ -57,7 +57,7 @@ void main() {
     }
 
     for (final l in ['Open rewards', 'Invite a friend', 'Open Om', 'Open Shanti', 'Everything you own',
-        'Join Frequency', 'Open partner program', 'Browse eBooks', 'Switch to Fashion Mode']) {
+        'Join Frequency', 'Open partner program', 'Browse eBooks', 'Enter Fashion Plus']) {
       if (_act(l).evaluate().isEmpty) continue;
       await tap(l);
     }
