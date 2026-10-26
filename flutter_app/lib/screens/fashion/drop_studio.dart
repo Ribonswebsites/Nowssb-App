@@ -72,7 +72,8 @@ class _DropStudioScreenState extends State<DropStudioScreen> {
     if (_busy) return;
     _busy = true;
     try {
-      await storeBuyNow(context, DropStudioScreen.item(w));
+      await storeBuyNow(context, DropStudioScreen.item(w),
+          checkout: (it) => DoorCheckoutScreen(items: [it]));
     } finally {
       _busy = false;
     }

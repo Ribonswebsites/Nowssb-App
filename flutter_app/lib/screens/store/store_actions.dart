@@ -83,6 +83,7 @@ Future<void> storeBuyNow(
   BagItem item, {
   GlobalKey? origin,
   GlobalKey? cartTarget,
+  Widget Function(BagItem item)? checkout,
 }) {
   return CartAddAnimation.playForContext(
     context,
@@ -95,7 +96,7 @@ Future<void> storeBuyNow(
       if (!context.mounted) return;
       // Buy Now = this one item on Google Play (the rest of the cart waits).
       Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => CheckoutPage(items: [item])));
+          .push(MaterialPageRoute<void>(builder: (_) => checkout?.call(item) ?? CheckoutPage(items: [item])));
     },
   );
 }

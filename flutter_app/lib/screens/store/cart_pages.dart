@@ -97,6 +97,29 @@ class WishlistPage extends StatelessWidget {
   }
 }
 
+/// The cart total as the checkout shows it (main's chip-inr money logic):
+/// what's still payable, or 'Included' when nothing is.
+String checkoutTotalLabel(List<BagItem> items) => _money(_payable(items));
+
+/// True when [it] needs no payment (free, owned or in the plan).
+bool checkoutLineOpen(BagItem it) {
+  final price = StorePrices.instance.priceFor(it.id, shown: it.price);
+  return price <= 0 || Entitlements.instance.ownsOrIncluded(it.id, price: price);
+}
+
+/// One line's price, 'Free' when it costs nothing.
+String checkoutPriceLabel(BagItem it) {
+  final price = StorePrices.instance.priceFor(it.id, shown: it.price);
+  return price <= 0 ? 'Free' : _money(price);
+}
+
+/// 'Free' / 'Owned' / 'In your plan' for an open line, else null.
+String? checkoutLineStatus(BagItem it) {
+  if (!checkoutLineOpen(it)) return null;
+  if (StorePrices.instance.priceFor(it.id, shown: it.price) <= 0) return 'Free';
+  return Entitlements.instance.ownsItem(it.id) ? 'Owned' : 'In your plan';
+}
+
 /// What the cart still costs: items not owned and not included in a plan.
 num _payable(List<BagItem> items) {
   final e = Entitlements.instance;

@@ -3,6 +3,7 @@ import 'package:nowssb/data/fashion_bg_dim.dart';
 import 'package:nowssb/data/home_widget_sync.dart';
 import 'package:nowssb/data/practice_progress.dart';
 import 'package:nowssb/screens/concept/doors/door_fashion_plus.dart';
+import 'package:nowssb/screens/concept/doors/door_checkout.dart';
 import 'package:nowssb/screens/concept/drop_v4_type.dart';
 import 'dart:math' as math;
 import 'package:nowssb/screens/concept/drop_v5.dart';
@@ -244,7 +245,19 @@ void main() {
       final got = CartBag.instance.cart.where((b) => b.id == 'word:${first.word.toLowerCase()}');
       expect(got, hasLength(1));
       expect(got.single.image, dropCutoutFor(first), reason: 'the bag shows the word\'s own cut-out');
-      expect(find.byType(CheckoutPage), findsOneWidget);
+      expect(find.byType(DoorCheckoutScreen), findsOneWidget);
+      final door = t.widget<DoorCheckout>(find.byType(DoorCheckout));
+      expect(door.items.map((l) => l.id), [got.single.id]);
+      expect(door.items.single.priceLabel, checkoutPriceLabel(got.single));
+      expect(door.totalLabel, checkoutTotalLabel([got.single]));
+      expect(door.cartCount, CartBag.instance.cart.length);
+      if (door.onPlaceOrder != null) {
+        door.onPlaceOrder!();
+        await settle(t, 2);
+        expect(find.byType(CheckoutPage), findsOneWidget, reason: 'Place order keeps the Google Play flow');
+      } else {
+        expect(door.allInPlan, isTrue);
+      }
     });
 
     testWidgets('bag opens Cart, a word opens WordDetail', (t) async {
@@ -260,6 +273,23 @@ void main() {
       await settle(t);
       expect(find.byType(WordDetail), findsOneWidget);
     });
+  });
+
+  testWidgets('Checkout door dock reads just TOTAL at 320@1.3', (t) async {
+    t.view.physicalSize = const Size(320 * 3, 690 * 3);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(
+        home: MediaQuery(
+            data: const MediaQueryData(size: Size(320, 690), textScaler: TextScaler.linear(1.3)),
+            child: DoorCheckout(
+                items: const [DoorLine(id: 'word:surya', title: 'Surya', kind: 'Word', priceLabel: '₹99', image: 'assets/video/earth-night-poster.webp')],
+                totalLabel: '₹99',
+                debugPhase: 0))));
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.text('TOTAL'), findsOneWidget);
+    expect(find.text('TOTAL · GOOGLE PLAY'), findsNothing);
+    await t.pumpWidget(const SizedBox());
   });
 
   group('drop logic', () {
@@ -280,7 +310,7 @@ void main() {
       });
       await settle(t, 30);
       expect(CartBag.instance.cart.where((b) => b.id == 'word:${first.word.toLowerCase()}'), hasLength(1));
-      expect(find.byType(CheckoutPage), findsOneWidget);
+      expect(find.byType(DoorCheckoutScreen), findsOneWidget);
     });
 
     testWidgets('the bar follows the deck: word, price and buy', (t) async {

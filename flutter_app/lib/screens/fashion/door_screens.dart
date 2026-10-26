@@ -24,6 +24,12 @@ import '../quick_access.dart';
 import '../concept/doors/door_access.dart';
 import '../concept/doors/door_background.dart';
 import '../concept/doors/door_fashion_plus.dart';
+import '../concept/doors/door_checkout.dart';
+import '../../data/cart_bag.dart';
+import '../../data/entitlements.dart';
+import '../../data/store_prices.dart';
+import '../store/cart_pages.dart';
+import '../../shell/nwsb_links.dart';
 import '../concept/doors/door_start_art.dart';
 
 /// Background door → film picker. Writes Settings.fashionVideoIndex and the
@@ -297,6 +303,74 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
             onJump: _jump,
             onMake: _jump,
             onToggle: _toggle,
+          );
+        },
+      );
+}
+
+/// Checkout door: the cart (or a Buy-now item) as the card stack, total from
+/// main's chip-inr money logic. It writes nothing itself: "Place order"
+/// opens CheckoutPage for the payable lines (Google Play flow); an all-in-plan
+/// bag's "Add to library" takes the open lines out of the cart (like Done).
+class DoorCheckoutScreen extends StatefulWidget {
+  const DoorCheckoutScreen({super.key, this.items, this.debugPhase, this.debugFront});
+
+  /// Just these (Buy now); null = the whole cart.
+  final List<BagItem>? items;
+  final double? debugPhase;
+  final int? debugFront;
+
+  @override
+  State<DoorCheckoutScreen> createState() => _DoorCheckoutScreenState();
+}
+
+class _DoorCheckoutScreenState extends State<DoorCheckoutScreen> {
+  late List<BagItem>? _only = widget.items == null ? null : [...widget.items!];
+  List<BagItem> get _items => _only ?? CartBag.instance.cart;
+
+  void _push(Widget page) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Listenable.merge([CartBag.instance, Entitlements.instance, StorePrices.instance]),
+        builder: (context, _) {
+          final items = _items;
+          final toBuy = [for (final it in items) if (!checkoutLineOpen(it)) it];
+          return DoorCheckout(
+            items: [
+              for (final it in items)
+                DoorLine(
+                  id: it.id,
+                  title: it.title,
+                  kind: it.kind,
+                  priceLabel: checkoutPriceLabel(it),
+                  image: it.image,
+                  meaning: it.subtitle.isEmpty ? null : it.subtitle,
+                  status: checkoutLineStatus(it),
+                  included: checkoutLineOpen(it),
+                ),
+            ],
+            totalLabel: checkoutTotalLabel(items),
+            cartCount: CartBag.instance.cart.length,
+            debugPhase: widget.debugPhase,
+            debugFront: widget.debugFront,
+            onBack: () => Navigator.of(context).maybePop(),
+            onOpenCart: () => NwsbLinks.cart(context),
+            onOpenWishlist: () => _push(const WishlistPage()),
+            onRemove: (id) {
+              if (_only != null) {
+                setState(() => _only = [for (final b in _only!) if (b.id != id) b]);
+              } else {
+                CartBag.instance.removeCart(id);
+              }
+            },
+            onPlaceOrder: toBuy.isEmpty ? null : () => _push(CheckoutPage(items: toBuy)),
+            onAddToLibrary: () {
+              for (final it in items) {
+                if (checkoutLineOpen(it)) CartBag.instance.removeCart(it.id);
+              }
+              Navigator.of(context).maybePop();
+            },
           );
         },
       );
