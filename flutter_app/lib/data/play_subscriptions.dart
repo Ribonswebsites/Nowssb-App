@@ -30,6 +30,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../features/economy/economy_api.dart';
+import '../features/economy/money.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:http/http.dart' as http;
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -158,6 +159,7 @@ class PlaySubscriptions extends ChangeNotifier {
       _base.clear();
       _buy.clear();
       for (final d in r.productDetails) {
+        FxBook.instance.notePlayCurrency(d.currencyCode);
         if (d is GooglePlayProductDetails && d.subscriptionIndex != null) {
           final offers = d.productDetails.subscriptionOfferDetails;
           final offer = offers == null ? null : offers[d.subscriptionIndex!];

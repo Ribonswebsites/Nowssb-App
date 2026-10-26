@@ -19,6 +19,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../features/economy/money.dart';
+import '../../features/economy/play_billing.dart' show PlayCheckout;
 import 'store_actions.dart';
 import '../../data/entitlements.dart';
 import '../../data/store_prices.dart';
@@ -36,8 +37,11 @@ String money(num value) {
 num get kWordPriceInr => StorePrices.instance.defaultFor('word');
 num get kWordSaleInr => kWordPriceInr;
 
-String localizedMoney(BuildContext context, num inrValue) {
+/// [sku]: the Play product id, when known. Play's own localized price wins.
+String localizedMoney(BuildContext context, num inrValue, {String? sku}) {
   if (inrValue <= 0) return 'Included';
+  final play = sku == null ? null : PlayCheckout.cachedPrice(sku);
+  if (play != null) return play;
   return FxBook.instance.formatPrice(inrValue);
 }
 

@@ -30,6 +30,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/billing_config.dart';
 import '../../data/play_subscriptions.dart';
 import 'economy_api.dart';
+import 'money.dart';
 
 class PlayCheckout {
   PlayCheckout._();
@@ -82,6 +83,9 @@ class PlayCheckout {
     }
   }
 
+  /// Play's own localized price for [productId], once it has been loaded.
+  static String? cachedPrice(String productId) => _prices[productId];
+
   static Future<String> priceLabel(String productId) async {
     final cached = _prices[productId];
     if (cached != null) return cached;
@@ -91,6 +95,7 @@ class PlayCheckout {
       if (response.productDetails.isEmpty) return 'Play price';
       final label = response.productDetails.first.price;
       _prices[productId] = label;
+      FxBook.instance.notePlayCurrency(response.productDetails.first.currencyCode);
       return label;
     } catch (_) {
       return 'Play price';

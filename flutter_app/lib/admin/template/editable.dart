@@ -18,6 +18,7 @@
 /// See lib/admin/README.md.
 library;
 
+import '../../theme/contrast.dart';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -152,6 +153,7 @@ class EditableLabel extends StatelessWidget {
     super.key,
     this.id,
     this.style,
+    this.legibleOn,
     this.strutStyle,
     this.textAlign,
     this.textDirection,
@@ -187,6 +189,11 @@ class EditableLabel extends StatelessWidget {
   final TextHeightBehavior? textHeightBehavior;
   final Color? selectionColor;
 
+  /// The (opaque) colour this label sits on. When set, a UI-editor colour
+  /// override that would read below 4.5:1 on it is ignored and the code's
+  /// own colour is kept, so a saved look can never make the label vanish.
+  final Color? legibleOn;
+
   String get slotKey => '$slot.${id ?? slotSlug(data)}';
 
   @override
@@ -199,9 +206,14 @@ class EditableLabel extends StatelessWidget {
     // truth); its overrides still restyle it.
     final text = (o != null && o.type == SlotType.text && o.textSet && !isTemplateSlot(key)) ? o.text : data;
     final look = o?.style ?? const <String, dynamic>{};
+    var resolved = look.isEmpty ? style : applyTextLook(style, look);
+    final on = legibleOn, own = style?.color, got = resolved?.color;
+    if (on != null && own != null && got != null) {
+      resolved = resolved!.copyWith(color: legibleOr(got, on, own));
+    }
     Widget child = Text(
       text,
-      style: look.isEmpty ? style : applyTextLook(style, look),
+      style: resolved,
       strutStyle: strutStyle,
       textAlign: textAlign,
       textDirection: textDirection,

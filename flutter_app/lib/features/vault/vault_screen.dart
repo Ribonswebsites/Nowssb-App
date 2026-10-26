@@ -1,3 +1,4 @@
+import '../../widgets/nwsb_choice_chip.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -360,16 +361,12 @@ class _MilestoneFormState extends State<_MilestoneForm> {
           children: [
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (final w in words)
-                ChoiceChip(
+                NwsbChoiceChip(
                   label: Text(w),
                   selected: w == pick,
                   onSelected: (_) => setState(() => _word = w),
-                  labelStyle: TextStyle(color: w == pick ? Colors.black : Colors.white, fontWeight: FontWeight.w700),
-                  selectedColor: NwsbColors.goldLight,
-                  backgroundColor: const Color(0x14FFFFFF),
-                  side: const BorderSide(color: Color(0x44E4C56A)),
-                  shape: const StadiumBorder(),
                   showCheckmark: false,
+                  fontSize: 14,
                 ),
             ]),
             const SizedBox(height: 8),

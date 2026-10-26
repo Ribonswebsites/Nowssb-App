@@ -1,19 +1,17 @@
 /// Local currency display for a global app.
 ///
-/// Every price is shown in the user's own currency. The country comes from
-/// the device location (only when location permission is already granted;
-/// the app never prompts for it here), else the device locale region. No
-/// third-party IP lookup. Exchange rates come from Firestore `config/fx` (`rates`: units per
+/// Every price is shown in the user's own currency: Google Play's quoted
+/// currency when known, else the country from the network time zone and
+/// the device locales (no location, no IP lookup), else INR. Exchange rates come from Firestore `config/fx` (`rates`: units per
 /// 1 USD). Catalogue amounts are stored in "base units" (the Play price
 /// tier values); `config/fx.baseCurrency` + its rate convert them to USD.
 library;
 
-import 'dart:ui' show PlatformDispatcher;
+import 'dart:io' as io;
+import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 import '../../data/firebase.dart';
@@ -39,13 +37,74 @@ class FxBook extends ChangeNotifier {
   /// ISO country of the user (device region, refined by IP lookup).
   String? country;
 
+  /// Located country, else the device's (zone/locales), live each read.
+  String? get region => country ?? _deviceCountry();
+
+  /// Currency Google Play itself quotes this account in (from any
+  /// ProductDetails the app has loaded). The most trustworthy signal: it is
+  /// the currency the user will actually be charged in.
+  String? playCurrency;
+
+  /// Records the currency of a Play [ProductDetails] price.
+  void notePlayCurrency(String? code) {
+    final c = code?.trim().toUpperCase();
+    if (c == null || !RegExp(r'^[A-Z]{3}$').hasMatch(c) || c == playCurrency) return;
+    playCurrency = c;
+    notifyListeners();
+  }
+
+  /// Time-zone offsets that belong to exactly one market. The phone's zone
+  /// is set by the mobile network, so this is the SIM/network region even
+  /// when the language is English (United States). +05:30 is India (Sri
+  /// Lanka shares it; a phone whose locale says LK keeps LK).
+  static const _zoneCountry = {330: 'IN'};
+
+  /// The user's country, from (in order) the network time zone, then any preferred locale that names a region. Null = unknown.
+  ///
+  /// Root cause of '\$1.18' on India phones: this used to read only
+  /// `PlatformDispatcher.locale.countryCode`, and most Indian phones run
+  /// English (United States), so the region came back 'US'.
+  static String? resolveCountry({
+    required List<Locale> locales,
+    required Duration tzOffset,
+    String? platformLocale,
+  }) {
+    final regions = [
+      for (final l in locales)
+        if ((l.countryCode ?? '').isNotEmpty) l.countryCode!.toUpperCase(),
+    ];
+    // Android's java default locale (Platform.localeName, e.g. 'en_IN' or
+    // 'en-IN.UTF-8') can carry the region when PlatformDispatcher's list
+    // is a bare 'en'.
+    final m = RegExp(r'^[a-zA-Z]{2,3}[_-]([a-zA-Z]{2})\b').firstMatch(platformLocale ?? '');
+    if (m != null && !regions.contains(m.group(1)!.toUpperCase())) {
+      regions.add(m.group(1)!.toUpperCase());
+    }
+    final zone = _zoneCountry[tzOffset.inMinutes];
+    if (zone != null && !(zone == 'IN' && regions.contains('LK'))) return zone;
+    return regions.isEmpty ? null : regions.first;
+  }
+
+  String? _deviceCountry() => resolveCountry(
+        locales: PlatformDispatcher.instance.locales,
+        tzOffset: DateTime.now().timeZoneOffset,
+        platformLocale: _platformLocaleName(),
+      );
+
+  static String? _platformLocaleName() {
+    if (kIsWeb) return null;
+    try {
+      return io.Platform.localeName;
+    } catch (_) {
+      return null;
+    }
+  }
+
   bool started = false;
 
   Future<void> start() async {
-    country ??= PlatformDispatcher.instance.locale.countryCode;
     if (started) return;
     started = true;
-    _lookupCountry();
     if (!NwsbFirebase.ready) return;
     FirebaseFirestore.instance.doc('config/fx').snapshots().listen((snap) {
       final data = snap.data() ?? const <String, dynamic>{};
@@ -64,36 +123,34 @@ class FxBook extends ChangeNotifier {
     }, onError: (Object e) => debugPrint('NowssB fx: $e'));
   }
 
-  Future<void> _lookupCountry() async {
-    try {
-      final perm = await Geolocator.checkPermission();
-      if (perm != LocationPermission.always && perm != LocationPermission.whileInUse) return;
-      final pos = await Geolocator.getLastKnownPosition() ??
-          await Geolocator.getCurrentPosition(
-              locationSettings: const LocationSettings(accuracy: LocationAccuracy.low, timeLimit: Duration(seconds: 8)));
-      final marks = await Geocoding().placemarkFromCoordinates(pos.latitude, pos.longitude);
-      final c = marks.isEmpty ? null : marks.first.isoCountryCode?.toUpperCase();
-      if (c != null && RegExp(r'^[A-Z]{2}$').hasMatch(c) && c != country) {
-        country = c;
-        notifyListeners();
-      }
-    } catch (_) {}
-  }
-
   String _locale([String? locale]) {
     if (locale != null) return locale.replaceAll('-', '_');
     final l = PlatformDispatcher.instance.locale;
-    final c = country ?? l.countryCode;
+    final c = country ?? _deviceCountry();
     return c == null || c.isEmpty ? l.languageCode : '${l.languageCode}_$c';
   }
 
-  /// ISO currency code for the user's country (or [locale]).
+  /// Currency of a region code like 'IN' (null when intl has no data).
+  static String? currencyOfCountry(String country, {String language = 'en'}) {
+    for (final loc in ['${language}_$country', 'en_$country']) {
+      try {
+        final name = NumberFormat.simpleCurrency(locale: loc).currencyName;
+        if (name != null && name.length == 3) return name.toUpperCase();
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  /// ISO currency code for the user (or for an explicit [locale] such as
+  /// 'en_IN'). Order: Google Play's own currency, then the region. With no
+  /// region at all ('en' alone) it falls back to [baseCurrency] (INR): the
+  /// catalogue is authored in it, so the number is exact, never converted.
   String codeFor([String? locale]) {
-    try {
-      final name = NumberFormat.simpleCurrency(locale: _locale(locale)).currencyName;
-      if (name != null && name.length == 3) return name.toUpperCase();
-    } catch (_) {}
-    return 'USD';
+    if (locale == null && playCurrency != null) return playCurrency!;
+    final loc = _locale(locale).split('_');
+    final region = loc.length > 1 ? loc.last.toUpperCase() : null;
+    if (region == null || region.isEmpty) return baseCurrency;
+    return currencyOfCountry(region, language: loc.first) ?? baseCurrency;
   }
 
   /// [cents] are USD cents, shown in local currency with its local symbol.
@@ -108,12 +165,28 @@ class FxBook extends ChangeNotifier {
         return NumberFormat.simpleCurrency(name: c);
       }
     }
-    if (rate == null) return fmt('USD').format(cents / 100);
+    if (rate == null) {
+      // No rate for the local currency: show the exact base amount rather
+      // than a guessed conversion.
+      final perUsd = rates[baseCurrency];
+      if (perUsd != null) return fmt(baseCurrency).format((cents / 100) * perUsd);
+      return fmt('USD').format(cents / 100);
+    }
     return fmt(code).format((cents / 100) * rate);
   }
 
   /// A stored catalogue amount (base units) shown in local currency.
   String formatPrice(num amount, {String? locale}) {
+    // Same currency as the catalogue: show the stored amount exactly (no
+    // round trip through USD cents, which turned ₹99 into ₹99.12).
+    if (codeFor(locale) == baseCurrency) {
+      final loc = _locale(locale);
+      try {
+        return NumberFormat.simpleCurrency(name: baseCurrency, locale: loc).format(amount);
+      } catch (_) {
+        return NumberFormat.simpleCurrency(name: baseCurrency).format(amount);
+      }
+    }
     final perUsd = rates[baseCurrency] ?? 1;
     return formatCents(((amount / perUsd) * 100).round(), locale: locale);
   }

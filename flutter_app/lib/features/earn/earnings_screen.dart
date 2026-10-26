@@ -34,7 +34,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   String _method = 'wise';
   // ignore: unused_field
   String _filter = 'all';
-  late String _country = _countries.any((c) => c.$1 == FxBook.instance.country) ? FxBook.instance.country! : 'XX';
+  late String _country = _countries.any((c) => c.$1 == FxBook.instance.region) ? FxBook.instance.region! : 'XX';
 
   static const _countries = <(String, String)>[
     ('IN', 'India — bank / UPI, INR'),

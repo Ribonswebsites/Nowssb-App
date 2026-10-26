@@ -186,7 +186,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     style: TextStyle(color: Color(0x99FFFFFF)),
                   ),
                 )
-              else
+              else ...[
+                _CheckoutSummary(
+                  total: items.length,
+                  toPay: toBuy.length,
+                ),
                 for (final it in items)
                   _CheckoutRow(
                     item: it,
@@ -199,6 +203,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 : 'In your plan')
                         : null,
                   ),
+              ],
               const SizedBox(height: 10),
               const EditableLabel('cart_pages.CheckoutPage',
                 'HOW YOU PAY',
@@ -241,7 +246,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
               if (toBuy.isEmpty && items.isNotEmpty)
                 _GoldBtn(
                   label: 'Done',
-                  onTap: () => Navigator.of(context).pop(),
+                  // Free / owned / in-plan items need no payment: Done takes
+                  // them out of the cart (badge follows CartBag).
+                  onTap: () {
+                    for (final it in items) {
+                      if (_open(it)) CartBag.instance.removeCart(it.id);
+                    }
+                    Navigator.of(context).maybePop();
+                  },
                 )
               else if (toBuy.isNotEmpty)
                 _GoldBtn(
@@ -256,6 +268,47 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ),
     );
   }
+}
+
+/// One line that says what is in the cart and what (if anything) is owed,
+/// so an 'In your plan' row is never read as something left to buy.
+class _CheckoutSummary extends StatelessWidget {
+  const _CheckoutSummary({required this.total, required this.toPay});
+  final int total;
+  final int toPay;
+
+  static String text(int total, int toPay) {
+    final free = total - toPay;
+    String n(int c) => '$c item${c == 1 ? '' : 's'}';
+    if (toPay == 0) {
+      return '${n(total)} in your cart. Nothing to pay: ${total == 1 ? 'it is' : 'they are'} already yours.';
+    }
+    if (free == 0) return '${n(total)} in your cart, ${n(toPay)} to pay for.';
+    return '${n(total)} in your cart: ${n(toPay)} to pay for, ${n(free)} already yours (nothing to pay).';
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('checkout-summary'),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: const Color(0xCC0B0A14),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: toPay == 0 ? const Color(0x80A5D6A7) : const Color(0x44E4C56A)),
+        ),
+        child: Row(
+          children: [
+            Icon(toPay == 0 ? Icons.check_circle_rounded : Icons.shopping_bag_outlined,
+                size: 18, color: toPay == 0 ? const Color(0xFFA5D6A7) : NwsbColors.goldLight),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(text(total, toPay),
+                  style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600, height: 1.35)),
+            ),
+          ],
+        ),
+      );
 }
 
 class _CheckoutRow extends StatelessWidget {
@@ -292,7 +345,9 @@ class _CheckoutRow extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                Text('${item.kind} · $price',
+                // A row that is Free / Owned / In your plan is not for sale:
+                // it never shows a price.
+                Text(state == null ? '${item.kind} · $price' : '${item.kind} · nothing to pay',
                     style: const TextStyle(fontSize: 11, color: Color(0x80FFFFFF))),
               ],
             ),

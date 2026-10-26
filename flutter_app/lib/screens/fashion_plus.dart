@@ -10,6 +10,7 @@
 /// and it is the honest one — "7 changes · Fashion home · Off by default".
 library;
 
+import '../widgets/nwsb_choice_chip.dart';
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
@@ -325,17 +326,10 @@ class _BackgroundChoice extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => ChoiceChip(
+  Widget build(BuildContext context) => NwsbChoiceChip(
         label: EditableLabel('fashion_plus.BackgroundChoice', label),
         selected: selected,
         onSelected: (_) => onTap(),
-        selectedColor: NwsbColors.goldLight,
-        backgroundColor: const Color(0x1FFFFFFF),
-        labelStyle: TextStyle(
-          color: selected ? NwsbColors.deep : Colors.white,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-        ),
       );
 }
 

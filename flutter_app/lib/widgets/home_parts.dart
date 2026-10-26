@@ -485,10 +485,13 @@ class _NcbCarouselState extends State<NcbCarousel> {
 
 /// The white "Enter →" chip.
 class EnterPill extends StatelessWidget {
-  const EnterPill({super.key, this.label = 'Enter', this.onTap});
+  const EnterPill({super.key, this.label = 'Enter', this.onTap, this.on = const Color(0xFF0B0A12)});
 
   final String label;
   final VoidCallback? onTap;
+
+  /// What the label sits on (dark by default): keeps 'Enter' >= 4.5:1.
+  final Color on;
 
   @override
   Widget build(BuildContext context) {
@@ -500,6 +503,7 @@ class EnterPill extends StatelessWidget {
         children: [
           EditableLabel('home_parts.EnterPill',
             label,
+            legibleOn: on,
             style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
