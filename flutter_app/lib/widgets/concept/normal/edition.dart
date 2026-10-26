@@ -51,41 +51,50 @@ class _NEditionState extends State<NEdition> with SingleTickerProviderStateMixin
         Text(curName == null ? 'Tune your plan' : 'You are on $curName', style: nHello),
         const Text('NowssB Edition', style: nTitle),
         const SizedBox(height: 14),
-        // tuning band
-        Container(height: 104, decoration: neu(r: 20, pressed: true), padding: const EdgeInsets.fromLTRB(10, 8, 10, 6),
-          child: LayoutBuilder(builder: (c, k) => AnimatedBuilder(animation: loop, builder: (_, __) => Stack(children: [
-            Positioned.fill(child: CustomPaint(painter: _Band(t: loop.value))),
-            AnimatedPositioned(duration: const Duration(milliseconds: 420), curve: Curves.easeOutBack,
-              left: (k.maxWidth / 3) * (idx + .5) - 1.5, top: 0, bottom: 44, width: 3,
-              child: Container(decoration: BoxDecoration(color: const Color(0xFFE0553A), borderRadius: BorderRadius.circular(2)))),
-            Positioned(left: 0, right: 0, bottom: 0, child: Builder(builder: (c) {
-              // one shared size for all three tabs: fit the widest label
-              // (bold, "Frequency X") into a third, then use it for every tab.
-              final ts = MediaQuery.textScalerOf(c);
-              final base = nSub.fontSize ?? 12.5;
-              final widest = NEdition.plans.map((p) => (TextPainter(text: TextSpan(text: p.$2,
-                  style: DefaultTextStyle.of(c).style.merge(nSub.copyWith(fontWeight: FontWeight.w800))), textDirection: TextDirection.ltr, textScaler: ts)..layout()).width)
-                  .reduce(math.max);
-              final fs = base * math.min(1.0, (k.maxWidth / 3 - 8) / widest);
-              return Row(children: [
-              for (final p in NEdition.plans)
-                Expanded(child: Semantics(button: true, selected: p.$1 == _sel, label: p.$2, child: GestureDetector(
-                  behavior: HitTestBehavior.opaque, onTap: () => setState(() => _sel = p.$1),
-                  child: ConstrainedBox(constraints: const BoxConstraints(minHeight: 44), child: Center(
-                    child: Text(p.$2, maxLines: 1, softWrap: false, style: nSub.copyWith(fontSize: fs,
-                        color: p.$1 == _sel ? nInk : nSubInk, fontWeight: p.$1 == _sel ? FontWeight.w800 : FontWeight.w400))))))),
-            ]);
-            })),
-          ])))),
+        // tuning band. Tab labels stay at full size (B012): when the widest
+        // one does not fit a third of the band, the tabs stack instead.
+        LayoutBuilder(builder: (c, k) {
+          final ts = MediaQuery.textScalerOf(c);
+          final bold = DefaultTextStyle.of(c).style.merge(nSub.copyWith(fontWeight: FontWeight.w800));
+          final widest = NEdition.plans.map((p) => (TextPainter(text: TextSpan(text: p.$2, style: bold),
+              textDirection: TextDirection.ltr, textScaler: ts)..layout()).width).reduce(math.max);
+          final inner = k.maxWidth - 20;
+          final stacked = widest + 12 > inner / 3;
+          Widget tab((String, String) p) => Semantics(button: true, selected: p.$1 == _sel, label: p.$2,
+              child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: () => setState(() => _sel = p.$1),
+                child: ConstrainedBox(constraints: const BoxConstraints(minHeight: 44), child: Container(
+                  alignment: Alignment.center,
+                  decoration: stacked && p.$1 == _sel ? neu(r: 14) : null,
+                  child: Text(p.$2, textAlign: TextAlign.center, style: nSub.copyWith(
+                      color: p.$1 == _sel ? nInk : nSubInk, fontWeight: p.$1 == _sel ? FontWeight.w800 : FontWeight.w400))))));
+          return Container(decoration: neu(r: 20, pressed: true), padding: const EdgeInsets.fromLTRB(10, 8, 10, 6),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              SizedBox(height: 54, child: AnimatedBuilder(animation: loop, builder: (_, __) => Stack(children: [
+                Positioned.fill(child: CustomPaint(painter: _Band(t: loop.value))),
+                if (!stacked)
+                  AnimatedPositioned(duration: const Duration(milliseconds: 420), curve: Curves.easeOutBack,
+                    left: (inner / 3) * (idx + .5) - 1.5, top: 0, bottom: 0, width: 3,
+                    child: Container(decoration: BoxDecoration(color: const Color(0xFFE0553A), borderRadius: BorderRadius.circular(2)))),
+              ]))),
+              if (stacked)
+                for (final p in NEdition.plans) tab(p)
+              else
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [for (final p in NEdition.plans) Expanded(child: tab(p))]),
+            ]));
+        }),
         const SizedBox(height: 10),
+        // The user's own plan: no price above Manage.
+        if (cur == _sel)
+          const SizedBox.shrink()
         // non-breaking spaces keep "Google Play" / "/ month" together at 320
-        if (price != null)
-          Text('$name · $price\u00A0/\u00A0month', style: nSub.copyWith(color: nInk, fontWeight: FontWeight.w700))
+        else if (price != null)
+          Text('$name · $price\u00A0/\u00A0month', key: const ValueKey('edition-price'), style: nSub.copyWith(color: nInk, fontWeight: FontWeight.w700))
         else if (widget.playAvailable == false)
           Text('$name · Price\u00A0on\u00A0Google\u00A0Play', style: nSub)
         else
-          Row(children: [
-            Flexible(child: Text('$name · ', style: nSub)),
+          // price still loading: no '·' until it arrives
+          Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+            Text(name, style: nSub),
             AnimatedBuilder(animation: loop, builder: (_, __) => Container(width: 74, height: 12,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(6), gradient: LinearGradient(
                 begin: Alignment(-1 + 3 * loop.value - 1, 0), end: Alignment(3 * loop.value - 1, 0),
@@ -110,7 +119,7 @@ class _Band extends CustomPainter {
   final double t;
   @override
   void paint(Canvas c, Size s) {
-    final h = s.height - 44;
+    final h = s.height - 4;
     for (var x = 0.0; x <= s.width; x += 6) {
       final major = (x / 6).round() % 5 == 0;
       final f = ((x / s.width) - t).abs();
