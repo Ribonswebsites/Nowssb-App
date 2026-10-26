@@ -9,6 +9,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'neomorphic_dashboard.dart' show FocusBlob;
 
 import '../../admin/template/editable.dart' show EditableLabel;
 import '../../data/content.dart';
@@ -269,6 +270,11 @@ class CalmToday extends StatelessWidget {
           return _Calm(
             key: const ValueKey('cv3-today'),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // bcb6baf design: the overlapping purple circles on the right.
+              Stack(clipBehavior: Clip.none, children: [
+              Padding(
+              padding: const EdgeInsets.only(right: 78),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Text('TODAY', style: _eyebrow),
               const SizedBox(height: 10),
               Row(children: [
@@ -298,6 +304,10 @@ class CalmToday extends StatelessWidget {
                         style: _sub),
                   ]),
                 ),
+              ]),
+              ]),
+              ),
+              const Positioned(right: -10, top: -10, child: FocusBlob()),
               ]),
               const SizedBox(height: 16),
               Wrap(spacing: 8, runSpacing: 8, children: [

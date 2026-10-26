@@ -147,7 +147,7 @@ class _FocusCard extends StatelessWidget {
               ],
             ),
           ),
-          const Positioned(right: -4, top: -4, child: _FocusBlob()),
+          const Positioned(right: -4, top: -4, child: FocusBlob()),
         ],
       ),
     );
@@ -165,8 +165,9 @@ class _FocusDot extends StatelessWidget {
       );
 }
 
-class _FocusBlob extends StatelessWidget {
-  const _FocusBlob();
+/// The overlapping purple circles on the right of 'Today's practice'.
+class FocusBlob extends StatelessWidget {
+  const FocusBlob({super.key});
 
   @override
   Widget build(BuildContext context) {

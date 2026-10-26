@@ -325,8 +325,8 @@ class _HomeNormalState extends State<HomeNormal> {
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
   List<(String, Widget?)> _sections() => [
-        ('greet', CalmGreeting(name: widget.name)),
-        ('search', CalmSearch(onTap: () => _go(2))),
+        ('greet', NmGreeting(name: widget.name)),
+        ('search', NmSearch(onSearch: (_) => _go(2))),
         ('promoRail', const SizedBox.shrink()),
         (
           'dashboard',
@@ -359,7 +359,7 @@ class _HomeNormalState extends State<HomeNormal> {
                 padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
                 child: TrioRail(),
               ),
-              const V4Essentials(),
+              const NmSuppliedEssentials(),
             ],
           ),
         ),
@@ -381,7 +381,7 @@ class _HomeNormalState extends State<HomeNormal> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
-            V4WhereToBegin(options: MainOptionsSection.options, onAction: _openMainOption),
+            MainOptionsSection(onGo: _go, onAction: _openMainOption),
           ],
         )),
         (

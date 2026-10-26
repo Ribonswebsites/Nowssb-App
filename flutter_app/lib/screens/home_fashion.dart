@@ -62,6 +62,7 @@ import 'daily_tasks.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
+import 'normal/home_v4.dart' show kRewardsLottie, kCoinsLottie, kGiftLottie, kSpeakerLottie;
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -393,15 +394,15 @@ class _HomeFashionState extends State<HomeFashion> {
 
   /// Pool for the daily 8-card quick row; every entry opens a real page.
   List<QuickCard> _quickPool() => [
-        QuickCard('rewards', 'Rewards', 'Your coins & perks', Icons.workspace_premium_rounded, () => _push(const RewardsProgramPage())),
-        QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const EarnHubScreen())),
-        QuickCard('gifts', 'Gifts', 'Send or redeem', Icons.card_giftcard_rounded, () => _push(const GiftsScreen())),
+        QuickCard('rewards', 'Rewards', 'Your coins & perks', Icons.workspace_premium_rounded, () => _push(const RewardsProgramPage()), lottie: kRewardsLottie),
+        QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const EarnHubScreen()), lottie: kCoinsLottie),
+        QuickCard('gifts', 'Gifts', 'Send or redeem', Icons.card_giftcard_rounded, () => _push(const GiftsScreen()), lottie: kGiftLottie),
         QuickCard('coupons', 'Coupons', 'Deals for you', Icons.local_offer_rounded, () => _push(const CouponScreen())),
         QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
         QuickCard('progress', 'Progress', 'Today at a glance', Icons.donut_large_rounded, () => ProgressPanel.open(context)),
         QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1)),
         QuickCard('tasks', 'Daily tasks', 'Tick off today', Icons.checklist_rounded, () => _push(const DailyTasksPage())),
-        QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen())),
+        QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen()), lottie: kSpeakerLottie),
         QuickCard('meanings', 'Meanings', 'Signature words', Icons.auto_stories_rounded, () => _push(const MeaningStoreScreen())),
         QuickCard('features', 'Features', 'Everything in NowssB', Icons.grid_view_rounded, () => _push(const FeaturesPage())),
         QuickCard('atelier', 'Atelier', 'Word Atelier', Icons.spellcheck_rounded, () => _push(const WordAtelierScreen())),

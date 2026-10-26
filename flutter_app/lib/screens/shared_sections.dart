@@ -31,6 +31,7 @@ import '../widgets/neu_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/tv_frame.dart';
 import '../admin/template/editable.dart';
+import 'normal/home_v4.dart' show V4Lottie, kEbookLottie, kCartLottie, kWishlistLottie;
 import '../admin/layout/carousel_fx.dart';
 import '../admin/layout/layout_sections.dart' show CarouselAutoRotate;
 
@@ -809,6 +810,7 @@ class QuickAccessSection extends StatelessWidget {
                   child: _QuickButton(
                     mark: NwsbMarks.cart,
                     markViewBox: 22,
+                    lottie: kCartLottie,
                     label: 'Cart',
                     onTap: onCart,
                   ),
@@ -818,6 +820,7 @@ class QuickAccessSection extends StatelessWidget {
                   child: _QuickButton(
                     mark: NwsbMarks.wishlist,
                     markViewBox: 22,
+                    lottie: kWishlistLottie,
                     label: 'Wishlist',
                     onTap: onWishlist,
                   ),
@@ -876,9 +879,11 @@ class _QuickButton extends StatelessWidget {
     this.markViewBox = 22,
     required this.label,
     this.onTap,
+    this.lottie,
   });
   final String mark;
   final double markViewBox;
+  final String? lottie;
   final String label;
   final VoidCallback? onTap;
 
@@ -890,8 +895,8 @@ class _QuickButton extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          NwsbIcon(mark, size: 22, viewBox: markViewBox),
-          const SizedBox(height: 8),
+          if (lottie != null) V4Lottie(lottie!, size: 34) else NwsbIcon(mark, size: 22, viewBox: markViewBox),
+          SizedBox(height: lottie != null ? 2 : 8),
           EditableLabel('shared_sections.QuickButton',
             label,
             style: const TextStyle(fontSize: 12, color: Color(0xB8FFFFFF)),
@@ -941,7 +946,8 @@ class EbooksSection extends StatelessWidget {
             color: Color(0xFF0C0C10),
             child: Padding(
               padding: EdgeInsets.fromLTRB(4, 12, 4, 4),
-              child: Column(
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -963,7 +969,11 @@ class EbooksSection extends StatelessWidget {
                     style: TextStyle(fontSize: 14, color: Colors.white, height: 1.35),
                   ),
                 ],
-              ),
+              )),
+              SizedBox(width: 8),
+              // The eBook line animation (eBooks only).
+              V4Lottie(kEbookLottie, size: 56),
+              ]),
             ),
           ),
           const SizedBox(height: 14),

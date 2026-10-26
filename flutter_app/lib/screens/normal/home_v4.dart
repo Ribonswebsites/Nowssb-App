@@ -87,7 +87,17 @@ const _glow = 'assets/anim/thinking/glow_ring_gold.json';
 const _infinity = 'assets/anim/loaders/infinity_gold.json';
 const _waves = 'assets/anim/loaders/wave_dots_gold.json';
 const _sand = 'assets/anim/loaders/sand_clock_gold.json';
-const _pages = 'assets/anim/loaders/book_pages_gold.json';
+/// The eBook line animation; used ONLY where eBooks appear.
+const kEbookLottie = 'assets/anim/loaders/book_pages_gold.json';
+const _pages = kEbookLottie;
+// Concept animations (LottieFiles, Lottie Simple License; see MEDIA-LICENSES.md).
+const kCoinsLottie = 'assets/home/nm-anim-coins.json';
+const kGiftLottie = 'assets/home/nm-anim-gift.json';
+const kRewardsLottie = 'assets/home/nm-anim-rewards.json';
+const kSpeakerLottie = 'assets/home/nm-anim-speaker.json';
+const kCartLottie = 'assets/home/nm-anim-cart.json';
+const kWishlistLottie = 'assets/home/nm-anim-wishlist.json';
+const kMeditateLottie = _meditate;
 
 /// A NowssB film cut to a rounded window.
 class V4Film extends StatelessWidget {
@@ -164,8 +174,9 @@ class _Well extends StatelessWidget {
 
 /// Small raised round button holding a mark.
 class _Knob extends StatelessWidget {
-  const _Knob(this.mark, {this.size = 46, this.tint = _accent});
+  const _Knob(this.mark, {this.size = 46, this.tint = _accent, this.lottie});
   final String mark;
+  final String? lottie;
   final double size;
   final Color tint;
   @override
@@ -173,7 +184,7 @@ class _Knob extends StatelessWidget {
         width: size,
         height: size,
         decoration: const BoxDecoration(color: _base, shape: BoxShape.circle, boxShadow: _raisedSm),
-        child: Center(child: NwsbIcon(mark, size: size * .46, color: tint)),
+        child: Center(child: lottie != null ? V4Lottie(lottie!, size: size * .7) : NwsbIcon(mark, size: size * .46, color: tint)),
       );
 }
 
@@ -196,67 +207,6 @@ Widget _twoCol(List<Widget> cells, {double gap = 14}) => Column(children: [
       ],
     ]);
 
-// ───────────────────────── essentials: numbered steps ─────────────────────────
-
-class V4Essentials extends StatelessWidget {
-  const V4Essentials({super.key});
-  @override
-  Widget build(BuildContext context) => Column(
-        key: const ValueKey('v4-essentials'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _head('Three small steps', 'Your essentials', _breath),
-          ValueListenableBuilder<List<DailyTaskView>>(
-            valueListenable: DailyTasks.items,
-            builder: (context, items, _) {
-              final done = items.where((t) => t.done).length;
-              void open() => _push(context, const DailyTasksPage());
-              return V4Card(
-                onTap: open,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Row(children: [
-                    Expanded(
-                      child: Text('$done of ${items.length} done today', style: _h),
-                    ),
-                    const V4Lottie(_meditate, size: 54),
-                  ]),
-                  const SizedBox(height: 12),
-                  for (var i = 0; i < items.length; i++)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(children: [
-                        _Well(
-                          circle: true,
-                          size: const Size.square(40),
-                          pad: 0,
-                          child: Center(
-                            child: items[i].done
-                                ? const Icon(Icons.check_rounded, color: _accent, size: 20)
-                                : Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w800, color: _accent, fontSize: 15)),
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Text(items[i].title,
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                  color: items[i].done ? _soft : _ink,
-                                  decoration: items[i].done ? TextDecoration.lineThrough : null)),
-                        ),
-                        NwsbIcon(items[i].mark, size: 20, color: _soft),
-                      ]),
-                    ),
-                  const SizedBox(height: 10),
-                  Align(alignment: Alignment.centerLeft, child: CalmGo(label: 'Open my day', onTap: open)),
-                ]),
-              );
-            },
-          ),
-        ],
-      );
-}
-
 // ───────────────────────── routineCards ─────────────────────────
 
 /// Sound Library: an orb film set into a pressed well, beside the call.
@@ -276,7 +226,10 @@ class V4SoundLibrary extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('SOUND LIBRARY', style: _eyebrow),
+              const Row(children: [
+                Expanded(child: Text('SOUND LIBRARY', style: _eyebrow)),
+                V4Lottie(kSpeakerLottie, size: 30),
+              ]),
               const SizedBox(height: 6),
               const Text("Open today's Sound Library.", style: _h),
               const SizedBox(height: 12),
@@ -435,7 +388,7 @@ class V4Doors extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Column(children: [
-                          _Knob(doors[r * 3 + c].$3),
+                          _Knob(doors[r * 3 + c].$3, lottie: doors[r * 3 + c].$1 == 'player' ? kSpeakerLottie : null),
                           const SizedBox(height: 8),
                           Text(doors[r * 3 + c].$2,
                               textAlign: TextAlign.center,
@@ -509,51 +462,6 @@ class V4Streak extends StatelessWidget {
             ]),
           );
         },
-      );
-}
-
-// ───────────────────────── mainops: Where to Begin ─────────────────────────
-
-class V4WhereToBegin extends StatelessWidget {
-  const V4WhereToBegin({super.key, required this.options, required this.onAction});
-  final List<(String, double, String, int)> options;
-  final void Function(String label, int tab) onAction;
-  static const _tints = [
-    Color(0xFFE4E1FB), Color(0xFFDDEBFA), Color(0xFFDDF1EA),
-    Color(0xFFFBE6D8), Color(0xFFF7E1EC), Color(0xFFF4EFD6),
-  ];
-  @override
-  Widget build(BuildContext context) => Column(
-        key: const ValueKey('v4-begin'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _head('Everything, one tap away', 'Where to Begin', _orb),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
-            child: _twoCol([
-              for (var i = 0; i < options.length; i++)
-                V4Card(
-                  margin: EdgeInsets.zero,
-                  radius: 22,
-                  pad: const EdgeInsets.all(14),
-                  onTap: () => onAction(options[i].$3, options[i].$4),
-                  child: Row(children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(color: _tints[i % _tints.length], shape: BoxShape.circle),
-                      child: Center(child: NwsbIcon(options[i].$1, size: 20, color: _ink)),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(options[i].$3,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _ink, height: 1.2)),
-                    ),
-                  ]),
-                ),
-            ]),
-          ),
-        ],
       );
 }
 
@@ -634,7 +542,7 @@ class V4StoreEarn extends StatelessWidget {
       V4Card(
         onTap: earn,
         child: Row(children: [
-          const _Well(circle: true, size: Size.square(64), child: V4Lottie(_infinity, size: 52)),
+          const _Well(circle: true, size: Size.square(64), child: V4Lottie(kCoinsLottie, size: 52)),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -692,7 +600,7 @@ class V4ReaderRewards extends StatelessWidget {
               return V4Card(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   Row(children: [
-                    const _Well(circle: true, size: Size.square(64), child: V4Lottie(_orb, size: 52)),
+                    const _Well(circle: true, size: Size.square(64), child: V4Lottie(kRewardsLottie, size: 52)),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -846,14 +754,14 @@ class V4Quick extends StatelessWidget {
   final VoidCallback? onOrders;
   @override
   Widget build(BuildContext context) {
-    Widget item(String mark, String label, VoidCallback? tap) => Expanded(
+    Widget item(String mark, String label, VoidCallback? tap, [String? lottie]) => Expanded(
           child: InkWell(
             borderRadius: BorderRadius.circular(18),
             onTap: tap,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Column(children: [
-                _Knob(mark, size: 52),
+                _Knob(mark, size: 52, lottie: lottie),
                 const SizedBox(height: 8),
                 Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _ink)),
               ]),
@@ -871,12 +779,12 @@ class V4Quick extends StatelessWidget {
               Text('On one screen', style: _h),
             ]),
           ),
-          V4Lottie(_pages, size: 46),
+          V4Lottie(kCartLottie, size: 46),
         ]),
         const SizedBox(height: 14),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          item(NwsbMarks.cart, 'Cart', onCart),
-          item(NwsbMarks.wishlist, 'Wishlist', onWishlist),
+          item(NwsbMarks.cart, 'Cart', onCart, kCartLottie),
+          item(NwsbMarks.wishlist, 'Wishlist', onWishlist, kWishlistLottie),
           item(NwsbMarks.order, 'Orders', onOrders),
         ]),
       ]),
@@ -950,7 +858,10 @@ class V4Ebooks extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('NOWSSB EBOOKS', style: _eyebrow),
+              const Row(children: [
+                Expanded(child: Text('NOWSSB EBOOKS', style: _eyebrow)),
+                V4Lottie(_pages, size: 40),
+              ]),
               const SizedBox(height: 6),
               const Text('Word science and sound healing, read anywhere.', style: _h),
               const SizedBox(height: 12),

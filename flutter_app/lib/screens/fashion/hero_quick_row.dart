@@ -10,11 +10,14 @@ import 'package:flutter/services.dart';
 
 import '../../widgets/glass_wrap.dart';
 import 'home_cards.dart' show AutoMarquee;
+import '../normal/home_v4.dart' show V4Lottie;
 
 enum QuickStyle { banner, button, colour }
 
 class QuickCard {
-  const QuickCard(this.id, this.title, this.sub, this.icon, this.onTap, {this.colour = const Color(0xFF2B2B33)});
+  const QuickCard(this.id, this.title, this.sub, this.icon, this.onTap, {this.colour = const Color(0xFF2B2B33), this.lottie});
+  /// Optional concept animation shown instead of [icon].
+  final String? lottie;
   final String id;
   final String title;
   final String sub;
@@ -138,6 +141,9 @@ class HeroQuickRow extends StatelessWidget {
         ]),
       );
 
+  Widget _mark(QuickCard c, double size, Color colour) =>
+      c.lottie != null ? V4Lottie(c.lottie!, size: size + 6) : Icon(c.icon, size: size, color: colour);
+
   Widget _button(QuickCard c) => Container(
         width: h,
         decoration: BoxDecoration(
@@ -146,7 +152,7 @@ class HeroQuickRow extends StatelessWidget {
           border: Border.all(color: const Color(0x26FFFFFF)),
         ),
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Icon(c.icon, size: 20, color: Colors.white),
+          _mark(c, 20, Colors.white),
           const SizedBox(height: 3),
           Text(c.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: _ink.copyWith(fontSize: 9.5, fontWeight: FontWeight.w700)),
         ]),
@@ -158,7 +164,7 @@ class HeroQuickRow extends StatelessWidget {
       width: h,
       decoration: BoxDecoration(color: colour, borderRadius: BorderRadius.circular(14)),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        Icon(c.icon, size: 20, color: fg),
+        _mark(c, 20, fg),
         const SizedBox(height: 3),
         Text(c.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: _ink.copyWith(color: fg, fontSize: 9.5, fontWeight: FontWeight.w800)),
       ]),
@@ -173,7 +179,7 @@ class HeroQuickRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(color: colour, borderRadius: BorderRadius.circular(10)),
       child: Row(children: [
-        Icon(c.icon, size: 18, color: fg),
+        _mark(c, 18, fg),
         const SizedBox(width: 8),
         Expanded(
           child: Text(c.title, maxLines: 2, overflow: TextOverflow.ellipsis,

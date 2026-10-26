@@ -6,12 +6,11 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../theme/tokens.dart';
-import '../../widgets/app_thinking_loader.dart';
 import '../daily_tasks.dart';
 import 'glassmorphism_theme.dart';
+import 'home_v4.dart' show V4Lottie, kMeditateLottie;
 import '../../admin/template/editable.dart';
 
 class NmSuppliedEssentials extends StatefulWidget {
@@ -338,16 +337,11 @@ class _HeroEssential extends StatelessWidget {
                                 color: _inkSoft))),
                   ]),
             ),
-            // Big composing orb bottom-right (replaces brown head SVG).
+            // The v4 'Your essentials' meditation Lottie (was the composing orb).
             const Positioned(
               right: 0,
               bottom: 0,
-              child: AppThinkingLoader(
-                size: 64,
-                state: OrbState.composing,
-                blackCircle: true,
-                circlePad: 10,
-              ),
+              child: V4Lottie(kMeditateLottie, size: 64),
             ),
           ],
         ),
