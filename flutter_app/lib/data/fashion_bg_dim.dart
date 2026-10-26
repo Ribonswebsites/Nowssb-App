@@ -63,8 +63,9 @@ class FashionBgDimOverlay extends StatelessWidget {
       );
 }
 
-/// The dim control: the designer's [FilmDial] (live on drag, saved on
-/// release or an a11y step). Falls back to [FashionBgDimSlider] when
+/// The dim control: the designer's [FilmDial], which shows how much film
+/// shows (film = 1 - dim; the stored dim and its 0.45 default are unchanged,
+/// so the dial opens at 55%). Live on drag, saved on release or an a11y step. Falls back to [FashionBgDimSlider] when
 /// [FashionBgDim.useSlider] is set or there is no room for the dial.
 class FashionBgDimControl extends StatelessWidget {
   const FashionBgDimControl({super.key});
@@ -81,18 +82,18 @@ class FashionBgDimControl extends StatelessWidget {
           builder: (context, v, _) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Background dim',
+              const Text('Background film',
                   style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
-              const Text('Darken the video so the cards are easy to read',
+              const Text('How much of the video shows behind the cards',
                   style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
               const SizedBox(height: 12),
               FilmDial(
                 key: const ValueKey('fashion-bg-dim-dial'),
-                value: v,
+                value: 1 - v,
                 size: w < 250 ? w : 250,
                 debugPhase: FashionBgDim.debugDialPhase,
-                onChanged: (x) => FashionBgDim.instance.set(x, persist: false),
-                onChangeEnd: (x) => FashionBgDim.instance.set(x),
+                onChanged: (film) => FashionBgDim.instance.set(1 - film, persist: false),
+                onChangeEnd: (film) => FashionBgDim.instance.set(1 - film),
               ),
             ],
           ),
@@ -100,7 +101,7 @@ class FashionBgDimControl extends StatelessWidget {
       });
 }
 
-/// Fallback control (stock slider).
+/// Fallback control (stock slider), also in film % (1 - dim).
 class FashionBgDimSlider extends StatelessWidget {
   const FashionBgDimSlider({super.key, this.onDimChanged});
   final ValueChanged<double>? onDimChanged;
@@ -113,27 +114,27 @@ class FashionBgDimSlider extends StatelessWidget {
           children: [
             Row(children: [
               const Expanded(
-                child: Text('Background dim',
+                child: Text('Background film',
                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
               ),
-              Text('${(v * 100).round()}%',
+              Text('${((1 - v) * 100).round()}%',
                   key: const ValueKey('fashion-bg-dim-value'),
                   style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
             ]),
-            const Text('Darken the video so the cards are easy to read',
+            const Text('How much of the video shows behind the cards',
                 style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
             Slider(
               key: const ValueKey('fashion-bg-dim-slider'),
-              value: v,
+              value: 1 - v,
               divisions: 20,
-              label: '${(v * 100).round()}%',
+              label: '${((1 - v) * 100).round()}%',
               activeColor: Colors.white,
               inactiveColor: const Color(0x55FFFFFF),
-              onChanged: (x) {
-                FashionBgDim.instance.set(x, persist: false);
-                onDimChanged?.call(x);
+              onChanged: (film) {
+                FashionBgDim.instance.set(1 - film, persist: false);
+                onDimChanged?.call(1 - film);
               },
-              onChangeEnd: (x) => FashionBgDim.instance.set(x),
+              onChangeEnd: (film) => FashionBgDim.instance.set(1 - film),
             ),
           ],
         ),

@@ -229,59 +229,70 @@ void main() {
       return SharedPreferences.getInstance();
     }
 
-    testWidgets('the dial replaces the slider and starts at 45%', (tester) async {
+    testWidgets('the dial shows film (1 - dim): default dim 0.45 opens at 55%', (tester) async {
       await start(tester, {});
       expect(dial, findsOneWidget);
       expect(find.byKey(const ValueKey('fashion-bg-dim-slider')), findsNothing);
-      expect(tester.widget<FilmDial>(dial).value, FilmDial.defaultValue);
-      expect(find.text('45'), findsOneWidget);
+      expect(tester.widget<FilmDial>(dial).value, closeTo(.55, 1e-9));
+      expect(find.text('55'), findsOneWidget);
       expect(overlay(tester).a, closeTo(.45, .01));
     });
 
-    testWidgets('dragging dims live; release saves', (tester) async {
+    testWidgets('dragging to 30% film dims live to 0.7; release saves dim 0.7', (tester) async {
       final prefs = await start(tester, {});
       final seen = <double>[];
       FashionBgDim.onDimChanged.add(seen.add);
       addTearDown(() => FashionBgDim.onDimChanged.remove(seen.add));
 
-      final g = await tester.startGesture(at(tester, .45));
+      final g = await tester.startGesture(at(tester, .55));
       // Sideways first so the dial's pan wins the arena over the page scroll.
       await g.moveBy(const Offset(40, 0));
       await tester.pump();
-      for (final v in [.6, .8, .7]) {
-        await g.moveTo(at(tester, v));
+      for (final film in [.45, .2, .3]) {
+        await g.moveTo(at(tester, film));
         await tester.pump();
-        expect(overlay(tester).a, closeTo(v, .02), reason: 'live at $v');
+        expect(overlay(tester).a, closeTo(1 - film, .02), reason: 'live at $film film');
         expect(prefs.getDouble(FashionBgDim.prefKey), isNull, reason: 'not saved mid-drag');
       }
-      expect(find.text('70'), findsOneWidget);
+      expect(find.text('30'), findsOneWidget);
       expect(seen.length, greaterThanOrEqualTo(3));
       await g.up();
       await tester.pump();
       expect(prefs.getDouble(FashionBgDim.prefKey), closeTo(.7, .02), reason: 'saved on release');
     });
 
+    for (final (dim, film, label) in [(0.0, '100', 'Full film'), (0.45, '55', 'Soft glow'), (0.7, '30', 'Soft glow')]) {
+      testWidgets('stored dim $dim shows $film% film ($label) and overlay alpha $dim', (tester) async {
+        await start(tester, {FashionBgDim.prefKey: dim});
+        expect(FashionBgDim.instance.value, dim);
+        expect(tester.widget<FilmDial>(dial).value, closeTo(1 - dim, 1e-9));
+        expect(find.descendant(of: dial, matching: find.text(film)), findsOneWidget);
+        expect(find.descendant(of: dial, matching: find.text(label)), findsOneWidget);
+        expect(overlay(tester).a, closeTo(dim, .005));
+      });
+    }
+
     testWidgets('a restart restores the saved dim', (tester) async {
       await start(tester, {FashionBgDim.prefKey: 0.2});
       expect(FashionBgDim.instance.value, .2);
-      expect(tester.widget<FilmDial>(dial).value, .2);
-      expect(find.text('20'), findsOneWidget);
+      expect(tester.widget<FilmDial>(dial).value, closeTo(.8, 1e-9));
+      expect(find.text('80'), findsOneWidget);
       expect(overlay(tester).a, closeTo(.2, .01));
     });
 
-    testWidgets('a11y increase/decrease steps save', (tester) async {
+    testWidgets('a11y steps go in film direction and save (increase = more film = less dim)', (tester) async {
       final h = tester.ensureSemantics();
       final prefs = await start(tester, {});
       final node = find.semantics.byLabel(RegExp('Film visibility'));
       tester.semantics.performAction(node, SemanticsAction.increase);
       await tester.pump();
-      expect(FashionBgDim.instance.value, closeTo(.55, .001));
-      expect(prefs.getDouble(FashionBgDim.prefKey), closeTo(.55, .001));
+      expect(FashionBgDim.instance.value, closeTo(.35, .001));
+      expect(prefs.getDouble(FashionBgDim.prefKey), closeTo(.35, .001));
       tester.semantics.performAction(node, SemanticsAction.decrease);
       tester.semantics.performAction(node, SemanticsAction.decrease);
       await tester.pump();
-      expect(prefs.getDouble(FashionBgDim.prefKey), closeTo(.35, .001));
-      expect(overlay(tester).a, closeTo(.35, .01));
+      expect(prefs.getDouble(FashionBgDim.prefKey), closeTo(.55, .001));
+      expect(overlay(tester).a, closeTo(.55, .01));
       h.dispose();
     });
 
@@ -304,21 +315,23 @@ void main() {
       });
     }
 
-    testWidgets('slider fallback behind the flag still dims and saves', (tester) async {
+    testWidgets('slider fallback shows film % too: dragged to 0% film saves dim 1', (tester) async {
       FashionBgDim.useSlider = true;
       addTearDown(() => FashionBgDim.useSlider = false);
       final prefs = await start(tester, {});
       final slider = find.byKey(const ValueKey('fashion-bg-dim-slider'));
       expect(dial, findsNothing);
+      expect(find.byKey(const ValueKey('fashion-bg-dim-value')), findsOneWidget);
+      expect(find.text('55%'), findsOneWidget);
       await tester.ensureVisible(slider);
       await tester.pumpAndSettle();
       final g = await tester.startGesture(tester.getCenter(slider));
       await g.moveTo(Offset(tester.getTopLeft(slider).dx - 40, tester.getCenter(slider).dy));
       await tester.pump();
-      expect(overlay(tester).a, closeTo(0, .01));
+      expect(overlay(tester).a, closeTo(1, .01));
       await g.up();
       await tester.pumpAndSettle();
-      expect(prefs.getDouble(FashionBgDim.prefKey), 0.0);
+      expect(prefs.getDouble(FashionBgDim.prefKey), 1.0);
     });
 
     test('defaults to 0.45 and clamps', () async {
