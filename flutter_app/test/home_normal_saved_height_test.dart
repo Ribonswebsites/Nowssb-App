@@ -69,7 +69,11 @@ void main() {
       final reader = t.getRect(find.byKey(const ValueKey('nm-reader')));
       expect(reader.left, 0);
       expect(reader.right, w);
-      for (final label in ['Sign in for rewards', 'They save. You earn.', 'Share your link  →']) {
+      // v5 'reader' slot = Rewards (+ Invite only with server config; none
+      // in tests). The old 'NOWSSB READER' card is gone.
+      expect(find.text('NOWSSB READER'), findsNothing);
+      expect(find.text('They save. You earn.'), findsNothing);
+      for (final label in ['Sign in for rewards', 'Coins and streak stay on your account']) {
         final f = find.text(label);
         expect(f, findsOneWidget, reason: label);
         final p = t.renderObject<RenderParagraph>(f);

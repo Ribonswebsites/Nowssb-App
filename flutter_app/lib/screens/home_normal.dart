@@ -411,14 +411,12 @@ class _HomeNormalState extends State<HomeNormal> {
         ('store', V4StoreEarn(onStore: () => _go(3))),
         (
           'reader',
-          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            V4Reader(onReader: () => _push(const ReaderHubScreen())),
-            V5RewardsInvite(
-              onOpenRewards: () => _push(const VaultScreen()),
-              onSignIn: () => NwsbSignInPage.open(context),
-              onInvite: () => _push(const ReferenceProgramPage()),
-            ),
-          ]),
+          // v5: Rewards + Invite only (the old v4 'NOWSSB READER' card is not in the v5 mocks)
+          V5RewardsInvite(
+            onOpenRewards: () => _push(const VaultScreen()),
+            onSignIn: () => NwsbSignInPage.open(context),
+            onInvite: () => _push(const ReferenceProgramPage()),
+          ),
         ),
         ('trendwd', V5Trending(onWord: (w) => _push(WordDetail(word: w)), onLibrary: () => _go(2))),
         ('custom', null),

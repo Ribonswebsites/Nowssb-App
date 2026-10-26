@@ -691,35 +691,6 @@ class V4StoreEarn extends StatelessWidget {
   }
 }
 
-// ───────────────────────── reader + rewards ─────────────────────────
-
-class V4Reader extends StatelessWidget {
-  const V4Reader({super.key, required this.onReader});
-  final VoidCallback onReader;
-  @override
-  Widget build(BuildContext context) => V4Card(
-        key: const ValueKey('v4-reader'),
-        onTap: onReader,
-        child: Row(children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('NOWSSB READER', style: _eyebrow),
-              const SizedBox(height: 6),
-              const Text('Read every meaning, and every eBook.', style: _h),
-              const SizedBox(height: 12),
-              CalmGo(label: 'Open Reader', onTap: onReader),
-            ]),
-          ),
-          const SizedBox(width: 12),
-          const _Well(
-            circle: true,
-            size: Size.square(88),
-            child: V4Film('assets/video/player-box-rings.mp4', slot: 'reader', circle: true),
-          ),
-        ]),
-      );
-}
-
 // ───────────────────────── feed ─────────────────────────
 
 class V4Community extends StatelessWidget {
