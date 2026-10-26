@@ -55,7 +55,8 @@ void main() {
       final pages =
           File('lib/screens/poster/poster_pages.dart').readAsStringSync();
       // Cart (add) and bag (buy) go through the shared store actions.
-      expect(pages, contains('storeAddToCart(x, wordBagItem('));
+      expect(pages, contains('posterAddToCart(x, wordBagItem('));
+      expect(pages, contains('await storeAddToCart(x, item);'));
       for (final item in ['wordBagItem(', 'meaningBagItem(', 'ebookBagItem(']) {
         expect(pages, contains('storeBuyNow(x, $item'), reason: item);
       }
