@@ -1,4 +1,8 @@
 import 'dart:io';
+import 'package:nowssb/data/fashion_bg_dim.dart';
+import 'package:nowssb/data/home_widget_sync.dart';
+import 'package:nowssb/data/practice_progress.dart';
+import 'package:nowssb/screens/concept/doors/door_fashion_plus.dart';
 import 'package:nowssb/screens/concept/drop_v4_type.dart';
 import 'dart:math' as math;
 import 'package:nowssb/screens/concept/drop_v5.dart';
@@ -121,18 +125,26 @@ void main() {
       (await t.runAsync(SharedPreferences.getInstance))!;
 
   group('customize doors use the home\'s real state', () {
-    testWidgets('Themes → WidgetsPage, hero style saved and reloaded', (t) async {
+    testWidgets('Themes → DoorFashionPlusScreen, real data, hero style + dim saved', (t) async {
       await openDoor(t, 'Themes');
-      expect(find.byType(WidgetsPage), findsOneWidget);
+      expect(find.byType(DoorFashionPlusScreen), findsOneWidget);
+      final page = t.widget<DoorFashionPlusPage>(find.byType(DoorFashionPlusPage));
+      expect(page.streak, PracticeProgress.instance.streak);
+      final w = HomeWidgetSync.wordFor(DateTime.now(), ContentStore.instance.library);
+      if (w != null) expect(page.wordOfDay, w.word);
+      for (final j in [...page.jumps, ...page.make]) {
+        expect(File(j.art).existsSync(), isTrue, reason: j.art);
+        expect(File('pubspec.yaml').readAsStringSync(), contains('- ${j.art}'), reason: 'not bundled: ${j.art}');
+      }
+      expect(page.heroStyle, Settings.instance.heroStyle);
       final next = Settings.instance.heroStyle == 'full' ? 'tv' : 'full';
-      final title = next == 'full' ? 'Full screen' : 'On the television';
-      final card = find.byWidgetPredicate((w) =>
-          w.runtimeType.toString() == '_HeroCard' && (w as dynamic).title == title);
-      expect(card, findsOneWidget);
-      await t.runAsync(() async => ((t.widget(card) as dynamic).onApply as VoidCallback)());
+      await t.runAsync(() async => page.onPickStyle!(next));
       await settle(t, 2);
       expect(Settings.instance.heroStyle, next);
       expect((await prefs(t)).getString('nwsb_hero_style'), next);
+      await t.runAsync(() async => page.onDimChangeEnd!(0.7));
+      await settle(t, 2);
+      expect(FashionBgDim.instance.value, closeTo(0.3, 1e-9));
       await t.runAsync(Settings.instance.load);
       expect(Settings.instance.heroStyle, next);
     });

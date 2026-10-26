@@ -92,7 +92,7 @@ class _DropStudioScreenState extends State<DropStudioScreen> {
       },
       onBuy: _buy,
       onOpenCart: () => NwsbLinks.cart(context),
-      onOpenThemes: () => push(const WidgetsPage()),
+      onOpenThemes: () => push(const DoorFashionPlusScreen()),
       onOpenBackground: () => push(const DoorBackgroundScreen()),
       onOpenStartArt: () => push(const DoorStartArtScreen()),
       onOpenAccess: () => push(const DoorAccessScreen()),
