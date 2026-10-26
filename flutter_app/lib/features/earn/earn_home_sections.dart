@@ -5,6 +5,7 @@
 /// banner sits above the glass pane, not inside it.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show kPartnerLottie;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -1058,6 +1059,7 @@ class PartnerHomeSection extends StatelessWidget {
               title: '${EconomyMirror.instance.partnerPoints} partner points',
               sub: 'Points come only from real purchases through your links.',
               mark: NwsbMarks.crown,
+              lottie: kPartnerLottie,
               onTap: () => EarnUmbrellaSection._open(context, const PartnerProgramPage()),
             ),
           ],

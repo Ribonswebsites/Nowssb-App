@@ -12,6 +12,7 @@
 /// on each class say where.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie;
 import 'package:flutter/material.dart';
 
 import '../../widgets/nwsb_icon.dart';
@@ -345,8 +346,7 @@ class _SearchPanelState extends State<_SearchPanel> {
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               color: Colors.white,
-                              child: const NwsbIcon(NwsbMarks.arrow,
-                                  size: 16, color: NwsbColors.ink),
+                              child: const V4Lottie(kSearchLottie, size: 16),
                             ),
                           ),
                         ],

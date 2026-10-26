@@ -6,6 +6,7 @@
 /// can be read side by side. Line numbers on each class say where.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show kStreakLottie, kReaderLottie;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -595,6 +596,7 @@ class FashReader extends StatelessWidget {
             sub: 'Meanings and eBooks, in one place',
             mark: NwsbMarks.reader,
             markViewBox: 22,
+            lottie: kReaderLottie,
             onTap: onTap,
           ),
         ],
@@ -661,6 +663,7 @@ class FashStreakBody extends StatelessWidget {
           title: 'Daily Streak',
           sub: 'Practice daily to keep your healing streak alive',
           mark: NwsbMarks.flame,
+          lottie: kStreakLottie,
           onTap: onTap,
         ),
       ],

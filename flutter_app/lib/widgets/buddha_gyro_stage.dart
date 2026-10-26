@@ -5,6 +5,7 @@
 /// swipe back through this week. Quotes live in `data/daily_quotes.dart`.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kQuotesLottie;
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -70,8 +71,13 @@ class BuddhaGyroStage extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
-          child: EditableLabel(_slot, "Today's Quotes",
-              style: TextStyle(fontSize: 21, fontWeight: FontWeight.w700, color: ink)),
+          child: Row(children: [
+            Expanded(
+              child: EditableLabel(_slot, "Today's Quotes",
+                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.w700, color: ink)),
+            ),
+            const V4Lottie(kQuotesLottie, size: 24),
+          ]),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),

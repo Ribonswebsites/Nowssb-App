@@ -31,7 +31,8 @@ import '../widgets/neu_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/tv_frame.dart';
 import '../admin/template/editable.dart';
-import 'normal/home_v4.dart' show V4Lottie, kEbookLottie, kCartLottie, kWishlistLottie;
+import 'normal/home_v4.dart'
+    show V4Lottie, kEbookLottie, kCartLottie, kWishlistLottie, kOrdersLottie, kPremiumLottie, kPlayLottie, kConnectLottie, kProgressLottie;
 import '../admin/layout/carousel_fx.dart';
 import '../admin/layout/layout_sections.dart' show CarouselAutoRotate;
 
@@ -159,6 +160,7 @@ class EditionSection extends StatelessWidget {
             title: 'Join NowssB',
             sub: 'Get your subscription today',
             mark: NwsbMarks.crown,
+            lottie: kPremiumLottie,
             onTap: onTap,
           ),
         ],
@@ -601,6 +603,12 @@ class _OptRow extends StatelessWidget {
 }
 
 /// One door: SVG mark above label — website `.mo-cell` / `.mo-ic` / `.mo-lbl`.
+const _optLottie = {
+  'Practice': kPlayLottie,
+  'Connect': kConnectLottie,
+  'My Progress': kProgressLottie,
+};
+
 class _Opt extends StatelessWidget {
   const _Opt(this.item, {required this.fashion, this.onGo, this.onAction});
 
@@ -645,13 +653,15 @@ class _Opt extends StatelessWidget {
                   ),
                 ],
               ),
-              child: NwsbIcon(
-                mark,
-                size: 15,
-                viewBox: box,
-                strokeWidth: 1.6,
-                color: markColor,
-              ),
+              child: _optLottie[label] != null
+                  ? V4Lottie(_optLottie[label]!, size: 20)
+                  : NwsbIcon(
+                      mark,
+                      size: 15,
+                      viewBox: box,
+                      strokeWidth: 1.6,
+                      color: markColor,
+                    ),
             ),
             const SizedBox(height: 1),
             EditableLabel('shared_sections.Opt',
@@ -830,6 +840,7 @@ class QuickAccessSection extends StatelessWidget {
                   child: _QuickButton(
                     mark: NwsbMarks.order,
                     markViewBox: 22,
+                    lottie: kOrdersLottie,
                     label: 'Order',
                     onTap: onOrders,
                   ),

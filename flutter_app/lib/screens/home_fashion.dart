@@ -62,7 +62,7 @@ import 'daily_tasks.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
-import 'normal/home_v4.dart' show kRewardsLottie, kCoinsLottie, kGiftLottie, kSpeakerLottie;
+import 'normal/home_v4.dart' show kRewardsLottie, kCoinsLottie, kGiftLottie, kSpeakerLottie, kPlayLottie, kProgressLottie;
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -399,8 +399,8 @@ class _HomeFashionState extends State<HomeFashion> {
         QuickCard('gifts', 'Gifts', 'Send or redeem', Icons.card_giftcard_rounded, () => _push(const GiftsScreen()), lottie: kGiftLottie),
         QuickCard('coupons', 'Coupons', 'Deals for you', Icons.local_offer_rounded, () => _push(const CouponScreen())),
         QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
-        QuickCard('progress', 'Progress', 'Today at a glance', Icons.donut_large_rounded, () => ProgressPanel.open(context)),
-        QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1)),
+        QuickCard('progress', 'Progress', 'Today at a glance', Icons.donut_large_rounded, () => ProgressPanel.open(context), lottie: kProgressLottie),
+        QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1), lottie: kPlayLottie),
         QuickCard('tasks', 'Daily tasks', 'Tick off today', Icons.checklist_rounded, () => _push(const DailyTasksPage())),
         QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen()), lottie: kSpeakerLottie),
         QuickCard('meanings', 'Meanings', 'Signature words', Icons.auto_stories_rounded, () => _push(const MeaningStoreScreen())),

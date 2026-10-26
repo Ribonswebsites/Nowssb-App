@@ -11,6 +11,7 @@
 /// on each class say where.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -204,7 +205,7 @@ class _SearchBarState extends State<_SearchBar> {
                 shape: BoxShape.circle,
                 boxShadow: NwsbShadows.raisedXs,
               ),
-              child: const Icon(Icons.search, size: 19, color: NwsbColors.ink),
+              child: const Center(child: V4Lottie(kSearchLottie, size: 30)),
             ),
           ),
         ],

@@ -19,6 +19,7 @@
 ///              "Enter" and an arrow in a disc.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie;
 import 'dart:async';
 
 import 'dart:ui' show ImageFilter;
@@ -316,11 +317,15 @@ class SecBanner extends StatelessWidget {
     required this.mark,
     this.markViewBox = 24,
     this.art,
+    this.lottie,
     this.onTap,
   });
 
   final String title;
   final String sub;
+
+  /// An optional looping Lottie shown in the round tile instead of [mark].
+  final String? lottie;
 
   /// The SVG path in the round tile — one of [NwsbMarks].
   final String mark;
@@ -354,7 +359,9 @@ class SecBanner extends StatelessWidget {
                 color: Color(0xFF14141C),
                 shape: BoxShape.circle,
               ),
-              child: art == null
+              child: lottie != null
+                  ? Center(child: V4Lottie(lottie!, size: 32))
+                  : art == null
                   ? Center(
                       child: NwsbIcon(mark,
                           size: 19,

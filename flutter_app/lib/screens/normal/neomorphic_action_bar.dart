@@ -1,6 +1,7 @@
 /// Native Flutter translation of app/widgets/neomorphic-action-bar-1.html.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSupportLottie;
 import 'package:flutter/material.dart';
 
 import 'glassmorphism_theme.dart';
@@ -85,6 +86,7 @@ class NmSuppliedActionBar extends StatelessWidget {
               children: [
                 _ActionCircle(
                   icon: Icons.support_agent_outlined,
+                  lottie: kSupportLottie,
                   label: 'Help and support',
                   onTap: onSupport,
                   glass: glass,
@@ -213,9 +215,11 @@ class _ActionCircle extends StatelessWidget {
   const _ActionCircle(
       {required this.icon,
       required this.label,
+      this.lottie,
       this.onTap,
       this.glass = false});
   final IconData icon;
+  final String? lottie;
   final String label;
   final VoidCallback? onTap;
   final bool glass;
@@ -229,7 +233,7 @@ class _ActionCircle extends StatelessWidget {
           child: _NeoCircle(
             size: 40,
             glass: glass,
-            child: Icon(
+            child: lottie != null ? V4Lottie(lottie!, size: 30) : Icon(
               icon,
               size: 18,
               color: glass

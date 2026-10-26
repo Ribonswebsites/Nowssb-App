@@ -103,6 +103,19 @@ const kSpeakerLottie = 'assets/home/nm-anim-speaker.json';
 const kCartLottie = 'assets/home/nm-anim-cart.json';
 const kWishlistLottie = 'assets/home/nm-anim-wishlist.json';
 const kMeditateLottie = _meditate;
+const kPlayLottie = 'assets/home/nm-anim-play.json';
+const kStreakLottie = 'assets/home/nm-anim-streak.json';
+const kProgressLottie = 'assets/home/nm-anim-progress.json';
+const kSearchLottie = 'assets/home/nm-anim-search.json';
+const kReaderLottie = 'assets/home/nm-anim-reader.json';
+const kQuotesLottie = 'assets/home/nm-anim-quotes.json';
+const kConnectLottie = 'assets/home/nm-anim-connect.json';
+const kOrdersLottie = 'assets/home/nm-anim-orders.json';
+const kPremiumLottie = 'assets/home/nm-anim-premium.json';
+const kPartnerLottie = 'assets/home/nm-anim-partner.json';
+const kSupportLottie = 'assets/home/nm-anim-support.json';
+/// The second meditation animation (line-art yoga); nm-v4-meditate stays.
+const kMeditateAltLottie = 'assets/home/nm-anim-meditate-line.json';
 
 /// A NowssB film cut to a rounded window.
 class V4Film extends StatelessWidget {
@@ -282,7 +295,7 @@ class V4GetStarted extends StatelessWidget {
                         width: 30,
                         height: 30,
                         decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                        child: const Icon(Icons.play_arrow_rounded, size: 18, color: _ink),
+                        child: const Center(child: V4Lottie(kPlayLottie, size: 24)),
                       ),
                     ]),
                     const SizedBox(height: 14),
@@ -365,6 +378,14 @@ class V4Doors extends StatelessWidget {
     ('progress', 'Progress', NwsbMarks.bars),
     ('quotes', 'Quotes', NwsbMarks.word),
   ];
+  static const _doorLottie = {
+    'player': kSpeakerLottie,
+    'practice': kPlayLottie,
+    'reader': kReaderLottie,
+    'subscription': kPremiumLottie,
+    'progress': kProgressLottie,
+    'quotes': kQuotesLottie,
+  };
   @override
   Widget build(BuildContext context) => V4Card(
         key: const ValueKey('v4-doors'),
@@ -393,7 +414,7 @@ class V4Doors extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Column(children: [
-                          _Knob(doors[r * 3 + c].$3, lottie: doors[r * 3 + c].$1 == 'player' ? kSpeakerLottie : null),
+                          _Knob(doors[r * 3 + c].$3, lottie: _doorLottie[doors[r * 3 + c].$1]),
                           const SizedBox(height: 8),
                           Text(doors[r * 3 + c].$2,
                               textAlign: TextAlign.center,
@@ -427,7 +448,11 @@ class V4Streak extends StatelessWidget {
               Row(children: [
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('YOUR STREAK', style: _eyebrow),
+                    const Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text('YOUR STREAK', style: _eyebrow),
+                      SizedBox(width: 6),
+                      V4Lottie(kStreakLottie, size: 16),
+                    ]),
                     const SizedBox(height: 4),
                     Text('$s', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: _ink, height: 1.1)),
                     Text(s == 1 ? 'day in a row' : 'days in a row', style: _sub),
@@ -498,7 +523,7 @@ class V4HelpCoach extends StatelessWidget {
               pad: const EdgeInsets.all(14),
               onTap: onSupport,
               child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Icon(Icons.support_agent_rounded, color: _accent),
+                V4Lottie(kSupportLottie, size: 24),
                 SizedBox(height: 8),
                 Text('Help and support', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _ink)),
               ]),
@@ -509,7 +534,7 @@ class V4HelpCoach extends StatelessWidget {
               pad: const EdgeInsets.all(14),
               onTap: onCoach,
               child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Icon(Icons.self_improvement_rounded, color: _accent),
+                V4Lottie(kMeditateAltLottie, size: 24),
                 SizedBox(height: 8),
                 Text('Personal Coach', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _ink)),
               ]),
@@ -736,7 +761,7 @@ class V4Community extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    _Knob(r.$1, size: 38),
+                    _Knob(r.$1, size: 38, lottie: r.$1 == NwsbMarks.feed ? kConnectLottie : null),
                     const SizedBox(height: 8),
                     Text(r.$2, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: _ink)),
                     Text(r.$3, style: const TextStyle(fontSize: 12.5, color: _soft, height: 1.3)),
@@ -790,7 +815,7 @@ class V4Quick extends StatelessWidget {
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           item(NwsbMarks.cart, 'Cart', onCart, kCartLottie),
           item(NwsbMarks.wishlist, 'Wishlist', onWishlist, kWishlistLottie),
-          item(NwsbMarks.order, 'Orders', onOrders),
+          item(NwsbMarks.order, 'Orders', onOrders, kOrdersLottie),
         ]),
       ]),
     );
@@ -829,7 +854,7 @@ class V4Edition extends StatelessWidget {
             builder: (context, _) => V4Card(
               onTap: () => _push(context, const PartnerProgramPage()),
               child: Row(children: [
-                const _Knob(NwsbMarks.crown),
+                const _Knob(NwsbMarks.crown, lottie: kPartnerLottie),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -3,6 +3,7 @@
 /// sideways and advances on its own.
 library;
 
+import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kMeditateAltLottie;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -190,7 +191,10 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
                     duration: const Duration(milliseconds: 420),
                     transitionBuilder: (c, a) => ScaleTransition(
                         scale: a, child: FadeTransition(opacity: a, child: c)),
-                    child: SvgPicture.string(slide.svg, key: ValueKey(_page), fit: BoxFit.contain),
+                    child: _page == 0
+                        // Meditation slide: the line-art yoga Lottie (nm-v4-meditate stays elsewhere).
+                        ? const V4Lottie(kMeditateAltLottie, key: ValueKey(0), size: 200)
+                        : SvgPicture.string(slide.svg, key: ValueKey(_page), fit: BoxFit.contain),
                   )),
               ),
               const SizedBox(width: _gap),
