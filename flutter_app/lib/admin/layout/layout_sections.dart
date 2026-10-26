@@ -342,7 +342,11 @@ class SectionFrame extends StatelessWidget {
     // Builtins, and the templates that do not size themselves from props.
     // Scaled to the height both ways: pinching bigger grows the section
     // (a scale-down-only fit left it small on top of blank space).
-    if (h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
+    // Normal home never scales a section up (same rule as section zoom in
+    // UiOverrides.sectionZoomOf): a height saved for an older design must
+    // not blow a rebuilt section up ~3x and clip its sides.
+    final stale = pageId == 'home.normal' && !entry.isTemplate;
+    if (!stale && h != null && h > 0 && (!entry.isTemplate || entry.kind == 'textBlock' || entry.kind == 'cta')) {
       w = SectionFitHeight(height: h, width: MediaQuery.sizeOf(context).width, child: w);
     }
     // Its own background, corners and shadow, set from a touch.
