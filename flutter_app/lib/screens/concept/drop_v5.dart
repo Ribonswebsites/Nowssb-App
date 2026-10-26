@@ -48,29 +48,18 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
       AnimationController.unbounded(vsync: this, value: (widget.debugFront ?? 0).toDouble());
   double get a => widget.debugAngle ?? _c.value;
   final _tabKeys = List.generate(4, (_) => GlobalKey());
-  int? _shownTab;
 
-  /// Keep the selected tab on screen (scroll row follows the prism).
-  void _revealTab(int fr) {
-    if (_shownTab == fr) return;
-    final first = _shownTab == null;
-    _shownTab = fr;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final ctx = _tabKeys[fr].currentContext;
-      if (ctx == null || !mounted) return;
-      // only the tab row scrolls: the page must not jump to the prism
-      final ro = ctx.findRenderObject();
-      if (ro == null) return;
-      Scrollable.of(ctx).position.ensureVisible(ro,
-          alignment: .5,
-          duration: first || Stillwater.still(ctx) ? Duration.zero : const Duration(milliseconds: 260),
-          curve: Curves.easeOutCubic);
-    });
-  }
   int get front => (a.round() % 4 + 4) % 4;
 
   @override
+  void initState() {
+    super.initState();
+    DayClock.retain(); // face 1 greeting follows the local hour
+  }
+
+  @override
   void dispose() {
+    DayClock.release();
     _c.dispose();
     super.dispose();
   }
@@ -99,7 +88,11 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Make this home yours', style: V4Type.greet()),
-          Text('Four doors. One tap.', style: V4Type.title()),
+          // one line, never an orphaned word: scales down to fit narrow/large text
+          FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text('Four doors. One tap.', key: const ValueKey('drop-prism-heading'), maxLines: 1, style: V4Type.title())),
           const SizedBox(height: 3),
           Text('Turn the prism. Tap the front to change it.', style: V4Type.sub()),
         ]),
@@ -163,14 +156,12 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
         animation: _c,
         builder: (context, _) {
           final fr = front;
-          _revealTab(fr);
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               // scrollable tab row: icon + label, one text size, never squeezed
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(children: [
+              // all four tabs always visible: wrap to a second row when narrow
+              Wrap(spacing: 8, runSpacing: 8, children: [
                   for (var i = 0; i < 4; i++)
                     Semantics(
                       key: _tabKeys[i],
@@ -183,7 +174,6 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                         child: AnimatedContainer(
                           duration: Stillwater.still(context) ? Duration.zero : const Duration(milliseconds: 240),
                           constraints: const BoxConstraints(minHeight: 44, minWidth: 44),
-                          margin: const EdgeInsets.only(right: 8),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(22),
@@ -200,7 +190,6 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                       ),
                     ),
                 ]),
-              ),
               const SizedBox(height: 6),
               // one-line live caption of the current setting
               FittedBox(
@@ -347,7 +336,10 @@ class _MiniPlainHome extends StatelessWidget {
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              Text('Good Evening', style: TextStyle(fontSize: 7, fontWeight: FontWeight.w300, color: Colors.black.withValues(alpha: .55))),
+              ListenableBuilder(
+                  listenable: DayClock.tick,
+                  builder: (context, _) => Text(dayPartFor(DayClock.now()).greeting,
+                      key: const ValueKey('drop-prism-greeting'), style: TextStyle(fontSize: 7, fontWeight: FontWeight.w300, color: Colors.black.withValues(alpha: .55)))),
               const Text('Healer', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _ink, height: 1)),
               const SizedBox(height: 3),
               Container(
@@ -437,8 +429,10 @@ class _EntryPeelV5State extends State<EntryPeelV5> with SingleTickerProviderStat
           child: LayoutBuilder(builder: (context, c) {
             final width = c.maxWidth;
             // the peel lives in the bottom band ONLY, below the word row
-            final rest = 104.0, maxD = math.max(rest, math.min(124.0, width * .4));
-            final band = maxD;
+            // full peel lifts ~60% of the card so the next word clearly shows;
+            // the layout band stays at the resting size.
+            final rest = 104.0, maxD = math.max(rest, math.min(230.0, width * .6));
+            final band = math.max(rest, math.min(124.0, width * .4));
             return AnimatedBuilder(
               animation: _p,
               builder: (context, _) => Breath(builder: (context, t) {
@@ -615,17 +609,25 @@ class _Under extends StatelessWidget {
                         end: Alignment.bottomRight,
                         stops: [0, .5, 1],
                         colors: [Color(0x00000000), Color(0xB3000000), Color(0xD9000000)])))),
-        Align(
-          alignment: Alignment.bottomRight,
-          child: Padding(
-            padding: const EdgeInsets.all(6),
+        // caption lives in the revealed (dark) triangle only: its box is
+        // .50d x .28d from the corner, so its far corner sits at .78d + 12
+        // < d along the fold diagonal for every d in the curl range.
+        Positioned(
+          right: 6,
+          bottom: 6,
+          width: d * .5,
+          height: d * .28,
+          child: FittedBox(
+            key: const ValueKey('drop-entry-next'),
+            fit: BoxFit.contain,
+            alignment: Alignment.bottomRight,
             child: Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
               Text('Next, ${_hh(at.add(const Duration(hours: 1)))}',
                   textScaler: TextScaler.noScaling,
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, height: 1.1, shadows: [Shadow(blurRadius: 4)])),
               Text((next?.word ?? '').toUpperCase(),
                   textScaler: TextScaler.noScaling,
-                  style: TextStyle(fontFamily: 'Anton', fontSize: d > 118 ? 18 : 15, color: Colors.white, height: 1.15, shadows: const [Shadow(blurRadius: 4)])),
+                  style: const TextStyle(fontFamily: 'Anton', fontSize: 18, color: Colors.white, height: 1.15, shadows: [Shadow(blurRadius: 4)])),
             ]),
           ),
         ),

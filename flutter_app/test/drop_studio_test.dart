@@ -1,5 +1,7 @@
+import 'package:nowssb/screens/concept/drop_v4_type.dart';
+import 'dart:math' as math;
 import 'package:nowssb/screens/concept/drop_v5.dart';
-import 'package:nowssb/screens/concept/drop_v4_concepts.dart' show DoorHooks;
+import 'package:nowssb/screens/concept/drop_v4_concepts.dart' show DoorHooks, hourWord;
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -374,6 +376,54 @@ void main() {
     }
   });
 
+  group('Drop entry v4 peel caption', () {
+    double lin(double c) => c <= .04045 ? c / 12.92 : math.pow((c + .055) / 1.055, 2.4).toDouble();
+    for (final w in [320.0, 390.0]) {
+      for (final s in [1.0, 1.3]) {
+        for (final peel in [0.0, .5, 1.0]) {
+          testWidgets('Next caption stays on the dark reveal, >=4.5:1, $w x$s peel $peel', (t) async {
+            await boot(
+                t,
+                Scaffold(
+                    body: Align(
+                        alignment: Alignment.topCenter,
+                        child: EntryPeelV5(
+                            debugPeel: peel, now: () => DateTime(2026, 10, 27, 1), wordFor: hourWord, onOpenDrop: () {}))),
+                w: w,
+                s: s);
+            final card = t.getRect(find.byType(ClipRRect).first);
+            final d = 104 + (math.max(104.0, math.min(230.0, card.width * .6)) - 104) * peel;
+            final cap = t.getRect(find.byKey(const ValueKey('drop-entry-next')));
+            for (final p in [cap.topLeft, cap.topRight, cap.bottomLeft, cap.bottomRight]) {
+              final along = (card.right - p.dx) + (card.bottom - p.dy);
+              expect(along, lessThanOrEqualTo(d - 4), reason: 'caption corner $p must sit inside the revealed triangle (d=$d), off the cream flap');
+            }
+            // scrim alpha at the caption's least-covered corner (gradient (0,-.4) → bottomRight, 0/.70/.85)
+            final a0 = Offset(card.center.dx, card.center.dy - .4 * card.height / 2), a1 = card.bottomRight;
+            final dir = a1 - a0;
+            final tt = (((cap.topLeft - a0).dx * dir.dx + (cap.topLeft - a0).dy * dir.dy) / dir.distanceSquared).clamp(0.0, 1.0);
+            final alpha = tt <= .5 ? .70 * tt / .5 : .70 + (.85 - .70) * (tt - .5) / .5;
+            // worst case: pure white art under the scrim, white text on top
+            final bg = lin(1 - alpha);
+            final ratio = 1.05 / (bg + .05);
+            expect(ratio, greaterThanOrEqualTo(4.5), reason: 'contrast $ratio at alpha $alpha');
+            debugPrint('caption contrast ${ratio.toStringAsFixed(2)}:1 (alpha ${alpha.toStringAsFixed(2)}) at $w x$s peel $peel');
+            await t.pumpWidget(const SizedBox());
+          });
+        }
+      }
+    }
+  });
+
+  testWidgets('prism face-1 greeting follows the local hour (01:00 = Good Night)', (t) async {
+    DayClock.clock = () => DateTime(2026, 10, 27, 1);
+    addTearDown(() => DayClock.clock = null);
+    await boot(t, const Scaffold(body: SingleChildScrollView(child: DoorsPrismV5())));
+    expect(find.text(dayPartFor(DateTime(2026, 10, 27, 1)).greeting), findsWidgets);
+    expect(find.text('Good Evening'), findsNothing);
+    await t.pumpWidget(const SizedBox());
+  });
+
   group('Drop doors v4 (prism)', () {
     for (final (i, label) in [(0, 'Themes'), (1, 'Background'), (2, 'Start art'), (3, 'Access')]) {
       testWidgets('tab $label turns the prism; front tap fires its hook', (t) async {
@@ -407,6 +457,13 @@ void main() {
         testWidgets('prism: no overflow at $w x$s', (t) async {
           await boot(t, const Scaffold(body: SingleChildScrollView(child: DoorsPrismV5())), w: w, s: s);
           expect(t.takeException(), isNull);
+          final screen = Offset.zero & t.view.physicalSize / t.view.devicePixelRatio;
+          for (var i = 0; i < 4; i++) {
+            final r = t.getRect(find.byKey(ValueKey('drop-prism-tab-$i')));
+            expect(r.left >= screen.left && r.right <= screen.right, isTrue, reason: 'tab $i $r fully on screen $screen');
+          }
+          final h = t.getRect(find.byKey(const ValueKey('drop-prism-heading')));
+          expect(h.height, lessThan(V4Type.title().fontSize! * s * 1.6), reason: 'heading is one line, no orphan word');
           for (final e in find.byType(Text).evaluate()) {
             expect((e.widget as Text).overflow, isNot(TextOverflow.ellipsis));
           }
