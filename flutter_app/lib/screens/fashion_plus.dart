@@ -20,8 +20,16 @@ import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 
+/// Which part of Fashion Plus a caller opens. [all] is the full page behind
+/// its intro; the other two open straight onto one chooser — the Drop Studio
+/// "Background" door (the video list) and "Start art" door (the still list,
+/// the one that writes `nwsb_fashplus_image`).
+enum FashionPlusMode { all, background, startArt }
+
 class FashionPlusScreen extends StatefulWidget {
-  const FashionPlusScreen({super.key});
+  const FashionPlusScreen({super.key, this.mode = FashionPlusMode.all});
+
+  final FashionPlusMode mode;
 
   @override
   State<FashionPlusScreen> createState() => _FashionPlusScreenState();
@@ -59,6 +67,27 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
   @override
   Widget build(BuildContext context) {
     final on = Settings.instance.fashionPlus;
+    if (widget.mode != FashionPlusMode.all) {
+      final video = widget.mode == FashionPlusMode.background;
+      return PageShell(
+        eyebrow: 'Fashion Plus',
+        title: video ? 'Background' : 'Start art',
+        film: 'assets/video/fashion-plus-bg-6.mp4',
+        onBack: () => Navigator.of(context).maybePop(),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            sliver: SliverList.list(children: [
+              if (video) ...[
+                _Switch(on: on, onChanged: (v) => Settings.instance.setFashionPlus(v)),
+                const SizedBox(height: 14),
+              ],
+              _BackgroundChooser(videos: video),
+            ]),
+          ),
+        ],
+      );
+    }
 
     return IntroGate(
       tag: 'Fashion · Plus',
@@ -195,7 +224,11 @@ class _Switch extends StatelessWidget {
 }
 
 class _BackgroundChooser extends StatelessWidget {
-  const _BackgroundChooser();
+  const _BackgroundChooser({this.videos});
+
+  /// null: follow the switch (videos when motion is on). true / false: pin
+  /// the video list or the start-art stills.
+  final bool? videos;
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +236,8 @@ class _BackgroundChooser extends StatelessWidget {
       animation: Settings.instance,
       builder: (_, __) {
         final settings = Settings.instance;
-        final motionOn = settings.fashionPlus;
+        final motionOn = videos ?? settings.fashionPlus;
+        final pinnedStill = videos == false;
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -217,7 +251,9 @@ class _BackgroundChooser extends StatelessWidget {
               Text(
                 motionOn
                     ? 'Selected Fashion Plus video'
-                    : 'Background when motion is off',
+                    : pinnedStill
+                        ? 'Start art'
+                        : 'Background when motion is off',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,

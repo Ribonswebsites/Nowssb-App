@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/data/cart_bag.dart';
 import 'package:nowssb/data/content.dart';
+import 'package:nowssb/data/models.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/fashion/drop_studio.dart';
@@ -28,6 +29,7 @@ void main() {
   });
 
   final tabs = <int>[];
+  final fixed = DateTime(2026, 10, 26, 16, 20);
 
   Future<void> boot(WidgetTester t, Widget home, {double w = 390, double s = 1}) async {
     t.view.physicalSize = Size(w * s * 2, 844 * s * 2);
@@ -115,6 +117,8 @@ void main() {
       await t.runAsync(() => Settings.instance.setFashionPlus(true));
       await openDoor(t, 'Background');
       expect(find.byType(FashionPlusScreen), findsOneWidget);
+      expect((t.widget(find.byType(FashionPlusScreen)) as FashionPlusScreen).mode, FashionPlusMode.background);
+      expect(find.text(Settings.fashionImageName(0)), findsNothing);
       final i = Settings.instance.fashionVideoIndex == 0 ? 2 : 0;
       final label = find.text(Settings.fashionVideoNames[i]);
       await reachIn(t, label, FashionPlusScreen);
@@ -128,10 +132,13 @@ void main() {
       expect(Settings.instance.fashionVideoIndex, i);
     });
 
-    testWidgets('Start art → FashionPlusScreen, still saved', (t) async {
-      await t.runAsync(() => Settings.instance.setFashionPlus(false));
+    testWidgets('Start art → FashionPlusScreen start-art mode, still saved', (t) async {
+      // Even with motion on, the Start art door opens the stills, not the films.
+      await t.runAsync(() => Settings.instance.setFashionPlus(true));
       await openDoor(t, 'Start art');
       expect(find.byType(FashionPlusScreen), findsOneWidget);
+      expect((t.widget(find.byType(FashionPlusScreen)) as FashionPlusScreen).mode, FashionPlusMode.startArt);
+      expect(find.text(Settings.fashionVideoNames[0]), findsNothing);
       final label = find.text(Settings.fashionImageName(0));
       await reachIn(t, label, FashionPlusScreen);
       await t.runAsync(() async {
@@ -170,14 +177,16 @@ void main() {
     });
 
     testWidgets('Own the drop → real word item in cart → Checkout', (t) async {
-      await boot(t, const DropStudioScreen());
-      final first = ContentStore.instance.library.firstWhere((w) => w.meaning.isNotEmpty);
+      await boot(t, DropStudioScreen(clock: () => fixed));
+      final first = dropWordsFor(ContentStore.instance.library, fixed).first;
       await t.runAsync(() async {
         await t.tap(find.text('Own the drop'));
         await Future<void>.delayed(const Duration(milliseconds: 1400));
       });
       await settle(t, 30);
-      expect(CartBag.instance.cart.any((b) => b.id == 'word:${first.word.toLowerCase()}'), isTrue);
+      final got = CartBag.instance.cart.where((b) => b.id == 'word:${first.word.toLowerCase()}');
+      expect(got, hasLength(1));
+      expect(got.single.image, dropCutoutFor(first), reason: 'the bag shows the word\'s own cut-out');
       expect(find.byType(CheckoutPage), findsOneWidget);
     });
 
@@ -193,6 +202,88 @@ void main() {
       await t.tap(deck.first);
       await settle(t);
       expect(find.byType(WordDetail), findsOneWidget);
+    });
+  });
+
+  group('drop logic', () {
+    Future<void> clearCart(WidgetTester t) async => t.runAsync(() async {
+          for (final b in CartBag.instance.cart.toList()) {
+            await CartBag.instance.removeCart(b.id);
+          }
+        });
+
+    testWidgets('double-tap Own adds once and opens one checkout', (t) async {
+      await boot(t, DropStudioScreen(clock: () => fixed));
+      await clearCart(t);
+      final first = dropWordsFor(ContentStore.instance.library, fixed).first;
+      await t.runAsync(() async {
+        await t.tap(find.text('Own the drop'));
+        await t.tap(find.text('Own the drop'), warnIfMissed: false);
+        await Future<void>.delayed(const Duration(milliseconds: 1400));
+      });
+      await settle(t, 30);
+      expect(CartBag.instance.cart.where((b) => b.id == 'word:${first.word.toLowerCase()}'), hasLength(1));
+      expect(find.byType(CheckoutPage), findsOneWidget);
+    });
+
+    testWidgets('the bar follows the deck: word, price and buy', (t) async {
+      await boot(t, DropStudioScreen(clock: () => fixed));
+      await clearCart(t);
+      final drop = dropWordsFor(ContentStore.instance.library, fixed);
+      Text dock() => t.widget<Text>(find.byKey(const ValueKey('drop-dock-word')));
+      expect(dock().data, drop[0].word);
+      final deck = find.byWidgetPredicate((w) => w.runtimeType.toString() == '_WordPoster').hitTestable();
+      await reach(t, deck);
+      await t.drag(deck.first, const Offset(-200, 0));
+      await settle(t);
+      expect(dock().data, drop[1].word);
+      expect(find.text('02 / ${drop.length.toString().padLeft(2, '0')}'), findsWidgets);
+      final price = t.widget<Text>(find.byKey(const ValueKey('drop-dock-price'))).data;
+      expect(price, isNotEmpty);
+      await t.runAsync(() async {
+        await t.tap(find.text('Own the drop'));
+        await Future<void>.delayed(const Duration(milliseconds: 1400));
+      });
+      await settle(t, 30);
+      expect(CartBag.instance.cart.map((b) => b.id), contains('word:${drop[1].word.toLowerCase()}'));
+    });
+
+    testWidgets('a debug page past the end is clamped (no 06 / 05)', (t) async {
+      await boot(t, DropStudioScreen(clock: () => fixed, debugPage: 9));
+      final n = dropWordsFor(ContentStore.instance.library, fixed).length;
+      final nn = n.toString().padLeft(2, '0');
+      expect(find.text('$nn / $nn'), findsWidgets);
+      expect(find.textContaining(RegExp(r'^(0[6-9]|1\d) / ')), findsNothing);
+      await finish(t);
+    });
+
+    test('words rotate by the hour, deterministically', () {
+      final all = ContentStore.instance.library;
+      final pool = all.where((w) => w.meaning.isNotEmpty).toList();
+      final a = dropWordsFor(all, fixed);
+      expect(dropWordsFor(all, fixed.add(const Duration(minutes: 39))).map((w) => w.key), a.map((w) => w.key));
+      expect(dropWordsFor(<Word>[], fixed), isEmpty);
+      if (pool.length > kDropSize) {
+        final b = dropWordsFor(all, fixed.add(const Duration(hours: 1)));
+        expect(a, hasLength(kDropSize));
+        expect(pool.indexOf(b.first), (pool.indexOf(a.first) + kDropSize) % pool.length);
+      }
+    });
+
+    testWidgets('a new drop lands at the top of the hour (injected clock)', (t) async {
+      var now = DateTime(2026, 10, 26, 15, 58);
+      await boot(t, DropStudioScreen(clock: () => now));
+      final all = ContentStore.instance.library;
+      final before = dropWordsFor(all, now).first.word;
+      Text dock() => t.widget<Text>(find.byKey(const ValueKey('drop-dock-word')));
+      expect(dock().data, before);
+      final after = dropWordsFor(all, DateTime(2026, 10, 26, 16)).first.word;
+      now = DateTime(2026, 10, 26, 16, 0, 1);
+      await t.pump(const Duration(minutes: 2, seconds: 1));
+      await t.pump();
+      expect(dock().data, after);
+      if (all.where((w) => w.meaning.isNotEmpty).length > kDropSize) expect(after, isNot(before));
+      await finish(t);
     });
   });
 

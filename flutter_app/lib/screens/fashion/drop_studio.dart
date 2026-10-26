@@ -10,6 +10,7 @@
 /// all copy is EditableLabel, all words come from ContentStore.library.
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -27,28 +28,50 @@ import '../fashion_plus.dart';
 import '../quick_access.dart';
 import '../store/store_actions.dart';
 import '../store/store_art.dart';
-import '../store/store_cards.dart' show kWordPriceInr;
+import '../store/store_cards.dart' show kWordPriceInr, localizedMoney;
 import '../widgets_page.dart';
 import '../word_detail.dart';
 
 /// The real Drop Studio page: every hook wired.
-class DropStudioScreen extends StatelessWidget {
-  const DropStudioScreen({super.key, this.controller, this.debugTilt, this.debugPage});
+class DropStudioScreen extends StatefulWidget {
+  const DropStudioScreen({super.key, this.controller, this.debugTilt, this.debugPage, this.clock});
 
   final ScrollController? controller;
   final Offset? debugTilt;
   final double? debugPage;
 
+  /// Wall clock for the hourly word rotation; tests inject one.
+  final DateTime Function()? clock;
+
   static Future<void> open(BuildContext context) => Navigator.of(context)
       .push(MaterialPageRoute<void>(builder: (_) => const DropStudioScreen()));
 
-  /// The bag item the existing Store word path builds for [w].
+  /// The bag item the existing Store word path builds for [w], with the
+  /// word's own poster cut-out as its picture.
   static BagItem item(Word w) => wordBagItem(
         name: w.word,
         root: w.organ.isNotEmpty ? w.organ : w.meaning,
-        img: kNowssbStoreMark,
+        img: dropCutoutFor(w),
         price: kWordPriceInr,
       );
+
+  @override
+  State<DropStudioScreen> createState() => _DropStudioScreenState();
+}
+
+class _DropStudioScreenState extends State<DropStudioScreen> {
+  /// Re-entry guard: a double tap on "Own" adds once and opens one checkout.
+  bool _busy = false;
+
+  Future<void> _buy(Word w) async {
+    if (_busy) return;
+    _busy = true;
+    try {
+      await storeBuyNow(context, DropStudioScreen.item(w));
+    } finally {
+      _busy = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,17 +85,40 @@ class DropStudioScreen extends StatelessWidget {
         if (i < 0 || i >= all.length) return;
         push(WordDetail(word: all[i]));
       },
-      onBuy: (w) => storeBuyNow(context, item(w)),
+      onBuy: _buy,
       onOpenCart: () => NwsbLinks.cart(context),
       onOpenThemes: () => push(const WidgetsPage()),
-      onOpenBackground: () => push(const FashionPlusScreen()),
-      onOpenStartArt: () => push(const FashionPlusScreen()),
+      onOpenBackground: () => push(const FashionPlusScreen(mode: FashionPlusMode.background)),
+      onOpenStartArt: () => push(const FashionPlusScreen(mode: FashionPlusMode.startArt)),
       onOpenAccess: () => push(const QuickAccessScreen()),
-      controller: controller,
-      debugTilt: debugTilt,
-      debugPage: debugPage,
+      controller: widget.controller,
+      debugTilt: widget.debugTilt,
+      debugPage: widget.debugPage,
+      clock: widget.clock,
     );
   }
+}
+
+/// How many words a drop holds.
+const kDropSize = 5;
+
+/// This hour's words: [kDropSize] words with a meaning, rotated through the
+/// library by the hour index, so every hour shows the next five, the same
+/// five on every device, and the whole library comes round in turn.
+List<Word> dropWordsFor(List<Word> library, DateTime at) {
+  final pool = library.where((w) => w.meaning.isNotEmpty).toList();
+  if (pool.length <= kDropSize) return pool;
+  // The local wall-clock hour (so it turns when the hourly timer fires, also
+  // in half-hour zones like IST), counted from the epoch.
+  final hour = DateTime.utc(at.year, at.month, at.day, at.hour).millisecondsSinceEpoch ~/ Duration.millisecondsPerHour;
+  final start = (hour * kDropSize) % pool.length;
+  return [for (var k = 0; k < kDropSize; k++) pool[(start + k) % pool.length]];
+}
+
+/// The cut-out a word wears on its poster (and in the bag): fixed per word.
+String dropCutoutFor(Word w) {
+  final i = ContentStore.instance.library.indexWhere((x) => x.key == w.key);
+  return _wordCutouts[(i < 0 ? w.word.length : i) % _wordCutouts.length];
 }
 
 const _slot = 'drop_studio.DropStudio';
@@ -108,7 +154,10 @@ class FashionDropStudio extends StatefulWidget {
     this.controller,
     this.debugTilt,
     this.debugPage,
+    this.clock,
   });
+
+  final DateTime Function()? clock;
 
   final VoidCallback? onBack;
 
@@ -139,11 +188,31 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
   late final ScrollController _scroll = widget.controller ?? ScrollController();
   double _y = 0;
 
+  /// The deck's front card. The pinned bar reads the same index, so the
+  /// bar's word, price and buy follow the swipe.
+  late final ValueNotifier<int> _top = ValueNotifier(widget.debugPage?.round() ?? 0);
+  Timer? _hourly;
+
+  DateTime _now() => (widget.clock ?? DateTime.now)();
+
+  /// Wake at the next top of the hour: new words land, the deck restarts.
+  void _armHour() {
+    _hourly?.cancel();
+    final now = _now();
+    final next = DateTime(now.year, now.month, now.day, now.hour + 1);
+    _hourly = Timer(next.difference(now), () {
+      if (!mounted) return;
+      setState(() => _top.value = 0);
+      _armHour();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     _scroll.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
+    _armHour();
   }
 
   void _onScroll() {
@@ -154,6 +223,8 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
 
   @override
   void dispose() {
+    _hourly?.cancel();
+    _top.dispose();
     _scroll.removeListener(_onScroll);
     if (widget.controller == null) _scroll.dispose();
     super.dispose();
@@ -171,8 +242,7 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
           builder: (context, _) {
             final all = ContentStore.instance.library;
             // ONE drop list: the deck and the pinned bar both read it.
-            final drop = all.where((w) => w.meaning.isNotEmpty).take(5).toList();
-            final first = drop.firstOrNull;
+            final drop = dropWordsFor(all, _now());
             final safe = MediaQuery.paddingOf(context).bottom;
             const dock = 68.0, dockGap = 22.0;
             return Stack(children: [
@@ -184,7 +254,7 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
                   const SizedBox(height: 26),
                   _WordsDeck(
                     words: drop,
-                    debugPage: widget.debugPage?.round(),
+                    top: _top,
                     onOpen: (w) => widget.onOpenWord?.call(all.indexOf(w)),
                     onBuy: widget.onBuy,
                   ),
@@ -226,7 +296,17 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
                 right: 16,
                 bottom: dockGap + safe,
                 height: dock,
-                child: _BuyDock(word: first, onBuy: first == null ? null : () => widget.onBuy?.call(first)),
+                child: ValueListenableBuilder<int>(
+                  valueListenable: _top,
+                  builder: (context, top, _) {
+                    final w = drop.isEmpty ? null : drop[top.clamp(0, drop.length - 1)];
+                    return _BuyDock(
+                      word: w,
+                      price: w == null ? null : localizedMoney(context, DropStudioScreen.item(w).price),
+                      onBuy: w == null ? null : () => widget.onBuy?.call(w),
+                    );
+                  },
+                ),
               ),
             ]);
           },
@@ -622,18 +702,58 @@ const _wordCutouts = [
 ];
 
 class _WordsDeck extends StatefulWidget {
-  const _WordsDeck({required this.words, required this.onOpen, this.onBuy, this.debugPage});
+  const _WordsDeck({required this.words, required this.top, required this.onOpen, this.onBuy});
   final List<Word> words;
+  final ValueNotifier<int> top;
   final ValueChanged<Word> onOpen;
   final ValueChanged<Word>? onBuy;
-  final int? debugPage;
   @override
   State<_WordsDeck> createState() => _WordsDeckState();
 }
 
 class _WordsDeckState extends State<_WordsDeck> {
-  late int _top = widget.debugPage ?? 0;
   double _dx = 0;
+
+  /// The front card, always inside the deck (never "06 / 05").
+  int get _top {
+    final n = widget.words.length;
+    return n == 0 ? 0 : widget.top.value.clamp(0, n - 1);
+  }
+
+  set _top(int v) => widget.top.value = v;
+
+  void _changed() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.top.addListener(_changed);
+  }
+
+  @override
+  void didUpdateWidget(_WordsDeck old) {
+    super.didUpdateWidget(old);
+    if (old.top != widget.top) {
+      old.top.removeListener(_changed);
+      widget.top.addListener(_changed);
+    }
+    // The drop shrank under the front card: clamp the shared index (after
+    // this frame, so the bar listening to it isn't rebuilt mid-build).
+    final n = widget.words.length;
+    if (widget.top.value != 0 && widget.top.value >= n) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.top.value >= widget.words.length) widget.top.value = math.max(0, widget.words.length - 1);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.top.removeListener(_changed);
+    super.dispose();
+  }
 
   void _end(DragEndDetails d) {
     final n = widget.words.length;
@@ -667,7 +787,7 @@ class _WordsDeckState extends State<_WordsDeck> {
             style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 13)),
         const SizedBox(height: 10),
         if (n == 0)
-          const SizedBox(height: 120)
+          const _EmptyPoster()
         else
           GestureDetector(
             onHorizontalDragUpdate: (d) => setState(() => _dx += d.delta.dx),
@@ -698,7 +818,7 @@ class _WordsDeckState extends State<_WordsDeck> {
                           n: i + 1,
                           of: n,
                           width: w,
-                          cutout: _wordCutouts[i % _wordCutouts.length],
+                          cutout: dropCutoutFor(words[i]),
                           front: r == 0,
                           onOpen: r == 0 ? () => widget.onOpen(words[i]) : null,
                           onBuy: r == 0 ? () => widget.onBuy?.call(words[i]) : null,
@@ -1258,8 +1378,9 @@ class _HowItFlows extends StatelessWidget {
 }
 
 class _BuyDock extends StatelessWidget {
-  const _BuyDock({this.word, this.onBuy});
+  const _BuyDock({this.word, this.price, this.onBuy});
   final Word? word;
+  final String? price;
   final VoidCallback? onBuy;
   @override
   Widget build(BuildContext context) => Container(
@@ -1279,9 +1400,18 @@ class _BuyDock extends StatelessWidget {
               const EditableLabel('drop_studio.BuyDock', "THIS HOUR'S DROP",
                   style: TextStyle(color: _goldSoft, fontSize: 9.5, fontWeight: FontWeight.w700, letterSpacing: 1.8)),
               const SizedBox(height: 2),
-              Text(word?.word ?? '—',
-                  style:
-                      const TextStyle(fontFamily: 'CormorantGaramond', color: Colors.white, fontSize: 22, height: 1.1)),
+              Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+                Text(word?.word ?? '—',
+                    key: const ValueKey('drop-dock-word'),
+                    style:
+                        const TextStyle(fontFamily: 'CormorantGaramond', color: Colors.white, fontSize: 22, height: 1.1)),
+                if (price != null) ...[
+                  const SizedBox(width: 8),
+                  Text(price!,
+                      key: const ValueKey('drop-dock-price'),
+                      style: const TextStyle(color: _goldSoft, fontSize: 13, fontWeight: FontWeight.w700)),
+                ],
+              ]),
             ]),
             ),
           ),
@@ -1307,11 +1437,14 @@ class _BuyDock extends StatelessWidget {
 
 // ─── Fashion home entry ───────────────────────────────────────────────────
 
-/// The one Fashion-home card that opens Drop Studio. It sits where
-/// "Make this home yours" used to be.
+/// The one Fashion-home card that opens Drop Studio, where "Make this home
+/// yours" used to be: a small cut of the Drop hero — tilted posters behind
+/// the cut-out figure, the gold drop chip, and this hour's word in giant
+/// cropped type.
 class DropStudioEntry extends StatelessWidget {
-  const DropStudioEntry({super.key, this.onTap});
+  const DropStudioEntry({super.key, this.onTap, this.clock});
   final VoidCallback? onTap;
+  final DateTime Function()? clock;
 
   @override
   Widget build(BuildContext context) {
@@ -1325,79 +1458,119 @@ class DropStudioEntry extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: onTap ?? () => DropStudioScreen.open(context),
           child: Container(
-            height: 168,
+            height: 214,
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
-              color: _deep,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: _gold.withValues(alpha: .38)),
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF1A1030), _deep],
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: _gold.withValues(alpha: .45)),
+              gradient: const RadialGradient(
+                center: Alignment(.3, .1),
+                radius: 1.1,
+                colors: [Color(0xFF2A1450), Colors.black],
               ),
+              boxShadow: const [BoxShadow(color: Color(0x80120428), blurRadius: 30, offset: Offset(0, 16))],
             ),
-            child: Stack(children: [
-              Positioned(
-                right: -6,
-                top: 0,
-                bottom: 0,
-                width: 150,
-                child: ShaderMask(
-                  shaderCallback: (r) => const LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.center,
-                    colors: [Colors.transparent, Colors.black],
-                  ).createShader(r),
-                  blendMode: BlendMode.dstIn,
-                  child: const EditableImage.asset(DropStudioAssets.figureDrop,
-                      slot: _slot, fit: BoxFit.cover, alignment: Alignment.topCenter),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 18, 130, 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const EditableLabel(_slot, 'DROP STUDIO',
-                        style: TextStyle(
-                            color: _goldSoft, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2.6)),
-                    const SizedBox(height: 8),
-                    const Expanded(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.topLeft,
-                        child: EditableLabel(_slot, "Today's drop.\nMake this home yours.",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'CormorantGaramond',
-                                fontSize: 21,
-                                height: 1.15,
-                                fontWeight: FontWeight.w600)),
-                      ),
+            child: ListenableBuilder(
+              listenable: ContentStore.instance,
+              builder: (context, _) {
+                final word = dropWordsFor(ContentStore.instance.library, (clock ?? DateTime.now)()).firstOrNull;
+                return Stack(clipBehavior: Clip.hardEdge, children: [
+                  Positioned.fill(child: CustomPaint(painter: _RingsPainter(.42))),
+                  // posters, far to near
+                  const Positioned(
+                    left: -22,
+                    top: 34,
+                    child: _Poster(asset: DropStudioAssets.stillness, id: 'entry.stillness', width: 150, angle: -.14),
+                  ),
+                  const Positioned(
+                    right: -30,
+                    top: 18,
+                    child: _Poster(asset: DropStudioAssets.cosmos, id: 'entry.cosmos', width: 150, angle: .12),
+                  ),
+                  const Positioned(
+                    left: 96,
+                    bottom: 18,
+                    child: _Poster(asset: DropStudioAssets.body, id: 'entry.body', width: 112, angle: .07),
+                  ),
+                  // the word, giant and cropped by the card
+                  if (word != null)
+                    Positioned(
+                      left: -6,
+                      bottom: -26,
+                      child: Text(word.word.toUpperCase(),
+                          key: const ValueKey('drop-studio-entry-word'),
+                          softWrap: false,
+                          overflow: TextOverflow.visible,
+                          style: TextStyle(
+                              fontFamily: 'CormorantGaramond',
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white.withValues(alpha: .94),
+                              fontSize: 112,
+                              height: .8,
+                              letterSpacing: -3,
+                              shadows: const [Shadow(color: Color(0xAA000000), blurRadius: 18)])),
                     ),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(
-                          color: _gold, borderRadius: BorderRadius.circular(40)),
-                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                        EditableLabel(_slot, 'Open the studio',
-                            style: TextStyle(color: _deep, fontSize: 13, fontWeight: FontWeight.w800)),
-                        SizedBox(width: 6),
-                        Icon(Icons.north_east_rounded, size: 15, color: _deep),
-                      ]),
+                  // cut-out figure in front of everything
+                  const Positioned(
+                    right: 6,
+                    top: 14,
+                    bottom: -4,
+                    width: 168,
+                    child: EditableImage.asset(DropStudioAssets.figureDrop,
+                        slot: _slot,
+                        id: 'entry.figure',
+                        fit: BoxFit.contain,
+                        alignment: Alignment.bottomCenter,
+                        filterQuality: FilterQuality.high),
+                  ),
+                  Positioned(left: 14, top: 14, child: _Chip(text: 'DROP STUDIO · ${_DropHero._hourLabel()}')),
+                  Positioned(
+                    right: 14,
+                    top: 14,
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(shape: BoxShape.circle, color: _gold),
+                      child: const Icon(Icons.north_east_rounded, color: Color(0xFF14100A), size: 19),
                     ),
-                    ),
-                  ],
-                ),
-              ),
-            ]),
+                  ),
+                ]);
+              },
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Stands in for the deck when the library has no words with a meaning yet.
+class _EmptyPoster extends StatelessWidget {
+  const _EmptyPoster();
+  @override
+  Widget build(BuildContext context) => Center(
+        child: Transform.rotate(
+          angle: -.03,
+          child: Container(
+            key: const ValueKey('drop-empty-poster'),
+            width: 260,
+            height: 200,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1E8D6),
+              border: Border.all(color: Colors.white, width: 4),
+              boxShadow: const [BoxShadow(color: Color(0xCC000000), blurRadius: 30, offset: Offset(0, 18))],
+            ),
+            child: const EditableLabel(_slot, 'Words land\non the hour',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontFamily: 'CormorantGaramond',
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF14100A),
+                    fontSize: 38,
+                    height: .95)),
+          ),
+        ),
+      );
 }

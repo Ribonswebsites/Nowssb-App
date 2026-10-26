@@ -201,13 +201,21 @@ class _PageShellState extends State<PageShell> {
                                 ),
                                 const SizedBox(height: 4),
                               ],
-                              EditableLabel('page_shell.PageShell',
-                                widget.title,
-                                style: const TextStyle(
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
-                                  height: 1.1,
+                              // One line, shrunk to fit: "NowssB Store" must
+                              // not break into "Nows / sB Store" at 390.
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: EditableLabel('page_shell.PageShell',
+                                  widget.title,
+                                  maxLines: widget.title.contains('\n') ? null : 1,
+                                  softWrap: false,
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                    height: 1.1,
+                                  ),
                                 ),
                               ),
                               if (widget.subtitle != null &&
