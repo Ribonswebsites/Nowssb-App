@@ -31,12 +31,14 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
       decoration: neu(r: 30), padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(children: [
-          const Flexible(child: Text('Trending now', style: nHello)),
-          const SizedBox(width: 8),
-          Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(color: nLink, borderRadius: BorderRadius.circular(10)),
-              child: const Text('#1', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white))),
-          const Spacer(),
+          // Wrap, not Flexible: at 320 x1.3 the badge drops below instead of
+          // breaking 'Trending' mid-word.
+          Expanded(child: Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+            const Text('Trending now', style: nHello),
+            Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(color: nLink, borderRadius: BorderRadius.circular(10)),
+                child: const Text('#1', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white))),
+          ])),
           const NLottie('assets/home/nm-anim-speaker.json', size: 36),
         ]),
         const SizedBox(height: 6),
