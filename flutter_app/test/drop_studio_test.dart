@@ -1,3 +1,5 @@
+import 'package:nowssb/screens/concept/drop_v5.dart';
+import 'package:nowssb/screens/concept/drop_v4_concepts.dart' show DoorHooks;
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -68,8 +70,22 @@ void main() {
 
   Future<void> openDoor(WidgetTester t, String label) async {
     await boot(t, const DropStudioScreen());
-    await reach(t, find.text(label));
-    await t.tap(find.text(label).hitTestable().first);
+    // v4 prism: the tab turns the prism, a tap on the front face opens it
+    final tab = find.ancestor(of: find.text(label), matching: find.byWidgetPredicate((w) => w.key is ValueKey<String> && '${(w.key as ValueKey<String>).value}'.startsWith('drop-prism-tab-')));
+    final prism = find.byKey(const ValueKey('drop-prism'));
+    for (var i = 0; i < 40 && prism.evaluate().isEmpty; i++) {
+      await t.drag(find.byType(Scrollable).first, const Offset(0, -220));
+      await t.pump(const Duration(milliseconds: 120));
+    }
+    await t.ensureVisible(prism);
+    await t.pump();
+    await t.ensureVisible(tab.first);
+    await t.pump();
+    await t.tap(tab.hitTestable().first);
+    await settle(t);
+    await t.ensureVisible(find.byKey(const ValueKey('drop-prism')));
+    await t.pump();
+    await t.tap(find.byKey(const ValueKey('drop-prism')));
     await settle(t);
   }
 
@@ -295,51 +311,102 @@ void main() {
       await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {}, clock: () => now)])));
       final all = ContentStore.instance.library;
       String word() => t.widget<Text>(find.byKey(const ValueKey('drop-studio-entry-word'))).data!;
-      String chip() => (t.widget(find.byKey(const ValueKey('drop-studio-entry-chip'))) as dynamic).text as String;
+      String chip() => t.widget<Text>(find.byKey(const ValueKey('drop-entry-when'))).data!;
       expect(word(), dropWordsFor(all, now).first.word.toUpperCase());
-      expect(chip(), endsWith('MORNING'));
+      expect(chip(), startsWith('This morning'));
       expect(DayClock.running, isTrue);
       now = DateTime(2026, 10, 26, 12, 0, 1);
       await t.pump(const Duration(minutes: 2, seconds: 1));
       await t.pump();
       expect(word(), dropWordsFor(all, now).first.word.toUpperCase());
-      expect(chip(), endsWith('AFTERNOON'));
+      expect(chip(), startsWith('This afternoon'));
       await t.pumpWidget(const SizedBox());
       expect(DayClock.running, isFalse, reason: 'last listener gone: the timer is cancelled');
     });
   });
 
-  group('Drop entry real-device fixes', () {
-    testWidgets('01:17 local reads NIGHT, not MORNING', (t) async {
-      final now = DateTime(2026, 10, 27, 1, 17);
-      DayClock.clock = () => now;
+  group('Drop entry v4 (peel poster)', () {
+    testWidgets('01:00 and 01:17 local read night (Tonight), not morning', (t) async {
+      for (final now in [DateTime(2026, 10, 27, 1), DateTime(2026, 10, 27, 1, 17)]) {
+        DayClock.clock = () => now;
+        await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {})])));
+        expect(t.widget<Text>(find.byKey(const ValueKey('drop-entry-when'))).data, 'Tonight, 1 AM');
+        expect(dayPartFor(now), DayPart.night);
+        await t.pumpWidget(const SizedBox());
+      }
+      DayClock.clock = null;
+    });
+    testWidgets('tap opens the studio; peel drag springs back (instant under reduced motion)', (t) async {
+      DayClock.clock = () => DateTime(2026, 10, 27, 9);
       addTearDown(() => DayClock.clock = null);
-      await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {})])));
-      final chip = (t.widget(find.byKey(const ValueKey('drop-studio-entry-chip'))) as dynamic).text as String;
-      expect(chip, 'DROP STUDIO · NIGHT');
-      expect(dayPartFor(DateTime(2026, 1, 1, 1)), DayPart.night);
+      var opened = 0;
+      await boot(
+          t,
+          MediaQuery(
+              data: const MediaQueryData(size: Size(390, 844), disableAnimations: true),
+              child: Scaffold(body: ListView(children: [DropStudioEntry(onTap: () => opened++)]))));
+      await t.tap(find.byKey(const ValueKey('drop-studio-entry-word')));
+      await t.pump();
+      expect(opened, 1);
+      final entry = t.getRect(find.byKey(const ValueKey('drop-studio-entry')));
+      await t.dragFrom(entry.bottomRight - const Offset(30, 30), const Offset(-60, -60));
+      expect(await t.pumpAndSettle(), lessThanOrEqualTo(6), reason: 'reduced motion: the peel snaps back, no spring');
       await t.pumpWidget(const SizedBox());
     });
     for (final w in [320.0, 360.0, 390.0, 412.0]) {
       for (final s in [1.0, 1.3]) {
-        testWidgets('word whole + chip clear of STILLNESS at $w x$s', (t) async {
+        testWidgets('entry word whole, no overflow at $w x$s', (t) async {
           DayClock.clock = () => DateTime(2026, 10, 27, 1, 17);
           addTearDown(() => DayClock.clock = null);
           await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {})])), w: w, s: s);
           final card = t.getRect(find.byKey(const ValueKey('drop-studio-entry')));
-          final wf = find.byKey(const ValueKey('drop-studio-entry-word'));
-          if (wf.evaluate().isNotEmpty) {
-            final fb = find.ancestor(of: wf, matching: find.byType(FittedBox)).first;
-            final r = t.getRect(fb);
-            expect(r.left >= card.left && r.right <= card.right && r.bottom <= card.bottom && r.top >= card.top, isTrue,
-                reason: 'word box $r inside card $card');
+          final r = t.getRect(find.ancestor(of: find.byKey(const ValueKey('drop-studio-entry-word')), matching: find.byType(FittedBox)).first);
+          expect(r.left >= card.left && r.right <= card.right && r.top >= card.top && r.bottom <= card.bottom, isTrue,
+              reason: 'word $r inside $card');
+          expect(t.takeException(), isNull);
+          for (final e in find.byType(Text).evaluate()) {
+            expect((e.widget as Text).overflow, isNot(TextOverflow.ellipsis));
           }
-          final chipBox = t.getRect(find.ancestor(
-              of: find.byKey(const ValueKey('drop-studio-entry-chip')), matching: find.byType(FittedBox)).first);
-          final still = find.byWidgetPredicate((x) => x.runtimeType.toString() == '_Poster' && (x as dynamic).id == 'entry.stillness');
-          final pr = t.getRect(still);
-          // poster tilts -0.14 rad: its raised corner sits ~11px above its box
-          expect(chipBox.bottom <= pr.top - 12, isTrue, reason: 'chip $chipBox vs poster $pr');
+          await t.pumpWidget(const SizedBox());
+        });
+      }
+    }
+  });
+
+  group('Drop doors v4 (prism)', () {
+    for (final (i, label) in [(0, 'Themes'), (1, 'Background'), (2, 'Start art'), (3, 'Access')]) {
+      testWidgets('tab $label turns the prism; front tap fires its hook', (t) async {
+        final hits = <String>[];
+        await boot(
+            t,
+            Scaffold(
+                body: ListView(children: [
+              DoorsPrismV5(
+                  hooks: DoorHooks(
+                onOpenThemes: () => hits.add('Themes'),
+                onOpenBackground: () => hits.add('Background'),
+                onOpenStartArt: () => hits.add('Start art'),
+                onOpenAccess: () => hits.add('Access'),
+              ))
+            ])));
+        await t.ensureVisible(find.byKey(ValueKey('drop-prism-tab-$i')));
+        await t.pump();
+        await t.tap(find.byKey(ValueKey('drop-prism-tab-$i')));
+        await settle(t, 4);
+        await t.tap(find.byKey(const ValueKey('drop-prism')));
+        await t.pump();
+        expect(hits, [label]);
+        await t.pumpWidget(const SizedBox());
+      });
+    }
+    for (final w in [320.0, 360.0, 390.0, 412.0]) {
+      for (final s in [1.0, 1.3]) {
+        testWidgets('prism: no overflow at $w x$s', (t) async {
+          await boot(t, const Scaffold(body: SingleChildScrollView(child: DoorsPrismV5())), w: w, s: s);
+          expect(t.takeException(), isNull);
+          for (final e in find.byType(Text).evaluate()) {
+            expect((e.widget as Text).overflow, isNot(TextOverflow.ellipsis));
+          }
           await t.pumpWidget(const SizedBox());
         });
       }

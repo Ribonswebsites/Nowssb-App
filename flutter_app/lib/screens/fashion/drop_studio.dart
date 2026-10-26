@@ -31,6 +31,8 @@ import '../store/store_actions.dart';
 import '../store/store_art.dart';
 import '../store/store_cards.dart' show kWordPriceInr, localizedMoney;
 import '../widgets_page.dart';
+import '../concept/drop_v4_concepts.dart' show DoorHooks;
+import '../concept/drop_v5.dart';
 import '../word_detail.dart';
 
 /// The real Drop Studio page: every hook wired.
@@ -255,13 +257,12 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
                     onBuy: widget.onBuy,
                   ),
                   const SizedBox(height: 34),
-                  _HomeAndDoors(
-                    scroll: _y - 900,
-                    doors: _Doors(
-                      onThemes: widget.onOpenThemes,
-                      onBackground: widget.onOpenBackground,
-                      onStartArt: widget.onOpenStartArt,
-                      onAccess: widget.onOpenAccess,
+                  DoorsPrismV5(
+                    hooks: DoorHooks(
+                      onOpenThemes: widget.onOpenThemes,
+                      onOpenBackground: widget.onOpenBackground,
+                      onOpenStartArt: widget.onOpenStartArt,
+                      onOpenAccess: widget.onOpenAccess,
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -1009,240 +1010,6 @@ class _WordPoster extends StatelessWidget {
   }
 }
 
-// ─── 3 · "Make this home yours" collage ──────────────────────────────────
-
-/// Collage + doors share one Stack so the cut-out figure can step down
-/// over the doors (it ignores taps, the doors stay tappable).
-class _HomeAndDoors extends StatelessWidget {
-  const _HomeAndDoors({required this.scroll, required this.doors});
-  final double scroll;
-  final Widget doors;
-  static const double _figTop = -32;
-  @override
-  Widget build(BuildContext context) {
-    final p = (scroll * .15).clamp(-60.0, 60.0);
-    return Breath(builder: (context, t) {
-      return Stack(clipBehavior: Clip.none, children: [
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const _Kicker('Make this home yours'),
-              const SizedBox(height: 8),
-              const EditableLabel(_slot, 'Four doors.\nOne tap.',
-                  style: TextStyle(
-                      fontFamily: 'CormorantGaramond',
-                      fontStyle: FontStyle.italic,
-                      color: Colors.white,
-                      fontSize: 40,
-                      height: 1)),
-              const SizedBox(height: 6),
-              const EditableLabel(_slot, 'Themes · Background\nStart art · Access',
-                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, height: 1.3)),
-              SizedBox(
-                height: 230,
-                child: Stack(clipBehavior: Clip.none, children: [
-                  Positioned(
-                    left: 0,
-                    top: 20 - p * .4,
-                    child: Plane(
-                        depth: .4,
-                        phase: t,
-                        drift: 4,
-                        child:
-                            const _Poster(asset: DropStudioAssets.player, id: 'home.player', width: 170, angle: -.12)),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 90 - p * .6,
-                    child: Plane(
-                        depth: .6,
-                        phase: t + .4,
-                        drift: 5,
-                        child: const _Poster(
-                            asset: DropStudioAssets.stillness, id: 'home.stillness', width: 190, angle: .1)),
-                  ),
-                  // the figure steps out of the collage and stands BEHIND the
-                  // doors: she lives in the collage layer, which paints before
-                  // the doors, so door 2's arch crops her lower body.
-                  Positioned(
-                    left: 154,
-                    right: -30,
-                    top: _figTop,
-                    height: 330,
-                    child: IgnorePointer(
-                      child: Plane(
-                        depth: 1,
-                        phase: t,
-                        drift: 2,
-                        // soft feather on the last strip so the sliver that
-                        // peeks past door 2's edge never shows a straight cut
-                        child: ShaderMask(
-                          blendMode: BlendMode.dstIn,
-                          shaderCallback: (r) => const LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            stops: [.8, 1],
-                            colors: [Colors.white, Colors.transparent],
-                          ).createShader(r),
-                          child: const EditableImage.asset(DropStudioAssets.figureHome,
-                              slot: _slot,
-                              id: 'home.figure',
-                              fit: BoxFit.contain,
-                              alignment: Alignment.bottomCenter,
-                              filterQuality: FilterQuality.high),
-                        ),
-                      ),
-                    ),
-                  ),
-                ]),
-              ),
-            ]),
-          ),
-          doors,
-        ]),
-      ]);
-    });
-  }
-}
-
-// ─── 4 · the four doors: arched collage doors ────────────────────────────
-
-class _Doors extends StatelessWidget {
-  const _Doors({this.onThemes, this.onBackground, this.onStartArt, this.onAccess});
-  final VoidCallback? onThemes;
-  final VoidCallback? onBackground;
-  final VoidCallback? onStartArt;
-  final VoidCallback? onAccess;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget door(int i, String title, String sub, String asset, VoidCallback? cb, double tilt) => Expanded(
-          child: _Door(n: i, title: title, sub: sub, asset: asset, onTap: cb, tilt: tilt),
-        );
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Breath(
-        builder: (context, t) => Column(children: [
-          Row(children: [
-            door(1, 'Themes', 'Black Edition', DropStudioAssets.library, onThemes, -.02 + .01 * Stillwater.lungs(t)),
-            door(2, 'Background', 'Fashion backdrop', DropStudioAssets.cosmos, onBackground,
-                .02 - .01 * Stillwater.lungs(t)),
-          ]),
-          const SizedBox(height: 10),
-          Row(children: [
-            door(3, 'Start art', 'Behind the start', DropStudioAssets.body, onStartArt, .015),
-            door(4, 'Access', 'Bottom nav bar', DropStudioAssets.listen, onAccess, -.015),
-          ]),
-        ]),
-      ),
-    );
-  }
-}
-
-class _Door extends StatefulWidget {
-  const _Door(
-      {required this.n, required this.title, required this.sub, required this.asset, this.onTap, this.tilt = 0});
-  final int n;
-  final String title;
-  final String sub;
-  final String asset;
-  final VoidCallback? onTap;
-  final double tilt;
-  @override
-  State<_Door> createState() => _DoorState();
-}
-
-class _DoorState extends State<_Door> {
-  bool _down = false;
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) {
-        HapticFeedback.selectionClick();
-        setState(() => _down = true);
-      },
-      onTapCancel: () => setState(() => _down = false),
-      onTapUp: (_) => setState(() => _down = false),
-      onTap: widget.onTap,
-      child: AnimatedScale(
-        scale: _down ? .95 : 1,
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutBack,
-        child: Transform.rotate(
-          angle: widget.tilt,
-          child: Container(
-            margin: const EdgeInsets.all(5),
-            height: 210,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(90), bottom: Radius.circular(18)),
-              border: Border.all(color: _gold.withValues(alpha: .7), width: 1.2),
-              boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 22, offset: Offset(0, 12))],
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(89), bottom: Radius.circular(17)),
-              child: Stack(fit: StackFit.expand, children: [
-                EditableImage.asset(widget.asset,
-                    slot: _slot,
-                    id: 'door.${widget.n}',
-                    fit: BoxFit.cover,
-                    alignment: Alignment.center,
-                    filterQuality: FilterQuality.high),
-                const DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: [.25, 1],
-                      colors: [Color(0x22060C18), Color(0xF2060C18)],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 14,
-                  bottom: 62,
-                  child: Center(
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: _goldSoft)),
-                      child: Text('${widget.n}',
-                          style: const TextStyle(
-                              fontFamily: 'CormorantGaramond',
-                              color: _goldSoft,
-                              fontSize: 16,
-                              fontStyle: FontStyle.italic)),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 14,
-                  right: 14,
-                  bottom: 14,
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    EditableLabel(_slot, widget.title,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -.3)),
-                    const SizedBox(height: 2),
-                    Row(children: [
-                      Expanded(
-                        child: EditableLabel(_slot, widget.sub,
-                            style: TextStyle(color: Colors.white.withValues(alpha: .7), fontSize: 11.5)),
-                      ),
-                      const Icon(Icons.arrow_forward_rounded, color: _goldSoft, size: 16),
-                    ]),
-                  ]),
-                ),
-              ]),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 // ─── 5 · how the drop flows: three torn tiles + buy dock ─────────────────
 
 class _TornClipper extends CustomClipper<Path> {
@@ -1429,145 +1196,20 @@ class _BuyDock extends StatelessWidget {
 /// yours" used to be: a small cut of the Drop hero — tilted posters behind
 /// the cut-out figure, the gold drop chip, and this hour's word in giant
 /// cropped type.
-class DropStudioEntry extends StatefulWidget {
+class DropStudioEntry extends StatelessWidget {
   const DropStudioEntry({super.key, this.onTap, this.clock});
   final VoidCallback? onTap;
   final DateTime Function()? clock;
 
   @override
-  State<DropStudioEntry> createState() => _DropStudioEntryState();
-}
-
-class _DropStudioEntryState extends State<DropStudioEntry> {
-  @override
-  void initState() {
-    super.initState();
-    DayClock.retain();
-  }
-
-  @override
-  void dispose() {
-    DayClock.release();
-    super.dispose();
-  }
-
-  VoidCallback? get onTap => widget.onTap;
-  DateTime Function()? get clock => widget.clock;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
-      child: Semantics(
-        button: true,
-        label: 'Open Drop Studio',
-        child: GestureDetector(
-          key: const ValueKey('drop-studio-entry'),
-          behavior: HitTestBehavior.opaque,
-          onTap: onTap ?? () => DropStudioScreen.open(context),
-          child: Container(
-            height: 214,
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: _gold.withValues(alpha: .45)),
-              gradient: const RadialGradient(
-                center: Alignment(.3, .1),
-                radius: 1.1,
-                colors: [Color(0xFF2A1450), Colors.black],
-              ),
-              boxShadow: const [BoxShadow(color: Color(0x80120428), blurRadius: 30, offset: Offset(0, 16))],
-            ),
-            child: ListenableBuilder(
-              listenable: Listenable.merge([ContentStore.instance, DayClock.tick]),
-              builder: (context, _) {
-                final now = clock?.call() ?? DayClock.now();
-                final word = dropWordsFor(ContentStore.instance.library, now).firstOrNull;
-                return Stack(clipBehavior: Clip.hardEdge, children: [
-                  Positioned.fill(child: CustomPaint(painter: _RingsPainter(.42))),
-                  // posters, far to near
-                  const Positioned(
-                    left: -22,
-                    top: 66,
-                    child: _Poster(asset: DropStudioAssets.stillness, id: 'entry.stillness', width: 150, angle: -.14),
-                  ),
-                  const Positioned(
-                    right: -30,
-                    top: 18,
-                    child: _Poster(asset: DropStudioAssets.cosmos, id: 'entry.cosmos', width: 150, angle: .12),
-                  ),
-                  const Positioned(
-                    left: 96,
-                    bottom: 18,
-                    child: _Poster(asset: DropStudioAssets.body, id: 'entry.body', width: 112, angle: .07),
-                  ),
-                  // cut-out figure behind the word
-                  const Positioned(
-                    right: 6,
-                    top: 14,
-                    bottom: -4,
-                    width: 168,
-                    child: EditableImage.asset(DropStudioAssets.figureDrop,
-                        slot: _slot,
-                        id: 'entry.figure',
-                        fit: BoxFit.contain,
-                        alignment: Alignment.bottomCenter,
-                        filterQuality: FilterQuality.high),
-                  ),
-                  // the word, giant: reads from its first letter and bleeds
-                  // off the right edge only
-                  if (word != null)
-                    Positioned(
-                      left: 14,
-                      right: 14,
-                      bottom: 10,
-                      child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.bottomLeft,
-                      child: Text(word.word.toUpperCase(),
-                          key: const ValueKey('drop-studio-entry-word'),
-                          softWrap: false,
-                          maxLines: 1,
-                          textAlign: TextAlign.left,
-                          overflow: TextOverflow.clip,
-                          style: TextStyle(
-                              fontFamily: 'CormorantGaramond',
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white.withValues(alpha: .94),
-                              fontSize: 112,
-                              height: .8,
-                              letterSpacing: -3,
-                              shadows: const [Shadow(color: Color(0xAA000000), blurRadius: 18)])),
-                    )),
-                  Positioned(
-                      left: 14,
-                      top: 14,
-                      right: 64,
-                      height: 34,
-                      child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.topLeft,
-                      child: _Chip(
-                          key: const ValueKey('drop-studio-entry-chip'),
-                          text: 'DROP STUDIO · ${_DropHero._hourLabel(now)}'))),
-                  Positioned(
-                    right: 14,
-                    top: 14,
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(shape: BoxShape.circle, color: _gold),
-                      child: const Icon(Icons.north_east_rounded, color: Color(0xFF14100A), size: 19),
-                    ),
-                  ),
-                ]);
-              },
-            ),
-          ),
+  Widget build(BuildContext context) => KeyedSubtree(
+        key: const ValueKey('drop-studio-entry'),
+        child: EntryPeelV5(
+          now: clock,
+          wordFor: (at) => dropWordsFor(ContentStore.instance.library, at).firstOrNull,
+          onOpenDrop: onTap ?? () => DropStudioScreen.open(context),
         ),
-      ),
-    );
-  }
+      );
 }
 
 /// Stands in for the deck when the library has no words with a meaning yet.
