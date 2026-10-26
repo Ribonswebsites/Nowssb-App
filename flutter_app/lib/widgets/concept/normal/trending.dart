@@ -39,7 +39,9 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
                 decoration: BoxDecoration(color: nLink, borderRadius: BorderRadius.circular(10)),
                 child: const Text('#1', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white))),
           ])),
-          const NLottie('assets/home/nm-anim-speaker.json', size: 36),
+          // small live equaliser (same loop as the poster), not a speaker icon
+          ExcludeSemantics(child: SizedBox(width: 30, height: 24, child: AnimatedBuilder(animation: loop,
+              builder: (_, __) => CustomPaint(painter: _Bars(loop.value))))),
         ]),
         const SizedBox(height: 6),
         NPress(label: 'Open $top', onTap: () => widget.onWord(top), child: SizedBox(height: 120, child: Stack(children: [
@@ -58,7 +60,7 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               child: Text.rich(TextSpan(children: [
                 TextSpan(text: '0${i + 1}  ', style: nSub.copyWith(color: nLink, fontWeight: FontWeight.w700)),
-                TextSpan(text: widget.words[i], style: nHello.copyWith(color: nInk)),
+                TextSpan(text: titleCase(widget.words[i]), style: nHello.copyWith(color: nInk)),
               ])),
             )),
         ]),
@@ -70,6 +72,26 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
       ]),
     ));
   }
+}
+
+/// 'SURYA' -> 'Surya', 'NEW MOON' -> 'New Moon' (library words are upper case).
+String titleCase(String s) => s.split(' ').map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1).toLowerCase()).join(' ');
+
+class _Bars extends CustomPainter {
+  _Bars(this.t);
+  final double t;
+  @override
+  void paint(Canvas c, Size s) {
+    const n = 4;
+    final bw = s.width / n;
+    final p = Paint()..color = nLink;
+    for (var i = 0; i < n; i++) {
+      final v = .3 + .7 * (.5 + .5 * math.sin(t * math.pi * 2 * 3 + i * 1.7));
+      c.drawRRect(RRect.fromLTRBR(i * bw + 2, s.height * (1 - v), (i + 1) * bw - 2, s.height, const Radius.circular(2)), p);
+    }
+  }
+  @override
+  bool shouldRepaint(_Bars o) => o.t != t;
 }
 
 class _Eq extends CustomPainter {
