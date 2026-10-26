@@ -41,13 +41,15 @@ class V5RewardsInvite extends StatelessWidget {
           final fd = _map(_map(_map(w.summary['config'])['reference'])['friendDiscount']);
           return Column(key: const ValueKey('v5-rewards-invite'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             NRewards(coins: w.coins, streak: w.streak, signedIn: signedIn, onOpenRewards: onOpenRewards, onSignIn: onSignIn),
-            NInvite(
-              onInvite: onInvite,
-              wordPct: _int(fd['wordPct']),
-              wordFirstN: _int(fd['wordFirstN']),
-              subscriptionPct: _int(fd['subscriptionPct']),
-              code: signedIn && w.code.isNotEmpty ? w.code : null,
-            ),
+            // no server config: no Invite card at all (no empty stub)
+            if (_int(fd['wordPct']) != null || _int(fd['subscriptionPct']) != null)
+              NInvite(
+                onInvite: onInvite,
+                wordPct: _int(fd['wordPct']),
+                wordFirstN: _int(fd['wordFirstN']),
+                subscriptionPct: _int(fd['subscriptionPct']),
+                code: signedIn && w.code.isNotEmpty ? w.code : null,
+              ),
           ]);
         },
       );
@@ -145,7 +147,8 @@ class V5EditionPartner extends StatelessWidget {
               playAvailable: ps.available,
               currentTier: ps.activeTier,
             ),
-            NPartner(points: w.partnerPoints, levels: levels.isEmpty ? null : levels, onPartner: onPartner),
+            // no server partner levels: no Partner card at all
+            if (levels.isNotEmpty) NPartner(points: w.partnerPoints, levels: levels, onPartner: onPartner),
           ]);
         },
       );
