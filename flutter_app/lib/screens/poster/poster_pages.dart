@@ -9,6 +9,7 @@ import '../library.dart';
 import '../store/bag_ui.dart';
 import '../store/product_detail.dart';
 import '../store/store_actions.dart';
+import '../store/store_art.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import '../store/store_cards.dart';
@@ -18,11 +19,13 @@ import '../store/store_select_sheet.dart';
 import 'poster_atelier.dart';
 import 'poster_kit.dart';
 import 'poster_meaning.dart';
+import 'poster_signature.dart';
 import 'poster_trending.dart';
 
 export 'poster_atelier.dart';
 export 'poster_kit.dart';
 export 'poster_meaning.dart';
+export 'poster_signature.dart';
 export 'poster_orbit.dart';
 export 'poster_trending.dart';
 
@@ -79,6 +82,25 @@ Widget posterMeaningPage(BuildContext x, {ScrollController? controller, DateTime
       onBuy: (m) => storeBuyNow(x, meaningBagItem(word: m.word, root: m.root, img: m.img, price: meaningPrice(m))),
     );
 
+/// The Signature Store poster (SignatureStoreScreen's page). Prices are the
+/// Play signature prices (StorePrices kind 'signature').
+Widget posterSignaturePage(BuildContext x, {ScrollController? controller}) => PosterSignature(
+      controller: controller,
+      onBack: () => posterBack(x),
+      onOpenStores: () => posterStores(x, 'signature'),
+      onOpenBag: () => posterBag(x),
+      onOpenSignatureWord: (s, p) => openAtelierWord(x, word: s.name, root: 'Most Exclusive', img: kNowssbStoreMark, signature: true, price: p),
+      onBuySignatureWord: (s, p) =>
+          storeBuyNow(x, wordBagItem(name: s.name, root: 'Most Exclusive', img: kNowssbStoreMark, price: p, signature: true)),
+      onOpenSignatureMeaning: (cat, e) => openMeaningDetail(
+        x,
+        MsMeaning(word: e.word, key: e.key, root: e.root, category: cat, price: sigMeaningPrice(e), img: kNowssbStoreMark),
+        signature: true,
+      ),
+      onBuySignatureMeaning: (cat, e) =>
+          storeBuyNow(x, meaningBagItem(word: e.word, root: e.root, img: kNowssbStoreMark, price: sigMeaningPrice(e), signature: true)),
+    );
+
 /// Trending — the destination of the home Trending cards.
 class TrendingScreen extends StatelessWidget {
   const TrendingScreen({super.key, this.controller, this.now, this.debugAngle, this.debugTilt});
@@ -107,5 +129,6 @@ class TrendingScreen extends StatelessWidget {
 final Map<String, PosterBuild> kPosterPages = {
   'trending': (c, now) => TrendingScreen(controller: c, now: now, debugAngle: .5, debugTilt: const Offset(-.3, .12)),
   'atelier': (c, now) => Builder(builder: (x) => posterAtelierPage(x, controller: c, now: now)),
+  'signature': (c, now) => Builder(builder: (x) => posterSignaturePage(x, controller: c)),
   'meaning': (c, now) => Builder(builder: (x) => posterMeaningPage(x, controller: c, now: now)),
 };
