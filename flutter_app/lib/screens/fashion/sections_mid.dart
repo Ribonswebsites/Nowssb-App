@@ -50,7 +50,8 @@ class FashTiles extends StatelessWidget {
     return SizedBox(
       height: pageH,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
+        // Side room so the banner titles sit inside the screen edges.
+        padding: const EdgeInsets.symmetric(horizontal: 18),
         child: _tilesShell(
           context,
           child: Column(
@@ -181,7 +182,11 @@ class _BannerTile extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            EditableImage.asset(
+            // Inset and scaled down so the banner's own title is not
+            // clipped by the tile's rounded edges.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 10, 34, 10),
+              child: EditableImage.asset(
               dest.banner,
               fit: BoxFit.contain,
               alignment: Alignment.centerLeft,
@@ -194,6 +199,7 @@ class _BannerTile extends StatelessWidget {
               errorBuilder: (_, __, ___) =>
                   const ColoredBox(color: Color(0xFF111111)),
                   slot: 'sections_mid.BannerTile',
+            ),
             ),
             // Top-right destination mark (restored SVG — was missing/broken).
             Positioned(

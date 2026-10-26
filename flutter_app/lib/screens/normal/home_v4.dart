@@ -116,6 +116,12 @@ const kPartnerLottie = 'assets/home/nm-anim-partner.json';
 const kSupportLottie = 'assets/home/nm-anim-support.json';
 /// The second meditation animation (line-art yoga); nm-v4-meditate stays.
 const kMeditateAltLottie = 'assets/home/nm-anim-meditate-line.json';
+const kBagLottie = 'assets/home/nm-anim-bag.json';
+const kHeadphonesLottie = 'assets/home/nm-anim-headphones.json';
+const kHeartLottie = 'assets/home/nm-anim-heart.json';
+const kTrendingLottie = 'assets/home/nm-anim-trending.json';
+const kInviteLottie = 'assets/home/nm-anim-invite.json';
+const kSunLottie = 'assets/home/nm-anim-sun.json';
 
 /// A NowssB film cut to a rounded window.
 class V4Film extends StatelessWidget {
@@ -224,6 +230,94 @@ Widget _twoCol(List<Widget> cells, {double gap = 14}) => Column(children: [
         ),
       ],
     ]);
+
+/// The Fashion 'NowssB Store' card, on the light home: a bold black title
+/// pill over rich rows (art tile, letter-spaced label, strong title, a line,
+/// and a round black action).
+class V4PillBlock extends StatelessWidget {
+  const V4PillBlock({super.key, required this.title, this.aside, required this.children});
+  final String title;
+  final String? aside;
+  final List<Widget> children;
+  @override
+  Widget build(BuildContext context) => V4Card(
+        pad: const EdgeInsets.all(12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Row(children: [
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(14)),
+                child: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+              ),
+            ),
+            if (aside != null) ...[
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(aside!,
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _accent)),
+              ),
+            ],
+          ]),
+          for (final c in children) ...[const SizedBox(height: 10), c],
+        ]),
+      );
+}
+
+/// One rich row of a [V4PillBlock].
+class V4RichRow extends StatelessWidget {
+  const V4RichRow({
+    super.key,
+    required this.art,
+    required this.label,
+    required this.title,
+    required this.sub,
+    required this.onTap,
+    this.action = Icons.arrow_forward_rounded,
+    this.actionLabel,
+  });
+  final Widget art;
+  final String label;
+  final String title;
+  final String sub;
+  final IconData action;
+  final String? actionLabel;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: actionLabel,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: _base, borderRadius: BorderRadius.circular(22), boxShadow: _raisedSm),
+            child: Row(children: [
+              _Well(size: const Size.square(68), pad: 4, child: Center(child: art)),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(label, style: const TextStyle(fontSize: 10.5, letterSpacing: 1.4, fontWeight: FontWeight.w800, color: _soft)),
+                  const SizedBox(height: 4),
+                  Text(title, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: _ink, height: 1.15)),
+                  const SizedBox(height: 3),
+                  Text(sub, style: const TextStyle(fontSize: 12.5, color: _soft, height: 1.3)),
+                ]),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+                child: Icon(action, color: Colors.white, size: 19),
+              ),
+            ]),
+          ),
+        ),
+      );
+}
 
 // ───────────────────────── routineCards ─────────────────────────
 
@@ -381,6 +475,9 @@ class V4Doors extends StatelessWidget {
   static const _doorLottie = {
     'player': kSpeakerLottie,
     'practice': kPlayLottie,
+    'library': kHeadphonesLottie,
+    'store': kBagLottie,
+    'healing': kHeartLottie,
     'reader': kReaderLottie,
     'subscription': kPremiumLottie,
     'progress': kProgressLottie,
@@ -625,56 +722,35 @@ class V4ReaderRewards extends StatelessWidget {
             listenable: EconomyMirror.instance,
             builder: (context, _) {
               final w = EconomyMirror.instance;
+              // The sign-in gate: no coins are shown until there is a real account.
               final signedIn = NwsbFirebase.ready && w.uid != null;
               final nextChest = 40 - (w.coins % 40);
-              return V4Card(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Row(children: [
-                    const _Well(circle: true, size: Size.square(64), child: V4Lottie(kRewardsLottie, size: 52)),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        const Text('NOWSSB REWARDS', style: _eyebrow),
-                        const SizedBox(height: 4),
-                        if (!signedIn) ...[
-                          const Text('Sign in to see your rewards', style: _h),
-                          const SizedBox(height: 4),
-                          const Text('Your coins and streak stay on your account', style: _sub),
-                        ] else ...[
-                          Text('${w.coins} coins', style: _h),
-                          const SizedBox(height: 4),
-                          Text('Streak ${w.streak} · $nextChest coins to the next chest', style: _sub),
-                        ],
-                      ]),
-                    ),
-                  ]),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: signedIn
-                        ? CalmGo(label: 'Open rewards', onTap: () => _push(context, const VaultScreen()))
-                        : CalmGo(label: 'Sign in', onTap: () => NwsbSignInPage.open(context)),
+              return V4PillBlock(
+                title: 'NowssB Rewards',
+                aside: signedIn ? 'Streak ${w.streak}' : 'Members',
+                children: [
+                  V4RichRow(
+                    art: const V4Lottie(kRewardsLottie, size: 52),
+                    label: 'NOWSSB REWARDS',
+                    title: signedIn ? '${w.coins} coins' : 'Sign in',
+                    sub: signedIn
+                        ? '$nextChest coins to the next chest'
+                        : 'Sign in to see your rewards',
+                    action: signedIn ? Icons.redeem_rounded : Icons.login_rounded,
+                    actionLabel: signedIn ? 'Open rewards' : 'Open sign in',
+                    onTap: signedIn
+                        ? () => _push(context, const VaultScreen())
+                        : () => NwsbSignInPage.open(context),
                   ),
-                  const SizedBox(height: 14),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(16),
+                  V4RichRow(
+                    art: const V4Lottie(kInviteLottie, size: 46),
+                    label: 'TRIBE · INVITE',
+                    title: 'Invite a friend',
+                    sub: 'Share your link. Your friend gets a discount; you earn when they buy for real.',
+                    action: Icons.person_add_alt_1_rounded,
                     onTap: () => _push(context, const ReferenceProgramPage()),
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 6),
-                      child: Row(children: [
-                        _Knob(NwsbMarks.reference, size: 40),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            Text('Invite a friend', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: _ink)),
-                            SizedBox(height: 2),
-                            Text('Share your link. Your friend gets a discount; you earn when they buy for real.', style: _sub),
-                          ]),
-                        ),
-                      ]),
-                    ),
                   ),
-                ]),
+                ],
               );
             },
           ),
@@ -695,34 +771,23 @@ class V4Trending extends StatelessWidget {
           final pick = [
             for (var i = 0; i < 3 && i < words.length; i++) words[(DateTime.now().day + 3 + i * 5) % words.length].word,
           ];
-          return V4Card(
+          return V4PillBlock(
             key: const ValueKey('v4-trending'),
-            onTap: onTap,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Row(children: [
-                Expanded(child: Text('TRENDING NOW', style: _eyebrow)),
-                V4Lottie(_waves, size: 44),
-              ]),
-              const SizedBox(height: 6),
-              for (var i = 0; i < pick.length; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
-                    SizedBox(
-                      width: 30,
-                      child: Text('${i + 1}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _accent)),
-                    ),
-                    Expanded(
-                      child: Text(pick[i],
-                          style: TextStyle(fontSize: i == 0 ? 26 : 20, fontWeight: FontWeight.w300, color: _ink, letterSpacing: .6)),
-                    ),
-                  ]),
-                ),
-              const SizedBox(height: 6),
-              const Text('See which words are healing the most people right now', style: _sub),
-              const SizedBox(height: 12),
-              Align(alignment: Alignment.centerLeft, child: CalmGo(label: 'Open the library', onTap: onTap)),
-            ]),
+            title: 'Trending Now',
+            aside: 'Healing right now',
+            children: [
+              V4RichRow(
+                art: const V4Lottie(kTrendingLottie, size: 52),
+                label: "TODAY'S TOP WORD",
+                title: pick.isEmpty ? 'The library' : pick.first,
+                sub: pick.length > 1
+                    ? 'Also rising: ${pick.skip(1).join(' · ')}'
+                    : 'See which words are healing the most people right now',
+                action: Icons.graphic_eq_rounded,
+                actionLabel: 'Open the library',
+                onTap: onTap,
+              ),
+            ],
           );
         },
       );
@@ -783,43 +848,37 @@ class V4Quick extends StatelessWidget {
   final VoidCallback? onWishlist;
   final VoidCallback? onOrders;
   @override
-  Widget build(BuildContext context) {
-    Widget item(String mark, String label, VoidCallback? tap, [String? lottie]) => Expanded(
-          child: InkWell(
-            borderRadius: BorderRadius.circular(18),
-            onTap: tap,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Column(children: [
-                _Knob(mark, size: 52, lottie: lottie),
-                const SizedBox(height: 8),
-                Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _ink)),
-              ]),
-            ),
+  Widget build(BuildContext context) => V4PillBlock(
+        key: const ValueKey('v4-quick'),
+        title: 'Everything You Own',
+        aside: 'On one screen',
+        children: [
+          V4RichRow(
+            art: const V4Lottie(kCartLottie, size: 46),
+            label: 'YOUR CART',
+            title: 'Cart',
+            sub: 'Words waiting for checkout',
+            action: Icons.shopping_bag_rounded,
+            onTap: onCart,
           ),
-        );
-    return V4Card(
-      key: const ValueKey('v4-quick'),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const Row(children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('EVERYTHING YOU OWN', style: _eyebrow),
-              SizedBox(height: 6),
-              Text('On one screen', style: _h),
-            ]),
+          V4RichRow(
+            art: const V4Lottie(kWishlistLottie, size: 46),
+            label: 'SAVED FOR LATER',
+            title: 'Wishlist',
+            sub: 'Words you kept to come back to',
+            action: Icons.favorite_rounded,
+            onTap: onWishlist,
           ),
-          V4Lottie(kCartLottie, size: 46),
-        ]),
-        const SizedBox(height: 14),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          item(NwsbMarks.cart, 'Cart', onCart, kCartLottie),
-          item(NwsbMarks.wishlist, 'Wishlist', onWishlist, kWishlistLottie),
-          item(NwsbMarks.order, 'Orders', onOrders, kOrdersLottie),
-        ]),
-      ]),
-    );
-  }
+          V4RichRow(
+            art: const V4Lottie(kOrdersLottie, size: 46),
+            label: 'YOUR ORDERS',
+            title: 'Orders',
+            sub: 'Track what you have bought',
+            action: Icons.local_shipping_rounded,
+            onTap: onOrders,
+          ),
+        ],
+      );
 }
 
 // ───────────────────────── edition ─────────────────────────

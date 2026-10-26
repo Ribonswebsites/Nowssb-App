@@ -406,11 +406,25 @@ class _PaidPeek extends StatelessWidget {
   }
 }
 
-/// The home Coupons section: a contained glass block of normal height —
-/// two tickets you can claim right here, and the way into the full page.
-/// No sideways strip, so it never traps the home scroll.
-class HomeCouponShelf extends StatelessWidget {
+/// The home Coupons section: a contained glass block with a snapping,
+/// swipeable row of every real ticket (the next one peeks in). Tapping a
+/// ticket claims it, exactly as on the full page.
+class HomeCouponShelf extends StatefulWidget {
   const HomeCouponShelf({super.key});
+
+  @override
+  State<HomeCouponShelf> createState() => _HomeCouponShelfState();
+}
+
+class _HomeCouponShelfState extends State<HomeCouponShelf> {
+  final _pager = PageController(viewportFraction: 0.88);
+  var _page = 0;
+
+  @override
+  void dispose() {
+    _pager.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -437,13 +451,36 @@ class HomeCouponShelf extends StatelessWidget {
                   style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600, height: 1.05, color: Color(0xFFF4F4F5)),
                 ),
                 const SizedBox(height: 4),
-                const EditableLabel('coupon_screen.HomeCouponShelf', 'Tap a ticket to claim it. A free scratch waits every day.',
-                    style: TextStyle(fontSize: 12, height: 1.35, color: Color(0xB3FFFFFF))),
+                Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  const Expanded(
+                    child: EditableLabel('coupon_screen.HomeCouponShelf', 'Swipe the tickets. Tap one to claim it.',
+                        style: TextStyle(fontSize: 12, height: 1.35, color: Color(0xB3FFFFFF))),
+                  ),
+                  const SizedBox(width: 8),
+                  Text('${_page + 1} / ${kWideCoupons.length}',
+                      key: const ValueKey('coupon-shelf-count'),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFFE4C56A))),
+                ]),
                 const SizedBox(height: 12),
-                for (final d in kWideCoupons.take(2)) ...[
-                  WideCoupon(data: d, width: c.maxWidth, expires: couponExpiry(d.copy), scissorsLeft: d == kWideCoupons.first),
-                  const SizedBox(height: 10),
-                ],
+                SizedBox(
+                  height: 168,
+                  child: PageView.builder(
+                    key: const ValueKey('coupon-shelf-pager'),
+                    controller: _pager,
+                    padEnds: false,
+                    itemCount: kWideCoupons.length,
+                    onPageChanged: (i) => setState(() => _page = i),
+                    itemBuilder: (context, i) {
+                      final d = kWideCoupons[i];
+                      final w = c.maxWidth * 0.88 - 10;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: WideCoupon(data: d, width: w, expires: couponExpiry(d.copy), scissorsLeft: i.isEven),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
                 GoldButton(
                   label: 'Scratch, tickets and paid cards',
                   filled: false,

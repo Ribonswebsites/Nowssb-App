@@ -260,8 +260,9 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
+          // Fashion (glassIcon) has no page dots under the promo.
+          if (!widget.glassIcon) const SizedBox(height: 8),
+          if (!widget.glassIcon) Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               for (var i = 0; i < _slides.length; i++)

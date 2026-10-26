@@ -11,7 +11,7 @@
 /// on each class say where.
 library;
 
-import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie;
+import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie, kSunLottie;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -72,7 +72,11 @@ class NmGreeting extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: NwsbShadows.raisedXs,
             ),
-            child: Icon(nmGreetMark(), size: 26, color: WrapHead.markGold),
+            child: Center(
+              child: DateTime.now().hour < 17
+                  ? const V4Lottie(kSunLottie, size: 34)
+                  : Icon(nmGreetMark(), size: 26, color: WrapHead.markGold),
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
