@@ -211,8 +211,18 @@ class CourseFace extends StatelessWidget {
         ),
         if (chips.isNotEmpty) ...[
           const SizedBox(height: 16),
-          SingleChildScrollView(
+          // The tabs scroll sideways; the right edge fades out so a cut-off
+          // tab reads as "more this way", not as a clipped word (B027).
+          ShaderMask(
+            key: const ValueKey('course-chips-fade'),
+            blendMode: BlendMode.dstIn,
+            shaderCallback: (r) => LinearGradient(
+              colors: const [Colors.white, Colors.white, Color(0x00FFFFFF)],
+              stops: [0, r.width <= 0 ? 0 : (1 - 32 / r.width).clamp(0.0, 1.0), 1],
+            ).createShader(r),
+            child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(right: 32),
             child: Row(
               children: [
                 for (var i = 0; i < chips.length; i++)
@@ -235,6 +245,7 @@ class CourseFace extends StatelessWidget {
                   ),
               ],
             ),
+          ),
           ),
         ],
         if (rowTitle != null) ...[
