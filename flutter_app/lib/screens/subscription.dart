@@ -16,20 +16,30 @@ import 'store/store_terms_sheet.dart';
 import '../features/programs/store_extras.dart';
 
 class SubscriptionScreen extends StatefulWidget {
-  const SubscriptionScreen({super.key});
+  const SubscriptionScreen({super.key, this.initialTier});
+
+  /// Billing tier id (e.g. 'frequency') to open on; null keeps the first plan.
+  final String? initialTier;
   @override
   State<SubscriptionScreen> createState() => _SubscriptionScreenState();
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   bool yearly = false;
-  int selected = 0;
+  late int selected = initialIndex(widget.initialTier);
   late final PageController planController;
+
+  /// Index into [plans] for a billing tier id; 0 when unknown or null.
+  static int initialIndex(String? tier) {
+    if (tier == null) return 0;
+    final i = plans.indexWhere((p) => tierForPlanName(p.name) == tier);
+    return i < 0 ? 0 : i;
+  }
 
   @override
   void initState() {
     super.initState();
-    planController = PageController(viewportFraction: 0.88);
+    planController = PageController(viewportFraction: 0.88, initialPage: selected);
     PlaySubscriptions.instance.addListener(_billingChanged);
     PlaySubscriptions.instance.start();
     WidgetsBinding.instance.addPostFrameCallback((_) {

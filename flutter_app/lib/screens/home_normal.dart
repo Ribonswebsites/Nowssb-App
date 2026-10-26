@@ -438,7 +438,7 @@ class _HomeNormalState extends State<HomeNormal> {
         (
           'edition',
           V5EditionPartner(
-            onJoin: (_) => _push(const SubscriptionScreen()),
+            onJoin: (t) => _push(SubscriptionScreen(initialTier: t)),
             onPartner: () => _push(const PartnerProgramPage()),
           )
         ),
