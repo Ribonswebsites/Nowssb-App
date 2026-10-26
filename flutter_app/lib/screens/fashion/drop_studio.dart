@@ -902,8 +902,8 @@ class _WordPoster extends StatelessWidget {
                     softWrap: false,
                     overflow: TextOverflow.visible,
                     style: TextStyle(
-                        fontFamily: 'CormorantGaramond',
-                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Anton',
+                        fontWeight: FontWeight.w400,
                         color: ink,
                         fontSize: 132,
                         height: .8,
@@ -931,8 +931,8 @@ class _WordPoster extends StatelessWidget {
                     softWrap: false,
                     overflow: TextOverflow.visible,
                     style: TextStyle(
-                        fontFamily: 'CormorantGaramond',
-                        fontWeight: FontWeight.w900,
+                        fontFamily: 'Anton',
+                        fontWeight: FontWeight.w400,
                         color: ink,
                         fontSize: 132,
                         height: .8,
@@ -1064,8 +1064,8 @@ class _FlowTile extends StatelessWidget {
               bottom: 14,
               child: EditableLabel(_slot, word,
                   style: const TextStyle(
-                      fontFamily: 'CormorantGaramond',
-                      fontWeight: FontWeight.w900,
+                      fontFamily: 'Anton',
+                      fontWeight: FontWeight.w400,
                       color: Colors.white,
                       fontSize: 92,
                       height: .8,

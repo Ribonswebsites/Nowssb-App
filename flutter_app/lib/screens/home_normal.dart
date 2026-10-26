@@ -670,6 +670,8 @@ class _TopRow extends StatelessWidget {
             ),
           ),
         ),
+        // B022: keep the word clear of the raised button's highlight.
+        const SizedBox(width: 10),
         // Right cluster: Settings | Notifications | Hamburger
         // Quick access belongs in Fashion Hero — bell returns here.
         _HeaderButton(

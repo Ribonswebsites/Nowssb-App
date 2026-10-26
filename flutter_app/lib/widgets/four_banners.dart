@@ -2,6 +2,7 @@
 /// a split promo, a black glass row, and a sideways poster shelf.
 library;
 
+import 'package:nowssb/widgets/word_fit_text.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -208,9 +209,8 @@ class _TrioRailState extends State<TrioRail> {
                                 left: 8,
                                 right: 8,
                                 bottom: 8,
-                                child: Text(
+                                child: WordFitText(
                                   face.label,
-                                  maxLines: 2,
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w800,

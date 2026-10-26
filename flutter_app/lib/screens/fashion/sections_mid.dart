@@ -1263,18 +1263,21 @@ class FashPrescription extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
                       width: 9,
                       height: 9,
+                      margin: const EdgeInsets.only(top: 4),
                       color: NwsbColors.goldLight,
                     ),
                     const SizedBox(width: 10),
-                    const Flexible(
+                    // Own line, wraps on word boundaries (B022: no ellipsis).
+                    const Expanded(
                       child: EditableLabel('sections_mid.FashPrescription',
                         'AI PRESCRIPTION',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        softWrap: true,
                         style: TextStyle(
                           fontSize: 12,
                           letterSpacing: 2,
@@ -1283,24 +1286,19 @@ class FashPrescription extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Spacer(),
-                    const SizedBox(width: 10),
-                    // Night Restoration is the longest slot label and the
-                    // widest this row ever gets — it gives way before the
-                    // heading does.
-                    Flexible(
-                      child: Text(
-                        _slotLabel(now),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0x99FFFFFF),
-                        ),
-                      ),
-                    ),
                   ],
+                ),
+                const SizedBox(height: 6),
+                Padding(
+                  padding: const EdgeInsets.only(left: 19),
+                  child: Text(
+                    _slotLabel(now),
+                    softWrap: true,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0x99FFFFFF),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 14),
                 Container(height: 1, color: const Color(0x14FFFFFF)),

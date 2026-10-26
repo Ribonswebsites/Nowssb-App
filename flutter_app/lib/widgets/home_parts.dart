@@ -389,8 +389,8 @@ class SecBanner extends StatelessWidget {
                 children: [
                   EditableLabel('home_parts.SecBanner',
                     title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    softWrap: true,
                     style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -399,8 +399,8 @@ class SecBanner extends StatelessWidget {
                   const SizedBox(height: 2),
                   EditableLabel('home_parts.SecBanner',
                     sub,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    maxLines: 3,
+                    softWrap: true,
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0x8CFFFFFF),
