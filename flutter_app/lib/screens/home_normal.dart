@@ -99,6 +99,7 @@ import 'practice_player.dart';
 import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
 import 'subscription.dart';
+import 'store/cart_pages.dart';
 import 'store/ebooks_store.dart';
 import 'store/meaning_store.dart';
 import 'features_page.dart';
@@ -430,7 +431,7 @@ class _HomeNormalState extends State<HomeNormal> {
           V5Own(
             onCart: () => NwsbLinks.cart(context),
             onWishlist: () => NwsbLinks.wishlist(context),
-            onOrders: () => _go(4),
+            onOrders: () => _push(const CartPage()), // the bag + "Your purchases", as Profile > Orders
           )
         ),
         ('trendshop', const SizedBox.shrink()),
