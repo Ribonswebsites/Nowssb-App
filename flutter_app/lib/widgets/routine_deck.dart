@@ -4,6 +4,7 @@
 /// black action bar. Every card calls [WorkCard.onTap]. No second rail.
 library;
 
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -91,12 +92,13 @@ class _RoutineDeckState extends State<RoutineDeck> {
           const SizedBox(height: 14),
           SizedBox(
             height: widget.cards.any((c) => c.onBuy != null || c.onCart != null) ? 530 : 420,
-            child: ListView.separated(
+            // B025: a card never outgrows a narrow deck (320 x1.3).
+            child: LayoutBuilder(builder: (context, box) => ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: n,
               separatorBuilder: (_, __) => const SizedBox(width: 14),
-              itemBuilder: (_, i) => _RoutineCard(card: widget.cards[i], image: widget.cards[i].image ?? kRoutineArts[i % kRoutineArts.length]),
-            ),
+              itemBuilder: (_, i) => _RoutineCard(card: widget.cards[i], image: widget.cards[i].image ?? kRoutineArts[i % kRoutineArts.length], width: math.min(330, box.maxWidth)),
+            )),
           ),
         ],
       ),
@@ -178,8 +180,9 @@ class _Dots extends StatelessWidget {
 }
 
 class _RoutineCard extends StatelessWidget {
-  const _RoutineCard({required this.card, required this.image});
+  const _RoutineCard({required this.card, required this.image, this.width = 330});
   final WorkCard card;
+  final double width;
   final String image;
 
   @override
@@ -187,7 +190,7 @@ class _RoutineCard extends StatelessWidget {
     const radius = 24.0;
     final shop = card.onBuy != null || card.onCart != null;
     return SizedBox(
-      width: 330,
+      width: width,
       child: GestureDetector(
         onTap: () {
           HapticFeedback.selectionClick();
