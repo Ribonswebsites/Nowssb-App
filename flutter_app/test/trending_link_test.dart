@@ -1,4 +1,4 @@
-// Home Trending 'See all': a text-only header link that opens the poster
+// Home Trending 'See all' and the big card both open the poster
 // TrendingScreen, while the word taps and 'Open the library' keep working.
 // No ellipsis or overflow at 320, 360, 390, 412 and 320@1.3.
 // Both read one ranking (trendingChart): the home #1-#3 are the chart's first three.
@@ -132,14 +132,36 @@ void main() {
     final log = <String>[];
     final obs = await _pump(t, log);
     final top = _top3();
-    await t.tap(_act('Open ${top[0]}').first, warnIfMissed: false);
-    await t.pump(const Duration(milliseconds: 600));
     await t.tap(_act('Open ${top[1]}').first, warnIfMissed: false);
     await t.pump(const Duration(milliseconds: 600));
     await t.tap(find.text('Open the library  →'));
     await t.pump(const Duration(milliseconds: 600));
-    expect(log, ['word:${top[0]}', 'word:${top[1]}', 'library']);
+    expect(log, ['word:${top[1]}', 'library']);
     expect(obs.pushed, isEmpty);
+  });
+
+  testWidgets('the big Trending card opens the poster TrendingScreen, not a word or the library', (t) async {
+    final log = <String>[];
+    final obs = await _pump(t, log);
+    expect(_act('Open Trending'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('trending-card')));
+    for (var i = 0; i < 5; i++) {
+      await t.pump(const Duration(milliseconds: 200));
+    }
+    expect(obs.pushed, hasLength(1));
+    expect(find.byType(TrendingScreen), findsOneWidget);
+    expect(log, isEmpty);
+  });
+
+  testWidgets('without See all the big card still opens the #1 word', (t) async {
+    final log = <String>[];
+    t.view.physicalSize = const Size(780, 1688);
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: NTrending(words: const ['OM', 'SOMA'], onWord: log.add, onLibrary: () {}))));
+    await t.pump(const Duration(milliseconds: 300));
+    await t.tap(find.byKey(const ValueKey('trending-card')));
+    await t.pump(const Duration(milliseconds: 600));
+    expect(log, ['OM']);
   });
 
   testWidgets('home #1-#3 equal the TrendingScreen chart\'s first three', (t) async {

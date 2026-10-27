@@ -53,7 +53,10 @@ class _NTrendingState extends State<NTrending> with SingleTickerProviderStateMix
                 builder: (_, __) => CustomPaint(painter: _Bars(loop.value))))),
         ]),
         const SizedBox(height: 6),
-        NPress(label: 'Open $top', onTap: () => widget.onWord(top), child: SizedBox(height: 120, child: Stack(children: [
+        // The big poster card opens the poster Trending page (same as 'See all');
+        // without that link it falls back to the #1 word.
+        NPress(label: widget.onSeeAll != null ? 'Open Trending' : 'Open $top',
+            onTap: widget.onSeeAll ?? () => widget.onWord(top), child: SizedBox(key: const ValueKey('trending-card'), height: 120, child: Stack(children: [
           Positioned.fill(child: AnimatedBuilder(animation: loop, builder: (_, __) =>
               CustomPaint(painter: _Eq(loop.value)))),
           Positioned.fill(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 4),
