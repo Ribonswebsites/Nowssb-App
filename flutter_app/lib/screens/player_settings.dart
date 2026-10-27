@@ -44,7 +44,8 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
         setState(() => _batteryPct = level.round().clamp(0, 100));
       }
     } catch (_) {
-      if (mounted) setState(() => _batteryPct = 52);
+      // No device battery reading on this build: show nothing, never a made-up value.
+      if (mounted) setState(() => _batteryPct = null);
     }
   }
 
@@ -121,7 +122,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final batt = _batteryPct ?? 52;
+    final batt = _batteryPct;
 
     // Shared player shell (Saved words / Library uses the same one).
     return PlayerAuraPage(
@@ -228,11 +229,11 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.battery_full,
+                  if (batt != null) Icon(Icons.battery_full,
                       size: 14, color: Colors.white.withOpacity(0.55)),
                   const SizedBox(width: 6),
                   Text(
-                    '$batt%',
+                    batt == null ? '' : '$batt%',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.55),
                       fontSize: 12,

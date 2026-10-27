@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models.dart';
 import 'practice_progress.dart';
+import 'settings.dart';
 import 'word_art.dart';
 import 'word_voice.dart';
 
@@ -49,7 +50,10 @@ class PlaybackSession extends ChangeNotifier {
 
   bool get active => _active;
   bool get minimized => _minimized;
-  bool get showPill => _active && _minimized;
+  /// Player Settings → Now Playing: 'Off' hides the mini player; 'On' and
+  /// 'Mini Only' show it while a session is minimized.
+  bool get showPill =>
+      _active && _minimized && Settings.instance.nowPlaying != 'Off';
   bool get playing => _playing;
   bool get loop => _loop;
   double get db => _db;

@@ -71,7 +71,8 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
         setState(() => _batteryPct = level.round().clamp(0, 100));
       }
     } catch (_) {
-      if (mounted) setState(() => _batteryPct = 52);
+      // No device battery reading on this build: show nothing, never a made-up value.
+      if (mounted) setState(() => _batteryPct = null);
     }
   }
 
@@ -190,7 +191,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
     final date = '${_now.day.toString().padLeft(2, '0')} ${months[_now.month - 1]} ${_now.year}';
     final weekday = days[_now.weekday - 1];
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final batt = _batteryPct ?? 52;
+    final batt = _batteryPct;
 
     return PlayerAuraBackdrop(
       film: kPlayerPageFilm,
@@ -432,10 +433,10 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.battery_full, size: 14, color: Colors.white.withOpacity(0.55)),
+                          if (batt != null) Icon(Icons.battery_full, size: 14, color: Colors.white.withOpacity(0.55)),
                           const SizedBox(width: 6),
                           Text(
-                            '$batt%',
+                            batt == null ? '' : '$batt%',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.55),
                               fontSize: 12,

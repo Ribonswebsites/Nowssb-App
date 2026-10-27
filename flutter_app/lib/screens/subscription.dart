@@ -252,7 +252,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               child: CustomScrollView(slivers: [
                 SliverAppBar(
                   pinned: true,
-                  backgroundColor: Colors.transparent,
+                  // Near-opaque so plan headings scrolling under the pinned
+                  // title don't print on top of it.
+                  backgroundColor: const Color(0xF2060C18),
                   surfaceTintColor: Colors.transparent,
                   leading: IconButton(
                     onPressed: () => Navigator.pop(context),
