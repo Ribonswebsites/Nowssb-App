@@ -248,7 +248,16 @@ class PlaybackSession extends ChangeNotifier {
     }
   }
 
+  // Each play() run owns one generation; pause/next/prev end it, so a
+  // stopped run can't count the word as completed, restart itself on Loop,
+  // or flip the next run's _playing back to false.
+  int _gen = 0;
+
+  /// Why the last play() ended without sound (recording missing), else null.
+  String? lastError;
+
   Future<void> pause() async {
+    _gen++;
     try {
       await _tts.stop();
       unawaited(WordVoice.instance.stop());
@@ -271,6 +280,8 @@ class PlaybackSession extends ChangeNotifier {
         unawaited(WordVoice.instance.stop());
       } catch (_) {}
     }
+    final gen = ++_gen;
+    bool alive() => _gen == gen && _playing;
     _playing = true;
     _startedAt = DateTime.now();
     _startDoseClock();
@@ -281,22 +292,29 @@ class PlaybackSession extends ChangeNotifier {
       await _tts.setSpeechRate(0.34);
       await _tts.setPitch(1.0);
       await _tts.setVolume(volume);
+      // The client's recording only; no synthetic voice. Without one the
+      // pill stops and says why ([lastError]).
       if (!await WordVoice.instance.play(w, volume: volume)) {
-        await _tts.speak(w.word);
+        lastError = WordVoice.hasVoice(w)
+            ? 'The recording for ${w.word} could not be loaded.'
+            : 'The recording for ${w.word} has not been added yet.';
+        return;
       }
+      lastError = null;
+      if (!alive()) return;
       final elapsed = DateTime.now().difference(_startedAt ?? DateTime.now()).inSeconds;
       await PracticeProgress.instance.recordCompletedWord(
         w,
         durationSec: elapsed > 0 ? elapsed : 1,
       );
-      if (_loop && _active) {
+      if (_loop && _active && alive()) {
         await play();
         return;
       }
     } catch (_) {
       // Device TTS unavailable — keep session UI alive.
     } finally {
-      if (_playing && !_loop) {
+      if (_gen == gen && _playing) {
         _playing = false;
         _stopDoseClock();
         notifyListeners();

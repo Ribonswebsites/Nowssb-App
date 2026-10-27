@@ -588,12 +588,12 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
           _field('deva'),
           _field('translit'),
           _field('phonetic'),
-          _head('Voice — one recording, played instead of text-to-speech'),
+          _head('Voice — the client recording for this word'),
           AdminPanel(
             child: VoiceRecorderPanel(
               current: _audio,
               enabled: !_busy,
-              emptyText: 'No recording — the app uses text-to-speech.',
+              emptyText: 'No recording yet — the app shows "recording not added yet" for this word.',
               upload: (f) async {
                 if (_k.isEmpty) throw 'Type the word first.';
                 final up = await uploadToR2(f, 'audio', _k, PickKind.audio);

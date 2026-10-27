@@ -257,13 +257,18 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (mounted) setState(() {});
   }
 
+  String? _armedSleep;
+
   void _onSettings() {
-    _armSleep();
+    // Only a new Sleep Timer choice restarts the countdown; any other setting
+    // change (EQ, volume, view) used to silently reset it.
+    if (Settings.instance.sleepTimer != _armedSleep) _armSleep();
     if (mounted) setState(() {});
   }
 
   void _armSleep() {
     _sleepTimer?.cancel();
+    _armedSleep = Settings.instance.sleepTimer;
     final mins = switch (Settings.instance.sleepTimer) {
       '15 Min' => 15,
       '30 Min' => 30,
@@ -273,9 +278,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     };
     if (mins <= 0) return;
     _sleepTimer = Timer(Duration(minutes: mins), () {
+      _playGen++;
       unawaited(_tts.stop());
       unawaited(WordVoice.instance.stop());
-      if (mounted) setState(() => _playing = false);
+      unawaited(PlayerRitual.stop());
+      if (mounted) {
+        setState(() {
+          _playing = false;
+          _ritual = null;
+        });
+      }
     });
   }
 
@@ -317,6 +329,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!await ensureWordOpen(context, _word) || !mounted || _playing) return;
     final unlocked = await WordPrivateStore.instance.resolve(_word);
     if (!mounted || _playing) return;
+    if (!WordVoice.hasVoice(_word)) {
+      // Only the client's own recordings are played (never a synthetic
+      // voice). Until one is uploaded the word says so instead.
+      setState(() {
+        _paidOverride = unlocked;
+        _completed = false;
+        _error = 'The recording for ${_word.word} has not been added yet. It will play here as soon as it is.';
+      });
+      return;
+    }
     final gen = ++_playGen;
     setState(() {
       _paidOverride = unlocked;
@@ -386,6 +408,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         unawaited(_fadeInVolume(volume, fadeInSeconds));
       }
       final line = frequencyLine(_word, PracticeProgress.instance.level);
+      var voiceFailed = false;
       await PlayerRitual.run(
         alive: alive,
         line: line,
@@ -395,32 +418,26 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         },
         say: (text, asset) async {
           if (!alive()) return;
+          // Recorded cue, or the caption alone for a moment — no synthetic voice.
           if (!await PlayerRitual.playAsset(asset, volume: startVol)) {
-            if (!alive()) return;
-            await _tts.speak(text);
+            await Future<void>.delayed(const Duration(milliseconds: 1400));
           }
         },
         sayWord: (text) async {
           if (!alive()) return;
-          if (text == _word.word) {
-            final own = await WordVoice.instance.play(_word, volume: startVol);
-            if (!own && alive()) await _tts.speak(text);
-          } else if (alive()) {
-            await _tts.speak(text);
-          }
+          if (!await WordVoice.instance.play(_word, volume: startVol)) voiceFailed = true;
         },
       );
       if (mounted && _playGen == gen) setState(() => _ritual = null);
       if (!alive()) return;
+      if (voiceFailed) {
+        setState(() => _error = 'The recording for ${_word.word} could not be loaded. Check your connection and try again.');
+        return;
+      }
       final again = await _askHearAgain();
       if (again && alive()) {
         if (mounted) setState(() => _ritual = RitualFrame(caption: line));
-        if (line == _word.word) {
-          final own = await WordVoice.instance.play(_word, volume: startVol);
-          if (!own && alive()) await _tts.speak(line);
-        } else if (alive()) {
-          await _tts.speak(line);
-        }
+        if (!await WordVoice.instance.play(_word, volume: startVol)) voiceFailed = true;
         if (mounted && _playGen == gen) setState(() => _ritual = null);
       }
       if (!alive()) return;
@@ -433,7 +450,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     } catch (_) {
       if (mounted) {
         setState(
-          () => _error = 'Your device could not start voice playback. Check that text-to-speech is enabled.',
+          () => _error = 'This recording could not be played. Please try again.',
         );
       }
     } finally {
@@ -548,11 +565,14 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         ? 0.0
         : DateTime.now().difference(_startedAt!).inMilliseconds / 1000;
     if (elapsed > 1.5) {
+      _playGen++;
       await _tts.stop();
       unawaited(WordVoice.instance.stop());
+      await PlayerRitual.stop();
       if (mounted)
         setState(() {
           _playing = false;
+          _ritual = null;
           _completed = false;
         });
       await _prepareAndPlay();
@@ -571,10 +591,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     while (next == _index && guard++ < 24) {
       next = math.Random().nextInt(widget.words.length);
     }
+    _playGen++;
     await _tts.stop();
     unawaited(WordVoice.instance.stop());
+    await PlayerRitual.stop();
+    if (!mounted) return;
     setState(() {
       _index = next;
+      _playing = false;
+      _ritual = null;
       _liked = false;
       _completed = false;
       _error = null;
@@ -849,8 +874,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       next = (_index + direction) % widget.words.length;
       if (next < 0) next += widget.words.length;
     }
+    // Next/Prev while playing: end the current word's run, otherwise
+    // _prepareAndPlay saw _playing == true and returned, so the new word
+    // never started and the old ritual kept going.
+    _playGen++;
     await _tts.stop();
     unawaited(WordVoice.instance.stop());
+    await PlayerRitual.stop();
     _fadeToken++; // cancel any in-flight fade-in
     final fade = switch (Settings.instance.crossfade) {
       '3 Sec' => 3,
@@ -863,6 +893,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!mounted) return;
     setState(() {
       _index = next;
+      _playing = false;
+      _ritual = null;
       _liked = false;
       _completed = false;
       _error = null;
@@ -1305,13 +1337,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   onLevel: _openLevel,
                                   onStore: () => NavScope.goTo(context, 3),
                                   onSyllable: (part) async {
-                                    await _tts.stop();
-                                    unawaited(WordVoice.instance.stop());
-                                    await _tts.speak(
-                                      part.roman.isNotEmpty
-                                          ? part.roman
-                                          : part.deva,
-                                    );
+                                    // No synthetic voice: syllables have no
+                                    // recordings of their own yet.
+                                    ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+                                      content: Text('Syllable recordings for ${part.roman.isNotEmpty ? part.roman : part.deva} have not been added yet.'),
+                                    ));
                                   },
                                 ),
                               ),
