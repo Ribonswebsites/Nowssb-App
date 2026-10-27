@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import '../../widgets/swipe_away.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -80,7 +81,6 @@ class _ProgressPopupHostState extends State<ProgressPopupHost> with SingleTicker
       AnimationController(vsync: this, duration: const Duration(milliseconds: 420), reverseDuration: const Duration(milliseconds: 220));
   ProgressItem? _shown;
   Timer? _hide;
-  double _drag = 0;
 
   ProgressCenter get _c => widget.center ?? ProgressCenter.instance;
 
@@ -109,7 +109,6 @@ class _ProgressPopupHostState extends State<ProgressPopupHost> with SingleTicker
     HapticFeedback.lightImpact();
     setState(() {
       _shown = item;
-      _drag = 0;
     });
     _slide.forward(from: 0);
     _hide?.cancel();
@@ -133,22 +132,16 @@ class _ProgressPopupHostState extends State<ProgressPopupHost> with SingleTicker
           left: 12,
           right: 12,
           top: MediaQuery.paddingOf(context).top + 8,
-          child: GestureDetector(
+          child: SwipeAway(
+            key: ValueKey('progress-popup-${item.kind}'),
             onTap: _c.dismiss,
-            onVerticalDragUpdate: (d) => setState(() => _drag = math.min(0, _drag + d.delta.dy)),
-            onVerticalDragEnd: (d) {
-              if (_drag < -24 || (d.primaryVelocity ?? 0) < -200) {
-                _c.dismiss();
-              } else {
-                setState(() => _drag = 0);
-              }
-            },
+            onDismissed: _c.dismiss,
             child: AnimatedBuilder(
               animation: _slide,
               builder: (context, child) {
                 final t = Curves.easeOutBack.transform(_slide.value.clamp(0.0, 1.0));
                 return Transform.translate(
-                  offset: Offset(0, -110 * (1 - t) + _drag),
+                  offset: Offset(0, -110 * (1 - t)),
                   child: Opacity(opacity: _slide.value.clamp(0.0, 1.0), child: child),
                 );
               },
@@ -178,15 +171,16 @@ class ProgressPopupCard extends StatelessWidget {
             const SizedBox(width: 8),
             Text('${(item.value * 100).round()}%', style: _ink.copyWith(fontSize: 12, fontWeight: FontWeight.w700)),
           ]),
-          const SizedBox(height: 7),
+          SizedBox(height: bare ? 5 : 7),
           ProgressBarLine(value: item.value, height: 6),
-          const SizedBox(height: 8),
+          SizedBox(height: bare ? 6 : 8),
           Container(
-            height: 52,
+            // Inside the 86 px notification row the strip is compact so it fits.
+            height: bare ? 32 : 52,
             decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(children: [
-              SizedBox(width: 40, height: 40, child: ProgressDoneAnim(kind: item.kind)),
+              SizedBox(width: bare ? 26 : 40, height: bare ? 26 : 40, child: ProgressDoneAnim(kind: item.kind)),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(item.subtitle.isNotEmpty ? item.subtitle : _cheer(item.kind),
@@ -198,7 +192,7 @@ class ProgressPopupCard extends StatelessWidget {
     return Material(
       type: MaterialType.transparency,
       child: bare
-          ? Padding(padding: const EdgeInsets.fromLTRB(12, 10, 12, 10), child: body)
+          ? Padding(padding: const EdgeInsets.fromLTRB(12, 8, 12, 8), child: body)
           : ProgressGlass(child: body),
     );
   }

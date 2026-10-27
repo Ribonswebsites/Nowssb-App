@@ -66,6 +66,8 @@ class NwsbTheme {
         ),
         textTheme: _text(NwsbColors.ink, NwsbColors.inkSoft),
         splashFactory: NoSplash.splashFactory,
+        // Every snackbar can be swiped away sideways instead of waiting it out.
+        snackBarTheme: const SnackBarThemeData(dismissDirection: DismissDirection.horizontal),
       );
 
   /// Everything else. Deep navy, pale copy, gold accents.
@@ -79,5 +81,7 @@ class NwsbTheme {
         ),
         textTheme: _text(Colors.white, const Color(0xB3C8E8F5)),
         splashFactory: NoSplash.splashFactory,
+        // Every snackbar can be swiped away sideways instead of waiting it out.
+        snackBarTheme: const SnackBarThemeData(dismissDirection: DismissDirection.horizontal),
       );
 }

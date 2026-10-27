@@ -36,7 +36,7 @@ ThemeData adminTheme() => ThemeData.dark(useMaterial3: true).copyWith(
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0x22FFFFFF))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: kGold)),
       ),
-      snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
+      snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating, dismissDirection: DismissDirection.horizontal),
     );
 
 /// Push a console page with a soft fade + rise.

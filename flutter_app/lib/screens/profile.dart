@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import '../widgets/swipe_away.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -213,7 +214,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         left: 26,
         right: 26,
         bottom: 26,
-        child: IgnorePointer(
+        child: SwipeAway(
+          onDismissed: () {
+            _toastEntry?.remove();
+            _toastEntry = null;
+          },
           child: Center(
             child: Material(
               color: Colors.transparent,
@@ -228,7 +233,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
     overlay.insert(_toastEntry!);
+    final mine = _toastEntry;
     Future.delayed(const Duration(milliseconds: 1800), () {
+      if (_toastEntry != mine) return; // swiped away or replaced already
       _toastEntry?.remove();
       _toastEntry = null;
     });
