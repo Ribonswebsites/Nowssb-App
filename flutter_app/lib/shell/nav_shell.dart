@@ -432,11 +432,49 @@ class _NavShellState extends State<NavShell> {
     NavScope._shellRoute = ModalRoute.of(context);
   }
 
+  DateTime? _backAt;
+
+  /// Android back on the shell itself (no page pushed on top): a non-Home
+  /// tab goes to Home; on Home, the first press warns and a second press
+  /// within 2 s exits. Before this the shell had no back handling at all,
+  /// so the root route popped and Android closed the app from any tab.
+  void _onShellBack() {
+    if (_coach != null) {
+      unawaited(_dismissCoach()); // back closes the tab guide first
+      return;
+    }
+    if (_i != 0) {
+      _goToTab(0);
+      return;
+    }
+    final now = DateTime.now();
+    if (_backAt != null && now.difference(_backAt!) < const Duration(seconds: 2)) {
+      _backAt = null;
+      SystemNavigator.pop();
+      return;
+    }
+    _backAt = now;
+    final m = ScaffoldMessenger.maybeOf(context);
+    m?.hideCurrentSnackBar();
+    m?.showSnackBar(const SnackBar(
+      key: ValueKey('press-back-again'),
+      content: Text('Press back again to exit'),
+      behavior: SnackBarBehavior.floating,
+      duration: Duration(seconds: 2),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return NavScope(
-      go: _goToTab,
-      child: _build(context),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _onShellBack();
+      },
+      child: NavScope(
+        go: _goToTab,
+        child: _build(context),
+      ),
     );
   }
 
