@@ -6,6 +6,7 @@
 /// admins see everything.
 library;
 
+import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -37,10 +38,29 @@ BagItem wordItemFor(Word w) => BagItem(
 /// answers again after it closes (true if the person bought it there).
 /// On success, prefetches paid fields from /api/content/word into
 /// [WordPrivateStore] (no-op when the API is offline or the word is free).
+Future<void> _waitFor(bool Function() ok, {Duration max = const Duration(seconds: 4)}) async {
+  final e = Entitlements.instance;
+  if (ok()) return;
+  final done = Completer<void>();
+  void check() {
+    if (ok() && !done.isCompleted) done.complete();
+  }
+  e.addListener(check);
+  try {
+    await done.future.timeout(max, onTimeout: () {});
+  } finally {
+    e.removeListener(check);
+  }
+}
+
 Future<bool> ensureWordOpen(BuildContext context, Word w) async {
   final e = Entitlements.instance;
   if (!e.canOpenWord(w)) {
     await showContentLock(context, item: wordItemFor(w), planNote: 'Every word is included in every plan.');
+    // A purchase that just went through reaches users/{uid}/owned a moment
+    // after checkout closes; without this wait the first tap after buying
+    // still said "locked" and the word looked unowned.
+    if (!e.canOpenWord(w) && e.signedIn) await _waitFor(() => e.canOpenWord(w));
   }
   if (!e.canOpenWord(w)) return false;
   await WordPrivateStore.instance.prefetch(w);
