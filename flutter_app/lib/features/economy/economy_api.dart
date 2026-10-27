@@ -51,7 +51,7 @@ class EconomyApi {
   /// POST an action with the signed-in user's Firebase ID token.
   static Future<Map<String, dynamic>> call(String name, [Map<String, dynamic>? data]) async {
     if (!NwsbFirebase.ready) {
-      throw EconomyException('Firebase is not connected on this build.');
+      throw EconomyException("Can't reach NowssB right now. Check your connection and try again.");
     }
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {

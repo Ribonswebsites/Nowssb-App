@@ -146,7 +146,7 @@ class _EchoWallScreenState extends State<EchoWallScreen> {
 
   Widget _feed() {
     final posts = _posts;
-    if (!NwsbFirebase.ready || posts == null) return const Center(child: EconomyNote('Firebase is not connected.'));
+    if (!NwsbFirebase.ready || posts == null) return const Center(child: EconomyNote("Can't load the wall right now. Sign in and check your connection."));
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: posts,
       builder: (context, snap) {

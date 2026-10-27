@@ -249,9 +249,8 @@ class _Empty extends StatelessWidget {
           ),
           SizedBox(height: 6),
           Text(
-            'The library loads from the studio. What ships with the app '
-            'should be here already — if this is empty, the bundled copy '
-            'did not read.',
+            'Your words are still loading. Close and reopen the app if '
+            'this stays empty.',
             textAlign: TextAlign.center,
             style:
                 TextStyle(fontSize: 12, color: Color(0x66FFFFFF), height: 1.5),

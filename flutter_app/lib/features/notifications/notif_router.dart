@@ -196,12 +196,12 @@ class LatestUpdatePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const lines = <(String, String)>[
-      ('Home', 'The television card is the first card. The red-hair hero is gone.'),
-      ('Morning film', 'The day film above Open a door is playing again.'),
-      ('Coins', 'A Go collect line opens Today, where you collect.'),
-      ('Rewards', 'Rewards opens the rewards room. You use it from there.'),
-      ('Gifts', 'Gifts opens send and redeem.'),
-      ('Wheel', 'Spinning wheel opens the daily spin.'),
+      ('Home', 'A cleaner home: your daily practice card now comes first.'),
+      ('Morning film', 'The short morning video above "Open a door" plays again.'),
+      ('Coins', 'Tap "Go collect" to open Today and collect your daily coins.'),
+      ('Rewards', 'Rewards shows your streaks and quests in one place.'),
+      ('Gifts', 'Gifts is where you send a gift or redeem one you received.'),
+      ('Wheel', 'The spinning wheel gives you one free spin every day.'),
     ];
     return Scaffold(
       backgroundColor: const Color(0xFF07070C),
