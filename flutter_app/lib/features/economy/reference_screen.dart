@@ -78,8 +78,10 @@ class _ReferenceScreenState extends State<ReferenceScreen> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: const Color(0xFF10141C),
+      // Rides up with the keyboard so the code field is never hidden under it.
+      isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(ctx).bottom),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
