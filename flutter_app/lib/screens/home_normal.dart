@@ -252,11 +252,21 @@ class _HomeNormalState extends State<HomeNormal> {
       );
 
   void _openDashboardSession(List<Word> words, String title) {
+    if (words.isEmpty) {
+      // A new user has no routine yet: send them where words are picked
+      // instead of opening an empty player.
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
+        content: Text('Pick a few words for your routine first.'),
+      ));
+      _go(1);
+      return;
+    }
     _push(PracticePlayerScreen(words: words, title: title));
   }
 
   void _openDashboardProgress() {
-    _push(PracticeProgressScreen(words: ContentStore.instance.library));
+    // Progress (sessions, streak, coins) is shown on the Profile tab.
+    _go(4);
   }
 
   void _openHomeMenu(BuildContext context) {

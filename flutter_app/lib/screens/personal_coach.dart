@@ -426,7 +426,7 @@ class _MetricCard extends StatelessWidget {
   final String label, title, detail;
   final double? progress;
   @override
-  Widget build(BuildContext context) => _Panel(height: progress == null ? 142 : 132, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  Widget build(BuildContext context) => _Panel(height: progress == null ? 152 : 142, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         _Label(label), const SizedBox(height: 9), EditableLabel('personal_coach.MetricCard', title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, height: 1.14, fontWeight: FontWeight.w500)), const Spacer(),
         if (progress != null) ...[LinearProgressIndicator(value: progress, minHeight: 2, color: Colors.white, backgroundColor: Colors.white12), const SizedBox(height: 8)],
         EditableLabel('personal_coach.MetricCard', detail, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF94949A), fontSize: 12)),

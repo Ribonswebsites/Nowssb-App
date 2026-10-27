@@ -86,16 +86,61 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
         child: child,
       );
 
+  void _openProfile() {
+    // Leave this page first, otherwise the Profile tab opens underneath it.
+    final local = context.getInheritedWidgetOfExactType<NavScope>();
+    if (local == null) {
+      NavScope.goTo(context, 4); // pops back to the shell, then switches
+      return;
+    }
+    final nav = Navigator.of(context);
+    if (nav.canPop()) nav.pop();
+    local.go(4);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: MpColors.bg,
       body: SafeArea(
-        child: Center(
-          child: TextButton(
-            onPressed: () => NavScope.goTo(context, 4),
-            child: const Text('Progress is on your Profile', style: TextStyle(color: Colors.white, fontSize: 16)),
-          ),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                tooltip: 'Back',
+                onPressed: _handleBack,
+                icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+              ),
+            ),
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.insights_rounded, color: Colors.white, size: 44),
+                      const SizedBox(height: 14),
+                      const Text('Your progress lives on your Profile',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      const Text('Sessions, streaks and coins are all shown there.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      const SizedBox(height: 20),
+                      FilledButton(
+                        style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
+                        onPressed: _openProfile,
+                        child: const Text('Open my Profile'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

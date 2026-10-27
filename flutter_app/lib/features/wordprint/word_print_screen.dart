@@ -135,9 +135,10 @@ class _WordPrintScreenState extends State<WordPrintScreen> {
   }
 
   Future<void> _find() async {
-    if (!NwsbFirebase.ready) return;
     final handle = _search.text.trim();
-    if (handle.isEmpty) return;
+    void say(String m) => ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(m)));
+    if (handle.isEmpty) return say('Type a handle first, for example @healer.');
+    if (!NwsbFirebase.ready) return say("Can't search right now. Check your connection and try again.");
     final found = await FirebaseFirestore.instance.collection('profiles').where('handle', isEqualTo: handle).limit(1).get();
     if (!mounted) return;
     setState(() => _found = found.docs.isEmpty ? null : found.docs.first.id);

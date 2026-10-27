@@ -294,6 +294,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   Future<void> _loadLiked() async {
     final prefs = await SharedPreferences.getInstance();
     final liked = prefs.getStringList(_likedWordsKey) ?? const <String>[];
+    if (widget.words.isEmpty) return;
     if (mounted) setState(() => _liked = liked.contains(_word.word));
   }
 
