@@ -139,6 +139,35 @@ void main() {
     expect(h, isNotEmpty);
   });
 
+  for (final dx in [-140.0, 140.0]) {
+    testWidgets('with several cards, sideways $dx removes only the shown card', (t) async {
+      final log = <String>[];
+      await t.pumpWidget(_Harness(items: [_n('First', 1), _n('Second', 2), _n('Third', 3)], log: log));
+      await t.pumpAndSettle();
+      final g = await t.startGesture(t.getCenter(find.text('First')));
+      for (var i = 0; i < 7; i++) {
+        await g.moveBy(Offset(dx / 7, 0));
+        await t.pump(const Duration(milliseconds: 16));
+      }
+      if (dx > 0) await _shot(t, 'multi_mid_swipe_right');
+      await g.up();
+      await t.pumpAndSettle();
+      expect(log, ['dismiss First']);
+      expect(find.text('Second'), findsOneWidget);
+      expect(find.text('Third'), findsNothing); // still waiting its turn
+    });
+  }
+
+  testWidgets('+N chip shows the next card', (t) async {
+    final log = <String>[];
+    await t.pumpWidget(_Harness(items: [_n('First', 1), _n('Second', 2)], log: log));
+    await t.pumpAndSettle();
+    await t.tap(find.byKey(const ValueKey('notif-more-chip')));
+    await t.pumpAndSettle();
+    expect(find.text('Second'), findsOneWidget);
+    expect(log, isEmpty);
+  });
+
   for (final dir in [const Offset(0, -120), const Offset(-200, 0), const Offset(200, 0)]) {
     testWidgets('header swipe $dir hides the whole row', (t) async {
       final log = <String>[];
