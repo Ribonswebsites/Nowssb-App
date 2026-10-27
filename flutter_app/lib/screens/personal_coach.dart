@@ -29,6 +29,16 @@ import '../admin/layout/layout_sections.dart';
 const _coachApi = 'https://nowssb-api.ribonpatil2.workers.dev/api/assistant/chat';
 const _coachHero = 'assets/coach/personal_coach_hero.jpg';
 
+/// Server errors can name the AI vendor or a missing setting (e.g. "<vendor>
+/// AI is not configured"); people only ever see a plain, friendly line.
+String _friendlyCoachError(int status, String raw) {
+  final m = raw.toLowerCase();
+  if (status == 401 || status == 403 || m.contains('sign in')) return 'Sign in again to talk with your coach.';
+  if (status == 429) return 'Your coach needs a short pause. Try again in a minute.';
+  if (status == 503 || m.contains('configured')) return 'Your coach is resting right now. Your practice still works — try the coach again later.';
+  return 'Your coach is unavailable right now. Please try again.';
+}
+
 class PersonalCoachScreen extends StatefulWidget {
   const PersonalCoachScreen({super.key});
 
@@ -44,6 +54,10 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
     serverClientId: _googleWebClientId,
   );
   bool _sending = false;
+  // Shown under the composer while the coach answers, so the sent message
+  // doesn't vanish; and kept when the reply came back but saving it failed.
+  _CoachMessage? _pending;
+  final List<_CoachMessage> _unsaved = [];
   bool _signingIn = false;
   String? _notice;
 
@@ -131,22 +145,32 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
     setState(() {
       _sending = true;
       _notice = null;
+      _pending = history.last;
       _input.clear();
     });
     try {
       final reply = await _requestCoach(user, history, data);
       history.add(_CoachMessage('assistant', reply));
+      _unsaved
+        ..clear()
+        ..addAll(history.sublist(history.length - 2));
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
         'coach': {
           'messages': history.lastItems(24).map((item) => item.toMap()).toList(),
           'updatedAt': FieldValue.serverTimestamp(),
         },
       }, SetOptions(merge: true));
+      _unsaved.clear();
     } on _CoachException catch (error) {
       if (mounted) setState(() { _notice = error.message; _restore(preset, message); });
     } catch (_) {
-      if (mounted) setState(() { _notice = 'Your coach is unavailable right now. Please try again.'; _restore(preset, message); });
+      if (_unsaved.isNotEmpty) {
+        if (mounted) setState(() => _notice = 'Your coach answered, but it could not be saved to your account.');
+      } else if (mounted) {
+        setState(() { _notice = 'Your coach is unavailable right now. Please try again.'; _restore(preset, message); });
+      }
     } finally {
+      _pending = null;
       if (mounted) setState(() => _sending = false);
     }
   }
@@ -192,7 +216,7 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
       final raw = await response.transform(utf8.decoder).join();
       final body = _asMap(raw);
       if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw _CoachException('${body['error'] ?? 'Your coach is unavailable right now. Please try again.'}');
+        throw _CoachException(_friendlyCoachError(response.statusCode, '${body['error'] ?? ''}'));
       }
       final reply = body['message'];
       if (reply is! String || reply.trim().isEmpty) throw const _CoachException('Your coach did not return a response. Please try again.');
@@ -269,9 +293,9 @@ class _PersonalCoachScreenState extends State<PersonalCoachScreen> {
         const SizedBox(height: 10),
         _composer(data, signedIn),
         if (_notice != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_notice!, style: const TextStyle(color: Color(0xFFE2B8BA), height: 1.4))),
-        if (data.messages.isNotEmpty) ...[
+        if (data.messages.isNotEmpty || _pending != null || _unsaved.isNotEmpty) ...[
           const SizedBox(height: 12),
-          ...data.messages.lastItems(6).map(_bubble),
+          ...[...data.messages, ..._unsaved, if (_pending != null) _pending!].lastItems(6).map(_bubble),
         ],
         const SizedBox(height: 12),
         LSection('note', 'Streak note', Text(data.streak > 0 ? 'Your ${data.streak}-day streak informs your coach context.' : 'Complete a practice to begin your coach progress history.', style: const TextStyle(color: Color(0xFF7F7F85), fontSize: 13))),
