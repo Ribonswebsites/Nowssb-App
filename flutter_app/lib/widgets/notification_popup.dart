@@ -246,14 +246,7 @@ class NotificationRow extends StatefulWidget {
 }
 
 class _NotificationRowState extends State<NotificationRow> {
-  final _pager = PageController();
   var _page = 0;
-
-  @override
-  void dispose() {
-    _pager.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +319,14 @@ class _NotificationRowState extends State<NotificationRow> {
                                     color: const Color(0xB3FFFFFF))),
                           if (rest > 0) ...[
                             const SizedBox(width: 6),
-                            Container(
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                widget.onTouch?.call();
+                                setState(() => _page = (page + 1) % n);
+                              },
+                              child: Container(
                               key: const ValueKey('notif-more-chip'),
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 7, vertical: 2),
@@ -337,7 +337,7 @@ class _NotificationRowState extends State<NotificationRow> {
                                   style: ink.copyWith(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w800)),
-                            ),
+                            )),
                           ],
                           const Spacer(),
                           _action('View all', widget.onViewAll),
@@ -345,25 +345,19 @@ class _NotificationRowState extends State<NotificationRow> {
                         ]),
                       )),
                   const SizedBox(height: 2),
+                  // One card at a time. Any swipe (up, left, right) on it
+                  // dismisses just that card and the next one slides in.
+                  // There is no pager here on purpose: on a phone a pager
+                  // swallowed every sideways swipe, so cards never went away.
+                  // Tap +N (or the count) to look at the next card.
                   SizedBox(
                     height: NotificationRow.cardHeight,
-                    child: PageView(
-                      controller: _pager,
-                      physics: n == 1
-                          ? const NeverScrollableScrollPhysics()
-                          : const BouncingScrollPhysics(),
-                      onPageChanged: (i) {
-                        HapticFeedback.selectionClick();
-                        widget.onTouch?.call();
-                        setState(() => _page = i);
-                      },
-                      children: [
-                        for (final c in cards)
-                          Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 2),
-                              child: c),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 2),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 180),
+                        child: cards[page],
+                      ),
                     ),
                   ),
                 ],
@@ -392,25 +386,14 @@ class _NotificationRowState extends State<NotificationRow> {
         ),
       );
 
-  /// Fast flick-up dismiss for one card.
+  /// Swipe up, left or right dismisses this one card (haptic in SwipeAway).
   Widget _swipeUp(bool single, Key key, VoidCallback onGone, Widget child) =>
-      single
-          ? SwipeAway(
-              key: key,
-              onDismissed: onGone,
-              child: SizedBox.expand(child: child))
-          : Dismissible(
-              key: key,
-              direction: DismissDirection.up,
-              movementDuration: const Duration(milliseconds: 160),
-              resizeDuration: null,
-              dismissThresholds: const {DismissDirection.up: 0.2},
-              onDismissed: (_) {
-                HapticFeedback.lightImpact();
-                onGone();
-              },
-              child: SizedBox.expand(child: child),
-            );
+      SwipeAway(
+        key: key,
+        behavior: HitTestBehavior.opaque,
+        onDismissed: onGone,
+        child: SizedBox.expand(child: child),
+      );
 }
 
 class _BlackPill extends StatelessWidget {

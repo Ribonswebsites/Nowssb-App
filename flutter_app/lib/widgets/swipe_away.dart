@@ -16,7 +16,7 @@ class SwipeAway extends StatefulWidget {
     this.onTap,
     this.up = true,
     this.sideways = true,
-    this.distance = 36,
+    this.distance = 28,
     this.behavior = HitTestBehavior.deferToChild,
   });
 
@@ -64,7 +64,7 @@ class _SwipeAwayState extends State<SwipeAway>
     if (_gone) return;
     final v = _clamp(d.velocity.pixelsPerSecond);
     final far = _drag.distance >= widget.distance;
-    final flick = v.distance >= 500;
+    final flick = v.distance >= 300;
     if (!far && !flick) {
       setState(() => _drag = Offset.zero);
       return;

@@ -16,6 +16,7 @@ import '../../admin/template/editable.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/swipe_away.dart';
 import 'reward_fx.dart' show ConfettiBurst;
 
 class RewardOverlay {
@@ -66,8 +67,11 @@ class RewardOverlay {
               child: child,
             ),
           ),
-          pageBuilder: (context, _, __) =>
-              YouWonCard(title: title, items: items, rarity: rarity),
+          // Swipe the card away (any direction) as well as tap-outside/back.
+          pageBuilder: (context, _, __) => SwipeAway(
+            onDismissed: () => Navigator.of(context).maybePop(),
+            child: YouWonCard(title: title, items: items, rarity: rarity),
+          ),
         )));
   }
 
