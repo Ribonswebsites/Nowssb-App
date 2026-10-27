@@ -410,8 +410,8 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                       _row(
                         Icons.queue_music,
                         'NOW PLAYING VIEW',
-                        s.playlist.toUpperCase(),
-                        () => _choose('Now Playing View', _viewOptions, s.playlist, s.setPlaylist),
+                        s.nowView.toUpperCase(),
+                        () => _choose('Now Playing View', _viewOptions, s.nowView, s.setNowView),
                       ),
                       const SizedBox(height: 10),
                       ],

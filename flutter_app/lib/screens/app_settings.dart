@@ -81,6 +81,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   Future<void> _loadLocal() async {
     try {
       final p = await SharedPreferences.getInstance();
+      if (!mounted) return;
       setState(() {
         _screenWake = p.getBool('ss_screen_wake') ?? true;
         _appearDiscover = p.getBool('ss_appear_discover') ?? true;
@@ -96,7 +97,15 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     setState(() => _appearDiscover = v);
     await _saveBool('ss_appear_discover', v);
     final ok = await ProfileVisibility.set(v);
-    if (!ok && mounted) _toast('Sign in to change who can find your profile.');
+    if (!ok) {
+      // Not saved anywhere that counts: put the switch back so it doesn't
+      // claim a visibility the profile doesn't have.
+      await _saveBool('ss_appear_discover', !v);
+      if (mounted) {
+        setState(() => _appearDiscover = !v);
+        _toast('Sign in to change who can find your profile.');
+      }
+    }
   }
 
   Future<void> _saveBool(String k, bool v) async {
@@ -396,14 +405,14 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   Future<void> _openTerms() async {
-    final uri = Uri.parse('https://nowssb.com');
-    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!opened && mounted) _toast('Could not open nowssb.com');
+    await _openUrl('https://nowssb.com');
   }
 
   Future<void> _openUrl(String url) async {
-    final opened =
-        await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    var opened = false;
+    try {
+      opened = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (_) {}
     if (!opened && mounted) _toast('Could not open $url');
   }
 

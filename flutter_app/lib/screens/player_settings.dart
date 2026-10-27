@@ -194,9 +194,9 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
               _nav(
                   Icons.queue_music,
                   'Now Playing View',
-                  s.playlist,
-                  () => _choose('Now Playing View', _viewOptions, s.playlist,
-                      s.setPlaylist))),
+                  s.nowView,
+                  () => _choose('Now Playing View', _viewOptions, s.nowView,
+                      s.setNowView))),
           LSection(
               'playlist',
               'Playlist view',
