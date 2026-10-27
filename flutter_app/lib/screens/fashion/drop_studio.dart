@@ -130,8 +130,10 @@ String dropCutoutFor(Word w) {
 const _slot = 'drop_studio.DropStudio';
 const _gold = Color(0xFFC8A96E);
 const _goldSoft = Color(0xFFE8D5A3);
-const _violet = Color(0xFF7C4DDB);
-const _deep = Color(0xFF060C18);
+// Ribon Oct 27: purple backgrounds became black; the old violet accent is a
+// neutral graphite so no purple glow is left behind the studio.
+const _violet = Color(0xFF2A2A2A);
+const _deep = Color(0xFF000000);
 
 /// Media the page uses — the same files the two replaced sections ship.
 class DropStudioAssets {
@@ -316,7 +318,7 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
   }
 }
 
-// ─── backdrop: purple liquid under night water ───────────────────────────
+// ─── backdrop: black (was purple liquid; Ribon Oct 27) ───────────────────────────
 
 class _LiquidBackdrop extends StatelessWidget {
   const _LiquidBackdrop();
@@ -339,9 +341,7 @@ class _LiquidPainter extends CustomPainter {
         Paint()
           ..shader = RadialGradient(colors: [col, col.withValues(alpha: 0)])
               .createShader(Rect.fromCircle(center: o, radius: r)));
-    blob(Offset(s.width * (.15 + .06 * math.sin(a)), s.height * .12), s.width * .9, const Color(0x8A5B2BC4));
-    blob(Offset(s.width * (.95 - .05 * math.cos(a)), s.height * .32), s.width * .8, const Color(0x669D4EDD));
-    blob(Offset(s.width * .3, s.height * (.78 + .02 * math.sin(a))), s.width * .9, const Color(0x553A1C8C));
+    blob(Offset(s.width * (.15 + .06 * math.sin(a)), s.height * .12), s.width * .7, const Color(0x14C8A96E));
     blob(Offset(s.width * .8, s.height * .95), s.width * .5, const Color(0x33C8A96E));
   }
 
@@ -366,7 +366,7 @@ class _TopBar extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.fromLTRB(12, top + 8, 16, 10),
               decoration: BoxDecoration(
-                color: Color.lerp(Colors.transparent, const Color(0xD9100A1E), k),
+                color: Color.lerp(Colors.transparent, const Color(0xD90A0A0A), k),
                 border: Border(bottom: BorderSide(color: _gold.withValues(alpha: .25 * k))),
               ),
               child: Row(children: [
@@ -471,7 +471,7 @@ class _TypePoster extends StatelessWidget {
                       height: .92,
                       letterSpacing: -1.2)),
             const SizedBox(height: 6),
-            Container(width: 22, height: 3, color: _violet),
+            Container(width: 22, height: 3, color: _gold),
           ]),
         ),
       );
@@ -510,7 +510,7 @@ class _DropHero extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   color: Colors.white.withValues(alpha: .07),
                   border: Border.all(color: Colors.white.withValues(alpha: .22)),
-                  boxShadow: const [BoxShadow(color: Color(0x80120428), blurRadius: 40, offset: Offset(0, 24))],
+                  boxShadow: const [BoxShadow(color: Color(0x800A0A0A), blurRadius: 40, offset: Offset(0, 24))],
                 ),
                 padding: const EdgeInsets.all(10),
                 child: ClipRRect(
@@ -523,7 +523,7 @@ class _DropHero extends StatelessWidget {
                           gradient: RadialGradient(
                             center: const Alignment(.1, .2),
                             radius: 1.1,
-                            colors: [const Color(0xFF1B1030), Colors.black.withValues(alpha: 1)],
+                            colors: [const Color(0xFF141414), Colors.black.withValues(alpha: 1)],
                           ),
                         ),
                       ),
@@ -864,7 +864,7 @@ class _WordPoster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final light = n.isOdd;
-    final paper = light ? const Color(0xFFF1E8D6) : const Color(0xFF16102A);
+    final paper = light ? const Color(0xFFF1E8D6) : const Color(0xFF0E0E0E);
     final ink = light ? const Color(0xFF14100A) : _goldSoft;
     final big = word.word.toUpperCase();
     final k = big.length <= 4 ? big.length : (big.length / 2).ceil();
@@ -1139,7 +1139,7 @@ class _BuyDock extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(18, 10, 10, 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(40),
-          color: const Color(0xE6100A1E),
+          color: const Color(0xE60A0A0A),
           border: Border.all(color: _gold.withValues(alpha: .5)),
           boxShadow: const [BoxShadow(color: Color(0xAA000000), blurRadius: 30, offset: Offset(0, 14))],
         ),

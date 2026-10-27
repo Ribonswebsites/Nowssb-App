@@ -125,7 +125,7 @@ class _ChartTopper extends StatelessWidget {
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [Color(0xFF3A1F63), Color(0xFF120A1F)],
+                              colors: [Color(0xFF1C1C1C), Color(0xFF0A0A0A)],
                             ),
                           ),
                         ),
@@ -169,7 +169,7 @@ class _ChartTopper extends StatelessWidget {
               // tag + actions in their own band, never on the figure
               Container(
                 width: double.infinity,
-                color: const Color(0xFF120A1F),
+                color: const Color(0xFF0A0A0A),
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   InkTag(word.meaning.isEmpty ? word.benefit : word.meaning),
@@ -302,7 +302,7 @@ class _Dock extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 68),
         padding: const EdgeInsets.fromLTRB(18, 8, 8, 8),
         decoration: BoxDecoration(
-          color: const Color(0xF0120A1F),
+          color: const Color(0xF00A0A0A),
           borderRadius: BorderRadius.circular(40),
           border: Border.all(color: kPGold.withValues(alpha: .6)),
         ),

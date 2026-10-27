@@ -81,7 +81,7 @@ class _PosterOrbitStageState extends State<PosterOrbitStage> with TickerProvider
       final plate = Container(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 16),
         decoration: const BoxDecoration(
-          color: Color(0xFF120A1F),
+          color: Color(0xFF0A0A0A),
           border: Border(top: BorderSide(color: kPGold, width: 2)),
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(6)),
         ),
@@ -188,7 +188,7 @@ class _PosterOrbitStageState extends State<PosterOrbitStage> with TickerProvider
         const Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
-              gradient: RadialGradient(center: Alignment(0, -.1), radius: .9, colors: [Color(0x553A1F63), Color(0xF0060C18)]),
+              gradient: RadialGradient(center: Alignment(0, -.1), radius: .9, colors: [Color(0x55262626), Color(0xF0060C18)]),
             ),
           ),
         ),

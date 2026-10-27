@@ -274,7 +274,7 @@ class _CategoryTile extends StatelessWidget {
 String _id(RmWordEntry e) => 'word:${e.word.toLowerCase()}';
 
 /// Cloth colours for the swatches — dyed fabric, not cream cards.
-const _cloth = [Color(0xFF5A1F2B), Color(0xFF1F3A35), Color(0xFF2B2150), Color(0xFF6B4A12), Color(0xFF1B2A44), Color(0xFF4A2A1A)];
+const _cloth = [Color(0xFF5A1F2B), Color(0xFF1F3A35), Color(0xFF1E1E1E), Color(0xFF6B4A12), Color(0xFF1B2A44), Color(0xFF4A2A1A)];
 
 class _Swatches extends StatelessWidget {
   const _Swatches({required this.cat, required this.words, required this.index, required this.onOpen, required this.onAdd, required this.onAll});

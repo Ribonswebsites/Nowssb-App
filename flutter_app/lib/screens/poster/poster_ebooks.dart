@@ -316,7 +316,7 @@ class _Cover extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF3A2160), kPPlum, Color(0xFF120A1F)]),
+          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF262626), kPPlum, Color(0xFF0A0A0A)]),
           borderRadius: const BorderRadius.horizontal(left: Radius.circular(3), right: Radius.circular(6)),
           border: Border.all(color: kPGold, width: 1.2),
           boxShadow: const [BoxShadow(color: Color(0xAA000000), blurRadius: 18, offset: Offset(-8, 10))],

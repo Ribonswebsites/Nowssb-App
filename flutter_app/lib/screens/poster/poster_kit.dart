@@ -49,7 +49,8 @@ const kPViolet = Color(0xFF7C4DDB);
 const kPDeep = Color(0xFF060C18);
 const kPInk = Color(0xFF14101C);
 const kPPaper = Color(0xFFF1EADB);
-const kPPlum = Color(0xFF241638);
+// Ribon Oct 27: no purple behind poster pages; plum is now a warm black.
+const kPPlum = Color(0xFF161616);
 
 /// The real cut-outs and photos (all bundled; admin can override per slot).
 class PosterAssets {
@@ -104,7 +105,7 @@ const kPieFallback = ['NotoSansPIE'];
 /// Kept for call sites: the greeting subline.
 final kSans = gSub();
 
-/// Page frame: deep violet liquid backdrop, scroll body, frosted top bar,
+/// Page frame: black backdrop (Ribon Oct 27: purple became black), scroll body, frosted top bar,
 /// optional pinned dock with a fade behind it (content never sits under it).
 class PosterScaffold extends StatefulWidget {
   const PosterScaffold({
@@ -117,7 +118,7 @@ class PosterScaffold extends StatefulWidget {
     this.onOpenBag,
     this.dock,
     this.controller,
-    this.tint = kPViolet,
+    this.tint = Colors.black,
   });
   final String slot;
   final String kicker;
@@ -153,7 +154,7 @@ class _PosterScaffoldState extends State<PosterScaffold> {
     final mq = MediaQuery.of(context);
     final dockH = widget.dock == null ? 0.0 : 68 + 22 + mq.padding.bottom;
     return Scaffold(
-      backgroundColor: kPDeep,
+      backgroundColor: Colors.black,
       body: Stack(children: [
         Positioned.fill(
           child: Breath(
@@ -210,7 +211,7 @@ class _TopBar extends StatelessWidget {
         filter: ui.ImageFilter.blur(sigmaX: 18 * frost, sigmaY: 18 * frost),
         child: Container(
           padding: EdgeInsets.fromLTRB(14, pad + 10, 14, 10),
-          color: Color.lerp(const Color(0x00060C18), const Color(0xCC0B0816), frost),
+          color: Color.lerp(const Color(0x00060C18), const Color(0xCC0A0A0A), frost),
           child: Row(children: [
             RoundIcon(icon: Icons.arrow_back_rounded, label: 'Back', onTap: widget.onBack),
             const SizedBox(width: 12),
@@ -301,16 +302,19 @@ class _Liquid extends CustomPainter {
   final Color tint;
   @override
   void paint(Canvas c, Size s) {
-    c.drawRect(Offset.zero & s, Paint()..color = kPDeep);
+    c.drawRect(Offset.zero & s, Paint()..color = Colors.black);
     final a = ph * math.pi * 2;
     void blob(double x, double yy, double r, Color col) {
       final o = Offset(x * s.width, yy * s.height - y * .08);
       c.drawCircle(o, r, Paint()..shader = RadialGradient(colors: [col, col.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: o, radius: r)));
     }
 
-    blob(.85 + .05 * math.sin(a), .22, s.width * .9, tint.withValues(alpha: .42));
-    blob(.1, .62 + .03 * math.cos(a), s.width * .8, kPPlum.withValues(alpha: .9));
-    blob(.7, 1.0, s.width * .7, tint.withValues(alpha: .28));
+    // Black page: only a page's own non-purple tint (gold, sea, leather)
+    // glows, faintly; the default is plain black with a soft gold breath.
+    if (tint != Colors.black) {
+      blob(.85 + .05 * math.sin(a), .22, s.width * .9, tint.withValues(alpha: .18));
+      blob(.7, 1.0, s.width * .7, tint.withValues(alpha: .12));
+    }
     blob(.2 + .04 * math.cos(a), .05, s.width * .45, kPGold.withValues(alpha: .10));
   }
 
