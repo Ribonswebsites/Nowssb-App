@@ -425,7 +425,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         },
         sayWord: (text) async {
           if (!alive()) return;
-          if (!await WordVoice.instance.play(_word, volume: startVol)) voiceFailed = true;
+          if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed)) voiceFailed = true;
         },
       );
       if (mounted && _playGen == gen) setState(() => _ritual = null);
@@ -437,7 +437,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       final again = await _askHearAgain();
       if (again && alive()) {
         if (mounted) setState(() => _ritual = RitualFrame(caption: line));
-        if (!await WordVoice.instance.play(_word, volume: startVol)) voiceFailed = true;
+        if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed)) voiceFailed = true;
         if (mounted && _playGen == gen) setState(() => _ritual = null);
       }
       if (!alive()) return;

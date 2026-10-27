@@ -298,7 +298,7 @@ class PlaybackSession extends ChangeNotifier {
       await _tts.setVolume(volume);
       // The client's recording only; no synthetic voice. Without one the
       // pill stops and says why ([lastError]).
-      if (!await WordVoice.instance.play(w, volume: volume)) {
+      if (!await WordVoice.instance.play(w, volume: volume, speed: Settings.instance.speed)) {
         lastError = WordVoice.hasVoice(w)
             ? 'The recording for ${w.word} could not be loaded.'
             : 'The recording for ${w.word} has not been added yet.';
