@@ -95,8 +95,10 @@ class _VoiceRecorderPanelState extends State<VoiceRecorderPanel> {
         return;
       }
       final dir = await getTemporaryDirectory();
-      final path = '${dir.path}/nwsb-voice-${DateTime.now().millisecondsSinceEpoch}.m4a';
-      await _recorder.start(const RecordConfig(encoder: AudioEncoder.aacLc, bitRate: 128000, sampleRate: 44100, numChannels: 1), path: path);
+      // WAV (uncompressed) so the app can compare learners' takes against
+      // this exact recording on the phone. A one-word take is ~100–300 KB.
+      final path = '${dir.path}/nwsb-voice-${DateTime.now().millisecondsSinceEpoch}.wav';
+      await _recorder.start(const RecordConfig(encoder: AudioEncoder.wav, sampleRate: 44100, numChannels: 1), path: path);
       setState(() {
         _rec = _Rec.recording;
         _take = null;

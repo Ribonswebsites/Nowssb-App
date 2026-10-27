@@ -593,7 +593,7 @@ class _WordEditorScreenState extends State<WordEditorScreen> {
             child: VoiceRecorderPanel(
               current: _audio,
               enabled: !_busy,
-              emptyText: 'No recording yet — the app shows "recording not added yet" for this word.',
+              emptyText: 'No recording yet — the app shows "recording not added yet" for this word. Record here (saved as WAV) so practice scoring works; picked MP3/M4A files play but can\'t be scored yet.',
               upload: (f) async {
                 if (_k.isEmpty) throw 'Type the word first.';
                 final up = await uploadToR2(f, 'audio', _k, PickKind.audio);

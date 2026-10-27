@@ -12,10 +12,14 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
+import 'dart:io';
+import 'dart:typed_data';
+
 import '../data/models.dart';
+import '../pronunciation/reference.dart';
+import '../pronunciation/scorer.dart';
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../widgets/app_thinking_loader.dart';
@@ -118,7 +122,6 @@ class PracticeLabSheet extends StatefulWidget {
 class _PracticeLabSheetState extends State<PracticeLabSheet>
     with TickerProviderStateMixin {
   final AudioRecorder _recorder = AudioRecorder();
-  final stt.SpeechToText _speech = stt.SpeechToText();
   late final AnimationController _entry;
   late final AnimationController _spin;
   late final CurvedAnimation _open;
@@ -128,9 +131,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 
   Timer? _clock;
   String? _takePath;
-  bool _speechReady = false;
   bool _holding = false;
-  bool _matched = false;
+  // Client reference takes (WAV bytes). null = still loading.
+  List<Uint8List>? _refs;
+  PronunciationResult? _result;
   int _elapsed = 0;
   _PracticeStatus _status = _PracticeStatus.ready;
 
@@ -157,7 +161,15 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     });
     _entry.forward();
     _spin.forward();
+    unawaited(_loadRefs());
   }
+
+  Future<void> _loadRefs() async {
+    final refs = await loadReferences(widget.word);
+    if (mounted) setState(() => _refs = refs);
+  }
+
+  bool get _noReference => _refs != null && _refs!.isEmpty;
 
   @override
   void dispose() {
@@ -180,18 +192,30 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 
   Future<void> _beginTake() async {
     if (_holding || _status == _PracticeStatus.recording) return;
+    if (_noReference) {
+      setState(() => _result =
+          const PronunciationResult(outcome: PronunciationOutcome.noReference));
+      return;
+    }
     _clock?.cancel();
     setState(() {
       _holding = true;
       _elapsed = 0;
-      _matched = false;
+      _result = null;
       _status = _PracticeStatus.listening;
     });
 
     try {
       final permitted = await _recorder.hasPermission();
       if (!permitted) {
-        if (mounted) setState(() => _holding = false);
+        if (mounted) {
+          setState(() {
+            _holding = false;
+            _status = _PracticeStatus.ready;
+          });
+          ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
+              content: Text('Allow the microphone in phone settings to practise.')));
+        }
         return;
       }
       // Replay (or the 30 s end) can land while the mic prompt, the recorder
@@ -201,12 +225,12 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       if (!_holding || !mounted) return;
       final dir = await getApplicationDocumentsDirectory();
       if (!_holding || !mounted) return;
-      _takePath = '${dir.path}/nwsb-practice-${widget.word.key}.m4a';
+      // WAV 16 kHz mono: compared sound-for-sound with the client's take.
+      _takePath = '${dir.path}/nwsb-practice-${widget.word.key}.wav';
       await _recorder.start(
         const RecordConfig(
-          encoder: AudioEncoder.aacLc,
-          bitRate: 96000,
-          sampleRate: 44100,
+          encoder: AudioEncoder.wav,
+          sampleRate: 16000,
           numChannels: 1,
           autoGain: true,
           echoCancel: true,
@@ -217,35 +241,6 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       if (!_holding || !mounted) {
         await _finishCapture();
         return;
-      }
-      _speechReady = await _speech.initialize(
-        onStatus: (status) {
-          if (!mounted || !_holding) return;
-          if (status == 'done' || status == 'notListening') {
-            setState(() => _status = _PracticeStatus.practicing);
-          }
-        },
-        onError: (_) {},
-      );
-      if (_speechReady) {
-        await _speech.listen(
-          onResult: (result) {
-            if (!mounted) return;
-            final heard = result.recognizedWords.trim();
-            if (heard.isEmpty) return;
-            setState(() {
-              _matched = _similarEnough(heard, widget.word.word);
-              _status = _PracticeStatus.practicing;
-            });
-          },
-          listenOptions: stt.SpeechListenOptions(
-            partialResults: true,
-            cancelOnError: false,
-            autoPunctuation: false,
-            listenFor: const Duration(seconds: _sessionLength),
-            pauseFor: const Duration(seconds: 4),
-          ),
-        );
       }
       if (!mounted) return;
       if (!_holding) {
@@ -262,7 +257,12 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
         }
       });
     } catch (_) {
-      if (mounted) setState(() => _holding = false);
+      if (mounted) {
+        setState(() {
+          _holding = false;
+          _status = _PracticeStatus.ready;
+        });
+      }
     }
   }
 
@@ -275,20 +275,24 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       _holding = false;
       _status = _PracticeStatus.processing;
     });
-    await Future<void>.delayed(const Duration(milliseconds: 720));
-    if (mounted) {
-      setState(
-        () => _status = _matched
-            ? _PracticeStatus.complete
-            : _PracticeStatus.results,
-      );
+    PronunciationResult result;
+    try {
+      final take = await File(_takePath!).readAsBytes();
+      final refs = _refs ?? await loadReferences(widget.word);
+      result = await scoreInBackground(refs, take, widget.word.syllables);
+    } catch (_) {
+      result = const PronunciationResult(outcome: PronunciationOutcome.tooQuiet);
     }
+    if (!mounted) return;
+    setState(() {
+      _result = result;
+      _status = result.outcome == PronunciationOutcome.scored && result.score >= 75
+          ? _PracticeStatus.complete
+          : _PracticeStatus.results;
+    });
   }
 
   Future<void> _finishCapture() async {
-    try {
-      if (_speechReady && _speech.isListening) await _speech.stop();
-    } catch (_) {}
     try {
       if (await _recorder.isRecording()) await _recorder.stop();
     } catch (_) {}
@@ -300,7 +304,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     if (!mounted) return;
     setState(() {
       _takePath = null;
-      _matched = false;
+      _result = null;
       _elapsed = 0;
       _holding = false;
       _status = _PracticeStatus.ready;
@@ -311,22 +315,34 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     await _playReference();
   }
 
-  bool _similarEnough(String heard, String target) {
-    final a = heard.toLowerCase().replaceAll(RegExp(r'[^a-z0-9 ]'), '').trim();
-    final b = target.toLowerCase().replaceAll(RegExp(r'[^a-z0-9 ]'), '').trim();
-    if (a.isEmpty || b.isEmpty) return false;
-    if (a == b) return true;
-    final heardWords = a.split(RegExp(r'\s+'));
-    return heardWords.any((w) => w == b) || a.contains(b);
-  }
-
   String get _statusLabel {
     if (_holding || _status == _PracticeStatus.recording) return 'Listening';
+    final r = _result;
+    if (r != null && r.outcome == PronunciationOutcome.scored) {
+      return 'Score ${r.score}';
+    }
+    if (_noReference) return 'Reference not added yet';
     if (_status == _PracticeStatus.processing ||
         _status == _PracticeStatus.practicing) {
       return 'Analyzing';
     }
     return 'Waiting';
+  }
+
+  /// Feedback line under the orb; null keeps the template copy.
+  String? get _message {
+    final r = _result;
+    if (r != null) {
+      final weak = r.weakest;
+      if (r.outcome == PronunciationOutcome.scored && weak != null) {
+        return '${r.verdict}. Work on "${weak.text}".';
+      }
+      return r.verdict;
+    }
+    if (_noReference) {
+      return 'The recording for ${widget.word.word} has not been added yet. Practice scoring opens as soon as it is.';
+    }
+    return null;
   }
 
   @override
@@ -362,12 +378,13 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _WordBreakTab(word: widget.word),
+                        _WordBreakTab(word: widget.word, result: _result),
                         const SizedBox(height: 10),
                         GestureDetector(
                           onTap: () {},
                           child: _BlackTab(
                             status: _statusLabel,
+                            message: _message,
                             holding: _holding,
                             onStart: _beginTake,
                             onReplay: () => unawaited(_replay()),
@@ -388,9 +405,22 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 }
 
 class _WordBreakTab extends StatelessWidget {
-  const _WordBreakTab({required this.word});
+  const _WordBreakTab({required this.word, this.result});
 
   final Word word;
+  final PronunciationResult? result;
+
+  /// After a scored take each syllable box shows how close it was.
+  Color _boxColor(int i) {
+    final r = result;
+    if (r == null || r.outcome != PronunciationOutcome.scored || i >= r.syllables.length) {
+      return const Color(0xFFF5F5F5);
+    }
+    final s = r.syllables[i].score;
+    if (s >= 75) return const Color(0xFFB9F6CA);
+    if (s >= 50) return const Color(0xFFFFE58F);
+    return const Color(0xFFFFB3B3);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -427,7 +457,7 @@ class _WordBreakTab extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
+                    color: _boxColor(i),
                     borderRadius: BorderRadius.circular(99),
                   ),
                   child: Text(
@@ -501,6 +531,7 @@ class _WordBreakTab extends StatelessWidget {
 class _BlackTab extends StatelessWidget {
   const _BlackTab({
     required this.status,
+    this.message,
     required this.holding,
     required this.onStart,
     required this.onReplay,
@@ -508,6 +539,7 @@ class _BlackTab extends StatelessWidget {
   });
 
   final String status;
+  final String? message;
   final bool holding;
   final VoidCallback onStart;
   final VoidCallback onReplay;
@@ -598,9 +630,18 @@ class _BlackTab extends StatelessWidget {
           const SizedBox(height: 8),
           const SizedBox(height: 132, child: Center(child: _OrbFilm())),
           const SizedBox(height: 10),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: EditableLabel(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: message != null
+                ? Text(message!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Color(0xCCF4F4F5),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        height: 1.35,
+                        letterSpacing: 0.1))
+                : const EditableLabel(
               'practice_overlay.BlackTab',
               'Wait for you to say it — then tap Start',
               textAlign: TextAlign.center,
