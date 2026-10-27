@@ -6,6 +6,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'swipe_away.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -21,7 +22,8 @@ import '../screens/splash.dart';
 import '../theme/liquid_glass_theme.dart';
 
 class NotificationPopupHost extends StatefulWidget {
-  const NotificationPopupHost({super.key, required this.child, this.center, this.navigatorKey});
+  const NotificationPopupHost(
+      {super.key, required this.child, this.center, this.navigatorKey});
   final Widget child;
   final ProgressCenter? center;
 
@@ -74,10 +76,14 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   static String _id(NotifItem e) => '${e.type}|${e.at}|${e.title}';
 
   List<NotifItem> _items() {
-    if (!SplashGate.done.value || !DailyQuoteGate.done.value || !NotificationBanner.showPopups.value) {
+    if (!SplashGate.done.value ||
+        !DailyQuoteGate.done.value ||
+        !NotificationBanner.showPopups.value) {
       return const [];
     }
-    final unread = NotifStore.instance.feed.where((e) => !e.read && !_gone.contains(_id(e))).toList();
+    final unread = NotifStore.instance.feed
+        .where((e) => !e.read && !_gone.contains(_id(e)))
+        .toList();
     if (unread.isEmpty) return const [];
     unread.sort((a, b) {
       if (a.type == 'coins' && b.type != 'coins') return -1;
@@ -133,11 +139,26 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     unawaited(NotifStore.instance.markAllRead());
   }
 
+  /// Swiping the row's header away hides the whole row at once. The items
+  /// stay unread in the inbox (View all), only the pop-up goes.
+  void _dismissRow(List<NotifItem> items) {
+    _hide?.cancel();
+    setState(() {
+      _gone.addAll(items.map(_id));
+      _hold = true;
+    });
+    for (final i in items) {
+      NotificationBanner.dismiss(i);
+    }
+    _pc.dismiss();
+  }
+
   void _viewAll() {
     _hide?.cancel();
     setState(() => _hold = true);
     _pc.dismiss();
-    final ctx = (widget.navigatorKey ?? RewardOverlay.navigatorKey).currentContext;
+    final ctx =
+        (widget.navigatorKey ?? RewardOverlay.navigatorKey).currentContext;
     if (ctx != null) showNotificationsSheet(ctx);
   }
 
@@ -147,7 +168,8 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
     final items = _hold ? const <NotifItem>[] : _items();
     final total = items.length + (progress != null ? 1 : 0);
     if (total > 0) {
-      _arm(Object.hash(Object.hashAll(items.map(_id)), progress?.kind, progress?.value));
+      _arm(Object.hash(
+          Object.hashAll(items.map(_id)), progress?.kind, progress?.value));
     }
     return Stack(
       children: [
@@ -161,7 +183,8 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
             switchInCurve: Curves.easeOutCubic,
             switchOutCurve: Curves.easeInCubic,
             transitionBuilder: (child, a) => SlideTransition(
-              position: Tween(begin: const Offset(0, -0.4), end: Offset.zero).animate(a),
+              position: Tween(begin: const Offset(0, -0.4), end: Offset.zero)
+                  .animate(a),
               child: FadeTransition(opacity: a, child: child),
             ),
             child: total == 0
@@ -175,6 +198,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
                     onDismissProgress: _pc.dismiss,
                     onViewAll: _viewAll,
                     onClearAll: () => _clearAll(items),
+                    onDismissAll: () => _dismissRow(items),
                     onTouch: _touch,
                   ),
           ),
@@ -196,6 +220,7 @@ class NotificationRow extends StatefulWidget {
     this.onDismissProgress,
     required this.onViewAll,
     required this.onClearAll,
+    this.onDismissAll,
     this.onTouch,
   });
   final List<NotifItem> items;
@@ -205,6 +230,9 @@ class NotificationRow extends StatefulWidget {
   final VoidCallback? onDismissProgress;
   final VoidCallback onViewAll;
   final VoidCallback onClearAll;
+
+  /// Header swiped up or sideways: hide the whole row now.
+  final VoidCallback? onDismissAll;
   final VoidCallback? onTouch;
 
   static const double cardHeight = 86;
@@ -230,18 +258,25 @@ class _NotificationRowState extends State<NotificationRow> {
   @override
   Widget build(BuildContext context) {
     final p = widget.progress;
+    // One card: it can go up or sideways. Several: sideways pages the row,
+    // up dismisses just that card.
+    final single = (p != null ? 1 : 0) + widget.items.length == 1;
     final cards = <Widget>[
       if (p != null)
         _swipeUp(
+          single,
           ValueKey('progress-${p.kind}'),
           widget.onDismissProgress ?? () {},
           DecoratedBox(
-            decoration: BoxDecoration(color: const Color(0xF0000000), borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(
+                color: const Color(0xF0000000),
+                borderRadius: BorderRadius.circular(16)),
             child: ProgressPopupCard(item: p, bare: true),
           ),
         ),
       for (final item in widget.items)
         _swipeUp(
+          single,
           ValueKey('n-${item.type}|${item.at}|${item.title}'),
           () => widget.onDismiss(item),
           _BlackPill(item: item, onTap: () => widget.onOpen(item)),
@@ -269,44 +304,65 @@ class _NotificationRowState extends State<NotificationRow> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(
-                    height: 26,
-                    child: Row(children: [
-                      const SizedBox(width: 8),
-                      Text('NOWSSB',
-                          style: ink.copyWith(fontSize: 11.5, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
-                      const SizedBox(width: 8),
-                      if (n > 1)
-                        Text('${page + 1}/$n',
-                            style: ink.copyWith(
-                                fontSize: 11.5, fontWeight: FontWeight.w600, color: const Color(0xB3FFFFFF))),
-                      if (rest > 0) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          key: const ValueKey('notif-more-chip'),
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(99)),
-                          child: Text('+$rest', style: ink.copyWith(fontSize: 11, fontWeight: FontWeight.w800)),
-                        ),
-                      ],
-                      const Spacer(),
-                      _action('View all', widget.onViewAll),
-                      _action('Clear all', widget.onClearAll),
-                    ]),
-                  ),
+                  SwipeAway(
+                      key: const ValueKey('notif-row-header'),
+                    behavior: HitTestBehavior.opaque,
+                      onDismissed: widget.onDismissAll ?? widget.onClearAll,
+                      child: SizedBox(
+                        height: 26,
+                        child: Row(children: [
+                          const SizedBox(width: 8),
+                          Text('NOWSSB',
+                              style: ink.copyWith(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.5)),
+                          const SizedBox(width: 8),
+                          if (n > 1)
+                            Text('${page + 1}/$n',
+                                style: ink.copyWith(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xB3FFFFFF))),
+                          if (rest > 0) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              key: const ValueKey('notif-more-chip'),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(99)),
+                              child: Text('+$rest',
+                                  style: ink.copyWith(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w800)),
+                            ),
+                          ],
+                          const Spacer(),
+                          _action('View all', widget.onViewAll),
+                          _action('Clear all', widget.onClearAll),
+                        ]),
+                      )),
                   const SizedBox(height: 2),
                   SizedBox(
                     height: NotificationRow.cardHeight,
                     child: PageView(
                       controller: _pager,
-                      physics: const BouncingScrollPhysics(),
+                      physics: n == 1
+                          ? const NeverScrollableScrollPhysics()
+                          : const BouncingScrollPhysics(),
                       onPageChanged: (i) {
                         HapticFeedback.selectionClick();
                         widget.onTouch?.call();
                         setState(() => _page = i);
                       },
                       children: [
-                        for (final c in cards) Padding(padding: const EdgeInsets.symmetric(horizontal: 2), child: c),
+                        for (final c in cards)
+                          Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 2),
+                              child: c),
                       ],
                     ),
                   ),
@@ -329,23 +385,32 @@ class _NotificationRowState extends State<NotificationRow> {
           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
           child: Text(label,
               style: const TextStyle(
-                  color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w700, decoration: TextDecoration.none)),
+                  color: Colors.white,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  decoration: TextDecoration.none)),
         ),
       );
 
   /// Fast flick-up dismiss for one card.
-  Widget _swipeUp(Key key, VoidCallback onGone, Widget child) => Dismissible(
-        key: key,
-        direction: DismissDirection.up,
-        movementDuration: const Duration(milliseconds: 160),
-        resizeDuration: null,
-        dismissThresholds: const {DismissDirection.up: 0.2},
-        onDismissed: (_) {
-          HapticFeedback.lightImpact();
-          onGone();
-        },
-        child: SizedBox.expand(child: child),
-      );
+  Widget _swipeUp(bool single, Key key, VoidCallback onGone, Widget child) =>
+      single
+          ? SwipeAway(
+              key: key,
+              onDismissed: onGone,
+              child: SizedBox.expand(child: child))
+          : Dismissible(
+              key: key,
+              direction: DismissDirection.up,
+              movementDuration: const Duration(milliseconds: 160),
+              resizeDuration: null,
+              dismissThresholds: const {DismissDirection.up: 0.2},
+              onDismissed: (_) {
+                HapticFeedback.lightImpact();
+                onGone();
+              },
+              child: SizedBox.expand(child: child),
+            );
 }
 
 class _BlackPill extends StatelessWidget {
@@ -411,7 +476,10 @@ class _BlackPill extends StatelessWidget {
                               _category,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700, height: 1),
+                              style: ink.copyWith(
+                                  fontSize: 12.5,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1),
                             ),
                           ),
                         ],
@@ -421,7 +489,10 @@ class _BlackPill extends StatelessWidget {
                         item.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: ink.copyWith(fontSize: 13, fontWeight: FontWeight.w600, height: 1.2),
+                        style: ink.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2),
                       ),
                       if (item.body.isNotEmpty) ...[
                         const SizedBox(height: 1),
@@ -430,7 +501,10 @@ class _BlackPill extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: ink.copyWith(
-                              fontSize: 12, fontWeight: FontWeight.w400, height: 1.25, color: const Color(0xE6FFFFFF)),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              height: 1.25,
+                              color: const Color(0xE6FFFFFF)),
                         ),
                       ],
                     ],
@@ -442,7 +516,8 @@ class _BlackPill extends StatelessWidget {
                   child: ColoredBox(
                     color: const Color(0xFF1A1A1E),
                     child: thumb != null
-                        ? Image.asset(thumb, width: 58, height: 52, fit: BoxFit.cover)
+                        ? Image.asset(thumb,
+                            width: 58, height: 52, fit: BoxFit.cover)
                         : NotificationRow.networkThumbs == false
                             ? const SizedBox(width: 58, height: 52)
                             : CachedNetworkImage(
@@ -450,7 +525,8 @@ class _BlackPill extends StatelessWidget {
                                 width: 58,
                                 height: 52,
                                 fit: BoxFit.cover,
-                                errorWidget: (_, __, ___) => const SizedBox(width: 58, height: 52),
+                                errorWidget: (_, __, ___) =>
+                                    const SizedBox(width: 58, height: 52),
                               ),
                   ),
                 ),
@@ -484,7 +560,8 @@ class NotifCategoryBadge extends StatelessWidget {
     'orders',
   };
   static const fallback = 'assets/icons/notif/default.svg';
-  static String assetFor(String type) => known.contains(type) ? 'assets/icons/notif/$type.svg' : fallback;
+  static String assetFor(String type) =>
+      known.contains(type) ? 'assets/icons/notif/$type.svg' : fallback;
 
   @override
   Widget build(BuildContext context) {
@@ -506,12 +583,14 @@ class NotifCategoryBadge extends StatelessWidget {
             width: black,
             height: black,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.black),
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle, color: Colors.black),
             child: Container(
               width: white,
               height: white,
               alignment: Alignment.center,
-              decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+              decoration: const BoxDecoration(
+                  shape: BoxShape.circle, color: Colors.white),
               child: SvgPicture.asset(
                 assetFor(type),
                 key: ValueKey('notif-icon-$type'),
