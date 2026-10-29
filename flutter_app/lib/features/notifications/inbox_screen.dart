@@ -29,7 +29,7 @@ class InboxScreen extends StatelessWidget {
           cta: 'Open NowssB Earn',
           leftColor: const Color(0xFF1A2438),
           rightColor: const Color(0xFFC8A96E),
-          art: SplitPromoArts.egyptianGold,
+          art: 'assets/banners/promo/uniq-inbox.jpg',
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()),
           ),

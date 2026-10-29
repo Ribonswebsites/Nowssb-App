@@ -180,9 +180,11 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
                     LSection('numbers', 'Your numbers', _pad(const ProgressEyebrow('Your Numbers', tightTop: true))),
                     _pad(ProgressStatsRow(progress: progress)),
                     const SizedBox(height: 14),
-                    LSection('promo', 'Split promo banner', _pad(ColoredSplitPromoBanner.forSurface(
-                      SplitPromoSurface.progress,
-                      onTap: () => NavScope.goTo(context, 1),
+                    LSection('promo', 'Split promo banner', _pad(ColoredSplitPromoBanner(
+                      spec: SplitPromoSpec.forSurface(
+                        SplitPromoSurface.progress,
+                        onTap: () => NavScope.goTo(context, 1),
+                      ).copyWith(art: 'assets/banners/promo/uniq-progress.jpg'),
                     ))),
                     LSection('week', 'This week', _pad(const ProgressEyebrow('This Week'))),
                     _pad(ProgressWeekGrid(progress: progress)),

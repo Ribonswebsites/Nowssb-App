@@ -804,10 +804,10 @@ class _CustIntroStage extends StatelessWidget {
   const _CustIntroStage();
 
   static const _stills = [
-    'assets/hero-curve/banner-player.webp',
-    'assets/hero-curve/banner-library.webp',
-    'assets/hero-curve/stillness.webp',
-    'assets/hero-curve/cosmos.webp',
+    'assets/banners/promo/uniq-orange.jpg',
+    'assets/banners/promo/uniq-navy.jpg',
+    'assets/banners/promo/uniq-still.jpg',
+    'assets/banners/promo/uniq-cosmos.jpg',
   ];
 
   @override

@@ -616,7 +616,9 @@ class _HomeFashionState extends State<HomeFashion> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                 child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
+                  spec: SplitPromoExtras.at(1, onTap: () => _go(1)).copyWith(
+                    art: 'assets/banners/promo/uniq-honey.jpg',
+                  ),
                   margin: EdgeInsets.zero,
                 ),
               ),

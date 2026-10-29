@@ -105,9 +105,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
               ),
             ]),
             const SizedBox(height: 18),
-            LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
-              SplitPromoSurface.library,
-              onTap: () => NavScope.goTo(context, 1),
+            LSection('promo', 'Split promo banner', ColoredSplitPromoBanner(
+              spec: SplitPromoSpec.forSurface(
+                SplitPromoSurface.library,
+                onTap: () => NavScope.goTo(context, 1),
+              ).copyWith(art: 'assets/banners/promo/uniq-library.jpg'),
               margin: EdgeInsets.zero,
             )),
             const SizedBox(height: 18),

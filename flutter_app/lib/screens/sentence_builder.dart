@@ -369,15 +369,17 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ColoredSplitPromoBanner.forSurface(
-                        SplitPromoSurface.sentenceBuilder,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const SoundLibraryScreen(),
-                            ),
-                          );
-                        },
+                      ColoredSplitPromoBanner(
+                        spec: SplitPromoSpec.forSurface(
+                          SplitPromoSurface.sentenceBuilder,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const SoundLibraryScreen(),
+                              ),
+                            );
+                          },
+                        ).copyWith(art: 'assets/banners/promo/uniq-sentence.jpg'),
                         margin: EdgeInsets.zero,
                       ),
                       // 2) Heading BELOW the black banner

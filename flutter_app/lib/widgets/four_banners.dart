@@ -48,7 +48,7 @@ class FourBanners extends StatelessWidget {
             cta: splitCta,
             leftColor: const Color(0xFF3D2914),
             rightColor: const Color(0xFFE4C56A),
-            art: SplitPromoArts.blondeLotus,
+            art: 'assets/banners/promo/uniq-four.jpg',
             // The split promo opens the next programme (never this page).
             onTap: () => Programmes.open(context, _next(current)),
           ),

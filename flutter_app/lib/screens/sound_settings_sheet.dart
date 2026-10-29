@@ -132,7 +132,7 @@ class _SoundSettingsSheetState extends State<SoundSettingsSheet> {
                     cta: 'How it works',
                     leftColor: const Color(0xFF1A2744),
                     rightColor: const Color(0xFF7C4DFF),
-                    art: SplitPromoArts.redHairBlazer,
+                    art: 'assets/banners/promo/uniq-soundset.jpg',
                     onTap: _how,
                   ),
                 ),

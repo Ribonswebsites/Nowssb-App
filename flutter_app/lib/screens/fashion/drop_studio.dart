@@ -1101,7 +1101,7 @@ class _HowItFlows extends StatelessWidget {
               child: Transform.rotate(
                 angle: -.09,
                 child: const _FlowTile(
-                    word: 'PICK', sub: 'A WORD THIS HOUR', asset: DropStudioAssets.cosmos, id: 'flow.pick', seed: 3),
+                    word: 'PICK', sub: 'A WORD THIS HOUR', asset: 'assets/banners/promo/uniq-cosmos.jpg', id: 'flow.pick', seed: 3),
               ),
             ),
             Positioned(
@@ -1119,7 +1119,7 @@ class _HowItFlows extends StatelessWidget {
               child: Transform.rotate(
                 angle: -.04,
                 child: const _FlowTile(
-                    word: 'OWN', sub: 'KEEP IT', asset: DropStudioAssets.library, id: 'flow.own', seed: 11),
+                    word: 'OWN', sub: 'KEEP IT', asset: 'assets/banners/promo/uniq-still.jpg', id: 'flow.own', seed: 11),
               ),
             ),
           ]),

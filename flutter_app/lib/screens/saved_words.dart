@@ -75,13 +75,13 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
   List<Word> _rows() => [..._saved, ..._suggested()];
 
   static const _arts = <String>[
-    'assets/banners/promo/pose-01.png',
-    'assets/banners/promo/pose-02.png',
-    'assets/banners/promo/pose-03.png',
-    'assets/banners/promo/pose-04.png',
-    'assets/banners/promo/pose-05.png',
-    'assets/banners/promo/pose-06.png',
-    'assets/banners/promo/pose-07.png',
+    'assets/banners/promo/uniq-sw1.jpg',
+    'assets/banners/promo/uniq-sw2.jpg',
+    'assets/banners/promo/uniq-sw3.jpg',
+    'assets/banners/promo/uniq-sw4.jpg',
+    'assets/banners/promo/uniq-sw5.jpg',
+    'assets/banners/promo/uniq-sw6.jpg',
+    'assets/banners/promo/uniq-sw7.jpg',
   ];
 
   static const _backs = <Color>[
