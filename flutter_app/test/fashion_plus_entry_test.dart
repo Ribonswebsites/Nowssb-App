@@ -139,7 +139,11 @@ void main() {
       await t.runAsync(() async {
         final img = await b.toImage(pixelRatio: 2);
         final bytes = await img.toByteData(format: ImageByteFormat.png);
-        File('/workspace/team-plan/shots/fpentry-build-$name-dim$d.png').writeAsBytesSync(bytes!.buffer.asUint8List());
+        // Screenshots are optional: only written where the shots folder exists.
+        final dir = Directory('/workspace/team-plan/shots');
+        if (dir.existsSync()) {
+          File('${dir.path}/fpentry-build-$name-dim$d.png').writeAsBytesSync(bytes!.buffer.asUint8List());
+        }
       });
     });
     }
