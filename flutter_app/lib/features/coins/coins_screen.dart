@@ -110,18 +110,18 @@ class CoinsBody extends StatelessWidget {
         Row(children: [
           const NwsbCoinDisc(size: 52),
           const SizedBox(width: 12),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('$_coins', style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800, height: 1)),
             const SizedBox(height: 4),
             const Text('coins in your wallet', style: TextStyle(color: _dim, fontSize: 13)),
-          ]),
+          ])),
         ]),
         if (cap > 0) ...[
           const SizedBox(height: 18),
           Row(children: [
-            Text('Earned today $earned', style: const TextStyle(color: _gold, fontWeight: FontWeight.w700)),
-            const Spacer(),
-            Text(left > 0 ? '$left left to earn' : 'Today\u2019s cap reached', style: const TextStyle(color: _dim, fontSize: 13)),
+            Flexible(child: Text('Earned today $earned', overflow: TextOverflow.ellipsis, style: const TextStyle(color: _gold, fontWeight: FontWeight.w700))),
+            const SizedBox(width: 8),
+            Flexible(child: Text(left > 0 ? '$left left to earn' : 'Today\u2019s cap reached', textAlign: TextAlign.end, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _dim, fontSize: 13))),
           ]),
           const SizedBox(height: 8),
           _bar(earned / cap),
@@ -193,7 +193,7 @@ class CoinsBody extends StatelessWidget {
           const SizedBox(width: 26),
           Expanded(child: _bar(limit == 0 ? 0 : done / limit)),
           const SizedBox(width: 10),
-          Text('${done * coins} of ${limit * coins} · $capText', style: const TextStyle(color: _dim, fontSize: 11)),
+          Flexible(flex: 2, child: Text('${done * coins} of ${limit * coins} · $capText', overflow: TextOverflow.ellipsis, style: const TextStyle(color: _dim, fontSize: 11))),
         ]),
       ]),
     );

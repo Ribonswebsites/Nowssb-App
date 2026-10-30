@@ -48,7 +48,8 @@ void main() {
     });
   }
 
-  setUpAll(() => _font('Roboto', '/usr/share/fonts/truetype/sand-box/google/Roboto/Roboto-VariableFont_wdth,wght.ttf'));
+  // CI has no Roboto: run the same layout with the test font (COINS_NO_FONT=1) too.
+  if (Platform.environment['COINS_NO_FONT'] == null) setUpAll(() => _font('Roboto', '/usr/share/fonts/truetype/sand-box/google/Roboto/Roboto-VariableFont_wdth,wght.ttf'));
 
   Widget frame(GlobalKey key, Widget child) => RepaintBoundary(
         key: key,
