@@ -69,6 +69,8 @@ void main() {
     expect(find.text('Earned today 63'), findsOneWidget);
     expect(find.text('187 left to earn'), findsOneWidget);
     expect(find.text('16 of 24 · 2 of 3 today'), findsOneWidget);
+    expect(find.text('Enter today\u2019s draw'), findsOneWidget);
+    expect(find.text('Winners and reviews'), findsOneWidget);
     await shot(t, key, '1-top');
     await t.scrollUntilVisible(find.textContaining('Store: up to 30%'), 300);
     expect(find.textContaining('with a coupon, up to 40%'), findsOneWidget);
