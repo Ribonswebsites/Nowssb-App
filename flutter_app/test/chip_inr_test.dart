@@ -234,10 +234,18 @@ void main() {
         await fill(t, [word('aarogya'), word('shakti')]);
         await boot(t, const CheckoutPage(), w: w, s: s);
         expect(CartBag.instance.cartCount, 2);
+        // Wider CI fonts can push Done below the lazily built list: scroll
+        // the checkout list until it exists, then tap it wherever it sits.
         final done = find.text('Done');
+        final list = find.byType(Scrollable).last;
+        for (var i = 0; i < 30 && done.hitTestable().evaluate().isEmpty; i++) {
+          await t.drag(list, const Offset(0, -160), warnIfMissed: false);
+          await t.pump(const Duration(milliseconds: 60));
+        }
+        expect(done, findsOneWidget);
         await t.ensureVisible(done);
         await t.pump();
-        await t.tap(done);
+        await t.tap(done.hitTestable().evaluate().isEmpty ? done : done.hitTestable(), warnIfMissed: false);
         await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
         await t.pump(const Duration(milliseconds: 300));
         expect(CartBag.instance.cartCount, 0, reason: 'badge drops to 0');

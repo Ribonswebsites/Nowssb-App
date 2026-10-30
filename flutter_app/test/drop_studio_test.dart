@@ -301,6 +301,24 @@ void main() {
     });
   });
 
+  testWidgets('Checkout door dock tolerates wider fonts (320 @ 1.6, no overflow)', (t) async {
+    t.view.physicalSize = const Size(320 * 3, 690 * 3);
+    t.view.devicePixelRatio = 3;
+    addTearDown(t.view.reset);
+    for (final inPlan in [false, true]) {
+      await t.pumpWidget(MaterialApp(
+          home: MediaQuery(
+              data: const MediaQueryData(size: Size(320, 690), textScaler: TextScaler.linear(1.6)),
+              child: DoorCheckout(
+                  items: [DoorLine(id: 'word:surya', title: 'Surya', kind: 'Word', priceLabel: inPlan ? 'Included' : '₹99', image: 'assets/video/earth-night-poster.webp', included: inPlan)],
+                  totalLabel: inPlan ? 'Included' : '₹99',
+                  debugPhase: 0))));
+      await t.pump(const Duration(milliseconds: 300));
+      expect(t.takeException(), isNull, reason: 'dock fits at 320 with big text (inPlan=$inPlan)');
+      expect(find.byType(DoorDock), findsOneWidget);
+    }
+  });
+
   testWidgets('Checkout door dock reads just TOTAL at 320@1.3', (t) async {
     t.view.physicalSize = const Size(320 * 3, 690 * 3);
     t.view.devicePixelRatio = 3;

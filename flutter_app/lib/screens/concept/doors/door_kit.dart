@@ -584,16 +584,23 @@ class DoorDock extends StatelessWidget {
             }),
           ),
           const SizedBox(width: 8),
-          GestureDetector(
-            onTap: onTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-              decoration: BoxDecoration(color: doorGold, borderRadius: BorderRadius.circular(30)),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text(action, style: doorBody(14.5, color: doorInk, w: FontWeight.w700)),
-                const SizedBox(width: 6),
-                const Icon(Icons.arrow_forward_rounded, color: doorInk, size: 18),
-              ]),
+          // Flexible + scaleDown: a wider font (or big text) shrinks the
+          // pill label a touch instead of overflowing the dock.
+          Flexible(
+            child: GestureDetector(
+              onTap: onTap,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                decoration: BoxDecoration(color: doorGold, borderRadius: BorderRadius.circular(30)),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(action, maxLines: 1, softWrap: false, style: doorBody(14.5, color: doorInk, w: FontWeight.w700)),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.arrow_forward_rounded, color: doorInk, size: 18),
+                  ]),
+                ),
+              ),
             ),
           ),
           ]),
