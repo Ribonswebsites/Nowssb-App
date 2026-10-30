@@ -115,7 +115,9 @@ class _PracticeProgressScreenState extends State<PracticeProgressScreen> {
             ),
             Expanded(
               child: Center(
-                child: Padding(
+                // Scrolls only when it can't fit (small phone, big system font,
+                // landscape); looks identical otherwise.
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
