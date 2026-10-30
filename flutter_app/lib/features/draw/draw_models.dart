@@ -17,11 +17,11 @@ class DrawPrize {
   final String detail;
 
   factory DrawPrize.fromJson(Map<String, dynamic> j) => DrawPrize(
-        id: _str(j['id']),
-        kind: _str(j['kind']) == 'coupon' ? 'coupon' : 'gift',
-        title: _str(j['title']),
-        detail: _str(j['detail']),
-      );
+    id: _str(j['id']),
+    kind: _str(j['kind']) == 'coupon' ? 'coupon' : 'gift',
+    title: _str(j['title']),
+    detail: _str(j['detail']),
+  );
 }
 
 /// GET draw status. `entered`/`result` are for the signed-in user only.
@@ -96,10 +96,10 @@ class DrawResult {
   final String claimId;
 
   factory DrawResult.fromJson(Map<String, dynamic> j) => DrawResult(
-        won: j['won'] == true,
-        prize: j['prize'] is Map ? DrawPrize.fromJson(Map<String, dynamic>.from(j['prize'] as Map)) : null,
-        claimId: _str(j['claimId']),
-      );
+    won: j['won'] == true,
+    prize: j['prize'] is Map ? DrawPrize.fromJson(Map<String, dynamic>.from(j['prize'] as Map)) : null,
+    claimId: _str(j['claimId']),
+  );
 }
 
 /// One real winner, as published by the server (first name + initial only).
@@ -112,12 +112,12 @@ class DrawWinner {
   final WinnerReview? review;
 
   factory DrawWinner.fromJson(Map<String, dynamic> j) => DrawWinner(
-        id: _str(j['id']),
-        displayName: _str(j['displayName']),
-        prizeTitle: _str(j['prizeTitle']),
-        wonAt: _date(j['wonAt']),
-        review: j['review'] is Map ? WinnerReview.fromJson(Map<String, dynamic>.from(j['review'] as Map)) : null,
-      );
+    id: _str(j['id']),
+    displayName: _str(j['displayName']),
+    prizeTitle: _str(j['prizeTitle']),
+    wonAt: _date(j['wonAt']),
+    review: j['review'] is Map ? WinnerReview.fromJson(Map<String, dynamic>.from(j['review'] as Map)) : null,
+  );
 }
 
 /// A review written by the winner themself, after moderation.
@@ -133,10 +133,10 @@ class WinnersPage {
   final List<DrawWinner> winners;
   final String? nextCursor;
   factory WinnersPage.fromJson(Map<String, dynamic> j) => WinnersPage(
-        winners: [
-          for (final w in (j['winners'] as List? ?? const []))
-            if (w is Map) DrawWinner.fromJson(Map<String, dynamic>.from(w)),
-        ],
-        nextCursor: j['nextCursor'] is String ? j['nextCursor'] as String : null,
-      );
+    winners: [
+      for (final w in (j['winners'] as List? ?? const []))
+        if (w is Map) DrawWinner.fromJson(Map<String, dynamic>.from(w)),
+    ],
+    nextCursor: j['nextCursor'] is String ? j['nextCursor'] as String : null,
+  );
 }

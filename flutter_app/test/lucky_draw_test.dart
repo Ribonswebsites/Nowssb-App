@@ -75,10 +75,16 @@ Future<void> _shot(WidgetTester t, String name) async {
 Future<void> _pump(WidgetTester t, Widget w) async {
   t.view.physicalSize = const Size(780, 1688);
   t.view.devicePixelRatio = 2;
-  await t.pumpWidget(RepaintBoundary(
+  await t.pumpWidget(
+    RepaintBoundary(
       key: _shotKey,
       child: MaterialApp(
-          debugShowCheckedModeBanner: false, theme: ThemeData(fontFamily: 'DM Sans', useMaterial3: true), home: w)));
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(fontFamily: 'DM Sans', useMaterial3: true),
+        home: w,
+      ),
+    ),
+  );
   await t.pump();
   await t.pump(const Duration(milliseconds: 50));
 }
@@ -114,11 +120,15 @@ void main() {
 
   testWidgets('win result from server, review goes to server', (t) async {
     final repo = FakeRepo(
-        statusJson: _statusJson(entered: true, result: {
-      'won': true,
-      'claimId': 'cl1',
-      'prize': {'id': 'c1', 'kind': 'coupon', 'title': '20% off coupon'}
-    }));
+      statusJson: _statusJson(
+        entered: true,
+        result: {
+          'won': true,
+          'claimId': 'cl1',
+          'prize': {'id': 'c1', 'kind': 'coupon', 'title': '20% off coupon'},
+        },
+      ),
+    );
     await _pump(t, LuckyDrawScreen(repository: repo));
     expect(find.byKey(const Key('draw-won')), findsOneWidget);
     await _shot(t, 'won');
@@ -134,7 +144,11 @@ void main() {
 
   testWidgets('lost result', (t) async {
     await _pump(
-        t, LuckyDrawScreen(repository: FakeRepo(statusJson: _statusJson(entered: true, result: {'won': false}))));
+      t,
+      LuckyDrawScreen(
+        repository: FakeRepo(statusJson: _statusJson(entered: true, result: {'won': false})),
+      ),
+    );
     expect(find.byKey(const Key('draw-lost')), findsOneWidget);
   });
 
@@ -158,6 +172,34 @@ void main() {
     await _shot(t, 'rules');
   });
 
+  for (final scale in [1.5, 2.0]) {
+    testWidgets('rules and review sheets fit at text scale $scale', (t) async {
+      t.platformDispatcher.textScaleFactorTestValue = scale;
+      addTearDown(t.platformDispatcher.clearTextScaleFactorTestValue);
+      final repo = FakeRepo(
+        statusJson: _statusJson(
+          entered: true,
+          result: {
+            'won': true,
+            'claimId': 'cl1',
+            'prize': {'id': 'c1', 'kind': 'coupon', 'title': '20% off coupon'},
+          },
+        ),
+      );
+      await _pump(t, LuckyDrawScreen(repository: repo));
+      await t.tap(find.text('Write a review'));
+      await t.pumpAndSettle();
+      expect(t.takeException(), isNull);
+      expect(find.text('Send review'), findsOneWidget);
+      Navigator.of(t.element(find.text('Send review'))).pop();
+      await t.pumpAndSettle();
+      showDrawRules(t.element(find.byType(LuckyDrawScreen)));
+      await t.pumpAndSettle();
+      expect(t.takeException(), isNull);
+      expect(find.textContaining('No purchase and no coins'), findsOneWidget);
+    });
+  }
+
   testWidgets('winners empty state has no made-up names', (t) async {
     await _pump(t, LuckyDrawWinnersScreen(repository: FakeRepo()));
     expect(find.textContaining('No winners yet'), findsOneWidget);
@@ -166,21 +208,30 @@ void main() {
 
   testWidgets('winners list shows server winners and reviews', (t) async {
     await _pump(
-        t,
-        LuckyDrawWinnersScreen(
-            repository: FakeRepo(winnersJson: {
-          'winners': [
-            {
-              'id': 'w1',
-              'displayName': 'Asha K.',
-              'prizeTitle': '20% off coupon',
-              'wonAt': '2026-10-30T18:30:00Z',
-              'review': {'text': 'Used it the same day.', 'stars': 5}
-            },
-            {'id': 'w2', 'displayName': 'Dev R.', 'prizeTitle': 'Headphone gift box', 'wonAt': '2026-10-29T18:30:00Z'},
-          ],
-          'nextCursor': null,
-        })));
+      t,
+      LuckyDrawWinnersScreen(
+        repository: FakeRepo(
+          winnersJson: {
+            'winners': [
+              {
+                'id': 'w1',
+                'displayName': 'Asha K.',
+                'prizeTitle': '20% off coupon',
+                'wonAt': '2026-10-30T18:30:00Z',
+                'review': {'text': 'Used it the same day.', 'stars': 5},
+              },
+              {
+                'id': 'w2',
+                'displayName': 'Dev R.',
+                'prizeTitle': 'Headphone gift box',
+                'wonAt': '2026-10-29T18:30:00Z',
+              },
+            ],
+            'nextCursor': null,
+          },
+        ),
+      ),
+    );
     expect(find.text('Asha K.'), findsOneWidget);
     expect(find.text('“Used it the same day.”'), findsOneWidget);
     expect(find.text('Load more'), findsNothing);

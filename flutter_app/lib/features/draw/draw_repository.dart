@@ -33,7 +33,8 @@ class EconomyDrawRepository implements DrawRepository {
 
   @override
   Future<WinnersPage> winners({String? cursor, int limit = 20}) async => WinnersPage.fromJson(
-      await EconomyApi.call('drawWinners', {if (cursor != null) 'cursor': cursor, 'limit': limit}));
+    await EconomyApi.call('drawWinners', {if (cursor != null) 'cursor': cursor, 'limit': limit}),
+  );
 
   @override
   Future<void> submitReview({required String claimId, required String text, int? stars}) async {

@@ -46,29 +46,40 @@ class _DrawPage extends StatelessWidget {
     );
     return Scaffold(
       backgroundColor: NwsbColors.deep,
-      body: Stack(fit: StackFit.expand, children: [
-        const AppBackdrop(),
-        const ColoredBox(color: Color(0x99000000)),
-        SafeArea(
-          child: Column(children: [
-            SizedBox(
-              height: 56,
-              child: Row(children: [
-                IconButton(
-                  tooltip: 'Back',
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.of(context).maybePop(),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const AppBackdrop(),
+          const ColoredBox(color: Color(0x99000000)),
+          SafeArea(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 56,
+                  child: Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Back',
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () => Navigator.of(context).maybePop(),
+                      ),
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 Expanded(
-                  child: Text(title,
-                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+                  child: onRefresh == null ? list : RefreshIndicator(onRefresh: onRefresh!, child: list),
                 ),
-              ]),
+              ],
             ),
-            Expanded(child: onRefresh == null ? list : RefreshIndicator(onRefresh: onRefresh!, child: list)),
-          ]),
-        ),
-      ]),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -81,20 +92,20 @@ class _Pill extends StatelessWidget {
   final bool busy;
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: 48,
-        child: FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: primary ? NwsbColors.gold : Colors.white12,
-            foregroundColor: primary ? Colors.black : Colors.white,
-            disabledBackgroundColor: Colors.white12,
-            shape: const StadiumBorder(),
-          ),
-          onPressed: busy ? null : onTap,
-          child: busy
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-              : Text(label, style: const TextStyle(fontWeight: FontWeight.w800)),
-        ),
-      );
+    height: 48,
+    child: FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor: primary ? NwsbColors.gold : Colors.white12,
+        foregroundColor: primary ? Colors.black : Colors.white,
+        disabledBackgroundColor: Colors.white12,
+        shape: const StadiumBorder(),
+      ),
+      onPressed: busy ? null : onTap,
+      child: busy
+          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+          : Text(label, style: const TextStyle(fontWeight: FontWeight.w800)),
+    ),
+  );
 }
 
 class _ErrorCard extends StatelessWidget {
@@ -102,35 +113,51 @@ class _ErrorCard extends StatelessWidget {
   final String text;
   final VoidCallback onRetry;
   @override
-  Widget build(BuildContext context) => PCard(children: [
-        Row(children: [
+  Widget build(BuildContext context) => PCard(
+    children: [
+      Row(
+        children: [
           const Icon(Icons.error_outline, color: Color(0xFFFF6B6B)),
           const SizedBox(width: 10),
-          Expanded(child: Text(text, style: const TextStyle(color: Colors.white, height: 1.4))),
-        ]),
-        const SizedBox(height: 12),
-        _Pill('Try again', onTap: onRetry, primary: false),
-      ]);
+          Expanded(
+            child: Text(text, style: const TextStyle(color: Colors.white, height: 1.4)),
+          ),
+        ],
+      ),
+      const SizedBox(height: 12),
+      _Pill('Try again', onTap: onRetry, primary: false),
+    ],
+  );
 }
 
 void showDrawRules(BuildContext context, {String serverText = ''}) {
   showModalBottomSheet<void>(
     context: context,
+    isScrollControlled: true,
     backgroundColor: const Color(0xFF0B0B12),
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-    builder: (_) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const PHeading('Lucky draw', 'Official rules', slot: 'draw.rules'),
-          for (final l in kDrawRules)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text('•  $l', style: const TextStyle(color: Colors.white, height: 1.4, fontSize: 13)),
+    builder: (ctx) => SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(ctx).height * 0.85),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const PHeading('Lucky draw', 'Official rules', slot: 'draw.rules'),
+                for (final l in kDrawRules)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Text('•  $l', style: const TextStyle(color: Colors.white, height: 1.4, fontSize: 13)),
+                  ),
+                if (serverText.isNotEmpty)
+                  Text(serverText, style: const TextStyle(color: NwsbColors.mist, height: 1.4, fontSize: 13)),
+              ],
             ),
-          if (serverText.isNotEmpty)
-            Text(serverText, style: const TextStyle(color: NwsbColors.mist, height: 1.4, fontSize: 13)),
-        ]),
+          ),
+        ),
       ),
     ),
   );
@@ -193,18 +220,21 @@ class _LuckyDrawScreenState extends State<LuckyDrawScreen> {
     }
   }
 
-  void _winners() => Navigator.of(context)
-      .push(MaterialPageRoute<void>(builder: (_) => LuckyDrawWinnersScreen(repository: widget.repository)));
+  void _winners() =>
+      Navigator.of(context)
+          .push(MaterialPageRoute<void>(builder: (_) => LuckyDrawWinnersScreen(repository: widget.repository)));
 
   @override
   Widget build(BuildContext context) {
     final s = _status;
     final children = <Widget>[];
     if (_loading && s == null) {
-      children.add(const Padding(
-        padding: EdgeInsets.only(top: 80),
-        child: Center(child: CircularProgressIndicator(color: NwsbColors.gold)),
-      ));
+      children.add(
+        const Padding(
+          padding: EdgeInsets.only(top: 80),
+          child: Center(child: CircularProgressIndicator(color: NwsbColors.gold)),
+        ),
+      );
     } else if (_error != null && s == null) {
       children.add(_ErrorCard(_errText(_error!), _load));
     } else if (s != null) {
@@ -217,105 +247,154 @@ class _LuckyDrawScreenState extends State<LuckyDrawScreen> {
     final result = s.result;
     final odds = s.oddsLine;
     return [
-      PCard(glow: NwsbColors.gold, children: [
-        const Row(children: [
-          NwsbCoinDisc(size: 48),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('DAILY LUCKY DRAW',
-                  style:
-                      TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 11, fontWeight: FontWeight.w800)),
-              SizedBox(height: 4),
-              Text('Win a gift or a coupon',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-            ]),
+      PCard(
+        glow: NwsbColors.gold,
+        children: [
+          const Row(
+            children: [
+              NwsbCoinDisc(size: 48),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'DAILY LUCKY DRAW',
+                      style: TextStyle(
+                        color: NwsbColors.gold,
+                        letterSpacing: 1.4,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Win a gift or a coupon',
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-        ]),
-        const SizedBox(height: 12),
-        const Text('Free to enter. No purchase or coins needed.', style: TextStyle(color: Colors.white, height: 1.4)),
-        if (odds.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Text(odds,
+          const SizedBox(height: 12),
+          const Text('Free to enter. No purchase or coins needed.', style: TextStyle(color: Colors.white, height: 1.4)),
+          if (odds.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              odds,
               key: const Key('draw-odds'),
-              style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
+              style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
+            ),
+          ],
+          if (s.closesAt != null && !s.entered && s.open) ...[
+            const SizedBox(height: 6),
+            Text('Entries close ${_when(s.closesAt)}', style: const TextStyle(color: NwsbColors.mist, fontSize: 13)),
+          ],
+          const SizedBox(height: 14),
+          if (result != null)
+            _resultView(result)
+          else if (s.entered)
+            Text(
+              s.resultsAt == null
+                  ? 'You\'re in today\'s draw. Results show here.'
+                  : 'You\'re in. Results at ${_when(s.resultsAt)}.',
+              key: const Key('draw-entered'),
+              style: const TextStyle(color: Color(0xFF6FE3C1), fontWeight: FontWeight.w700),
+            )
+          else if (!s.open)
+            const Text('Today\'s draw is closed. Come back tomorrow.', style: TextStyle(color: NwsbColors.mist))
+          else
+            _Pill('Enter free', onTap: _enter, busy: _entering),
+          if (_enterError != null) ...[
+            const SizedBox(height: 8),
+            Text(_enterError!, style: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 13)),
+          ],
         ],
-        if (s.closesAt != null && !s.entered && s.open) ...[
-          const SizedBox(height: 6),
-          Text('Entries close ${_when(s.closesAt)}', style: const TextStyle(color: NwsbColors.mist, fontSize: 13)),
-        ],
-        const SizedBox(height: 14),
-        if (result != null)
-          _resultView(result)
-        else if (s.entered)
-          Text(
-            s.resultsAt == null
-                ? 'You\'re in today\'s draw. Results show here.'
-                : 'You\'re in. Results at ${_when(s.resultsAt)}.',
-            key: const Key('draw-entered'),
-            style: const TextStyle(color: Color(0xFF6FE3C1), fontWeight: FontWeight.w700),
-          )
-        else if (!s.open)
-          const Text('Today\'s draw is closed. Come back tomorrow.', style: TextStyle(color: NwsbColors.mist))
-        else
-          _Pill('Enter free', onTap: _enter, busy: _entering),
-        if (_enterError != null) ...[
-          const SizedBox(height: 8),
-          Text(_enterError!, style: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 13)),
-        ],
-      ]),
+      ),
       if (s.prizes.isNotEmpty) ...[
         const PHeading('Today', 'Prizes in the draw', slot: 'draw.prizes'),
-        PCard(children: [
-          for (final p in s.prizes)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(children: [
-                Icon(p.kind == 'coupon' ? Icons.confirmation_number_outlined : Icons.card_giftcard,
-                    color: NwsbColors.gold),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(p.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                    if (p.detail.isNotEmpty)
-                      Text(p.detail, style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
-                  ]),
+        PCard(
+          children: [
+            for (final p in s.prizes)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    Icon(
+                      p.kind == 'coupon' ? Icons.confirmation_number_outlined : Icons.card_giftcard,
+                      color: NwsbColors.gold,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            p.title,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                          ),
+                          if (p.detail.isNotEmpty)
+                            Text(p.detail, style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+                        ],
+                      ),
+                    ),
+                    PPill(p.kind == 'coupon' ? 'Coupon' : 'Gift', color: NwsbColors.goldLight),
+                  ],
                 ),
-                PPill(p.kind == 'coupon' ? 'Coupon' : 'Gift', color: NwsbColors.goldLight),
-              ]),
-            ),
-          const SizedBox(height: 6),
-          const Text('Prizes have no cash value.', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
-        ]),
+              ),
+            const SizedBox(height: 6),
+            const Text('Prizes have no cash value.', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
+          ],
+        ),
       ],
-      Row(children: [
-        Expanded(child: _Pill('Winners', onTap: _winners, primary: false)),
-        const SizedBox(width: 10),
-        Expanded(
-            child:
-                _Pill('Official rules', onTap: () => showDrawRules(context, serverText: s.rulesText), primary: false)),
-      ]),
+      Row(
+        children: [
+          Expanded(child: _Pill('Winners', onTap: _winners, primary: false)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _Pill(
+              'Official rules',
+              onTap: () => showDrawRules(context, serverText: s.rulesText),
+              primary: false,
+            ),
+          ),
+        ],
+      ),
     ];
   }
 
   Widget _resultView(DrawResult r) {
     if (!r.won) {
-      return const Text('Not this time. A new free draw opens tomorrow.',
-          key: Key('draw-lost'), style: TextStyle(color: NwsbColors.mist, fontWeight: FontWeight.w700));
+      return const Text(
+        'Not this time. A new free draw opens tomorrow.',
+        key: Key('draw-lost'),
+        style: TextStyle(color: NwsbColors.mist, fontWeight: FontWeight.w700),
+      );
     }
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text('You won${r.prize == null ? '' : ': ${r.prize!.title}'}',
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'You won${r.prize == null ? '' : ': ${r.prize!.title}'}',
           key: const Key('draw-won'),
-          style: const TextStyle(color: Color(0xFF6FE3C1), fontSize: 17, fontWeight: FontWeight.w800)),
-      const SizedBox(height: 4),
-      Text(r.prize?.kind == 'coupon' ? 'It\'s in your coupons.' : 'It\'s in your gifts.',
-          style: const TextStyle(color: Colors.white)),
-      if (r.claimId.isNotEmpty) ...[
-        const SizedBox(height: 10),
-        _Pill('Write a review',
-            primary: false, onTap: () => showDrawReviewSheet(context, widget.repository, r.claimId)),
+          style: const TextStyle(color: Color(0xFF6FE3C1), fontSize: 17, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          r.prize?.kind == 'coupon' ? 'It\'s in your coupons.' : 'It\'s in your gifts.',
+          style: const TextStyle(color: Colors.white),
+        ),
+        if (r.claimId.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          _Pill(
+            'Write a review',
+            primary: false,
+            onTap: () => showDrawReviewSheet(context, widget.repository, r.claimId),
+          ),
+        ],
       ],
-    ]);
+    );
   }
 }
 
@@ -361,8 +440,11 @@ class _ReviewSheetState extends State<_ReviewSheet> {
       _msg = null;
     });
     try {
-      await widget.repo
-          .submitReview(claimId: widget.claimId, text: _text.text.trim(), stars: _stars == 0 ? null : _stars);
+      await widget.repo.submitReview(
+        claimId: widget.claimId,
+        text: _text.text.trim(),
+        stars: _stars == 0 ? null : _stars,
+      );
       if (mounted) setState(() => _done = true);
     } catch (e) {
       if (mounted) setState(() => _msg = _errText(e));
@@ -373,40 +455,50 @@ class _ReviewSheetState extends State<_ReviewSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(20, 18, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        const PHeading('Your prize', 'Write a review', slot: 'draw.review'),
-        if (_done)
-          const Text('Thanks. It shows on the winners page once it\'s checked.',
-              style: TextStyle(color: Color(0xFF6FE3C1)))
-        else ...[
-          Row(children: [
-            for (var i = 1; i <= 5; i++)
-              IconButton(
-                tooltip: '$i stars',
-                onPressed: () => setState(() => _stars = i),
-                icon: Icon(i <= _stars ? Icons.star : Icons.star_border, color: NwsbColors.gold),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20, 18, 20, 20 + MediaQuery.viewInsetsOf(context).bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const PHeading('Your prize', 'Write a review', slot: 'draw.review'),
+            if (_done)
+              const Text(
+                'Thanks. It shows on the winners page once it\'s checked.',
+                style: TextStyle(color: Color(0xFF6FE3C1)),
+              )
+            else ...[
+              Row(
+                children: [
+                  for (var i = 1; i <= 5; i++)
+                    IconButton(
+                      tooltip: '$i stars',
+                      onPressed: () => setState(() => _stars = i),
+                      icon: Icon(i <= _stars ? Icons.star : Icons.star_border, color: NwsbColors.gold),
+                    ),
+                ],
               ),
-          ]),
-          TextField(
-            controller: _text,
-            maxLength: 280,
-            maxLines: 3,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
-              hintText: 'How was your prize?',
-              hintStyle: TextStyle(color: Colors.white38),
-              filled: true,
-              fillColor: Colors.white10,
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
-            ),
-          ),
-          if (_msg != null) Text(_msg!, style: const TextStyle(color: Color(0xFFFF6B6B))),
-          const SizedBox(height: 8),
-          _Pill('Send review', onTap: _send, busy: _busy),
-        ],
-      ]),
+              TextField(
+                controller: _text,
+                maxLength: 280,
+                maxLines: 3,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'How was your prize?',
+                  hintStyle: TextStyle(color: Colors.white38),
+                  filled: true,
+                  fillColor: Colors.white10,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
+                ),
+              ),
+              if (_msg != null) Text(_msg!, style: const TextStyle(color: Color(0xFFFF6B6B))),
+              const SizedBox(height: 8),
+              _Pill('Send review', onTap: _send, busy: _busy),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
@@ -458,46 +550,66 @@ class _LuckyDrawWinnersScreenState extends State<LuckyDrawWinnersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final children = <Widget>[
-      const PHeading('Lucky draw', 'Recent winners', slot: 'draw.winners'),
-    ];
+    final children = <Widget>[const PHeading('Lucky draw', 'Recent winners', slot: 'draw.winners')];
     if (_loading && _winners.isEmpty) {
-      children.add(const Padding(
-        padding: EdgeInsets.only(top: 60),
-        child: Center(child: CircularProgressIndicator(color: NwsbColors.gold)),
-      ));
+      children.add(
+        const Padding(
+          padding: EdgeInsets.only(top: 60),
+          child: Center(child: CircularProgressIndicator(color: NwsbColors.gold)),
+        ),
+      );
     } else if (_error != null && _winners.isEmpty) {
       children.add(_ErrorCard(_errText(_error!), () => _load(reset: true)));
     } else if (_winners.isEmpty) {
-      children.add(const PCard(children: [
-        PEmpty('No winners yet. The first winners show here after the next draw.', slot: 'draw.winners.empty'),
-      ]));
+      children.add(
+        const PCard(
+          children: [
+            PEmpty('No winners yet. The first winners show here after the next draw.', slot: 'draw.winners.empty'),
+          ],
+        ),
+      );
     } else {
       for (final w in _winners) {
-        children.add(PCard(children: [
-          Row(children: [
-            const Icon(Icons.emoji_events_outlined, color: NwsbColors.gold),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(w.displayName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-                Text(w.prizeTitle, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 13)),
-              ]),
-            ),
-            if (w.wonAt != null)
-              Text(shortDate(w.wonAt!.millisecondsSinceEpoch),
-                  style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
-          ]),
-          if (w.review != null && w.review!.text.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            if ((w.review!.stars ?? 0) > 0)
-              Row(children: [
-                for (var i = 0; i < w.review!.stars!.clamp(0, 5); i++)
-                  const Icon(Icons.star, size: 16, color: NwsbColors.gold),
-              ]),
-            Text('“${w.review!.text}”', style: const TextStyle(color: Colors.white, height: 1.4)),
-          ],
-        ]));
+        children.add(
+          PCard(
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.emoji_events_outlined, color: NwsbColors.gold),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          w.displayName,
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+                        ),
+                        Text(w.prizeTitle, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                  if (w.wonAt != null)
+                    Text(
+                      shortDate(w.wonAt!.millisecondsSinceEpoch),
+                      style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
+                    ),
+                ],
+              ),
+              if (w.review != null && w.review!.text.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                if ((w.review!.stars ?? 0) > 0)
+                  Row(
+                    children: [
+                      for (var i = 0; i < w.review!.stars!.clamp(0, 5); i++)
+                        const Icon(Icons.star, size: 16, color: NwsbColors.gold),
+                    ],
+                  ),
+                Text('“${w.review!.text}”', style: const TextStyle(color: Colors.white, height: 1.4)),
+              ],
+            ],
+          ),
+        );
       }
       if (_more) {
         children.add(_Pill('Load more', primary: false, busy: _loading, onTap: () => _load()));
