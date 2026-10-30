@@ -55,12 +55,13 @@ class _PartnerScreenState extends State<PartnerScreen> {
               final points = EconomyMirror.instance.partnerPoints;
               final perk = EconomyMirror.instance.partnerPerk;
               return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Text('Your Partner points', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
                 Text(
                   '$points',
                   style: const TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.w800),
                 ),
                 Text(
-                  perk.isEmpty ? 'No perk yet' : perk,
+                  perk.isEmpty ? 'No perk yet. Share a link to start earning points.' : 'Current perk: $perk',
                   style: const TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700),
                 ),
               ]);

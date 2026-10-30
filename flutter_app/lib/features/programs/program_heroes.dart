@@ -400,7 +400,7 @@ class PartnerHero extends StatelessWidget {
           line: 'Points come from cleared purchases by other people through your links. Perks, never cash.',
           artLeft: true,
           art: const CustomPaint(painter: _CrownPainter()),
-          stats: [(_n(p['points']), 'points'), (_n(p['pending']), 'pending'), (perk.isEmpty ? '—' : 'On', 'perk')],
+          stats: [(_n(p['points']), 'points'), (_n(p['pending']), 'pending'), (perk.isEmpty ? 'None' : 'Active', 'perk')],
         );
       });
 }
