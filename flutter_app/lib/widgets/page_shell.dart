@@ -7,6 +7,8 @@
 library;
 
 import '../data/fashion_bg_dim.dart';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
@@ -45,6 +47,7 @@ class PageShell extends StatefulWidget {
 
   final String eyebrow;
   final String title;
+
   /// Optional secondary line under [title] (e.g. Word Atelier under NowssB Store).
   final String? subtitle;
 
@@ -101,7 +104,8 @@ class _PageShellState extends State<PageShell> {
                   )
                 : (widget.background ?? const AppBackdrop()),
           ),
-          if (widget.fashionDim) const Positioned.fill(child: FashionBgDimOverlay()),
+          if (widget.fashionDim)
+            const Positioned.fill(child: FashionBgDimOverlay()),
           // Fashion-home #fpBgVeil language so AppBackdrop / page film reads
           // clearly — never the old solid lid that hid the video.
           if (widget.usePageFilm)
@@ -168,129 +172,164 @@ class _PageShellState extends State<PageShell> {
                 constraints: const BoxConstraints(maxWidth: 860),
                 child: CustomScrollView(
                   slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-                    child: Row(
-                      children: [
-                        if (widget.onBack != null) ...[
-                          GestureDetector(
-                            onTap: widget.onBack,
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              width: 42,
-                              height: 42,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.arrow_back,
-                                  size: 19, color: NwsbColors.ink),
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-                        ],
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (widget.eyebrow.trim().isNotEmpty) ...[
-                                Text(
-                                  widget.eyebrow.toUpperCase(),
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    letterSpacing: 3,
-                                    fontWeight: FontWeight.w700,
-                                    color: NwsbColors.gold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                              ],
-                              // One line, shrunk to fit: "NowssB Store" must
-                              // not break into "Nows / sB Store" at 390.
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                alignment: Alignment.centerLeft,
-                                child: EditableLabel('page_shell.PageShell',
-                                  widget.title,
-                                  maxLines: widget.title.contains('\n') ? null : 1,
-                                  softWrap: false,
-                                  style: const TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w800,
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+                        child: Row(
+                          children: [
+                            if (widget.onBack != null) ...[
+                              GestureDetector(
+                                onTap: widget.onBack,
+                                behavior: HitTestBehavior.opaque,
+                                child: Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: const BoxDecoration(
                                     color: Colors.white,
-                                    height: 1.1,
+                                    shape: BoxShape.circle,
                                   ),
+                                  child: const Icon(Icons.arrow_back,
+                                      size: 19, color: NwsbColors.ink),
                                 ),
                               ),
-                              if (widget.subtitle != null &&
-                                  widget.subtitle!.trim().isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.subtitle!,
-                                  maxLines: 1,
-                                  softWrap: false,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xCCFFFFFF),
-                                    height: 1.2,
-                                  ),
-                                ),
-                              ],
+                              const SizedBox(width: 14),
                             ],
-                          ),
-                        ),
-                        if (widget.actions.isNotEmpty) ...[
-                          const SizedBox(width: 8),
-                          ...widget.actions,
-                        ],
-                        if (widget.onStorePicker != null) ...[
-                          const SizedBox(width: 8),
-                          const StoreBagBar(),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: widget.onStorePicker,
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              height: 42,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(21),
-                                color: const Color(0x33FFFFFF),
-                                border: Border.all(color: const Color(0x44FFFFFF)),
-                              ),
-                              child: const Row(
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.storefront_outlined, size: 18, color: Colors.white),
-                                  SizedBox(width: 6),
-                                  EditableLabel('page_shell.PageShell',
-                                    'Stores',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                                  if (widget.eyebrow.trim().isNotEmpty) ...[
+                                    Text(
+                                      widget.eyebrow.toUpperCase(),
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        letterSpacing: 3,
+                                        fontWeight: FontWeight.w700,
+                                        color: NwsbColors.gold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                  ],
+                                  // One line, shrunk to fit: "NowssB Store" must
+                                  // not break into "Nows / sB Store" at 390.
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: EditableLabel(
+                                      'page_shell.PageShell',
+                                      widget.title,
+                                      maxLines: widget.title.contains('\n')
+                                          ? null
+                                          : 1,
+                                      softWrap: false,
+                                      style: const TextStyle(
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                        height: 1.1,
+                                      ),
                                     ),
                                   ),
+                                  if (widget.subtitle != null &&
+                                      widget.subtitle!.trim().isNotEmpty) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      widget.subtitle!,
+                                      maxLines: 1,
+                                      softWrap: false,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xCCFFFFFF),
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
-                          ),
-                        ],
-                      ],
+                            if (widget.actions.isNotEmpty ||
+                                widget.onStorePicker != null)
+                              // Trailing controls shrink to fit on narrow phones
+                              // (320 wide) instead of overflowing the row.
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: math.max(
+                                    0,
+                                    math.min(860.0,
+                                            MediaQuery.sizeOf(context).width) -
+                                        40 -
+                                        (widget.onBack != null ? 56 : 0) -
+                                        120,
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerRight,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (widget.actions.isNotEmpty) ...[
+                                        const SizedBox(width: 8),
+                                        ...widget.actions,
+                                      ],
+                                      if (widget.onStorePicker != null) ...[
+                                        const SizedBox(width: 8),
+                                        const StoreBagBar(),
+                                        const SizedBox(width: 8),
+                                        GestureDetector(
+                                          onTap: widget.onStorePicker,
+                                          behavior: HitTestBehavior.opaque,
+                                          child: Container(
+                                            height: 42,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(21),
+                                              color: const Color(0x33FFFFFF),
+                                              border: Border.all(
+                                                  color:
+                                                      const Color(0x44FFFFFF)),
+                                            ),
+                                            child: const Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(Icons.storefront_outlined,
+                                                    size: 18,
+                                                    color: Colors.white),
+                                                SizedBox(width: 6),
+                                                EditableLabel(
+                                                  'page_shell.PageShell',
+                                                  'Stores',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    ...widget.slivers,
+                    // Clear of the bottom nav.
+                    const SliverToBoxAdapter(child: SizedBox(height: 108)),
+                  ],
                 ),
-                ...widget.slivers,
-                // Clear of the bottom nav.
-                  const SliverToBoxAdapter(child: SizedBox(height: 108)),
-                ],
               ),
             ),
-          ),
           ),
         ],
       ),
@@ -330,14 +369,16 @@ class DarkHead extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              EditableLabel('page_shell.DarkHead',
+              EditableLabel(
+                'page_shell.DarkHead',
                 eyebrow,
                 style: const TextStyle(
                   fontSize: 12,
                   color: Color(0x99FFFFFF),
                 ),
               ),
-              EditableLabel('page_shell.DarkHead',
+              EditableLabel(
+                'page_shell.DarkHead',
                 title,
                 style: const TextStyle(
                   fontSize: 18,
@@ -422,7 +463,8 @@ class WordRow extends StatelessWidget {
                   ),
                   if (sub.isNotEmpty) ...[
                     const SizedBox(height: 2),
-                    EditableLabel('page_shell.WordRow',
+                    EditableLabel(
+                      'page_shell.WordRow',
                       sub,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
