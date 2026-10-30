@@ -29,10 +29,13 @@ class GiftItem {
   final String id;
   final String label;
 
-  /// Price in whole rupees from the live settings doc (Play shows the
-  /// buyer's own currency at checkout).
+  /// Catalogue price in base units (config/fx `baseCurrency`); shown in
+  /// the user's own currency. Play quotes the real price at checkout.
   final int cents;
   final String productId;
+
+  /// Local-currency label for [cents] (no hardcoded rupee sign).
+  String get priceLabel => FxBook.instance.formatPrice(cents, whole: true);
 }
 
 /// Gift cards (Plan 6.3). The live list comes from config/economy
@@ -55,7 +58,7 @@ List<GiftItem> get kGiftCatalog {
   if (cards.isEmpty) return _kGiftDefaults;
   return [
     for (final c in cards.whereType<Map>())
-      GiftItem('${c['id']}', '${c['title']}', (c['priceINR'] as num?)?.toInt() ?? 0, productId: '${c['productId'] ?? ''}'),
+      GiftItem('${c['id']}', '${c['title']}', ((c['price'] ?? c['priceINR']) as num?)?.toInt() ?? 0, productId: '${c['productId'] ?? ''}'),
   ];
 }
 
@@ -259,7 +262,7 @@ class _GiftCardSheetState extends State<_GiftCardSheet> {
                               FutureBuilder<String>(
                                 future: _price,
                                 builder: (context, snap) => Text(
-                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? '\u20b9${widget.card.cents}' : snap.data!,
+                                  snap.data == null || snap.data == 'Play price' || snap.data!.isEmpty ? widget.card.priceLabel : FxBook.wholeLabel(snap.data!),
                                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15),
                                 ),
                               ),
@@ -363,6 +366,14 @@ class _GiftsScreenState extends State<GiftsScreen> {
   void initState() {
     super.initState();
     GiftBook.instance.load();
+    // Deep links (Earn \u2192 Redeem, nwsb links, banners) ask for a tab:
+    // open it straight away instead of silently landing on the hub.
+    final tab = widget.startOnRedeem ? 'redeem' : widget.initialTab;
+    if (tab != null && kGiftsSpec.indexOf(tab) >= 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openTabs(tab);
+      });
+    }
   }
 
   @override
@@ -374,21 +385,31 @@ class _GiftsScreenState extends State<GiftsScreen> {
   void _tab(String id) => _go.value?.call(id);
 
   void _openSpin(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(
-      backgroundColor: Color(0xFF07070C),
-      body: SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: GiftWheel())),
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      appBar: _subBar('Daily spin'),
+      body: const SafeArea(child: SingleChildScrollView(padding: EdgeInsets.all(16), child: GiftWheel())),
     )));
   }
 
   void _openTabs(String id) {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
       backgroundColor: const Color(0xFF07070C),
+      appBar: _subBar('NowssB Gifts'),
       body: SafeArea(child: ListView(
         padding: const EdgeInsets.all(16),
         children: [ProgramTabsBlock(spec: kGiftsSpec, initialTab: id, scrollTo: true, showDisclaimer: false)],
       )),
     )));
   }
+
+  /// Visible way back on the sub-pages (Android back already works).
+  static PreferredSizeWidget _subBar(String title) => AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.white,
+        title: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+      );
 
   @override
   Widget build(BuildContext context) {
