@@ -552,6 +552,8 @@ class _DestinationSearchSheetState extends State<_DestinationSearchSheet> {
                               child: TextField(
                                 controller: _ctrl,
                                 autofocus: true,
+                                textInputAction: TextInputAction.search,
+                                onSubmitted: (_) => FocusScope.of(context).unfocus(),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,

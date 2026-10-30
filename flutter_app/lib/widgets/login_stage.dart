@@ -138,6 +138,7 @@ class LoginStage extends StatelessWidget {
               _GlassField(
                 controller: secret,
                 hint: codeSent ? 'SMS code' : 'Password',
+                onSubmitted: busy ? null : onSubmit,
                 icon: codeSent ? Icons.sms_outlined : Icons.lock_outline,
                 obscure: codeSent ? false : obscure,
                 keyboard: codeSent ? TextInputType.number : TextInputType.visiblePassword,
@@ -361,6 +362,7 @@ class _GlassField extends StatelessWidget {
     this.obscure = false,
     this.keyboard,
     this.suffix,
+    this.onSubmitted,
   });
 
   final TextEditingController controller;
@@ -369,6 +371,7 @@ class _GlassField extends StatelessWidget {
   final bool obscure;
   final TextInputType? keyboard;
   final Widget? suffix;
+  final VoidCallback? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -380,6 +383,9 @@ class _GlassField extends StatelessWidget {
           controller: controller,
           obscureText: obscure,
           keyboardType: keyboard,
+          textInputAction: onSubmitted != null ? TextInputAction.go : TextInputAction.next,
+          onSubmitted: onSubmitted == null ? null : (_) => onSubmitted!(),
+          onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           autocorrect: false,
           enableSuggestions: !obscure,
           style: const TextStyle(color: Colors.white, fontSize: 14),

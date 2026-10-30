@@ -167,6 +167,9 @@ class _SearchField extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (_) => FocusScope.of(context).unfocus(),
+              onTapOutside: (_) => FocusScope.of(context).unfocus(),
               style: const TextStyle(fontSize: 14, color: Colors.white),
               cursorColor: NwsbColors.goldLight,
               decoration: const InputDecoration(
