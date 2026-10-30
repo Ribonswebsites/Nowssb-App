@@ -2,6 +2,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:nowssb/features/bazaar/bazaar_screen.dart';
 import 'package:nowssb/features/circle/circle_screen.dart';
+import 'package:nowssb/features/coins/coins_screen.dart';
 import 'package:nowssb/features/earn/earn_hub_screen.dart';
 import 'package:nowssb/features/earn/earn_topic_page.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
@@ -129,6 +130,7 @@ final btScreens = <String, Widget Function()>{
   'SubscriptionTermsScreen': () => const SubscriptionTermsScreen(),
   'TrendingScreen': () => const TrendingScreen(),
   'VaultScreen': () => const VaultScreen(),
+  'CoinsScreen': () => const CoinsScreen(),
   'WidgetsPage': () => const WidgetsPage(),
   'WishlistPage': () => const WishlistPage(),
   'WordAtelierScreen': () => const WordAtelierScreen(),

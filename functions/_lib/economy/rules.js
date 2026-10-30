@@ -60,10 +60,13 @@ export function drawRarity(odds, r = rand()) {
 }
 
 /* ── coins in a cart (Plan B 4.3) ── */
-export function coinCapPct(listINR, kind, cfg) {
+/** Store rule: without a coupon, coins cover at most `noCouponCoinPct`
+ *  (30 %) of a Store price; a fitting coupon unlocks the band cap. */
+export function coinCapPct(listINR, kind, cfg, hasCoupon = false) {
   if (kind === 'subscription') return cfg.cart.subscriptionCoinPct;
-  for (const b of cfg.cart.coinCapBands) if (listINR <= b.maxINR) return b.pct;
-  return cfg.cart.coinCapBands[cfg.cart.coinCapBands.length - 1].pct;
+  let band = cfg.cart.coinCapBands[cfg.cart.coinCapBands.length - 1].pct;
+  for (const b of cfg.cart.coinCapBands) if (listINR <= b.maxINR) { band = b.pct; break; }
+  return hasCoupon ? band : Math.min(band, cfg.cart.noCouponCoinPct ?? 30);
 }
 
 /**
@@ -80,7 +83,8 @@ export function quoteCheckout({ listINR, kind, linkPct = 0, coupon = null, coins
     couponOff = round2(Math.min(((list - linkOff) * coupon.pct) / 100, coupon.capINR ?? Infinity, maxOff - linkOff));
   }
   const afterDisc = round2(list - linkOff - couponOff);
-  const coinCapINR = round2(Math.min((list * coinCapPct(list, kind, cfg)) / 100, maxOff - linkOff - couponOff, afterDisc));
+  const capPct = coinCapPct(list, kind, cfg, couponOff > 0);
+  const coinCapINR = round2(Math.min((list * capPct) / 100, maxOff - linkOff - couponOff, afterDisc));
   const perRupee = cfg.coinsPerRupee;
   const wantINR = coinsWanted == null ? Infinity : Math.max(0, coinsWanted) / perRupee;
   const coinTargetINR = Math.max(0, Math.min(coinCapINR, Math.floor(coinsBalance) / perRupee, wantINR));
@@ -106,7 +110,7 @@ export function quoteCheckout({ listINR, kind, linkPct = 0, coupon = null, coins
     absorbedINR: absorbed,
     payINR: tier,
     productId: 'nowssb_tier_' + tier,
-    coinCapPct: coinCapPct(list, kind, cfg),
+    coinCapPct: capPct,
   };
 }
 export function couponFits(coupon, kind) {

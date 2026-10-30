@@ -10,6 +10,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../admin/template/editable.dart';
+import '../features/economy/economy_api.dart' show EconomyMirror;
 import '../features/economy/reward_overlay.dart' show CoinPillAnchor;
 
 class NwsbCoinFly {
@@ -28,7 +29,7 @@ class NwsbCoinFly {
       context: context,
       useRootNavigator: true,
       barrierDismissible: false,
-      barrierColor: const Color(0x8C000000),
+      barrierColor: const Color(0x40000000),
       pageBuilder: (context, _, __) => _FlyStage(count: count, from: from, to: to, target: CoinPillAnchor.target()),
     );
   }
@@ -54,7 +55,7 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
-    _move = AnimationController(vsync: this, duration: const Duration(milliseconds: 2600));
+    _move = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200));
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (_quiet || MediaQuery.disableAnimationsOf(context)) {
@@ -74,6 +75,15 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
     super.dispose();
   }
 
+  double get _pillTop => MediaQuery.paddingOf(context).top + 10;
+  double get _pillWidth => math.min(MediaQuery.sizeOf(context).width - 32, 360);
+
+  /// Centre of the glass wallet circle on the right of the pill: the coins land here.
+  Offset get _walletCentre {
+    final w = MediaQuery.sizeOf(context).width;
+    return Offset((w + _pillWidth) / 2 - CoinWalletPill.pad - CoinWalletPill.circle / 2, _pillTop + CoinWalletPill.height / 2);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -88,52 +98,18 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
             final t = _move.value;
             final shown = widget.from + ((widget.to - widget.from) * Curves.easeOut.transform(t)).round();
             final punch = t > 0.82 ? math.sin((t - 0.82) / 0.18 * math.pi) : 0.0;
+            final fade = t < 0.08 ? t / 0.08 : (t > 0.94 ? (1 - t) / 0.06 : 1.0);
             return Stack(
               children: [
                 Positioned(
                   left: 0,
                   right: 0,
-                  top: (widget.target?.dy ?? MediaQuery.paddingOf(context).top + 60) + 34,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const EditableLabel('nwsb_coin_fly.FlyStage',
-                        'NOWSSB COINS',
-                        style: TextStyle(
-                          color: Color(0xFFE4C56A),
-                          fontSize: 11,
-                          letterSpacing: 2.4,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Transform.scale(
-                        scale: 1 + punch * 0.12,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0x14FFFFFF),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: const Color(0x66E4C56A)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const _Disc(size: 28),
-                              const SizedBox(width: 8),
-                              Text(
-                                '$shown',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                  top: _pillTop,
+                  child: Center(
+                    child: Opacity(
+                      opacity: fade.clamp(0.0, 1.0),
+                      child: CoinWalletPill(total: shown, punch: punch, width: _pillWidth),
+                    ),
                   ),
                 ),
                 for (var i = 0; i < widget.count; i++) _coin(i, widget.count, t),
@@ -160,7 +136,7 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
       size.width * (0.18 + (i % 7) * 0.1),
       size.height * (0.28 - (i % 4) * 0.04),
     );
-    final end = widget.target ?? Offset(size.width * 0.50, MediaQuery.paddingOf(context).top + 60);
+    final end = _walletCentre;
     final a = Offset.lerp(start, lift, curve)!;
     final b = Offset.lerp(lift, end, curve)!;
     final p = Offset.lerp(a, b, curve)!;
@@ -216,6 +192,95 @@ class NwsbCoinDisc extends StatelessWidget {
         ),
       ),
       slot: 'nwsb_coin_fly.NwsbCoinDisc',
+    );
+  }
+}
+
+
+/// The pill that drops in at the top after a coin collect: the new total,
+/// today's free-coin progress on the app's gold progress bar, and on the
+/// right a round glass wallet the coins fly into.
+class CoinWalletPill extends StatelessWidget {
+  const CoinWalletPill({super.key, required this.total, this.punch = 0, this.width = 340});
+
+  static const height = 56.0;
+  static const circle = 44.0;
+  static const pad = 6.0;
+
+  final int total;
+  final double punch;
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    final today = (EconomyMirror.instance.summary['today'] as Map?) ?? const {};
+    final earned = (today['freeCoins'] as num?)?.toInt();
+    final cap = ((today['ceilingNow'] ?? today['ceiling']) as num?)?.toInt();
+    final hasCap = earned != null && cap != null && cap > 0;
+    return Container(
+      width: width,
+      height: height,
+      padding: const EdgeInsets.fromLTRB(10, pad, pad, pad),
+      decoration: BoxDecoration(
+        color: const Color(0xCC0B0B10),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: const Color(0x66E4C56A)),
+        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 6))],
+      ),
+      child: Row(children: [
+        const NwsbCoinDisc(size: 28),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Text('$total',
+                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, height: 1.1)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(hasCap ? 'today $earned / $cap' : 'coins',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11, fontWeight: FontWeight.w600)),
+                ),
+              ]),
+              if (hasCap) ...[
+                const SizedBox(height: 5),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: LinearProgressIndicator(
+                    value: (earned / cap).clamp(0.0, 1.0),
+                    minHeight: 4,
+                    color: const Color(0xFFE4C56A),
+                    backgroundColor: const Color(0x33FFFFFF),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        Transform.scale(
+          scale: 1 + punch * 0.14,
+          child: Container(
+            width: circle,
+            height: circle,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0x40FFFFFF), Color(0x14FFFFFF)],
+              ),
+              border: Border.all(color: const Color(0x66FFFFFF)),
+              boxShadow: [BoxShadow(color: const Color(0xFFE4C56A).withValues(alpha: 0.25 + 0.4 * punch), blurRadius: 14)],
+            ),
+            child: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFFE4C56A), size: 22),
+          ),
+        ),
+      ]),
     );
   }
 }

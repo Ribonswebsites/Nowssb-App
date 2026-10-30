@@ -58,7 +58,9 @@ class RewardHaptics {
 /// Coins from a server response: "You won N coins", then the flight and
 /// count-up into the balance pill. Plays on the root overlay, so it runs
 /// even if the widget that asked has already gone (context may be stale).
-Future<void> playCoins(BuildContext? context, int gained, {int? balanceAfter, String title = 'NowssB coins', bool reveal = true}) async {
+/// Coins only: no "You won" card in the middle of the flow any more — the
+/// coins fly straight into the top wallet pill, which shows the new total.
+Future<void> playCoins(BuildContext? context, int gained, {int? balanceAfter, String title = 'NowssB coins', bool reveal = false}) async {
   if (gained <= 0) return;
   unawaited(NotifStore.instance.pingCoins(gained));
   final after = balanceAfter ?? EconomyMirror.instance.coins;
@@ -127,7 +129,9 @@ Future<void> celebrate(BuildContext context, Map<String, dynamic> r, {String? ti
     if (items.isEmpty && r['granted'] is Map) items = [Map<String, dynamic>.from(r['granted'] as Map)];
     if (items.isEmpty && gained > 0) items = [{'type': 'coins', 'coins': gained, 'label': '$gained coins'}];
     if (items.isEmpty && r['win'] == false) items = [{'type': 'none', 'label': 'Not this time'}];
-    if (items.isNotEmpty) {
+    // Coins-only wins skip the mid-flow card; the wallet pill shows them.
+    final coinsOnly = items.isNotEmpty && items.every((i) => '${i['type']}' == 'coins');
+    if (items.isNotEmpty && !coinsOnly) {
       await RewardOverlay.reveal(title: title ?? 'On your account', items: items, rarity: rarity.isEmpty ? null : rarity);
     }
   }

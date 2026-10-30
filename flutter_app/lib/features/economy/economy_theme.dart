@@ -5,6 +5,7 @@ import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/glass_system.dart';
 import '../../widgets/glass_wrap.dart';
+import '../coins/coins_screen.dart';
 import '../programs/rewards_program.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -91,7 +92,7 @@ class EconomyPage extends StatelessWidget {
   }
 }
 
-/// Live coin balance from the server wallet. Tap → Rewards · Wallet.
+/// Live coin balance from the server wallet. Tap → Coins.
 class CoinBalancePill extends StatefulWidget {
   const CoinBalancePill({super.key, this.onRewardsPage = false});
 
@@ -127,7 +128,7 @@ class _CoinBalancePillState extends State<CoinBalancePill> {
         return GestureDetector(
           onTap: widget.onRewardsPage
               ? null
-              : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RewardsProgramPage(initialTab: 6))),
+              : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsScreen())),
           behavior: HitTestBehavior.opaque,
           child: Container(
             key: _anchor,

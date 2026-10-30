@@ -196,6 +196,8 @@ export const DEFAULT_ECONOMY = {
   cart: {
     coinCapBands: [{ maxINR: 120, pct: 30 }, { maxINR: 220, pct: 35 }, { maxINR: 1e12, pct: 40 }],
     subscriptionCoinPct: 40,
+    // Store rule: coins pay at most this % of a Store price unless a coupon is applied.
+    noCouponCoinPct: 30,
     maxTotalDiscountPct: 50,
     order: ['link', 'coupon', 'coins'],
     checkoutTtlMinutes: 30,

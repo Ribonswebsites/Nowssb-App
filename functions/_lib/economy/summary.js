@@ -10,7 +10,7 @@ export function publicConfig(cfg) {
   return {
     version: cfg.version, coinsPerRupee: cfg.coinsPerRupee,
     rewards: { dailyCeiling: R.dailyCeiling, login: R.login, streakMilestones: R.streakMilestones, streakHold: R.streakHold, streakRestore: R.streakRestore, comeback: R.comeback, actions: R.actions, timeLadder: R.timeLadder, weeklyQuests: R.weeklyQuests, weeklyChest: R.weeklyChest, weeklyGift: R.weeklyGift, monthlyQuest: R.monthlyQuest, monthlyGift: R.monthlyGift, monthlyMark: R.monthlyMark, starterQuests: R.starterQuests, mastery: R.mastery, sets: R.sets, buying: R.buying, season: R.season, leagues: R.leagues, spend: R.spend, events: R.events, eventMultiplier: R.eventMultiplier, expireAfterInactiveDays: R.expireAfterInactiveDays },
-    cart: { coinCapBands: cfg.cart.coinCapBands, subscriptionCoinPct: cfg.cart.subscriptionCoinPct, maxTotalDiscountPct: cfg.cart.maxTotalDiscountPct, order: cfg.cart.order, payTiersINR: cfg.cart.payTiersINR },
+    cart: { coinCapBands: cfg.cart.coinCapBands, noCouponCoinPct: cfg.cart.noCouponCoinPct ?? 30, subscriptionCoinPct: cfg.cart.subscriptionCoinPct, maxTotalDiscountPct: cfg.cart.maxTotalDiscountPct, order: cfg.cart.order, payTiersINR: cfg.cart.payTiersINR },
     odds: oddsTable(cfg),
     coupons: { rarities: cfg.coupons.rarities, paidAdultsOnly: cfg.coupons.paidAdultsOnly, paidMonthlyLimitINR: cfg.coupons.paidMonthlyLimitINR, freeExpiryDays: cfg.coupons.freeExpiryDays, codes: Object.fromEntries(Object.entries(cfg.coupons.codes).map(([k, v]) => [k, { type: v.type, label: v.label, how: v.how || '', winPct: v.winPct || null }])) },
     spin: { costCoins: 0, freePerDay: spinFree(cfg), paidPerDay: spinPaid(cfg), perDay: spinFree(cfg) + spinPaid(cfg), slices: cfg.spin.slices.map((x) => ({ label: x.label, w: x.w })) },
@@ -87,7 +87,12 @@ export async function economySummary(ctx, uid) {
     wallet: { coins: W.coins || 0, lifetimeCoins: W.lifetimeCoins || 0, streak: W.streak || 0, bestStreak: W.bestStreak || 0, holds: W.holds || 0, freezes: W.freezes || 0, restores: W.restores || 0, brokenStreak: broken, practiceCredits: W.practiceCredits || 0, cosmetics: W.cosmetics || [], badges: (W.badges || []).length, earlyHours: W.earlyHours || 0, coinsBackBonusPct: W.coinsBackBonusPct || 0, leagueTier: W.leagueTier || R.leagues.tiers[0], nextLogin: loginCoins((W.streak || 0) + 1, cfg) },
     today: { day, login: !!D.login, scratch: !!D.scratch, scratchId: D.scratchId || null, freeCoins: D.freeCoins || 0, ceiling: R.dailyCeiling, minutes: Math.floor(D.minutes || 0), ladder: ladderState(D, cfg), boxOpened: D.boxOpened || null, spins: (D.counts || {}).spin || 0,
       spin: spinState(D, W, cfg),
-      scratchCard: dailyCard.data ? { id: D.scratchId, status: dailyCard.data.status, rarity: dailyCard.data.rarity, label: dailyCard.data.status === 'revealed' ? (dailyCard.data.label || (dailyCard.data.granted || {}).label || '') : '', granted: dailyCard.data.status === 'revealed' ? (dailyCard.data.granted || null) : null } : null, actions: Object.entries(R.actions).map(([id, a]) => ({ id, title: a.title, coins: a.coins, per: a.per || 'day', limit: a.limit || 1, done: a.per === 'once' ? ((W.done || {})[id] ? 1 : 0) : (D.counts || {})[id] || 0 })) },
+      scratchCard: dailyCard.data ? { id: D.scratchId, status: dailyCard.data.status, rarity: dailyCard.data.rarity, label: dailyCard.data.status === 'revealed' ? (dailyCard.data.label || (dailyCard.data.granted || {}).label || '') : '', granted: dailyCard.data.status === 'revealed' ? (dailyCard.data.granted || null) : null } : null, actions: Object.entries(R.actions).map(([id, a]) => ({ id, title: a.title, coins: a.coins, per: a.per || 'day', free: a.free !== false,
+        limit: a.per === 'key' ? (a.dayLimit || 3) : (a.limit || 1),
+        done: a.per === 'once' ? ((W.done || {})[id] ? 1 : 0) : a.per === 'month' ? (MO.counts || {})['act_' + id] || 0 : (D.counts || {})[id] || 0 })),
+      // The free-coin ceiling that applies to this account today (lower for new accounts).
+      ceilingNow: (W.createdAt && now - W.createdAt < R.newAccountDays * DAY) ? R.newAccountCeiling : R.dailyCeiling,
+      timeLadder: (R.timeLadder || []).map((t) => ({ minutes: t.minutes, coins: t.coins })) },
     quests: {
       starter: (R.starterQuests || []).map((q) => ({ ...q, value: Number(W[q.metric]) || Number(stats[q.metric]) || 0, claimed: !!(W.done || {})['q:' + q.id] })),
       weekly: R.weeklyQuests.map((q) => ({ ...q, value: weekMetric(q.metric), claimed: claimedW.includes(q.id) })),
