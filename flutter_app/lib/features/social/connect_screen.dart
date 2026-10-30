@@ -44,13 +44,6 @@ const _explain = [
   ('Frequency', 'https://media.nowssb.com/migrated-images/d143c72a353c7f2e_image_dtmprf.jpg'),
   ('Healing', 'https://media.nowssb.com/migrated-images/c061be5a902cf11b_grok_image_1782620475749_fgncxl.jpg'),
 ];
-const _replies = [
-  'Frequency received 🙏',
-  'Which word are you practicing today?',
-  'The resonance is building...',
-  'Every sound is a step closer.',
-  'Keep your streak going!',
-];
 
 class _Person {
   const _Person(this.id, this.username, this.name, this.avatar, this.category);
@@ -216,16 +209,8 @@ class _ConnectData extends ChangeNotifier {
     chats[id] = list;
     notifyListeners();
     await _persistChats();
-    if (reply && line['mine'] == true) {
-      await Future<void>.delayed(const Duration(milliseconds: 900));
-      final text = _replies[DateTime.now().millisecond % _replies.length];
-      chats[id] = [
-        ...linesFor(id),
-        {'mine': false, 'text': text, 'ts': DateTime.now().millisecondsSinceEpoch},
-      ];
-      notifyListeners();
-      await _persistChats();
-    }
+    // No canned auto-replies: these chats are not backed by a real
+    // messaging service, so we never invent a reply from the other person.
   }
 
   Future<void> _persistChats() async {

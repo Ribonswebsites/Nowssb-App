@@ -211,8 +211,8 @@ class IdentityRails extends StatelessWidget {
           labels: const ['Sales', 'Pending', 'Payouts'],
           arts: kEarningsArt,
           a: _pack(const ['Lifetime', 'Available', 'Pending', 'This week', 'Paid out'], const ['All', 'Ready', 'Hold', 'Now', 'Sent']),
-          b: _pack(const ['Sales', 'Referrals', 'UPI', 'Wise', 'PayPal'], const ['Ledger', 'People', 'India', 'Abroad', 'Abroad']),
-          c: _pack(const ['First payout', 'Hold window', 'Add UPI', 'Invite sale', 'Review'], const ['When the minimum clears', 'Thirty days', 'India rail', 'A paid plan', 'A person checks it']),
+          b: _pack(const ['Sales', 'Referrals', 'Bank', 'Wise', 'PayPal'], const ['Ledger', 'People', 'Local', 'Abroad', 'Abroad']),
+          c: _pack(const ['First payout', 'Hold window', 'Add payout', 'Invite sale', 'Review'], const ['When the minimum clears', 'Thirty days', 'Bank or wallet', 'A paid plan', 'A person checks it']),
         ),
     };
     return HubRails(
