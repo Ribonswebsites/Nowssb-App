@@ -93,6 +93,12 @@ Future<void> _reveal(WidgetTester t, Finder f) async {
     st.position.jumpTo((st.position.pixels + 250).clamp(0, st.position.maxScrollExtent));
     await t.pump(const Duration(milliseconds: 80));
   }
+  // Centre it: a widget on the very bottom edge reads as hit-testable but a
+  // tap there lands outside the 844-high screen on CI fonts.
+  if (f.evaluate().isNotEmpty) {
+    await Scrollable.ensureVisible(f.evaluate().first, alignment: 0.5);
+    await t.pump(const Duration(milliseconds: 80));
+  }
 }
 
 Future<void> _shotOf(GlobalKey key, String name, {Rect? crop, double zoom = 1}) async {
