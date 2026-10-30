@@ -56,6 +56,7 @@ class Entitlements extends ChangeNotifier {
     _uid = uid;
     _tier = tier;
     _until = until;
+    _paidHere.clear();
     _owned
       ..clear()
       ..addAll(owned ?? const {});
@@ -78,7 +79,24 @@ class Entitlements extends ChangeNotifier {
   bool hasTier(String tier) => isAdmin || _rank >= (tierRank[tier] ?? 99);
 
   Set<String> get owned => Set.unmodifiable(_owned);
-  bool ownsItem(String itemId) => _owned.contains(ownedDocId(itemId));
+  bool ownsItem(String itemId) {
+    final id = ownedDocId(itemId);
+    return _owned.contains(id) || _paidHere.contains(id);
+  }
+
+  /// Items Google Play just confirmed on this phone. The server writes
+  /// users/{uid}/owned a moment later; until that snapshot lands the item
+  /// must already read as Owned (no second Buy button). Cleared on sign-out.
+  final Set<String> _paidHere = {};
+
+  /// Called by checkout right after a confirmed purchase.
+  void markPaid(Iterable<String> itemIds) {
+    var changed = false;
+    for (final i in itemIds) {
+      changed = _paidHere.add(ownedDocId(i)) || changed;
+    }
+    if (changed) notifyListeners();
+  }
 
   void _start() {
     AdminState.instance.addListener(notifyListeners);
@@ -98,6 +116,7 @@ class Entitlements extends ChangeNotifier {
     _until = null;
     _ebookPassUntil = null;
     _owned.clear();
+    _paidHere.clear();
     _loaded = _uid == null;
     notifyListeners();
     final uid = _uid;
@@ -119,6 +138,7 @@ class Entitlements extends ChangeNotifier {
           for (final d in s.docs)
             if ('${d.data()['status'] ?? 'active'}' == 'active') d.id,
         ]);
+      _paidHere.removeAll(_owned);
       notifyListeners();
     }, onError: (Object e) => debugPrint('NowssB owned: $e'));
   }

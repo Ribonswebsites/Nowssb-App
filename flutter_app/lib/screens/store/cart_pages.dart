@@ -178,6 +178,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
       ];
 
   void _paid(List<BagItem> bought, Map<String, dynamic> result) {
+    // Owned at once in the list, detail and cart (no re-buy) while the
+    // server writes users/{uid}/owned.
+    Entitlements.instance.markPaid([for (final it in bought) it.id]);
     for (final it in bought) {
       CartBag.instance.removeCart(it.id);
     }
