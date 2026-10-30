@@ -21,6 +21,8 @@ import 'package:nowssb/widgets/glass_wrap.dart';
 import 'package:nowssb/widgets/tv_frame.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/shell/nav_shell.dart';
+import 'package:nowssb/screens/fashion/sections_mid.dart';
+import 'package:nowssb/widgets/enter_curve_stage.dart';
 
 import 'fake_video_platform.dart';
 
@@ -207,11 +209,20 @@ void main() {
 
     expect(find.text('Tap to restyle'), findsWidgets);
 
-    for (final t in ['Enter']) {
-      expect(find.text(t), findsWidgets, reason: '$t is not on the home');
-    }
-    expect(find.text('The Store'), findsNothing,
-        reason: 'The Store is not one of the four tiles');
+    // Current layout: the four tiles are Player, Sound Library, Store and
+    // Reader, and the home wires every one of them to a real destination.
+    // ("The Store" elsewhere on the page is the Where to Begin grid.)
+    expect(
+      [for (final d in EnterCurveAssets.destinations) d.id],
+      ['player', 'library', 'store', 'reader'],
+    );
+    final tiles = tester.widget<FashTiles>(find.byType(FashTiles));
+    expect(tiles.onOpen, isNotNull, reason: 'the tiles go nowhere');
+    expect(
+      find.descendant(of: find.byType(FashTiles), matching: find.text('The Store')),
+      findsNothing,
+      reason: 'The Store is not one of the four tiles',
+    );
   });
 
   testWidgets('the offer is one section: head, film, bar', (tester) async {

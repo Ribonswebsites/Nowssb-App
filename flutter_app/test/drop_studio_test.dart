@@ -1,3 +1,4 @@
+import 'support/offline_google_fonts.dart';
 import 'dart:io';
 import 'package:nowssb/screens/concept/doors/door_kit.dart';
 import 'package:nowssb/data/fashion_bg_dim.dart';
@@ -587,6 +588,8 @@ void main() {
   });
 
   group('Fashion home', () {
+    // Fonts come from test/fonts, never the network (test setup only).
+    setUpAll(setUpOfflineGoogleFonts);
     testWidgets('entry opens Drop Studio; old sections are gone', (t) async {
       await boot(t, const HomeFashion());
       var sawOld = false;

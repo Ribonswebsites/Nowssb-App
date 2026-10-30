@@ -1083,16 +1083,22 @@ class _ReaderFilmState extends State<ReaderFilm> {
     'Hear the word',
   ];
   var _i = 0;
+  Timer? _tick;
 
   @override
   void initState() {
     super.initState();
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 2));
-      if (!mounted) return false;
+    // Cancelled in dispose so the line rotation never outlives the card.
+    _tick = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!mounted) return;
       setState(() => _i = (_i + 1) % _lines.length);
-      return true;
     });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    super.dispose();
   }
 
   @override

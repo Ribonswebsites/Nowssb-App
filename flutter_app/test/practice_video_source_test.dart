@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Fashion practice uses website PRACTICE_VID via NwsbVideo', () {
+  test('Fashion practice uses the bundled practice-halo clip via NwsbVideo', () {
     final src = File('lib/screens/fashion/sections_top.dart').readAsStringSync();
-    expect(src, contains('09a50041065bdeab_grok_video_2026-07-30-14-54-07_ddjmrr.mp4'));
+    expect(src, contains('assets/video/practice-halo.mp4'));
+    expect(File('assets/video/practice-halo.mp4').existsSync(), isTrue);
     expect(src, contains('ClipPriority.feature'));
     expect(src, isNot(contains('player-liquid-splash.mp4')));
   });

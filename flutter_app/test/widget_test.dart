@@ -21,6 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/home_parts.dart';
+import 'package:nowssb/widgets/concept/ritual_card.dart';
 import 'package:nowssb/data/settings.dart';
 
 import 'fake_video_platform.dart';
@@ -133,17 +134,21 @@ void main() {
       // The Normal Home can intentionally omit its black-banner sections.
       // In that layout, the supplied dashboard's primary action is the
       // visible home section that must remain wired into the shell.
-      final dashboardAction = find.text('Play session');
-      // The home list is lazy: the dashboard sits below the hero and only
-      // builds once it is scrolled near.
+      final today = find.byKey(const ValueKey('cv3-today'));
+      // The home list is lazy: today's ritual card sits below the greeting
+      // and only builds once it is scrolled near.
       final homeList = find.byType(Scrollable).first;
-      for (var i = 0; i < 30 && dashboardAction.evaluate().isEmpty; i++) {
+      for (var i = 0; i < 30 && today.evaluate().isEmpty; i++) {
         await tester.drag(homeList, const Offset(0, -300));
         await tester.pump(const Duration(milliseconds: 16));
       }
-      expect(dashboardAction, findsOneWidget,
+      expect(today, findsOneWidget,
           reason: 'the home needs a reachable primary section action');
-      await tester.ensureVisible(dashboardAction);
+      // Begin on a fresh account has no routine yet, so the shell must send
+      // the user to Practice with a hint instead of an empty player.
+      tester.widget<RitualCard>(today).onBegin();
+      await tester.pump();
+      expect(find.text('Pick a few words for your routine first.'), findsOneWidget);
     }
     await tester.pump(const Duration(milliseconds: 80));
     expect(tester.takeException(), isNull);
