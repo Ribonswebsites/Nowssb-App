@@ -486,16 +486,22 @@ class _LoginFilmState extends State<_LoginFilm> {
     _film = VideoPlayerController.asset('assets/video/login-phone.mp4')
       ..setLooping(true)
       ..setVolume(0);
-    _film.initialize().then((_) {
-      if (!mounted) return;
-      _film.play();
-      setState(() => _ready = true);
-    });
+    // A film that cannot load (no decoder, missing platform) must never
+    // take the login screen down; the still backdrop stays instead.
+    try {
+      _film.initialize().then((_) {
+        if (!mounted) return;
+        _film.play();
+        setState(() => _ready = true);
+      }).catchError((Object _) {});
+    } catch (_) {}
   }
 
   @override
   void dispose() {
-    _film.dispose();
+    try {
+      _film.dispose();
+    } catch (_) {}
     super.dispose();
   }
 
