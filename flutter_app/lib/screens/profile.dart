@@ -42,6 +42,8 @@ import 'auth_gate.dart';
 import 'saved_words.dart';
 import 'sound_library.dart';
 import '../features/notifications/inbox_screen.dart';
+import '../features/notifications/notif_prefs.dart';
+import '../features/notifications/notif_scheduler.dart';
 import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'store.dart';
@@ -251,19 +253,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22), side: const BorderSide(color: _borderSoft)),
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: TextField(
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [TextField(
             controller: controller,
             autofocus: true,
             maxLength: 32,
             style: const TextStyle(color: _text, fontSize: 18),
             decoration: const InputDecoration(
-              labelText: 'Practitioner name',
+              labelText: 'Your name',
               labelStyle: TextStyle(color: _dim),
               enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: _border)),
               focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: _accent)),
             ),
+            textInputAction: TextInputAction.done,
+            textCapitalization: TextCapitalization.words,
             onSubmitted: (_) => Navigator.pop(context, controller.text),
           ),
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel', style: TextStyle(color: _dim))),
+            TextButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text('Save', style: TextStyle(color: _accent))),
+          ]),
+          ]),
         ),
       ),
     );
@@ -463,8 +472,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (value == null || !mounted) return;
     _reminder = value;
     await _prefs.setString('nowssb_reminder', _reminderText);
+    // Re-plan the phone reminders so the new time is really used.
+    try {
+      await NotifPrefs.instance.load(fresh: true);
+      await NotifScheduler.instance.replan();
+    } catch (e) {
+      debugPrint('NowssB reminder replan: $e');
+    }
     if (!mounted) return;
     setState(() {});
+    _showToast('Daily reminder set for $_reminderText');
   }
 
   void _onLiveProgress() { if (mounted) setState(() {}); }
@@ -481,7 +498,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
     final int today = (DateTime.now().weekday - 1).clamp(0, 6);
-    return Theme(
+    return PopScope(
+      canPop: !_recentOpen,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _recentOpen) setState(() => _recentOpen = false);
+      },
+      child: Theme(
       data: ThemeData.dark(useMaterial3: true).copyWith(
         scaffoldBackgroundColor: Colors.black,
         colorScheme: const ColorScheme.dark(primary: _accent),
@@ -529,6 +551,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 
@@ -564,7 +587,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: _nameController.text,
           meta: 'NowssB coins $coins   ·   Streak $streak   ·   Score $score',
           foot: 'Continue',
-          indexLabel: '1 of 4',
+          indexLabel: '${_chip.clamp(0, rows.length - 1) + 1} of ${rows.length}',
           onContinue: () => NavScope.goTo(context, 1),
           onImage: _openBannerChoices,
           chips: [
@@ -655,7 +678,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           GestureDetector(
                             onTap: () => setState(() => _prog = i == 0 ? 0 : i - 1),
-                            child: const Text('Skip', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                            child: Text('Back', style: TextStyle(color: i == 0 ? Colors.white38 : Colors.white, fontWeight: FontWeight.w600)),
                           ),
                           const Spacer(),
                           GestureDetector(
@@ -673,7 +696,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: const Color(0x88FFFFFF)),
                               ),
-                              child: const Text('Next', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                              child: Text(i >= slides.length - 1 ? 'Practice' : 'Next', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
                             ),
                           ),
                         ],
@@ -1326,7 +1349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
           const SizedBox(height: 14),
-          Row(children: [Expanded(child: _compactQuick('Practice', _durationText, 15)), const SizedBox(width: 5), Expanded(child: _compactQuick('Reminder', _reminderText, 17)), const SizedBox(width: 5), Expanded(child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21)))]),
+          Row(children: [Expanded(child: InkWell(onTap: () => _stepDuration(_duration >= 60 ? -60 : 15), borderRadius: BorderRadius.circular(16), child: _compactQuick('Practice', _durationText, 15))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(16), child: _compactQuick('Reminder', _reminderText, 17))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), borderRadius: BorderRadius.circular(16), child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21))))]),
         ]),
       );
 
@@ -1515,7 +1538,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const Padding(padding: EdgeInsets.symmetric(vertical: 18), child: EditableLabel('profile.ProfileScreen', 'No sessions yet. Practise a word and it shows here.', style: TextStyle(fontSize: 13, color: _dim)))
               else
                 GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), crossAxisCount: MediaQuery.sizeOf(context).width <= 360 ? 1 : 2, crossAxisSpacing: 10, mainAxisSpacing: 10, childAspectRatio: 2.55, children: [
-                  for (var i = 0; i < shown.length; i++) _MoreCard(shown[i].word, '${shown[i].cat} · ${shown[i].when}', imgs[i % imgs.length]),
+                  for (var i = 0; i < shown.length; i++) InkWell(onTap: () { setState(() => _recentOpen = false); NavScope.goTo(context, 1); }, borderRadius: BorderRadius.circular(18), child: _MoreCard(shown[i].word, '${shown[i].cat} · ${shown[i].when}', imgs[i % imgs.length])),
                 ]),
             ]);
           }),
