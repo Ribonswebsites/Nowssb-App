@@ -32,6 +32,9 @@ void main() {
       for (final m in re.allMatches(src)) {
         final path = m.group(1)!;
         if (!seen.add(path)) continue;
+        // Voice cues are optional: frequency_ritual plays them only when the
+        // file is there and stays silent otherwise.
+        if (path.startsWith('assets/voice/cues/')) continue;
         if (!File(path).existsSync()) {
           missing.add('$path  (${f.path})');
         }
