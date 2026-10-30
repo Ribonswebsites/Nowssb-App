@@ -38,6 +38,7 @@ import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
 import 'follow_steps.dart';
+import '../../shell/shell_back.dart';
 import '../../admin/template/editable.dart';
 import '../../admin/layout/carousel_fx.dart';
 import '../../admin/layout/layout_sections.dart' show CarouselAutoRotate;
@@ -156,6 +157,7 @@ class _FashionHeroState extends State<FashionHero> {
 
   @override
   void dispose() {
+    ShellBack.release(_backClosesGuide);
     _t?.cancel();
     _deck.dispose();
     super.dispose();
@@ -171,6 +173,16 @@ class _FashionHeroState extends State<FashionHero> {
       _held = DateTime.now().add(_hold);
     });
     if (_deck.hasClients) _deck.jumpToPage(0);
+    _guide
+        ? ShellBack.claim(_backClosesGuide)
+        : ShellBack.release(_backClosesGuide);
+  }
+
+  /// Android back with the guide open closes the guide, not the app.
+  bool _backClosesGuide() {
+    if (!mounted || !_guide) return false;
+    _toggleGuide();
+    return true;
   }
 
   /// `fstStep` — :361. Clamped rather than wrapping: the arrows are a way

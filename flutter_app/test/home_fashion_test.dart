@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:nowssb/shell/shell_back.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/widgets/home_parts.dart';
@@ -406,5 +407,22 @@ void main() {
             reason: '"${s.title}" points at a tab that does not exist');
       }
     }
+  });
+
+  testWidgets('Android back closes the Learn guide before leaving the home',
+      (tester) async {
+    await pump(tester);
+    final disc = find.bySemanticsLabel('How this app works — follow the steps');
+    await tester.ensureVisible(disc);
+    await tester.pump();
+    await tester.tap(disc);
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('LEARN'), findsNothing, reason: 'the guide did not open');
+
+    // The shell asks ShellBack first on every system back.
+    expect(ShellBack.handle(), isTrue);
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(find.text('LEARN'), findsOneWidget, reason: 'back left the guide open');
+    expect(ShellBack.handle(), isFalse, reason: 'a closed guide still claims back');
   });
 }

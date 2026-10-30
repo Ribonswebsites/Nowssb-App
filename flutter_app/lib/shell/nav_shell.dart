@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
+import 'shell_back.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
 import '../data/home_widget_sync.dart';
@@ -439,6 +440,7 @@ class _NavShellState extends State<NavShell> {
   /// within 2 s exits. Before this the shell had no back handling at all,
   /// so the root route popped and Android closed the app from any tab.
   void _onShellBack() {
+    if (ShellBack.handle()) return; // an in-page guide closes first
     if (_coach != null) {
       unawaited(_dismissCoach()); // back closes the tab guide first
       return;
