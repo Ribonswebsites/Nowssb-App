@@ -272,7 +272,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           WorkCard(category: 'You', title: 'Word Print', meta: 'Public profile', action: 'Open print', image: 'assets/rails/glass-02.jpg', onTap: () => _push(context, const WordPrintScreen())),
                           WorkCard(category: 'Wall', title: 'Echo Wall', meta: 'Reflections', action: 'Open the wall', image: 'assets/rails/glass-03.jpg', onTap: () => _push(context, const EchoWallScreen())),
                           WorkCard(category: 'Cash', title: 'Earnings', meta: 'Payouts and commissions', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => _push(context, const EarningsScreen())),
-                          WorkCard(category: 'Ledger', title: 'Activity', meta: 'Coin and cash ledger', action: 'Open activity', image: 'assets/rails/clear-04.jpg', onTap: () => _push(context, const EarnHubScreen())),
+                          WorkCard(category: 'Ledger', title: 'Activity', meta: 'Coin and cash ledger', action: 'Open activity', image: 'assets/rails/clear-04.jpg', onTap: () => _push(context, const EarningsScreen())),
                           WorkCard(category: 'Connect', title: 'NowssB Connect', meta: 'Community', action: 'Open connect', image: 'assets/rails/glass-04.jpg', onTap: () => _push(context, const ConnectScreen())),
                         ],
                       ),

@@ -297,14 +297,14 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                   ),
                 ),
               ),
-              const Positioned(
+              Positioned(
                 top: 14,
                 right: 14,
                 child: DecoratedBox(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
+                  decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Text('Active', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(card.category, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
                   ),
                 ),
               ),
@@ -394,7 +394,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              _openTerms();
+              _openWebsite();
             },
             child: const EditableLabel(
                 'app_settings.AppSettingsScreen', 'Website'),
@@ -404,7 +404,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     );
   }
 
-  Future<void> _openTerms() async {
+  Future<void> _openWebsite() async {
     await _openUrl('https://nowssb.com');
   }
 
