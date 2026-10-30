@@ -270,7 +270,16 @@ class Tap extends StatefulWidget {
 class _TapState extends State<Tap> {
   bool _down = false;
   @override
-  Widget build(BuildContext context) => GestureDetector(
+  Widget build(BuildContext context) => FocusableActionDetector(
+        // Keyboard / switch access: Tab focuses, Enter or Space activates.
+        enabled: widget.onTap != null,
+        actions: {
+          ActivateIntent: CallbackAction<ActivateIntent>(onInvoke: (_) {
+            widget.onTap?.call();
+            return null;
+          }),
+        },
+        child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTapDown: (_) => setState(() => _down = true),
         onTapCancel: () => setState(() => _down = false),
@@ -282,6 +291,7 @@ class _TapState extends State<Tap> {
                 widget.onTap!();
               },
         child: AnimatedScale(scale: _down ? .96 : 1, duration: const Duration(milliseconds: 120), child: widget.child),
+      ),
       );
 }
 

@@ -457,12 +457,16 @@ class _ActBtn extends StatelessWidget {
             if (filled) const SizedBox(width: 8),
             if (!filled) NwsbIcon(mark, size: 16, color: ink),
             if (!filled) const SizedBox(width: 8),
-            EditableLabel('product_detail.ActBtn',
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: filled ? NwsbColors.ink : const Color(0xB8FFFFFF),
+            Flexible(
+              child: EditableLabel('product_detail.ActBtn',
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: filled ? NwsbColors.ink : const Color(0xB8FFFFFF),
+                ),
               ),
             ),
             if (!filled) const SizedBox.shrink(),
