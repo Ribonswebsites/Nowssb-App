@@ -311,7 +311,7 @@ class _CalmTodayState extends State<CalmToday> {
                     title: r.title,
                     subtitle: m.$2,
                     alignment: m.$3,
-                    comment: EzComment(name: 'Today', text: '${r.done} of ${r.total} sessions done · ${r.streak} day streak'),
+                    comment: EzComment(name: 'Today', text: ezHeroLine(r.done, r.total, r.streak)),
                   ),
               ],
             ),
@@ -792,4 +792,11 @@ class CalmFooter extends StatelessWidget {
           ]),
         ]),
       );
+}
+
+/// Short one-line hero pill copy; friendly prompt for brand-new users.
+String ezHeroLine(int done, int total, int streak) {
+  if (done <= 0 && streak <= 0) return 'Start your first session';
+  final d = total > 0 ? '$done of $total done' : '$done done';
+  return streak > 0 ? '$d · $streak-day streak' : d;
 }

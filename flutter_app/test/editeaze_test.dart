@@ -112,4 +112,11 @@ void main() {
     expect(find.text('Practice once to see this'), findsOneWidget);
     expect(find.textContaining('%'), findsNothing);
   });
+
+  test('hero pill copy is short and friendly', () {
+    expect(ezHeroLine(0, 0, 0), 'Start your first session');
+    expect(ezHeroLine(0, 3, 0), 'Start your first session');
+    expect(ezHeroLine(2, 3, 4), '2 of 3 done · 4-day streak');
+    expect(ezHeroLine(1, 3, 0), '1 of 3 done');
+  });
 }
