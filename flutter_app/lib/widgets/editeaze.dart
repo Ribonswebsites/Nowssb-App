@@ -138,7 +138,8 @@ class _EzIconButton extends StatelessWidget {
         label: i.label,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: i.onTap,
+          // Always claim the tap so a button never falls through to the card.
+          onTap: i.onTap ?? () {},
           child: Container(
             width: 28, height: 28,
             decoration: BoxDecoration(color: const Color(0x2EFFFFFF), borderRadius: BorderRadius.circular(9)),
@@ -481,4 +482,174 @@ class _DashPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DashPainter o) => o.line != line || o.fill != fill;
+}
+
+/// One hero card: a solid colour with a studio cut-out photo standing on it.
+class EzHeroCard {
+  const EzHeroCard({
+    required this.color,
+    required this.image,
+    required this.title,
+    this.subtitle,
+    this.saved = false,
+    this.onSave,
+  });
+  final Color color;
+  final String image;
+  final String title;
+  final String? subtitle;
+  final bool saved;
+  final VoidCallback? onSave;
+}
+
+/// The Normal home hero, as on the Editeaze phone screen: rounded solid
+/// colour cards, a person photographed on a plain backdrop blending into
+/// the card, a small white title and subtitle top-left and two tiny icon
+/// buttons top-right. Auto-rotates, swipe or drag to move, pauses while
+/// touched, the next card peeks at the edge. No dots, no indicator.
+class EzHeroCarousel extends StatefulWidget {
+  const EzHeroCarousel({
+    super.key,
+    required this.cards,
+    this.onOpen,
+    this.height = 268,
+    this.peek = .86,
+    this.interval = const Duration(seconds: 4),
+    this.resumeAfter = const Duration(seconds: 3),
+  });
+  final List<EzHeroCard> cards;
+  final void Function(int index)? onOpen;
+  final double height;
+  final double peek;
+  final Duration interval;
+  final Duration resumeAfter;
+
+  @override
+  State<EzHeroCarousel> createState() => EzHeroCarouselState();
+}
+
+class EzHeroCarouselState extends State<EzHeroCarousel> {
+  static const _loop = 10000;
+  late final PageController _page =
+      PageController(initialPage: _loop * widget.cards.length, viewportFraction: widget.peek);
+  Timer? _tick;
+  Timer? _resume;
+  bool _held = false;
+
+  /// Test hooks.
+  bool get held => _held;
+  int get index => _page.hasClients ? (_page.page ?? 0).round() % widget.cards.length : 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _start();
+  }
+
+  void _start() {
+    _tick?.cancel();
+    if (widget.cards.length < 2) return;
+    _tick = Timer.periodic(widget.interval, (_) {
+      if (_held || !mounted || !_page.hasClients) return;
+      if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+        _page.jumpToPage((_page.page ?? 0).round() + 1);
+      } else {
+        _page.nextPage(duration: const Duration(milliseconds: 650), curve: Curves.easeInOutCubic);
+      }
+    });
+  }
+
+  void _down(PointerDownEvent _) {
+    _resume?.cancel();
+    _held = true;
+  }
+
+  void _up(PointerEvent _) {
+    _resume?.cancel();
+    _resume = Timer(widget.resumeAfter, () {
+      _held = false;
+      _start();
+    });
+  }
+
+  @override
+  void dispose() {
+    _tick?.cancel();
+    _resume?.cancel();
+    _page.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final n = widget.cards.length;
+    return Listener(
+      onPointerDown: _down,
+      onPointerUp: _up,
+      onPointerCancel: _up,
+      child: SizedBox(
+        height: widget.height,
+        child: PageView.builder(
+          key: const ValueKey('ez-carousel'),
+          controller: _page,
+          padEnds: false,
+          onPageChanged: (_) => HapticFeedback.selectionClick(),
+          itemBuilder: (context, i) => Padding(
+            padding: const EdgeInsets.only(left: 20, right: 2),
+            child: _EzHeroTile(
+              card: widget.cards[i % n],
+              onOpen: widget.onOpen == null ? null : () => widget.onOpen!(i % n),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EzHeroTile extends StatelessWidget {
+  const _EzHeroTile({required this.card, this.onOpen});
+  final EzHeroCard card;
+  final VoidCallback? onOpen;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: card.color,
+        borderRadius: BorderRadius.circular(24),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onOpen,
+          child: Stack(fit: StackFit.expand, children: [
+            Positioned(
+              left: 0, right: 0, top: 52, bottom: 0,
+              child: Image.asset(card.image,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomCenter,
+                  cacheHeight: 720,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink()),
+            ),
+            Positioned(
+              left: 16, right: 12, top: 14,
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(card.title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, height: 1.2)),
+                    if (card.subtitle != null) ...[
+                      const SizedBox(height: 3),
+                      Text(card.subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 11, height: 1.2)),
+                    ],
+                  ]),
+                ),
+                const SizedBox(width: 8),
+                _EzIconButton(EzIcon(Icons.play_arrow_rounded, label: 'Play', onTap: onOpen)),
+                const SizedBox(width: 6),
+                _EzIconButton(EzIcon(card.saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                    label: card.saved ? 'Saved' : 'Save', onTap: card.onSave)),
+              ]),
+            ),
+          ]),
+        ),
+      );
 }

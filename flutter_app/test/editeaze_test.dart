@@ -93,13 +93,34 @@ void main() {
     await t.pump(const Duration(milliseconds: 300));
     final hero = find.byKey(const ValueKey('cv3-ez-hero'));
     expect(hero, findsOneWidget);
-    final s = t.state<EzOrangeCarouselState>(hero);
+    final s = t.state<EzHeroCarouselState>(hero);
     await t.fling(hero, const Offset(-250, 0), 1200);
     for (var i = 0; i < 12; i++) {
       await t.pump(const Duration(milliseconds: 100));
     }
     expect(s.index, 1);
     expect(_indicators, findsNothing);
+    // Only the card: no comment pill, no Today/Begin block under it.
+    expect(find.byType(EzCommentPill), findsNothing);
+    expect(find.text('Begin'), findsNothing);
+    expect(find.text('See progress'), findsNothing);
+    await t.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('hero: play opens the session, save is separate', (t) async {
+    t.view.physicalSize = const Size(360, 900);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    var opened = 0;
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(child: CalmToday(onStart: (_, __) => opened++)))));
+    await t.pump(const Duration(milliseconds: 300));
+    await t.tap(find.bySemanticsLabel('Play').hitTestable().first);
+    await t.pump();
+    expect(opened, 1);
+    // Save is its own button: it never opens the session.
+    await t.tap(find.bySemanticsLabel(RegExp(r'^Saved?$')).hitTestable().first);
+    await t.pump(const Duration(milliseconds: 50));
+    expect(opened, 1);
     await t.pumpWidget(const SizedBox());
   });
 
@@ -113,10 +134,4 @@ void main() {
     expect(find.textContaining('%'), findsNothing);
   });
 
-  test('hero pill copy is short and friendly', () {
-    expect(ezHeroLine(0, 0, 0), 'Start your first session');
-    expect(ezHeroLine(0, 3, 0), 'Start your first session');
-    expect(ezHeroLine(2, 3, 4), '2 of 3 done · 4-day streak');
-    expect(ezHeroLine(1, 3, 0), '1 of 3 done');
-  });
 }

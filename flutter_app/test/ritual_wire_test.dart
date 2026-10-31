@@ -119,31 +119,27 @@ void main() {
     await _size(t, 390);
     var t0 = DateTime(2026, 10, 27, 1, 0);
     DayClock.clock = () => t0;
-    var begun = 0, prog = 0;
-    await t.pumpWidget(_host(CalmToday(onStart: (_, __) => begun++, onProgress: () => prog++)));
+    var begun = 0;
+    await t.pumpWidget(_host(CalmToday(onStart: (_, __) => begun++)));
     await t.pump();
-    var card = t.widget<RitualCard>(find.byType(RitualCard));
-    expect(card.time, RitualTime.night);
-    expect(card.title, 'Night Restoration');
+    expect(find.text('Night Restoration'), findsWidgets);
     expect(find.byKey(const ValueKey('cv3-today')), findsOneWidget); // one card, old one gone
-    await t.tap(find.text('Begin'));
-    await t.tap(find.text('See progress'));
+    await t.tap(find.bySemanticsLabel('Play').hitTestable().first);
     await t.pump(const Duration(milliseconds: 500));
-    expect((begun, prog), (1, 1));
+    expect(begun, 1);
     // hourly tick: 04:59 → 05:00 flips to morning live
     t0 = DateTime(2026, 10, 27, 4, 59, 59);
     DayClock.refresh();
     await t.pump();
     t0 = DateTime(2026, 10, 27, 5);
     await t.pump(const Duration(seconds: 2));
-    card = t.widget<RitualCard>(find.byType(RitualCard));
-    expect(card.time, RitualTime.morning);
+    expect(find.text('Night Restoration'), findsNothing);
     // resume after sleep → night
     t0 = DateTime(2026, 10, 27, 22);
     t.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
     t.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
     await t.pump();
-    expect(t.widget<RitualCard>(find.byType(RitualCard)).time, RitualTime.night);
+    expect(find.text('Night Restoration'), findsWidgets);
     await t.pumpWidget(const SizedBox());
   });
 

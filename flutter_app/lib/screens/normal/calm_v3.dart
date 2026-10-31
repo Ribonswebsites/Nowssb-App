@@ -12,6 +12,7 @@ import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/data/today_ritual.dart';
 import 'package:nowssb/widgets/concept/ritual_card.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lottie/lottie.dart';
 import 'neomorphic_dashboard.dart' show FocusBlob;
 
@@ -247,12 +248,13 @@ class CalmSearch extends StatelessWidget {
 // ───────────────────────────── dashboard ─────────────────────────────
 
 /// Meditation photos for the Normal home hero (Pexels licence, see CREDITS.md).
-const kEzMeditations = <(String, String, Alignment)>[
-  ('assets/home/ez/ez-med-beach.webp', 'Breathe by the sea', Alignment(0, .2)),
-  ('assets/home/ez/ez-med-lotus-room.webp', 'Sit tall, soften the face', Alignment.center),
-  ('assets/home/ez/ez-med-pillar.webp', 'Let the day settle', Alignment(0, -.1)),
-  ('assets/home/ez/ez-med-home.webp', 'A quiet corner at home', Alignment(0, .1)),
-  ('assets/home/ez/ez-med-candle.webp', 'One breath, one word', Alignment.center),
+/// Hero cards: solid colour + a studio photo cut cleanly onto it.
+const kEzHeroLooks = <(Color, String)>[
+  (Color(0xFFF47A3C), 'assets/home/ez/ez-hero-orange.webp'),
+  (Color(0xFF1F9E8F), 'assets/home/ez/ez-hero-teal.webp'),
+  (Color(0xFFE9B23A), 'assets/home/ez/ez-hero-yellow.webp'),
+  (Color(0xFFEE6C5E), 'assets/home/ez/ez-hero-coral.webp'),
+  (Color(0xFF2F4F8F), 'assets/home/ez/ez-hero-blue.webp'),
 ];
 
 typedef CalmLauncher = void Function(List<Word> words, String title);
@@ -269,10 +271,28 @@ class CalmToday extends StatefulWidget {
 }
 
 class _CalmTodayState extends State<CalmToday> {
+  static const _likedWordsKey = 'nwsb_liked_words';
   late final TodayRitualModel _model = TodayRitualModel(
     onBegin: (words, title) => widget.onStart?.call(words, title),
     onSeeProgress: () => widget.onProgress?.call(),
   );
+  Set<String> _liked = const {};
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((p) {
+      if (mounted) setState(() => _liked = (p.getStringList(_likedWordsKey) ?? const []).toSet());
+    });
+  }
+
+  Future<void> _toggleSave(String word) async {
+    final next = {..._liked};
+    if (!next.remove(word)) next.add(word);
+    setState(() => _liked = next);
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList(_likedWordsKey, next.toList());
+  }
 
   @override
   void dispose() {
@@ -285,33 +305,22 @@ class _CalmTodayState extends State<CalmToday> {
         listenable: _model,
         builder: (context, _) {
           final r = _model.value;
-          return RitualCard(
+          final words = r.words.take(kEzHeroLooks.length).toList();
+          return Padding(
             key: const ValueKey('cv3-today'),
-            completed: r.done,
-            total: r.total,
-            sessionCount: r.totalSessions,
-            streak: r.streak,
-            time: ritualTimeOf(r.part),
-            title: r.title,
-            onBegin: _model.begin,
-            onReplay: _model.replay,
-            onSeeProgress: _model.seeProgress,
-            visual: EzOrangeCarousel(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: EzHeroCarousel(
               key: const ValueKey('cv3-ez-hero'),
-              height: 300,
-              onTap: (_) => _model.begin(),
-              icons: [
-                EzIcon(Icons.play_arrow_rounded, label: 'Begin', onTap: _model.begin),
-                EzIcon(Icons.insights_rounded, label: 'See progress', onTap: _model.seeProgress),
-              ],
-              slides: [
-                for (final m in kEzMeditations)
-                  EzSlide(
-                    image: m.$1,
+              onOpen: (_) => _model.begin(),
+              cards: [
+                for (var i = 0; i < kEzHeroLooks.length; i++)
+                  EzHeroCard(
+                    color: kEzHeroLooks[i].$1,
+                    image: kEzHeroLooks[i].$2,
                     title: r.title,
-                    subtitle: m.$2,
-                    alignment: m.$3,
-                    comment: EzComment(name: 'Today', text: ezHeroLine(r.done, r.total, r.streak)),
+                    subtitle: words.isEmpty ? null : words[i % words.length].word,
+                    saved: words.isNotEmpty && _liked.contains(words[i % words.length].word),
+                    onSave: words.isEmpty ? null : () => _toggleSave(words[i % words.length].word),
                   ),
               ],
             ),
@@ -794,9 +803,3 @@ class CalmFooter extends StatelessWidget {
       );
 }
 
-/// Short one-line hero pill copy; friendly prompt for brand-new users.
-String ezHeroLine(int done, int total, int streak) {
-  if (done <= 0 && streak <= 0) return 'Start your first session';
-  final d = total > 0 ? '$done of $total done' : '$done done';
-  return streak > 0 ? '$d · $streak-day streak' : d;
-}

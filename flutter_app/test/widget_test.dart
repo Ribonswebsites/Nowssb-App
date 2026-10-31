@@ -146,7 +146,7 @@ void main() {
           reason: 'the home needs a reachable primary section action');
       // Begin on a fresh account has no routine yet, so the shell must send
       // the user to Practice with a hint instead of an empty player.
-      tester.widget<RitualCard>(today).onBegin();
+      await tester.tap(find.descendant(of: today, matching: find.bySemanticsLabel('Play')).hitTestable().first);
       await tester.pump();
       expect(find.text('Pick a few words for your routine first.'), findsOneWidget);
     }
