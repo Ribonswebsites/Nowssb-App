@@ -13,11 +13,11 @@ import 'package:nowssb/admin/template/editable.dart';
 import 'package:nowssb/admin/template/slot_keys.dart';
 import 'package:nowssb/admin/template/ui_overrides.dart';
 
-Widget _frame(SectionEntry entry, Widget child) => Directionality(
+Widget _frame(SectionEntry entry, Widget child, {String pageId = 'home.fashion'}) => Directionality(
       textDirection: TextDirection.ltr,
       child: Align(
         alignment: Alignment.topCenter,
-        child: SizedBox(width: 300, child: SectionFrame(pageId: 'home.normal', entry: entry, child: child)),
+        child: SizedBox(width: 300, child: SectionFrame(pageId: pageId, entry: entry, child: child)),
       ),
     );
 
@@ -51,6 +51,11 @@ void main() {
       final fit = tester.renderObject<RenderSectionFitHeight>(find.byType(SectionFitHeight));
       expect(fit.size.height, 50);
       expect(fit.scale, closeTo(0.5, 0.001));
+    });
+
+    testWidgets('normal home never rescales a built-in section', (tester) async {
+      await tester.pumpWidget(_frame(const SectionEntry(id: 'hero', props: {'height': 200}), content, pageId: 'home.normal'));
+      expect(find.byType(SectionFitHeight), findsNothing);
     });
 
     testWidgets('no height: untouched', (tester) async {
