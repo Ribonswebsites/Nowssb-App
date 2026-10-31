@@ -231,8 +231,31 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
         }
       });
 
+  /// Android back steps out of Sign Up or the code step before closing.
+  bool get _hasInnerStep => !_busy && (_create || _verificationId != null);
+
   @override
   Widget build(BuildContext context) {
+    return PopScope(
+      canPop: !_hasInnerStep,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop || !_hasInnerStep) return;
+        setState(() {
+          if (_verificationId != null) {
+            _verificationId = null;
+            _codeFor = null;
+          } else {
+            _create = false;
+          }
+          _error = null;
+          _notice = null;
+        });
+      },
+      child: _scaffold(context),
+    );
+  }
+
+  Widget _scaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       resizeToAvoidBottomInset: true,
