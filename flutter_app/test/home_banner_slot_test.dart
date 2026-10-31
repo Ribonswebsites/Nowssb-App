@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/features/programs/program_router.dart';
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/home_banner_slot.dart';
+import 'support/test_fonts.dart';
 
 Future<void> _font(String family, String path) async {
   final f = File(path);
@@ -18,8 +19,6 @@ Future<void> _font(String family, String path) async {
   final l = FontLoader(family)..addFont(Future.value(ByteData.sublistView(f.readAsBytesSync())));
   await l.load();
 }
-
-const _g = '/usr/share/fonts/truetype/sand-box/google';
 
 Widget _frame({required bool fashion, required Widget slot, double scale = 1, double width = 390}) {
   final bg = fashion ? NwsbColors.deep : NwsbColors.surface;
@@ -62,8 +61,8 @@ Future<void> _precache(WidgetTester t) async {
 
 void main() {
   setUpAll(() async {
-    await _font('DM Sans', '$_g/DM Sans/DMSans-VariableFont_opsz,wght.ttf');
-    await _font('MaterialIcons', '/home/box/flutter/bin/cache/dart-sdk/bin/resources/devtools/assets/fonts/MaterialIcons-Regular.otf');
+    await loadDmSans();
+    await loadMaterialIcons();
     await _font('CormorantGaramond', 'assets/fonts/CormorantGaramond-Variable.ttf');
   });
 

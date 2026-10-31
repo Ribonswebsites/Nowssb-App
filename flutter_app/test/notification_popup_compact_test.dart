@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/notifications.dart';
 import 'package:nowssb/widgets/notification_popup.dart';
+import 'support/test_fonts.dart';
 
 const samples = <String, (String, String)>{
   'routine': ('Today’s word: Shanti', 'Peace that settles the mind. Two minutes to say it with intent.'),
@@ -25,13 +26,6 @@ const samples = <String, (String, String)>{
   'orders': ('Order confirmed', 'Your Signature print #NW-2041 is being prepared.'),
   'support': ('Reply from support', 'We have looked into your question about the Reader.'),
 };
-
-Future<void> _font(String family, String path) async {
-  final f = File(path);
-  if (!f.existsSync()) return;
-  final l = FontLoader(family)..addFont(Future.value(ByteData.sublistView(f.readAsBytesSync())));
-  await l.load();
-}
 
 void main() {
   test('every NotifStore kind has its own SVG, unknown falls back', () {
@@ -51,7 +45,7 @@ void main() {
     final shots = Platform.environment['NOTIF_SHOTS'];
     ui.Image? bg;
     await t.runAsync(() async {
-      await _font('Roboto', '/usr/share/fonts/truetype/sand-box/google/Roboto/Roboto-VariableFont_wdth,wght.ttf');
+      await loadRoboto();
       final bgFile = File('assets/video/hero-bg-poster.webp');
       if (shots != null && bgFile.existsSync()) {
         final c = await ui.instantiateImageCodec(bgFile.readAsBytesSync());

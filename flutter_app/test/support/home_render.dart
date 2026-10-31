@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'test_fonts.dart';
+
 Future<void> _font(String family, String path) async {
   final f = File(path);
   if (!f.existsSync()) return;
@@ -18,8 +20,6 @@ Future<void> _font(String family, String path) async {
     ..addFont(Future.value(ByteData.sublistView(f.readAsBytesSync())));
   await l.load();
 }
-
-const _g = '/usr/share/fonts/truetype/sand-box/google';
 
 /// The google_fonts cache to render with: HOME_FONT_CACHE, else
 /// ~/.cache/nowssb-test-fonts. Null when neither exists.
@@ -50,12 +50,11 @@ Future<void> setUpHomeRender() async {
     const MethodChannel('plugins.flutter.io/path_provider'),
     (call) async => dir,
   );
-  await _font('DM Sans', '$_g/DM Sans/DMSans-VariableFont_opsz,wght.ttf');
-  await _font('MaterialIcons',
-      '/home/box/flutter/bin/cache/dart-sdk/bin/resources/devtools/assets/fonts/MaterialIcons-Regular.otf');
+  await loadDmSans();
+  await loadMaterialIcons();
   await _font(
       'CormorantGaramond', 'assets/fonts/CormorantGaramond-Variable.ttf');
-  await _font('Anton', '$_g/Anton/Anton-Regular.ttf');
+  await loadAnton();
   // google_fonts names each face '<Family>_<variant>'; register the cached
   // files under those names so first-frame text is not tofu.
   if (cache != null) {
