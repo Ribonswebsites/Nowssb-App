@@ -108,6 +108,7 @@ void main() {
   });
 
   testWidgets('hero: play opens the session, save is separate', (t) async {
+    SharedPreferences.setMockInitialValues({});
     t.view.physicalSize = const Size(360, 900);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
@@ -121,6 +122,14 @@ void main() {
     await t.tap(find.bySemanticsLabel(RegExp(r'^Saved?$')).hitTestable().first);
     await t.pump(const Duration(milliseconds: 50));
     expect(opened, 1);
+    // No routine words in this test library: Save keeps the session itself,
+    // confirms it, and the icon flips to saved.
+    expect(find.byKey(const ValueKey('cv3-hero-saved')), findsOneWidget);
+    expect(find.textContaining('Saved "'), findsOneWidget);
+    expect(find.byIcon(Icons.bookmark_rounded), findsWidgets);
+    final p = await SharedPreferences.getInstance();
+    expect(p.getStringList('nwsb_saved_sessions'), isNotEmpty);
+    await t.pump(const Duration(seconds: 3));
     await t.pumpWidget(const SizedBox());
   });
 

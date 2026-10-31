@@ -282,16 +282,37 @@ class _CalmTodayState extends State<CalmToday> {
   void initState() {
     super.initState();
     SharedPreferences.getInstance().then((p) {
-      if (mounted) setState(() => _liked = (p.getStringList(_likedWordsKey) ?? const []).toSet());
+      if (mounted) {
+        setState(() {
+          _liked = (p.getStringList(_likedWordsKey) ?? const []).toSet();
+          _sessions = (p.getStringList(_savedSessionsKey) ?? const []).toSet();
+        });
+      }
     });
   }
 
-  Future<void> _toggleSave(String word) async {
-    final next = {..._liked};
-    if (!next.remove(word)) next.add(word);
-    setState(() => _liked = next);
+  static const _savedSessionsKey = 'nwsb_saved_sessions';
+  Set<String> _sessions = const {};
+
+  /// Saves (or unsaves) a word when the card has one, otherwise the session
+  /// itself, so Save works for every user, and confirms either way.
+  Future<void> _toggleSave({String? word, required String session}) async {
+    final isWord = word != null;
+    final key = isWord ? _likedWordsKey : _savedSessionsKey;
+    final item = word ?? session;
+    final next = {...(isWord ? _liked : _sessions)};
+    final removed = next.remove(item);
+    if (!removed) next.add(item);
+    setState(() => isWord ? _liked = next : _sessions = next);
+    ScaffoldMessenger.maybeOf(context)
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        key: const ValueKey('cv3-hero-saved'),
+        content: Text(removed ? 'Removed "$item" from saved' : 'Saved "$item"'),
+        duration: const Duration(seconds: 2),
+      ));
     final p = await SharedPreferences.getInstance();
-    await p.setStringList(_likedWordsKey, next.toList());
+    await p.setStringList(key, next.toList());
   }
 
   @override
@@ -319,8 +340,8 @@ class _CalmTodayState extends State<CalmToday> {
                     image: kEzHeroLooks[i].$2,
                     title: r.title,
                     subtitle: words.isEmpty ? null : words[i % words.length].word,
-                    saved: words.isNotEmpty && _liked.contains(words[i % words.length].word),
-                    onSave: words.isEmpty ? null : () => _toggleSave(words[i % words.length].word),
+                    saved: words.isEmpty ? _sessions.contains(r.title) : _liked.contains(words[i % words.length].word),
+                    onSave: () => _toggleSave(word: words.isEmpty ? null : words[i % words.length].word, session: r.title),
                   ),
               ],
             ),
