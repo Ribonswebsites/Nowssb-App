@@ -9,6 +9,8 @@ import '../../data/store_catalog.dart';
 import '../../data/cart_bag.dart';
 import '../../data/entitlements.dart';
 import '../../data/store_prices.dart';
+import '../poster/poster_kit.dart' show inr;
+import '../reader/reader_book.dart' show ReaderBookScreen, ReaderKind;
 import '../../data/word_art.dart';
 import '../../widgets/page_shell.dart';
 import 'store_routes.dart';
@@ -109,6 +111,7 @@ void openEbookDetail(BuildContext context, EbBook b) {
         about: b.about,
         highlights: b.contents,
         disclaimer: kEbDisclaimer,
+        ebook: b,
       ),
     ),
   );
@@ -132,7 +135,11 @@ class StoreProductPage extends StatefulWidget {
     this.disclaimer,
     this.heroVideo,
     this.itemId,
+    this.ebook,
   });
+
+  /// The ebook behind this page, when it is one: "Read now" opens it.
+  final EbBook? ebook;
 
   /// Bag / ownership id (word:x, signature:x, meaning:x, ebook:x). Derived
   /// from [kind] when not given.
@@ -271,7 +278,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          _open ? (price <= 0 ? 'Free' : (Entitlements.instance.ownsItem(_id) ? 'Owned' : 'Included in your plan')) : money(price),
+                          _open ? (price <= 0 ? 'Free' : (Entitlements.instance.ownsItem(_id) ? 'Owned' : 'Included in your plan')) : inr(price, sku: _id),
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w700,
@@ -305,6 +312,15 @@ class _StoreProductPageState extends State<StoreProductPage> {
                                 mark: NwsbMarks.cart,
                                 filled: false,
                                 onTap: () {
+                                  if (_open) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('$title is already yours — no need to buy it again'),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                    return;
+                                  }
                                   storeAddToCart(
                                     context,
                                     _bagItem,
@@ -323,11 +339,18 @@ class _StoreProductPageState extends State<StoreProductPage> {
                         ),
                         const SizedBox(height: 10),
                         _ActBtn(
-                          label: _open ? 'Yours — open it in the Library' : 'Buy on Google Play',
+                          label: _open ? (widget.ebook != null ? 'Yours — read it now' : 'Yours — open it in the Library') : 'Buy on Google Play',
                           mark: NwsbMarks.bag,
                           filled: true,
                           onTap: () {
                             if (_open) {
+                              final book = widget.ebook;
+                              if (book != null) {
+                                Navigator.of(context).push(MaterialPageRoute<void>(
+                                  builder: (_) => ReaderBookScreen(kind: ReaderKind.ebook, initialBook: book),
+                                ));
+                                return;
+                              }
                               Navigator.of(context).pop();
                               return;
                             }
