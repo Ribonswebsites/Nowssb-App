@@ -10,6 +10,7 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
+import '../../widgets/editeaze.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -759,10 +760,17 @@ class V4Healing extends StatelessWidget {
           const SizedBox(height: 6),
           const Text('Customise your healing path', style: _h),
           const SizedBox(height: 12),
-          Wrap(spacing: 10, runSpacing: 10, children: [
-            CalmGo(label: 'Her path', onTap: onFemale),
-            CalmGo(label: 'His path', light: true, onTap: onMale),
-          ]),
+          // One tap on a photo picks the path (was two look-alike buttons).
+          EzSplitStrip(
+            key: const ValueKey('v4-healing-strip'),
+            dark: false,
+            height: 112,
+            left: EzTile(image: 'assets/home/ez/ez-med-studio.webp', label: 'Her path', alignment: const Alignment(0, -.2), onTap: onFemale),
+            right: EzTile(image: 'assets/home/ez/ez-med-rock.webp', label: 'His path', alignment: const Alignment(0, -.3), onTap: onMale),
+            addLabel: 'All paths',
+            addIcon: Icons.arrow_forward_rounded,
+            onAdd: onTap,
+          ),
         ]),
       );
 }

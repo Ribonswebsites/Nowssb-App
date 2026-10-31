@@ -28,6 +28,11 @@ Future<void> _settle(WidgetTester t, [int n = 12]) async {
 
 final _key = GlobalKey();
 
+const _midKeys = <String, List<String>>{
+  'Home': ['v4-healing', 'nm-ez-footer'],
+  'Profile': ['profile-mind'],
+};
+
 Future<void> _shot(WidgetTester t, String name) async {
   await precacheAll(t);
   await t.pump(const Duration(milliseconds: 100));
@@ -115,6 +120,22 @@ void main() {
             await _settle(t, 10);
           }
           await _shot(t, '${tag}_${skin}_${tab}_top');
+          // Mid-page sections worth a look of their own.
+          for (final k in _midKeys[tab] ?? const <String>[]) {
+            final f = find.byKey(ValueKey(k));
+            if (f.evaluate().isEmpty) {
+              final sc = find.byType(Scrollable).hitTestable();
+              if (sc.evaluate().isEmpty) continue;
+              try {
+                await t.scrollUntilVisible(f, 300, scrollable: sc.first, maxScrolls: 80);
+              } catch (_) {
+                continue;
+              }
+            }
+            await t.ensureVisible(f.first);
+            await _settle(t, 6);
+            await _shot(t, '${tag}_${skin}_${tab}_$k');
+          }
           await _toEnd(t);
           await _shot(t, '${tag}_${skin}_${tab}_end');
           if (tab == 'Home') {

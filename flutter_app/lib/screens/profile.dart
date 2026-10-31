@@ -1,3 +1,4 @@
+import 'profile_mind.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
@@ -532,6 +533,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     LSection('face', 'Profile', _courseFace()),
                     LSection('earn', 'Earn hub', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
+                    LSection('mind', 'Practice mind', Padding(
+                      padding: const EdgeInsets.only(bottom: 18),
+                      child: ProfileMind(
+                        onPractice: () => NavScope.goTo(context, 1),
+                        onProgress: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                            builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library))),
+                      ),
+                    )),
                     LSection('about', 'About', _about()),
                     LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
                       SplitPromoSurface.profile,

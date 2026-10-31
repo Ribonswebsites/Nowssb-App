@@ -80,9 +80,13 @@ class RitualCard extends StatefulWidget {
   final VoidCallback? onReplay;
   /// Test hook: fixes breath (0..1) and push-in (0..1) phases.
   final double? debugPhase;
+  /// Replaces the animated scene (the visual area) when given; the footer
+  /// with the title and buttons stays. Normal home passes the Editeaze
+  /// orange photo carousel here.
+  final Widget? visual;
   const RitualCard({
     super.key, required this.completed, required this.total, required this.sessionCount,
-    required this.streak, required this.onBegin, required this.onSeeProgress, this.onReplay, this.time, this.title, this.debugPhase,
+    required this.streak, required this.onBegin, required this.onSeeProgress, this.onReplay, this.time, this.title, this.debugPhase, this.visual,
   });
 
   @override
@@ -178,6 +182,9 @@ class _RitualCardState extends State<RitualCard> with TickerProviderStateMixin {
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            if (widget.visual != null)
+              Padding(padding: const EdgeInsets.fromLTRB(8, 8, 8, 0), child: widget.visual!)
+            else
             GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTapDown: (_) => _press.forward(),

@@ -7,6 +7,7 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
+import '../../widgets/editeaze.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/data/today_ritual.dart';
 import 'package:nowssb/widgets/concept/ritual_card.dart';
@@ -245,6 +246,15 @@ class CalmSearch extends StatelessWidget {
 
 // ───────────────────────────── dashboard ─────────────────────────────
 
+/// Meditation photos for the Normal home hero (Pexels licence, see CREDITS.md).
+const kEzMeditations = <(String, String, Alignment)>[
+  ('assets/home/ez/ez-med-beach.webp', 'Breathe by the sea', Alignment(0, .2)),
+  ('assets/home/ez/ez-med-lotus-room.webp', 'Sit tall, soften the face', Alignment.center),
+  ('assets/home/ez/ez-med-pillar.webp', 'Let the day settle', Alignment(0, -.1)),
+  ('assets/home/ez/ez-med-home.webp', 'A quiet corner at home', Alignment(0, .1)),
+  ('assets/home/ez/ez-med-candle.webp', 'One breath, one word', Alignment.center),
+];
+
 typedef CalmLauncher = void Function(List<Word> words, String title);
 
 /// The Today card. All its data and both actions come from
@@ -286,6 +296,25 @@ class _CalmTodayState extends State<CalmToday> {
             onBegin: _model.begin,
             onReplay: _model.replay,
             onSeeProgress: _model.seeProgress,
+            visual: EzOrangeCarousel(
+              key: const ValueKey('cv3-ez-hero'),
+              height: 300,
+              onTap: (_) => _model.begin(),
+              icons: [
+                EzIcon(Icons.play_arrow_rounded, label: 'Begin', onTap: _model.begin),
+                EzIcon(Icons.insights_rounded, label: 'See progress', onTap: _model.seeProgress),
+              ],
+              slides: [
+                for (final m in kEzMeditations)
+                  EzSlide(
+                    image: m.$1,
+                    title: r.title,
+                    subtitle: m.$2,
+                    alignment: m.$3,
+                    comment: EzComment(name: 'Today', text: '${r.done} of ${r.total} sessions done · ${r.streak} day streak'),
+                  ),
+              ],
+            ),
           );
         },
       );
