@@ -13,6 +13,7 @@ import '../../widgets/nwsb_coin_fly.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
+import '../draw/lucky_draw_gate.dart';
 import '../draw/lucky_draw_screen.dart';
 
 class CoinsScreen extends StatefulWidget {
@@ -83,12 +84,12 @@ class CoinsBody extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 32),
       children: [
         _hero(earned, cap),
-        _section('Daily lucky draw', [
+        LuckyDrawGate(child:         _section('Daily lucky draw', [
           _link(context, Icons.card_giftcard_rounded, 'Enter today\u2019s draw', 'Free to enter. Winners are picked on the server.',
               () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LuckyDrawScreen()))),
           _link(context, Icons.emoji_events_rounded, 'Winners and reviews', 'See who won what and what they said.',
               () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LuckyDrawWinnersScreen()))),
-        ]),
+        ])),
         _section('Today\u2019s activities', [
           for (final a in acts) _activity(a),
           if (acts.isEmpty) const Text('No coin activities are switched on today.', style: TextStyle(color: _dim)),

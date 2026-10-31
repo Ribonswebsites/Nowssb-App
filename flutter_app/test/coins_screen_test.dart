@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/data/app_control.dart';
 import 'package:nowssb/features/coins/coins_screen.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/widgets/nwsb_coin_fly.dart';
@@ -70,8 +71,16 @@ void main() {
     expect(find.text('Earned today 63'), findsOneWidget);
     expect(find.text('187 left to earn'), findsOneWidget);
     expect(find.text('16 of 24 · 2 of 3 today'), findsOneWidget);
+    // Lucky draw links stay hidden until the remote flag is on.
+    expect(find.text('Enter today\u2019s draw'), findsNothing);
+    AppControl.instance.flags = const {'lucky_draw_enabled': true};
+    AppControl.instance.notifyListeners();
+    await t.pump();
     expect(find.text('Enter today\u2019s draw'), findsOneWidget);
     expect(find.text('Winners and reviews'), findsOneWidget);
+    AppControl.instance.flags = const {};
+    AppControl.instance.notifyListeners();
+    await t.pump();
     await shot(t, key, '1-top');
     await t.scrollUntilVisible(find.textContaining('Store: up to 30%'), 300);
     expect(find.textContaining('with a coupon, up to 40%'), findsOneWidget);
