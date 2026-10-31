@@ -1225,15 +1225,11 @@ class _SlmFeed extends StatelessWidget {
           margin: EdgeInsets.zero,
         ),
       1 => ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(4, onTap: onPractice).copyWith(
-            art: 'assets/banners/promo/uniq-sl-a.jpg',
-          ),
+          spec: SplitPromoExtras.at(4, onTap: onPractice),
           margin: EdgeInsets.zero,
         ),
       _ => ColoredSplitPromoBanner(
-          spec: SplitPromoExtras.at(5, onTap: onStore).copyWith(
-            art: 'assets/banners/promo/uniq-sl-b.jpg',
-          ),
+          spec: SplitPromoExtras.at(5, onTap: onStore),
           margin: EdgeInsets.zero,
         ),
     };

@@ -133,7 +133,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
                       builder: (_) => const SoundLibraryScreen(),
                     ),
                   ),
-                ).copyWith(art: 'assets/banners/promo/uniq-prac.jpg'),
+                ),
                 margin: EdgeInsets.zero,
               )),
             ]),

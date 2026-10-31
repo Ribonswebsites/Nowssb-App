@@ -559,13 +559,8 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   Widget _heroStage(double height, String subject) {
     final rot = _auto + _drag + _para * 0.004;
     final top = <(String, EnterCurveDest?)>[
-      ('assets/banners/promo/uniq-egypt.jpg', EnterCurveAssets.destinations[0]),
-      ('assets/banners/promo/uniq-red.jpg', EnterCurveAssets.destinations[1]),
-      ('assets/banners/promo/uniq-turtle.jpg', EnterCurveAssets.destinations[2]),
-      ('assets/banners/promo/uniq-silver.jpg', EnterCurveAssets.destinations[3]),
-      ('assets/banners/promo/uniq-dark.jpg', null),
-      ('assets/banners/promo/uniq-auburn.jpg', null),
-      ('assets/hero-curve/tab-stool.webp', null),
+      for (final d in EnterCurveAssets.destinations) (d.banner, d),
+      for (final a in EnterCurveAssets.extras) (a, null),
     ];
     final bot = <(String, EnterCurveDest?)>[
       for (final a in HeroCurveAssets.cards) (a, null),
@@ -672,7 +667,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           scale: scale,
           child: dest == null
               ? _still(asset, 152, 86)
-              : _banner(dest, width: 152, height: 86, asset: asset),
+              : _banner(dest, width: 152, height: 86),
         ),
       ),
     );
@@ -824,7 +819,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
   }
 
   Widget _banner(EnterCurveDest dest,
-      {required double width, required double height, String? asset}) {
+      {required double width, required double height}) {
     return GestureDetector(
       onTap: () => _open(dest.id),
       child: Container(
@@ -846,7 +841,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           fit: StackFit.expand,
           children: [
             EditableImage.asset(
-              asset ?? dest.banner,
+              dest.banner,
               fit: BoxFit.cover,
               alignment: Alignment.centerLeft,
               filterQuality: FilterQuality.medium,

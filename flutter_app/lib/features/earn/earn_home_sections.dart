@@ -1012,7 +1012,7 @@ class ReferenceHomeSection extends StatelessWidget {
               cta: 'Share a link',
               left: Color(0xFF14283D),
               right: Color(0xFF3D7AE0),
-              art: 'assets/banners/promo/uniq-reference.jpg',
+              art: SplitPromoArts.whiteRobot,
               dest: _Dest.reference,
             ),
           ],

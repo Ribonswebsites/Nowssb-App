@@ -45,14 +45,8 @@ class BannerMix extends StatelessWidget {
                 _ => NwsbLinks.tab(context, 1),
               },
     );
-    final mixArt = switch (seed.abs() % 4) {
-      0 => 'assets/banners/promo/uniq-mix-a.jpg',
-      1 => 'assets/banners/promo/uniq-mix-b.jpg',
-      2 => 'assets/banners/promo/uniq-mix-c.jpg',
-      _ => null,
-    };
     final split = ColoredSplitPromoBanner(
-      spec: SplitPromoExtras.at(seed + 3, onTap: onTap).copyWith(art: mixArt),
+      spec: SplitPromoExtras.at(seed + 3, onTap: onTap),
       margin: EdgeInsets.zero,
     );
     final bar = SecBanner(

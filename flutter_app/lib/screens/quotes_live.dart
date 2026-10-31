@@ -325,7 +325,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                                 spec: SplitPromoExtras.at(
                                   4,
                                   onTap: () => _push(const PracticeScreen()),
-                                ).copyWith(art: 'assets/banners/promo/uniq-qt-a.jpg'),
+                                ),
                                 margin: const EdgeInsets.only(bottom: 36),
                               ),
                               _calendarStrip(),
@@ -336,7 +336,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                                 spec: SplitPromoExtras.at(
                                   8,
                                   onTap: () => _push(const PracticeScreen()),
-                                ).copyWith(art: 'assets/banners/promo/uniq-qt-b.jpg'),
+                                ),
                                 margin: EdgeInsets.zero,
                               ),
                               const SizedBox(height: 8),
@@ -506,13 +506,13 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
   }
 
   static const _strip = <(String, Color)>[
-    ('assets/banners/promo/uniq-q1.jpg', Color(0xFFE07A32)),
-    ('assets/banners/promo/uniq-q2.jpg', Color(0xFF7C4DFF)),
-    ('assets/banners/promo/uniq-q3.jpg', Color(0xFF2EC4B6)),
-    ('assets/banners/promo/uniq-q4.jpg', Color(0xFFE85D9A)),
-    ('assets/banners/promo/uniq-q5.jpg', Color(0xFFD4A017)),
-    ('assets/banners/promo/uniq-q6.jpg', Color(0xFFE67E22)),
-    ('assets/banners/promo/uniq-q7.jpg', Color(0xFF3D8BDB)),
+    ('assets/banners/promo/pose-01.png', Color(0xFFE07A32)),
+    ('assets/banners/promo/pose-02.png', Color(0xFF7C4DFF)),
+    ('assets/banners/promo/pose-03.png', Color(0xFF2EC4B6)),
+    ('assets/banners/promo/pose-04.png', Color(0xFFE85D9A)),
+    ('assets/banners/promo/pose-06.png', Color(0xFFD4A017)),
+    ('assets/banners/promo/pose-09.png', Color(0xFFE67E22)),
+    ('assets/banners/promo/pose-10.png', Color(0xFF3D8BDB)),
   ];
 
   Widget _calendarStrip() {

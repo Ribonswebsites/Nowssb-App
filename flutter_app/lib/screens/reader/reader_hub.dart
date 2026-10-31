@@ -163,17 +163,15 @@ class _ReaderHubScreenState extends State<ReaderHubScreen> {
                       onTap: () => _open(ReaderKind.meaning),
                     ),
                     const SizedBox(height: 14),
-                    ColoredSplitPromoBanner(
-                      spec: SplitPromoSpec.forSurface(
-                        SplitPromoSurface.readerHub,
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => const EbooksStoreScreen(),
-                            ),
-                          );
-                        },
-                      ).copyWith(art: 'assets/banners/promo/uniq-reader.jpg'),
+                    ColoredSplitPromoBanner.forSurface(
+                      SplitPromoSurface.readerHub,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            builder: (_) => const EbooksStoreScreen(),
+                          ),
+                        );
+                      },
                       margin: EdgeInsets.zero,
                     ),
                     const SizedBox(height: 14),

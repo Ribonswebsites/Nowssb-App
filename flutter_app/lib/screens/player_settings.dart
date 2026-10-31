@@ -142,7 +142,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                   cta: 'View plans',
                   leftColor: Color(0xFF1A2744),
                   rightColor: Color(0xFFC9A227),
-                  art: 'assets/banners/promo/uniq-pset.jpg',
+                  art: SplitPromoArts.pose09,
                 ),
                 margin: EdgeInsets.zero,
               )),

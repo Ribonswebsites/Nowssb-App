@@ -346,7 +346,7 @@ class _EssentialCard extends StatelessWidget {
                         blurRadius: 12,
                         offset: Offset(0, 5))
                   ]),
-              child: EditableImage.asset('assets/banners/promo/earn.png',
+              child: EditableImage.asset('assets/banners/promo/store.png',
                   fit: BoxFit.contain, slot: 'horizontal_routine_cards.EssentialCard'),
             ),
           ),

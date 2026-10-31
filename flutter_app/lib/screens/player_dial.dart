@@ -332,7 +332,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                       cta: 'Open Store',
                       leftColor: Color(0xFF3A2410),
                       rightColor: Color(0xFFC47B2B),
-                      art: 'assets/banners/promo/uniq-dial.jpg',
+                      art: SplitPromoArts.pose06,
                     ),
                     margin: EdgeInsets.zero,
                   ),

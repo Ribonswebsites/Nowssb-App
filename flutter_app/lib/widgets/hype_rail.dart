@@ -33,8 +33,8 @@ const kHypeCards = <HypeCard>[
   HypeCard('coupons', 'assets/gifts/coupon-hero.png', 'NowssB Coupons', 'Scratch today'),
   HypeCard('gifts', 'assets/gifts/gift-hero.png', 'NowssB Gifts', 'Daily spin'),
   HypeCard('earn', 'assets/banners/programs/earn.png', 'NowssB Earn', 'Coins on real sales'),
-  HypeCard('signature', 'assets/banners/promo/uniq-hype-sig.jpg', 'Signature', 'The rarest words'),
-  HypeCard('library', 'assets/banners/promo/uniq-hype-lib.jpg', 'Sound Library', 'Hear a word'),
+  HypeCard('signature', 'assets/hero-curve/banner-store.webp', 'Signature', 'The rarest words'),
+  HypeCard('library', 'assets/hero-curve/banner-library.webp', 'Sound Library', 'Hear a word'),
 ];
 
 /// Internal tile model — from [HypeCard] or [SectionMediaItem].

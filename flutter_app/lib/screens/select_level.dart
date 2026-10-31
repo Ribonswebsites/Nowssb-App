@@ -98,17 +98,15 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
                 ]),
                 const SizedBox(height: 18),
-                ColoredSplitPromoBanner(
-                  spec: SplitPromoSpec.forSurface(
-                    SplitPromoSurface.selectLevel,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => const PracticeScreen(),
-                        ),
-                      );
-                    },
-                  ).copyWith(art: 'assets/banners/promo/uniq-level.jpg'),
+                ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.selectLevel,
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => const PracticeScreen(),
+                      ),
+                    );
+                  },
                   margin: EdgeInsets.zero,
                 ),
                 const SizedBox(height: 18),
