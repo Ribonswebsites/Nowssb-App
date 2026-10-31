@@ -223,6 +223,10 @@ void main() {
         ),
       );
       await _pump(t, LuckyDrawScreen(repository: repo));
+      // At large text the button sits below the fold (CI fonts are wider);
+      // scroll it into view so the tap really lands.
+      await t.ensureVisible(find.text('Write a review'));
+      await t.pumpAndSettle();
       await t.tap(find.text('Write a review'));
       await t.pumpAndSettle();
       expect(t.takeException(), isNull);
