@@ -72,16 +72,28 @@ test('a win credits a coupon or gift box, lists the winner, and the review flow 
   const coupons = await db.query('coupons'); const boxes = await db.query('boxes');
   const mine = [...coupons, ...boxes].filter((x) => x.path.startsWith(`users/${win.uid}/`));
   assert.equal(mine.length, 1, 'prize credited');
-  const list = await ACTIONS.drawWinners(ctx(), 'anyone', { limit: 50 });
-  const row = list.winners.find((w) => w.id === claimId);
-  assert.ok(row); assert.equal(row.displayName, 'A NowssB member'); assert.equal(row.review, undefined);
-  await assert.rejects(ACTIONS.drawReview(ctx(), 'someone-else', { claimId, text: 'nice' }), /Only the winner/);
-  await assert.rejects(ACTIONS.drawReview(ctx(), win.uid, { claimId, text: 'x'.repeat(281) }), /280/);
-  const rv = await ACTIONS.drawReview(ctx(), win.uid, { claimId, text: 'Loved the gift!', stars: 5 });
-  assert.equal(rv.status, 'pending');
-  assert.equal((await ACTIONS.drawWinners(ctx(), 'a', {})).winners.find((w) => w.id === claimId).review, undefined);
+  // Not opted in: never listed publicly.
+  assert.equal((await ACTIONS.drawWinners(ctx(), 'anyone', { limit: 50 })).winners.find((w) => w.id === claimId), undefined);
+  // An opted-in winner is listed as "First L.".
+  let pub = null;
+  for (let i = 0; i < 20 && !pub; i++) { const r = await ACTIONS.drawEnter(ctx(), 'v' + i, { showName: true }, { name: 'Asha Rao' }); if (r.result.won) pub = { uid: 'v' + i, claimId: r.result.claimId }; }
+  const row = (await ACTIONS.drawWinners(ctx(), 'anyone', { limit: 50 })).winners.find((w) => w.id === pub.claimId);
+  assert.ok(row); assert.equal(row.displayName, 'Asha R.'); assert.equal(row.review, undefined);
+  // Review moderation on an unlisted win stays private.
+  await ACTIONS.drawReview(ctx(), win.uid, { claimId, text: 'Private one', stars: 4 });
   await reviewDrawReview(ctx(), 'admin', { claimId, approve: true });
-  assert.deepEqual((await ACTIONS.drawWinners(ctx(), 'a', {})).winners.find((w) => w.id === claimId).review, { text: 'Loved the gift!', stars: 5 });
+  assert.equal(await db.get(`drawWinners/${claimId}`).then((d) => d.exists), false);
+  const pid = pub.claimId;
+  await assert.rejects(ACTIONS.drawReview(ctx(), 'someone-else', { claimId: pid, text: 'nice' }), /Only the winner/);
+  await assert.rejects(ACTIONS.drawReview(ctx(), pub.uid, { claimId: pid, text: 'x'.repeat(281) }), /280/);
+  const rv = await ACTIONS.drawReview(ctx(), pub.uid, { claimId: pid, text: 'Loved the gift!', stars: 5 });
+  assert.equal(rv.status, 'pending');
+  assert.equal((await ACTIONS.drawWinners(ctx(), 'a', {})).winners.find((w) => w.id === pid).review, undefined);
+  await reviewDrawReview(ctx(), 'admin', { claimId: pid, approve: true });
+  assert.deepEqual((await ACTIONS.drawWinners(ctx(), 'a', {})).winners.find((w) => w.id === pid).review, { text: 'Loved the gift!', stars: 5 });
+  const s = await ACTIONS.drawStatus(mk().ctx(), 'x', {});
+  assert.match(s.rulesText, /No purchase needed/); assert.match(s.rulesText, /One free entry per person per day/); assert.match(s.rulesText, /about 1 in 150/);
+  assert.ok(!JSON.stringify(s).includes('₹'));
 });
 
 test('showName consent gives "First L."; daily winner ceiling holds', async () => {

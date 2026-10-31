@@ -20,7 +20,7 @@ export const DRAW_DEFAULTS = {
   denominator: 150,
   maxWinnersPerDay: 25,
   prizes: [
-    { id: 'coupon25', kind: 'coupon', title: '25% off any item', detail: 'A coupon in your Coupons, up to ₹500 off. Valid for 30 days.', prize: { type: 'percentOff', pct: 25, scope: 'any', capINR: 500 } },
+    { id: 'coupon25', kind: 'coupon', title: '25% off any item', detail: 'A coupon in your Coupons for 25% off one item. A maximum discount applies and is shown on the coupon in your currency. Valid for 30 days.', prize: { type: 'percentOff', pct: 25, scope: 'any', capINR: 500 } },
     { id: 'giftGold', kind: 'gift', title: 'Gold gift box', detail: 'A sealed gold gift box in your Gifts. Open it any time.', prize: { type: 'giftbox', box: 'gold' } },
   ],
 };
@@ -66,7 +66,7 @@ function statusOut(ctx, d, drawId, entry) {
     entered: !!entry,
     result: entry ? { won: !!entry.won, prize: entry.won ? publicPrize(d.prizes.find((p) => p.id === entry.prizeId) || entry.prizePublic) : null, claimId: entry.claimId || null } : null,
     prizes: d.prizes.map(publicPrize),
-    rulesText: `Free to enter, once a day. About ${d.numerator} in ${d.denominator} entries wins a gift or a coupon, drawn on our server the moment you enter. Prizes go straight into your Gifts or Coupons. Prizes have no cash value. A new draw starts every day.`,
+    rulesText: `Official rules: No purchase needed. One free entry per person per day. Odds of winning are about ${d.numerator} in ${d.denominator} per entry. Free to enter, once a day. About ${d.numerator} in ${d.denominator} entries wins a gift or a coupon, drawn on our server the moment you enter. Prizes go straight into your Gifts or Coupons. Prizes have no cash value. A new draw starts every day.`,
   };
 }
 
@@ -103,7 +103,8 @@ export async function drawEnter(ctx, uid, data = {}, claims = {}) {
       const showName = data.showName === true;
       const displayName = (showName && firstNameInitial(claims.name)) || 'A NowssB member';
       s.create(`drawWins/${claimId}`, { uid, drawId, prizeId: prize.id, prizeTitle: prize.title, kind: prize.kind, granted: granted || null, displayName, review: null, at: s.now });
-      s.create(`drawWinners/${claimId}`, { drawId, displayName, prizeTitle: prize.title, kind: prize.kind, wonAtMs: s.now, review: null });
+      // The public list shows only winners who opted in, as "First L.".
+      if (showName && displayName !== 'A NowssB member') s.create(`drawWinners/${claimId}`, { drawId, displayName, prizeTitle: prize.title, kind: prize.kind, wonAtMs: s.now, review: null });
       notify(s, uid, 'You won the lucky draw', `${prize.title} is in your ${prize.kind === 'coupon' ? 'Coupons' : 'Gifts'}.`, 'draw', claimId);
       s.effect({ kind: 'draw', won: true, prizeId: prize.id });
     }
@@ -159,8 +160,8 @@ export async function reviewDrawReview(ctx, uid, data = {}) {
     if (!win || !win.review) throw new EconomyError('No review to moderate.', 404, 'not-found');
     const w = await s.edit(`drawWins/${claimId}`);
     w.review = { ...w.review, status: approve ? 'approved' : 'rejected', moderatedBy: uid, moderatedAt: s.now };
-    const row = await s.edit(`drawWinners/${claimId}`);
-    row.review = approve ? { text: w.review.text, stars: w.review.stars || null, status: 'approved' } : null;
+    const pub = await s.doc(`drawWinners/${claimId}`);
+    if (pub) (await s.edit(`drawWinners/${claimId}`)).review = approve ? { text: w.review.text, stars: w.review.stars || null, status: 'approved' } : null;
     return { status: w.review.status };
   });
 }
