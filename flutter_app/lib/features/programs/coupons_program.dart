@@ -75,7 +75,7 @@ List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
       for (final c in coupons)
         PRow(
           title: '${c['label'] ?? '${sInt(c['pct'])}% off'}',
-          sub: '${c['scope'] ?? 'any'} · cap ${money(sNum(c['capINR']))}${sInt(c['expiresAt']) > 0 ? ' · until ${shortDate(c['expiresAt'])}' : ''}',
+          sub: discountLine(c),
           mark: NwsbMarks.bag,
           trailing: sInt(c['expiresAt']) > 0 && sInt(c['expiresAt']) < soon ? const PPill('Expiring soon', color: Color(0xFFFFA24C)) : null,
         ),
@@ -83,7 +83,7 @@ List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
     LSection('tokens', 'Tokens', PCard(children: [
       const PHeading('Unlocks', 'Tokens', slot: 'coupons_program.mine'),
       if (tokens.isEmpty) const PEmpty('No tokens yet. Tokens unlock a stage, a word or a sample.'),
-      for (final t in tokens) PRow(title: '${t['label'] ?? t['item']}', sub: 'From ${t['source'] ?? 'a reward'} · ${shortDate(t['at'])}', mark: NwsbMarks.stages),
+      for (final t in tokens) PRow(title: '${t['label'] ?? t['item'] ?? 'Token'}', sub: ['From ${t['source'] ?? 'a reward'}', if (shortDate(t['at']).isNotEmpty) shortDate(t['at'])].join(' · '), mark: NwsbMarks.stages),
     ])),
     const LSection('code', 'Enter a code', _CodeBox()),
   ];
@@ -195,13 +195,14 @@ List<Widget> _shop(BuildContext context, Map<String, dynamic> s) {
   final coins = sInt(sMap(s['wallet'])['coins']);
   return [
     const LSection('note', 'Shop note', PEmpty('Every paid card returns at least its price in coins or discounts. Odds are listed on each card. 18+ only.', slot: 'coupons_program.shop')),
+    if (paid.isEmpty) const LSection('none', 'No paid cards', PEmpty('No paid cards are on sale right now. Pull down to refresh.')),
     for (final c in paid)
       LSection('card_${c['id']}', '${c['title']}', PCard(glow: rarityColor('${c['id']}'), children: [
         EditableLabel('coupons_program.shared', 'PAID CARD', style: TextStyle(color: rarityColor('${c['id']}').withValues(alpha: 0.8), fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         Row(children: [
           Expanded(child: Text('${c['title']}', style: TextStyle(color: rarityColor('${c['id']}'), fontSize: 18, fontWeight: FontWeight.w800))),
-          Text(money(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          if (sNum(c['priceINR']) > 0) Text(money(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
         ]),
         Text('Rarest prize: ${c['rarest'] ?? ''}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
         const SizedBox(height: 6),
@@ -369,7 +370,8 @@ List<Widget> _odds(BuildContext context, Map<String, dynamic> s) {
       const EditableLabel('coupons_program.shared', 'Rarity of the free card after a purchase', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
       for (final b in after)
         Text('Up to ${sNum(b['maxINR']) > 1e9 ? 'any amount' : money(sNum(b['maxINR']))}: ${sMap(b['odds']).entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
-      Text('Subscriptions: ${afterSub.entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
+      if (after.isEmpty && afterSub.isEmpty) const Text('Not set yet.', style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
+      if (afterSub.isNotEmpty) Text('Subscriptions: ${afterSub.entries.map((e) => '${rarityTitle(e.key)} ${e.value}%').join(' · ')}', style: const TextStyle(color: Colors.white70, fontSize: 12, height: 1.6)),
     ])),
     LSection('spin', 'Daily Spin odds', table('Daily Spin', spin)),
   ];
@@ -397,7 +399,9 @@ class _CodeBoxState extends State<_CodeBox> {
           controller: _c,
           textCapitalization: TextCapitalization.characters,
           style: const TextStyle(color: Colors.white, letterSpacing: 1.2),
+          textInputAction: TextInputAction.done,
           onChanged: (_) => setState(() {}),
+          onSubmitted: (_) => FocusScope.of(context).unfocus(),
           decoration: const InputDecoration(hintText: 'NWSB-…', hintStyle: TextStyle(color: NwsbColors.mist)),
         ),
         const SizedBox(height: 8),
@@ -406,11 +410,43 @@ class _CodeBoxState extends State<_CodeBox> {
           child: PClaim(
             label: 'Claim',
             action: 'claimTicket',
-            data: {'code': _c.text.trim()},
+            data: {'code': _c.text.trim().toUpperCase()},
+            enabled: _c.text.trim().isNotEmpty,
             title: 'Coupon',
-            onDone: (r) => setState(() => _note = r['locked'] == true || r['action'] != null ? '${r['label']}: ${r['how']}' : r['win'] == false ? 'No win this time (${r['winPct']}% chance).' : '${r['label'] ?? 'Claimed'} is on your account.'),
+            onDone: (r) => setState(() {
+              _note = couponClaimNote(r);
+              _c.clear();
+            }),
           ),
         ),
         if (_note != null) PEmpty(_note!),
       ]);
+}
+
+/// One plain line for a discount: where it works, its cap (only when set)
+/// and its end date (only when set).
+String discountLine(Map<String, dynamic> c) {
+  final scope = '${c['scope'] ?? ''}'.trim();
+  final cap = sNum(c['capINR']);
+  return [
+    scope.isEmpty || scope == 'any' ? 'Works on anything' : 'Works on $scope',
+    if (cap > 0) 'saves up to ${money(cap)}',
+    if (sInt(c['expiresAt']) > 0) 'until ${shortDate(c['expiresAt'])}',
+  ].join(' · ');
+}
+
+/// What a claimed code did, in plain words.
+String couponClaimNote(Map<String, dynamic> r) {
+  final label = '${r['label'] ?? ''}'.trim();
+  if (r['locked'] == true || r['action'] != null) {
+    final how = '${r['how'] ?? ''}'.trim();
+    return [if (label.isNotEmpty) label, if (how.isNotEmpty) how].join(': ').ifEmpty('This code needs one more step.');
+  }
+  if (r['win'] == false) return r['winPct'] == null ? 'No win this time.' : 'No win this time (${r['winPct']}% chance).';
+  if (r['already'] == true) return 'This code is already on your account.';
+  return '${label.isEmpty ? 'Your coupon' : label} is on your account.';
+}
+
+extension on String {
+  String ifEmpty(String v) => isEmpty ? v : this;
 }

@@ -103,48 +103,6 @@ class _CouponScreenState extends State<CouponScreen> {
     )));
   }
 
-  void _detail(WideCouponData d) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(12),
-        child: GlassWrapper(
-          radius: 36,
-          blur: true,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: const Color(0xFF0B0B12), borderRadius: BorderRadius.circular(28)),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(d.banner, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 6),
-                Text(d.line, style: const TextStyle(color: Color(0xB3FFFFFF))),
-                const SizedBox(height: 8),
-                Text(d.copy, style: const TextStyle(color: kTileGold, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 8),
-                const Text('Coins cover only part of the price. A coupon is not cash.', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
-                const SizedBox(height: 14),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () async {
-                      Navigator.pop(ctx);
-                      await NowssbLoader.run(context, EconomyApi.call('claimTicket', {'code': d.copy}));
-                    },
-                    child: const Text('Apply now'),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return EconomyPage(
@@ -309,8 +267,8 @@ class _OpenedCard extends StatelessWidget {
   }
 }
 
-/// The paid cards from the server's own odds table, with a jump to the
-/// Coupon Shop tab (where each card is bought directly on Play).
+/// Type a coupon code and add it to the account. Shows what it gave, or
+/// why it did not work, instead of failing silently.
 class _CodeBox extends StatefulWidget {
   const _CodeBox();
   @override
@@ -319,10 +277,25 @@ class _CodeBox extends StatefulWidget {
 
 class _CodeBoxState extends State<_CodeBox> {
   final _code = TextEditingController();
+  var _busy = false;
   @override
   void dispose() {
     _code.dispose();
     super.dispose();
+  }
+
+  Future<void> _add() async {
+    final raw = _code.text.trim().toUpperCase();
+    if (raw.isEmpty || _busy) return;
+    FocusScope.of(context).unfocus();
+    setState(() => _busy = true);
+    final r = await runReward(context, () => EconomyApi.call('claimTicket', {'code': raw}), title: 'Coupon');
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (r == null) return;
+    _code.clear();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(couponClaimNote(r))));
+    await EconomyMirror.instance.refresh();
   }
 
   @override
@@ -333,75 +306,22 @@ class _CodeBoxState extends State<_CodeBox> {
         children: [
           Expanded(
             child: TextField(
+              key: const ValueKey('coupon-code-field'),
               controller: _code,
+              textCapitalization: TextCapitalization.characters,
+              textInputAction: TextInputAction.done,
+              onChanged: (_) => setState(() {}),
+              onSubmitted: (_) => _add(),
               style: const TextStyle(color: Colors.white),
               decoration: const InputDecoration(hintText: 'Enter coupon code', hintStyle: TextStyle(color: Color(0x66FFFFFF)), border: InputBorder.none),
             ),
           ),
           TextButton(
-            onPressed: () async {
-              final raw = _code.text.trim();
-              if (raw.isEmpty) return;
-              await NowssbLoader.run(context, EconomyApi.call('claimTicket', {'code': raw}));
-            },
-            child: const Text('Add coupon', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            onPressed: _busy || _code.text.trim().isEmpty ? null : _add,
+            child: Text(_busy ? 'Adding…' : 'Add coupon', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _PaidPeek extends StatelessWidget {
-  const _PaidPeek({required this.onOpen});
-  final VoidCallback onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: EconomyMirror.instance,
-      builder: (context, _) {
-        final paid = sList(sMap(sMap(EconomyMirror.instance.summary['config'])['odds'])['paid']);
-        if (paid.isEmpty) {
-          return const PEmpty('Paid cards and their odds load from your account.', slot: 'coupon_screen.PaidPeek');
-        }
-        return Column(
-          children: [
-            for (final c in paid)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: GestureDetector(
-                  onTap: onOpen,
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: rarityColor('${c['id']}').withValues(alpha: 0.6)),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('${c['title'] ?? c['id']}'.toUpperCase(), style: TextStyle(color: rarityColor('${c['id']}'), fontWeight: FontWeight.w800, letterSpacing: 1.4)),
-                              const SizedBox(height: 3),
-                              Text('Rarest: ${c['rarest'] ?? '—'} · ${sList(c['odds']).length} prizes listed', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
-                            ],
-                          ),
-                        ),
-                        Text(money(sNum(c['priceINR'])), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 18)),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.chevron_right, color: NwsbColors.goldLight),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
     );
   }
 }
