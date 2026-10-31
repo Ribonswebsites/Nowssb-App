@@ -10,7 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:nowssb/features/draw/draw_models.dart';
 import 'package:nowssb/features/draw/draw_repository.dart';
+import 'package:nowssb/features/draw/lucky_draw_gate.dart';
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
+import 'package:nowssb/data/app_control.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/media/video_pool.dart';
 
@@ -18,18 +20,18 @@ import 'fake_video_platform.dart';
 import 'support/home_render.dart';
 
 Map<String, dynamic> _statusJson({bool entered = false, Map<String, dynamic>? result}) => {
-      'drawId': 'd-2026-10-31',
-      'odds': {'text': 'About 1 in 150 entries wins', 'numerator': 1, 'denominator': 150},
-      'closesAt': '2026-10-31T18:29:00Z',
-      'resultsAt': '2026-10-31T18:30:00Z',
-      'entered': entered,
-      'open': true,
-      'result': result,
-      'prizes': [
-        {'id': 'g1', 'kind': 'gift', 'title': 'Headphone gift box', 'detail': 'Delivered to your address'},
-        {'id': 'c1', 'kind': 'coupon', 'title': '20% off coupon', 'detail': 'Covers part of a price'},
-      ],
-    };
+  'drawId': 'd-2026-10-31',
+  'odds': {'text': 'About 1 in 150 entries wins', 'numerator': 1, 'denominator': 150},
+  'closesAt': '2026-10-31T18:29:00Z',
+  'resultsAt': '2026-10-31T18:30:00Z',
+  'entered': entered,
+  'open': true,
+  'result': result,
+  'prizes': [
+    {'id': 'g1', 'kind': 'gift', 'title': 'Headphone gift box', 'detail': 'Delivered to your address'},
+    {'id': 'c1', 'kind': 'coupon', 'title': '20% off coupon', 'detail': 'Covers part of a price'},
+  ],
+};
 
 class FakeRepo implements DrawRepository {
   FakeRepo({this.statusJson, this.fail = false, this.winnersJson = const {'winners': []}});
@@ -95,6 +97,40 @@ void main() {
     FakeVideoPlatform();
     VideoPool.debugDeadlines = false;
     await setUpHomeRender();
+  });
+  setUp(() => AppControl.instance.flags = const {kLuckyDrawFlag: true});
+  tearDown(() => AppControl.instance.flags = const {});
+
+  group('flag off (default)', () {
+    setUp(() => AppControl.instance.flags = const {});
+
+    test('unavailable unless lucky_draw_enabled is true', () async {
+      expect(await luckyDrawAvailable(), isFalse);
+      AppControl.instance.flags = const {kLuckyDrawFlag: false};
+      expect(await luckyDrawAvailable(), isFalse);
+      AppControl.instance.flags = const {kLuckyDrawFlag: true};
+      expect(await luckyDrawAvailable(), isTrue);
+    });
+
+    testWidgets('gate renders nothing', (t) async {
+      await _pump(t, const Scaffold(body: LuckyDrawGate(child: Text('entry'))));
+      expect(find.text('entry'), findsNothing);
+    });
+
+    testWidgets('screens show coming soon and never call the server', (t) async {
+      final repo = FakeRepo(fail: true);
+      await _pump(t, LuckyDrawScreen(repository: repo));
+      expect(find.byKey(const Key('draw-coming-soon')), findsOneWidget);
+      expect(find.text('Try again'), findsNothing);
+      await _shot(t, 'coming-soon');
+      await _pump(t, LuckyDrawWinnersScreen(repository: repo));
+      expect(find.byKey(const Key('draw-coming-soon')), findsOneWidget);
+    });
+  });
+
+  testWidgets('gate shows child when on', (t) async {
+    await _pump(t, const Scaffold(body: LuckyDrawGate(child: Text('entry'))));
+    expect(find.text('entry'), findsOneWidget);
   });
 
   testWidgets('shows server odds, free entry, enters once', (t) async {
@@ -193,7 +229,7 @@ void main() {
       expect(find.text('Send review'), findsOneWidget);
       Navigator.of(t.element(find.text('Send review'))).pop();
       await t.pumpAndSettle();
-      showDrawRules(t.element(find.byType(LuckyDrawScreen)));
+      showDrawRules(t.element(find.byType(Scaffold)));
       await t.pumpAndSettle();
       expect(t.takeException(), isNull);
       expect(find.textContaining('No purchase and no coins'), findsOneWidget);

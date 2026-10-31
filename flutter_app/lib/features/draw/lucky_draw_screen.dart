@@ -8,10 +8,12 @@ import 'package:flutter/material.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_backdrop.dart';
 import '../../widgets/nwsb_coin_fly.dart';
+import '../../data/app_control.dart';
 import '../economy/economy_api.dart';
 import '../programs/program_kit.dart';
 import 'draw_models.dart';
 import 'draw_repository.dart';
+import 'lucky_draw_gate.dart';
 
 const kDrawRules = <String>[
   'Free to enter. No purchase and no coins are needed, and entering never costs anything.',
@@ -130,6 +132,47 @@ class _ErrorCard extends StatelessWidget {
   );
 }
 
+/// Shown instead of the draw while `lucky_draw_enabled` is off.
+class _ComingSoon extends StatelessWidget {
+  const _ComingSoon();
+  @override
+  Widget build(BuildContext context) => const _DrawPage(
+    title: 'Lucky draw',
+    children: [
+      PCard(
+        children: [
+          Text(
+            'DAILY LUCKY DRAW',
+            style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 11, fontWeight: FontWeight.w800),
+          ),
+          SizedBox(height: 6),
+          Text(
+            'Coming soon',
+            key: Key('draw-coming-soon'),
+            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'The free daily draw isn\'t open yet. It will show up here when it is.',
+            style: TextStyle(color: NwsbColors.mist, height: 1.4),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+/// Gates a draw page: the real page when on, the coming-soon card when off.
+class _Gated extends StatelessWidget {
+  const _Gated(this.child);
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: AppControl.instance,
+    builder: (_, __) => isLuckyDrawEnabled() ? child : const _ComingSoon(),
+  );
+}
+
 void showDrawRules(BuildContext context, {String serverText = ''}) {
   showModalBottomSheet<void>(
     context: context,
@@ -165,17 +208,25 @@ void showDrawRules(BuildContext context, {String serverText = ''}) {
 
 /// The daily lucky draw. Open it from anywhere with
 /// `Navigator.push(MaterialPageRoute(builder: (_) => const LuckyDrawScreen()))`.
-class LuckyDrawScreen extends StatefulWidget {
+class LuckyDrawScreen extends StatelessWidget {
   const LuckyDrawScreen({super.key, this.repository = const EconomyDrawRepository()});
   final DrawRepository repository;
 
   static const routeName = '/rewards/lucky-draw';
 
   @override
-  State<LuckyDrawScreen> createState() => _LuckyDrawScreenState();
+  Widget build(BuildContext context) => _Gated(_LuckyDrawScreenBody(repository: repository));
 }
 
-class _LuckyDrawScreenState extends State<LuckyDrawScreen> {
+class _LuckyDrawScreenBody extends StatefulWidget {
+  const _LuckyDrawScreenBody({required this.repository});
+  final DrawRepository repository;
+
+  @override
+  State<_LuckyDrawScreenBody> createState() => _LuckyDrawScreenState();
+}
+
+class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
   DrawStatus? _status;
   Object? _error;
   bool _loading = true;
@@ -504,17 +555,25 @@ class _ReviewSheetState extends State<_ReviewSheet> {
 }
 
 /// Real winners published by the server, newest first, with their reviews.
-class LuckyDrawWinnersScreen extends StatefulWidget {
+class LuckyDrawWinnersScreen extends StatelessWidget {
   const LuckyDrawWinnersScreen({super.key, this.repository = const EconomyDrawRepository()});
   final DrawRepository repository;
 
   static const routeName = '/rewards/lucky-draw/winners';
 
   @override
-  State<LuckyDrawWinnersScreen> createState() => _LuckyDrawWinnersScreenState();
+  Widget build(BuildContext context) => _Gated(_LuckyDrawWinnersScreenBody(repository: repository));
 }
 
-class _LuckyDrawWinnersScreenState extends State<LuckyDrawWinnersScreen> {
+class _LuckyDrawWinnersScreenBody extends StatefulWidget {
+  const _LuckyDrawWinnersScreenBody({required this.repository});
+  final DrawRepository repository;
+
+  @override
+  State<_LuckyDrawWinnersScreenBody> createState() => _LuckyDrawWinnersScreenState();
+}
+
+class _LuckyDrawWinnersScreenState extends State<_LuckyDrawWinnersScreenBody> {
   final _winners = <DrawWinner>[];
   String? _cursor;
   bool _loading = true;
