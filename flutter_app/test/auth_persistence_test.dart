@@ -95,5 +95,26 @@ void main() {
       expect(find.byKey(_home), findsNothing);
       await auth.close();
     });
+  
+    testWidgets('Android back in Sign Up returns to Log In, not out of the app',
+        (tester) async {
+      final auth = StreamController<User?>();
+      await tester.pumpWidget(_gate(auth.stream, <String>[]));
+      auth.add(null);
+      await tester.pump();
+      await tester.pump();
+      final toggle = find.textContaining("Don't have an account?");
+      await tester.ensureVisible(toggle);
+      await tester.tap(toggle, warnIfMissed: false);
+      await tester.pump();
+      expect(find.textContaining('Already have an account?'), findsOneWidget);
+
+      final handled = await tester.binding.handlePopRoute();
+      await tester.pump();
+      expect(handled, isTrue, reason: 'back left the app from Sign Up');
+      expect(find.textContaining("Don't have an account?"), findsOneWidget);
+      expect(find.byType(LoginStage), findsOneWidget);
+      await auth.close();
+    });
   });
 }

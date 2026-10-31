@@ -377,7 +377,34 @@ class _AuthGateState extends State<AuthGate> {
         }
       });
 
+  /// Android back on the sign-in screen steps back inside it first: out of
+  /// "create account", or from the code step back to the number, before the
+  /// system is allowed to leave the app.
+  bool get _hasInnerStep =>
+      !_busy && (_createAccount || _verificationId != null);
+
+  void _innerBack() => setState(() {
+        if (_verificationId != null) {
+          _verificationId = null;
+          _codeFor = null;
+        } else {
+          _createAccount = false;
+        }
+        _error = null;
+        _notice = null;
+      });
+
   Widget _buildAuthScreen({String? unavailable}) {
+    return PopScope(
+      canPop: !_hasInnerStep,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _hasInnerStep) _innerBack();
+      },
+      child: _authScaffold(unavailable: unavailable),
+    );
+  }
+
+  Widget _authScaffold({String? unavailable}) {
     return Scaffold(
       backgroundColor: Colors.black,
       resizeToAvoidBottomInset: true,
