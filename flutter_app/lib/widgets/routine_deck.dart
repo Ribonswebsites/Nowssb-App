@@ -8,6 +8,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'hero_glass.dart';
 import 'package:flutter/services.dart';
 
 import '../admin/template/editable.dart';
@@ -272,14 +273,14 @@ class _RoutineCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+        filter: ImageFilter.blur(sigmaX: HeroGlassRecipe.blurSigma, sigmaY: HeroGlassRecipe.blurSigma),
         child: Container(
           height: height,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0x0EFFFFFF),
+            color: HeroGlassRecipe.fill,
             borderRadius: BorderRadius.circular(radius),
-            border: Border.all(color: const Color(0x21FFFFFF)),
+            border: Border.all(color: HeroGlassRecipe.line),
           ),
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
           child: child,

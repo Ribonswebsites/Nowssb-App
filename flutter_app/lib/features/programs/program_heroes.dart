@@ -55,9 +55,9 @@ class _HeroShell extends StatelessWidget {
         children: [
           EditableLabel(slot, eyebrow, style: TextStyle(color: accent, fontSize: 10.5, letterSpacing: 2, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          EditableLabel(slot, title, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 24, height: 1.05, fontWeight: FontWeight.w800)),
+          EditableLabel(slot, title, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, height: 1.05, fontWeight: FontWeight.w800)),
           const SizedBox(height: 6),
-          EditableLabel(slot, line, maxLines: 3, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5, height: 1.35)),
+          EditableLabel(slot, line, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5, height: 1.35)),
         ],
       ),
     );

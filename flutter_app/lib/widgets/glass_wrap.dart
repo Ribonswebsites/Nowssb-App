@@ -29,6 +29,8 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import 'hero_glass.dart';
+
 import 'nwsb_icon.dart';
 import '../admin/template/editable.dart';
 
@@ -49,11 +51,12 @@ class GlassWrap extends StatelessWidget {
   final EdgeInsets margin;
   final double radius;
 
-  /// CSS blur(18px) → sigma 9.
-  static const double blurSigma = 9;
+  /// Same glass as the hero header (HeroGlassRecipe): sigma 10, 8% white
+  /// fill, 10% white hairline, so every glass card matches the hero.
+  static const double blurSigma = HeroGlassRecipe.blurSigma;
 
-  static const fill = Color(0x0EFFFFFF); // rgba(255,255,255,0.055)
-  static const line = Color(0x21FFFFFF); // rgba(255,255,255,0.13)
+  static const fill = HeroGlassRecipe.fill;
+  static const line = HeroGlassRecipe.line;
 
   @override
   Widget build(BuildContext context) {

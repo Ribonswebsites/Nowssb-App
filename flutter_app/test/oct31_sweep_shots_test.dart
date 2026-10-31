@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/shell/nav_shell.dart';
+import 'package:nowssb/theme/theme.dart';
+import 'package:nowssb/widgets/faint_film.dart';
 import 'fake_video_platform.dart';
+import 'support/test_fonts.dart';
 import 'support/home_render.dart';
 
 const _out = String.fromEnvironment('SWEEP_SHOTS');
@@ -56,7 +58,20 @@ void main() {
   SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
   setUpAll(() async {
     await setUpHomeRender();
-    GoogleFonts.config.allowRuntimeFetching = false;
+    await loadRoboto();
+    final dir = sdkMaterialFonts;
+    if (dir != null) {
+      for (final fam in ['SF Pro Display', 'Roboto Mono', 'monospace', 'Georgia']) {
+        final l = FontLoader(fam);
+        for (final f in Directory(dir).listSync().whereType<File>()) {
+          final n = f.uri.pathSegments.last;
+          if (n.startsWith('Roboto-') && n.endsWith('.ttf')) {
+            l.addFont(Future.value(ByteData.sublistView(f.readAsBytesSync())));
+          }
+        }
+        await l.load();
+      }
+    }
     FakeVideoPlatform();
     VideoPool.debugDeadlines = false;
     final m = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
@@ -74,7 +89,16 @@ void main() {
       FlutterError.onError = (d) => errs.add(d.exceptionAsString().split('\n').first);
       addTearDown(() => FlutterError.onError = prev);
       await t.pumpWidget(MaterialApp(
-          home: RepaintBoundary(key: _key, child: const NavShell())));
+          theme: NwsbTheme.light,
+          debugShowCheckedModeBanner: false,
+          builder: (c, child) => RepaintBoundary(
+              key: _key,
+              child: Stack(children: [
+                const Positioned.fill(child: ColoredBox(color: Colors.black)),
+                const Positioned.fill(child: FaintFilm()),
+                child ?? const SizedBox(),
+              ])),
+          home: const NavShell()));
       await _settle(t, 15);
       final agree = find.text('I Agree · Continue');
       if (agree.evaluate().isNotEmpty) {
