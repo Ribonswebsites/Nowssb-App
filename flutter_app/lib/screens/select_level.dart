@@ -94,7 +94,7 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                 const SizedBox(height: 18),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
-                  Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: EditableLabel('select_level.SelectLevelScreen', 'SELECT FREQUENCY', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 3, fontWeight: FontWeight.w500))),
+                  Flexible(child: Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: EditableLabel('select_level.SelectLevelScreen', 'SELECT FREQUENCY', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 12, letterSpacing: 3, fontWeight: FontWeight.w500)))),
                   SizedBox(width: 44, child: Divider(color: Color(0x59FFFFFF))),
                 ]),
                 const SizedBox(height: 18),

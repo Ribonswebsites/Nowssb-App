@@ -642,7 +642,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                             ),
                                                             const SizedBox(
                                                                 width: 10),
-                                                            EditableLabel('sentence_builder.SentenceBuilderScreen',
+                                                            Flexible(child: EditableLabel('sentence_builder.SentenceBuilderScreen',
                                                               'Combine into sentence',
                                                               style: TextStyle(
                                                                 color: enabled
@@ -657,7 +657,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                                 letterSpacing:
                                                                     0.4,
                                                               ),
-                                                            ),
+                                                            )),
                                                           ],
                                                         ),
                                                 ),
