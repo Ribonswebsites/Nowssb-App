@@ -14,6 +14,7 @@ import 'package:nowssb/data/day_part.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import '../../widgets/hero_glass.dart';
 import '../../widgets/glass_wrap.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -45,7 +46,8 @@ class HomeHeader extends StatelessWidget {
     // page instead of the page showing through it.
     return ClipRect(
       child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        filter: ui.ImageFilter.blur(
+            sigmaX: HeroGlassRecipe.blurSigma, sigmaY: HeroGlassRecipe.blurSigma),
         child: Container(
           // `padding: max(env(safe-area-inset-top, 14px), 14px) 20px 14px` —
           // the status bar's height is PART of the header, which is what makes
@@ -58,9 +60,9 @@ class HomeHeader extends StatelessWidget {
             14,
           ),
           decoration: const BoxDecoration(
-            color: Color(0x14FFFFFF),
+            color: HeroGlassRecipe.fill,
             border: Border(
-              bottom: BorderSide(color: Color(0x1AFFFFFF)),
+              bottom: BorderSide(color: HeroGlassRecipe.line),
             ),
           ),
           child: SizedBox(

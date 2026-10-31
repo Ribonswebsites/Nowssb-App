@@ -524,7 +524,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     return answer == true;
   }
 
+  var _minimizing = false;
+
   Future<void> _minimizeToPill() async {
+    if (_minimizing) return;
+    _minimizing = true;
     final theme = _theme;
     final wasPlaying = _playing;
     _handingOff = true;
@@ -1296,6 +1300,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 onPointerUp: (_) {
                   final ms = DateTime.now().millisecondsSinceEpoch - _pullStamp;
                   if (_pull < -90 && ms < 450) _openQueueSheet(context);
+                  // Swipe down collapses the player to the mini pill, like a
+                  // music app's now-playing screen.
+                  if (_pull > 140 && ms < 700) unawaited(_minimizeToPill());
                   _pull = 0;
                 },
                 child: LayoutBuilder(
@@ -2101,6 +2108,8 @@ class _QueueSheetState extends State<_QueueSheet> {
   static const _likedWordsKey = 'nwsb_liked_words';
 
   final _scrollCtrl = ScrollController();
+  var _dismissing = false;
+  var _handleDrag = 0.0;
   var _filter = _QueueFilter.all;
   late List<int> _order; // indices into widget.words
   var _saved = false;
@@ -2256,8 +2265,19 @@ class _QueueSheetState extends State<_QueueSheet> {
 
     return NotificationListener<ScrollNotification>(
       onNotification: (n) {
-        final atTop = !_scrollCtrl.hasClients || _scrollCtrl.offset <= 1;
-        if (atTop && n is OverscrollNotification && n.overscroll < -16) {
+        // Swipe down at the top dismisses, like a music app's now-playing
+        // sheet. The list uses bouncing physics, so a pull past the top shows
+        // up as negative scroll pixels (not an OverscrollNotification) on
+        // iOS-style physics, and as overscroll on clamping physics.
+        if (_dismissing || n.metrics.axis != Axis.vertical) return false;
+        final pulled = (n is OverscrollNotification &&
+                n.overscroll < -16 &&
+                n.metrics.pixels <= n.metrics.minScrollExtent + 1) ||
+            (n is ScrollUpdateNotification &&
+                n.dragDetails != null &&
+                n.metrics.pixels < n.metrics.minScrollExtent - 64);
+        if (pulled) {
+          _dismissing = true;
           Navigator.of(context).maybePop();
         }
         return false;
@@ -2637,9 +2657,12 @@ class _QueueSheetState extends State<_QueueSheet> {
                 left: 0,
                 right: 0,
                 child: GestureDetector(
+                  key: const ValueKey('queue-grab-handle'),
                   behavior: HitTestBehavior.opaque,
+                  onVerticalDragStart: (_) => _handleDrag = 0,
+                  onVerticalDragUpdate: (d) => _handleDrag += d.delta.dy,
                   onVerticalDragEnd: (d) {
-                    if ((d.primaryVelocity ?? 0) > 160) {
+                    if ((d.primaryVelocity ?? 0) > 160 || _handleDrag > 60) {
                       Navigator.of(context).maybePop();
                     }
                   },

@@ -196,7 +196,6 @@ const kSlotManifest = <List<String>>[
   ['home_normal.TopRow.logo-disc', 'image', 'assets/icons/logo-disc.webp', 'screens/home_normal.dart'],
   ['home_normal.TopRow.nowssb', 'text', 'NowssB', 'screens/home_normal.dart'],
   ['horizontal_routine_cards.EssentialCard.store', 'image', 'assets/banners/promo/store.png', 'screens/normal/horizontal_routine_cards.dart'],
-  ['horizontal_routine_cards.NmHorizontalRoutineCards.6-cards', 'text', '6 cards', 'screens/normal/horizontal_routine_cards.dart'],
   ['intro_gate.Intro.t88a0ce36', 'text', '·', 'widgets/intro_gate.dart'],
   ['login_stage.LoginStage.continue-with-apple', 'text', 'Continue with Apple', 'widgets/login_stage.dart'],
   ['login_stage.LoginStage.continue-with-google', 'text', 'Continue with Google', 'widgets/login_stage.dart'],

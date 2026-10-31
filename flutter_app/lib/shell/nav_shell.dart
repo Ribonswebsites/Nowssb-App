@@ -4,6 +4,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../widgets/hero_glass.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
@@ -74,6 +75,37 @@ class NavScope extends InheritedWidget {
 
   @override
   bool updateShouldNotify(NavScope old) => false;
+}
+
+/// How much of the bottom of a tab the floating nav bar (and the mode pill /
+/// mini player row above it) covers, safe area included. A tab's main scroll
+/// view ends with [NavClearanceSpacer] so its last item (the footer) can be
+/// scrolled fully above the nav. Zero on pages pushed above the shell.
+class NavClearance extends InheritedWidget {
+  const NavClearance({super.key, required this.height, required super.child});
+
+  final double height;
+
+  /// Nav bar: 14 from the bottom + 58 tall, plus 12 breathing room.
+  static const double navOnly = 14 + 58 + 12;
+
+  /// Nav bar plus the Normal/Fashion pill or mini-player row (bottom 88, ~40 tall).
+  static const double navAndPill = 88 + 40 + 8;
+
+  static double of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<NavClearance>()?.height ?? 0;
+
+  @override
+  bool updateShouldNotify(NavClearance old) => old.height != height;
+}
+
+/// Empty space at the end of a tab's scroll view, as tall as [NavClearance].
+class NavClearanceSpacer extends StatelessWidget {
+  const NavClearanceSpacer({super.key, this.extra = 0});
+  final double extra;
+  @override
+  Widget build(BuildContext context) =>
+      SizedBox(key: const ValueKey('nav-clearance'), height: NavClearance.of(context) + extra);
 }
 
 class _NavShellState extends State<NavShell> {
@@ -225,28 +257,22 @@ class _NavShellState extends State<NavShell> {
   }
 
   Widget _fashionHomeChip() {
+    // Same glass as the hero header (HeroGlass). Ink on the light Normal
+    // home, white over the Fashion film.
+    final ink = _fashion ? Colors.white : NwsbColors.ink;
     return GestureDetector(
+      key: const ValueKey('home-mode-pill'),
       onTap: () => Settings.instance.setFashionHome(!_fashion),
-      child: Container(
+      child: HeroGlass(
+        radius: 16,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-        decoration: BoxDecoration(
-          color: _fashion ? Colors.white : Colors.black,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 14,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               _fashion ? Icons.light_mode : Icons.dark_mode,
               size: 14,
-              color: _fashion ? Colors.black : Colors.white,
+              color: ink,
             ),
             const SizedBox(width: 6),
             Text(
@@ -254,7 +280,7 @@ class _NavShellState extends State<NavShell> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: _fashion ? Colors.black : Colors.white,
+                color: ink,
               ),
             ),
           ],
@@ -417,11 +443,14 @@ class _NavShellState extends State<NavShell> {
   /// do not claim VideoPool decoders. NwsbVideo already respects Offstage.
   Widget _tabAlive(int index, Widget child) {
     final on = _i == index;
+    final pill = index == 0 || PlaybackSession.instance.showPill;
+    final clearance = (pill ? NavClearance.navAndPill : NavClearance.navOnly) +
+        MediaQuery.viewPaddingOf(context).bottom;
     return TickerMode(
       enabled: on,
       child: Offstage(
         offstage: !on,
-        child: child,
+        child: NavClearance(height: clearance, child: child),
       ),
     );
   }

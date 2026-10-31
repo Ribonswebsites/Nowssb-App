@@ -84,7 +84,6 @@ class _RoutineDeckState extends State<RoutineDeck> {
               Expanded(
                 child: Text(widget.title, style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w700)),
               ),
-              Text('$n cards', style: const TextStyle(color: Colors.white70, fontSize: 12)),
             ],
           ),
           const SizedBox(height: 12),

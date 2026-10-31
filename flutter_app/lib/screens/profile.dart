@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import '../widgets/hero_glass.dart';
 import '../widgets/swipe_away.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -98,6 +99,9 @@ const kDefaultAvatar =
 /// own body (that made Profile and Progress feel identical).
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  /// Human label for a coin-ledger reason (e.g. `act:open` -> "Opened the app").
+  static String coinReason(String r) => _ProfileScreenState.coinReason(r);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -1256,8 +1260,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()))),
         child: GlassCard(
           padding: const EdgeInsets.all(16),
-          image: 'assets/profile_source/img-qa.jpeg',
-          overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xC7000000), Color(0x52000000), Color(0xCC000000)]),
           child: Row(children: List.generate(5, (i) {
             final names = ['Sessions', 'Saved', 'Liked', 'Journal', 'Settings'];
             return Expanded(child: Padding(padding: EdgeInsets.only(right: i == 4 ? 0 : 8), child: _quickItem(names[i], i + 6)));
@@ -1279,35 +1281,94 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
 
-  static String _coinReason(String r) {
+  /// Human label for a coin-ledger reason. Never shows a raw key such as
+  /// `act:open` to the user.
+  static String coinReason(String r) {
+    const acts = {
+      'open': 'Opened the app', 'ring_listen': 'Practice Ring: listened', 'ring_say': 'Practice Ring: said it aloud',
+      'ring_reflect': 'Practice Ring: saved or reflected', 'word_of_day': 'Word of the day', 'sound_bath': 'Sound Bath session',
+      'pronounce80': 'Pronunciation score 80+', 'quote': 'Read the daily quote', 'read_meaning': 'Read a meaning to the end',
+      'explore': 'Visited a program page', 'first_share': 'Shared a word', 'close_stage': 'Closed a stage',
+      'profile_complete': 'Completed your profile', 'reminders_on': 'Turned on reminders', 'echo_first_post': 'First Echo Wall post',
+      'feedback': 'Sent feedback',
+    };
+    if (r.startsWith('act:')) {
+      final a = r.substring(4).split(':').first;
+      return acts[a] ?? _humanize(a);
+    }
     final k = r.split(':').first;
     const names = {
       'login': 'Daily sign-in', 'quest': 'Quest', 'scratch': 'Scratch card', 'checkout': 'Coins at checkout', 'checkout-release': 'Coins returned',
       'sale-coins': 'Sale coins', 'expired': 'Coins expired', 'gift': 'Gift', 'box': 'Gift box', 'spin': 'Spin', 'season': 'Season reward',
       'league': 'League reward', 'mastery': 'Mastery', 'practice': 'Practice', 'explore': 'Explored a page', 'coins-back': 'Coins back on a purchase',
+      'streak': 'Streak reward', 'comeback': 'Welcome back reward', 'time': 'Practice time reward', 'draw': 'Lucky draw', 'ref': 'Friend invite',
     };
     for (final e in names.entries) {
       if (k.startsWith(e.key)) return e.value;
     }
-    return r.isEmpty ? 'Coins' : r;
+    return r.isEmpty ? 'Coins' : _humanize(k);
   }
 
-  Widget _recentActivity() {
+  static String _humanize(String key) {
+    final words = key.replaceAll(RegExp(r'[_\-.:]+'), ' ').trim();
+    if (words.isEmpty) return 'Coins';
+    return words[0].toUpperCase() + words.substring(1);
+  }
+
+  static const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  /// "31 Oct, 5:10 PM" in the phone's local time.
+  static String activityWhen(int ms) {
+    if (ms <= 0) return '';
+    final d = DateTime.fromMillisecondsSinceEpoch(ms).toLocal();
+    final h = d.hour % 12 == 0 ? 12 : d.hour % 12;
+    final m = d.minute.toString().padLeft(2, '0');
+    return '${d.day} ${_months[d.month - 1]}, $h:$m ${d.hour < 12 ? 'AM' : 'PM'}';
+  }
+
+  static List<EarnActivity> activityItems() {
     final raw = EconomyMirror.instance.summary['recentCoins'];
-    final items = <EarnActivity>[
+    return <EarnActivity>[
       for (final r in (raw is List ? raw : const []))
         if (r is Map)
-          EarnActivity(
-            at: (r['at'] as num?)?.toInt() ?? 0,
-            title: _coinReason('${r['reason'] ?? ''}'),
-            detail: r['balance'] == null ? '' : 'Balance ${r['balance']}',
-            coins: (r['delta'] as num?)?.toInt() ?? 0,
-          ),
+          () {
+            final at = (r['at'] as num?)?.toInt() ?? 0;
+            final when = activityWhen(at);
+            final bal = r['balance'] == null ? '' : 'Balance ${r['balance']}';
+            return EarnActivity(
+              at: at,
+              title: coinReason('${r['reason'] ?? ''}'),
+              detail: [when, bal].where((x) => x.isNotEmpty).join(' · '),
+              coins: (r['delta'] as num?)?.toInt() ?? 0,
+            );
+          }(),
     ];
+  }
+
+  static Widget activityRow(EarnActivity a, {bool divider = true}) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        decoration: BoxDecoration(border: Border(bottom: divider ? const BorderSide(color: _borderSoft) : BorderSide.none)),
+        child: Row(children: [
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(a.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600, color: _text)),
+            const SizedBox(height: 2),
+            Text(a.detail, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, color: _dim)),
+          ])),
+          const SizedBox(width: 10),
+          Text(
+            a.coins == 0 ? '—' : (a.coins > 0 ? '+${a.coins}' : '${a.coins}'),
+            style: const TextStyle(fontFamily: _mono, fontSize: 12, color: _accent),
+          ),
+        ]),
+      );
+
+  Widget _recentActivity() {
+    final items = activityItems();
+    final n = items.length < 6 ? items.length : 6;
     return SectionBlock(
       marginBottom: 40,
       title: 'Recent Activity',
-      trailing: _viewAll(icon: 'assets/icons/icon_11.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())), pill: true),
+      trailing: _viewAll(icon: 'assets/icons/icon_11.svg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const RecentActivityScreen())), pill: true),
       child: GlassCard(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: items.isEmpty
@@ -1316,23 +1377,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: EditableLabel('profile.ProfileScreen', 'Coins, sales, and referrals show up here.', style: TextStyle(fontSize: 13, color: _dim)),
               )
             : Column(children: [
-                for (var i = 0; i < items.length && i < 6; i++)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
-                    decoration: BoxDecoration(border: Border(bottom: i == items.length - 1 || i == 5 ? BorderSide.none : const BorderSide(color: _borderSoft))),
-                    child: Row(children: [
-                      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(items[i].title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 2),
-                        Text(items[i].detail, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, color: _dim)),
-                      ])),
-                      const SizedBox(width: 10),
-                      Text(
-                        items[i].coins == 0 ? '—' : (items[i].coins > 0 ? '+${items[i].coins}' : '${items[i].coins}'),
-                        style: const TextStyle(fontFamily: _mono, fontSize: 12, color: _accent),
-                      ),
-                    ]),
-                  ),
+                for (var i = 0; i < n; i++) activityRow(items[i], divider: i < n - 1),
               ]),
       ),
     );
@@ -1435,7 +1480,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         listenable: EconomyMirror.instance,
         builder: (context, _) => _sectionList('Account', [
           _listRow('Member Since', trailing: Text(_memberSince, style: const TextStyle(fontSize: 13, color: _dim))),
-          _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)))])),
+          _listRow('Current Plan', trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_planName, style: const TextStyle(fontSize: 13, color: _dim)), const SizedBox(width: 10), InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), child: const EditableLabel('profile.ProfileScreen', 'Upgrade', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, decoration: TextDecoration.none)))])),
         ]),
       );
 
@@ -1500,11 +1545,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const EditableLabel('profile.ProfileScreen', 'Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
       );
 
-  Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [SectionLabel(title), GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.all(4), child: Column(children: rows))]);
+  // Dividers go BETWEEN rows only: a divider under the last row sat on the
+  // card's bottom edge and read as a cropped border.
+  Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [SectionLabel(title), GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.all(4), child: Column(children: [for (var i = 0; i < rows.length; i++) ...[if (i > 0) const Divider(height: 1, thickness: 1, color: _borderSoft, indent: 12, endIndent: 12), rows[i]]]))]);
 
-  Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Expanded(child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 14.5, color: muted ? _faint : _text))), const SizedBox(width: 12), trailing]));
+  Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), child: Row(children: [Expanded(child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 14.5, color: muted ? const Color(0xFFD9D9D6) : _text))), const SizedBox(width: 12), trailing]));
 
-  Widget _shopRow(String label, String count, int icon) => InkWell(onTap: () => _openShop(label), child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: _borderSoft))), child: Row(children: [Container(width: 34, height: 34, decoration: BoxDecoration(border: Border.all(color: _borderSoft), borderRadius: BorderRadius.circular(11)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), const SizedBox(width: 13), Expanded(child: EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 14.5))), Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12.5, color: _faint)), const SizedBox(width: 6), EditableSvg.asset('assets/icons/icon_16.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
+  Widget _shopRow(String label, String count, int icon) => InkWell(onTap: () => _openShop(label), child: Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), child: Row(children: [Container(width: 34, height: 34, decoration: BoxDecoration(border: Border.all(color: _borderSoft), borderRadius: BorderRadius.circular(11)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(_text, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), const SizedBox(width: 13), Expanded(child: EditableLabel('profile.ProfileScreen', label, style: const TextStyle(fontSize: 14.5))), Text(count, style: const TextStyle(fontFamily: _mono, fontSize: 12.5, color: _faint)), const SizedBox(width: 6), EditableSvg.asset('assets/icons/icon_16.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
 
   Widget _viewAll({required String icon, required VoidCallback onTap, bool pill = false}) => InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: Container(padding: pill ? const EdgeInsets.symmetric(horizontal: 9, vertical: 6) : EdgeInsets.zero, decoration: pill ? BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)) : null, child: Row(mainAxisSize: MainAxisSize.min, children: [const EditableLabel('profile.ProfileScreen', 'View All', style: TextStyle(fontSize: 12, color: _dim)), const SizedBox(width: 5), EditableSvg.asset(icon, width: pill ? 16 : 13, height: pill ? 16 : 13, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen')])));
 
@@ -1599,6 +1646,45 @@ class _GrainPainter extends CustomPainter {
   @override bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+/// Every coin-ledger entry this account has, newest first (Profile → Recent
+/// Activity → View All).
+class RecentActivityScreen extends StatelessWidget {
+  const RecentActivityScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF050507),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF050507),
+        foregroundColor: _text,
+        title: const Text('Recent Activity'),
+      ),
+      body: ListenableBuilder(
+        listenable: EconomyMirror.instance,
+        builder: (context, _) {
+          final items = _ProfileScreenState.activityItems()..sort((a, b) => b.at.compareTo(a.at));
+          if (items.isEmpty) {
+            return const Center(child: Padding(padding: EdgeInsets.all(24), child: Text('Coins, sales, and referrals show up here.', textAlign: TextAlign.center, style: TextStyle(color: _dim))));
+          }
+          return ListView(
+            key: const ValueKey('recent-activity-all'),
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 24 + MediaQuery.paddingOf(context).bottom),
+            children: [
+              GlassCard(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                child: Column(children: [
+                  for (var i = 0; i < items.length; i++) _ProfileScreenState.activityRow(items[i], divider: i < items.length - 1),
+                ]),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets padding;
@@ -1610,13 +1696,26 @@ class GlassCard extends StatelessWidget {
   final double? minHeight;
   const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.margin, this.radius = 22, this.image, this.overlay, this.backgroundColor, this.minHeight});
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    // Plain grouped cards: the hero header's glass (blur 10, 8% white, 10%
+    // hairline) instead of a flat tinted slab.
+    if (image == null && backgroundColor == null) {
+      return HeroGlass(
+        margin: margin,
+        radius: radius,
+        padding: padding,
+        constraints: minHeight == null ? null : BoxConstraints(minHeight: minHeight!),
+        child: overlay == null ? child : DecoratedBox(decoration: BoxDecoration(gradient: overlay), child: child),
+      );
+    }
+    return Container(
         margin: margin,
         constraints: minHeight == null ? null : BoxConstraints(minHeight: minHeight!),
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(radius), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), color: backgroundColor ?? _surface, image: image == null ? null : DecorationImage(image: slotImageProvider(context, 'profile.GlassCard', image!, AssetImage(image!)), fit: BoxFit.cover, alignment: Alignment.center)),
         clipBehavior: Clip.antiAlias,
         child: ClipRRect(borderRadius: BorderRadius.circular(radius), child: Stack(children: [if (overlay != null) Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: overlay))), Padding(padding: padding, child: child)])),
       );
+  }
 }
 
 class SectionLabel extends StatelessWidget {

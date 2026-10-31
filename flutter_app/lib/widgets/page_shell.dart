@@ -10,6 +10,7 @@ import '../data/fashion_bg_dim.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import '../shell/nav_shell.dart';
 
 import '../data/settings.dart';
 import '../theme/tokens.dart';
@@ -325,7 +326,8 @@ class _PageShellState extends State<PageShell> {
                     ),
                     ...widget.slivers,
                     // Clear of the bottom nav.
-                    const SliverToBoxAdapter(child: SizedBox(height: 108)),
+                    // 108 on pushed pages; nav + pill + safe area inside the shell.
+                    SliverToBoxAdapter(child: Builder(builder: (c) => SizedBox(height: NavClearance.of(c) > 108 ? NavClearance.of(c) : 108))),
                   ],
                 ),
               ),

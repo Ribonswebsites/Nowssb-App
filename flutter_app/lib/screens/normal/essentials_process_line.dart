@@ -6,17 +6,26 @@ import '../../theme/tokens.dart';
 /// laid out horizontally so it can track the horizontal routine carousel.
 class NmEssentialsProcessLine extends StatelessWidget {
   const NmEssentialsProcessLine(
-      {super.key, required this.active, this.glass = false});
+      {super.key, required this.active, this.glass = false, this.onTap});
 
   final int active;
   final bool glass;
+
+  /// Tapping a step jumps the routine carousel to that card.
+  final ValueChanged<int>? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         for (var i = 0; i < 6; i++) ...[
-          Container(
+          GestureDetector(
+           key: ValueKey('routine-step-$i'),
+           behavior: HitTestBehavior.opaque,
+           onTap: onTap == null ? null : () => onTap!(i),
+           child: Padding(
+           padding: const EdgeInsets.all(6),
+           child: Container(
             width: 18,
             height: 18,
             decoration: BoxDecoration(
@@ -54,7 +63,7 @@ class NmEssentialsProcessLine extends StatelessWidget {
                         ]
                       : NwsbShadows.raisedXs),
             ),
-          ),
+          ))),
           if (i != 5)
             Expanded(
               child: Container(

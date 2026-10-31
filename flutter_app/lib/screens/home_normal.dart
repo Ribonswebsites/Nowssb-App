@@ -557,8 +557,11 @@ class _HomeNormalState extends State<HomeNormal> {
               cacheExtent: 480,
               // Footer paints solid black through nav clearance.
               padding: EdgeInsets.zero,
-              itemCount: shown.length,
-              itemBuilder: (context, i) => HomeKeepAlive(child: shown[i]),
+              itemCount: shown.length + 1,
+              itemBuilder: (context, i) => i == shown.length
+                  // Last item: room to scroll the footer clear of the nav bar.
+                  ? const NavClearanceSpacer()
+                  : HomeKeepAlive(child: shown[i]),
             ),
           ),
         ],

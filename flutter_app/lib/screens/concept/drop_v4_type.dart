@@ -19,11 +19,9 @@ class V4Type {
       dark ? HomeText.heading : HomeText.heading.copyWith(color: NwsbColors.ink);
   static TextStyle sub({bool dark = true}) =>
       dark ? HomeText.subline : HomeText.subline.copyWith(color: NwsbColors.inkFaint);
-  /// sub size, bold — for action words (underlined, never a chip).
+  /// sub size, bold — for action words (never a chip, never underlined).
   static TextStyle action({bool dark = true}) => sub(dark: dark).copyWith(
       fontWeight: FontWeight.w800,
       color: dark ? Colors.white : NwsbColors.ink,
-      decoration: TextDecoration.underline,
-      decorationColor: const Color(0xFFC8A96E),
-      decorationThickness: 2);
+      decoration: TextDecoration.none);
 }

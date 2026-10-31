@@ -640,14 +640,14 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
 }
 
 class YourRewardsSection extends StatelessWidget {
-  const YourRewardsSection({super.key});
+  const YourRewardsSection({super.key, this.fill = false});
+
+  /// Stretch the pane to the height it is given (equal-height rail pages).
+  final bool fill;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SectionPane(
+    final pane = SectionPane(
           child: ListenableBuilder(
             listenable: EconomyMirror.instance,
             builder: (context, _) {
@@ -719,21 +719,23 @@ class YourRewardsSection extends StatelessWidget {
               );
             },
           ),
-        ),
-      ],
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [fill ? Expanded(child: pane) : pane],
     );
   }
 }
 
 class GiftsHomeSection extends StatelessWidget {
-  const GiftsHomeSection({super.key});
+  const GiftsHomeSection({super.key, this.fill = false});
+
+  /// Stretch the pane to the height it is given (equal-height rail pages).
+  final bool fill;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SectionPane(
+    final pane = SectionPane(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -772,8 +774,10 @@ class GiftsHomeSection extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [fill ? Expanded(child: pane) : pane],
     );
   }
 }
@@ -902,60 +906,120 @@ Future<void> copyFriendInvite(BuildContext context) async {
 }
 
 
-/// Rewards, Gifts, and Coupons as one row. Same size. It turns on its own.
+/// Rewards, Gifts, and Coupons as one swipeable row. All three pages share
+/// the tallest card's height. It turns on its own every few seconds, and any
+/// touch pauses it so the user can swipe or tap straight to the card they want.
 class ProgramTrioRail extends StatefulWidget {
-  const ProgramTrioRail({super.key});
+  const ProgramTrioRail({super.key, this.autoRotate = !_flutterTest});
+
+  final bool autoRotate;
 
   @override
   State<ProgramTrioRail> createState() => _ProgramTrioRailState();
 }
 
 class _ProgramTrioRailState extends State<ProgramTrioRail> {
+  final _pages = PageController();
   Timer? _timer;
   var _i = 0;
-  var _hold = false;
+  var _touching = false;
+  DateTime _lastTouch = DateTime.fromMillisecondsSinceEpoch(0);
+
+  static const _resumeAfter = Duration(seconds: 8);
 
   @override
   void initState() {
     super.initState();
-    if (_flutterTest) return;
+    if (!widget.autoRotate) return;
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || _hold) return;
+      if (!mounted || _touching || !_pages.hasClients) return;
+      if (DateTime.now().difference(_lastTouch) < _resumeAfter) return;
       if (!TickerMode.of(context)) return;
-      setState(() => _i = (_i + 1) % 3);
+      _pages.animateToPage((_i + 1) % 3,
+          duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic);
     });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _pages.dispose();
     super.dispose();
   }
 
-  Widget _page() => switch (_i) {
-        0 => const YourRewardsSection(),
-        1 => const GiftsHomeSection(),
+  Widget _page(int i, {bool fill = false}) => switch (i) {
+        0 => YourRewardsSection(fill: fill),
+        1 => GiftsHomeSection(fill: fill),
         _ => const HomeCouponShelf(),
       };
 
+  void _touch(bool down) {
+    _touching = down;
+    _lastTouch = DateTime.now();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Hug the card that is showing. A fixed tall box left a purple hole
-    // under the gifts card and above the coupon film.
-    return Listener(
-      onPointerDown: (_) => _hold = true,
-      onPointerUp: (_) => _hold = false,
-      onPointerCancel: (_) => _hold = false,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 420),
-        switchInCurve: Curves.easeOutCubic,
-        switchOutCurve: Curves.easeOutCubic,
-        layoutBuilder: (current, previous) => Stack(
-          alignment: Alignment.topCenter,
-          children: [...previous, if (current != null) current],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Listener(
+          onPointerDown: (_) => _touch(true),
+          onPointerUp: (_) => _touch(false),
+          onPointerCancel: (_) => _touch(false),
+          child: Stack(
+            children: [
+              // Invisible copies size the rail to the tallest card.
+              for (var i = 0; i < 3; i++)
+                IgnorePointer(
+                  child: ExcludeSemantics(
+                    child: Opacity(opacity: 0, child: TickerMode(enabled: false, child: _page(i))),
+                  ),
+                ),
+              Positioned.fill(
+                child: PageView.builder(
+                  key: const ValueKey('program-trio-pages'),
+                  controller: _pages,
+                  itemCount: 3,
+                  onPageChanged: (i) => setState(() => _i = i),
+                  itemBuilder: (_, i) => KeyedSubtree(
+                      key: ValueKey('program-trio-$i'), child: _page(i, fill: true)),
+                ),
+              ),
+            ],
+          ),
         ),
-        child: KeyedSubtree(key: ValueKey(_i), child: _page()),
-      ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (var i = 0; i < 3; i++)
+              GestureDetector(
+                key: ValueKey('program-trio-dot-$i'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  _touch(false);
+                  _pages.animateToPage(i,
+                      duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    width: i == _i ? 22 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: HomeSkinScope.of(context) == HomeSkin.normal
+                          ? (i == _i ? NwsbColors.ink : NwsbColors.inkSoft.withValues(alpha: .35))
+                          : (i == _i ? Colors.white : Colors.white38),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -17,6 +17,10 @@ import '../../widgets/black_glass_banner.dart';
 import 'glassmorphism_theme.dart';
 import 'essentials_process_line.dart';
 import '../../admin/template/editable.dart';
+import '../../data/content.dart';
+import '../../data/models.dart';
+import '../../shell/nav_shell.dart';
+import '../practice_player.dart';
 
 class NmHorizontalRoutineCards extends StatefulWidget {
   const NmHorizontalRoutineCards({super.key, this.fashion = false});
@@ -46,9 +50,101 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
     super.dispose();
   }
 
+  static const _stride = 344.0; // card width 330 + separator 14
+
   void _onCardsScroll() {
-    final next = (_cardsController.offset / 344).round().clamp(0, 5);
+    final next = (_cardsController.offset / _stride).round().clamp(0, 5);
     if (next != _activeCard && mounted) setState(() => _activeCard = next);
+  }
+
+  /// Selects a card: highlights its step and scrolls it into view.
+  void _select(int i) {
+    setState(() => _activeCard = i);
+    if (!_cardsController.hasClients) return;
+    final max = _cardsController.position.maxScrollExtent;
+    _cardsController.animateTo((i * _stride).clamp(0.0, max),
+        duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
+  }
+
+  /// Starts the card's session in the player.
+  void _start(int i) {
+    _select(i);
+    final card = _cards[i];
+    final lib = ContentStore.instance.library;
+    final key = card.category.toLowerCase();
+    var words = lib
+        .where((w) => w.categories.any((c) => c.toLowerCase().contains(key)))
+        .toList();
+    if (words.isEmpty) words = lib.take(6).toList();
+    if (words.isEmpty) {
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(
+          content: Text('Pick a few words for your routine first.')));
+      NavScope.goTo(context, 1);
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) =>
+            PracticePlayerScreen(words: List<Word>.of(words), title: card.title)));
+  }
+
+  /// "My Routine · Customize your practice": the routine builder sheet.
+  void _openBuilder() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF0B0B10),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (sheet) => SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(sheet).size.height * .8),
+          child: ListView(
+            key: const ValueKey('routine-builder'),
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+            children: [
+              const Text('Customize your practice',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              const Text('Choose the session for today, or start one now.',
+                  style: TextStyle(color: Colors.white70, fontSize: 13)),
+              const SizedBox(height: 12),
+              for (var i = 0; i < _cards.length; i++)
+                ListTile(
+                  key: ValueKey('routine-builder-$i'),
+                  contentPadding: EdgeInsets.zero,
+                  leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(_cards[i].image,
+                          width: 52, height: 52, fit: BoxFit.cover)),
+                  title: Text(_cards[i].title,
+                      style: const TextStyle(color: Colors.white)),
+                  subtitle: Text(_cards[i].meta,
+                      style: const TextStyle(color: Colors.white70)),
+                  trailing: IconButton(
+                    tooltip: _cards[i].action,
+                    icon: const Icon(Icons.play_circle_fill_rounded,
+                        color: Colors.white),
+                    onPressed: () {
+                      Navigator.of(sheet).pop();
+                      _start(i);
+                    },
+                  ),
+                  selected: i == _activeCard,
+                  onTap: () {
+                    Navigator.of(sheet).pop();
+                    _select(i);
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   static const _cards = <_EssentialCardData>[
@@ -117,27 +213,23 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
                             color: glass || widget.fashion
                                 ? Colors.white
                                 : const Color(0xFF2B2D33)))),
-                EditableLabel('horizontal_routine_cards.NmHorizontalRoutineCards', '6 cards',
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: glass || widget.fashion
-                            ? Colors.white70
-                            : const Color(0xFF8A8F9A))),
               ],
             ),
           ),
           if (widget.fashion)
-            const Padding(
-              padding: EdgeInsets.only(right: 20, bottom: 12),
+            Padding(
+              padding: const EdgeInsets.only(right: 20, bottom: 12),
               child: RoutineStyleBlackBanner(
+                key: const ValueKey('routine-customize'),
                 title: 'My Routine',
                 subtitle: 'Customize your practice',
+                onTap: _openBuilder,
               ),
             ),
           Padding(
             padding: const EdgeInsets.only(right: 20, bottom: 16, top: 4),
             child: NmEssentialsProcessLine(
-                glass: glass || widget.fashion, active: _activeCard),
+                glass: glass || widget.fashion, active: _activeCard, onTap: _select),
           ),
           SizedBox(
             height: 392,
@@ -148,7 +240,11 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
               itemCount: _cards.length,
               separatorBuilder: (_, __) => const SizedBox(width: 14),
               itemBuilder: (context, index) => _EssentialCard(
-                  card: _cards[index], glass: glass, fashion: widget.fashion),
+                  card: _cards[index],
+                  glass: glass,
+                  fashion: widget.fashion,
+                  onSelect: () => _select(index),
+                  onStart: () => _start(index)),
             ),
           ),
         ],
@@ -170,8 +266,14 @@ class _EssentialCardData {
 
 class _EssentialCard extends StatelessWidget {
   const _EssentialCard(
-      {required this.card, required this.glass, required this.fashion});
+      {required this.card,
+      required this.glass,
+      required this.fashion,
+      this.onSelect,
+      this.onStart});
   final _EssentialCardData card;
+  final VoidCallback? onSelect;
+  final VoidCallback? onStart;
   final bool glass;
   final bool fashion;
 
@@ -283,9 +385,17 @@ class _EssentialCard extends StatelessWidget {
         children: [
           Column(
             children: [
-              cardPane,
+              GestureDetector(
+                  key: ValueKey('routine-card-${card.title}'),
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onSelect,
+                  child: cardPane),
               const SizedBox(height: 38),
-              Container(
+              GestureDetector(
+               key: ValueKey('routine-start-${card.title}'),
+               behavior: HitTestBehavior.opaque,
+               onTap: onStart,
+               child: Container(
                 width: double.infinity,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -304,7 +414,7 @@ class _EssentialCard extends StatelessWidget {
                   const Icon(Icons.arrow_forward_rounded,
                       color: Colors.white, size: 18)
                 ]),
-              ),
+              )),
             ],
           ),
           Positioned(

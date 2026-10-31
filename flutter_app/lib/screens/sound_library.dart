@@ -12,6 +12,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../shell/nav_shell.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
@@ -435,7 +436,9 @@ class _SlmFeed extends StatelessWidget {
                   // Extra scroll pad so last sections clear floating nav even
                   // when outer embedded inset is zero (pushed routes).
                   padding: EdgeInsets.only(
-                    bottom: MediaQuery.paddingOf(context).bottom + 48,
+                    bottom: NavClearance.of(context) > 0
+                        ? NavClearance.of(context)
+                        : MediaQuery.paddingOf(context).bottom + 48,
                   ),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
                   children: layoutIndexed(context, 'sound.library', const {

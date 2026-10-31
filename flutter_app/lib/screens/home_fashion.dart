@@ -886,8 +886,11 @@ class _HomeFashionState extends State<HomeFashion> {
                   cacheExtent: 480,
                   // Footer carries solid-black bottom clearance (no video bleed).
                   padding: EdgeInsets.zero,
-                  itemCount: shown.length,
-                  itemBuilder: (context, i) => HomeKeepAlive(child: shown[i]),
+                  itemCount: shown.length + 1,
+                  itemBuilder: (context, i) => i == shown.length
+                  // Last item: room to scroll the footer clear of the nav bar.
+                  ? const ColoredBox(color: Colors.black, child: NavClearanceSpacer())
+                  : HomeKeepAlive(child: shown[i]),
                 ),
               ),
             ],
