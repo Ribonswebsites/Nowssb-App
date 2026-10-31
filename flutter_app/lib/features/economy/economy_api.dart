@@ -49,7 +49,13 @@ class EconomyApi {
   }
 
   /// POST an action with the signed-in user's Firebase ID token.
+  /// Tests answer server actions here instead of the network.
+  @visibleForTesting
+  static Future<Map<String, dynamic>> Function(String name, Map<String, dynamic> data)? debugHandler;
+
   static Future<Map<String, dynamic>> call(String name, [Map<String, dynamic>? data]) async {
+    final fake = debugHandler;
+    if (fake != null) return fake(name, data ?? const {});
     if (!NwsbFirebase.ready) {
       throw EconomyException("Can't reach NowssB right now. Check your connection and try again.");
     }

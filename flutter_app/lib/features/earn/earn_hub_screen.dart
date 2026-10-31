@@ -70,34 +70,4 @@ class EarnHubScreen extends StatelessWidget {
       ),
     );
   }
-
-  void _open(BuildContext context, Widget page) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
-  }
-
-  Widget _ledger(String collection, String? uid) {
-    if (!NwsbFirebase.ready || uid == null) return const EconomyNote('Sign in to see the ledger.');
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection(collection).where('uid', isEqualTo: uid).limit(15).snapshots(),
-      builder: (context, snap) {
-        final docs = snap.data?.docs ?? [];
-        if (docs.isEmpty) return const EconomyNote('Nothing here yet.');
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            for (final doc in docs)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(
-                  collection == 'commissionLedger'
-                      ? '${doc.data()['note'] ?? doc.data()['type'] ?? ''}  ${FxBook.instance.formatPrice(((doc.data()['paise'] as num?) ?? 0) / 100)}'
-                      : '${doc.data()['reason'] ?? ''}  ${doc.data()['delta'] ?? 0}',
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
 }

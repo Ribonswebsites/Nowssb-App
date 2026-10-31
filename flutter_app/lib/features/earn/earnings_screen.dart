@@ -27,47 +27,22 @@ class EarningsScreen extends StatefulWidget {
 }
 
 class _EarningsScreenState extends State<EarningsScreen> {
-  final _upi = TextEditingController();
-  final _legal = TextEditingController();
-  final _pan = TextEditingController();
   final _email = TextEditingController();
+  final _legal = TextEditingController();
   String _method = 'wise';
-  // ignore: unused_field
-  String _filter = 'all';
-  late String _country = _countries.any((c) => c.$1 == FxBook.instance.region) ? FxBook.instance.region! : 'XX';
-
-  static const _countries = <(String, String)>[
-    ('IN', 'India — bank / UPI, INR'),
-    ('US', 'United States'),
-    ('GB', 'United Kingdom'),
-    ('CA', 'Canada'),
-    ('AU', 'Australia'),
-    ('AE', 'United Arab Emirates'),
-    ('SG', 'Singapore'),
-    ('DE', 'Germany'),
-    ('FR', 'France'),
-    ('JP', 'Japan'),
-    ('BR', 'Brazil'),
-    ('MX', 'Mexico'),
-    ('NZ', 'New Zealand'),
-    ('XX', 'Another country'),
-  ];
+  late String _country = defaultPayoutCountry();
 
   @override
   void dispose() {
-    _upi.dispose();
-    _legal.dispose();
-    _pan.dispose();
     _email.dispose();
+    _legal.dispose();
     super.dispose();
   }
 
   Future<void> _saveAccount() async {
     final result = await EconomyApi.call('savePayoutAccount', {
       'country': _country,
-      'upi': _upi.text.trim(),
       'legalName': _legal.text.trim(),
-      'pan': _pan.text.trim(),
       'method': _method,
       'email': _email.text.trim(),
     });
@@ -75,55 +50,90 @@ class _EarningsScreenState extends State<EarningsScreen> {
     if (url.startsWith('http')) {
       await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     }
+    // The Request card reads the saved account from the mirror.
+    await EconomyMirror.instance.refresh();
     final message = '${result['message'] ?? ''}';
     final rail = '${result['rail'] ?? ''}';
     if (!mounted) return;
     final text = message.isNotEmpty
         ? message
         : rail == 'unsupported'
-            ? 'This country is not supported yet. Your balance stays here.'
-            : rail == 'upi_manual'
-                ? 'India payouts will settle in INR to your UPI.'
-                : 'Payout account saved.';
+            ? 'Payouts are not available in your country yet. Your balance stays safe here.'
+            : 'Payout account saved.';
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: EditableLabel('earnings_screen.EarningsScreen', text)));
   }
 
-  void _openAccount(BuildContext context, bool india, bool unsupported, bool canPay) {
+  Future<void> _requestPayout() async {
+    await EconomyApi.call('requestPayout');
+    await EconomyMirror.instance.refresh();
+  }
+
+  void _openAccount(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF10141C),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(ctx).bottom),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                initialValue: _country,
-                dropdownColor: const Color(0xFF141820),
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(labelText: 'Payout country'),
-                items: [for (final item in _countries) DropdownMenuItem(value: item.$1, child: Text(item.$2))],
-                onChanged: (value) {
-                  if (value == null) return;
-                  setState(() => _country = value);
-                  Navigator.pop(ctx);
-                  _openAccount(context, value == 'IN', value == 'XX', canPay);
-                },
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) {
+          final unsupported = _country == 'XX';
+          final valid = !unsupported && looksLikeEmail(_email.text) && _legal.text.trim().length >= 2;
+          return Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(ctx).bottom),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DropdownButtonFormField<String>(
+                    initialValue: _country,
+                    isExpanded: true,
+                    dropdownColor: const Color(0xFF141820),
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(labelText: 'Payout country'),
+                    items: [for (final item in kPayoutCountries) DropdownMenuItem(value: item.$1, child: Text(item.$2))],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _country = value);
+                      setSheet(() {});
+                    },
+                  ),
+                  if (unsupported)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Text('Payouts are not available in your country yet. Your balance stays safe here.', style: TextStyle(color: Color(0xCCFFFFFF))),
+                    )
+                  else ...[
+                    Wrap(spacing: 8, children: [
+                      ChoiceChip(label: const Text('Wise'), selected: _method == 'wise', onSelected: (_) => setSheet(() => _method = 'wise')),
+                      ChoiceChip(label: const Text('PayPal'), selected: _method == 'paypal', onSelected: (_) => setSheet(() => _method = 'paypal')),
+                    ]),
+                    TextField(controller: _email, onChanged: (_) => setSheet(() {}), keyboardType: TextInputType.emailAddress, textInputAction: TextInputAction.next, style: const TextStyle(color: Colors.white), decoration: InputDecoration(hintText: _method == 'paypal' ? 'PayPal email' : 'Wise email')),
+                    TextField(controller: _legal, onChanged: (_) => setSheet(() {}), textInputAction: TextInputAction.done, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Full legal name')),
+                  ],
+                  const SizedBox(height: 12),
+                  Opacity(
+                    opacity: valid ? 1 : 0.4,
+                    child: GoldButton(
+                      label: unsupported ? 'Close' : 'Save payout account',
+                      onTap: () {
+                        if (unsupported) {
+                          Navigator.pop(ctx);
+                          return;
+                        }
+                        if (!valid) {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add a valid email and your full name.')));
+                          return;
+                        }
+                        Navigator.pop(ctx);
+                        runPrivate(context, _saveAccount);
+                      },
+                    ),
+                  ),
+                ],
               ),
-              if (india) ...[
-                TextField(controller: _upi, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'UPI id, name@bank')),
-                TextField(controller: _legal, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Legal name')),
-                TextField(controller: _pan, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'PAN')),
-              ],
-              if (!india && !unsupported)
-                TextField(controller: _email, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Wise or PayPal email')),
-              const SizedBox(height: 12),
-              GoldButton(label: 'Save payout account', onTap: () { Navigator.pop(ctx); runPrivate(context, _saveAccount); }),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -138,10 +148,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
         listenable: EconomyMirror.instance,
         builder: (context, _) {
           final w = EconomyMirror.instance;
-          final india = _country == 'IN';
           final unsupported = _country == 'XX';
           // The server checks the minimum, the hold and the saved account.
-          final canPay = !unsupported && w.payoutRail.isNotEmpty;
+          final canPay = !unsupported && w.payoutRail.isNotEmpty && w.cash > 0;
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
@@ -149,13 +158,13 @@ class _EarningsScreenState extends State<EarningsScreen> {
               RoutineDeck(
                 title: 'Earnings',
                 banner: 'Your earning',
-                bannerSub: india ? 'India · UPI' : 'Sales and referrals',
-                onBanner: () => _openAccount(context, india, unsupported, canPay),
+                bannerSub: 'Sales and referrals',
+                onBanner: () => _openAccount(context),
                 cards: [
-                  WorkCard(category: 'Cash', title: 'Lifetime', meta: FxBook.instance.formatCents(w.lifetimeCents), action: 'Open sales', image: 'assets/rails/gen-54.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'sales')))),
-                  WorkCard(category: 'Cash', title: 'Available', meta: FxBook.instance.formatCents(w.cash), action: 'Open payouts', image: 'assets/rails/gen-55.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'payouts')))),
-                  WorkCard(category: 'Account', title: 'Payout account', meta: india ? 'India · UPI' : 'Wise or PayPal', action: 'Set account', image: 'assets/rails/earnings-02.jpg', onTap: () => _openAccount(context, india, unsupported, canPay)),
-                  WorkCard(category: 'Cash', title: 'Request payout', meta: FxBook.instance.formatCents(w.cash), action: canPay ? 'Request' : 'Save account first', image: 'assets/rails/earnings-03.jpg', onTap: canPay ? () => runPrivate(context, () => EconomyApi.call('requestPayout')) : () => _openAccount(context, india, unsupported, canPay)),
+                  WorkCard(category: 'Cash', title: 'Lifetime', meta: FxBook.instance.formatCents(w.lifetimeCents), action: 'Open sales', image: 'assets/rails/gen-54.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EarnProgramPage(initialTab: earnTabIndex('sales'))))),
+                  WorkCard(category: 'Cash', title: 'Available', meta: FxBook.instance.formatCents(w.cash), action: 'Open payouts', image: 'assets/rails/gen-55.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EarnProgramPage(initialTab: earnTabIndex('payouts'))))),
+                  WorkCard(category: 'Account', title: 'Payout account', meta: w.payoutRail.isEmpty ? 'Wise or PayPal' : 'Saved', action: w.payoutRail.isEmpty ? 'Set account' : 'Change', image: 'assets/rails/earnings-02.jpg', onTap: () => _openAccount(context)),
+                  WorkCard(category: 'Cash', title: 'Request payout', meta: FxBook.instance.formatCents(w.cash), action: canPay ? 'Request' : w.payoutRail.isEmpty ? 'Save account first' : 'Nothing to pay yet', image: 'assets/rails/earnings-03.jpg', onTap: canPay ? () => runPrivate(context, _requestPayout) : w.payoutRail.isEmpty ? () => _openAccount(context) : () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nothing is available to pay out yet. Cleared sales show up here after 30 days.')))),
                 ],
               ),
             ],
@@ -166,69 +175,3 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 }
 
-class _History extends StatelessWidget {
-  const _History({required this.uid, required this.filter});
-  final String uid;
-  final String filter;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection('cashLedger').where('uid', isEqualTo: uid).limit(40).snapshots(),
-      builder: (context, cashSnap) {
-        return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance.collection('referralLedger').where('referrerUid', isEqualTo: uid).limit(40).snapshots(),
-          builder: (context, refSnap) {
-            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: FirebaseFirestore.instance.collection('payoutRequests').where('uid', isEqualTo: uid).limit(20).snapshots(),
-              builder: (context, paySnap) {
-                if (cashSnap.hasError || refSnap.hasError || paySnap.hasError) {
-                  return const EconomyMessage(title: 'Could not load earnings', body: 'Try again in a moment.');
-                }
-                if (!cashSnap.hasData || !refSnap.hasData || !paySnap.hasData) return const EconomySkeleton();
-                final rows = <_Row>[];
-                for (final doc in cashSnap.data!.docs) {
-                  final reason = '${doc.data()['reason'] ?? ''}';
-                  final kind = reason.toLowerCase().contains('circle') ? 'circle' : reason.toLowerCase().contains('payout') ? 'payout' : 'sale';
-                  rows.add(_Row(kind, reason, (doc.data()['delta'] as num?)?.toInt() ?? 0, '${doc.data()['reason'] ?? ''}'));
-                }
-                for (final doc in refSnap.data!.docs) {
-                  rows.add(_Row('circle', 'Level ${doc.data()['level']}', (doc.data()['commissionAmount'] as num?)?.toInt() ?? 0, '${doc.data()['status']}'));
-                }
-                for (final doc in paySnap.data!.docs) {
-                  rows.add(_Row('payout', 'Payout', (doc.data()['amountBase'] as num?)?.toInt() ?? 0, '${doc.data()['status']}'));
-                }
-                final shown = rows.where((row) => filter == 'all' || row.kind == filter).toList();
-                if (shown.isEmpty) {
-                  return const EconomyMessage(title: 'No earnings yet', body: 'Sales and referral commissions will show up here.');
-                }
-                return Column(
-                  children: [
-                    for (final row in shown)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Row(
-                          children: [
-                            Expanded(child: Text('${row.title}\n${row.status}', style: const TextStyle(color: Colors.white, height: 1.3))),
-                            Text(FxBook.instance.formatCents(row.cents), style: const TextStyle(color: NwsbColors.goldLight)),
-                          ],
-                        ),
-                      ),
-                  ],
-                );
-              },
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
-class _Row {
-  _Row(this.kind, this.title, this.cents, this.status);
-  final String kind;
-  final String title;
-  final int cents;
-  final String status;
-}
