@@ -45,7 +45,16 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(MaterialApp(home: screen));
-    await tester.pumpAndSettle();
+    if (screen is WidgetsPage) {
+      // Settings' film dial (FashionBgDimControl → FilmDial) spins for as
+      // long as the page is open, so the tree never settles. Give it a
+      // bounded couple of seconds instead.
+      for (var i = 0; i < 20; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+    } else {
+      await tester.pumpAndSettle();
+    }
   }
 
   final screens = <String, Widget>{

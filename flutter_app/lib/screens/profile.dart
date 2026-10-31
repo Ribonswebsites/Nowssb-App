@@ -1548,19 +1548,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 class _Background extends StatelessWidget {
   const _Background();
+  // Motion off (Fashion Plus) shows the clip's own still poster and never
+  // asks for a decoder, like every other page background.
   @override
-  Widget build(BuildContext context) => const Stack(
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Settings.instance,
+        builder: (context, _) => Stack(
         fit: StackFit.expand,
         children: [
-          NwsbVideo(
-            asset: 'assets/video/subscription-bg.mp4',
-            priority: ClipPriority.decoration,
-            autoplay: true,
-            loop: true,
-            fit: BoxFit.cover,
-            slot: 'profile.Background',
-          ),
-          DecoratedBox(
+          if (Settings.instance.fashionPlus)
+            const NwsbVideo(
+              asset: 'assets/video/subscription-bg.mp4',
+              priority: ClipPriority.decoration,
+              autoplay: true,
+              loop: true,
+              fit: BoxFit.cover,
+              slot: 'profile.Background',
+            )
+          else
+            Image.asset(
+              'assets/video/subscription-bg-poster.webp',
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF060C18)),
+            ),
+          const DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
@@ -1570,6 +1581,7 @@ class _Background extends StatelessWidget {
             ),
           ),
         ],
+      ),
       );
 }
 
