@@ -22,13 +22,10 @@ Free photos under the [Pexels licence](https://www.pexels.com/license/): free to
 | File | Photo | Photographer |
 |---|---|---|
 | ez-med-beach.webp | [Man Meditating at the Beach](https://www.pexels.com/photo/man-meditating-at-the-beach-5992566/) | Tima Miroshnichenko |
-| ez-med-rock.webp | [Man Sitting on Rock Under Blue Sky](https://www.pexels.com/photo/man-sitting-on-rock-under-blue-sky-5992489/) | Tima Miroshnichenko |
 | ez-med-pillar.webp | [Man Meditating at Sunset in Assos, Türkiye](https://www.pexels.com/photo/man-meditating-at-sunset-in-assos-turkiye-34044030/) | Emrecan Dora |
 | ez-med-lotus-room.webp | [Woman in Lotus Position Meditating](https://www.pexels.com/photo/woman-in-lotus-position-meditating-7596969/) | Pavel Danilyuk |
 | ez-med-home.webp | [Woman Sitting in Lotus Position Meditating Inside a House](https://www.pexels.com/photo/woman-sitting-in-lotus-position-meditating-inside-a-house-6246588/) | KoolShooters |
-| ez-med-studio.webp | [A Woman Doing the Lotus Pose](https://www.pexels.com/photo/a-woman-doing-the-lotus-pose-8436940/) | Yan Krukau |
 | ez-med-lotus-white.webp | [Serene plus size female meditating in Lotus pose](https://www.pexels.com/photo/serene-plus-size-female-meditating-in-lotus-pose-6975413/) | SHVETS production |
 | ez-med-candle.webp | [Lighted Candle Beside a Tibetan Singing Bowl](https://www.pexels.com/photo/lighted-candle-beside-a-tibetan-singing-bowl-7303281/) | Cup of Couple |
-| ez-med-sunset-hands.webp | [A Person Meditating](https://www.pexels.com/photo/a-person-meditating-8964948/) | olia danilevich |
 
 Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`): Normal home hero carousel, Normal home footer card, Healing path strip, and the Profile "Your practice mind" section (`ez-med-lotus-white` is that section's meditation image).

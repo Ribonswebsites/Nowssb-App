@@ -68,7 +68,6 @@ void main() {
     t.view.physicalSize = const Size(360, 900);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
-    await _shoot(t, const V4Healing(), const Color(0xFFF0F2F7), '360_section_healing_strip');
     await _shoot(t, const ProfileMind(), Colors.black, '360_section_profile_mind_empty');
     SharedPreferences.setMockInitialValues({'nwsb_native_sessions': jsonEncode(_seed())});
     await t.runAsync(() => PracticeProgress.instance.start());

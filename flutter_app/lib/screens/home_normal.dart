@@ -37,7 +37,6 @@
 /// [HomeSkinScope] is what tells them which home they are on.
 library;
 
-import 'package:nowssb/widgets/editeaze.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -475,25 +474,7 @@ class _HomeNormalState extends State<HomeNormal> {
           'fashsw',
           const NFashionPlusEntryLive(),
         ),
-        ('footer', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 20, 18),
-            child: ListenableBuilder(
-              listenable: PracticeProgress.instance,
-              builder: (context, _) => EzOrangeCard(
-                key: const ValueKey('nm-ez-footer'),
-                title: 'Sound library',
-                subtitle: 'Calm sounds for tonight',
-                image: 'assets/home/ez/ez-med-sunset-hands.webp',
-                height: 210,
-                icons: [EzIcon(Icons.headphones_rounded, label: 'Open Sound library', onTap: () => _footerLink('sound-library'))],
-                comment: EzComment(name: 'Your practice', text: '${PracticeProgress.instance.timeLabel} listened so far'),
-                onTap: () => _footerLink('sound-library'),
-              ),
-            ),
-          ),
-          NFooter(onLink: _footerLink),
-        ])),
+        ('footer', NFooter(onLink: _footerLink)),
       ];
 
   @override

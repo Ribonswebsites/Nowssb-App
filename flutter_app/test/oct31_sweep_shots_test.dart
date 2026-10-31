@@ -29,7 +29,7 @@ Future<void> _settle(WidgetTester t, [int n = 12]) async {
 final _key = GlobalKey();
 
 const _midKeys = <String, List<String>>{
-  'Home': ['v4-healing', 'nm-ez-footer'],
+  'Home': ['cv3-ez-hero'],
   'Profile': ['profile-mind'],
 };
 
