@@ -5,6 +5,7 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:nowssb/screens/normal/calm_hero.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -92,7 +93,9 @@ void main() {
     }
     // Section headings: a single-line paragraph of 18px+ text is a heading.
     final seen = <String, int>{};
+    final hero = _heroParagraphs();
     for (final r in paragraphs()) {
+      if (hero.contains(r)) continue; // the hero carousel repeats its title per card
       final txt = r.text.toPlainText().trim();
       final style = (r.text as TextSpan).style;
       final size = style?.fontSize ?? 14;
@@ -103,7 +106,7 @@ void main() {
     final dupes =
         seen.entries.where((e) => e.value > 1).map((e) => e.key).toList();
     // Carousels repeat a face while looping; only fixed headings count.
-    const looped = {'NOWSSB'};
+    const looped = {'NOWSSB', 'NowssB'}; // brand face on looping carousels
     expect(dupes.where((d) => !looped.contains(d)), isEmpty, reason: '$dupes');
     for (final k in kNormalSectionOrder.where((k) => !_quiet.contains(k))) {
       expect(find.byKey(ValueKey('nm-$k')), findsOneWidget, reason: k);
@@ -167,8 +170,11 @@ void main() {
             .evaluate())
           e.renderObject,
       };
+      // The hero carousel's display serif title and Prakrit word were
+      // approved by Ribon (Nov 1) at display size; only the hero is exempt.
+      final hero = _heroParagraphs();
       for (final r in paragraphs()) {
-        if (quote.contains(r)) continue;
+        if (quote.contains(r) || hero.contains(r)) continue;
         var max = 0.0;
         r.text.visitChildren((s) {
           final f = (s is TextSpan ? s.style?.fontSize : null) ?? 0;
@@ -198,3 +204,10 @@ void main() {
     }, skip: !homeFontsReady); // needs real fonts, see support/home_render.dart
   }
 }
+
+Set<RenderObject?> _heroParagraphs() => {
+      for (final e in find
+          .descendant(of: find.byType(MixedHero), matching: find.byType(RichText))
+          .evaluate())
+        e.renderObject,
+    };

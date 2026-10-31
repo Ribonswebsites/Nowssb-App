@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/screens/normal/calm_v3.dart';
+import 'package:nowssb/screens/normal/calm_hero.dart';
 import 'package:nowssb/screens/profile_mind.dart';
 import 'package:nowssb/widgets/editeaze.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -85,7 +86,7 @@ void main() {
     expect(_indicators, findsNothing);
   });
 
-  testWidgets('Normal home hero is the orange carousel and swipes', (t) async {
+  testWidgets('Normal home hero is the mixed photo carousel and swipes', (t) async {
     t.view.physicalSize = const Size(360, 900);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
@@ -93,16 +94,15 @@ void main() {
     await t.pump(const Duration(milliseconds: 300));
     final hero = find.byKey(const ValueKey('cv3-ez-hero'));
     expect(hero, findsOneWidget);
-    final s = t.state<EzHeroCarouselState>(hero);
+    final s = t.state<HeroCarouselState>(find.byKey(const ValueKey('hero-mixed')));
     await t.fling(hero, const Offset(-250, 0), 1200);
     for (var i = 0; i < 12; i++) {
       await t.pump(const Duration(milliseconds: 100));
     }
     expect(s.index, 1);
     expect(_indicators, findsNothing);
-    // Only the card: no comment pill, no Today/Begin block under it.
+    // Only the cards: no comment pill, no Today/See progress block under it.
     expect(find.byType(EzCommentPill), findsNothing);
-    expect(find.text('Begin'), findsNothing);
     expect(find.text('See progress'), findsNothing);
     await t.pumpWidget(const SizedBox());
   });
@@ -115,7 +115,7 @@ void main() {
     var opened = 0;
     await t.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(child: CalmToday(onStart: (_, __) => opened++)))));
     await t.pump(const Duration(milliseconds: 300));
-    await t.tap(find.bySemanticsLabel('Play').hitTestable().first);
+    await t.tap(find.bySemanticsLabel("Begin today's session").hitTestable().first);
     await t.pump();
     expect(opened, 1);
     // Save is its own button: it never opens the session.

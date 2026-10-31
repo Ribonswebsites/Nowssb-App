@@ -33,6 +33,7 @@ import '../../widgets/colored_split_promo_banner.dart';
 import '../nwsb_sign_in_sheet.dart';
 import '../practice.dart';
 import 'sections_top.dart' show nmGreetHello;
+import 'calm_hero.dart';
 
 const _ink = Color(0xFF26302C);
 const _soft = Color(0xFF5E6B66);
@@ -247,16 +248,6 @@ class CalmSearch extends StatelessWidget {
 
 // ───────────────────────────── dashboard ─────────────────────────────
 
-/// Meditation photos for the Normal home hero (Pexels licence, see CREDITS.md).
-/// Hero cards: solid colour + a studio photo cut cleanly onto it.
-const kEzHeroLooks = <(Color, String)>[
-  (Color(0xFFF47A3C), 'assets/home/ez/ez-hero-orange.webp'),
-  (Color(0xFF1F9E8F), 'assets/home/ez/ez-hero-teal.webp'),
-  (Color(0xFFE9B23A), 'assets/home/ez/ez-hero-yellow.webp'),
-  (Color(0xFFEE6C5E), 'assets/home/ez/ez-hero-coral.webp'),
-  (Color(0xFF2F4F8F), 'assets/home/ez/ez-hero-blue.webp'),
-];
-
 typedef CalmLauncher = void Function(List<Word> words, String title);
 
 /// The Today card. All its data and both actions come from
@@ -326,25 +317,20 @@ class _CalmTodayState extends State<CalmToday> {
         listenable: _model,
         builder: (context, _) {
           final r = _model.value;
-          final words = r.words.take(kEzHeroLooks.length).toList();
+          final d = HeroData(
+            title: r.title,
+            partLabel: r.part.label,
+            words: r.words,
+            done: r.done,
+            total: r.total,
+            onBegin: _model.begin,
+            isSaved: (w) => w == null ? _sessions.contains(r.title) : _liked.contains(w),
+            onSave: (w) => _toggleSave(word: w, session: r.title),
+          );
           return Padding(
             key: const ValueKey('cv3-today'),
             padding: const EdgeInsets.only(bottom: 8),
-            child: EzHeroCarousel(
-              key: const ValueKey('cv3-ez-hero'),
-              onOpen: (_) => _model.begin(),
-              cards: [
-                for (var i = 0; i < kEzHeroLooks.length; i++)
-                  EzHeroCard(
-                    color: kEzHeroLooks[i].$1,
-                    image: kEzHeroLooks[i].$2,
-                    title: r.title,
-                    subtitle: words.isEmpty ? null : words[i % words.length].word,
-                    saved: words.isEmpty ? _sessions.contains(r.title) : _liked.contains(words[i % words.length].word),
-                    onSave: () => _toggleSave(word: words.isEmpty ? null : words[i % words.length].word, session: r.title),
-                  ),
-              ],
-            ),
+            child: MixedHero(key: const ValueKey('cv3-ez-hero'), data: d),
           );
         },
       );

@@ -124,7 +124,7 @@ void main() {
     await t.pump();
     expect(find.text('Night Restoration'), findsWidgets);
     expect(find.byKey(const ValueKey('cv3-today')), findsOneWidget); // one card, old one gone
-    await t.tap(find.bySemanticsLabel('Play').hitTestable().first);
+    await t.tap(find.bySemanticsLabel("Begin today's session").hitTestable().first);
     await t.pump(const Duration(milliseconds: 500));
     expect(begun, 1);
     // hourly tick: 04:59 → 05:00 flips to morning live

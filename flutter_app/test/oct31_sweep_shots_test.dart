@@ -38,7 +38,7 @@ Future<void> _shot(WidgetTester t, String name) async {
   await t.pump(const Duration(milliseconds: 100));
   final ro = _key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
   await t.runAsync(() async {
-    final img = await ro.toImage(pixelRatio: 1);
+    final img = await ro.toImage(pixelRatio: double.parse(const String.fromEnvironment('SHOT_PR', defaultValue: '1')));
     final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
     File('$_out/$name.png')
       ..createSync(recursive: true)
