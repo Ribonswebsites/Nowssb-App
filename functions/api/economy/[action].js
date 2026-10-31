@@ -24,6 +24,7 @@ import * as er from '../../_lib/economy/earn.js';
 import * as ck from '../../_lib/economy/checkout.js';
 import * as so from '../../_lib/economy/social.js';
 import * as ad from '../../_lib/economy/admin.js';
+import * as dr from '../../_lib/economy/draw.js';
 import { economySummary, publicConfig } from '../../_lib/economy/summary.js';
 import { settleProduct } from '../../_lib/economy/playorders.js';
 import { missingPlayEnv } from '../../_lib/play.js';
@@ -94,6 +95,11 @@ export const ACTIONS = {
     if (r.status >= 400) throw new EconomyError(r.body.error || 'Purchase not confirmed.', r.status, 'failed-precondition');
     return r.body;
   },
+  // Daily lucky draw (free, server RNG, one entry per user per day)
+  drawStatus: dr.drawStatus,
+  drawEnter: dr.drawEnter,
+  drawWinners: dr.drawWinners,
+  drawReview: dr.drawReview,
   // Community
   createEchoPost: so.createEchoPost,
   commentOnPost: so.commentOnPost,
@@ -112,6 +118,7 @@ const ADMIN = {
   adminPayout: ad.adminPayout,
   adminMonthlyPool: ad.adminMonthlyPool,
   adminReverse: ad.adminReverse,
+  reviewDrawReview: dr.reviewDrawReview,
 };
 
 /* Admin console gates: users/{uid}.blocked / .restrictions[area] and the
@@ -124,6 +131,7 @@ const AREA = {
   reportAction: 'earning', heartbeat: 'earning', claimTimeStep: 'earning', openDailyBox: 'earning', openBox: 'earning', claimWeeklyChest: 'earning',
   claimWeeklyGift: 'earning', claimMonthlyGift: 'earning', claimMonthlyMark: 'earning', claimSeason: 'earning', claimLeague: 'earning',
   dailyScratch: 'earning', revealScratch: 'earning', claimTicket: 'earning', spin: 'earning', claimPartnerLevel: 'earning',
+  drawEnter: 'earning', drawReview: 'community',
   createEchoPost: 'community', commentOnPost: 'community', toggleEchoLike: 'community',
 };
 const COUPON_ACTIONS = new Set(['dailyScratch', 'revealScratch', 'scratchCoupon', 'buyScratchWithCoins', 'claimTicket']);
@@ -155,6 +163,7 @@ export async function gateFor(db, cfg, uid, action, data) {
   const sw = cfg.switches || {};
   if (sw.coupons === false && (COUPON_ACTIONS.has(action) || (action === 'beginCheckout' && data && data.kind === 'scratch'))) return 'Coupons are switched off for now.';
   if (sw.gifts === false && (GIFT_ACTIONS.has(action) || (action === 'beginCheckout' && data && data.kind === 'giftcard'))) return 'Gifts are switched off for now.';
+  if (sw.draw === false && (action === 'drawEnter' || action === 'drawReview')) return 'The lucky draw is switched off for now.';
   if (cfg.earn && cfg.earn.enabled === false && ['requestPayout', 'appoint', 'answerAppointment'].includes(action)) return 'NowssB Earn is switched off for now.';
   return null;
 }
