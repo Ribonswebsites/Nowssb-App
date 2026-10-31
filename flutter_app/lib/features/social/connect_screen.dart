@@ -1,17 +1,18 @@
 /// NowssB Connect — the website flow, in Flutter.
 ///
 /// Setup (intro, profile, welcome), then Home, Reels, Connect, Profile,
-/// messages and the call screen. Same pictures, same words, same steps.
+/// and real one-to-one messages. Same pictures, same words, same steps.
+/// People, posts, follows and chats are real and come from the server.
 library;
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../data/practice_progress.dart';
+import '../economy/economy_api.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 
@@ -45,101 +46,113 @@ const _explain = [
   ('Healing', 'https://media.nowssb.com/migrated-images/c061be5a902cf11b_grok_image_1782620475749_fgncxl.jpg'),
 ];
 
+/// A real NowssB Connect member (from connectProfiles on the server).
 class _Person {
-  const _Person(this.id, this.username, this.name, this.avatar, this.category);
+  const _Person(this.id, this.username, this.name, this.avatar, this.category, [this.bio = '']);
   final String id;
   final String username;
   final String name;
   final String avatar;
   final String category;
+  final String bio;
+
+  factory _Person.from(Map m) => _Person('${m['uid'] ?? ''}', '${m['username'] ?? ''}', '${m['name'] ?? 'NowssB member'}', '${m['avatar'] ?? ''}', '${m['focus'] ?? ''}', '${m['bio'] ?? ''}');
 }
 
-const _people = [
-  _Person('1', 'kavya.frequency', 'Kavya Singh', 'https://i.pravatar.cc/150?img=5', 'Sound Healer'),
-  _Person('2', 'aryan.sound', 'Aryan Mehta', 'https://i.pravatar.cc/150?img=13', 'Daily Practitioner'),
-  _Person('3', 'priya.heals', 'Priya Nair', 'https://i.pravatar.cc/150?img=20', 'Wellness'),
-  _Person('4', 'rohan.resonance', 'Rohan Desai', 'https://i.pravatar.cc/150?img=33', 'Frequency Sage'),
-  _Person('5', 'aisha.vibration', 'Aisha Patel', 'https://i.pravatar.cc/150?img=45', 'Practitioner'),
-  _Person('6', 'dev.tones', 'Dev Sharma', 'https://i.pravatar.cc/150?img=51', 'Sound Healer'),
-  _Person('7', 'meera.om', 'Meera Iyer', 'https://i.pravatar.cc/150?img=47', 'Beginner'),
-  _Person('8', 'kabir.naad', 'Kabir Khan', 'https://i.pravatar.cc/150?img=60', 'Practitioner'),
-];
-
-_Person? _person(String id) {
-  for (final p in _people) {
-    if (p.id == id) return p;
-  }
-  return null;
-}
-
+/// A real post from the shared, moderated Echo feed.
 class _Post {
-  const _Post(this.id, this.authorId, this.image, this.caption);
+  const _Post(this.id, this.authorId, this.image, this.caption, {this.authorName = '', this.authorAvatar = '', this.authorFocus = '', this.likes = 0});
   final String id;
   final String authorId;
   final String image;
   final String caption;
+  final String authorName;
+  final String authorAvatar;
+  final String authorFocus;
+  final int likes;
+
+  factory _Post.from(Map m) => _Post('${m['id']}', '${m['authorUid'] ?? ''}', '${m['image'] ?? ''}', '${m['text'] ?? ''}',
+      authorName: '${m['authorName'] ?? ''}', authorAvatar: '${m['authorAvatar'] ?? ''}', authorFocus: '${m['authorFocus'] ?? ''}', likes: (m['likes'] as num?)?.toInt() ?? 0);
 }
 
-const _posts = [
-  _Post('p1', '1', 'https://media.nowssb.com/migrated-images/8a4d334229f9ff55_grok_image_1782620063491_op58of.jpg', 'Origin of the tone. One sit, one word.'),
-  _Post('p2', '3', 'https://media.nowssb.com/migrated-images/b0d670b6066b0c49_image_qg7ro5.jpg', 'How the practice evolved. Still the same frequency.'),
-  _Post('p3', '4', 'https://media.nowssb.com/migrated-images/d143c72a353c7f2e_image_dtmprf.jpg', 'Frequency held until it landed.'),
-  _Post('p4', '5', 'https://media.nowssb.com/migrated-images/c061be5a902cf11b_grok_image_1782620475749_fgncxl.jpg', 'Healing is the fashion. Show up today.'),
-];
-
+/// Everything here comes from the NowssB server (/api/economy/connect*).
+/// Nothing is invented: no sample people, posts, replies or counts.
 class _ConnectData extends ChangeNotifier {
   bool ready = false;
   bool done = false;
+  String? error;
+  String uid = '';
   String name = '';
   String focus = _focus.first;
   String bio = '';
   String theme = 'neu';
   String banner = _banners.first;
+  String avatar = '';
+  int followers = 0;
+  var people = <_Person>[];
+  var posts = <_Post>[];
   final follows = <String>{};
   final liked = <String>{};
-  final saved = <String>{};
+  final saved = <String>{}; // bookmarks are private, kept on this phone
+  var inbox = <Map<String, dynamic>>[];
   final chats = <String, List<Map<String, dynamic>>>{};
 
+  _Person? person(String id) {
+    for (final p in people) {
+      if (p.id == id) return p;
+    }
+    for (final c in inbox) {
+      final w = c['with'];
+      if (w is Map && w['uid'] == id) return _Person.from(w);
+    }
+    return null;
+  }
+
+  List<_Post> get myPosts => [for (final p in posts) if (p.authorId == uid && uid.isNotEmpty) p];
+
   Future<void> load() async {
-    final p = await SharedPreferences.getInstance();
-    done = p.getBool('nwsb_connect_done') ?? false;
-    name = p.getString('nwsb_connect_name') ?? '';
-    focus = p.getString('nwsb_connect_focus') ?? _focus.first;
-    bio = p.getString('nwsb_connect_bio') ?? '';
-    theme = p.getString('nwsb_connect_theme') ?? 'neu';
-    banner = p.getString('nwsb_connect_banner') ?? _banners.first;
-    follows
-      ..clear()
-      ..addAll(p.getStringList('nwsb_connect_follows') ?? const []);
-    liked
-      ..clear()
-      ..addAll(p.getStringList('nwsb_connect_liked') ?? const []);
-    saved
-      ..clear()
-      ..addAll(p.getStringList('nwsb_connect_saved') ?? const []);
-    chats.clear();
-    final raw = p.getString('nwsb_connect_chats_v2');
-    if (raw != null) {
-      final decoded = jsonDecode(raw);
-      if (decoded is Map) {
-        for (final e in decoded.entries) {
-          final list = e.value;
-          if (list is List) {
-            chats['${e.key}'] = [
-              for (final row in list)
-                if (row is Map) Map<String, dynamic>.from(row),
-            ];
-          }
-        }
-      }
+    try {
+      final p = await SharedPreferences.getInstance();
+      saved
+        ..clear()
+        ..addAll(p.getStringList('nwsb_connect_saved') ?? const []);
+      await refresh();
+      error = null;
+    } on Object catch (e) {
+      error = e is EconomyException ? e.message : 'Couldn’t reach NowssB Connect. Check your connection.';
     }
     ready = true;
     notifyListeners();
   }
 
-  Future<void> _prefs(void Function(SharedPreferences p) write) async {
-    final p = await SharedPreferences.getInstance();
-    write(p);
+  Future<void> refresh() async {
+    final h = await EconomyApi.call('connectHome');
+    final me = h['me'];
+    done = me is Map;
+    if (me is Map) {
+      uid = '${me['uid'] ?? ''}';
+      name = '${me['name'] ?? ''}';
+      focus = _focus.contains(me['focus']) ? '${me['focus']}' : _focus.first;
+      bio = '${me['bio'] ?? ''}';
+      theme = me['theme'] == 'glass' ? 'glass' : 'neu';
+      final b = '${me['banner'] ?? ''}';
+      banner = b.isEmpty ? _banners.first : b;
+      avatar = '${me['avatar'] ?? ''}';
+    }
+    people = [for (final m in (h['people'] as List? ?? const [])) if (m is Map) _Person.from(m)];
+    posts = [for (final m in (h['posts'] as List? ?? const [])) if (m is Map) _Post.from(m)];
+    liked
+      ..clear()
+      ..addAll([for (final m in (h['posts'] as List? ?? const [])) if (m is Map && m['liked'] == true) '${m['id']}']);
+    follows
+      ..clear()
+      ..addAll([for (final f in (h['following'] as List? ?? const [])) '$f']);
+    followers = (h['followerCount'] as num?)?.toInt() ?? 0;
+    notifyListeners();
+  }
+
+  Future<void> _saveRemote() async {
+    await EconomyApi.call('connectSaveProfile', {'name': name, 'focus': focus, 'bio': bio, 'theme': theme, 'banner': banner});
   }
 
   Future<void> finish(String name, String focus, String bio, String theme, String banner) async {
@@ -148,73 +161,88 @@ class _ConnectData extends ChangeNotifier {
     this.bio = bio;
     this.theme = theme;
     this.banner = banner;
-    done = true;
-    await _prefs((p) {
-      p.setBool('nwsb_connect_done', true);
-      p.setString('nwsb_connect_name', name);
-      p.setString('nwsb_connect_focus', focus);
-      p.setString('nwsb_connect_bio', bio);
-      p.setString('nwsb_connect_theme', theme);
-      p.setString('nwsb_connect_banner', banner);
-    });
-    notifyListeners();
+    await _saveRemote();
+    await refresh();
   }
 
   Future<void> saveProfile(String name, String focus, String bio) async {
     this.name = name;
     this.focus = focus;
     this.bio = bio;
-    await _prefs((p) {
-      p.setString('nwsb_connect_name', name);
-      p.setString('nwsb_connect_focus', focus);
-      p.setString('nwsb_connect_bio', bio);
-    });
     notifyListeners();
+    await _saveRemote();
   }
 
   Future<void> setTheme(String theme) async {
     this.theme = theme;
-    await _prefs((p) => p.setString('nwsb_connect_theme', theme));
     notifyListeners();
+    await _saveRemote();
   }
 
   Future<void> setBanner(String banner) async {
     this.banner = banner;
-    await _prefs((p) => p.setString('nwsb_connect_banner', banner));
     notifyListeners();
+    await _saveRemote();
   }
 
   Future<void> toggleFollow(String id) async {
-    if (!follows.add(id)) follows.remove(id);
-    await _prefs((p) => p.setStringList('nwsb_connect_follows', follows.toList()));
+    final on = !follows.contains(id);
+    on ? follows.add(id) : follows.remove(id);
     notifyListeners();
+    try {
+      await EconomyApi.call('connectFollow', {'targetUid': id, 'follow': on});
+    } on Object {
+      on ? follows.remove(id) : follows.add(id);
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> toggleLike(String id) async {
-    if (!liked.add(id)) liked.remove(id);
-    await _prefs((p) => p.setStringList('nwsb_connect_liked', liked.toList()));
+    final r = await EconomyApi.call('connectLike', {'postId': id});
+    r['liked'] == true ? liked.add(id) : liked.remove(id);
+    final likes = (r['likes'] as num?)?.toInt();
+    if (likes != null) {
+      posts = [
+        for (final p in posts)
+          p.id == id ? _Post(p.id, p.authorId, p.image, p.caption, authorName: p.authorName, authorAvatar: p.authorAvatar, authorFocus: p.authorFocus, likes: likes) : p,
+      ];
+    }
     notifyListeners();
   }
 
   Future<void> toggleSave(String id) async {
     if (!saved.add(id)) saved.remove(id);
-    await _prefs((p) => p.setStringList('nwsb_connect_saved', saved.toList()));
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList('nwsb_connect_saved', saved.toList());
+  }
+
+  Future<void> post(String text) async {
+    await EconomyApi.call('connectPost', {'text': text});
+    await refresh();
+  }
+
+  Future<void> loadInbox() async {
+    final r = await EconomyApi.call('connectInbox');
+    inbox = [for (final c in (r['chats'] as List? ?? const [])) if (c is Map) Map<String, dynamic>.from(c)];
     notifyListeners();
   }
 
   List<Map<String, dynamic>> linesFor(String id) => chats[id] ?? const [];
 
-  Future<void> pushLine(String id, Map<String, dynamic> line, {bool reply = false}) async {
-    final list = [...linesFor(id), line];
-    chats[id] = list;
+  Future<void> loadThread(String id) async {
+    final r = await EconomyApi.call('connectThread', {'withUid': id});
+    chats[id] = [for (final m in (r['messages'] as List? ?? const [])) if (m is Map) Map<String, dynamic>.from(m)];
     notifyListeners();
-    await _persistChats();
-    // No canned auto-replies: these chats are not backed by a real
-    // messaging service, so we never invent a reply from the other person.
   }
 
-  Future<void> _persistChats() async {
-    await _prefs((p) => p.setString('nwsb_connect_chats_v2', jsonEncode(chats)));
+  /// Sends a real message. The other person's replies only ever come from them.
+  Future<void> send(String id, String text) async {
+    final r = await EconomyApi.call('connectSend', {'toUid': id, 'text': text});
+    final m = r['message'];
+    if (m is Map) chats[id] = [...linesFor(id), Map<String, dynamic>.from(m)];
+    notifyListeners();
   }
 }
 
@@ -248,6 +276,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
         if (!_data.ready) {
           return const Scaffold(backgroundColor: _ink, body: Center(child: CircularProgressIndicator(color: _gold)));
         }
+        if (_data.error != null) return _offline(_data);
         if (!_data.done) return _Setup(data: _data);
         return _Shell(data: _data);
       },
@@ -557,8 +586,12 @@ class _SetupState extends State<_Setup> {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _ctaButton('Enter NowssB Connect', () {
-                  widget.data.finish(name, _focusPick, _bio.text.trim(), _theme, _banner);
+                child: _ctaButton('Enter NowssB Connect', () async {
+                  try {
+                    await widget.data.finish(name, _focusPick, _bio.text.trim(), _theme, _banner);
+                  } on Object catch (e) {
+                    if (mounted) _toast(context, e);
+                  }
                 }),
               ),
             ],
@@ -784,7 +817,12 @@ class _Home extends StatelessWidget {
           ),
         ),
         const _Hd('Suggested · Community'),
-        for (final person in _people.take(5)) _personRow(context, data, person),
+        if (data.people.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text('No one else has joined Connect yet. Invite a friend who practices.', style: TextStyle(color: Color(0x66FFFFFF), fontSize: 12)),
+          ),
+        for (final person in data.people.take(5)) _personRow(context, data, person),
       ],
     );
   }
@@ -851,14 +889,17 @@ class _CommunityState extends State<_Community> {
   Widget build(BuildContext context) {
     final q = _q.trim().toLowerCase();
     final people = [
-      for (final p in _people)
+      for (final p in widget.data.people)
         if (q.isEmpty || p.name.toLowerCase().contains(q) || p.username.contains(q) || p.category.toLowerCase().contains(q)) p,
     ];
     final posts = [
-      for (final post in _posts)
+      for (final post in widget.data.posts)
         if (q.isEmpty || post.caption.toLowerCase().contains(q)) post,
     ];
-    return ListView(
+    return RefreshIndicator(
+      color: _gold,
+      onRefresh: () => widget.data.refresh(),
+      child: ListView(
       padding: EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 16, 16, 24),
       children: [
         const Text.rich(TextSpan(children: [
@@ -880,14 +921,15 @@ class _CommunityState extends State<_Community> {
         ),
         const SizedBox(height: 16),
         if (people.isEmpty && posts.isEmpty)
-          const Padding(
-            padding: EdgeInsets.only(top: 36),
-            child: Text('No posts to explore yet', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          Padding(
+            padding: const EdgeInsets.only(top: 36),
+            child: Text(q.isEmpty ? 'No people or posts yet. Be the first to post.' : 'Nothing matches your search.', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
           ),
         for (final person in people) _personRow(context, widget.data, person),
         if (posts.isNotEmpty) const _Hd('Explore'),
         for (final post in posts) _postCard(context, widget.data, post),
       ],
+    ),
     );
   }
 }
@@ -921,7 +963,8 @@ class _Profile extends StatelessWidget {
                 CircleAvatar(
                   radius: 36,
                   backgroundColor: const Color(0xFF1A1A2E),
-                  child: Text(data.name.isEmpty ? 'N' : data.name[0].toUpperCase(), style: const TextStyle(color: _gold, fontSize: 26, fontWeight: FontWeight.w800)),
+                  backgroundImage: data.avatar.isEmpty ? null : NetworkImage(data.avatar),
+                  child: data.avatar.isNotEmpty ? null : Text(data.name.isEmpty ? 'N' : data.name[0].toUpperCase(), style: const TextStyle(color: _gold, fontSize: 26, fontWeight: FontWeight.w800)),
                 ),
                 const SizedBox(height: 10),
                 Text(data.name.isEmpty ? 'there' : data.name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
@@ -932,9 +975,9 @@ class _Profile extends StatelessWidget {
                 ],
                 const SizedBox(height: 12),
                 Row(children: [
-                  _count('${_posts.length}', 'Posts'),
+                  _count('${data.myPosts.length}', 'Posts'),
                   _count('${data.follows.length}', 'Following'),
-                  _count('0', 'Followers'),
+                  _count('${data.followers}', 'Followers'),
                 ]),
                 const SizedBox(height: 12),
                 Row(children: [
@@ -955,9 +998,14 @@ class _Profile extends StatelessWidget {
         const SizedBox(height: 8),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(children: [for (final post in _posts) _postCard(context, data, post)]),
+          child: Column(children: [
+            if (data.myPosts.isEmpty)
+              const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Text('You haven’t posted yet.', style: TextStyle(color: Color(0x88FFFFFF)))),
+            for (final post in data.myPosts) _postCard(context, data, post),
+          ]),
         ),
         const SizedBox(height: 8),
+        _row(Icons.edit_note, 'New post', 'Share with the NowssB community', () => _compose(context)),
         _row(Icons.bookmark_border, 'Saved', "Posts you've bookmarked", () => _list(context, 'Saved', data.saved)),
         _row(Icons.favorite_border, 'Liked', "Posts you've liked", () => _list(context, 'Liked', data.liked)),
         const SizedBox(height: 8),
@@ -1023,7 +1071,7 @@ class _Profile extends StatelessWidget {
   }
 
   void _list(BuildContext context, String title, Set<String> ids) {
-    final posts = [for (final post in _posts) if (ids.contains(post.id)) post];
+    final posts = [for (final post in data.posts) if (ids.contains(post.id)) post];
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
           backgroundColor: _ink,
           appBar: AppBar(backgroundColor: _ink, foregroundColor: Colors.white, title: Text(title)),
@@ -1041,6 +1089,38 @@ class _Profile extends StatelessWidget {
       trailing: const Icon(Icons.chevron_right, color: Color(0x55FFFFFF)),
       onTap: onTap,
     );
+  }
+
+  Future<void> _compose(BuildContext context) async {
+    final text = TextEditingController();
+    final ok = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF10141C),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(ctx).bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('New post', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 10),
+            TextField(key: const Key('connect-post-text'), controller: text, maxLines: 4, maxLength: 500, style: const TextStyle(color: Colors.white), decoration: _field('What did you practice today?')),
+            const SizedBox(height: 8),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: _gold, foregroundColor: _ink),
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('Post'),
+            ),
+          ],
+        ),
+      ),
+    );
+    final body = text.text.trim();
+    text.dispose();
+    if (ok == true && body.isNotEmpty && context.mounted) {
+      await _guard(context, () => data.post(body));
+    }
   }
 
   Future<void> _edit(BuildContext context) async {
@@ -1079,7 +1159,11 @@ class _Profile extends StatelessWidget {
       ),
     );
     if (ok == true) {
-      data.saveProfile(name.text.trim().isEmpty ? data.name : name.text.trim(), focus, bio.text.trim());
+      try {
+        await data.saveProfile(name.text.trim().isEmpty ? data.name : name.text.trim(), focus, bio.text.trim());
+      } on Object catch (e) {
+        if (context.mounted) _toast(context, e);
+      }
     }
     name.dispose();
     bio.dispose();
@@ -1093,44 +1177,72 @@ class _Peer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final on = data.follows.contains(person.id);
-    return Scaffold(
-      backgroundColor: _ink,
-      appBar: AppBar(backgroundColor: _ink, foregroundColor: Colors.white, title: Text(person.username)),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Center(child: ClipOval(child: Image.network(person.avatar, width: 88, height: 88, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const CircleAvatar(radius: 44, child: Icon(Icons.person))))),
-          const SizedBox(height: 12),
-          Center(child: Text(person.name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800))),
-          Center(child: Text(person.category, style: const TextStyle(color: _gold))),
-          const SizedBox(height: 16),
-          Row(children: [
-            Expanded(child: _ctaButton(on ? 'Following' : 'Follow', () => data.toggleFollow(person.id))),
-            const SizedBox(width: 10),
-            Expanded(child: _ctaButton('Message', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Thread(data: data, person: person))))),
-          ]),
-        ],
-      ),
+    return ListenableBuilder(
+      listenable: data,
+      builder: (context, _) {
+        final on = data.follows.contains(person.id);
+        final theirPosts = [for (final p in data.posts) if (p.authorId == person.id) p];
+        return Scaffold(
+          backgroundColor: _ink,
+          appBar: AppBar(backgroundColor: _ink, foregroundColor: Colors.white, title: Text(person.username)),
+          body: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              Center(child: _avatar(person.avatar, person.name, 44)),
+              const SizedBox(height: 12),
+              Center(child: Text(person.name, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800))),
+              Center(child: Text(person.category, style: const TextStyle(color: _gold))),
+              if (person.bio.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Center(child: Text(person.bio, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xCCFFFFFF)))),
+              ],
+              const SizedBox(height: 16),
+              Row(children: [
+                Expanded(child: _ctaButton(on ? 'Following' : 'Follow', () => _guard(context, () => data.toggleFollow(person.id)))),
+                const SizedBox(width: 10),
+                Expanded(child: _ctaButton('Message', () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Thread(data: data, person: person))))),
+              ]),
+              const SizedBox(height: 16),
+              for (final post in theirPosts) _postCard(context, data, post),
+            ],
+          ),
+        );
+      },
     );
   }
 }
 
-class _Inbox extends StatelessWidget {
+class _Inbox extends StatefulWidget {
   const _Inbox({required this.data});
   final _ConnectData data;
 
   @override
+  State<_Inbox> createState() => _InboxState();
+}
+
+class _InboxState extends State<_Inbox> {
+  var _loading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      await widget.data.loadInbox();
+      _error = null;
+    } on Object catch (e) {
+      _error = _msg(e);
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final ordered = [..._people]..sort((a, b) {
-        final al = data.linesFor(a.id);
-        final bl = data.linesFor(b.id);
-        if (al.isEmpty && bl.isNotEmpty) return 1;
-        if (bl.isEmpty && al.isNotEmpty) return -1;
-        final at = al.isEmpty ? 0 : (al.last['ts'] as num? ?? 0);
-        final bt = bl.isEmpty ? 0 : (bl.last['ts'] as num? ?? 0);
-        return bt.compareTo(at);
-      });
+    final data = widget.data;
     return Scaffold(
       backgroundColor: _ink,
       appBar: AppBar(
@@ -1139,43 +1251,83 @@ class _Inbox extends StatelessWidget {
         title: const Text('Messages'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => _newChat(context),
             child: const Text('+ New', style: TextStyle(color: _gold, fontWeight: FontWeight.w800)),
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          for (final person in ordered)
-            InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Thread(data: data, person: person))),
+      body: ListenableBuilder(
+        listenable: data,
+        builder: (context, _) {
+          if (_loading) return const Center(child: CircularProgressIndicator(color: _gold));
+          if (_error != null) return Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Color(0x99FFFFFF)))));
+          if (data.inbox.isEmpty) {
+            return const Center(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
-                child: Row(children: [
-                  ClipOval(child: Image.network(person.avatar, width: 48, height: 48, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const CircleAvatar(radius: 24))),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(person.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
-                      Text(_preview(data, person), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 12)),
-                    ]),
-                  ),
-                ]),
+                padding: EdgeInsets.all(24),
+                child: Text('No messages yet.\nTap + New or open someone’s profile to say hello.', textAlign: TextAlign.center, style: TextStyle(color: Color(0x99FFFFFF))),
               ),
+            );
+          }
+          return RefreshIndicator(
+            color: _gold,
+            onRefresh: _load,
+            child: ListView(
+              children: [
+                for (final c in data.inbox)
+                  if (c['with'] is Map) _chatRow(context, data, c),
+              ],
             ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  String _preview(_ConnectData data, _Person person) {
-    final lines = data.linesFor(person.id);
-    if (lines.isEmpty) return 'Tap to start a conversation';
-    final last = lines.last;
-    final mine = last['mine'] == true ? 'You: ' : '';
-    if (last['type'] == 'voice') return '$mine Voice note';
-    if (last['type'] == 'image') return '$mine Photo';
-    return '$mine${last['text'] ?? ''}';
+  Widget _chatRow(BuildContext context, _ConnectData data, Map<String, dynamic> c) {
+    final person = _Person.from(c['with'] as Map);
+    final preview = '${c['lastMine'] == true ? 'You: ' : ''}${c['lastText'] ?? ''}';
+    return InkWell(
+      onTap: () async {
+        await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Thread(data: data, person: person)));
+        _load();
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+        child: Row(children: [
+          _avatar(person.avatar, person.name, 24),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(person.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
+              Text(preview, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x73FFFFFF), fontSize: 12)),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  void _newChat(BuildContext context) {
+    final people = widget.data.people;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF10141C),
+      builder: (ctx) => people.isEmpty
+          ? const Padding(padding: EdgeInsets.all(24), child: Text('No one else has joined Connect yet.', style: TextStyle(color: Color(0x99FFFFFF))))
+          : ListView(children: [
+              for (final p in people)
+                ListTile(
+                  leading: _avatar(p.avatar, p.name, 18),
+                  title: Text(p.name, style: const TextStyle(color: Colors.white)),
+                  subtitle: Text(p.category, style: const TextStyle(color: _gold, fontSize: 12)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Thread(data: widget.data, person: p)));
+                  },
+                ),
+            ]),
+    );
   }
 }
 
@@ -1191,24 +1343,57 @@ class _Thread extends StatefulWidget {
 class _ThreadState extends State<_Thread> {
   final _text = TextEditingController();
   var _stickers = false;
+  var _loading = true;
+  var _sending = false;
+  Timer? _poll;
   static const _stickersList = ['🙏', '🎧', '✨', '🔥', '💫', '🤍'];
 
   @override
+  void initState() {
+    super.initState();
+    _load();
+    // New replies arrive by polling every 10 s while this chat is open.
+    _poll = Timer.periodic(const Duration(seconds: 10), (_) => _load(quiet: true));
+  }
+
+  Future<void> _load({bool quiet = false}) async {
+    try {
+      await widget.data.loadThread(widget.person.id);
+    } on Object catch (e) {
+      if (!quiet && mounted) _toast(context, e);
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  @override
   void dispose() {
+    _poll?.cancel();
     _text.dispose();
     super.dispose();
   }
 
-  void _sendText([String? preset]) {
+  Future<void> _sendText([String? preset]) async {
     final text = (preset ?? _text.text).trim();
-    if (text.isEmpty) return;
-    _text.clear();
-    setState(() => _stickers = false);
-    widget.data.pushLine(widget.person.id, {'mine': true, 'text': text, 'ts': DateTime.now().millisecondsSinceEpoch}, reply: true);
+    if (text.isEmpty || _sending) return;
+    setState(() {
+      _stickers = false;
+      _sending = true;
+    });
+    try {
+      await widget.data.send(widget.person.id, text);
+      if (preset == null) _text.clear();
+    } on Object catch (e) {
+      if (mounted) _toast(context, e);
+    }
+    if (mounted) setState(() => _sending = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(listenable: widget.data, builder: (context, _) => _build(context));
+  }
+
+  Widget _build(BuildContext context) {
     final lines = widget.data.linesFor(widget.person.id);
     return Scaffold(
       backgroundColor: _ink,
@@ -1223,21 +1408,19 @@ class _ThreadState extends State<_Thread> {
                   Row(children: [
                     IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.arrow_back, color: Colors.white)),
                     const Expanded(child: Text('NowssB Connect', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800))),
-                    IconButton(onPressed: () => _call(false), icon: const Icon(Icons.call, color: Colors.white, size: 20)),
-                    IconButton(onPressed: () => _call(true), icon: const Icon(Icons.videocam_outlined, color: Colors.white)),
+                    const SizedBox(width: 48),
                   ]),
                   InkWell(
                     onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Peer(data: widget.data, person: widget.person))),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
                       child: Row(children: [
-                        ClipOval(child: Image.network(widget.person.avatar, width: 36, height: 36, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const CircleAvatar(radius: 18))),
+                        _avatar(widget.person.avatar, widget.person.name, 18),
                         const SizedBox(width: 10),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text(widget.person.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                           Text(widget.person.category, style: const TextStyle(color: _gold, fontSize: 12)),
                         ])),
-                        TextButton(onPressed: _rate, child: const Text('Rate ★', style: TextStyle(color: _gold))),
                       ]),
                     ),
                   ),
@@ -1246,12 +1429,16 @@ class _ThreadState extends State<_Thread> {
             ),
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                for (final e in lines) _bubble(e),
-              ],
-            ),
+            child: _loading
+                ? const Center(child: CircularProgressIndicator(color: _gold))
+                : lines.isEmpty
+                    ? Center(child: Text('Say hello to ${widget.person.name}.', style: const TextStyle(color: Color(0x88FFFFFF))))
+                    : ListView(
+                        padding: const EdgeInsets.all(16),
+                        children: [
+                          for (final e in lines) _bubble(e),
+                        ],
+                      ),
           ),
           if (_stickers)
             SizedBox(
@@ -1271,24 +1458,17 @@ class _ThreadState extends State<_Thread> {
           Padding(
             padding: EdgeInsets.fromLTRB(8, 0, 8, 8 + MediaQuery.paddingOf(context).bottom),
             child: Row(children: [
-              IconButton(
-                onPressed: () => widget.data.pushLine(widget.person.id, {'mine': true, 'type': 'image', 'img': _explain[0].$2, 'ts': DateTime.now().millisecondsSinceEpoch}, reply: true),
-                icon: const Icon(Icons.photo_camera_outlined, color: Color(0xCCFFFFFF)),
-              ),
               Expanded(
                 child: TextField(
+                  key: const Key('connect-message'),
                   controller: _text,
                   style: const TextStyle(color: Colors.white),
                   decoration: _field('Message…'),
                   onSubmitted: (_) => _sendText(),
                 ),
               ),
-              IconButton(
-                onPressed: () => widget.data.pushLine(widget.person.id, {'mine': true, 'type': 'voice', 'text': '0:02', 'ts': DateTime.now().millisecondsSinceEpoch}, reply: true),
-                icon: const Icon(Icons.mic_none, color: Color(0xCCFFFFFF)),
-              ),
               IconButton(onPressed: () => setState(() => _stickers = !_stickers), icon: const Icon(Icons.emoji_emotions_outlined, color: Color(0xCCFFFFFF))),
-              IconButton(onPressed: () => _sendText(), icon: const Icon(Icons.send, color: _gold)),
+              IconButton(key: const Key('connect-send'), onPressed: _sending ? null : () => _sendText(), icon: const Icon(Icons.send, color: _gold)),
             ]),
           ),
         ],
@@ -1298,140 +1478,63 @@ class _ThreadState extends State<_Thread> {
 
   Widget _bubble(Map<String, dynamic> e) {
     final mine = e['mine'] == true;
-    final type = e['type'];
-    Widget child;
-    if (type == 'image') {
-      child = ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Image.network('${e['img']}', width: 180, height: 140, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const SizedBox(width: 180, height: 80, child: ColoredBox(color: Color(0xFF222222)))),
-      );
-    } else if (type == 'voice') {
-      child = Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.play_arrow, color: mine ? _ink : Colors.white),
-        const SizedBox(width: 6),
-        Text('Voice · ${e['text'] ?? '0:02'}', style: TextStyle(color: mine ? _ink : Colors.white, fontWeight: FontWeight.w700)),
-      ]);
-    } else {
-      child = Text('${e['text']}', style: TextStyle(color: mine ? _ink : Colors.white));
-    }
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
-        padding: type == 'image' ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        constraints: const BoxConstraints(maxWidth: 280),
         decoration: BoxDecoration(
           color: mine ? _gold : const Color(0xFF1A1A22),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: child,
-      ),
-    );
-  }
-
-  void _call(bool video) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Call(person: widget.person, video: video)));
-  }
-
-  Future<void> _rate() async {
-    var stars = 5;
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(0xFF141820),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, set) => Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Rate Practitioner', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 6),
-              const Text('How was your interaction with this healer?', style: TextStyle(color: Color(0x88FFFFFF))),
-              const SizedBox(height: 12),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                for (var i = 1; i <= 5; i++)
-                  IconButton(
-                    onPressed: () => set(() => stars = i),
-                    icon: Icon(i <= stars ? Icons.star : Icons.star_border, color: _gold, size: 32),
-                  ),
-              ]),
-              const SizedBox(height: 8),
-              _ctaButton('Submit Rating', () {
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Rated ${widget.person.name} $stars★')));
-              }),
-            ],
-          ),
-        ),
+        child: Text('${e['text']}', style: TextStyle(color: mine ? _ink : Colors.white)),
       ),
     );
   }
 }
 
-class _Call extends StatefulWidget {
-  const _Call({required this.person, required this.video});
-  final _Person person;
-  final bool video;
+String _msg(Object e) => e is EconomyException ? e.message : 'Something went wrong. Try again.';
 
-  @override
-  State<_Call> createState() => _CallState();
+void _toast(BuildContext context, Object e) {
+  ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(_msg(e))));
 }
 
-class _CallState extends State<_Call> {
-  var _status = 'Calling…';
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _timer = Timer(const Duration(milliseconds: 1400), () {
-      if (mounted) setState(() => _status = 'Connected');
-    });
+Future<void> _guard(BuildContext context, Future<void> Function() run) async {
+  try {
+    await run();
+  } on Object catch (e) {
+    if (context.mounted) _toast(context, e);
   }
+}
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
+Widget _avatar(String url, String name, double r) {
+  final letter = CircleAvatar(
+    radius: r,
+    backgroundColor: const Color(0xFF1A1A2E),
+    child: Text(name.isEmpty ? 'N' : name[0].toUpperCase(), style: TextStyle(color: _gold, fontWeight: FontWeight.w800, fontSize: r * 0.8)),
+  );
+  if (url.isEmpty) return letter;
+  return ClipOval(child: Image.network(url, width: r * 2, height: r * 2, fit: BoxFit.cover, errorBuilder: (_, __, ___) => letter));
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _ink,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.network(widget.person.avatar, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: _ink)),
-          const DecoratedBox(decoration: BoxDecoration(color: Color(0xB0060C18))),
-          SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 28),
-                Text(widget.video ? 'Video Call' : 'Voice Call', style: const TextStyle(color: _gold, letterSpacing: 1.4, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 28),
-                ClipOval(child: Image.network(widget.person.avatar, width: 120, height: 120, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const CircleAvatar(radius: 60))),
-                const SizedBox(height: 16),
-                Text(widget.person.name, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 6),
-                Text(_status, style: const TextStyle(color: Color(0xCCFFFFFF))),
-                const Spacer(),
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    width: 68,
-                    height: 68,
-                    decoration: const BoxDecoration(color: Color(0xFFE23B3B), shape: BoxShape.circle),
-                    child: const Icon(Icons.call_end, color: Colors.white),
-                  ),
-                ),
-                const SizedBox(height: 36),
-              ],
-            ),
-          ),
-        ],
+Widget _offline(_ConnectData data) {
+  return Scaffold(
+    backgroundColor: _ink,
+    body: Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(data.error ?? '', textAlign: TextAlign.center, style: const TextStyle(color: Colors.white)),
+          const SizedBox(height: 16),
+          _ctaButton('Try again', () {
+            data.ready = false;
+            data.load();
+          }),
+        ]),
       ),
-    );
-  }
+    ),
+  );
 }
 
 class _Feature extends StatelessWidget {
@@ -1517,20 +1620,20 @@ Widget _personRow(BuildContext context, _ConnectData data, _Person person) {
     child: Row(children: [
       GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Peer(data: data, person: person))),
-        child: ClipOval(child: Image.network(person.avatar, width: 44, height: 44, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const CircleAvatar(radius: 22))),
+        child: _avatar(person.avatar, person.name, 22),
       ),
       const SizedBox(width: 10),
       Expanded(
         child: GestureDetector(
           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Peer(data: data, person: person))),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(person.username, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+            Text(person.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
             Text(person.category, style: const TextStyle(color: Color(0x88FFFFFF), fontSize: 12)),
           ]),
         ),
       ),
       GestureDetector(
-        onTap: () => data.toggleFollow(person.id),
+        onTap: () => _guard(context, () => data.toggleFollow(person.id)),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(color: on ? const Color(0xFF1A1E28) : _gold, borderRadius: BorderRadius.circular(16)),
@@ -1542,33 +1645,41 @@ Widget _personRow(BuildContext context, _ConnectData data, _Person person) {
 }
 
 Widget _postCard(BuildContext context, _ConnectData data, _Post post) {
-  final author = _person(post.authorId);
+  final author = data.person(post.authorId);
+  final mine = post.authorId == data.uid;
   final liked = data.liked.contains(post.id);
   final saved = data.saved.contains(post.id);
+  final name = mine ? (data.name.isEmpty ? 'You' : data.name) : (post.authorName.isEmpty ? 'NowssB member' : post.authorName);
   return Container(
     margin: const EdgeInsets.only(bottom: 12),
     decoration: BoxDecoration(color: const Color(0xF0101014), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x18FFFFFF))),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ListTile(
-          leading: author == null ? null : ClipOval(child: Image.network(author.avatar, width: 36, height: 36, fit: BoxFit.cover)),
-          title: Text(author?.name ?? 'NowssB', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-          subtitle: Text(author?.category ?? '', style: const TextStyle(color: _gold, fontSize: 12)),
+        Material(
+          type: MaterialType.transparency,
+          child: ListTile(
+          leading: _avatar(mine ? data.avatar : post.authorAvatar, name, 18),
+          title: Text(name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          subtitle: Text(mine ? data.focus : post.authorFocus, style: const TextStyle(color: _gold, fontSize: 12)),
+          onTap: author == null || mine ? null : () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Peer(data: data, person: author))),
+          ),
         ),
-        AspectRatio(
-          aspectRatio: 1.4,
-          child: Image.network(post.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1028))),
-        ),
+        if (post.image.isNotEmpty)
+          AspectRatio(
+            aspectRatio: 1.4,
+            child: Image.network(post.image, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1028))),
+          ),
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
           child: Text(post.caption, style: const TextStyle(color: Colors.white)),
         ),
         Row(children: [
-          IconButton(onPressed: () => data.toggleLike(post.id), icon: Icon(liked ? Icons.favorite : Icons.favorite_border, color: liked ? const Color(0xFFE06A8A) : Colors.white)),
+          IconButton(onPressed: () => _guard(context, () => data.toggleLike(post.id)), icon: Icon(liked ? Icons.favorite : Icons.favorite_border, color: liked ? const Color(0xFFE06A8A) : Colors.white)),
+          if (post.likes > 0) Text('${post.likes}', style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12)),
           IconButton(onPressed: () => data.toggleSave(post.id), icon: Icon(saved ? Icons.bookmark : Icons.bookmark_border, color: saved ? _gold : Colors.white)),
           const Spacer(),
-          if (author != null)
+          if (author != null && !mine)
             TextButton(
               onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => _Thread(data: data, person: author))),
               child: const Text('Message', style: TextStyle(color: _gold)),
