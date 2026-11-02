@@ -37,6 +37,8 @@
 /// [HomeSkinScope] is what tells them which home they are on.
 library;
 
+import 'package:nowssb/widgets/concept/r27/hero.dart' show R27MeditationBanner;
+import 'package:nowssb/data/content.dart' show ContentStore;
 import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'dart:async';
 
@@ -401,7 +403,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
+            R27MeditationBanner(hourCount: ContentStore.instance.library.length, onTap: () => _go(1)),
             MainOptionsSection(onGo: _go, onAction: _openMainOption),
           ],
         )),
