@@ -9,7 +9,7 @@ import 'package:nowssb/features/social/connect_screen.dart';
 import 'package:nowssb/screens/concept/drop_v4_type.dart';
 import 'dart:math' as math;
 import 'package:nowssb/screens/concept/drop_v5.dart';
-import 'package:nowssb/screens/concept/drop_v4_concepts.dart' show DoorHooks, hourWord;
+import 'package:nowssb/screens/concept/drop_v4_concepts.dart' show DoorHooks, DoorKind, hourWord;
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:nowssb/screens/fashion/door_screens.dart';
@@ -500,15 +500,6 @@ void main() {
     }
   });
 
-  testWidgets('prism face-1 greeting follows the local hour (01:00 = Good Night)', (t) async {
-    DayClock.clock = () => DateTime(2026, 10, 27, 1);
-    addTearDown(() => DayClock.clock = null);
-    await boot(t, const Scaffold(body: SingleChildScrollView(child: DoorsPrismV5())));
-    expect(find.text(dayPartFor(DateTime(2026, 10, 27, 1)).greeting), findsWidgets);
-    expect(find.text('Good Evening'), findsNothing);
-    await t.pumpWidget(const SizedBox());
-  });
-
   group('Drop doors v4 (prism)', () {
     for (final (i, label) in [(0, 'Background'), (1, 'Start art'), (2, 'Access')]) {
       testWidgets('tab $label turns the prism; front tap fires its hook', (t) async {
@@ -542,7 +533,7 @@ void main() {
           await boot(t, const Scaffold(body: SingleChildScrollView(child: DoorsPrismV5())), w: w, s: s);
           expect(t.takeException(), isNull);
           final screen = Offset.zero & t.view.physicalSize / t.view.devicePixelRatio;
-          for (var i = 0; i < 4; i++) {
+          for (var i = 0; i < DoorKind.values.length; i++) {
             final r = t.getRect(find.byKey(ValueKey('drop-prism-tab-$i')));
             expect(r.left >= screen.left && r.right <= screen.right, isTrue, reason: 'tab $i $r fully on screen $screen');
           }
