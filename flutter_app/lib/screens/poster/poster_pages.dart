@@ -22,14 +22,12 @@ import 'poster_atelier.dart';
 import 'poster_ebooks.dart';
 import 'poster_kit.dart';
 import 'poster_meaning.dart';
-import 'poster_signature.dart';
 import 'poster_trending.dart';
 
 export 'poster_atelier.dart';
 export 'poster_ebooks.dart';
 export 'poster_kit.dart';
 export 'poster_meaning.dart';
-export 'poster_signature.dart';
 export 'poster_orbit.dart';
 export 'poster_trending.dart';
 
@@ -94,28 +92,6 @@ Widget posterMeaningPage(BuildContext x, {ScrollController? controller, DateTime
       onRequest: () => openRequestWords(x),
     );
 
-/// The Signature Store poster (SignatureStoreScreen's page). Prices are the
-/// Play signature prices (StorePrices kind 'signature').
-Widget posterSignaturePage(BuildContext x, {ScrollController? controller}) => PosterSignature(
-      controller: controller,
-      onBack: () => posterBack(x),
-      onOpenStores: () => posterStores(x, 'signature'),
-      onOpenBag: () => posterBag(x),
-      onOpenSignatureWord: (s, p) => openAtelierWord(x, word: s.name, root: 'Most Exclusive', img: kNowssbStoreMark, signature: true, price: p),
-      onBuySignatureWord: (s, p) =>
-          storeBuyNow(x, wordBagItem(name: s.name, root: 'Most Exclusive', img: kNowssbStoreMark, price: p, signature: true)),
-      onOpenSignatureMeaning: (cat, e) => openMeaningDetail(
-        x,
-        MsMeaning(word: e.word, key: e.key, root: e.root, category: cat, price: sigMeaningPrice(e), img: kNowssbStoreMark),
-        signature: true,
-      ),
-      onBuySignatureMeaning: (cat, e) =>
-          storeBuyNow(x, meaningBagItem(word: e.word, root: e.root, img: kNowssbStoreMark, price: sigMeaningPrice(e), signature: true)),
-      onOpenPlace: (r) => openAtelierWord(x, word: r.$1, root: r.$2, img: kNowssbStoreMark, signature: true, price: sigPlacePrice(r.$1)),
-      onCartPlace: (r, p) => posterAddToCart(x, wordBagItem(name: r.$1, root: r.$2, img: kNowssbStoreMark, price: p, signature: true)),
-      onBuyPlace: (r, p) => storeBuyNow(x, wordBagItem(name: r.$1, root: r.$2, img: kNowssbStoreMark, price: p, signature: true)),
-      onRequest: () => openRequestWords(x),
-    );
 
 /// The Ebooks Store poster (EbooksStoreScreen's page).
 Widget posterEbooksPage(BuildContext x, {ScrollController? controller}) => PosterEbooks(
@@ -155,7 +131,6 @@ class TrendingScreen extends StatelessWidget {
 final Map<String, PosterBuild> kPosterPages = {
   'trending': (c, now) => TrendingScreen(controller: c, now: now, debugAngle: .5, debugTilt: const Offset(-.3, .12)),
   'atelier': (c, now) => Builder(builder: (x) => posterAtelierPage(x, controller: c, now: now)),
-  'signature': (c, now) => Builder(builder: (x) => posterSignaturePage(x, controller: c)),
   'ebooks': (c, now) => Builder(builder: (x) => posterEbooksPage(x, controller: c)),
   'meaning': (c, now) => Builder(builder: (x) => posterMeaningPage(x, controller: c, now: now)),
 };

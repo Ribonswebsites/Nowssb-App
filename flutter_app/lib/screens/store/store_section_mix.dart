@@ -89,14 +89,6 @@ List<SectionMediaItem> _storeDoors({required String skip}) => [
           ctaLabel: 'Open',
           ctaLink: 'page:store.meaning',
         ),
-      if (skip != 'signature')
-        const SectionMediaItem(
-          id: 'signature',
-          title: 'Signature Store',
-          subtitle: 'The rarest words',
-          ctaLabel: 'Open',
-          ctaLink: 'page:store.signature',
-        ),
       if (skip != 'ebooks')
         const SectionMediaItem(
           id: 'ebooks',
@@ -144,14 +136,6 @@ abstract final class AtelierMix {
           icon: 'meaning',
           ctaLink: 'meaning',
           meta: {'glowColor': 0xFFE8A23A},
-        ),
-        const SectionMediaItem(
-          id: 'signature',
-          title: 'Signature',
-          subtitle: 'Rarest words',
-          icon: 'signature',
-          ctaLink: 'signature',
-          meta: {'glowColor': 0xFFC8A96E},
         ),
         const SectionMediaItem(
           id: 'ebooks',
@@ -301,14 +285,6 @@ abstract final class EbooksMix {
           icon: 'meaning',
           ctaLink: 'meaning',
           meta: {'glowColor': 0xFFE8A23A},
-        ),
-        const SectionMediaItem(
-          id: 'signature',
-          title: 'Signature',
-          subtitle: 'Rarest words',
-          icon: 'signature',
-          ctaLink: 'signature',
-          meta: {'glowColor': 0xFFC8A96E},
         ),
         ..._programmeChips('Request a word'),
       ]);

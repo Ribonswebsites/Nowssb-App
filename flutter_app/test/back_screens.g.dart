@@ -120,7 +120,6 @@ final btScreens = <String, Widget Function()>{
   'SavedWordsScreen': () => const SavedWordsScreen(),
   'SelectLevelScreen': () => const SelectLevelScreen(),
   'SentenceBuilderScreen': () => const SentenceBuilderScreen(),
-  'SignatureStoreScreen': () => const SignatureStoreScreen(),
   'SoundLibraryScreen': () => const SoundLibraryScreen(),
   'SpinWheelPage': () => const SpinWheelPage(),
   'StoreScreen': () => const StoreScreen(),

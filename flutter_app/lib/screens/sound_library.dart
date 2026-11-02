@@ -1196,12 +1196,6 @@ class _SlmFeed extends StatelessWidget {
         onTap: onStore,
       ),
       _StoreVid(
-        title: 'NowssB Signature',
-        sub: 'The rarest words and meanings',
-        asset: 'assets/video/signature-banner.mp4',
-        onTap: onStore,
-      ),
-      _StoreVid(
         title: 'Subscription',
         sub: 'Unlock the full word library',
         asset: 'assets/video/subscription-a.mp4',

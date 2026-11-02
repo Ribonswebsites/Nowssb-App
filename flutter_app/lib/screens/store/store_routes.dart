@@ -7,7 +7,6 @@ import '../../widgets/routine_deck.dart';
 import 'store_art.dart';
 import 'ebooks_store.dart';
 import 'meaning_store.dart';
-import 'signature_store.dart';
 import 'word_atelier.dart';
 
 void openStoreFromPicker(BuildContext context, String id, {required String current}) {
@@ -19,9 +18,6 @@ void openStoreFromPicker(BuildContext context, String id, {required String curre
       break;
     case 'ebooks':
       page = const EbooksStoreScreen();
-      break;
-    case 'signature':
-      page = const SignatureStoreScreen();
       break;
     case 'word':
     default:
@@ -43,7 +39,6 @@ class StoreRoomDeck extends StatelessWidget {
     const rooms = [
       ('word', 'Word Atelier', 'Words and roots', 'Open the atelier'),
       ('meaning', 'Meaning Store', 'Where the English name comes from', 'Open meanings'),
-      ('signature', 'Signature Store', 'The mark on a word', 'Open signatures'),
       ('ebooks', 'eBooks', 'Read the books', 'Open the shelf'),
     ];
     return RoutineDeck(

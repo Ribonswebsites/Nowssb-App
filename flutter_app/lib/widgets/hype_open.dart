@@ -20,8 +20,6 @@ void ensureHypeRoutes() {
         Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()));
       case 'rewards':
         NwsbLinks.cta(context, 'reward');
-      case 'signature':
-        NwsbLinks.signatures(context);
       case 'library':
         NwsbLinks.tab(context, 2);
       case 'profile':

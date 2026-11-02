@@ -24,13 +24,11 @@ import 'store/store_home_sections.dart';
 
 export 'store/ebooks_store.dart';
 export 'store/meaning_store.dart';
-export 'store/signature_store.dart';
 export 'store/word_atelier.dart';
 
 import 'store/ebooks_store.dart';
 import 'store/meaning_store.dart';
 import 'store/request_words.dart';
-import 'store/signature_store.dart';
 import 'store/word_atelier.dart';
 import 'subscription.dart';
 import 'store/store_terms_sheet.dart';
@@ -183,22 +181,6 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ),
         ],
       ),
-      const _StoreDepartmentLabel('SIGNATURE STORE'),
-      _StoreGlassSection(
-        children: [
-          HomeKeepAlive(
-            child: _SignatureDoor(
-                onTap: () => _push(context, const SignatureStoreScreen())),
-          ),
-          _StoreInfoBanner(
-            onTap: () => _push(context, const SignatureStoreScreen()),
-            eyebrow: 'SIGNATURE STORE · LIMITED COLLECTIONS',
-            title: 'Words & Meanings',
-            sub: '15 Words · 5 Meanings. Owned once, never restocked.',
-            icon: Icons.headphones_outlined,
-          ),
-        ],
-      ),
       // 'See every plan' split promo removed from the Store (Oct 23).
       const SizedBox.shrink(),
       const _StoreDepartmentLabel('NOWSSB CONNECT'),
@@ -284,13 +266,12 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             items[4],
             LSection.group('atelier', 'Word Atelier', [items[5], items[6]]),
             LSection.group('meaning', 'Meaning Store', [items[7], items[8]]),
-            LSection.group('signature', 'Signature Store', [items[9], items[10]]),
-            LSection('promo', 'Split promo banner', items[11]),
-            LSection.group('connect', 'NowssB Connect', [items[12], items[13]]),
-            LSection.group('ebooks', 'eBooks', [items[14], items[15]]),
-            LSection.group('plans', 'Subscription plans', [items[16], items[17]]),
-            LSection('disclaimer', 'Disclaimer', items[18]),
-            LSection('credits', 'Credits', items[19]),
+            LSection('promo', 'Split promo banner', items[9]),
+            LSection.group('connect', 'NowssB Connect', [items[10], items[11]]),
+            LSection.group('ebooks', 'eBooks', [items[12], items[13]]),
+            LSection.group('plans', 'Subscription plans', [items[14], items[15]]),
+            LSection('disclaimer', 'Disclaimer', items[16]),
+            LSection('credits', 'Credits', items[17]),
           ]);
     return Scaffold(
       backgroundColor: NwsbColors.deep,
@@ -594,7 +575,7 @@ class _StoreBanner extends StatelessWidget {
                           fontWeight: FontWeight.w300,
                           color: Colors.white)),
                   SizedBox(height: 5),
-                  EditableLabel('store.StoreBanner', 'Word Library · Meaning Library · NowssB Signature',
+                  EditableLabel('store.StoreBanner', 'Word Library · Meaning Library',
                       style: TextStyle(fontSize: 11, color: Color(0xB3FFFFFF))),
                 ],
               ),
@@ -728,79 +709,6 @@ class _StoreChip extends StatelessWidget {
             style: const TextStyle(
                 fontSize: 8, letterSpacing: 1.5, color: Color(0xCCFFFFFF))),
       );
-}
-
-class _SignatureDoor extends StatelessWidget {
-  const _SignatureDoor({required this.onTap});
-  final VoidCallback onTap;
-
-  static const _clip = 'assets/flutter_video/signature_words.mp4';
-
-  @override
-  Widget build(BuildContext context) {
-    final editing = editModeOn(context);
-    // Pencils on: no parent button, so a tap on the film opens the sheet.
-    final frame = AspectRatio(
-      aspectRatio: 16 / 9,
-      child: Container(
-        margin: EdgeInsets.zero,
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18), color: Colors.black),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            EditMedia(
-              child: NwsbVideo(
-                asset: _clip,
-                fit: BoxFit.cover,
-                priority: ClipPriority.feature,
-                autoplay: true,
-                loop: true,
-                showPoster: false,
-                slot: 'store.SignatureDoor',
-              ),
-            ),
-            // Words sit on the film, but they do not cover it. A tap on the
-            // picture opens the video sheet. A tap on a word edits that word.
-            // No vignette: the film shows in full. A soft text shadow keeps
-            // the two short lines readable.
-            const Positioned(
-              left: 16,
-              right: 16,
-              bottom: 12,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  EditableLabel('store.SignatureDoor', 'Words & Meanings',
-                      style: TextStyle(
-                          fontSize: 24,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          shadows: [Shadow(color: Color(0x99000000), blurRadius: 10)])),
-                  SizedBox(height: 4),
-                  EditableLabel('store.SignatureDoor', '15 Words   ·   5 Meanings',
-                      style: TextStyle(
-                          fontSize: 10,
-                          letterSpacing: 1.5,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          shadows: [Shadow(color: Color(0x99000000), blurRadius: 8)])),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (editing) return frame;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: frame,
-    );
-  }
 }
 
 class _StoreCompactVideoBanner extends StatelessWidget {

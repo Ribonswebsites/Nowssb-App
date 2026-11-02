@@ -42,7 +42,6 @@ void main() {
       final wrappers = {
         'lib/screens/store/word_atelier.dart': 'posterAtelierPage(',
         'lib/screens/store/meaning_store.dart': 'posterMeaningPage(',
-        'lib/screens/store/signature_store.dart': 'posterSignaturePage(',
         'lib/screens/store/ebooks_store.dart': 'posterEbooksPage(',
       };
       wrappers.forEach((path, page) {

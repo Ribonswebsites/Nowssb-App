@@ -45,7 +45,6 @@ final _practice = <_Feature>[
 final _store = <_Feature>[
   _Feature('store', 'The Store', 'Words, bundles and the plans, priced by Google Play.', NwsbMarks.bag, (c) => NwsbLinks.tab(c, 3)),
   _Feature('meanings', 'Meanings', 'The full meaning of a word, to keep.', NwsbMarks.meaning, (c) => NwsbLinks.meanings(c)),
-  _Feature('signatures', 'Signatures', 'Signature recordings for the words you love.', NwsbMarks.signature, (c) => NwsbLinks.signatures(c)),
   _Feature('ebooks', 'Ebooks', 'Long reads on practice and sound.', NwsbMarks.ebook, (c) => NwsbLinks.ebooks(c)),
   _Feature('plans', 'Plans', 'Resonance, Frequency and Frequency X.', NwsbMarks.crown, (c) => NwsbLinks.subscription(c)),
   _Feature('request', 'Request a word', 'Ask for a word that is not in the library yet.', NwsbMarks.word, (c) => NwsbLinks.requestWord(c)),

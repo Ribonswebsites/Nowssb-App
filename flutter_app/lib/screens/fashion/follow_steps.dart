@@ -203,18 +203,6 @@ const kFstSteps = <FstStep>[
     ],
   ),
   FstStep(
-    mark: FstMarks.sig,
-    title: 'The Signature',
-    goLabel: 'See the Signature',
-    goTab: 3,
-    lead: 'Your name, in sound — the word science turned on the one word you '
-        'answer to.',
-    points: [
-      ('Your own frequency', 'What your name activates, and where it lands.'),
-      ('Made once', 'Generated for you, and then it is yours.'),
-    ],
-  ),
-  FstStep(
     mark: FstMarks.sound,
     title: 'Sound Library',
     goLabel: 'Open the library',

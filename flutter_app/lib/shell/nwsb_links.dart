@@ -17,7 +17,6 @@ import '../screens/store/cart_pages.dart';
 import '../screens/store/ebooks_store.dart';
 import '../screens/store/meaning_store.dart';
 import '../screens/store/request_words.dart';
-import '../screens/store/signature_store.dart';
 import '../screens/subscription.dart';
 import 'nav_shell.dart';
 
@@ -29,7 +28,6 @@ abstract final class NwsbLinks {
 
   static void subscription(BuildContext context) => push(context, const SubscriptionScreen());
   static void meanings(BuildContext context) => push(context, const MeaningStoreScreen());
-  static void signatures(BuildContext context) => push(context, const SignatureStoreScreen());
   static void ebooks(BuildContext context) => push(context, const EbooksStoreScreen());
   static void reader(BuildContext context) => push(context, const ReaderHubScreen());
   static void requestWord(BuildContext context) => push(context, const RequestWordsScreen());
@@ -46,7 +44,6 @@ abstract final class NwsbLinks {
   static void cta(BuildContext context, String cta) {
     final c = cta.toLowerCase();
     if (c.contains('sound library') || c.contains('open library')) return tab(context, 2);
-    if (c.contains('signature')) return signatures(context);
     if (c.contains('ebook')) return ebooks(context);
     if (c.contains('meaning')) return meanings(context);
     if (c.contains('reader') || c.contains('science')) return reader(context);

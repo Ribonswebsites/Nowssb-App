@@ -23,7 +23,6 @@ import 'package:nowssb/screens/store/ebooks_store.dart';
 import 'package:nowssb/data/models.dart' show Book;
 import 'package:nowssb/screens/poster/poster_ebooks.dart' show posterBooks;
 import 'package:nowssb/screens/store/meaning_store.dart';
-import 'package:nowssb/screens/store/signature_store.dart';
 import 'package:nowssb/screens/store/word_atelier.dart';
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/concept/stillwater.dart';
@@ -155,11 +154,6 @@ final specs = <PosterSpec>[
       }, 'Own · ', 'Open'),
   PosterSpec('meaning', () => MeaningStoreScreen(now: _now), () => {for (final m in kMsBaseMeanings) 'meaning:${m.word.toLowerCase()}'}, 'Own · ',
       PosterMeaning.pick(_now).word),
-  PosterSpec('signature', () => const SignatureStoreScreen(), () => {
-        for (final c in kRmCategories)
-          if (c.signature != null) 'signature:${c.signature!.name.toLowerCase()}',
-        for (final e in kMsSignature.values) 'meaning:${e.word.toLowerCase()}',
-      }, 'Own · ', 'Look inside'),
   PosterSpec('ebooks', () => const EbooksStoreScreen(), () => {for (final b in kEbBooks) 'ebook:${b.title.toLowerCase()}'}, 'Own · ',
       'Look inside'),
 ];

@@ -74,8 +74,6 @@ const _rail = [
   // The clip every meaning's page opens with — MS_MEANING_VID.
   _Rail(NwsbMarks.meaning, 'What a word truly means', 'NowssB Meaning Store',
       'assets/video/hero-meaning-store.mp4', 3),
-  _Rail(NwsbMarks.signature, 'The rarest word', 'The Signature',
-      'assets/video/signature-banner.mp4', 3),
   // The eBooks banner clip — and NOT the little one spinning in the spill
   // disc, which is the mistake part083.js:130 records having made.
   _Rail(NwsbMarks.book, 'Page by page', 'NowssB eBooks',

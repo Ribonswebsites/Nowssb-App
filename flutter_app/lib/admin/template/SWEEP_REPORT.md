@@ -76,7 +76,6 @@
 | screens/store/meaning_store.dart | 0 | 0 | 0 | 0 | 0 | 1 |
 | screens/store/product_detail.dart | 0 | 0 | 0 | 1 | 0 | 5 |
 | screens/store/request_words.dart | 0 | 0 | 0 | 0 | 0 | 7 |
-| screens/store/signature_store.dart | 0 | 0 | 0 | 0 | 0 | 3 |
 | screens/store/store_cards.dart | 5 | 0 | 0 | 1 | 0 | 12 |
 | screens/store/store_home_sections.dart | 11 | 0 | 0 | 4 | 0 | 19 |
 | screens/store/store_select_sheet.dart | 1 | 0 | 0 | 1 | 0 | 1 |

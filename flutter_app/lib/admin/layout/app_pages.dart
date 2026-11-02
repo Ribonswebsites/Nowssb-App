@@ -68,7 +68,6 @@ final List<AppPage> kAppPages = [
   AppPage('store.home', 'Store', 'Stores', Icons.storefront_rounded, () => const StoreScreen(), tab: 3),
   AppPage('store.atelier', 'Word Atelier', 'Stores', Icons.brush_rounded, () => const WordAtelierScreen()),
   AppPage('store.meaning', 'Meaning Store', 'Stores', Icons.menu_book_rounded, () => const MeaningStoreScreen()),
-  AppPage('store.signature', 'Signature Store', 'Stores', Icons.draw_rounded, () => const SignatureStoreScreen()),
   AppPage('store.ebooks', 'eBooks', 'Stores', Icons.auto_stories_rounded, () => const EbooksStoreScreen()),
   AppPage('store.request', 'Request words', 'Stores', Icons.mark_email_unread_rounded, () => const RequestWordsScreen()),
   AppPage('practice', 'Practice', 'Player', Icons.self_improvement_rounded, () => const PracticeScreen(), tab: 1),

@@ -2185,7 +2185,6 @@ class StoreQuickMosaic extends StatelessWidget {
               children: [
                 _MosaicPill(label: 'Atelier', mark: NwsbMarks.bag, onTap: onWords),
                 _MosaicPill(label: 'Meanings', mark: NwsbMarks.bag, onTap: onMeanings),
-                _MosaicPill(label: 'Signature', mark: NwsbMarks.wishlist, onTap: onSignature),
                 _MosaicPill(label: 'Ebooks', mark: NwsbMarks.house, onTap: onEbooks),
                 _MosaicPill(label: 'Request', mark: NwsbMarks.bell, onTap: onRequest),
               ],

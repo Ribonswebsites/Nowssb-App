@@ -37,11 +37,6 @@ const kStoreSelectEntries = <StoreSelectEntry>[
     art: 'assets/store/picker-meaning.png',
   ),
   StoreSelectEntry(
-    id: 'signature',
-    title: 'Signature',
-    art: 'assets/store/picker-signature.png',
-  ),
-  StoreSelectEntry(
     id: 'ebooks',
     title: 'Ebooks',
     art: 'assets/store/picker-ebooks.png',

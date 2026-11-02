@@ -97,14 +97,6 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
         'Tap the Store icon anytime to buy new words and meanings — every purchase instantly joins your Library, so you can keep expanding your personal word ritual.',
   ),
   PlayerGuideSlide(
-    title: 'Signature Word',
-    icon: _kStoreIcon,
-    img: 'assets/player/guide/07.webp',
-    heading: 'Unlock a Signature Word',
-    desc:
-        'Signature words are the rarest word in each category — one per set, own only in a special gold edition. Look for the Signature tag in the Store to add one to your collection.',
-  ),
-  PlayerGuideSlide(
     title: 'Player Ready',
     icon: _kReadyIcon,
     img: 'assets/player/guide/08.webp',
