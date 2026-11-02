@@ -250,9 +250,9 @@ void main() {
     });
 
     testWidgets('swatch price tags are full size at 320 and 320@1.3', (t) async {
-      for (final sc in [1.0, 1.3]) {
+      for (final (w, sc) in [(320.0, 1.0), (320.0, 1.3), (390.0, 1.0)]) {
         final key = GlobalKey();
-        await _pump(t, (x) => posterAtelierPage(x, now: DateTime(2026, 10, 27, 9)), width: 320, scale: sc, key: key);
+        await _pump(t, (x) => posterAtelierPage(x, now: DateTime(2026, 10, 27, 9)), width: w, scale: sc, key: key);
         final tag = _sem(RegExp(r'^Add .* to bag$'));
         await _reveal(t, tag);
         final prices = find.textContaining(RegExp(r'^₹[0-9,]+$'));
@@ -260,11 +260,11 @@ void main() {
         for (final e in prices.evaluate()) {
           final rb = e.renderObject! as RenderBox;
           final s = rb.getTransformTo(null).getMaxScaleOnAxis();
-          expect(s, closeTo(1, .01), reason: 'price tag scaled to $s at 320@$sc');
+          expect(s, closeTo(1, .01), reason: 'price tag scaled to $s at $w@$sc');
           expect((e.widget as Text).style?.fontSize, greaterThanOrEqualTo(14));
         }
         if (_shots.isNotEmpty && homeFontsReady) {
-          await t.runAsync(() => _shotOf(key, 'poster-atelier-swatches-320${sc == 1 ? '' : '-1.3x'}'));
+          await t.runAsync(() => _shotOf(key, 'poster-atelier-swatches-${w.toInt()}${sc == 1 ? '' : '-1.3x'}'));
         }
       }
     });

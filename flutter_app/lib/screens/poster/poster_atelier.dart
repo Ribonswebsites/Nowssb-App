@@ -363,7 +363,7 @@ class _Swatch extends StatelessWidget {
                             maxLines: 2, style: gSub(dark: false, color: kPInk).copyWith(fontSize: 14, fontWeight: FontWeight.w700, height: 1.15)),
                         if (was != null)
                           Text(inr(was, sku: id),
-                              maxLines: 1, style: gSub(dark: false, color: kPInk).copyWith(fontSize: 14, decoration: TextDecoration.lineThrough)),
+                              maxLines: 1, style: gSub(dark: false, color: kPInk).copyWith(fontSize: 14, height: 1.15, decoration: TextDecoration.lineThrough)),
                       ]),
                     ),
                   ),
