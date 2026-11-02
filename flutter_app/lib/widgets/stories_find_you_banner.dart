@@ -35,7 +35,7 @@ class StoriesFindYouBanner extends StatelessWidget {
     ),
     _StoryCard(
       color: Color(0xFFE8C12A),
-      image: 'assets/banners/stories/pitta.png',
+      image: 'assets/banners/stories/pitta.webp',
       kicker: 'PITTA',
       title: 'LIGHT\nBODY',
       layout: _BookLayout.photoTop,

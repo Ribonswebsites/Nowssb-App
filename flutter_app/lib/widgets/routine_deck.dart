@@ -15,12 +15,12 @@ import '../admin/template/editable.dart';
 import 'nwsb_icon.dart';
 
 const kRoutineArts = <String>[
-  'assets/routine/trusting-the-breath.png',
-  'assets/routine/positive-self-talk.png',
-  'assets/routine/your-body-knows.png',
-  'assets/routine/stillness.png',
-  'assets/routine/softer-voice.png',
-  'assets/routine/quiet-within.png',
+  'assets/routine/trusting-the-breath.webp',
+  'assets/routine/positive-self-talk.webp',
+  'assets/routine/your-body-knows.webp',
+  'assets/routine/stillness.webp',
+  'assets/routine/softer-voice.webp',
+  'assets/routine/quiet-within.webp',
 ];
 
 class WorkCard {

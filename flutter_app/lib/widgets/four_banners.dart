@@ -128,7 +128,7 @@ class _TrioRailState extends State<TrioRail> {
     _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
     // The coin ledger (Rewards · Wallet), not the Rewards front again.
     _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),
-    _RailFace('NowssB Coupons', 'assets/banners/earn/hands-light.png', Color(0xFF7A1F4F), Programme.coupons),
+    _RailFace('NowssB Coupons', 'assets/banners/earn/hands-light.webp', Color(0xFF7A1F4F), Programme.coupons),
     _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.webp', Color(0xFF1F4E7A), Programme.reference),
   ];
 
@@ -183,7 +183,7 @@ class _TrioRailState extends State<TrioRail> {
                 width: 112,
                 height: 176,
                 child: Image(
-                  image: AssetImage('assets/banners/earn/hands-raise.png'),
+                  image: AssetImage('assets/banners/earn/hands-raise.webp'),
                   fit: BoxFit.cover,
                   alignment: Alignment(0, -0.05),
                 ),

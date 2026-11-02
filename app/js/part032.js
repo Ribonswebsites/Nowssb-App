@@ -29,7 +29,7 @@ var SS_PLANS = [
     id:'resonance', name:'Resonance',
     tagline:'The full frequency. The complete practice.',
     color:'#c8e8f5', badge:'',
-    photoFront: 'assets/subscription/tier-sun-front.png',
+    photoFront: 'assets/subscription/tier-sun-front.webp',
     photoBack: 'assets/subscription/tier-sun-back.png',
     price:{ monthly:4.99, yearly:49.99 },
     wordsPerWeek: 5,

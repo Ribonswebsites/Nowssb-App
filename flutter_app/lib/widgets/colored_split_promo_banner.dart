@@ -26,8 +26,8 @@ abstract final class SplitPromoArts {
   static const pose01 = 'assets/banners/promo/pose-01.png';
   static const pose02 = 'assets/banners/promo/pose-02.webp';
   static const pose03 = 'assets/banners/promo/pose-03.png';
-  static const pose04 = 'assets/banners/promo/pose-04.png';
-  static const pose05 = 'assets/banners/promo/pose-05.png';
+  static const pose04 = 'assets/banners/promo/pose-04.webp';
+  static const pose05 = 'assets/banners/promo/pose-05.webp';
   static const pose06 = 'assets/banners/promo/pose-06.webp';
   static const pose07 = 'assets/banners/promo/pose-07.png';
   static const pose08 = 'assets/banners/promo/pose-08.png';

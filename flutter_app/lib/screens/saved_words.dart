@@ -78,8 +78,8 @@ class _SavedWordsScreenState extends State<SavedWordsScreen> {
     'assets/banners/promo/pose-01.png',
     'assets/banners/promo/pose-02.webp',
     'assets/banners/promo/pose-03.png',
-    'assets/banners/promo/pose-04.png',
-    'assets/banners/promo/pose-05.png',
+    'assets/banners/promo/pose-04.webp',
+    'assets/banners/promo/pose-05.webp',
     'assets/banners/promo/pose-06.webp',
     'assets/banners/promo/pose-07.png',
   ];

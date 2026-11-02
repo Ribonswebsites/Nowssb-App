@@ -49,7 +49,7 @@ class GiftShowcase extends StatelessWidget {
           child: Stack(
             children: [
               EditableImage.asset(
-                'assets/gifts/gift-hero.png',
+                'assets/gifts/gift-hero.webp',
                 height: 210,
                 width: double.infinity,
                 fit: BoxFit.cover,

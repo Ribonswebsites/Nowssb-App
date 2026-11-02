@@ -509,7 +509,7 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
     ('assets/banners/promo/pose-01.png', Color(0xFFE07A32)),
     ('assets/banners/promo/pose-02.webp', Color(0xFF7C4DFF)),
     ('assets/banners/promo/pose-03.png', Color(0xFF2EC4B6)),
-    ('assets/banners/promo/pose-04.png', Color(0xFFE85D9A)),
+    ('assets/banners/promo/pose-04.webp', Color(0xFFE85D9A)),
     ('assets/banners/promo/pose-06.webp', Color(0xFFD4A017)),
     ('assets/banners/promo/pose-09.png', Color(0xFFE67E22)),
     ('assets/banners/promo/pose-10.png', Color(0xFF3D8BDB)),

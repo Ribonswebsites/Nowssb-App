@@ -52,7 +52,7 @@ Widget _frame({required bool fashion, required Widget slot, double scale = 1, do
 Future<void> _precache(WidgetTester t) async {
   await t.runAsync(() async {
     final ctx = t.element(find.byType(Scaffold));
-    for (final d in [...homeDoors.map((d) => d.image), 'assets/banners/earn/hands-raise.png']) {
+    for (final d in [...homeDoors.map((d) => d.image), 'assets/banners/earn/hands-raise.webp']) {
       await precacheImage(AssetImage(d), ctx);
     }
   });

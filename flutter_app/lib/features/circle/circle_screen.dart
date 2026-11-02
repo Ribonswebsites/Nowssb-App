@@ -294,7 +294,7 @@ class _TierRailState extends State<_TierRail> {
       rate: '10%',
       detail: '0–99 units · 10% of net',
       note: 'Your code works on any purchase. Commission is 10% of net after the store fee.',
-      front: 'assets/banners/earn/hands-light.png',
+      front: 'assets/banners/earn/hands-light.webp',
       back: 'assets/banners/earn/hands-dark.webp',
       accent: Color(0xFFE8D5A3),
       wash: Color(0xFF1A1024),

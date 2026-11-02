@@ -117,3 +117,78 @@ Earn backs and coupon hero now WebP (q80); cut-outs palette-compressed PNG (<200
 | `login/card-20.jpg` | Woman with curly brown hair, on white | Red-haired woman |
 | `profile/rails/avatar_a.jpg` | Painted Indonesian woman, straight black hair | Painted red-haired woman |
 | root `subscription/tier-{bag,nile,sun}-{back,front}.png` | Synced to the clean flutter_app versions | Red-haired / Cleopatra figures |
+
+## Sweep 4 – dedupe blonde / text fixes (Nov 2026)
+
+All images below are original AI-generated artwork made for NowssB (Grok Bot image generation, free to use); tagline-only edits re-typeset in Inter (SIL OFL) and NATURAL/ORIGIN in Oswald (SIL OFL).
+
+| File | Change |
+|---|---|
+| flutter_app/assets/subscription/tier-sun-front.webp | new distinct meditation figure (gen f11fc68f) |
+| assets/subscription/tier-sun-front.webp | new distinct meditation figure (gen f11fc68f) |
+| flutter_app/assets/banners/programs/bonus.webp | new distinct meditation figure (gen 47809ad7) |
+| flutter_app/assets/gifts/coupon-banner.webp | new distinct meditation figure (gen 7fca5658) |
+| flutter_app/assets/hero-curve/countries.webp | new distinct meditation figure (gen 78bd0b17) |
+| flutter_app/assets/hero-curve/banner-reader.webp | new distinct meditation figure (gen e516c8df) |
+| file_00000000674c820889c49845ef98b79f.webp | new distinct meditation figure (gen 4f3cf888) |
+| flutter_app/assets/banners/banner-gold.webp | new distinct meditation figure (gen 2cabe3f4) |
+| flutter_app/assets/banners/banner-sit.webp | new distinct meditation figure (gen cd6541f6) |
+| flutter_app/assets/banners/banner-store.webp | new distinct meditation figure (gen e5f63937) |
+| flutter_app/assets/banners/earn/bag-blonde.jpg | new distinct meditation figure (gen a96949e9) |
+| flutter_app/assets/banners/earn/hands-light.webp | new distinct meditation figure (gen d9758618) |
+| flutter_app/assets/banners/earn/hands-raise.webp | new distinct meditation figure (gen 9d32c7bf) |
+| flutter_app/assets/banners/programs/earn.webp | new distinct meditation figure (gen c68e58b1) |
+| flutter_app/assets/banners/promo/pose-04.webp | new distinct meditation figure (gen ddcc58e8) |
+| flutter_app/assets/banners/promo/pose-05.webp | new distinct meditation figure (gen e54ff8f0) |
+| flutter_app/assets/banners/stories/pitta.webp | new distinct meditation figure (gen c4ab3feb) |
+| flutter_app/assets/flip_brand/img1.jpg | new distinct meditation figure (gen f6488283) |
+| flutter_app/assets/flip_brand/img8.jpg | new distinct meditation figure (gen 423606e2) |
+| flutter_app/assets/footer/tab-calm-new-loud.webp | new distinct meditation figure (gen 209de98e) |
+| flutter_app/assets/footer/tab-still-mind-still-style.webp | new distinct meditation figure (gen 3fddd0cc) |
+| flutter_app/assets/gifts/gift-hero.webp | new distinct meditation figure (gen 75cb876b) |
+| flutter_app/assets/hero-curve/body.webp | new distinct meditation figure (gen ccf2d9a6) |
+| flutter_app/assets/hero-curve/listen.webp | new distinct meditation figure (gen 30ee7f36) |
+| flutter_app/assets/hero-curve/tab-stool.webp | new distinct meditation figure (gen e751022b) |
+| flutter_app/assets/hero-curve/tab-beach.webp | new distinct meditation figure (gen baffc67a) |
+| flutter_app/assets/hero-curve/tab-desert.webp | new distinct meditation figure (gen 935b7ecf) |
+| flutter_app/assets/hero-curve/tab-forest.webp | new distinct meditation figure (gen 89fc757f) |
+| flutter_app/assets/hero-curve/tab-rain.webp | new distinct meditation figure (gen 39b754e8) |
+| flutter_app/assets/hero-curve/tab-window.webp | new distinct meditation figure (gen 3ce3b978) |
+| flutter_app/assets/hero-curve/tab-subject.webp | new distinct meditation figure (gen bb865d82) |
+| flutter_app/assets/hero-curve/stillness.webp | new distinct meditation figure (gen e4234419) |
+| flutter_app/assets/player/intro/02.webp | new distinct meditation figure (gen 5c41bc21) |
+| flutter_app/assets/player/intro/03.webp | new distinct meditation figure (gen 866db098) |
+| flutter_app/assets/player/intro/07.webp | new distinct meditation figure (gen a1f7835e) |
+| flutter_app/assets/player/guide/06.webp | new distinct meditation figure (gen 622adcac) |
+| flutter_app/assets/player/guide/08.webp | new distinct meditation figure (gen 0b97b61e) |
+| flutter_app/assets/login/card-04.jpg | new distinct meditation figure (gen 6d0ae85a) |
+| flutter_app/assets/login/login-neon.webp | new distinct meditation figure (gen 9ec8b3d1) |
+| flutter_app/assets/notifications/hands-offer.webp | new distinct meditation figure (gen 7f3a6c18) |
+| flutter_app/assets/routine/positive-self-talk.webp | new distinct meditation figure (gen 0a5c0aca) |
+| flutter_app/assets/routine/quiet-within.webp | new distinct meditation figure (gen eea04887) |
+| flutter_app/assets/routine/softer-voice.webp | new distinct meditation figure (gen 4f6f1da9) |
+| flutter_app/assets/routine/stillness.webp | new distinct meditation figure (gen ce766410) |
+| flutter_app/assets/routine/trusting-the-breath.webp | new distinct meditation figure (gen f9bcc1a3) |
+| flutter_app/assets/routine/your-body-knows.webp | new distinct meditation figure (gen a57105bf) |
+| file_00000000acd48211be9d4c5ef0f99257.webp | composited: Oswald headline above figure (no overlap) |
+| flutter_app/assets/store/collections/cosmos.webp | new distinct meditation figure (gen e47f77ed) |
+| flutter_app/assets/store/collections/mythical.webp | new distinct meditation figure (gen 141b656c) |
+| flutter_app/assets/store/collections/nature.webp | new distinct meditation figure (gen a7cc1c7e) |
+| flutter_app/assets/store/collections/peace.webp | new distinct meditation figure (gen 40aa9654) |
+| flutter_app/assets/store/collections/sacred.webp | new distinct meditation figure (gen 9260ae94) |
+| flutter_app/assets/flip_brand/img2.jpg | italic tagline repainted in plain Inter |
+| file_00000000813081f594f7597ac46978d6.webp | italic tagline repainted in plain Inter |
+| flutter_app/assets/flip_brand/img3.jpg | italic tagline repainted in plain Inter |
+| file_00000000b77c82119c4127cc603420a8.webp | italic tagline repainted in plain Inter |
+| flutter_app/assets/flip_brand/img4.jpg | italic tagline repainted in plain Inter |
+| file_00000000b56c820aade81ceee1d06ccf.webp | italic tagline repainted in plain Inter |
+| flutter_app/assets/flip_brand/img5.jpg | italic tagline repainted in plain Inter |
+| flutter_app/assets/flip_brand/img6.jpg | italic tagline repainted in plain Inter |
+| flutter_app/assets/flip_brand/img7.jpg | italic tagline repainted in plain Inter |
+| flutter_app/assets/flip_brand/img9.jpg | italic tagline repainted in plain Inter |
+| file_000000005f8881f48b6867d03c79a021.webp | italic tagline repainted in plain Inter |
+| flutter_app/assets/footer/tab-ancient-calm-new-sound.webp | italic tagline repainted in plain Inter |
+| flutter_app/assets/footer/tab-breathe-new-noise.webp | italic tagline repainted in plain Inter |
+| flutter_app/assets/footer/tab-find-your-frequency.webp | italic tagline repainted in plain Inter |
+| file_00000000500081f4924f93ad2f6542de.webp | italic tagline repainted in plain Inter |
+| flutter_app/assets/footer/tab-sound-of-stillness.webp | italic tagline repainted in plain Inter |

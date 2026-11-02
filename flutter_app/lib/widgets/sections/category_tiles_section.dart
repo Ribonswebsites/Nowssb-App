@@ -29,7 +29,7 @@ const _kDefaultTiles = <SectionMediaItem>[
     id: 'gifts',
     title: 'Gifts',
     subtitle: 'Daily spin',
-    imageUrl: 'assets/gifts/gift-hero.png',
+    imageUrl: 'assets/gifts/gift-hero.webp',
     icon: 'gift',
     ctaLink: 'gifts',
     meta: {'glowColor': 0xFFE07070},

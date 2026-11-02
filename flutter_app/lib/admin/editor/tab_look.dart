@@ -30,7 +30,7 @@ const kLookPictures = <String>[
   'assets/banners/stories/aura.png',
   'assets/banners/stories/prana.webp',
   'assets/banners/stories/soma.webp',
-  'assets/banners/stories/pitta.png',
+  'assets/banners/stories/pitta.webp',
 ];
 
 const kLookCorners = <int>[0, 8, 16, 24, 40];

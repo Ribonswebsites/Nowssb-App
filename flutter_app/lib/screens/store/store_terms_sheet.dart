@@ -102,7 +102,7 @@ class _StoreTermsSheet extends StatelessWidget {
                         width: 280,
                         height: 360,
                         child: EditableImage.asset(
-                          'assets/notifications/hands-offer.png',
+                          'assets/notifications/hands-offer.webp',
                           fit: BoxFit.cover,
                           alignment: Alignment(0, -0.05),
                           slot: 'store.StoreTermsSheet',
