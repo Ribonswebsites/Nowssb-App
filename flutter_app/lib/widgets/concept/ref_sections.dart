@@ -56,7 +56,8 @@ class RefSection extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 26),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(tag.toUpperCase(),
-                style: TextStyle(fontFamily: 'monospace', fontSize: 12.5, letterSpacing: 2.4, color: accent, fontWeight: FontWeight.w600, height: 1.35)),
+                // B039: DM Sans caps (no 'monospace'); fits 2 lines at 320@1.3.
+                style: TextStyle(fontFamily: 'DM Sans', fontSize: 12.5, letterSpacing: 1.6, color: accent, fontWeight: FontWeight.w700, height: 1.35)),
             const SizedBox(height: 10),
             Text.rich(
               TextSpan(children: [
