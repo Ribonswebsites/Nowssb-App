@@ -192,3 +192,5 @@ All images below are original AI-generated artwork made for NowssB (Grok Bot ima
 | flutter_app/assets/footer/tab-find-your-frequency.webp | italic tagline repainted in plain Inter |
 | file_00000000500081f4924f93ad2f6542de.webp | italic tagline repainted in plain Inter |
 | flutter_app/assets/footer/tab-sound-of-stillness.webp | italic tagline repainted in plain Inter |
+| assets/gifts/coupon-banner.webp | garbled 'Moanit' earcup logo removed (local retouch) |
+| flutter_app/assets/flip_brand/img4.jpg (+ root file_…eee1…ccf.webp) | tagline backdrop re-blended into gradient |
