@@ -30,7 +30,7 @@ class HypeCard {
 }
 
 const kHypeCards = <HypeCard>[
-  HypeCard('coupons', 'assets/gifts/coupon-hero.png', 'NowssB Coupons', 'Scratch today'),
+  HypeCard('coupons', 'assets/gifts/coupon-hero.webp', 'NowssB Coupons', 'Scratch today'),
   HypeCard('gifts', 'assets/gifts/gift-hero.png', 'NowssB Gifts', 'Daily spin'),
   HypeCard('earn', 'assets/banners/programs/earn.png', 'NowssB Earn', 'Coins on real sales'),
   HypeCard('library', 'assets/hero-curve/banner-library.webp', 'Sound Library', 'Hear a word'),

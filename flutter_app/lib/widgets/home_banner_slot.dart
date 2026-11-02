@@ -46,7 +46,7 @@ const homeDoors = <HomeDoor>[
   HomeDoor('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
   HomeDoor('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),
   HomeDoor('NowssB Coupons', 'assets/banners/earn/hands-light.png', Color(0xFF7A1F4F), Programme.coupons),
-  HomeDoor('NowssB Reference', 'assets/banners/earn/sit-light.png', Color(0xFF1F4E7A), Programme.reference),
+  HomeDoor('NowssB Reference', 'assets/banners/earn/sit-light.webp', Color(0xFF1F4E7A), Programme.reference),
 ];
 
 const _portrait = 'assets/banners/earn/hands-raise.png';

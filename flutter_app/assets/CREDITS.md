@@ -73,6 +73,11 @@ Generated with Grok Bot image generation; white background removed in-house.
 | `banners/promo/pose-01.png` | Older man in saffron kurta, seated namaste (cut-out) | Same Cleopatra cut-out |
 | `banners/promo/split-robot-lotus.png` | Woman kneeling on sage cushion (cut-out) | Copy of pose-05 |
 | `banners/promo/split-robot-lookback.png` | Man in tree pose, hands overhead (cut-out) | Copy of pose-04 |
-| `banners/earn/hands-dark.png` | Man, arms raised in breath, violet on black | Mirrored/recoloured hands-light |
-| `banners/earn/sit-dark.png` | Woman seated in spotlight on black | Recoloured red-haired sit-light |
-| `banners/earn/sit-light.png` | Man in white linen seated, white background | Red-haired figure |
+| `banners/earn/hands-dark.webp` | Man, arms raised in breath, violet on black | Mirrored/recoloured hands-light |
+| `banners/earn/sit-dark.webp` | Woman seated in spotlight on black | Recoloured red-haired sit-light |
+| `banners/earn/sit-light.webp` | Man in white linen seated, white background | Red-haired figure |
+| `banners/promo/split-red-lotus.png` | Older woman with silver hair, lotus pose (cut-out) | Red-haired figure |
+| `banners/promo/split-red-hair-blazer.png` | Man in mustard blazer, hand-on-heart breathing (cut-out) | Red-haired figure |
+| `gifts/coupon-hero.webp` | Man in navy turban meditating with a golden coupon, on black | Red-haired woman (Zen "In the spotlight / Coupons") |
+
+Earn backs and coupon hero now WebP (q80); cut-outs palette-compressed PNG (<200 KB each).

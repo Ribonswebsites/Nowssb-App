@@ -129,7 +129,7 @@ class _TrioRailState extends State<TrioRail> {
     // The coin ledger (Rewards · Wallet), not the Rewards front again.
     _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),
     _RailFace('NowssB Coupons', 'assets/banners/earn/hands-light.png', Color(0xFF7A1F4F), Programme.coupons),
-    _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.png', Color(0xFF1F4E7A), Programme.reference),
+    _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.webp', Color(0xFF1F4E7A), Programme.reference),
   ];
 
   late final List<_RailFace> _faces = [

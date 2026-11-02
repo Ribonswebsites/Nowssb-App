@@ -20,7 +20,7 @@ const _kDefaultTiles = <SectionMediaItem>[
     id: 'coupons',
     title: 'Coupons',
     subtitle: 'Scratch & save',
-    imageUrl: 'assets/gifts/coupon-hero.png',
+    imageUrl: 'assets/gifts/coupon-hero.webp',
     icon: 'coupon',
     ctaLink: 'coupons',
     meta: {'glowColor': 0xFFE8A23A},

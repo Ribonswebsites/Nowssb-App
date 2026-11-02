@@ -61,7 +61,7 @@ const kSlotManifest = <List<String>>[
   ['coupon_screen.HomeCouponShelf.tap-a-ticket-to-claim-it-a-free-scratch-7d8e0285', 'text', 'Tap a ticket to claim it. A free scratch waits every day.', 'features/economy/coupon_screen.dart'],
   ['coupon_screen.OpenedCard.already-scratched-today', 'text', 'ALREADY SCRATCHED TODAY', 'features/economy/coupon_screen.dart'],
   ['coupon_screen.OpenedCard.next-free-card-at-midnight-it-s-on-your-477ac172', 'text', 'Next free card at midnight · it’s on your account', 'features/economy/coupon_screen.dart'],
-  ['coupon_tickets.CouponRails.coupon-hero', 'image', 'assets/gifts/coupon-hero.png', 'features/economy/coupon_tickets.dart'],
+  ['coupon_tickets.CouponRails.coupon-hero', 'image', 'assets/gifts/coupon-hero.webp', 'features/economy/coupon_tickets.dart'],
   ['coupon_tickets.FlipCoupon.coupon-banner', 'image', 'assets/gifts/coupon-banner.png', 'features/economy/coupon_tickets.dart'],
   ['coupon_tickets.FlipCoupon.coupon-code', 'text', 'COUPON CODE:  ', 'features/economy/coupon_tickets.dart'],
   ['coupon_tickets.FlipCoupon.flip-back-not-a-rank-key', 'text', 'Flip back. Not a rank key.', 'features/economy/coupon_tickets.dart'],

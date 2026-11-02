@@ -171,7 +171,7 @@ class _CouponRailsState extends State<CouponRails> {
               child: SizedBox(
                 height: 132,
                 child: EditableImage.asset(
-                  'assets/gifts/coupon-hero.png',
+                  'assets/gifts/coupon-hero.webp',
                   fit: BoxFit.cover,
                   alignment: const Alignment(0, -0.35),
                   errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
