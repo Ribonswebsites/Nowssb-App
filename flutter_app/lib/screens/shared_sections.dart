@@ -539,14 +539,14 @@ class MainOptionsSection extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _OptRow(
-                    options.sublist(0, 3),
+                    options.sublist(0, options.length.clamp(0, 3)),
                     fashion: fashion,
                     onGo: onGo,
                     onAction: onAction,
                   ),
                   Container(height: 1, color: rule),
                   _OptRow(
-                    options.sublist(3, 6),
+                    options.sublist(options.length.clamp(0, 3), options.length.clamp(0, 6)),
                     fashion: fashion,
                     onGo: onGo,
                     onAction: onAction,
@@ -1795,7 +1795,7 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
                                   ),
                                   children: [
                                     TextSpan(
-                                        text: 'THE NEW FASHION TREND OF '),
+                                        text: 'THE NEW ZEN TREND OF '),
                                     TextSpan(
                                       text: 'MEDITATION',
                                       style: TextStyle(

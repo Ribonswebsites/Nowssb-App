@@ -32,7 +32,7 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 - hc-c-word — KATRIN BOLOVTSOVA, https://www.pexels.com/photo/7113566/
 - hc-b-sound — Jan Kopřiva, https://www.pexels.com/photo/6593243/
 - hc-b-sleep — RAVI LAGES, https://www.pexels.com/photo/6308172/
-- hc-b-heal — Pavel Danilyuk, https://www.pexels.com/photo/7596969/
+- hc-f-heal — https://www.pexels.com/photo/3822906/ (Pexels License; replaces hc-b-heal, whose source cropped the head)
 
 ## Meditation cut-outs (assets/meditation/) — CC0
 | File | Source | Use |

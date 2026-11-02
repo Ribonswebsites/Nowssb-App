@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_video_platform.dart';
 import 'support/home_render.dart';
+import 'support/offline_google_fonts.dart';
 
 const _out = String.fromEnvironment('RITUAL_OUT', defaultValue: '');
 
@@ -23,6 +24,7 @@ void main() {
     FakeVideoPlatform();
     VideoPool.debugDeadlines = false;
     await setUpHomeRender();
+    await setUpOfflineGoogleFonts();
     ByteData f(String p) => ByteData.sublistView(File(p).readAsBytesSync());
     if (!homeFontsReady) {
       for (final fam in ['DM Sans', 'monospace', 'Roboto']) {

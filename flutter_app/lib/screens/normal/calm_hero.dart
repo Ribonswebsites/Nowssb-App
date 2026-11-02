@@ -10,6 +10,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart' show SpringDescription, SpringSimulation;
 import 'package:flutter/services.dart';
 
 import '../../data/models.dart';
@@ -209,7 +210,7 @@ class _World {
 }
 
 const _worlds = [
-  _World('Breath', 'hc-d-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B)),
+  _World('Breath', 'hc-d-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B), align: Alignment(0, .7)),
   _World('Sound', 'hc-d-sound', Color(0xFFC9A46A), Color(0xFF2A2219)),
   _World('Sleep', 'hc-d-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433)),
 ];
@@ -239,7 +240,7 @@ class MixedHero extends StatelessWidget {
       (off) => _DepthCard(data: data, parallax: off),
       (off) => _WordCard2(look: const _WordLook('hc-c-word', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
       (off) => _CinemaCard(photo: 'hc-b-sleep', kicker: 'Dusk', tone: const Color(0xFF0E1230), data: data, word: w(1), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('hc-b-heal', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('hc-f-heal', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
       (off) => _CinemaCard(photo: 'hc-b-sound', kicker: 'Sound', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
       (off) => _WordCard2(look: const _WordLook('hc-e-word', Color(0xFFE2D4F0), Color(0xFF1E1530)), data: data, word: w(2), parallax: off),
     ];
@@ -260,8 +261,8 @@ class MixedHero extends StatelessWidget {
 }
 
 /// Soft, shared photo plate: parallax shift against the card on swipe.
-Widget _plate(String photo, double off, {double k = 28, double dy = 0}) =>
-    Transform.translate(offset: Offset(off * k, dy), child: Transform.scale(scale: 1.06, alignment: Alignment.bottomCenter, child: _img(photo)));
+Widget _plate(String photo, double off, {double k = 28, double dy = 0, Alignment align = Alignment.topCenter}) =>
+    Transform.translate(offset: Offset(off * k, dy), child: Transform.scale(scale: 1.06, alignment: Alignment.bottomCenter, child: _img(photo, align: align)));
 
 TextStyle _kick(Color c) => TextStyle(color: c, fontSize: 10, letterSpacing: 2.4, fontWeight: FontWeight.w600);
 
@@ -314,7 +315,7 @@ class _CinemaCard extends StatelessWidget {
           child: Stack(fit: StackFit.expand, children: [
             ColoredBox(color: tone),
             _plate(photo, parallax),
-            _plate('$photo-fg', parallax, k: 40),
+            if (photo != 'hc-b-sound') _plate('$photo-fg', parallax, k: 40),
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
@@ -368,32 +369,62 @@ class _DepthCard extends StatefulWidget {
 
 /// The stack scrolls vertically: swipe up brings the next practice to the
 /// front, swipe down brings the previous one back (wraps around).
-class _DepthCardState extends State<_DepthCard> {
+class _DepthCardState extends State<_DepthCard> with SingleTickerProviderStateMixin {
   static const _bg = Color(0xFF0B0B0D);
-  int front = 0;
-  double _drag = 0;
+  static const _spring = SpringDescription(mass: 1, stiffness: 260, damping: 24);
+  /// Continuous stack position (0 = world 0 in front); springs between ints.
+  late final AnimationController _pos = AnimationController.unbounded(vsync: this)..addListener(() => setState(() {}));
+  double _drag = 0, _start = 0;
+  int get front => _pos.value.round() % _worlds.length;
   HeroData get data => widget.data;
   double get parallax => widget.parallax;
 
+  @override
+  void dispose() {
+    _pos.dispose();
+    super.dispose();
+  }
+
+  void _settle(double target, double velocity) {
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+      _pos.value = target;
+      return;
+    }
+    _pos.animateWith(SpringSimulation(_spring, _pos.value, target, velocity));
+  }
+
   void _step(int d) {
     HapticFeedback.selectionClick();
-    setState(() => front = (front + d) % _worlds.length);
+    _settle(_start + d, 0);
   }
 
   @override
   Widget build(BuildContext context) {
     final n = _worlds.length;
     // back → front, as indexes into _worlds; depth = position from front.
-    final order = [for (var d = n - 1; d >= 0; d--) (front + d) % n];
+    final raw = _pos.value;
+    final p = (raw - raw.round()).abs() < .02 ? raw.roundToDouble() : raw;
+    double depth(int i) => (i - p) % n; // 0 = front, fractional while moving
+    final order = [for (var i = 0; i < n; i++) i]..sort((a, b) => depth(b).compareTo(depth(a)));
     return GestureDetector(
       key: const ValueKey('hero-depth'),
       onTap: data.onBegin,
-      onVerticalDragStart: (_) => _drag = 0,
-      onVerticalDragUpdate: (u) => _drag += u.delta.dy,
+      onVerticalDragStart: (_) {
+        _pos.stop();
+        _drag = 0;
+        _start = _pos.value.roundToDouble();
+      },
+      // The front sheet follows the finger (one practice per 140px)…
+      onVerticalDragUpdate: (u) {
+        _drag += u.delta.dy;
+        _pos.value = _start + (-_drag / 140).clamp(-1.0, 1.0);
+      },
+      // …then a spring carries it home, keeping the fling's speed.
       onVerticalDragEnd: (e) {
         final v = e.primaryVelocity ?? 0;
-        if (_drag < -24 || v < -250) _step(1);
-        if (_drag > 24 || v > 250) _step(n - 1);
+        final d = (_drag < -24 || v < -250) ? 1 : (_drag > 24 || v > 250) ? -1 : 0;
+        if (d != 0) HapticFeedback.selectionClick();
+        _pos.animateWith(SpringSimulation(_spring, _pos.value, _start + d, -v / 140));
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
@@ -416,7 +447,7 @@ class _DepthCardState extends State<_DepthCard> {
             left: 16, right: 16, top: 50, bottom: 16,
             child: LayoutBuilder(builder: (context, c) {
               return Stack(clipBehavior: Clip.hardEdge, alignment: Alignment.bottomCenter, children: [
-                for (final i in order) _sheet(c, i, (i - front) % n),
+                for (final i in order) _sheet(c, i, depth(i)),
               ]);
             }),
           ),
@@ -425,26 +456,30 @@ class _DepthCardState extends State<_DepthCard> {
     );
   }
 
-  Widget _sheet(BoxConstraints c, int wi, int d) {
+  Widget _sheet(BoxConstraints c, int wi, double dd) {
     final world = _worlds[wi];
-    final front = d == 0;
+    final n = _worlds.length;
+    // A sheet leaving the front (dd just under n) lifts away and fades.
+    final leaving = dd > n - 1 ? dd - n : 0.0; // -1..0
+    final d = leaving < 0 ? 0.0 : dd;
+    final front = wi == this.front;
     final h = c.maxHeight - 88;
     final tilt = parallax.clamp(-1.0, 1.0);
     final m = Matrix4.identity()
       ..setEntry(3, 2, .001)
-      ..translateByDouble(tilt * d * 10, -d * 44.0, 0, 1)
+      ..translateByDouble(tilt * d * 10, -d * 44.0 + leaving * 160, 0, 1)
       ..scaleByDouble(1 - d * .06, 1 - d * .06, 1, 1)
       ..rotateY(-tilt * .18 * (1 + d * .4));
     return Positioned(
       left: 0, right: 0, bottom: 0, height: h,
-      child: Transform(
+      child: Opacity(opacity: (1 + leaving).clamp(0.0, 1.0), child: Transform(
         alignment: Alignment.bottomCenter,
         transform: m,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(22),
           child: Stack(fit: StackFit.expand, children: [
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [world.a, world.b]))),
-            Opacity(opacity: .85, child: _plate(world.photo, -tilt, k: 14)),
+            Opacity(opacity: .85, child: _plate(world.photo, -tilt, k: 14, align: world.align)),
             if (front && !world.photo.startsWith('hc-d-')) _plate('${world.photo}-fg', -tilt, k: 22),
             DecoratedBox(
               decoration: BoxDecoration(
@@ -504,7 +539,7 @@ class _DepthCardState extends State<_DepthCard> {
               ),
           ]),
         ),
-      ),
+      )),
     );
   }
 }
@@ -545,7 +580,7 @@ class _WordCard2 extends StatelessWidget {
                   ),
                 ),
               ),
-              if (!look.photo.startsWith('hc-e-')) _plate('${look.photo}-fg', parallax, k: 30, dy: drop),
+              if (!look.photo.startsWith('hc-e-') && !look.photo.startsWith('hc-f-')) _plate('${look.photo}-fg', parallax, k: 30, dy: drop),
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,

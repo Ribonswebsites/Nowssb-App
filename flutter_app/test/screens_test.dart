@@ -98,7 +98,7 @@ void main() {
     await Settings.instance.setFashionPlus(false);
     await pump(tester, const FashionPlusScreen());
 
-    await tester.tap(find.text('ENTER FASHION PLUS'));
+    await tester.tap(find.text('ENTER ZEN PLUS'));
     await tester.pumpAndSettle();
 
     expect(find.text('Motion is off'), findsOneWidget);

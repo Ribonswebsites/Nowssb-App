@@ -104,7 +104,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
         on ? 'On' : 'Off by default',
       ],
       art: 'assets/fashion/fp-intro.webp',
-      enterLabel: 'ENTER FASHION PLUS',
+      enterLabel: 'ENTER ZEN PLUS',
       child: PageShell(
         eyebrow: 'Experience',
         title: 'Zen Plus',

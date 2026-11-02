@@ -312,7 +312,7 @@ class _BeginButtonState extends State<_BeginButton> {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      button: true, label: "Begin today's session", hint: widget.p.title,
+      button: true, label: "Begin today's session", hint: widget.p.title, excludeSemantics: true,
       child: GestureDetector(
         onTapDown: (_) => setState(() => _down = true),
         onTapCancel: () => setState(() => _down = false),

@@ -8,7 +8,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import '../media/nwsb_video.dart';
+import '../data/practice_progress.dart' show PracticeProgress;
+import '../widgets/concept/r27/anims.dart' show R27BreathFlame;
 import '../media/video_pool.dart';
 import '../widgets/home_parts.dart';
 import '../widgets/home_skin.dart';
@@ -165,11 +166,15 @@ class _VideoBannerCard extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               child: AspectRatio(
                 aspectRatio: StreakStoreCarousel.videoAspect,
-                child: NwsbVideo(
-                  asset: asset,
-                  priority: priority,
-                  fit: BoxFit.cover,
-                  slot: 'streak_store_carousel.VideoBannerCard',
+                // Ribon 11-02: no 'Choose Your Path' film on any streak card —
+                // the breathing streak flame on a white neumorphic well.
+                child: ColoredBox(
+                  key: const ValueKey('streak-anim'),
+                  color: const Color(0xFFF0F2F7),
+                  child: ListenableBuilder(
+                    listenable: PracticeProgress.instance,
+                    builder: (_, __) => Center(child: R27BreathFlame(streak: PracticeProgress.instance.streak, size: 132, light: true)),
+                  ),
                 ),
               ),
             ),

@@ -107,7 +107,7 @@ void main() {
   Future<void> reachIn(WidgetTester t, Finder f, Type screen) async {
     final scroll = find.descendant(of: find.byType(screen), matching: find.byWidgetPredicate(
         (w) => w is Scrollable && w.axisDirection == AxisDirection.down));
-    final enter = find.text('ENTER FASHION PLUS').hitTestable();
+    final enter = find.text('ENTER ZEN PLUS').hitTestable();
     if (enter.evaluate().isNotEmpty) {
       await t.tap(enter.first);
       await settle(t, 10);

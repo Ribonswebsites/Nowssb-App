@@ -493,7 +493,7 @@ class V4Doors extends StatelessWidget {
           const Row(children: [
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('NINE DOORS', style: _eyebrow),
+                Text('EIGHT DOORS', style: _eyebrow),
                 SizedBox(height: 6),
                 Text('Open a door', style: _h),
               ]),
@@ -501,11 +501,14 @@ class V4Doors extends StatelessWidget {
             V4Lottie(_infinity, size: 48),
           ]),
           const SizedBox(height: 14),
-          for (var r = 0; r < 3; r++)
+          for (var r = 0; r * 3 < doors.length; r++)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(children: [
                 for (var c = 0; c < 3; c++)
+                  if (r * 3 + c >= doors.length)
+                    const Expanded(child: SizedBox())
+                  else
                   Expanded(
                     child: InkWell(
                       key: ValueKey('v4-door-${doors[r * 3 + c].$1}'),
