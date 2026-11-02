@@ -70,6 +70,8 @@ class FashOffer extends StatelessWidget {
           SecBanner(
             title: "Today's Offer",
             sub: "Rotating store coupons — tap to redeem today's deal",
+            // B041: the whole line shows at 320@1.3 (was cut at 3 lines).
+            subMaxLines: null,
             mark: NwsbMarks.bag,
             onTap: onTap,
           ),

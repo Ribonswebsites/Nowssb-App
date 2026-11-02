@@ -319,10 +319,14 @@ class SecBanner extends StatelessWidget {
     this.art,
     this.lottie,
     this.onTap,
+    this.subMaxLines = 3,
   });
 
   final String title;
   final String sub;
+
+  /// Line cap for [sub]; null lets a free-height bar grow to show it all.
+  final int? subMaxLines;
 
   /// An optional looping Lottie shown in the round tile instead of [mark].
   final String? lottie;
@@ -399,7 +403,7 @@ class SecBanner extends StatelessWidget {
                   const SizedBox(height: 2),
                   EditableLabel('home_parts.SecBanner',
                     sub,
-                    maxLines: 3,
+                    maxLines: subMaxLines,
                     softWrap: true,
                     style: const TextStyle(
                       fontSize: 12,
