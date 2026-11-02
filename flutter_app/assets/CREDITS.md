@@ -34,6 +34,10 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 - hc-b-sound — Jan Kopřiva, https://www.pexels.com/photo/6593243/
 - hc-b-sleep — RAVI LAGES, https://www.pexels.com/photo/6308172/
 - hc-b-heal — Pavel Danilyuk, https://www.pexels.com/photo/7596969/
+
+## Meditation cut-outs (assets/meditation/) — CC0
+| File | Source | Use |
+|---|---|---|
 | `meditation/meditation-morning.webp` | "Thai woman meditating" by Kochphon (Honey) Onshawee, Wikimedia Commons `File:Thai_woman_meditating.jpg` (from Pixabay 481902), CC0 1.0 | Background removed (cut-out). Ritual card MORNING model (Ribon Oct 27) |
 | `meditation/meditation-evening.webp` | rawpixel 5912948 "Free woman doing yoga pose", https://www.rawpixel.com/image/5912948, CC0 1.0 | Cut-out. Ritual card EVENING model |
 | `meditation/meditation-seated.webp` | StockSnap AYWO7QN7K7 by Matthew Henry, https://stocksnap.io/photo/people-woman-AYWO7QN7K7, CC0 1.0 | Cropped cut-out. Poster Trending hero |
