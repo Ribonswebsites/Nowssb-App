@@ -748,3 +748,107 @@ String _nextArt(Word? w) {
   }
   return storeSubjectArt(w.word);
 }
+
+/// The Drop Studio entry card's corner peel, reusable on any card: the
+/// bottom-right corner curls back (same cut, fold shadow and paper flap as
+/// [EntryPeelV5]) over [under]. With [auto] it peels a little and settles on
+/// a loop; a tap peels it fully, then calls [onOpen].
+class CornerPeel extends StatefulWidget {
+  const CornerPeel({super.key, required this.child, this.under, this.onOpen, this.auto = true,
+      this.rest = 26, this.loop = const Duration(milliseconds: 3200), this.debugPeel, this.label});
+  final Widget child;
+  final Widget? under;
+  final VoidCallback? onOpen;
+  final bool auto;
+  /// Corner size while resting (px).
+  final double rest;
+  final Duration loop;
+  /// Shots: freeze the peel (0 = resting, 1 = fully peeled).
+  final double? debugPeel;
+  final String? label;
+  /// Tests: let the loop run although Stillwater holds motion still in tests.
+  static bool debugLoopInTests = false;
+  @override
+  State<CornerPeel> createState() => CornerPeelState();
+}
+
+class CornerPeelState extends State<CornerPeel> with TickerProviderStateMixin {
+  late final AnimationController _loop = AnimationController(vsync: this, duration: widget.loop);
+  late final AnimationController _full = AnimationController(vsync: this, duration: const Duration(milliseconds: 520));
+  bool _opening = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  bool get _still => !CornerPeel.debugLoopInTests ? Stillwater.still(context) : (MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_still || !widget.auto || widget.debugPeel != null) {
+      _loop.stop();
+    } else if (!_loop.isAnimating && !_opening) {
+      _loop.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _loop.dispose();
+    _full.dispose();
+    super.dispose();
+  }
+
+  /// Auto peel: lift to ~45% and settle, in the first half of each loop.
+  double get _autoPeel {
+    final t = _loop.value;
+    if (t > .5) return 0;
+    return .45 * math.sin(t / .5 * math.pi);
+  }
+
+  double get peel => (widget.debugPeel ?? math.max(_autoPeel, Curves.easeInOutCubic.transform(_full.value))).clamp(0.0, 1.0);
+
+  Future<void> open() async {
+    if (_opening) return;
+    _opening = true;
+    HapticFeedback.lightImpact();
+    _loop.stop();
+    await _full.forward(from: 0);
+    if (!mounted) return;
+    widget.onOpen?.call();
+    _full.value = 0;
+    _opening = false;
+    if (widget.auto && mounted && !_still) _loop.repeat();
+  }
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: widget.label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: open,
+          child: LayoutBuilder(builder: (context, c) {
+            final maxD = math.max(c.maxWidth, c.maxHeight) * 1.05;
+            return AnimatedBuilder(
+              animation: Listenable.merge([_loop, _full]),
+              builder: (context, _) {
+                final p = peel;
+                // ease the corner from rest to past the far corner
+                final d = widget.rest + (maxD * 2 - widget.rest) * p * p * .5 + (maxD * .5) * p;
+                final flap = math.min(d, maxD * 2);
+                return Stack(fit: StackFit.expand, children: [
+                  widget.under ?? const ColoredBox(color: Color(0xFF0B0B0D)),
+                  Positioned(right: 0, bottom: 0, width: flap, height: flap, child: CustomPaint(painter: _FoldShadow())),
+                  ClipPath(clipper: _CornerCut(d), child: widget.child),
+                  Positioned(right: 0, bottom: 0, width: flap, height: flap,
+                      child: IgnorePointer(child: CustomPaint(key: const ValueKey('corner-peel-flap'), painter: _FlapPainter(DayPart.morning)))),
+                ]);
+              },
+            );
+          }),
+        ),
+      );
+}

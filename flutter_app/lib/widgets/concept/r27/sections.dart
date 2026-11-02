@@ -4,6 +4,7 @@
 /// Every card row auto-rotates; every tap is a required hook.
 library;
 
+import '../../../screens/concept/drop_v5.dart' show CornerPeel;
 import 'package:flutter/material.dart';
 
 import '../../../features/economy/reward_fx.dart' show rarityColor, rarityTitle;
@@ -30,7 +31,8 @@ class _Shell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!fashion) {
-      return R27NeuFrame(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      return R27NeuFrame(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(padding: const EdgeInsets.only(right: 18), child: head),
         const SizedBox(height: 16),
         ClipRect(child: row),
@@ -56,8 +58,11 @@ class _Shell extends StatelessWidget {
 
 // ══ REWARDS — torn tiles drifting over hour posters ═══════════════════════
 class R27RewardsSection extends StatelessWidget {
-  const R27RewardsSection({super.key, required this.data, required this.onOpen, required this.onClaim, required this.onSignIn, this.fashion = false});
+  const R27RewardsSection({super.key, required this.data, required this.onOpen, required this.onClaim, required this.onSignIn, this.fashion = false, this.debugPeel});
   final R27Rewards data;
+
+  /// Shots: freeze every tile's corner peel.
+  final double? debugPeel;
   final VoidCallback onOpen, onClaim, onSignIn;
   final bool fashion;
 
@@ -70,13 +75,12 @@ class R27RewardsSection extends StatelessWidget {
     return _Shell(
       fashion: fashion,
       poster: fashion ? const Padding(padding: EdgeInsets.fromLTRB(16, 0, 16, 0), child: SizedBox(height: 74, child: R27Word('REWARDS', color: r27Gold, outline: true))) : null,
-      head: R27Head(dark: fashion, hello: 'Your rewards', title: '${data.coins} coins',
-          sub: 'Day ${data.streak} streak · next chest in ${data.toChest} coins'),
+      head: R27Head(dark: fashion, hello: 'Your rewards', title: '${data.coins} coins', sub: 'Day ${data.streak} streak · next chest in ${data.toChest} coins'),
       row: R27AutoRow(
         count: t.length,
         height: h,
         fraction: fashion ? .62 : .56,
-        builder: (c, i, off) => R27TornTile(t[i], offset: off),
+        builder: (c, i, off) => R27TornTile(t[i], offset: off, peel: true, debugPeel: debugPeel),
       ),
       links: [R27Link('Open rewards', dark: fashion, onTap: onOpen)],
     );
@@ -97,17 +101,42 @@ List<R27TornData> r27RewardTiles(R27Rewards d, {required VoidCallback onOpen, re
       if (!d.signedIn)
         R27TornData(hour: 'ananda', tag: 'Today', value: 'SIGN IN', line: 'Sign in to keep your coins', onTap: onSignIn, seed: 21)
       else
-        R27TornData(hour: 'ananda', tag: 'Today', value: d.loginToday ? 'DONE' : 'CLAIM',
-            line: d.loginToday ? "Today's coin is in" : "Today's coin is waiting", onTap: d.loginToday ? onOpen : onClaim, seed: 21),
+        R27TornData(
+            hour: 'ananda',
+            tag: 'Today',
+            value: d.loginToday ? 'DONE' : 'CLAIM',
+            line: d.loginToday ? "Today's coin is in" : "Today's coin is waiting",
+            onTap: d.loginToday ? onOpen : onClaim,
+            seed: 21),
     ];
 
 class R27TornTile extends StatelessWidget {
-  const R27TornTile(this.d, {super.key, this.offset = 0});
+  const R27TornTile(this.d, {super.key, this.offset = 0, this.peel = false, this.debugPeel});
+
+  /// Home card: the auto corner peel (tap peels fully, then opens).
+  final bool peel;
   final R27TornData d;
+
+  /// Shots: freeze the corner peel.
+  final double? debugPeel;
   final double offset;
   @override
   Widget build(BuildContext context) {
     final a = offset.abs().clamp(0.0, 1.0);
+    final Widget face = Stack(fit: StackFit.expand, children: [
+      Transform.translate(offset: Offset(offset * -24, 0), child: Transform.scale(scale: 1.15, child: R27Img(d.hour))),
+      const DecoratedBox(decoration: r27Scrim),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(14, 18, 14, 16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          R27TagLabel(d.tag),
+          const Spacer(),
+          Flexible(flex: 3, child: R27Word(d.value, align: Alignment.bottomLeft)),
+          const SizedBox(height: 6),
+          Text(d.line, style: dSub),
+        ]),
+      ),
+    ]);
     final tilt = (d.seed.isOdd ? -.035 : .03) + offset * .05;
     return Transform.translate(
       offset: Offset(0, a * 14),
@@ -117,26 +146,25 @@ class R27TornTile extends StatelessWidget {
           opacity: 1 - a * .25,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
-            child: NPress(
-              onTap: d.onTap,
-              label: '${d.tag} ${d.value}',
-              child: ClipPath(
-                clipper: R27Torn(seed: d.seed),
-                child: Stack(fit: StackFit.expand, children: [
-                  Transform.translate(offset: Offset(offset * -24, 0), child: Transform.scale(scale: 1.15, child: R27Img(d.hour))),
-                  const DecoratedBox(decoration: r27Scrim),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 18, 14, 16),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      R27TagLabel(d.tag),
-                      const Spacer(),
-                      Flexible(flex: 3, child: R27Word(d.value, align: Alignment.bottomLeft)),
-                      const SizedBox(height: 6),
-                      Text(d.line, style: dSub),
-                    ]),
-                  ),
-                ]),
-              ),
+            // Ribon 11-02: the Drop Studio entry's corner peel, playing on a
+            // loop; a tap peels it fully, then opens.
+            child: ClipPath(
+              clipper: R27Torn(seed: d.seed),
+              child: !peel
+                  ? NPress(onTap: d.onTap, label: '${d.tag} ${d.value}', child: face)
+                  : CornerPeel(
+                      key: ValueKey('rewards-peel-${d.seed}'),
+                      label: '${d.tag} ${d.value}',
+                      loop: Duration(milliseconds: 3000 + d.seed * 90),
+                      debugPeel: debugPeel,
+                      onOpen: d.onTap,
+                      under: Stack(fit: StackFit.expand, children: [
+                        R27Img(d.hour),
+                        const ColoredBox(color: Color(0xB3000000)),
+                        const Center(child: Icon(Icons.redeem_rounded, color: r27Gold, size: 40)),
+                      ]),
+                      child: face,
+                    ),
             ),
           ),
         ),
@@ -166,12 +194,13 @@ class R27GiftsSection extends StatelessWidget {
     );
     return _Shell(
       fashion: fashion,
-      head: R27Head(dark: fashion, hello: 'NowssB Gifts', title: 'Give a word',
-          sub: '${cards.length} gift cards from ₹$low · ${data.sent} sent · ${data.received} received'),
+      head: R27Head(dark: fashion, hello: 'NowssB Gifts', title: 'Give a word', sub: '${cards.length} gift cards from ₹$low · ${data.sent} sent · ${data.received} received'),
       row: fashion
           ? Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              SizedBox(width: 58, height: h, child: const RotatedBox(quarterTurns: 3, child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10), child: R27Word('GIFTS', color: r27Gold, align: Alignment.center)))),
+              SizedBox(
+                  width: 58,
+                  height: h,
+                  child: const RotatedBox(quarterTurns: 3, child: Padding(padding: EdgeInsets.symmetric(horizontal: 10), child: R27Word('GIFTS', color: r27Gold, align: Alignment.center)))),
               Expanded(child: row),
             ])
           : row,
@@ -212,8 +241,7 @@ class R27GiftPoster extends StatelessWidget {
             onTap: onGift,
             label: 'Gift ${g.label}',
             child: Container(
-              decoration: BoxDecoration(color: r27Paper, borderRadius: BorderRadius.circular(6),
-                  boxShadow: const [BoxShadow(color: Color(0x59000000), blurRadius: 18, offset: Offset(0, 10))]),
+              decoration: BoxDecoration(color: r27Paper, borderRadius: BorderRadius.circular(6), boxShadow: const [BoxShadow(color: Color(0x59000000), blurRadius: 18, offset: Offset(0, 10))]),
               padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 Expanded(flex: 4, child: R27Word(r27GiftWord(g.label), color: r27PaperInk, shadow: false)),
@@ -257,14 +285,14 @@ class R27EarnSection extends StatelessWidget {
     return _Shell(
       fashion: fashion,
       poster: fashion
-          ? Padding(padding: const EdgeInsets.fromLTRB(20, 0, 16, 6), child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Expanded(child: SizedBox(height: 84, child: R27Word('${_n(data.topRate)}%', color: r27Gold, outline: true))),
-              const R27Coin(size: 64),
-            ]))
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 16, 6),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Expanded(child: SizedBox(height: 84, child: R27Word('${_n(data.topRate)}%', color: r27Gold, outline: true))),
+                const R27Coin(size: 64),
+              ]))
           : null,
-      head: fashion
-          ? _earnHead(true, next)
-          : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: _earnHead(false, next)), const R27Coin(size: 56)]),
+      head: fashion ? _earnHead(true, next) : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: _earnHead(false, next)), const R27Coin(size: 56)]),
       row: R27AutoRow(
         count: data.ranks.length,
         height: h,
@@ -304,36 +332,35 @@ class R27RankStep extends StatelessWidget {
         onTap: onTap,
         label: '${r.title} ${_n(r.ratePct)} percent',
         child: Container(
-          foregroundDecoration: BoxDecoration(borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: current ? r27Gold : r27Line, width: current ? 2 : 1)),
+          foregroundDecoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: current ? r27Gold : r27Line, width: current ? 2 : 1)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: Stack(fit: StackFit.expand, children: [
               R27Img(r27Hours[(index + 5) % r27Hours.length]),
               const ColoredBox(color: Color(0x99000000)),
-              LayoutBuilder(builder: (c, box) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
-                          if (current) ...[const R27TagLabel('You'), const SizedBox(height: 8)],
-                          Text(r.title, style: dSub.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
-                          Text('${r.minWords}+ words', style: dSub),
-                        ]),
-                      ),
-                    ),
-                    SizedBox(
-                      height: box.maxHeight * f,
-                      child: ClipPath(
-                        clipper: R27Torn(seed: index + 4, bottom: false, depth: 6),
-                        child: ColoredBox(
-                          color: current ? r27Gold : r27Paper,
-                          child: Padding(padding: const EdgeInsets.fromLTRB(10, 12, 10, 8),
-                              child: R27Word('${_n(r.ratePct)}%', color: r27PaperInk, shadow: false, align: Alignment.bottomLeft)),
+              LayoutBuilder(
+                  builder: (c, box) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
+                              if (current) ...[const R27TagLabel('You'), const SizedBox(height: 8)],
+                              Text(r.title, style: dSub.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
+                              Text('${r.minWords}+ words', style: dSub),
+                            ]),
+                          ),
                         ),
-                      ),
-                    ),
-                  ])),
+                        SizedBox(
+                          height: box.maxHeight * f,
+                          child: ClipPath(
+                            clipper: R27Torn(seed: index + 4, bottom: false, depth: 6),
+                            child: ColoredBox(
+                              color: current ? r27Gold : r27Paper,
+                              child: Padding(padding: const EdgeInsets.fromLTRB(10, 12, 10, 8), child: R27Word('${_n(r.ratePct)}%', color: r27PaperInk, shadow: false, align: Alignment.bottomLeft)),
+                            ),
+                          ),
+                        ),
+                      ])),
             ]),
           ),
         ),
@@ -354,17 +381,16 @@ class R27CouponsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = r27CouponCards(data, onScratch: onScratch, onOpen: onOpen, onCoupon: onCoupon);
     final h = r27H(context, fashion ? 176 : 164, 80);
-    final title = data.coupons.isNotEmpty
-        ? '${data.coupons.length} ${data.coupons.length == 1 ? 'discount' : 'discounts'} ready'
-        : (!data.scratchedToday ? "Today's card is ready" : 'Cards and discounts');
+    final title =
+        data.coupons.isNotEmpty ? '${data.coupons.length} ${data.coupons.length == 1 ? 'discount' : 'discounts'} ready' : (!data.scratchedToday ? "Today's card is ready" : 'Cards and discounts');
     return _Shell(
       fashion: fashion,
       poster: fashion
-          ? const Padding(padding: EdgeInsets.fromLTRB(20, 0, 20, 0), child: SizedBox(height: 66,
-              child: ClipRect(child: Align(alignment: Alignment.topLeft, heightFactor: .72, child: SizedBox(height: 92, child: R27Word('SAVE', color: r27Gold))))))
+          ? const Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+              child: SizedBox(height: 66, child: ClipRect(child: Align(alignment: Alignment.topLeft, heightFactor: .72, child: SizedBox(height: 92, child: R27Word('SAVE', color: r27Gold))))))
           : null,
-      head: R27Head(dark: fashion, hello: 'NowssB Coupons', title: title,
-          sub: '${data.sealedTotal} sealed ${data.sealedTotal == 1 ? 'card' : 'cards'} waiting · discounts apply at checkout'),
+      head: R27Head(dark: fashion, hello: 'NowssB Coupons', title: title, sub: '${data.sealedTotal} sealed ${data.sealedTotal == 1 ? 'card' : 'cards'} waiting · discounts apply at checkout'),
       row: R27AutoRow(
         count: items.length,
         height: h,
@@ -387,11 +413,9 @@ class R27CouponsSection extends StatelessWidget {
 }
 
 List<Widget> r27CouponCards(R27Coupons d, {required VoidCallback onScratch, required VoidCallback onOpen, required void Function(int) onCoupon}) => [
-      if (!d.scratchedToday)
-        R27FoilCard(tint: r27Gold, tag: 'Today', word: 'FREE', line: "Today's card is ready to scratch", onTap: onScratch),
+      if (!d.scratchedToday) R27FoilCard(tint: r27Gold, tag: 'Today', word: 'FREE', line: "Today's card is ready to scratch", onTap: onScratch),
       for (var i = 0; i < d.coupons.length; i++) R27Stub(d.coupons[i], onTap: () => onCoupon(i)),
-      for (final e in d.sealed.entries)
-        R27FoilCard(tint: rarityColor(e.key), tag: rarityTitle(e.key), word: '×${e.value}', line: 'Sealed · scratch to open', onTap: onOpen),
+      for (final e in d.sealed.entries) R27FoilCard(tint: rarityColor(e.key), tag: rarityTitle(e.key), word: '×${e.value}', line: 'Sealed · scratch to open', onTap: onOpen),
       if (d.scratchedToday && d.coupons.isEmpty && d.sealed.isEmpty)
         R27FoilCard(tint: const Color(0xFF8A8F9C), tag: 'Tomorrow', word: 'NEXT', line: 'Your next free card comes tomorrow', onTap: onOpen),
     ];
@@ -411,27 +435,31 @@ class R27Stub extends StatelessWidget {
             child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Expanded(
                 flex: 36,
-                child: ColoredBox(color: r27Coal, child: Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 16, 8, 14),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Expanded(child: R27Word('${c.pct}%', color: r27Gold)),
-                    const SizedBox(height: 6),
-                    const R27TagLabel('Off'),
-                  ]),
-                )),
+                child: ColoredBox(
+                    color: r27Coal,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 16, 8, 14),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Expanded(child: R27Word('${c.pct}%', color: r27Gold)),
+                        const SizedBox(height: 6),
+                        const R27TagLabel('Off'),
+                      ]),
+                    )),
               ),
               SizedBox(width: 0, child: OverflowBox(maxWidth: 10, child: CustomPaint(size: const Size(10, double.infinity), painter: const R27Perf(Color(0x66FFFFFF))))),
               Expanded(
                 flex: 64,
-                child: ColoredBox(color: r27Paper, child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                    Text(c.label.isEmpty ? '${c.pct}% off' : c.label, style: nSub.copyWith(color: r27PaperInk, fontWeight: FontWeight.w800)),
-                    const SizedBox(height: 4),
-                    Text('On ${c.scope} · cap ₹${_n(c.capInr)}', style: nSub.copyWith(color: const Color(0xC7000000))),
-                    if (c.expiresAt > 0) Text('Until ${_shortDate(c.expiresAt)}', style: nSub.copyWith(color: const Color(0xC7000000))),
-                  ]),
-                )),
+                child: ColoredBox(
+                    color: r27Paper,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Text(c.label.isEmpty ? '${c.pct}% off' : c.label, style: nSub.copyWith(color: r27PaperInk, fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 4),
+                        Text('On ${c.scope} · cap ₹${_n(c.capInr)}', style: nSub.copyWith(color: const Color(0xC7000000))),
+                        if (c.expiresAt > 0) Text('Until ${_shortDate(c.expiresAt)}', style: nSub.copyWith(color: const Color(0xC7000000))),
+                      ]),
+                    )),
               ),
             ]),
           ),
