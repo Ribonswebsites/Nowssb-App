@@ -363,18 +363,19 @@ class R27RankStep extends StatelessWidget {
             child: Stack(fit: StackFit.expand, children: [
               if (light) const ColoredBox(color: r27LCard) else ...[R27Img(r27Hours[(index + 5) % r27Hours.length]), const ColoredBox(color: Color(0x99000000))],
               LayoutBuilder(
-                  builder: (c, box) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
-                              if (current) ...[const R27TagLabel('You'), const SizedBox(height: 8)],
-                              Text(r.title, style: dSub.copyWith(color: light ? r27LInk : Colors.white, fontWeight: FontWeight.w800)),
-                              Text('${r.minWords}+ words', style: light ? dSub.copyWith(color: r27LSub) : dSub),
-                            ]),
-                          ),
+                  // B029: the name keeps its natural height; the bar takes
+                  // f of the step but yields to it (no overflow at top rank).
+                  builder: (c, box) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisAlignment: MainAxisAlignment.end, children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                            if (current) ...[const R27TagLabel('You'), const SizedBox(height: 8)],
+                            Text(r.title, style: dSub.copyWith(color: light ? r27LInk : Colors.white, fontWeight: FontWeight.w800)),
+                            Text('${r.minWords}+ words', style: light ? dSub.copyWith(color: r27LSub) : dSub),
+                          ]),
                         ),
-                        SizedBox(
+                        Flexible(
+                            child: SizedBox(
                           height: box.maxHeight * f,
                           child: ClipPath(
                             clipper: R27Torn(seed: index + 4, bottom: false, depth: 6),
@@ -383,7 +384,7 @@ class R27RankStep extends StatelessWidget {
                               child: Padding(padding: const EdgeInsets.fromLTRB(10, 12, 10, 8), child: R27Word('${_n(r.ratePct)}%', color: r27PaperInk, shadow: false, align: Alignment.bottomLeft)),
                             ),
                           ),
-                        ),
+                        )),
                       ])),
             ]),
           ),
