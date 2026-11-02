@@ -74,7 +74,6 @@ class FashGreeting extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          const ProgressPillButton(),
         ],
       ),
     );

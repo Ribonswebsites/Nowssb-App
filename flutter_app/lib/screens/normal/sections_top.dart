@@ -754,13 +754,6 @@ class NmTiles extends StatelessWidget {
       2,
     ),
     (
-      'My Progress',
-      'Healing journey',
-      'https://media.nowssb.com/migrated-images/14f6230703172bda_file_00000000345481faafd2bea97c8320ab_oknybe.png',
-      Icons.show_chart,
-      4,
-    ),
-    (
       'Word Science',
       'NowssB texts',
       'https://media.nowssb.com/migrated-images/47036d4cd4790929_file_00000000a24081fa83eeab9164647db8_w2fzuq.png',

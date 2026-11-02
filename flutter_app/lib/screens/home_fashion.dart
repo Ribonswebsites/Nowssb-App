@@ -79,7 +79,6 @@ import 'widgets_page.dart';
 import 'quick_access.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
-import 'progress/progress_screen.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'personal_coach.dart';
@@ -294,8 +293,6 @@ class _HomeFashionState extends State<HomeFashion> {
         _push(const SubscriptionScreen());
       case 'player':
         _push(const PlayerSettingsScreen());
-      case 'progress':
-        _push(PracticeProgressScreen(words: ContentStore.instance.library));
       case 'quotes':
         _push(const QuotesWeekScreen());
     }
@@ -322,8 +319,6 @@ class _HomeFashionState extends State<HomeFashion> {
     switch (label) {
       case 'Sound Library':
         _push(const SoundLibraryScreen());
-      case 'My Progress':
-        _push(PracticeProgressScreen(words: ContentStore.instance.library));
       default:
         _go(tab);
     }
@@ -346,8 +341,6 @@ class _HomeFashionState extends State<HomeFashion> {
         _go(1);
       case 'profile':
         _go(4);
-      case 'progress':
-        _push(PracticeProgressScreen(words: ContentStore.instance.library));
       case 'healing':
       case 'healer':
         _push(const HealingPathScreen());
@@ -404,7 +397,6 @@ class _HomeFashionState extends State<HomeFashion> {
         QuickCard('gifts', 'Gifts', 'Send or redeem', Icons.card_giftcard_rounded, () => _push(const GiftsScreen()), lottie: kGiftLottie),
         QuickCard('coupons', 'Coupons', 'Deals for you', Icons.local_offer_rounded, () => _push(const CouponScreen())),
         QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
-        QuickCard('progress', 'Progress', 'Today at a glance', Icons.donut_large_rounded, () => ProgressPanel.open(context), lottie: kProgressLottie),
         QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1), lottie: kPlayLottie),
         QuickCard('tasks', 'Daily tasks', 'Tick off today', Icons.checklist_rounded, () => _push(const DailyTasksPage())),
         QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen()), lottie: kSpeakerLottie),

@@ -473,7 +473,6 @@ class V4Doors extends StatelessWidget {
     ('healing', 'Healing', NwsbMarks.wishlist),
     ('subscription', 'Subscribe', NwsbMarks.crown),
     ('player', 'Player', NwsbMarks.play),
-    ('progress', 'Progress', NwsbMarks.bars),
     ('quotes', 'Quotes', NwsbMarks.word),
   ];
   static const _doorLottie = {

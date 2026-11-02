@@ -39,7 +39,6 @@ import 'package:nowssb/screens/player_settings.dart';
 import 'package:nowssb/screens/practice.dart';
 import 'package:nowssb/screens/practice_player.dart';
 import 'package:nowssb/screens/profile.dart';
-import 'package:nowssb/screens/progress/progress_screen.dart';
 import 'package:nowssb/screens/quick_access.dart';
 import 'package:nowssb/screens/reader/reader_hub.dart';
 import 'package:nowssb/screens/saved_words.dart';
@@ -132,7 +131,6 @@ Map<String, Widget Function()> _pages() {
     'partner_program': () => const PartnerProgramPage(),
     'reference': () => const ReferenceScreen(),
     'reference_program': () => const ReferenceProgramPage(),
-    'progress': () => PracticeProgressScreen(words: words.take(12).toList()),
     'daily_tasks': () => const DailyTasksPage(),
     'features': () => const FeaturesPage(),
   };

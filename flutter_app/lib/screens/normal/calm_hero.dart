@@ -644,7 +644,6 @@ class _PaperRitualSlot extends StatelessWidget {
             time: data.ritualTime,
             title: data.title,
             onBegin: data.onBegin,
-            onSeeProgress: data.onProgress ?? data.onBegin,
           ),
         ),
       );

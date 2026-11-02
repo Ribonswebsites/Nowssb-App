@@ -432,7 +432,6 @@ const kNwsbSearchDestinations = <(String, String)>[
   ('Player', 'player'),
   ('Practice', 'practice'),
   ('Profile', 'profile'),
-  ('Progress', 'progress'),
   ('Quick Access', 'quick-access'),
   ('Reader', 'reader'),
   ('Request Words', 'request-words'),

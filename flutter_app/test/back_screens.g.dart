@@ -47,7 +47,6 @@ import 'package:nowssb/screens/player_settings.dart';
 import 'package:nowssb/screens/poster/poster_pages.dart';
 import 'package:nowssb/screens/practice.dart';
 import 'package:nowssb/screens/profile.dart';
-import 'package:nowssb/screens/progress/progress_screen.dart';
 import 'package:nowssb/screens/quick_access.dart';
 import 'package:nowssb/screens/quotes_live.dart';
 import 'package:nowssb/screens/reader/reader_book.dart';
@@ -109,7 +108,6 @@ final btScreens = <String, Widget Function()>{
   'PartnerScreen': () => const PartnerScreen(),
   'PersonalCoachScreen': () => const PersonalCoachScreen(),
   'PlayerSettingsScreen': () => const PlayerSettingsScreen(),
-  'PracticeProgressScreen': () => const PracticeProgressScreen(),
   'PracticeScreen': () => const PracticeScreen(),
   'ProfileScreen': () => const ProfileScreen(),
   'QuickAccessScreen': () => const QuickAccessScreen(),

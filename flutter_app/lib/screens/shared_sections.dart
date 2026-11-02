@@ -504,8 +504,6 @@ class MainOptionsSection extends StatelessWidget {
     (NwsbMarks.wordBag, 24, 'Word Science', 2),
     (NwsbMarks.bag, 24, 'The Store', 3),
     (NwsbMarks.connectPair, 24, 'Connect', 0),
-    // Tab sentinel -1: Progress is a pushed screen, never Profile (tab 4).
-    (NwsbMarks.bars, 24, 'My Progress', 4),
   ];
 
   @override

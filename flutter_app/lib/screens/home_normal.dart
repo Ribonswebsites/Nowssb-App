@@ -99,7 +99,6 @@ import '../features/earn/earn_hub_screen.dart';
 import 'app_settings.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
-import 'progress/progress_screen.dart';
 import 'reader/reader_hub.dart';
 import 'subscription.dart';
 import 'store/cart_pages.dart';
@@ -267,11 +266,6 @@ class _HomeNormalState extends State<HomeNormal> {
     _push(PracticePlayerScreen(words: words, title: title));
   }
 
-  void _openDashboardProgress() {
-    // Progress (sessions, streak, coins) is shown on the Profile tab.
-    _go(4);
-  }
-
   void _openHomeMenu(BuildContext context) {
     showHomeMenuDrawer(context, goTab: _go);
   }
@@ -280,8 +274,6 @@ class _HomeNormalState extends State<HomeNormal> {
     switch (label) {
       case 'Sound Library':
         _push(const SoundLibraryScreen());
-      case 'My Progress':
-        _openDashboardProgress();
       default:
         _go(tab);
     }
@@ -303,8 +295,6 @@ class _HomeNormalState extends State<HomeNormal> {
         _push(const SubscriptionScreen());
       case 'player':
         _push(const PlayerSettingsScreen());
-      case 'progress':
-        _push(PracticeProgressScreen(words: ContentStore.instance.library));
       case 'quotes':
         _push(const QuotesWeekScreen());
     }
@@ -358,7 +348,6 @@ class _HomeNormalState extends State<HomeNormal> {
             children: [
               CalmToday(
                 onStart: _openDashboardSession,
-                onProgress: _openDashboardProgress,
               ),
             ],
           ),

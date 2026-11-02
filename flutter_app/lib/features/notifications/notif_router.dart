@@ -20,7 +20,6 @@ import '../../data/content.dart';
 import '../../data/home_widget_sync.dart';
 import '../../data/models.dart';
 import '../../screens/practice_player.dart';
-import '../../screens/progress/progress_screen.dart';
 import '../../screens/reader/reader_hub.dart';
 import '../../screens/store/ebooks_store.dart';
 import '../../screens/store/request_words.dart';
@@ -134,7 +133,7 @@ class NotifRouter {
         final w = _word(arg);
         return w == null ? const RequestWordsScreen() : WordDetail(word: w);
       case 'progress':
-        return PracticeProgressScreen(words: ContentStore.instance.library);
+        return null; // Progress page removed (Ribon 11-02)
       case 'rewards':
         return const RewardsProgramPage();
       case 'coins':

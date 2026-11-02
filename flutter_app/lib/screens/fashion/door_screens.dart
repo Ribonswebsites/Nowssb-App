@@ -15,7 +15,6 @@ import '../notifications_settings.dart';
 import '../player_settings.dart';
 import '../practice.dart';
 import '../profile.dart';
-import '../progress/progress_screen.dart';
 import '../sound_library.dart';
 import '../store.dart';
 import '../store/meaning_store.dart';
@@ -216,7 +215,6 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
   static const jumps = [
     DoorJump('practice', 'Practice', "Today's word ritual", 'assets/doors/practice.webp'),
     DoorJump('library', 'Sound Library', 'Every word you own', 'assets/video/player-box-rings-poster.webp'),
-    DoorJump('progress', 'Progress', 'How far you have come', 'assets/video/my-progress-scene-1-poster.webp'),
     DoorJump('store', 'Store', 'Words and frequencies', 'assets/doors/fashion_plus_store.webp'),
     DoorJump('meaning', 'Meaning', 'What it truly means', 'assets/video/nm-calm-stream-poster.webp'),
     DoorJump('connect', 'Connect', 'The social space', 'assets/video/nm-calm-clouds-poster.webp'),
@@ -244,8 +242,6 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
         _push(const PracticeScreen());
       case 'library':
         _push(const SoundLibraryScreen());
-      case 'progress':
-        _push(PracticeProgressScreen(words: ContentStore.instance.library));
       case 'store':
         _push(const StoreScreen());
       case 'meaning':

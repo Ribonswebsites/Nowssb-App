@@ -128,7 +128,6 @@ void main() {
       for (final (title, screen) in [
         ('Practice', 'PracticeScreen'),
         ('Sound Library', 'SoundLibraryScreen'),
-        ('Progress', 'PracticeProgressScreen'),
         ('Store', 'StoreScreen'),
         ('Meaning', 'MeaningStoreScreen'),
         ('Notifications', 'NotificationsSettingsPage'),

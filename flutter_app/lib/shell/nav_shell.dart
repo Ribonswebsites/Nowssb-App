@@ -21,7 +21,6 @@ import '../screens/practice_player.dart';
 import '../screens/profile.dart';
 import '../screens/quotes_live.dart';
 import '../screens/splash.dart';
-import '../screens/progress/progress_screen.dart';
 import '../screens/store.dart';
 import '../screens/quick_access.dart';
 import '../screens/app_settings.dart';
@@ -162,11 +161,6 @@ class _NavShellState extends State<NavShell> {
       reportEarn('word_of_day');
       Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => PracticePlayerScreen(words: [w!], title: 'Word of the day', showIntro: false),
-      ));
-    } else if (what == 'streak') {
-      _popShellOverlays();
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
       ));
     }
   }
@@ -339,11 +333,6 @@ class _NavShellState extends State<NavShell> {
       'img':
           'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
     },
-    'progress': {
-      'label': 'Progress',
-      'img':
-          'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'
-    },
     'wordscience': {
       'label': 'Word Sci',
       'img':
@@ -413,15 +402,6 @@ class _NavShellState extends State<NavShell> {
     if (tab != null) {
       // Profile / Connect / Practice / Library / Store — never Progress.
       _goToTab(tab);
-      return;
-    }
-    if (id == 'progress') {
-      // Progress is NOT a tab root — push the dedicated screen only.
-      _popShellOverlays();
-      Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) =>
-            PracticeProgressScreen(words: ContentStore.instance.library),
-      ));
       return;
     }
     // Shortcuts with their own page open it; the rest keep opening Quick
@@ -543,7 +523,7 @@ class _NavShellState extends State<NavShell> {
                 // SLM), NOT the old plain letter list in library.dart.
                 _tabAlive(2, const SoundLibraryScreen(embedded: true)),
                 _tabAlive(3, const StoreScreen()),
-                // Tab 4 is always account Profile — never PracticeProgressScreen.
+                // Tab 4 is always account Profile.
                 _tabAlive(4, const ProfileScreen()),
               ],
             ),

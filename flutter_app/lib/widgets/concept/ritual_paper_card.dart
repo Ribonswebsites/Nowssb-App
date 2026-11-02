@@ -65,12 +65,13 @@ class PaperRitualCard extends StatefulWidget {
   final int completed, total, sessionCount, streak;
   /// Defaults to device local time. Pass to pin (tests, admin preview).
   final RitualTime? time;
-  final VoidCallback onBegin, onSeeProgress;
+  final VoidCallback onBegin;
+  final VoidCallback? onSeeProgress; // unused: Progress page removed
   /// Real ritual title (TodayRitual.title); null = the time of day's.
   final String? title;
   const PaperRitualCard({this.title,
     super.key, required this.completed, required this.total, required this.sessionCount,
-    required this.streak, required this.onBegin, required this.onSeeProgress, this.time,
+    required this.streak, required this.onBegin, this.onSeeProgress, this.time,
   });
 
   @override
@@ -184,8 +185,6 @@ class _PaperRitualCardState extends State<PaperRitualCard> with TickerProviderSt
                     style: HomeText.heading.copyWith(fontSize: 22, color: const Color(0xFF1A1A2E))),
               ]);
               final buttons = Row(mainAxisSize: MainAxisSize.min, children: [
-                _InsetButton(label: 'See progress', onTap: () => _tap(widget.onSeeProgress)),
-                const SizedBox(width: 8),
                 _BeginButton(p: p, onTap: () => _tap(widget.onBegin)),
               ]);
               final scale = MediaQuery.textScalerOf(ctx).scale(10) / 10;

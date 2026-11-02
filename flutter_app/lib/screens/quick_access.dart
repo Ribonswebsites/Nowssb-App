@@ -55,12 +55,6 @@ const quickAccessFeatures = <Map<String, String>>[
         'https://media.nowssb.com/migrated-images/3979b9fa35b579e6_62ebfdb0-56d2-11f1-8fad-095787cce754_oap0j4.png'
   },
   {
-    'id': 'progress',
-    'label': 'Progress',
-    'img':
-        'https://media.nowssb.com/migrated-images/0480c10b8a8d79dd_file_00000000ae607208aa51504989648920_ml2czc.png'
-  },
-  {
     'id': 'wordscience',
     'label': 'Word Sci',
     'img':

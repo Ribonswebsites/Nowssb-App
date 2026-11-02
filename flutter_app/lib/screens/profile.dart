@@ -46,7 +46,6 @@ import 'sound_library.dart';
 import '../features/notifications/inbox_screen.dart';
 import '../features/notifications/notif_prefs.dart';
 import '../features/notifications/notif_scheduler.dart';
-import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'store.dart';
 import 'subscription.dart';
@@ -93,7 +92,7 @@ const kDefaultAvatar =
     'https://media.nowssb.com/migrated-images/1590b73b14f17aee_image-131_jyrnhx.jpg';
 
 
-/// Account / settings Profile — distinct from [PracticeProgressScreen].
+/// Account / settings Profile — the only profile page.
 ///
 /// Shows avatar, Quick Access, Shop, Preferences. The Progress teaser opens
 /// Progress as a pushed route; this widget must never return Progress as its
@@ -537,8 +536,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.only(bottom: 18),
                       child: ProfileMind(
                         onPractice: () => NavScope.goTo(context, 1),
-                        onProgress: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                            builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library))),
                       ),
                     )),
                     LSection('about', 'About', _about()),
@@ -1166,13 +1163,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _progress() {
-    void openProgress() {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => PracticeProgressScreen(words: ContentStore.instance.library),
-        ),
-      );
-    }
 
     return ListenableBuilder(
       listenable: Listenable.merge([PracticeProgress.instance, EconomyMirror.instance]),
@@ -1180,9 +1170,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final p = PracticeProgress.instance;
     return SectionBlock(
       title: 'Your Progress',
-      trailing: _viewAll(icon: 'assets/icons/icon_05.svg', onTap: openProgress),
       child: InkWell(
-        onTap: openProgress,
+        onTap: null,
         borderRadius: BorderRadius.circular(22),
         child: GlassCard(
           margin: const EdgeInsets.only(bottom: 0),
@@ -1219,12 +1208,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ? Row(children: [
                     coins,
                     const SizedBox(width: 10),
-                    Expanded(child: InkWell(onTap: openProgress, child: Row(children: [streak, const SizedBox(width: 10), sessions, const SizedBox(width: 10), words]))),
+                    Expanded(child: InkWell(onTap: null, child: Row(children: [streak, const SizedBox(width: 10), sessions, const SizedBox(width: 10), words]))),
                   ])
                 : Column(key: const ValueKey('stats-2x2'), children: [
                     IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: coins), const SizedBox(width: 10), streak])),
                     const SizedBox(height: 10),
-                    InkWell(onTap: openProgress, child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [sessions, const SizedBox(width: 10), words]))),
+                    InkWell(onTap: null, child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [sessions, const SizedBox(width: 10), words]))),
                   ]);
             return Row(
             children: [

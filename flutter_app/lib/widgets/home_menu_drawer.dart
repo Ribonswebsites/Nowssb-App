@@ -24,7 +24,6 @@ import '../features/vault/vault_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
 import '../screens/features_page.dart';
 import '../screens/notifications_settings.dart';
-import '../screens/progress/progress_screen.dart';
 import '../screens/reader/reader_hub.dart';
 import '../screens/shared_sections.dart';
 import '../screens/sound_library.dart';
@@ -258,7 +257,6 @@ class HomeMenuDrawer extends StatelessWidget {
                         bannerSub: 'Progress, store, settings',
                         onBanner: () => _goTab(context, 4),
                         cards: [
-                          WorkCard(category: 'Progress', title: 'My Progress', meta: 'Healing journey', action: 'Open progress', image: 'assets/rails/gen-07.jpg', onTap: () => _push(context, PracticeProgressScreen(words: ContentStore.instance.library))),
                           WorkCard(category: 'Store', title: 'NowssB Store', meta: 'Word and meaning libraries', action: 'Open store', image: 'assets/rails/gen-08.jpg', onTap: () => _goTab(context, 3)),
                           WorkCard(category: 'Store', title: 'Meaning Store', meta: 'Hidden meanings', action: 'Open meanings', image: 'assets/rails/gen-09.jpg', onTap: () => _push(context, const MeaningStoreScreen())),
                           WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', image: 'assets/rails/gen-10.jpg', onTap: () => _goTab(context, 4)),

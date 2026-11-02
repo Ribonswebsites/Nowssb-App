@@ -29,7 +29,6 @@ import '../../screens/player_settings.dart';
 import '../../screens/practice.dart';
 import '../../screens/practice_player.dart';
 import '../../screens/profile.dart';
-import '../../screens/progress/progress_screen.dart';
 import '../../screens/quick_access.dart';
 import '../../screens/quotes_live.dart';
 import '../../screens/reader/reader_hub.dart';
@@ -83,7 +82,6 @@ final List<AppPage> kAppPages = [
   AppPage('sentence', 'Sentence builder', 'Learn', Icons.short_text_rounded, () => const SentenceBuilderScreen()),
   AppPage('quotes', 'Quotes of the week', 'Learn', Icons.format_quote_rounded, () => const QuotesWeekScreen()),
   AppPage('profile', 'Profile', 'You', Icons.person_rounded, () => const ProfileScreen(), tab: 4),
-  AppPage('progress', 'Progress', 'You', Icons.insights_rounded, () => PracticeProgressScreen(words: _words())),
   AppPage('subscription', 'Subscription', 'You', Icons.workspace_premium_rounded, () => const SubscriptionScreen()),
   AppPage('quickaccess', 'Quick access', 'You', Icons.apps_rounded, () => const QuickAccessScreen()),
   AppPage('settings', 'Settings', 'You', Icons.settings_rounded, () => const AppSettingsScreen()),

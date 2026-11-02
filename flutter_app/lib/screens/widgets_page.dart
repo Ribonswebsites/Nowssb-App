@@ -30,7 +30,6 @@ import 'player_settings.dart';
 import 'practice.dart';
 import 'store.dart';
 import 'profile.dart';
-import 'progress/progress_screen.dart';
 import 'quick_access.dart';
 import 'sound_library.dart';
 import 'store/meaning_store.dart';
@@ -155,11 +154,6 @@ class _WidgetsPageState extends State<WidgetsPage> {
                       child: _JumpRail(
                         onPractice: () => _push(const PracticeScreen()),
                         onLibrary: () => _push(const SoundLibraryScreen()),
-                        onProgress: () => _push(
-                          PracticeProgressScreen(
-                            words: ContentStore.instance.library,
-                          ),
-                        ),
                         onStore: () => _push(const StoreScreen()),
                         onMeaning: () => _push(const MeaningStoreScreen()),
                         onConnect: () {
@@ -499,7 +493,6 @@ class _JumpRail extends StatelessWidget {
   const _JumpRail({
     required this.onPractice,
     required this.onLibrary,
-    required this.onProgress,
     required this.onStore,
     required this.onMeaning,
     required this.onConnect,
@@ -509,7 +502,6 @@ class _JumpRail extends StatelessWidget {
 
   final VoidCallback onPractice;
   final VoidCallback onLibrary;
-  final VoidCallback onProgress;
   final VoidCallback onStore;
   final VoidCallback onMeaning;
   final VoidCallback onConnect;
@@ -525,12 +517,6 @@ class _JumpRail extends StatelessWidget {
         'Sound Library',
         'Every word you own',
         onLibrary
-      ),
-      (
-        Icons.insights_outlined,
-        'Progress',
-        'How far you have come',
-        onProgress
       ),
       (Icons.storefront_outlined, 'Store', 'Words and frequencies', onStore),
       (Icons.menu_book_outlined, 'Meaning', 'What it truly means', onMeaning),

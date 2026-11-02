@@ -15,7 +15,6 @@ import '../widgets/glass_wrap.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/nwsb_icon.dart';
 import 'healing_path.dart';
-import 'progress/progress_screen.dart';
 import 'sound_library.dart';
 import 'widgets_page.dart';
 
@@ -38,7 +37,6 @@ const _youArt = <String>['assets/rails/gifts-04.jpg', 'assets/rails/gifts-05.jpg
 final _practice = <_Feature>[
   _Feature('player', 'Practice player', 'Listen to a word, say it aloud, sit with it. Each sitting counts toward your streak.', NwsbMarks.play24, (c) => NwsbLinks.tab(c, 1)),
   _Feature('library', 'Sound Library', 'Every recorded word, with its own voice and meaning.', NwsbMarks.sound, (c) => _push(c, const SoundLibraryScreen())),
-  _Feature('progress', 'My Progress', 'Sessions, minutes, streak and this week at a glance.', NwsbMarks.bars, (c) => _push(c, PracticeProgressScreen(words: ContentStore.instance.library))),
   _Feature('healing', 'Healing Path', 'A guided path of words for the way you feel.', NwsbMarks.verified, (c) => _push(c, const HealingPathScreen())),
   _Feature('coach', 'Personal Coach', 'Ask about a word, a practice, or where to begin.', NwsbMarks.people, (c) => NwsbLinks.coach(c)),
   _Feature('reader', 'Reader', 'Read meanings and the science behind the words.', NwsbMarks.reader, (c) => NwsbLinks.reader(c)),

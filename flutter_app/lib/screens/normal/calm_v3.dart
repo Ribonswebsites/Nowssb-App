@@ -267,7 +267,6 @@ class _CalmTodayState extends State<CalmToday> {
   static const _likedWordsKey = 'nwsb_liked_words';
   late final TodayRitualModel _model = TodayRitualModel(
     onBegin: (words, title) => widget.onStart?.call(words, title),
-    onSeeProgress: () => widget.onProgress?.call(),
   );
   Set<String> _liked = const {};
 

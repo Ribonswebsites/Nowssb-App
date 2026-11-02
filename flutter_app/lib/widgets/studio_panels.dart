@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import '../data/practice_progress.dart';
 import '../screens/notifications_sheet.dart';
 import '../screens/practice.dart';
-import '../screens/progress/progress_screen.dart';
 import '../screens/sound_library.dart';
 import '../shell/nav_shell.dart';
 import 'glass_wrap.dart';
@@ -70,13 +69,6 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
 
   void _openPractice() => _openTab(1);
 
-  void _openProgress() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => const PracticeProgressScreen(),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -213,7 +205,7 @@ class _PracticeCoursesPanelState extends State<PracticeCoursesPanel> {
                                     ),
                                     const Spacer(),
                                     GestureDetector(
-                                      onTap: _progress ? _openProgress : _openPractice,
+                                      onTap: _openPractice,
                                       child: const EditableLabel('studio_panels.PracticeCoursesPanel',
                                         'Continue  ›',
                                         style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
