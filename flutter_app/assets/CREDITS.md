@@ -49,3 +49,4 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 | `meditation/meditation-candle.webp` | rawpixel 5963227, https://www.rawpixel.com/image/5963227, CC0 1.0 | Cut-out. Enter-curve stage subject |
 | `meditation/meditation-cairn.webp` | rawpixel 5902834 "Stacked wellness zen stones", https://www.rawpixel.com/image/5902834, CC0 1.0 | Cut-out. Hero-curve stage subject |
 - rs-candle — Pexels (free licence), https://www.pexels.com/photo/3822622/ — Offers & earning image and ref-style sections
+- Ribon 10-27: the Cleopatra / Egyptian / red-haired art files (banners/promo/split-*-{egyptian,red}*.png, banners/course-cleo-{a,b}.jpg, banners/brand-cleo*.png) now hold the meditation photos above (hc-*, rs-candle); same Pexels credits.

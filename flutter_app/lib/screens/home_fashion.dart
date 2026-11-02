@@ -25,6 +25,8 @@
 /// further down come and go.
 library;
 
+import 'package:nowssb/widgets/concept/r27/hero.dart' show R27MeditationBanner;
+import 'package:nowssb/data/content.dart' show ContentStore;
 import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'poster/poster_pages.dart' show TrendingScreen, posterPush;
 import '../data/fashion_bg_dim.dart';
@@ -567,7 +569,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true, glassIcon: true),
+            R27MeditationBanner(hourCount: ContentStore.instance.library.length, onTap: () => _go(1)),
             SizedBox(height: kFashSectionGap),
             FashTiles(onTile: _go, onOpen: _openEnter),
             SizedBox(height: kFashSectionGap),
