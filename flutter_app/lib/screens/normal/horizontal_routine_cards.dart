@@ -305,13 +305,15 @@ class _EssentialCard extends StatelessWidget {
                     color: foreground.withValues(alpha: darkGlass ? .78 : .72),
                     fontSize: 12)),
             const SizedBox(height: 10),
-            ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: EditableImage.asset(card.image,
-                    height: 152,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    alignment: Alignment.topCenter, slot: 'horizontal_routine_cards.EssentialCard')),
+            // B030: art gives way (cover-cropped) when big text wraps meta/title.
+            Flexible(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: EditableImage.asset(card.image,
+                        height: 152,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        alignment: Alignment.topCenter, slot: 'horizontal_routine_cards.EssentialCard'))),
             const SizedBox(height: 12),
             Text(card.meta,
                 style: TextStyle(
