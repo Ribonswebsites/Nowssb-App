@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import '../data/settings.dart';
 import '../theme/tokens.dart';
 import '../widgets/intro_gate.dart';
+import '../widgets/concept/r27/how_it_works.dart';
 import '../widgets/banner_mix.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
@@ -105,7 +106,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
       ],
       art: 'assets/fashion/fp-intro.webp',
       enterLabel: 'ENTER ZEN PLUS',
-      child: PageShell(
+      child: r27Guide('plus', r27PlusGuide, PageShell(
         eyebrow: 'Experience',
         title: 'Zen Plus',
         film: 'assets/video/fashion-plus-bg-6.mp4',
@@ -146,7 +147,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
             ])),
           ),
         ],
-      ),
+      )),
     );
   }
 }

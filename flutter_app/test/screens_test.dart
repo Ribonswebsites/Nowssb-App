@@ -29,7 +29,7 @@ void main() {
   // Settings persist through SharedPreferences, which has no platform in a
   // test — getInstance() never completes and the whole file hangs rather
   // than failing. An in-memory store is the sanctioned stand-in.
-  SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
+  SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1', 'guide_seen_plus': true});
 
   setUpAll(() {
     FakeVideoPlatform();

@@ -32,7 +32,11 @@ class StoreFirstUseGuide extends StatefulWidget {
     required this.child,
     this.steps = storeGuideSteps,
     this.helpButton = true,
+    this.showIcons = true,
   });
+
+  /// False drops the step icon so a card is title and body only.
+  final bool showIcons;
 
   /// False when the page puts a [StoreGuideButton] in its own header.
   final bool helpButton;
@@ -120,8 +124,10 @@ class StoreFirstUseGuideState extends State<StoreFirstUseGuide> {
                         border: Border.all(color: const Color(0x55FFFFFF)),
                       ),
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        Icon(s.icon, color: Colors.white, size: 44),
-                        const SizedBox(height: 14),
+                        if (widget.showIcons) ...[
+                          Icon(s.icon, color: Colors.white, size: 44),
+                          const SizedBox(height: 14),
+                        ],
                         Semantics(
                           header: true,
                           child: Text(s.title,

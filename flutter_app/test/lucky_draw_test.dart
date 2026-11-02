@@ -92,7 +92,7 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 }
 
 void main() {
-  SharedPreferences.setMockInitialValues({});
+  SharedPreferences.setMockInitialValues({'guide_seen_lucky_draw': true}); // B035 pop-up already seen
   setUpAll(() async {
     FakeVideoPlatform();
     VideoPool.debugDeadlines = false;

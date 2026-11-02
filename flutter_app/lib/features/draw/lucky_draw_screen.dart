@@ -3,6 +3,7 @@
 /// Free to enter. Odds, the draw, winners and reviews all come from the server.
 library;
 
+import '../../widgets/concept/r27/how_it_works.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
@@ -216,7 +217,8 @@ class LuckyDrawScreen extends StatelessWidget {
   static const routeName = '/rewards/lucky-draw';
 
   @override
-  Widget build(BuildContext context) => _Gated(_LuckyDrawScreenBody(repository: repository));
+  Widget build(BuildContext context) =>
+      r27Guide('lucky_draw', r27DrawGuide, _Gated(_LuckyDrawScreenBody(repository: repository)));
 }
 
 class _LuckyDrawScreenBody extends StatefulWidget {
