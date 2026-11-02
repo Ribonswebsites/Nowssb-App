@@ -101,15 +101,11 @@ export const ACTIONS = {
   drawEnter: dr.drawEnter,
   drawWinners: dr.drawWinners,
   drawReview: dr.drawReview,
-  // NowssB Connect (real profiles, follows, feed, chats)
-  connectSaveProfile: cn.connectSaveProfile,
-  connectHome: cn.connectHome,
-  connectFollow: cn.connectFollow,
-  connectPost: cn.connectPost,
-  connectLike: cn.connectLike,
-  connectInbox: cn.connectInbox,
-  connectThread: cn.connectThread,
-  connectSend: cn.connectSend,
+  // NowssB Connect: the daily word board (anonymous thoughts on today's word)
+  boardDay: cn.boardDay,
+  boardPost: cn.boardPost,
+  boardFelt: cn.boardFelt,
+  boardReport: cn.boardReport,
   // Community
   createEchoPost: so.createEchoPost,
   commentOnPost: so.commentOnPost,
@@ -142,7 +138,7 @@ const AREA = {
   claimWeeklyGift: 'earning', claimMonthlyGift: 'earning', claimMonthlyMark: 'earning', claimSeason: 'earning', claimLeague: 'earning',
   dailyScratch: 'earning', revealScratch: 'earning', claimTicket: 'earning', spin: 'earning', claimPartnerLevel: 'earning',
   drawEnter: 'earning', drawReview: 'community',
-  connectSaveProfile: 'community', connectPost: 'community', connectLike: 'community', connectSend: 'community', connectFollow: 'community',
+  boardPost: 'community', boardFelt: 'community', boardReport: 'community',
   createEchoPost: 'community', commentOnPost: 'community', toggleEchoLike: 'community',
 };
 const COUPON_ACTIONS = new Set(['dailyScratch', 'revealScratch', 'scratchCoupon', 'buyScratchWithCoins', 'claimTicket']);

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULT_ECONOMY, deepMerge } from '../functions/_lib/economy/config.js';
 import { ACTIONS } from '../functions/api/economy/[action].js';
-import { chatIdFor, usernameFrom } from '../functions/_lib/economy/connect.js';
+import { hasProfanity, imageOk, POSTS_PER_DAY } from '../functions/_lib/economy/connect.js';
 
 class MemDb {
   constructor() { this.m = new Map(); }
@@ -11,13 +11,11 @@ class MemDb {
     return [...this.m].filter(([p]) => { const s = p.split('/'); return s.length % 2 === 0 && s[s.length - 2] === col && (!parent || s.slice(0, -2).join('/') === parent); })
       .map(([p, d]) => ({ id: p.split('/').pop(), path: p, data: structuredClone(d) }));
   }
-  async query(col, where = [], { limit = 100, orderBy = null, parent = '' } = {}) {
-    let rows = this.rows(col, parent).sort((a, b) => (a.id < b.id ? -1 : 1));
-    for (const [f, op, v] of where) rows = rows.filter((r) => (op === '==' ? r.data[f] === v : Array.isArray(r.data[f]) && r.data[f].includes(v)));
-    if (orderBy) rows.sort((a, b) => ((a.data[orderBy[0]] || 0) - (b.data[orderBy[0]] || 0)) * (orderBy[1] === 'desc' ? -1 : 1));
+  async query(col, where = [], { limit = 100, parent = '' } = {}) {
+    let rows = this.rows(col, parent);
+    for (const [f, op, v] of where) rows = rows.filter((r) => op === '==' && r.data[f] === v);
     return rows.slice(0, limit);
   }
-  async count(col, where = [], { parent = '' } = {}) { return (await this.query(col, where, { parent, limit: 1e9 })).length; }
   async tx(fn) {
     const w = [];
     const t = { get: (p) => this.get(p), set: (p, o, { merge } = {}) => w.push(['set', p, o, merge]), create: (p, o) => w.push(['create', p, o]), delete: (p) => w.push(['del', p]) };
@@ -26,63 +24,80 @@ class MemDb {
     return out;
   }
 }
-const mk = () => { const db = new MemDb(); const cfg = deepMerge(DEFAULT_ECONOMY, {}); let now = Date.parse('2026-10-31T06:00:00Z'); return { db, ctx: () => ({ db, cfg, now: (now += 1000), env: {} }) }; };
-const A = 'userAAAA01', B = 'userBBBB02', C = 'userCCCC03';
+const mk = (start = '2026-11-02T06:00:00Z') => { const db = new MemDb(); const cfg = deepMerge(DEFAULT_ECONOMY, {}); const clock = { now: Date.parse(start) }; return { db, clock, ctx: () => ({ db, cfg, now: (clock.now += 1000), env: {} }) }; };
+const A = 'userAAAA01', B = 'userBBBB02', C = 'userCCCC03', D = 'userDDDD04';
 
-test('empty Connect shows nothing invented', async () => {
+test('old Instagram-style Connect actions are gone', () => {
+  for (const a of ['connectSaveProfile', 'connectHome', 'connectFollow', 'connectPost', 'connectLike', 'connectInbox', 'connectThread', 'connectSend']) assert.equal(ACTIONS[a], undefined, a);
+  for (const a of ['boardDay', 'boardPost', 'boardFelt', 'boardReport']) assert.equal(typeof ACTIONS[a], 'function', a);
+});
+
+test('empty board invents nothing', async () => {
   const { ctx } = mk();
-  const h = await ACTIONS.connectHome(ctx(), A, {});
-  assert.equal(h.me, null); assert.deepEqual(h.people, []); assert.deepEqual(h.posts, []);
-  assert.equal(h.followerCount, 0); assert.equal(h.followingCount, 0);
-  assert.deepEqual((await ACTIONS.connectInbox(ctx(), A, {})).chats, []);
+  const b = await ACTIONS.boardDay(ctx(), A, {});
+  assert.deepEqual(b.posts, []); assert.equal(b.readOnly, false); assert.equal(b.postsLeft, POSTS_PER_DAY); assert.deepEqual(b.days, []);
 });
 
-test('profiles, follow counts and validation', async () => {
+test('anonymous posts, newest first, no author identity leaks', async () => {
   const { ctx } = mk();
-  await assert.rejects(ACTIONS.connectSaveProfile(ctx(), A, { name: ' ' }), /display name/);
-  await assert.rejects(ACTIONS.connectSaveProfile(ctx(), A, { name: 'Asha', bio: 'see https://x.y' }), /Links/);
-  const p = await ACTIONS.connectSaveProfile(ctx(), A, { name: 'Asha Rao', focus: 'Wellness', bio: 'Hi' }, { picture: 'https://p/a.png' });
-  assert.equal(p.profile.username, usernameFrom('Asha Rao', A));
-  await ACTIONS.connectSaveProfile(ctx(), B, { name: 'Ben', focus: 'nope' });
-  await assert.rejects(ACTIONS.connectFollow(ctx(), A, { targetUid: C }), /not on Connect/);
-  await ACTIONS.connectFollow(ctx(), A, { targetUid: B });
-  const ha = await ACTIONS.connectHome(ctx(), A, {});
-  assert.equal(ha.me.name, 'Asha Rao'); assert.equal(ha.me.avatar, 'https://p/a.png');
-  assert.deepEqual(ha.people.map((x) => x.uid), [B]); assert.equal(ha.people[0].focus, 'Sound Healer');
-  assert.deepEqual(ha.following, [B]); assert.equal(ha.followingCount, 1);
-  assert.equal((await ACTIONS.connectHome(ctx(), B, {})).followerCount, 1);
-  await ACTIONS.connectFollow(ctx(), A, { targetUid: B, follow: false });
-  assert.equal((await ACTIONS.connectHome(ctx(), B, {})).followerCount, 0);
+  await ACTIONS.boardPost(ctx(), A, { text: 'Felt like rain on a hot day', feeling: 'calm', word: 'TEJAS', meaning: 'radiance' });
+  await ACTIONS.boardPost(ctx(), B, { text: 'Heavy, then lighter', feeling: 'nope' });
+  const b = await ACTIONS.boardDay(ctx(), C, {});
+  assert.equal(b.word, 'TEJAS'); assert.equal(b.posts.length, 2);
+  assert.equal(b.posts[0].text, 'Heavy, then lighter'); assert.equal(b.posts[0].feeling, '');
+  assert.equal(b.posts[1].feeling, 'calm');
+  assert.ok(!JSON.stringify(b).includes(A)); assert.ok(!JSON.stringify(b).includes(B));
+  assert.equal((await ACTIONS.boardDay(ctx(), A, {})).posts[1].mine, true);
 });
 
-test('chat: send, thread, inbox, blocks', async () => {
-  const { db, ctx } = mk();
-  await assert.rejects(ACTIONS.connectSend(ctx(), A, { toUid: B, text: 'hi' }), /not on Connect/);
-  await ACTIONS.connectSaveProfile(ctx(), B, { name: 'Ben' });
-  await assert.rejects(ACTIONS.connectSend(ctx(), A, { toUid: B, text: 'hi' }), /profile first/);
-  await ACTIONS.connectSaveProfile(ctx(), A, { name: 'Asha' });
-  await assert.rejects(ACTIONS.connectSend(ctx(), A, { toUid: B, text: '  ' }), /Write/);
-  await ACTIONS.connectSend(ctx(), A, { toUid: B, text: 'Hello Ben' });
-  await ACTIONS.connectSend(ctx(), B, { toUid: A, text: 'Hi Asha' });
-  const t = await ACTIONS.connectThread(ctx(), A, { withUid: B });
-  assert.equal(t.chatId, chatIdFor(A, B));
-  assert.deepEqual(t.messages.map((m) => [m.mine, m.text]), [[true, 'Hello Ben'], [false, 'Hi Asha']]);
-  const inbox = await ACTIONS.connectInbox(ctx(), B, {});
-  assert.equal(inbox.chats.length, 1); assert.equal(inbox.chats[0].with.name, 'Asha'); assert.equal(inbox.chats[0].lastMine, true);
-  assert.ok(db.rows('notifications', `users/${B}`).length >= 1);
-  await ACTIONS.blockEchoUser(ctx(), B, { targetUid: A });
-  await assert.rejects(ACTIONS.connectSend(ctx(), A, { toUid: B, text: 'again' }), /can’t message/);
-  assert.deepEqual((await ACTIONS.connectHome(ctx(), B, {})).people, []);
+test('validation: length, links, profanity, image ownership', async () => {
+  const { ctx } = mk();
+  await assert.rejects(ACTIONS.boardPost(ctx(), A, { text: 'x'.repeat(281) }), /280/);
+  await assert.rejects(ACTIONS.boardPost(ctx(), A, { text: ' ' }), /thought/);
+  await assert.rejects(ACTIONS.boardPost(ctx(), A, { text: 'see www.spam.com' }), /Links/);
+  await assert.rejects(ACTIONS.boardPost(ctx(), A, { text: 'this is sh1t' }), /gentle/);
+  await assert.rejects(ACTIONS.boardPost(ctx(), A, { text: 'ok', image: `connect/${B}/1730000000000.jpg` }), /image/);
+  const p = await ACTIONS.boardPost(ctx(), A, { image: `connect/${A}/1730000000000.jpg` });
+  assert.equal(p.post.image, `connect/${A}/1730000000000.jpg`);
+  assert.equal(hasProfanity('Shall we pass the class'), false);
+  assert.equal(imageOk(A, 'https://evil/x.jpg'), false);
 });
 
-test('feed uses real posts and likes', async () => {
-  const { db, ctx } = mk();
-  await ACTIONS.connectSaveProfile(ctx(), A, { name: 'Asha', focus: 'Beginner' });
-  const post = await ACTIONS.connectPost(ctx(), A, { text: 'First session today', image: 'https://evil.example/x.png' });
-  const h = await ACTIONS.connectHome(ctx(), B, {});
-  assert.equal(h.posts.length, 1); assert.equal(h.posts[0].authorName, 'Asha'); assert.equal(h.posts[0].image, '');
-  assert.equal(h.posts[0].liked, false);
-  await ACTIONS.connectLike(ctx(), B, { postId: post.id || h.posts[0].id });
-  const h2 = await ACTIONS.connectHome(ctx(), B, {});
-  assert.equal(h2.posts[0].likes, 1); assert.equal(h2.posts[0].liked, true);
+test('three posts a day, then a new day resets and yesterday is read-only', async () => {
+  const { ctx, clock } = mk();
+  for (let i = 0; i < 3; i++) await ACTIONS.boardPost(ctx(), A, { text: `thought ${i}` });
+  await assert.rejects(ACTIONS.boardPost(ctx(), A, { text: 'one more' }), /3 thoughts/);
+  const y = (await ACTIONS.boardDay(ctx(), A, {})).today;
+  clock.now += 24 * 3600e3;
+  const t = await ACTIONS.boardDay(ctx(), A, {});
+  assert.notEqual(t.today, y); assert.deepEqual(t.posts, []); assert.equal(t.postsLeft, 3); assert.deepEqual(t.days, [y]);
+  const old = await ACTIONS.boardDay(ctx(), A, { day: y });
+  assert.equal(old.readOnly, true); assert.equal(old.posts.length, 3); assert.equal(old.postsLeft, 0);
+  await assert.rejects(ACTIONS.boardFelt(ctx(), B, { day: y, postId: old.posts[0].id }), /read-only/);
+  await ACTIONS.boardPost(ctx(), A, { text: 'new day' });
+});
+
+test('felt this toggles once per person and counts', async () => {
+  const { ctx } = mk();
+  const { post } = await ACTIONS.boardPost(ctx(), A, { text: 'soft' });
+  assert.equal((await ACTIONS.boardFelt(ctx(), B, { postId: post.id })).felt, 1);
+  assert.equal((await ACTIONS.boardFelt(ctx(), C, { postId: post.id, on: true })).felt, 2);
+  assert.equal((await ACTIONS.boardFelt(ctx(), C, { postId: post.id, on: true })).felt, 2);
+  const b = await ACTIONS.boardDay(ctx(), B, {});
+  assert.equal(b.posts[0].felt, 2); assert.equal(b.posts[0].feltByMe, true);
+  assert.equal((await ACTIONS.boardFelt(ctx(), B, { postId: post.id })).felt, 1);
+});
+
+test('hide is personal; three reports hide for everyone', async () => {
+  const { ctx } = mk();
+  const { post } = await ACTIONS.boardPost(ctx(), A, { text: 'something odd' });
+  await ACTIONS.boardReport(ctx(), B, { postId: post.id, hideOnly: true });
+  assert.equal((await ACTIONS.boardDay(ctx(), B, {})).posts.length, 0);
+  assert.equal((await ACTIONS.boardDay(ctx(), C, {})).posts.length, 1);
+  await ACTIONS.boardReport(ctx(), C, { postId: post.id, reason: 'spam' });
+  await ACTIONS.boardReport(ctx(), C, { postId: post.id, reason: 'spam' });
+  await ACTIONS.boardReport(ctx(), D, { postId: post.id });
+  assert.equal((await ACTIONS.boardDay(ctx(), A, {})).posts.length, 1);
+  await ACTIONS.boardReport(ctx(), B, { postId: post.id });
+  assert.equal((await ACTIONS.boardDay(ctx(), A, {})).posts.length, 0);
 });
