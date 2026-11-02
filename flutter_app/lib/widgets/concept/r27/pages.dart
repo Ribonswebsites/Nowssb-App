@@ -117,9 +117,9 @@ class R27GiftsPage extends StatelessWidget {
     final cards = data.cards;
     return R27PageShell(
       hour: 'ananda', word: 'GIVE', onBack: onBack,
-      head: R27Head(dark: true, hello: 'NowssB Gifts', title: 'Give a word', sub: '${cards.length} gift cards · paid in your own currency at checkout'),
+      head: R27Head(dark: true, hello: 'NowssB Gifts', title: 'Give a word', sub: cards.isEmpty ? null : '${cards.length} gift cards · paid in your own currency at checkout'),
       children: [
-        R27AutoRow(count: cards.length, height: r27H(context, 340, 34), fraction: .7, every: const Duration(milliseconds: 3200),
+        if (cards.isEmpty) const R27GiftsEmpty(dark: true) else R27AutoRow(count: cards.length, height: r27H(context, 340, 34), fraction: .7, every: const Duration(milliseconds: 3200),
             builder: (c, i, off) => R27GiftPoster(cards[i], hour: r27Hours[(i + 4) % r27Hours.length], offset: off, onGift: () => onGift(cards[i].id))),
         _label('Have a code?'),
         _pad(NPress(
@@ -139,7 +139,9 @@ class R27GiftsPage extends StatelessWidget {
           ),
         )),
         _label('Your gifts'),
-        _pad(Row(children: [
+        if (data.sent == 0 && data.received == 0)
+          _pad(Text('Nothing sent or received yet. Gifts you give and get will show up here.', key: const ValueKey('gifts-counts-empty'), style: dSub))
+        else _pad(Row(children: [
           Expanded(child: _count('${data.sent}', 'Sent', 'kapha', onHistory)),
           const SizedBox(width: 12),
           Expanded(child: _count('${data.received}', 'Received', 'chandra', onHistory)),

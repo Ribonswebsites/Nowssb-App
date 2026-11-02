@@ -194,8 +194,10 @@ class R27GiftsSection extends StatelessWidget {
     );
     return _Shell(
       fashion: fashion,
-      head: R27Head(dark: fashion, hello: 'NowssB Gifts', title: 'Give a word', sub: '${cards.length} gift cards from ₹$low · ${data.sent} sent · ${data.received} received'),
-      row: fashion
+      head: R27Head(dark: fashion, hello: 'NowssB Gifts', title: 'Give a word', sub: r27GiftsLine(data, low)),
+      row: cards.isEmpty
+          ? R27GiftsEmpty(dark: fashion)
+          : fashion
           ? Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
               SizedBox(
                   width: 58,
@@ -210,6 +212,41 @@ class R27GiftsSection extends StatelessWidget {
       ],
     );
   }
+}
+
+/// B034: the Gifts sub line from real counts only; zero parts are left out
+/// (null when there is nothing to say).
+String? r27GiftsLine(R27Gifts d, num low) {
+  final parts = [
+    if (d.cards.isNotEmpty) '${d.cards.length} gift cards from ₹$low',
+    if (d.sent > 0) '${d.sent} sent',
+    if (d.received > 0) '${d.received} received',
+  ];
+  return parts.isEmpty ? null : parts.join(' · ');
+}
+
+/// B034: shown instead of the card row when there are no gift cards.
+class R27GiftsEmpty extends StatelessWidget {
+  const R27GiftsEmpty({super.key, this.dark = false});
+  final bool dark;
+  @override
+  Widget build(BuildContext context) => Padding(
+        key: const ValueKey('gifts-empty'),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: dark ? r27Line : const Color(0x1F000000)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('No gift cards right now', style: (dark ? dSub : nSub).copyWith(color: dark ? Colors.white : nInk, fontWeight: FontWeight.w800, fontSize: 14)),
+            const SizedBox(height: 4),
+            Text('Have a code someone sent you? Redeem it below.', style: dark ? dSub : nSub),
+          ]),
+        ),
+      );
 }
 
 String r27GiftWord(String label) {
