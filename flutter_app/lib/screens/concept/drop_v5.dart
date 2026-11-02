@@ -740,7 +740,7 @@ class _MoonPainter extends CustomPainter {
 /// The next word's own picture: its meaning art (e.g. Surya → sun), else
 /// the store's picture of the word.
 String _nextArt(Word? w) {
-  if (w == null) return 'assets/rails/mean-sun.jpg';
+  if (w == null) return 'assets/meditation/meditation-candle.webp';
   for (final tok in w.meaning.toLowerCase().split(RegExp(r'[^a-z]+'))) {
     if (tok.isEmpty) continue;
     final a = meaningFlipArt(tok);

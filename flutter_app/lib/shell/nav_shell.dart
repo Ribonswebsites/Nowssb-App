@@ -14,6 +14,7 @@ import '../data/content.dart';
 import '../data/home_widget_sync.dart';
 import '../data/models.dart';
 import '../screens/home_fashion.dart';
+import '../theme/white_neu.dart';
 import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
 import '../screens/practice.dart';
@@ -257,7 +258,17 @@ class _NavShellState extends State<NavShell> {
     return GestureDetector(
       key: const ValueKey('home-mode-pill'),
       onTap: () => Settings.instance.setFashionHome(!_fashion),
-      child: HeroGlass(
+      child: !_fashion
+          ? Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: wnBox(radius: 16),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.dark_mode, size: 14, color: ink),
+                const SizedBox(width: 6),
+                Text('Zen home', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: ink)),
+              ]),
+            )
+          : HeroGlass(
         radius: 16,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         child: Row(
@@ -589,11 +600,13 @@ class _NavShellState extends State<NavShell> {
                         final homeSlot = found >= 0 ? found : 0;
                         return Container(
                           height: 58,
-                          decoration: BoxDecoration(
-                            color: background,
-                            borderRadius: BorderRadius.circular(radius),
-                            border: Border.all(color: const Color(0x22FFFFFF)),
-                          ),
+                          decoration: lightHome
+                              ? wnBox(radius: radius)
+                              : BoxDecoration(
+                                  color: background,
+                                  borderRadius: BorderRadius.circular(radius),
+                                  border: Border.all(color: const Color(0x22FFFFFF)),
+                                ),
                           child: Row(children: [
                             for (var i = 0; i < slots.length; i++) ...[
                               if (i > 0)
@@ -602,10 +615,11 @@ class _NavShellState extends State<NavShell> {
                                   height: 18,
                                   margin:
                                       const EdgeInsets.symmetric(horizontal: 2),
-                                  color: const Color(0x33FFFFFF),
+                                  color: lightHome ? const Color(0x22000000) : const Color(0x33FFFFFF),
                                 ),
                               Expanded(
                                 child: _NavSlot(
+                                  light: lightHome,
                                   active: _primaryTab(slots[i]) == _i,
                                   asHome: _i != 0 && i == homeSlot,
                                   image: _navFeatures[slots[i]]?['img'] ?? '',
@@ -646,8 +660,10 @@ class _NavSlot extends StatelessWidget {
     required this.image,
     required this.label,
     required this.onTap,
+    this.light = false,
   });
 
+  final bool light;
   final bool active;
   final bool asHome;
   final String image;
@@ -656,7 +672,9 @@ class _NavSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? NwsbColors.goldLight : const Color(0x99FFFFFF);
+    final color = light
+        ? (active ? NwsbColors.ink : const Color(0x99111522))
+        : (active ? NwsbColors.goldLight : const Color(0x99FFFFFF));
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -664,7 +682,7 @@ class _NavSlot extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (asHome)
-            const NwsbIcon(NwsbMarks.house, size: 26, color: Color(0xF2FFFFFF), strokeWidth: 1.9)
+            NwsbIcon(NwsbMarks.house, size: 26, color: light ? NwsbColors.ink : const Color(0xF2FFFFFF), strokeWidth: 1.9)
           else if (image.startsWith('asset:'))
             EditableImage.asset(
               image.substring(6),

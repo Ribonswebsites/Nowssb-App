@@ -182,7 +182,7 @@ class _Hero extends StatelessWidget {
                   width: W * .6,
                   height: H,
                   child: const Sway(
-                      amp: .006, child: Cutout(PosterAssets.pointer, slot: _slot, id: 'hero.cutout', flip: true, fadeBottom: .1, align: Alignment.bottomRight)),
+                      amp: .006, child: Cutout(PosterAssets.seated, slot: _slot, id: 'hero.cutout', fadeBottom: .1, align: Alignment.bottomRight)),
                 ),
                 const Positioned(left: 14, top: 0, child: GoldTag('Cut today')),
                 // the word she points at, in front

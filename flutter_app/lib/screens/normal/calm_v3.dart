@@ -12,6 +12,8 @@ import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/data/today_ritual.dart';
 import 'package:nowssb/widgets/concept/ritual_card.dart';
 import 'package:flutter/material.dart';
+
+import '../../theme/white_neu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lottie/lottie.dart';
 import 'neomorphic_dashboard.dart' show FocusBlob;
@@ -111,16 +113,19 @@ class CalmGo extends StatelessWidget {
   final VoidCallback? onTap;
   final bool light;
   @override
-  Widget build(BuildContext context) => Material(
-        color: light ? Colors.white : _ink,
-        shape: const StadiumBorder(),
-        child: InkWell(
-          customBorder: const StadiumBorder(),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Text(label,
-                style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: light ? _ink : Colors.white)),
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: wnBox(radius: 40),
+        child: Material(
+          color: Colors.transparent,
+          shape: const StadiumBorder(),
+          child: InkWell(
+            customBorder: const StadiumBorder(),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              child: Text(label,
+                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: _ink)),
+            ),
           ),
         ),
       );

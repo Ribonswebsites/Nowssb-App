@@ -668,7 +668,7 @@ class YourRewardsSection extends StatelessWidget {
                     compact: true,
                     title: 'NowssB Rewards',
                     mark: NwsbMarks.rewards,
-                    art: 'assets/rails/rewards-coins.png',
+                    art: 'assets/rails/art-coins.jpg',
                     artFit: BoxFit.cover,
                     artAlignment: Alignment.center,
                   ),

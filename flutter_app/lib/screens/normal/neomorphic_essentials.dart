@@ -264,8 +264,8 @@ class _HeroEssential extends StatelessWidget {
   final String subtitle;
   final String duration;
 
-  static const _ink = Color(0xFF2A1848);
-  static const _inkSoft = Color(0xFF3D2A66);
+  static const _ink = Color(0xFF1E2233);
+  static const _inkSoft = Color(0xFF4A4E63);
 
   @override
   Widget build(BuildContext context) => Container(
@@ -273,10 +273,8 @@ class _HeroEssential extends StatelessWidget {
         padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(26),
-          gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFB794F6), Color(0xFF7E57C2)]),
+          color: NwsbColors.surface,
+          border: Border.all(color: const Color(0xB3FFFFFF)),
           boxShadow: NwsbShadows.raised,
         ),
         // No LayoutBuilder here: the timeline row sizes us with
@@ -297,7 +295,7 @@ class _HeroEssential extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                            color: const Color(0x8CFFFFFF),
+                            color: const Color(0xFFE4E6ED),
                             borderRadius: BorderRadius.circular(20)),
                         // Real dots, not '●' glyphs the bundled fonts lack.
                         child: Row(mainAxisSize: MainAxisSize.min, children: [

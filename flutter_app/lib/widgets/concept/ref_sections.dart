@@ -160,7 +160,10 @@ class _Pill extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
-    final fg = refPillInk(color);
+    // White neumorphic pill (Bug Fixer's contrast rule picks the ink for the
+    // white plate, >= 4.5:1); the section accent survives as the arrow.
+    const plate = Color(0xFFF0F2F7);
+    final fg = refPillInk(plate);
     return Semantics(
       button: true,
       child: GestureDetector(
@@ -168,17 +171,22 @@ class _Pill extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(minHeight: 52),
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(14),
+          decoration: BoxDecoration(color: plate, borderRadius: BorderRadius.circular(14),
               boxShadow: const [BoxShadow(color: Color(0x24000000), offset: Offset(5, 5), blurRadius: 12), BoxShadow(color: Color(0xFAFFFFFF), offset: Offset(-4, -4), blurRadius: 10)]),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             Flexible(child: Text(label, style: TextStyle(fontFamily: 'DM Sans', fontSize: 16, fontWeight: FontWeight.w700, color: fg))),
             const SizedBox(width: 10),
-            Icon(Icons.arrow_forward_rounded, size: 18, color: fg),
+            Icon(Icons.arrow_forward_rounded, size: 18, color: _contrast(color, plate) >= 3 ? color : fg),
           ]),
         ),
       ),
     );
   }
+}
+
+double _contrast(Color a, Color b) {
+  final x = a.computeLuminance(), y = b.computeLuminance();
+  return (math.max(x, y) + .05) / (math.min(x, y) + .05);
 }
 
 void _push(BuildContext c, Widget w) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => w));

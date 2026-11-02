@@ -5,6 +5,7 @@ library;
 import 'package:nowssb/widgets/word_fit_text.dart';
 import 'dart:async';
 
+import '../theme/white_neu.dart';
 import 'package:flutter/material.dart';
 
 import '../features/programs/program_router.dart';
@@ -100,9 +101,29 @@ class _RailFace {
 }
 
 class _TrioRailState extends State<TrioRail> {
+  // Normal home: a white neumorphic tile, untinted photo, ink label.
+  Widget _whiteFace(_RailFace face) => Container(
+        margin: const EdgeInsets.fromLTRB(2, 2, 2, 10),
+        padding: const EdgeInsets.all(6),
+        decoration: wnBox(radius: 16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(11),
+              child: Image(image: AssetImage(face.image), fit: BoxFit.cover, alignment: const Alignment(0, -0.3)),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(4, 6, 4, 2),
+            child: Text(face.label, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: wnInk, fontWeight: FontWeight.w800, fontSize: 12.5, height: 1.1)),
+          ),
+        ]),
+      );
+
   static const _loop = 80;
   static const _all = <_RailFace>[
-    _RailFace('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), Programme.gifts),
+    _RailFace('NowssB Gifts', 'assets/meditation/meditation-singing-bowl.webp', Color(0xFF6A1B4D), Programme.gifts),
     _RailFace('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), Programme.rewards),
     _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
     // The coin ledger (Rewards · Wallet), not the Rewards front again.
@@ -183,7 +204,7 @@ class _TrioRailState extends State<TrioRail> {
                       padding: const EdgeInsets.only(right: 8),
                       child: GestureDetector(
                         onTap: () => face.open(context),
-                        child: ClipRRect(
+                        child: onNormal(context) ? _whiteFace(face) : ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Stack(
                             fit: StackFit.expand,

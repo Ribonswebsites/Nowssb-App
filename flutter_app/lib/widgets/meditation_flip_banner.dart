@@ -217,7 +217,7 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
                       child: SizedBox(
                         width: _cardW,
                         height: _cardH,
-                        child: _Card(slide: _slides[i], cycle: _cycle, amount: _amount, onTap: widget.onTap),
+                        child: _Card(slide: _slides[i], cycle: _cycle, amount: _amount, onTap: widget.onTap, white: !widget.glassIcon),
                       ),
                     ),
                   ),
@@ -285,7 +285,10 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
 }
 
 class _Card extends StatelessWidget {
-  const _Card({required this.slide, required this.cycle, required this.amount, this.onTap});
+  const _Card({required this.slide, required this.cycle, required this.amount, this.onTap, this.white = false});
+
+  /// Normal home: white neumorphic plate, the slide colour only as ink.
+  final bool white;
 
   final _Slide slide;
   final AnimationController cycle;
@@ -297,10 +300,20 @@ class _Card extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: ClipRRect(
+      child: Container(
+        decoration: white
+            ? const BoxDecoration(
+                color: Color(0xFFF0F2F7),
+                borderRadius: BorderRadius.all(Radius.circular(16)),
+                boxShadow: [
+                  BoxShadow(color: Color(0x26000000), offset: Offset(5, 5), blurRadius: 12),
+                  BoxShadow(color: Color(0xFAFFFFFF), offset: Offset(-4, -4), blurRadius: 10),
+                ])
+            : null,
+        child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: ColoredBox(
-          color: slide.color,
+          color: white ? const Color(0xFFF0F2F7) : slide.color,
           child: AnimatedBuilder(
             animation: cycle,
             builder: (context, _) {
@@ -342,7 +355,7 @@ class _Card extends StatelessWidget {
                         child: Transform.scale(
                           scale: 0.88 + 0.12 * title.clamp(0.0, 1.1),
                           alignment: Alignment.centerLeft,
-                          child: _Title(word: slide.word, ink: slide.ink),
+                          child: _Title(word: slide.word, ink: white ? _whiteInk(slide) : slide.ink),
                         ),
                       ),
                     ),
@@ -358,7 +371,7 @@ class _Card extends StatelessWidget {
                         child: Text(
                           slide.line,
                           style: GoogleFonts.oswald(
-                            color: slide.ink,
+                            color: white ? const Color(0xFF3A3F52) : slide.ink,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             height: 1.15,
@@ -374,9 +387,13 @@ class _Card extends StatelessWidget {
           ),
         ),
       ),
+      ),
     );
   }
 }
+
+/// On white, the yellow slide's ink stays dark; the others keep their colour.
+Color _whiteInk(_Slide s) => s.ink == Colors.white ? s.color : s.ink;
 
 class _Title extends StatelessWidget {
   const _Title({required this.word, required this.ink});

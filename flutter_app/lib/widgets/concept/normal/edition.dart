@@ -102,12 +102,12 @@ class _NEditionState extends State<NEdition> with SingleTickerProviderStateMixin
           ]),
         const SizedBox(height: 12),
         // the real Join control
-        Semantics(button: true, label: 'Join $name', child: Material(color: nInk, borderRadius: BorderRadius.circular(16),
+        Semantics(button: true, label: 'Join $name', child: DecoratedBox(decoration: neu(r: 16), child: Material(color: Colors.transparent, borderRadius: BorderRadius.circular(16),
           child: InkWell(borderRadius: BorderRadius.circular(16), onTap: () => widget.onJoin(_sel),
             child: ConstrainedBox(constraints: const BoxConstraints(minHeight: 48, minWidth: double.infinity),
               child: Padding(padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                 child: Center(child: Text(cur == _sel ? 'Manage $name' : 'Join $name', textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)))))))),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: nInk))))))))),
       ]),
     ));
   }

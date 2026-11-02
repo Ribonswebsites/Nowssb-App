@@ -41,7 +41,7 @@ class HomeDoor {
 
 /// Same doors, pictures and destinations as [TrioRail].
 const homeDoors = <HomeDoor>[
-  HomeDoor('NowssB Gifts', 'assets/banners/earn/sit-dark.png', Color(0xFF6A1B4D), Programme.gifts),
+  HomeDoor('NowssB Gifts', 'assets/meditation/meditation-singing-bowl.webp', Color(0xFF6A1B4D), Programme.gifts),
   HomeDoor('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), Programme.rewards),
   HomeDoor('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
   HomeDoor('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),

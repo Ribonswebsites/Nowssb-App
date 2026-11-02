@@ -417,7 +417,7 @@ class R27RankStep extends StatelessWidget {
                           child: ClipPath(
                             clipper: R27Torn(seed: index + 4, bottom: false, depth: 6),
                             child: ColoredBox(
-                              color: current ? r27Gold : (light ? const Color(0xFFE6E9F0) : r27Paper),
+                              color: light ? (current ? const Color(0xFFF7F8FB) : const Color(0xFFE6E9F0)) : (current ? r27Gold : r27Paper),
                               child: Padding(padding: const EdgeInsets.fromLTRB(10, 12, 10, 8), child: R27Word('${_n(r.ratePct)}%', color: r27PaperInk, shadow: false, align: Alignment.bottomLeft)),
                             ),
                           ),

@@ -288,8 +288,10 @@ class R27Pill extends StatelessWidget {
   final bool filled;
   @override
   Widget build(BuildContext context) {
-    final bg = filled ? (light ? r27PaperInk : r27Gold) : Colors.transparent;
-    final fg = filled ? (light ? Colors.white : r27PaperInk) : (light ? r27PaperInk : r27Gold);
+    // Normal home (light tone): white neumorphic pill with ink text.
+    final white = R27Tone.isLight(context);
+    final bg = white ? const Color(0xFFF0F2F7) : filled ? (light ? r27PaperInk : r27Gold) : Colors.transparent;
+    final fg = white ? r27PaperInk : filled ? (light ? Colors.white : r27PaperInk) : (light ? r27PaperInk : r27Gold);
     return NPress(
       onTap: onTap,
       label: text,
@@ -297,7 +299,13 @@ class R27Pill extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 40),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(40),
-            border: filled ? null : Border.all(color: fg, width: 1.3)),
+            boxShadow: white
+                ? const [
+                    BoxShadow(color: Color(0x26000000), offset: Offset(4, 4), blurRadius: 10),
+                    BoxShadow(color: Color(0xFAFFFFFF), offset: Offset(-4, -4), blurRadius: 9),
+                  ]
+                : null,
+            border: filled || white ? null : Border.all(color: fg, width: 1.3)),
         child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: fg, height: 1.3)),
       ),
     );

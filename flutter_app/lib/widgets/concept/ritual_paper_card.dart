@@ -324,7 +324,7 @@ class _BeginButtonState extends State<_BeginButton> {
           height: 46,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: widget.p.ink,
+            color: const Color(0xFFF0F2F7),
             borderRadius: BorderRadius.circular(23),
             boxShadow: _down
                 ? const [BoxShadow(color: Color(0x22000000), offset: Offset(2, 2), blurRadius: 4)]
@@ -335,10 +335,10 @@ class _BeginButtonState extends State<_BeginButton> {
           ),
           alignment: Alignment.center,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.play_arrow_rounded, size: 18, color: widget.p.orbGlow),
+            Icon(Icons.play_arrow_rounded, size: 18, color: widget.p.ink),
             const SizedBox(width: 4),
             const Text('Begin', textScaler: TextScaler.linear(1),
-                style: TextStyle(fontFamily: 'DM Sans', fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                style: TextStyle(fontFamily: 'DM Sans', fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF26283A))),
           ]),
         ),
       ),

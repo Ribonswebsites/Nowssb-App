@@ -429,17 +429,17 @@ class _DepthCardState extends State<_DepthCard> with SingleTickerProviderStateMi
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: Stack(fit: StackFit.expand, children: [
+          // White neumorphic plate behind the photo sheets (Normal home is all white).
           const DecoratedBox(
             decoration: BoxDecoration(
-              gradient: RadialGradient(center: Alignment(0, -.6), radius: 1.2, colors: [Color(0xFF3A2A3E), _bg]),
+              gradient: RadialGradient(center: Alignment(0, -.6), radius: 1.2, colors: [Color(0xFFFFFFFF), Color(0xFFE9ECF3)]),
             ),
           ),
-          const _Grain(opacity: .06),
           Positioned(
             left: 22, top: 20, right: 20,
             child: Row(children: [
-              Expanded(child: Text('PRACTICES · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xCCFFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              _SaveButton(data: data, word: data.words.isEmpty ? null : data.words.first.word),
+              Expanded(child: Text('PRACTICES · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xCC1A1A2E)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              _SaveButton(data: data, word: data.words.isEmpty ? null : data.words.first.word, light: true),
             ]),
           ),
           // The stack lives in its own inset box; nothing escapes the card.
@@ -624,7 +624,8 @@ class _WordCard2 extends StatelessWidget {
 }
 
 class _SaveButton extends StatelessWidget {
-  const _SaveButton({required this.data, required this.word});
+  const _SaveButton({required this.data, required this.word, this.light = false});
+  final bool light;
   final HeroData data;
   final String? word;
   @override
@@ -646,10 +647,11 @@ class _SaveButton extends StatelessWidget {
               width: 32, height: 32,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0x2EFFFFFF),
-                border: Border.all(color: const Color(0x40FFFFFF), width: .6),
+                color: light ? const Color(0xFFF0F2F7) : const Color(0x2EFFFFFF),
+                border: Border.all(color: light ? const Color(0xFFFFFFFF) : const Color(0x40FFFFFF), width: .6),
+                boxShadow: light ? const [BoxShadow(color: Color(0x26000000), offset: Offset(2, 2), blurRadius: 5)] : null,
               ),
-              child: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, size: 16, color: Colors.white),
+              child: Icon(saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded, size: 16, color: light ? const Color(0xFF1A1A2E) : Colors.white),
             ),
           ),
         ),

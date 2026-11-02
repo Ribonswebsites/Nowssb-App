@@ -64,3 +64,15 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 - hc-d-sound — https://www.pexels.com/photo/4056535/ (Pexels License)
 - hc-d-sleep — https://www.pexels.com/photo/6698513/ (Pexels License)
 - hc-e-word — https://www.pexels.com/photo/4040567/ (Pexels License)
+
+## B043/B044 replacements (Nov 2, 2026) — original art generated in-house for NowssB (no third-party source, free to use)
+Generated with Grok Bot image generation; white background removed in-house.
+| File | Picture | Replaces |
+|---|---|---|
+| `banners/promo/split-blonde-lotus.png` | Woman in linen, lotus pose, mudra (cut-out) | Egyptian/Cleopatra cut-out (was byte-identical to pose-01) |
+| `banners/promo/pose-01.png` | Older man in saffron kurta, seated namaste (cut-out) | Same Cleopatra cut-out |
+| `banners/promo/split-robot-lotus.png` | Woman kneeling on sage cushion (cut-out) | Copy of pose-05 |
+| `banners/promo/split-robot-lookback.png` | Man in tree pose, hands overhead (cut-out) | Copy of pose-04 |
+| `banners/earn/hands-dark.png` | Man, arms raised in breath, violet on black | Mirrored/recoloured hands-light |
+| `banners/earn/sit-dark.png` | Woman seated in spotlight on black | Recoloured red-haired sit-light |
+| `banners/earn/sit-light.png` | Man in white linen seated, white background | Red-haired figure |
