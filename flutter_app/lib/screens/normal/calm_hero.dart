@@ -361,7 +361,7 @@ class _DepthCard extends StatefulWidget {
 /// The stack scrolls vertically: swipe up brings the next practice to the
 /// front, swipe down brings the previous one back (wraps around).
 class _DepthCardState extends State<_DepthCard> {
-  static const _bg = Color(0xFF1B1420);
+  static const _bg = Color(0xFF0B0B0D);
   int front = 0;
   double _drag = 0;
   HeroData get data => widget.data;
@@ -566,7 +566,7 @@ class _WordCard2 extends StatelessWidget {
                   _GlassChip(
                         key: const ValueKey('hero-hear'),
                         icon: hasAudio ? Icons.graphic_eq_rounded : Icons.schedule_rounded,
-                        text: hasAudio ? 'Hear it' : 'Client recording coming soon',
+                        text: hasAudio ? 'Hear it' : 'Recording soon',
                         dim: !hasAudio,
                         onTap: hasAudio ? () => data.onHear?.call(word!) : null,
                   ),
@@ -624,7 +624,7 @@ class _RitualSlot extends StatelessWidget {
         key: const ValueKey('hero-ritual'),
         borderRadius: BorderRadius.circular(28),
         child: ColoredBox(
-          color: const Color(0xFF0C0C20),
+          color: const Color(0xFF000000),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.topCenter,
