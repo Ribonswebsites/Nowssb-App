@@ -139,6 +139,19 @@ class RefSection extends StatelessWidget {
   }
 }
 
+/// B033: pill label colour, whichever of ink or white contrasts more with
+/// [bg] (red FF4D3D: ink 5.7:1, white only 3.3:1).
+Color refPillInk(Color bg) {
+  const ink = Color(0xFF111111);
+  final l = bg.computeLuminance();
+  double ratio(Color c) {
+    final m = c.computeLuminance();
+    return (math.max(l, m) + .05) / (math.min(l, m) + .05);
+  }
+
+  return ratio(ink) >= ratio(Colors.white) ? ink : Colors.white;
+}
+
 class _Pill extends StatelessWidget {
   const _Pill({required this.label, required this.color, required this.onTap});
   final String label;
@@ -146,8 +159,7 @@ class _Pill extends StatelessWidget {
   final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
-    final dark = color.computeLuminance() > .4;
-    final fg = dark ? const Color(0xFF111111) : Colors.white;
+    final fg = refPillInk(color);
     return Semantics(
       button: true,
       child: GestureDetector(
