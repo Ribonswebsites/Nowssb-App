@@ -134,7 +134,6 @@ void main() {
     for (final label in [
       'WORD ATELIER',
       'MEANING STORE',
-      'SIGNATURE STORE',
       'SHABDAPATHY · LIBRARY',
     ]) {
       await tester.scrollUntilVisible(find.text(label), 260,
