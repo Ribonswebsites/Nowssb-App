@@ -34,3 +34,13 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 - hc-b-sound — Jan Kopřiva, https://www.pexels.com/photo/6593243/
 - hc-b-sleep — RAVI LAGES, https://www.pexels.com/photo/6308172/
 - hc-b-heal — Pavel Danilyuk, https://www.pexels.com/photo/7596969/
+| `meditation/meditation-morning.webp` | "Thai woman meditating" by Kochphon (Honey) Onshawee, Wikimedia Commons `File:Thai_woman_meditating.jpg` (from Pixabay 481902), CC0 1.0 | Background removed (cut-out). Ritual card MORNING model (Ribon Oct 27) |
+| `meditation/meditation-evening.webp` | rawpixel 5912948 "Free woman doing yoga pose", https://www.rawpixel.com/image/5912948, CC0 1.0 | Cut-out. Ritual card EVENING model |
+| `meditation/meditation-seated.webp` | StockSnap AYWO7QN7K7 by Matthew Henry, https://stocksnap.io/photo/people-woman-AYWO7QN7K7, CC0 1.0 | Cropped cut-out. Poster Trending hero |
+| `meditation/meditation-stone-stack.webp` | rawpixel 6030800 "Balancing rock piles", https://www.rawpixel.com/image/6030800, CC0 1.0 | Cut-out. Poster Orbit centre |
+| `meditation/meditation-singing-bowl.webp` | rawpixel 5925218 "Free singing bowl set", https://www.rawpixel.com/image/5925218, CC0 1.0 | Cut-out. Poster Signature hero |
+| `meditation/meditation-stones-wave.webp` | rawpixel 6029827 "Stone stacked, zen mode", https://www.rawpixel.com/image/6029827, CC0 1.0 | Cut-out. Drop Studio featured drop |
+| `meditation/meditation-bowls-pair.webp` | rawpixel 5912429 "Free standing bell image", https://www.rawpixel.com/image/5912429, CC0 1.0 | Cut-out. Drop Studio word deck |
+| `meditation/meditation-lotus.webp` | StockSnap VC8IOCGVII "Lotus Flower", https://stocksnap.io/photo/lotus-flower-VC8IOCGVII, CC0 1.0 | Cut-out. Drop Studio word deck |
+| `meditation/meditation-candle.webp` | rawpixel 5963227, https://www.rawpixel.com/image/5963227, CC0 1.0 | Cut-out. Enter-curve stage subject |
+| `meditation/meditation-cairn.webp` | rawpixel 5902834 "Stacked wellness zen stones", https://www.rawpixel.com/image/5902834, CC0 1.0 | Cut-out. Hero-curve stage subject |

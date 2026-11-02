@@ -43,7 +43,7 @@ class RitualPalette {
 
   static RitualPalette of(RitualTime t) => switch (t) {
         RitualTime.morning => const RitualPalette(
-            word: 'MORNING', title: 'Morning Ritual', model: 'assets/hero-curve/subject.webp',
+            word: 'MORNING', title: 'Morning Ritual', model: 'assets/meditation/meditation-morning.webp',
             sky: [Color(0xFF2B1B5E), Color(0xFF8E3F8F), Color(0xFFF07A5A), Color(0xFFFFC77A)],
             sun: Color(0xFFFFE3A0), glow: Color(0xFFFFB25C), ground: Color(0xFF140A2A),
             accent: Color(0xFFFFB25C), wordBack: Color(0xFFFFF1D6), wordFront: Color(0xFFFFD08A),
@@ -55,7 +55,7 @@ class RitualPalette {
             accent: Color(0xFFFFE27A), wordBack: Color(0xFFFFFFFF), wordFront: Color(0xFFFFE27A),
             cloud: Color(0xFFFFFFFF), sunX: .2, sunY: .78, motion: 1, shade: .5),
         RitualTime.evening => const RitualPalette(
-            word: 'EVENING', title: 'Evening Ritual', model: 'assets/hero-curve/cleopatra.webp',
+            word: 'EVENING', title: 'Evening Ritual', model: 'assets/meditation/meditation-evening.webp',
             sky: [Color(0xFF12082E), Color(0xFF4A1466), Color(0xFFC2305E), Color(0xFFFF7A3C)],
             sun: Color(0xFFFF6A3D), glow: Color(0xFFFF4D6D), ground: Color(0xFF0D0620),
             accent: Color(0xFFFF6A8A), wordBack: Color(0xFFFFE0EA), wordFront: Color(0xFFFF8FA8),

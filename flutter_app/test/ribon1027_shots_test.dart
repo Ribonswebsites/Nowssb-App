@@ -16,7 +16,9 @@ import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/fashion/drop_studio.dart';
 import 'package:nowssb/shell/nav_shell.dart';
+import 'package:nowssb/widgets/concept/ritual_card.dart';
 import 'package:nowssb/widgets/concept/stillwater.dart';
+import 'package:nowssb/widgets/enter_curve_stage.dart';
 
 import 'fake_video_platform.dart';
 import 'support/home_render.dart';
@@ -60,8 +62,20 @@ class ShotSpec {
   final Finder Function()? scrollTo;
 }
 
+Widget _light(Widget child) => Scaffold(
+      backgroundColor: const Color(0xFFF0F2F7),
+      body: ListView(padding: const EdgeInsets.only(top: 18), children: [child]),
+    );
+
+Widget _ritual(RitualTime t) => _light(RitualCard(
+    time: t, debugPhase: .5, completed: 0, total: 8, sessionCount: 9, streak: 0,
+    onBegin: () {}, onSeeProgress: () {}));
+
 final specs = <ShotSpec>[
-  ShotSpec('item3-drop-studio-black', () => const DropStudioScreen(), scrollShots: 1),
+  ShotSpec('item4-ritual-morning-meditation', () => _ritual(RitualTime.morning)),
+  ShotSpec('item6-ritual-evening-meditation', () => _ritual(RitualTime.evening)),
+  ShotSpec('item6-enter-curve-candle', () => _light(const AspectRatio(aspectRatio: 16 / 10, child: EnterCurveStage(embedded: true)))),
+  ShotSpec('item6-drop-studio-meditation', () => const DropStudioScreen(), scrollShots: 1),
 ];
 
 void main() {

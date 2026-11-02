@@ -248,6 +248,7 @@ flutter:
     - assets/content/
     - assets/subscription/
     - assets/hero-curve/
+    - assets/meditation/
     # Doors art (text-free 3:4): Access features, Start art Meanings/eBooks, Fashion Plus Store + TV.
     - assets/doors/ai.webp
     - assets/doors/cart.webp

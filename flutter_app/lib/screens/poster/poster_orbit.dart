@@ -1,7 +1,7 @@
 /// POSTER · Orbit stage — the loved Fashion "Today's offers" 3D effect
 /// (EnterCurveStage), rebuilt deeper for the Trending hero.
 ///
-/// The Cleopatra cut-out stands still at the centre; the hero-curve word
+/// The stone-stack cut-out stands still at the centre; the hero-curve word
 /// posters ride a tilted 3D ellipse around her. Posters with z < 0 paint
 /// BEHIND her, z > 0 paint IN FRONT (bigger, sharper) → real occlusion.
 /// The backdrop photo, the orbit plane and the figure move at three parallax
@@ -209,7 +209,7 @@ class _PosterOrbitStageState extends State<PosterOrbitStage> with TickerProvider
           width: W * .68,
           top: H * .02 + t.dy * 10,
           bottom: -H * .02,
-          child: Cutout(PosterAssets.cleopatra, slot: widget.slot, id: 'orbit.cutout', fadeBottom: .12),
+          child: Cutout(PosterAssets.stoneStack, slot: widget.slot, id: 'orbit.cutout', fadeBottom: .12),
         ),
         ...front,
       ]),

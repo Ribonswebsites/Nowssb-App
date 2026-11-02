@@ -1,5 +1,5 @@
 /// POSTER · Signature — "THE SEAL".
-/// Variation: black and gold. Cleopatra cropped tight and FLIPPED to the
+/// Variation: black and gold. Singing bowl cropped tight and FLIPPED to the
 /// left (unlike the centred Trending orbit), a giant gold outline SEAL behind
 /// her and a wax seal sticker. Signature
 /// words are perforated gold ticket stubs; signature meanings black/gold cards.
@@ -168,7 +168,7 @@ class _Hero extends StatelessWidget {
                         top: H * .1,
                         width: W * .95,
                         height: H * .9,
-                        child: const Cutout(PosterAssets.cleopatra, slot: _slot, id: 'hero.cutout', align: Alignment.bottomLeft, fadeBottom: .18),
+                        child: const Cutout(PosterAssets.bowl, slot: _slot, id: 'hero.cutout', align: Alignment.bottomLeft, fadeBottom: .18),
                       ),
                       Positioned(right: 16, top: H * .36, child: Transform.rotate(angle: .18, child: const _Wax())),
                     ])),

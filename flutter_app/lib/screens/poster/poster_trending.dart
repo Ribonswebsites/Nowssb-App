@@ -1,6 +1,6 @@
 /// POSTER · Trending — "THE CHART".
 /// Variation: a dark chart-topper poster (giant gold outline rank numeral
-/// BEHIND the redhead cut-out, the word split across her with line 2 in
+/// BEHIND the meditation cut-out, the word split across her with line 2 in
 /// front), then a ladder of torn paper chart strips 02–07.
 library;
 
@@ -143,7 +143,7 @@ class _ChartTopper extends StatelessWidget {
                         top: H * .14,
                         width: W * .62,
                         height: H * .86,
-                        child: const Cutout(PosterAssets.redhead, slot: _slot, id: 'hero.cutout', align: Alignment.bottomRight),
+                        child: const Cutout(PosterAssets.seated, slot: _slot, id: 'hero.cutout', align: Alignment.bottomRight),
                       ),
                       // the word, ONE line, in front of her shoulder (scaled to fit, never wrapped)
                       Positioned(

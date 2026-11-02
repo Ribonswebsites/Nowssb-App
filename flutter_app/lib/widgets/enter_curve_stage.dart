@@ -38,7 +38,7 @@ class EnterCurveDest {
 
 class EnterCurveAssets {
   static const pointer = 'assets/hero-curve/pointer.webp';
-  static const cleopatra = 'assets/hero-curve/cleopatra.webp';
+  static const candle = 'assets/meditation/meditation-candle.webp';
   static const subject = HeroCurveAssets.tabSubject;
 
   static const destinations = <EnterCurveDest>[
@@ -95,7 +95,7 @@ class _EnterPageSpec {
 const _pages = <_EnterPageSpec>[
   // Card 1 — same 520 stage, copy is Today's offers.
   _EnterPageSpec(
-    subject: EnterCurveAssets.cleopatra,
+    subject: EnterCurveAssets.candle,
     kicker: "Today's offers",
     title: 'A featured drop for this hour',
     sub: 'Swipe for the words and what they mean.',

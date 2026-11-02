@@ -137,7 +137,7 @@ const _deep = Color(0xFF000000);
 
 /// Media the page uses — the same files the two replaced sections ship.
 class DropStudioAssets {
-  static const figureDrop = 'assets/hero-curve/cleopatra.webp';
+  static const figureDrop = 'assets/meditation/meditation-stones-wave.webp';
   static const figureHome = 'assets/hero-curve/pointer.webp';
   static const stillness = 'assets/hero-curve/stillness.webp';
   static const cosmos = 'assets/hero-curve/cosmos.webp';
@@ -681,8 +681,8 @@ class _Chip extends StatelessWidget {
 
 /// Cut-outs (alpha) the word posters layer over their giant type.
 const _wordCutouts = [
-  'assets/hero-curve/subject.webp',
-  'assets/hero-curve/cleopatra.webp',
+  'assets/meditation/meditation-bowls-pair.webp',
+  'assets/meditation/meditation-lotus.webp',
   'assets/hero-curve/tab-subject.webp',
   'assets/hero-curve/pointer.webp',
 ];
@@ -964,7 +964,9 @@ class _WordPoster extends StatelessWidget {
             Positioned(
               left: 12,
               bottom: 66,
-              width: width * .55,
+              // wide enough that a long word ("transformation") never
+              // breaks mid-word at 320 with 1.3x text.
+              width: width * .64,
               child: Transform.rotate(
                 angle: -.03,
                 child: Container(
