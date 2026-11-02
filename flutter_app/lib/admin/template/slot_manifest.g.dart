@@ -62,7 +62,7 @@ const kSlotManifest = <List<String>>[
   ['coupon_screen.OpenedCard.already-scratched-today', 'text', 'ALREADY SCRATCHED TODAY', 'features/economy/coupon_screen.dart'],
   ['coupon_screen.OpenedCard.next-free-card-at-midnight-it-s-on-your-477ac172', 'text', 'Next free card at midnight · it’s on your account', 'features/economy/coupon_screen.dart'],
   ['coupon_tickets.CouponRails.coupon-hero', 'image', 'assets/gifts/coupon-hero.webp', 'features/economy/coupon_tickets.dart'],
-  ['coupon_tickets.FlipCoupon.coupon-banner', 'image', 'assets/gifts/coupon-banner.png', 'features/economy/coupon_tickets.dart'],
+  ['coupon_tickets.FlipCoupon.coupon-banner', 'image', 'assets/gifts/coupon-banner.webp', 'features/economy/coupon_tickets.dart'],
   ['coupon_tickets.FlipCoupon.coupon-code', 'text', 'COUPON CODE:  ', 'features/economy/coupon_tickets.dart'],
   ['coupon_tickets.FlipCoupon.flip-back-not-a-rank-key', 'text', 'Flip back. Not a rank key.', 'features/economy/coupon_tickets.dart'],
   ['coupon_tickets.FlipCoupon.nowssb', 'text', 'NOWSSB', 'features/economy/coupon_tickets.dart'],

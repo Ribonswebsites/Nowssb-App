@@ -504,7 +504,7 @@ class _FlipCouponState extends State<FlipCoupon> with SingleTickerProviderStateM
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: EditableImage.asset(
-              'assets/gifts/coupon-banner.png',
+              'assets/gifts/coupon-banner.webp',
               height: 52,
               width: double.infinity,
               fit: BoxFit.cover,

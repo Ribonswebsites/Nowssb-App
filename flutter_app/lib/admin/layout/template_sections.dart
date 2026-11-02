@@ -123,7 +123,7 @@ Map<String, dynamic> templateStarter(String kind) => switch (kind) {
           'title': 'Your headline',
           'cta': 'Watch',
           'route': 'tab:1',
-          'image': 'assets/banners/stories/prana.png',
+          'image': 'assets/banners/stories/prana.webp',
           'height': 240,
         },
       'splitPromo' => {

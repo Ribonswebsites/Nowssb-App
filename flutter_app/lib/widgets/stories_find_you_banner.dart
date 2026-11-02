@@ -28,7 +28,7 @@ class StoriesFindYouBanner extends StatelessWidget {
   static const _cards = <_StoryCard>[
     _StoryCard(
       color: Color(0xFFE07A32),
-      image: 'assets/banners/stories/prana.png',
+      image: 'assets/banners/stories/prana.webp',
       kicker: 'PRANA',
       title: 'SOUND\nRITUAL',
       layout: _BookLayout.photoBottom,
@@ -42,7 +42,7 @@ class StoriesFindYouBanner extends StatelessWidget {
     ),
     _StoryCard(
       color: Color(0xFFC43A32),
-      image: 'assets/banners/stories/soma.png',
+      image: 'assets/banners/stories/soma.webp',
       kicker: 'SOMA',
       title: 'WORD\nSCIENCE',
       layout: _BookLayout.whiteInset,

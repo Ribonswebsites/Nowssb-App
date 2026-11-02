@@ -81,3 +81,39 @@ Generated with Grok Bot image generation; white background removed in-house.
 | `gifts/coupon-hero.webp` | Man in navy turban meditating with a golden coupon, on black | Red-haired woman (Zen "In the spotlight / Coupons") |
 
 Earn backs and coupon hero now WebP (q80); cut-outs palette-compressed PNG (<200 KB each).
+
+### Red-hair / Cleopatra sweep 3 (in-house generated art, free to use; each figure distinct)
+
+| File | New figure | Replaced |
+|---|---|---|
+| `footer/tab-breathe-new-noise.webp` | Bald bearded South Asian man, saffron kurta, on yellow ("NEW NOISE") | Red-haired woman |
+| `banners/promo/pose-02.webp` | Elderly Black woman, grey afro, teal linen, lotus (cut-out) | Red-haired woman ("A word for the body now") |
+| `banners/promo/pose-06.webp` | Korean man, grey hoodie, kneeling, prayer hands (cut-out) | Red-haired woman |
+| `banners/promo/split-blonde-blazer.webp` | Latina woman, black braid, olive linen, arms overhead (cut-out) | Red-haired woman |
+| `banners/stories/prana.webp` | Ethiopian man in white linen, on black | Red-haired woman |
+| `banners/stories/soma.webp` | Japanese woman, black bob, navy wrap | Cleopatra figure |
+| `footer/tab-ancient-calm-new-sound.webp` | Tibetan monk on pink | Cleopatra figure |
+| `footer/tab-find-your-frequency.webp` (+ root `file_…ad2f6542de.webp`) | Polynesian man, top bun, on red | Red-haired woman |
+| `gifts/coupon-banner.webp` | Grey-bearded man holding coupons | Red-haired woman |
+| `hero-curve/banner-library.webp` | Indian woman, purple saree | Red-haired woman |
+| `hero-curve/banner-reader.webp` | Middle-Eastern young man, black suit, kneeling | Red-haired woman |
+| `hero-curve/cleopatra.webp` (root) | Black woman, shaved head, purple robe, seated (cut-out) | Cleopatra figure |
+| `hero-curve/cosmos.webp` | Mongolian man, long black hair, on the moon | Red-haired woman |
+| `hero-curve/countries.webp` | Nigerian woman in purple gele | Cleopatra figure |
+| `hero-curve/subject.webp` | Filipino woman, black pixie cut, black suit (cut-out) | Red-haired woman |
+| `player/guide/03.webp` | Brazilian man, curly hair, floating lotus | Red-haired woman |
+| `store/signature-portrait.jpg` | Older South Indian man, salt-and-pepper hair, black kurta | Red-haired woman |
+| `banners/course-bubble.jpg` | Young woman, curly black hair, white linen | Red-haired woman |
+| `banners/programs/bonus.webp` | Pakistani bearded man, purple kurta | Cleopatra figure |
+| `banners/programs/gift.webp` | Chinese grandmother, silver bun, black jacket | Red-haired woman |
+| `flip_brand/img2.jpg` (+ root `file_…7ac46978d6.webp`) | Sri Lankan woman, purple dress (PLAYER) | Red-haired woman |
+| `flip_brand/img3.jpg` (+ root `file_…cc603420a8.webp`) | Arab man, purple thobe, prayer hands (WORD SCIENCE) | Cleopatra figure |
+| `flip_brand/img4.jpg` (+ root `file_…eee1d06ccf.webp`) | Black man with locs, black suit, lotus (SOUND LIBRARY) | Red-haired woman |
+| `flip_brand/img9.jpg` (+ root `file_…d03c79a021.webp`) | Thai woman, short silver hair, kneeling (READER) | Red-haired woman |
+| root `file_…674c…79f.webp` | Andean woman, black braids, woven poncho | Red-haired woman |
+| root `file_…acd4…257.webp` | Malaysian man, purple baju melayu | Cleopatra figure |
+| `login/card-02.jpg` | Ghanaian woman, shaved head, on yellow | Red-haired woman |
+| `login/card-03.jpg` | Older Persian man, grey beard, on blue | Cleopatra figure |
+| `login/card-20.jpg` | Woman with curly brown hair, on white | Red-haired woman |
+| `profile/rails/avatar_a.jpg` | Painted Indonesian woman, straight black hair | Painted red-haired woman |
+| root `subscription/tier-{bag,nile,sun}-{back,front}.png` | Synced to the clean flutter_app versions | Red-haired / Cleopatra figures |
