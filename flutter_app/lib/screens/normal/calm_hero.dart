@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/models.dart';
+import '../../widgets/concept/ritual_card.dart';
 
 class HeroData {
   const HeroData({
@@ -25,7 +26,17 @@ class HeroData {
       this.onHear,
     this.isSaved,
     this.onSave,
+    this.streak = 0,
+    this.sessions = 0,
+    this.ritualTime,
+    this.onProgress,
   });
+
+  /// Night/Morning Ritual card inputs.
+  final int streak;
+  final int sessions;
+  final RitualTime? ritualTime;
+  final VoidCallback? onProgress;
 
   /// Save: the card's word when it has one, else the session itself.
   final bool Function(String? word)? isSaved;
@@ -41,8 +52,8 @@ class HeroData {
   String get wordsLine => words.isEmpty ? 'Your routine' : '${words.length} words';
 }
 
-const _serif = 'CormorantGaramond';
 
+const _serif = 'CormorantGaramond';
 const _hc = 'assets/home/hc';
 
 /// Film grain, drawn over everything at low strength.
@@ -70,7 +81,7 @@ class _Grain extends StatelessWidget {
       );
 }
 
-Widget _img(String name, {Alignment align = Alignment.center}) => Image.asset('$_hc/$name.webp',
+Widget _img(String name, {Alignment align = Alignment.topCenter}) => Image.asset('$_hc/$name.webp',
     fit: BoxFit.cover, alignment: align, filterQuality: FilterQuality.medium, gaplessPlayback: true,
     errorBuilder: (_, __, ___) => const SizedBox.shrink());
 
@@ -220,6 +231,9 @@ class MixedHero extends StatelessWidget {
       (off) => _WordCard2(look: const _WordLook('hc-c-word', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
       (off) => _CinemaCard(photo: 'hc-b-sleep', kicker: 'Dusk', tone: const Color(0xFF0E1230), data: data, word: w(1), parallax: off),
       (off) => _WordCard2(look: const _WordLook('hc-b-heal', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
+      (off) => _RitualSlot(data: data),
+      (off) => _CinemaCard(photo: 'hc-b-sound', kicker: 'Sound', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('hc-b-breath', Color(0xFFF2C9A8), Color(0xFF4A2418)), data: data, word: w(2), parallax: off),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 14),
@@ -239,7 +253,7 @@ class MixedHero extends StatelessWidget {
 
 /// Soft, shared photo plate: parallax shift against the card on swipe.
 Widget _plate(String photo, double off, {double k = 28, double dy = 0}) =>
-    Transform.translate(offset: Offset(off * k, dy), child: Transform.scale(scale: 1.1, child: _img(photo)));
+    Transform.translate(offset: Offset(off * k, dy), child: Transform.scale(scale: 1.06, alignment: Alignment.bottomCenter, child: _img(photo)));
 
 TextStyle _kick(Color c) => TextStyle(color: c, fontSize: 10, letterSpacing: 2.4, fontWeight: FontWeight.w600);
 
@@ -336,17 +350,43 @@ class _CinemaCard extends StatelessWidget {
 }
 
 // B2 · Depth: three practices stacked in perspective, fully inside the card.
-class _DepthCard extends StatelessWidget {
+class _DepthCard extends StatefulWidget {
   const _DepthCard({required this.data, required this.parallax});
   final HeroData data;
   final double parallax;
+  @override
+  State<_DepthCard> createState() => _DepthCardState();
+}
+
+/// The stack scrolls vertically: swipe up brings the next practice to the
+/// front, swipe down brings the previous one back (wraps around).
+class _DepthCardState extends State<_DepthCard> {
   static const _bg = Color(0xFF1B1420);
+  int front = 0;
+  double _drag = 0;
+  HeroData get data => widget.data;
+  double get parallax => widget.parallax;
+
+  void _step(int d) {
+    HapticFeedback.selectionClick();
+    setState(() => front = (front + d) % _worlds.length);
+  }
 
   @override
   Widget build(BuildContext context) {
-    const order = [2, 1, 0]; // back → front: Sleep, Sound, Breath
+    final n = _worlds.length;
+    // back → front, as indexes into _worlds; depth = position from front.
+    final order = [for (var d = n - 1; d >= 0; d--) (front + d) % n];
     return GestureDetector(
+      key: const ValueKey('hero-depth'),
       onTap: data.onBegin,
+      onVerticalDragStart: (_) => _drag = 0,
+      onVerticalDragUpdate: (u) => _drag += u.delta.dy,
+      onVerticalDragEnd: (e) {
+        final v = e.primaryVelocity ?? 0;
+        if (_drag < -24 || v < -250) _step(1);
+        if (_drag > 24 || v > 250) _step(n - 1);
+      },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: Stack(fit: StackFit.expand, children: [
@@ -368,7 +408,7 @@ class _DepthCard extends StatelessWidget {
             left: 16, right: 16, top: 50, bottom: 16,
             child: LayoutBuilder(builder: (context, c) {
               return Stack(clipBehavior: Clip.hardEdge, alignment: Alignment.bottomCenter, children: [
-                for (final d in order) _sheet(c, d),
+                for (final i in order) _sheet(c, i, (i - front) % n),
               ]);
             }),
           ),
@@ -377,8 +417,8 @@ class _DepthCard extends StatelessWidget {
     );
   }
 
-  Widget _sheet(BoxConstraints c, int d) {
-    final world = _worlds[d];
+  Widget _sheet(BoxConstraints c, int wi, int d) {
+    final world = _worlds[wi];
     final front = d == 0;
     final h = c.maxHeight - 88;
     final tilt = parallax.clamp(-1.0, 1.0);
@@ -410,6 +450,11 @@ class _DepthCard extends StatelessWidget {
               left: 16, top: front ? 14 : 8, right: 14,
               child: Row(children: [
                 Expanded(child: Text(world.name.toUpperCase(), style: _kick(front ? Colors.white : const Color(0xB3FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                if (front) ...[
+                  Text('${wi + 1}/${_worlds.length}', style: _kick(const Color(0xCCFFFFFF))),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.swipe_vertical_rounded, size: 14, color: Color(0xCCFFFFFF)),
+                ],
               ]),
             ),
             if (front)
@@ -511,7 +556,7 @@ class _WordCard2 extends StatelessWidget {
                 left: 22, right: 22, bottom: 22,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                   if (word != null && word!.phonetic.isNotEmpty)
-                    Text(word!.phonetic, style: const TextStyle(fontFamily: _serif, color: Colors.white, fontSize: 24, fontStyle: FontStyle.italic, height: 1)),
+                    Text(word!.phonetic, style: const TextStyle(fontFamily: 'DM Sans', color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: .4, height: 1.1)),
                   if (word != null && word!.meaning.isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(word!.meaning, maxLines: 1, overflow: TextOverflow.ellipsis,
@@ -568,4 +613,35 @@ class _SaveButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Night/Morning Ritual card (time of day) as a hero slide.
+class _RitualSlot extends StatelessWidget {
+  const _RitualSlot({required this.data});
+  final HeroData data;
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        key: const ValueKey('hero-ritual'),
+        borderRadius: BorderRadius.circular(28),
+        child: ColoredBox(
+          color: const Color(0xFF0C0C20),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: 360,
+              child: RitualCard(
+                completed: data.done,
+                total: data.total,
+                sessionCount: data.sessions,
+                streak: data.streak,
+                time: data.ritualTime,
+                title: data.title,
+                onBegin: data.onBegin,
+                onSeeProgress: data.onProgress ?? data.onBegin,
+              ),
+            ),
+          ),
+        ),
+      );
 }

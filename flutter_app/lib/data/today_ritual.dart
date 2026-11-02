@@ -91,3 +91,37 @@ class TodayRitualModel extends ChangeNotifier {
     super.dispose();
   }
 }
+
+/// Hero words for this user: words they own or bought first, then the words
+/// they saved (their routine), then the day part's routine words. Matches by
+/// the word itself inside an owned item's title (case-insensitive). Falls
+/// back to [routine] when the user owns and saved nothing.
+List<Word> personalHeroWords({
+  required Iterable<Word> library,
+  required List<Word> routine,
+  Iterable<String> ownedTitles = const [],
+  Iterable<String> saved = const [],
+}) {
+  final out = <Word>[];
+  final seen = <String>{};
+  void add(Word w) {
+    if (seen.add(w.word.toLowerCase())) out.add(w);
+  }
+
+  final titles = [for (final t in ownedTitles) t.toLowerCase()];
+  if (titles.isNotEmpty) {
+    for (final w in library) {
+      final k = w.word.toLowerCase();
+      if (k.isEmpty) continue;
+      if (titles.any((t) => RegExp('\\b${RegExp.escape(k)}\\b').hasMatch(t))) add(w);
+    }
+  }
+  final s = {for (final x in saved) x.toLowerCase()};
+  for (final w in library) {
+    if (s.contains(w.word.toLowerCase())) add(w);
+  }
+  for (final w in routine) {
+    add(w);
+  }
+  return out;
+}

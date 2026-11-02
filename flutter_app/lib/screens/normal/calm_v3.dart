@@ -18,6 +18,8 @@ import 'neomorphic_dashboard.dart' show FocusBlob;
 
 import '../../admin/template/editable.dart' show EditableLabel;
 import '../../data/content.dart';
+import '../../data/cart_bag.dart';
+import '../../data/earn_wallet.dart';
 import '../../data/firebase.dart';
 import '../../data/models.dart';
 import '../../data/practice_progress.dart';
@@ -314,13 +316,26 @@ class _CalmTodayState extends State<CalmToday> {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-        listenable: _model,
+        listenable: Listenable.merge([_model, CartBag.instance, EarnWallet.instance]),
         builder: (context, _) {
           final r = _model.value;
+          final words = personalHeroWords(
+            library: ContentStore.instance.library,
+            routine: r.words,
+            ownedTitles: [
+              for (final o in CartBag.instance.orders) for (final it in o.items) it.title,
+              for (final o in EarnWallet.instance.owned) o.title,
+            ],
+            saved: _liked,
+          );
           final d = HeroData(
+            streak: r.streak,
+            sessions: r.totalSessions,
+            ritualTime: ritualTimeOf(r.part),
+            onProgress: _model.seeProgress,
             title: r.title,
             partLabel: r.part.label,
-            words: r.words,
+            words: words,
             done: r.done,
             total: r.total,
             onBegin: _model.begin,
