@@ -14,6 +14,9 @@ import 'poster_kit.dart';
 
 const _slot = 'concept.PosterMeaning';
 
+/// 15 Oct meaning room picture.
+const _oct15MeaningArt = 'assets/rails/store-meaning.jpg';
+
 /// Live price of a meaning (bag id meaning:<word>).
 num meaningPrice(MsMeaning m) => StorePrices.instance.priceFor('meaning:${m.word.toLowerCase()}', shown: m.price);
 String _id(MsMeaning m) => 'meaning:${m.word.toLowerCase()}';
@@ -141,7 +144,7 @@ class _Hero extends StatelessWidget {
                         right: 0,
                         top: H * .06,
                         bottom: 0,
-                        child: const Cutout(PosterAssets.blonde, slot: _slot, id: 'hero.cutout', align: Alignment.bottomCenter, fadeBottom: .12),
+                        child: const Cutout(_oct15MeaningArt, slot: _slot, id: 'hero.cutout', align: Alignment.bottomCenter, fadeBottom: .12),
                       ),
                       const Positioned(right: 12, top: 12, child: GoldTag('Meaning of the day')),
                     ]),

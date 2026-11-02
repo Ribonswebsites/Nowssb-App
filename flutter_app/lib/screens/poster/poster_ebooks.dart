@@ -16,6 +16,9 @@ import 'poster_kit.dart';
 
 const _slot = 'concept.PosterEbooks';
 
+/// 15 Oct ebooks room picture.
+const _oct15EbookArt = 'assets/rails/store-ebooks.jpg';
+
 /// Live ebook price (bag id ebook:<title>; catalogue price as the shown one).
 num bookPrice(EbBook b) => StorePrices.instance.priceFor('ebook:${b.title.toLowerCase()}', shown: b.price);
 String _id(EbBook b) => 'ebook:${b.title.toLowerCase()}';
@@ -113,7 +116,7 @@ class _Hero extends StatelessWidget {
                   child: ClipPath(
                     clipper: const TornClipper(41, depth: 1.5),
                     child: Stack(fit: StackFit.expand, children: [
-                      Photo(PosterAssets.rail('ebooks'), slot: _slot, id: 'hero.photo'),
+                      Photo(_oct15EbookArt, slot: _slot, id: 'hero.photo'),
                       const DecoratedBox(decoration: BoxDecoration(color: Color(0x55060C18))),
                     ]),
                   ),

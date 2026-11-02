@@ -12,6 +12,34 @@ import 'poster_kit.dart';
 
 const _slot = 'concept.PosterAtelier';
 
+/// 15 Oct room and category pictures (not the later hero-curve stand-ins).
+const _oct15WordArt = 'assets/rails/store-word.jpg';
+
+String _oct15CatArt(String id) {
+  const map = {
+    'off50': 'assets/rails/store-premium.jpg',
+    'elements': 'assets/rails/store-elements.jpg',
+    'sacred': 'assets/rails/store-sacred.jpg',
+    'identity': 'assets/rails/store-mind.jpg',
+    'cosmos': 'assets/rails/store-cosmos.jpg',
+    'nature': 'assets/rails/store-nature.jpg',
+    'family': 'assets/rails/store-family.jpg',
+    'elite': 'assets/rails/store-premium.jpg',
+    'premium': 'assets/rails/store-premium.jpg',
+    'mythical': 'assets/rails/store-myth.jpg',
+    'warriors': 'assets/rails/store-warriors.jpg',
+    'ancient': 'assets/rails/store-ancient.jpg',
+    'peace': 'assets/rails/store-peace.jpg',
+    'white': 'assets/rails/store-white.jpg',
+    'black': 'assets/rails/store-black.jpg',
+    'Countries': 'assets/rails/store-places.jpg',
+    'Capitals': 'assets/rails/store-ancient.jpg',
+    'Currency': 'assets/rails/store-premium.jpg',
+    'Language': 'assets/rails/store-word.jpg',
+  };
+  return map[id] ?? _oct15WordArt;
+}
+
 /// Search match on word or root (the Atelier's original filter).
 bool atelierMatches(RmWordEntry e, String q) {
   final k = q.trim().toLowerCase();
@@ -161,7 +189,7 @@ class _Hero extends StatelessWidget {
                     child: ClipPath(
                       clipper: const TornClipper(12, depth: 1.4),
                       child: Stack(fit: StackFit.expand, children: [
-                        Photo(PosterAssets.rail('word'), slot: _slot, id: 'hero.photo'),
+                        Photo(_oct15WordArt, slot: _slot, id: 'hero.photo'),
                         const DecoratedBox(decoration: BoxDecoration(color: Color(0x66060C18))),
                       ]),
                     ),
@@ -237,7 +265,7 @@ class _CategoryTile extends StatelessWidget {
             child: SizedBox(
               height: 190,
               child: Stack(fit: StackFit.expand, children: [
-                Photo(PosterAssets.rail(cat.id, index), slot: _slot, id: 'cat.${cat.id}.photo'),
+                Photo(_oct15CatArt(cat.id), slot: _slot, id: 'cat.${cat.id}.photo'),
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x22000000), Color(0xDD060C18)]),
