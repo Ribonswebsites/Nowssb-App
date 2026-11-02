@@ -30,7 +30,6 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 ## Home hero (assets/home/hc/) — Pexels License, colour-graded, cut-outs made in-house
 - hc-a-breath — Ivan S, https://www.pexels.com/photo/6648599/
 - hc-c-word — KATRIN BOLOVTSOVA, https://www.pexels.com/photo/7113566/
-- hc-b-breath — Tima Miroshnichenko, https://www.pexels.com/photo/5928625/
 - hc-b-sound — Jan Kopřiva, https://www.pexels.com/photo/6593243/
 - hc-b-sleep — RAVI LAGES, https://www.pexels.com/photo/6308172/
 - hc-b-heal — Pavel Danilyuk, https://www.pexels.com/photo/7596969/
@@ -50,3 +49,18 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 | `meditation/meditation-cairn.webp` | rawpixel 5902834 "Stacked wellness zen stones", https://www.rawpixel.com/image/5902834, CC0 1.0 | Cut-out. Hero-curve stage subject |
 - rs-candle — Pexels (free licence), https://www.pexels.com/photo/3822622/ — Offers & earning image and ref-style sections
 - Ribon 10-27: the Cleopatra / Egyptian / red-haired art files (banners/promo/split-*-{egyptian,red}*.png, banners/course-cleo-{a,b}.jpg, banners/brand-cleo*.png) now hold the meditation photos above (hc-*, rs-candle); same Pexels credits.
+
+## Normal-home ref sections (assets/home/ref/) — Pexels License (free), resized to 480px webp
+- ref-1 — https://www.pexels.com/photo/1051838/
+- ref-2 — https://www.pexels.com/photo/3822864/
+- ref-3 — https://www.pexels.com/photo/3772612/
+- ref-4 — https://www.pexels.com/photo/3820380/
+- ref-5 — https://www.pexels.com/photo/3822583/
+- ref-6 — https://www.pexels.com/photo/1029604/
+- ref-7 — https://www.pexels.com/photo/4057839/
+- ref-8 — https://www.pexels.com/photo/4325484/
+- ref-9 — https://www.pexels.com/photo/6787202/
+- hc-d-breath — https://www.pexels.com/photo/3094215/ (Pexels License)
+- hc-d-sound — https://www.pexels.com/photo/4056535/ (Pexels License)
+- hc-d-sleep — https://www.pexels.com/photo/6698513/ (Pexels License)
+- hc-e-word — https://www.pexels.com/photo/4040567/ (Pexels License)

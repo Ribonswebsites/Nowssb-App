@@ -27,7 +27,7 @@ void main() {
   });
 
   test(
-      'mini player is a black rounded rectangle inside glass, beside Fashion home',
+      'mini player is a black rounded rectangle inside glass, beside Zen home',
       () {
     final src = File('lib/widgets/mini_player_pill.dart').readAsStringSync();
     expect(src, contains('assets/store/nowssb-bag-headphones.webp'));

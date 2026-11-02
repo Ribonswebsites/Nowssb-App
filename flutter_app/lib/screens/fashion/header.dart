@@ -423,7 +423,7 @@ const kNwsbSearchDestinations = <(String, String)>[
   ('About', 'about'),
   ('App Settings', 'settings'),
   ('Connect', 'connect'),
-  ('Fashion Plus', 'fashion'),
+  ('Zen Plus', 'fashion'),
   ('Healer', 'healer'),
   ('Healing Path', 'healing'),
   ('Library', 'library'),

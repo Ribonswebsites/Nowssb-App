@@ -131,7 +131,7 @@ void main() {
       }
     });
 
-    testWidgets('Fashion Plus subline wraps whole at $tag', (t) async {
+    testWidgets('Zen Plus subline wraps whole at $tag', (t) async {
       final errs = await boot(t, const FashPlusMini(), w, s);
       expect(errs, isEmpty);
       final sub = find.textContaining(Settings.instance.fashionPlus ? 'On —' : 'Off —');

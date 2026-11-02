@@ -165,8 +165,8 @@ void main() {
     // The Normal home is the pale one and shows the greeting; the Fashion
     // home is the dark one and shows its own. The switch names the home you
     // would be going TO, so it reads as an action rather than a status.
-    expect(find.text('Fashion home'), findsOneWidget);
-    await tester.tap(find.text('Fashion home'));
+    expect(find.text('Zen home'), findsOneWidget);
+    await tester.tap(find.text('Zen home'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 80));
 

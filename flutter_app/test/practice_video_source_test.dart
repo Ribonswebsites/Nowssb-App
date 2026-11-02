@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Fashion practice uses the bundled practice-halo clip via NwsbVideo', () {
+  test('Zen practice uses the bundled practice-halo clip via NwsbVideo', () {
     final src = File('lib/screens/fashion/sections_top.dart').readAsStringSync();
     expect(src, contains('assets/video/practice-halo.mp4'));
     expect(File('assets/video/practice-halo.mp4').existsSync(), isTrue);

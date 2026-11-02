@@ -129,7 +129,7 @@ void main() {
       (await t.runAsync(SharedPreferences.getInstance))!;
 
   group('customize doors use the home\'s real state', () {
-    testWidgets('Themes → DoorFashionPlusScreen, real data, hero style + dim saved', (t) async {
+    testWidgets('Themes → DoorZenPlusScreen, real data, hero style + dim saved', (t) async {
       await openDoor(t, 'Themes');
       expect(find.byType(DoorFashionPlusScreen), findsOneWidget);
       final page = t.widget<DoorFashionPlusPage>(find.byType(DoorFashionPlusPage));
@@ -605,7 +605,7 @@ void main() {
     }
   });
 
-  group('Fashion home', () {
+  group('Zen home', () {
     // Fonts come from test/fonts, never the network (test setup only).
     setUpAll(setUpOfflineGoogleFonts);
     testWidgets('entry opens Drop Studio; old sections are gone', (t) async {

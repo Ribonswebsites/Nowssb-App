@@ -348,3 +348,38 @@ class R27NeuFrame extends StatelessWidget {
 /// Bottom-up black scrim for legible text on posters.
 const r27Scrim = BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
     colors: [Color(0x1A000000), Color(0x66000000), Color(0xF2000000)], stops: [0, .45, 1]));
+
+// ── Light tone (Ribon 11-02: the normal home is white neumorphism only) ──
+const r27LSurf = Color(0xFFF0F2F7);
+const r27LCard = Color(0xFFFFFFFF);
+const r27LInk = Color(0xFF1A1A2E);
+const r27LSub = Color(0xFF4A4E5C);
+const r27LNeu = [
+  BoxShadow(color: Color(0x24000000), offset: Offset(6, 6), blurRadius: 14),
+  BoxShadow(color: Color(0xFAFFFFFF), offset: Offset(-5, -5), blurRadius: 12),
+];
+
+/// Marks a subtree as the normal (white neumorphic) home: cards inside
+/// draw light faces with dark text and no photos.
+class R27Tone extends InheritedWidget {
+  const R27Tone({super.key, required this.light, required super.child});
+  final bool light;
+  static bool isLight(BuildContext c) => c.dependOnInheritedWidgetOfExactType<R27Tone>()?.light ?? false;
+  @override
+  bool updateShouldNotify(R27Tone o) => o.light != light;
+}
+
+/// A neumorphic well holding an icon (light tone stand-in for a photo).
+class R27IconWell extends StatelessWidget {
+  const R27IconWell(this.icon, {super.key, this.size = 44, this.color = r27Gold});
+  final IconData icon;
+  final double size;
+  final Color color;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: const BoxDecoration(color: r27LSurf, shape: BoxShape.circle, boxShadow: r27LNeu),
+        child: Icon(icon, size: size * .5, color: color),
+      );
+}

@@ -1,15 +1,10 @@
-/// Fashion Plus entry — "Plus aperture": a white neumorphic frame holding a
-/// dark portal. The real Fashion Plus still (assets/fashion/fp-intro.webp,
-/// cropped to the model and her neon plus, left of the printed FASHION
-/// letters, so no printed text shows) is seen only through a giant
-/// plus-shaped window. The window breathes, a neon line traces its outline
-/// with a running spark, and violet rings echo out in the dark corners.
-/// Tapping anywhere opens the plus until the still fills the portal, then
-/// calls [onEnter].
+/// Zen Plus entry (Ribon 11-02): a white neumorphic card holding a brand-new
+/// Flutter animation — a breathing lotus around a soft plus, with ripple
+/// rings and three orbiting beads. No photo. Tapping blooms the lotus open,
+/// then calls [onEnter].
 ///
-/// [bgDim] (0..1, optional) = how much the Fashion background is dimmed
-/// (Builder: FashionBgDim). It darkens the still the same way, so the card
-/// previews the user's own setting. null = no dim.
+/// [bgDim] is kept for call-site compatibility (the Zen home's dim setting)
+/// and only deepens the lotus tint slightly, so the card previews it.
 library;
 
 import 'dart:math' as math;
@@ -17,11 +12,8 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'surface.dart';
 
-/// Derived from fp-intro.webp (tools: rembg matte + crop): the printed
-/// FASHION letter block behind the model is replaced by the dark backdrop,
-/// so no printed text or letter slab can show.
-const kNFashionPlusStill = 'assets/home/fp-entry.webp';
-const _neon = Color(0xFFB45CFF);
+const _lav = Color(0xFF7B61D9);
+const _peach = Color(0xFFE9A46B);
 
 class NFashionPlusEntry extends StatefulWidget {
   const NFashionPlusEntry({super.key, required this.onEnter, this.bgDim});
@@ -33,7 +25,7 @@ class NFashionPlusEntry extends StatefulWidget {
 
 class _NFashionPlusEntryState extends State<NFashionPlusEntry> with SingleTickerProviderStateMixin, NormalLoop {
   @override
-  Duration get period => const Duration(milliseconds: 4200);
+  Duration get period => const Duration(milliseconds: 6000);
   bool _opening = false;
 
   bool get _reduced => MediaQuery.maybeDisableAnimationsOf(context) ?? false;
@@ -41,7 +33,6 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with SingleTicker
   Future<void> _enter() async {
     if (_opening) return;
     setState(() => _opening = true);
-    // Reduced motion: open instantly and enter now, with no animation.
     if (!_reduced) await Future<void>.delayed(const Duration(milliseconds: 520));
     if (!mounted) return;
     widget.onEnter();
@@ -51,155 +42,86 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with SingleTicker
   @override
   Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      child: NPress(label: 'Enter Fashion Plus', onTap: _enter, child: Container(
+      child: NPress(label: 'Enter Zen Plus', onTap: _enter, child: Container(
         decoration: neu(r: 30), padding: const EdgeInsets.all(14),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const Padding(padding: EdgeInsets.fromLTRB(4, 4, 4, 0), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Step into', style: nHello),
-            Text('Fashion Plus', style: nTitle),
+            Text('Zen Plus', style: nTitle),
             SizedBox(height: 4),
-            Text('The dark, cinematic home. Tap anywhere to open it.', style: nSub),
+            Text('A calmer, deeper home for your practice. Tap anywhere to open it.', style: nSub),
           ])),
           const SizedBox(height: 14),
-          ClipRRect(borderRadius: BorderRadius.circular(22), child: SizedBox(height: 236, child: LayoutBuilder(builder: (c, k) {
-            final w = k.maxWidth;
-            const h = 236.0;
-            return TweenAnimationBuilder<double>(
-              tween: Tween(end: _opening ? 1 : 0), duration: _reduced ? Duration.zero : const Duration(milliseconds: 480), curve: Curves.easeInCubic,
-              builder: (_, open, __) => AnimatedBuilder(animation: loop, builder: (_, __) {
-                final t = loop.value;
-                final breathe = math.sin(t * math.pi * 2) * .5 + .5;
-                final arm = lerpDouble(lerpDouble(.27, .31, breathe)!, .9, open)! * h; // half-thickness
-                final plus = _plusPath(Size(w, h), arm);
-                final rim = _innerOutline(Size(w, h), arm);
-                final dim = (widget.bgDim ?? 0).clamp(0.0, 1.0);
-                return Stack(fit: StackFit.expand, children: [
-                  const ColoredBox(color: Color(0xFF0B0812)),
-                  ClipPath(clipper: _PathClip(plus), child: Stack(fit: StackFit.expand, children: [
-                    // Builder edit (Hunter H on 24d4e8d): the dim darkens the
-                    // photo only; the still's own neon plus is kept out of it.
-                    _Still(w: w, h: h, dim: dim),
-                  ])),
-                  // Builder edit: ripples sit above the (dimmed) photo, below the neon.
-                  CustomPaint(key: const ValueKey('fp-entry-rings'), painter: _Rings(t: t)),
-                  CustomPaint(key: const ValueKey('fp-entry-neon'), painter: _Neon(path: rim, t: t, fade: 1 - open)),
-                ]);
-              }));
-          }))),
+          Container(
+            key: const ValueKey('zen-plus-well'),
+            height: 236,
+            decoration: neu(r: 22, pressed: true),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(end: _opening ? 1 : 0), duration: _reduced ? Duration.zero : const Duration(milliseconds: 480), curve: Curves.easeOutCubic,
+              builder: (_, open, __) => AnimatedBuilder(
+                animation: loop,
+                builder: (_, __) => CustomPaint(
+                  key: const ValueKey('zen-plus-lotus'),
+                  size: Size.infinite,
+                  painter: ZenLotusPainter(t: loop.value, open: open, tint: (widget.bgDim ?? 0).clamp(0.0, 1.0)),
+                ),
+              ),
+            ),
+          ),
         ]),
       )));
 }
 
-/// A plus centred in the portal; arms run to the edges.
-Path _plusPath(Size s, double a) {
-  final c = s.center(Offset.zero);
-  final ax = math.min(a, s.width / 2), ay = math.min(a, s.height / 2);
-  return Path.combine(PathOperation.union,
-      Path()..addRect(Rect.fromLTRB(0, c.dy - ay, s.width, c.dy + ay)),
-      Path()..addRect(Rect.fromLTRB(c.dx - ax, 0, c.dx + ax, s.height)));
-}
+/// Breathing lotus + plus, ripple rings and orbiting beads (t = 0..1 loop).
+class ZenLotusPainter extends CustomPainter {
+  ZenLotusPainter({required this.t, this.open = 0, this.tint = 0});
+  final double t, open, tint;
 
-/// The plus outline *inside* the portal only: four L-shaped inner corners
-/// (the arm ends lie on the portal edge and are not drawn), so the neon
-/// line and its spark never run along the portal border.
-Path _innerOutline(Size s, double a) {
-  final c = s.center(Offset.zero);
-  final ax = math.min(a, s.width / 2), ay = math.min(a, s.height / 2);
-  final l = c.dx - ax, r = c.dx + ax, t = c.dy - ay, b = c.dy + ay;
-  final p = Path();
-  if (l > 0 && t > 0) p..moveTo(l, 0)..lineTo(l, t)..lineTo(0, t);
-  if (r < s.width && t > 0) p..moveTo(r, 0)..lineTo(r, t)..lineTo(s.width, t);
-  if (r < s.width && b < s.height) p..moveTo(s.width, b)..lineTo(r, b)..lineTo(r, s.height);
-  if (l > 0 && b < s.height) p..moveTo(0, b)..lineTo(l, b)..lineTo(l, s.height);
-  return p;
-}
-
-class _PathClip extends CustomClipper<Path> {
-  _PathClip(this.p);
-  final Path p;
   @override
-  Path getClip(Size size) => p;
-  @override
-  bool shouldReclip(_PathClip o) => o.p != p;
-}
-
-/// The still, cropped to the model and the neon plus (x 0–.7 of the
-/// 941×1672 frame); the face sits inside the plus's horizontal arm.
-class _Still extends StatelessWidget {
-  const _Still({required this.w, required this.h, this.dim = 0});
-  final double w, h, dim;
-  static const _fy = .465, _span = .7;
-  @override
-  Widget build(BuildContext context) {
-    // the portal's width shows x 0..[_span] of the frame
-    final iw = w / _span, ih = iw * 1672 / 941;
-    return ClipRect(child: Stack(clipBehavior: Clip.hardEdge, children: [
-      Positioned(left: 0, top: h / 2 - ih * _fy, width: iw, height: ih,
-          child: Stack(fit: StackFit.expand, children: [
-            Image.asset(kNFashionPlusStill, fit: BoxFit.fill, errorBuilder: (_, __, ___) => const SizedBox()),
-            if (dim > 0) CustomPaint(key: const ValueKey('fp-entry-dim'), painter: _PhotoDim(dim)),
-          ])),
-    ]));
-  }
-}
-
-/// Violet rings rippling out from the centre in the dark corners.
-class _Rings extends CustomPainter {
-  _Rings({required this.t});
-  final double t;
-  @override
-  void paint(Canvas c, Size s) {
-    final o = s.center(Offset.zero);
-    final maxR = s.longestSide * .75;
-    for (var i = 0; i < 6; i++) {
-      final f = (i / 6 + t) % 1;
-      c.drawCircle(o, maxR * f, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.6
-        ..color = _neon.withValues(alpha: .45 * (1 - f)));
+  void paint(Canvas canvas, Size s) {
+    final c = s.center(Offset.zero);
+    final r0 = math.min(s.width, s.height) * .5;
+    final breathe = math.sin(t * math.pi * 2) * .5 + .5;
+    // ripples
+    for (var i = 0; i < 3; i++) {
+      final k = (t + i / 3) % 1;
+      canvas.drawCircle(c, r0 * (.35 + .6 * k), Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..color = _lav.withValues(alpha: .35 * (1 - k)));
+    }
+    // petals
+    final petal = r0 * lerpDouble(.52, .62, breathe)! * (1 + .25 * open);
+    final spread = lerpDouble(.18, .32, breathe)! + .3 * open;
+    for (var i = 0; i < 8; i++) {
+      final a = i * math.pi / 4 + t * math.pi / 8;
+      final tip = c + Offset(math.cos(a), math.sin(a)) * petal;
+      final l = c + Offset(math.cos(a - spread), math.sin(a - spread)) * petal * .45;
+      final r = c + Offset(math.cos(a + spread), math.sin(a + spread)) * petal * .45;
+      final p = Path()
+        ..moveTo(c.dx, c.dy)
+        ..quadraticBezierTo(l.dx, l.dy, tip.dx, tip.dy)
+        ..quadraticBezierTo(r.dx, r.dy, c.dx, c.dy);
+      final col = Color.lerp(_lav, _peach, i.isEven ? .15 : .6)!;
+      canvas.drawPath(p, Paint()..color = col.withValues(alpha: .20 + .12 * tint));
+      canvas.drawPath(p, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.4..color = col.withValues(alpha: .75));
+    }
+    // soft plus in the heart
+    final arm = r0 * lerpDouble(.16, .2, breathe)!, th = r0 * .06;
+    final plus = RRect.fromRectAndRadius(Rect.fromCenter(center: c, width: arm * 2, height: th * 2), Radius.circular(th));
+    final plusV = RRect.fromRectAndRadius(Rect.fromCenter(center: c, width: th * 2, height: arm * 2), Radius.circular(th));
+    canvas.drawCircle(c, arm * 1.25, Paint()..color = const Color(0xFFFFFFFF));
+    final pp = Paint()..color = _lav;
+    canvas.drawRRect(plus, pp);
+    canvas.drawRRect(plusV, pp);
+    // orbiting beads
+    for (var i = 0; i < 3; i++) {
+      final a = t * math.pi * 2 * (i.isEven ? 1 : -1) + i * 2.1;
+      final rr = r0 * (.72 + .08 * i);
+      canvas.drawCircle(c + Offset(math.cos(a), math.sin(a)) * rr, 3.5 + i.toDouble(), Paint()..color = i == 1 ? _peach : _lav);
     }
   }
-  @override
-  bool shouldRepaint(_Rings o) => o.t != t;
-}
 
-/// Neon outline of the plus window with a spark running along it.
-class _Neon extends CustomPainter {
-  _Neon({required this.path, required this.t, required this.fade});
-  final Path path;
-  final double t, fade;
   @override
-  void paint(Canvas c, Size s) {
-    if (fade <= 0) return;
-    c.drawPath(path, Paint()..style = PaintingStyle.stroke..strokeWidth = 8..color = _neon.withValues(alpha: .35 * fade)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6));
-    c.drawPath(path, Paint()..style = PaintingStyle.stroke..strokeWidth = 2..color = const Color(0xFFE3C4FF).withValues(alpha: fade));
-    for (final m in path.computeMetrics()) {
-      final p = m.getTangentForOffset(m.length * (.08 + .84 * t))?.position;
-      if (p == null) continue;
-      c.drawCircle(p, 9, Paint()..color = _neon.withValues(alpha: .6 * fade)..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6));
-      c.drawCircle(p, 3, Paint()..color = Colors.white.withValues(alpha: fade));
-    }
-  }
-  @override
-  bool shouldRepaint(_Neon o) => o.t != t || o.path != path || o.fade != fade;
-}
-
-/// Black at alpha [dim] over the photo, except the still's own neon plus
-/// (frame px: vertical bar x 218–273 / y 600–850, horizontal bar x 152–339 /
-/// y 700–800 of 941×1672), which stays at full brightness.
-class _PhotoDim extends CustomPainter {
-  _PhotoDim(this.dim);
-  final double dim;
-  @override
-  void paint(Canvas c, Size s) {
-    final sx = s.width / 941, sy = s.height / 1672;
-    Rect fr(double l, double t, double r, double b) => Rect.fromLTRB(l * sx, t * sy, r * sx, b * sy).inflate(6 * sx);
-    c.saveLayer(Offset.zero & s, Paint());
-    c.drawRect(Offset.zero & s, Paint()..color = Colors.black.withValues(alpha: dim));
-    final hole = Paint()..blendMode = BlendMode.dstOut..maskFilter = MaskFilter.blur(BlurStyle.normal, 10 * sx);
-    c.drawRect(fr(218, 600, 273, 850), hole);
-    c.drawRect(fr(152, 700, 339, 800), hole);
-    c.restore();
-  }
-  @override
-  bool shouldRepaint(_PhotoDim o) => o.dim != dim;
+  bool shouldRepaint(ZenLotusPainter o) => o.t != t || o.open != open || o.tint != tint;
 }

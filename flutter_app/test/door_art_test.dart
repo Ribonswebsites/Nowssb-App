@@ -19,10 +19,10 @@ void main() {
     expect(doorAccessArt.keys.toSet(), ids.toSet());
   });
 
-  test('Start art Meanings/eBooks, Fashion Plus Store + TV use the doors art', () {
+  test('Start art Meanings/eBooks, Zen Plus Store + TV use the doors art', () {
     expect(doorStillArt('Meanings Clean', 'x'), 'assets/doors/meanings.webp');
     expect(doorStillArt('eBooks Pair', 'x'), 'assets/doors/hour-kapha.webp');
-    expect(doorStillArt('Fashion', 'x'), 'assets/doors/fashion_plus_tv.webp');
+    expect(doorStillArt('Zen', 'x'), 'assets/doors/fashion_plus_tv.webp');
     expect(doorStillArt('Store', 'x'), 'assets/doors/store.webp');
     expect(doorStillArt('Word Atelier', 'x'), 'assets/doors/wordscience.webp');
     // Every Start art tile has its own art: no two tiles share a file.

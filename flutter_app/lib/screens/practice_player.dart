@@ -102,7 +102,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   static const _marqueeLines = <String>[
     'NowssB · Words Without Dictionary',
     'NowssB · The future of Meditation',
-    'NowssB · The New fashion Trend of meditation',
+    'NowssB · The new way to meditate',
   ];
 
   final FlutterTts _tts = FlutterTts();

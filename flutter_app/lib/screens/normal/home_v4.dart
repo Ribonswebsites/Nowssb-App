@@ -336,7 +336,7 @@ class V4SoundLibrary extends StatelessWidget {
           const _Well(
             circle: true,
             size: Size.square(96),
-            child: ClipOval(child: ColoredBox(color: Color(0xFF0B0B0F), child: Center(child: R27SoundOrb(size: 92)))),
+            child: ClipOval(child: ColoredBox(color: Color(0xFFF0F2F7), child: Center(child: R27SoundOrb(size: 92, light: true)))),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -562,7 +562,7 @@ class V4Streak extends StatelessWidget {
                 _Well(
                   circle: true,
                   size: const Size.square(92),
-                  child: ClipOval(child: ColoredBox(color: const Color(0xFF0B0B0F), child: Center(child: R27BreathFlame(streak: s, size: 88)))),
+                  child: ClipOval(child: ColoredBox(color: const Color(0xFFF0F2F7), child: Center(child: R27BreathFlame(streak: s, size: 88, light: true)))),
                 ),
               ]),
               const SizedBox(height: 14),

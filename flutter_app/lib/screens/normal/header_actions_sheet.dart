@@ -323,7 +323,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
       case 'notifications':
         return 'Notifications';
       case 'fashion':
-        return 'Fashion home';
+        return 'Zen home';
       case 'store':
         return 'Store';
       case 'player':
@@ -647,7 +647,7 @@ class _FlatCarousel extends StatelessWidget {
         );
       case 'fashion':
         return _ActionSpec(
-          label: 'Fashion',
+          label: 'Zen',
           body: NwsbMarks.moon,
         );
       case 'store':
@@ -830,7 +830,7 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
     'store': 'Store',
     'player': 'Player',
     'glass': 'Glassmorphism',
-    'fashion': 'Fashion home',
+    'fashion': 'Zen home',
   };
 
   @override

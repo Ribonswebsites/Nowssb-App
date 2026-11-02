@@ -19,23 +19,26 @@ const _tau = math.pi * 2;
 
 // ── Sound orb ─────────────────────────────────────────────────────────────
 class R27SoundOrb extends StatelessWidget {
-  const R27SoundOrb({super.key, this.size = 120});
+  const R27SoundOrb({super.key, this.size = 120, this.light = false});
   final double size;
+  /// Normal home: light neumorphic well instead of the black disc.
+  final bool light;
   @override
   Widget build(BuildContext context) => R27Anim(
         period: const Duration(seconds: 6),
-        builder: (_, t) => CustomPaint(size: Size.square(size), painter: _OrbP(t)),
+        builder: (_, t) => CustomPaint(size: Size.square(size), painter: _OrbP(t, light)),
       );
 }
 
 class _OrbP extends CustomPainter {
-  _OrbP(this.t);
+  _OrbP(this.t, [this.light = false]);
   final double t;
+  final bool light;
   @override
   void paint(Canvas c, Size s) {
     final o = s.center(Offset.zero);
     final R = s.shortestSide / 2;
-    c.drawCircle(o, R, Paint()..shader = ui.Gradient.radial(o, R, const [Color(0xFF1A1712), r27Black], [0, 1]));
+    c.drawCircle(o, R, Paint()..shader = ui.Gradient.radial(o, R, light ? const [Color(0xFFFFFFFF), Color(0xFFE4E7EF)] : const [Color(0xFF1A1712), r27Black], [0, 1]));
     // breathing rings
     for (var k = 0; k < 3; k++) {
       final p = (t + k / 3) % 1;
@@ -51,7 +54,7 @@ class _OrbP extends CustomPainter {
       final a = i / n * _tau;
       final amp = .5 + .5 * math.sin(a * 3 + t * _tau) * math.cos(a * 2 - t * _tau * 2);
       final r0 = R * .34, r1 = r0 + R * (.08 + .22 * amp.abs());
-      bar.color = Color.lerp(r27Gold, Colors.white, amp.abs())!.withValues(alpha: .9);
+      bar.color = Color.lerp(r27Gold, light ? const Color(0xFF7A4E0C) : Colors.white, amp.abs())!.withValues(alpha: .9);
       c.drawLine(o + Offset(math.cos(a), math.sin(a)) * r0, o + Offset(math.cos(a), math.sin(a)) * r1, bar);
     }
     // core
@@ -60,12 +63,14 @@ class _OrbP extends CustomPainter {
         const [Color(0xFFFFF3D6), r27Gold, Color(0xFF6B4A14)], [0, .55, 1]));
   }
   @override
-  bool shouldRepaint(_OrbP o) => o.t != t;
+  bool shouldRepaint(_OrbP o) => o.t != t || o.light != light;
 }
 
 // ── Streak breath flame ───────────────────────────────────────────────────
 class R27BreathFlame extends StatelessWidget {
-  const R27BreathFlame({super.key, required this.streak, this.size = 92});
+  const R27BreathFlame({super.key, required this.streak, this.size = 92, this.light = false});
+  /// Normal home: light neumorphic well instead of the black disc.
+  final bool light;
   /// Real streak days; lights that many of the seven week beads.
   final int streak;
   final double size;
@@ -74,26 +79,27 @@ class R27BreathFlame extends StatelessWidget {
         label: '$streak day streak',
         child: R27Anim(
           period: const Duration(milliseconds: 4200),
-          builder: (_, t) => CustomPaint(size: Size.square(size), painter: _FlameP(t, streak)),
+          builder: (_, t) => CustomPaint(size: Size.square(size), painter: _FlameP(t, streak, light)),
         ),
       );
 }
 
 class _FlameP extends CustomPainter {
-  _FlameP(this.t, this.streak);
+  _FlameP(this.t, this.streak, [this.light = false]);
+  final bool light;
   final double t;
   final int streak;
   @override
   void paint(Canvas c, Size s) {
     final o = s.center(Offset.zero);
     final R = s.shortestSide / 2;
-    c.drawCircle(o, R, Paint()..color = r27Black);
+    c.drawCircle(o, R, Paint()..color = light ? const Color(0xFFF0F2F7) : r27Black);
     final lit = streak <= 0 ? 0 : ((streak - 1) % 7) + 1;
     for (var i = 0; i < 7; i++) {
       final a = -math.pi / 2 + i / 7 * _tau + t * _tau * .08;
       final on = i < lit;
       c.drawCircle(o + Offset(math.cos(a), math.sin(a)) * R * .78, R * (on ? .085 : .06),
-          Paint()..color = on ? r27Gold : const Color(0x40FFFFFF));
+          Paint()..color = on ? r27Gold : (light ? const Color(0x2E000000) : const Color(0x40FFFFFF)));
     }
     final breath = .88 + .12 * math.sin(t * _tau);
     final h = R * .9 * breath, w = R * .42;
@@ -110,7 +116,7 @@ class _FlameP extends CustomPainter {
     c.drawPath(flame(.5), Paint()..color = const Color(0xFFFFF6E0));
   }
   @override
-  bool shouldRepaint(_FlameP o) => o.t != t || o.streak != streak;
+  bool shouldRepaint(_FlameP o) => o.t != t || o.streak != streak || o.light != light;
 }
 
 // ── Spinning coin ─────────────────────────────────────────────────────────

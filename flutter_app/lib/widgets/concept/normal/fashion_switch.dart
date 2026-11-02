@@ -32,11 +32,11 @@ class _NFashionSwitchState extends State<NFashionSwitch> with SingleTickerProvid
   @override
   Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      child: NPress(label: 'Switch to Fashion Mode', onTap: _go, child: Container(decoration: neu(r: 30), padding: const EdgeInsets.all(18),
+      child: NPress(label: 'Switch to Zen Mode', onTap: _go, child: Container(decoration: neu(r: 30), padding: const EdgeInsets.all(18),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
               child: Text('Discover the experience', maxLines: 1, softWrap: false, style: nHello)),
-          const Text('Fashion Mode', style: nTitle),
+          const Text('Zen Mode', style: nTitle),
           const SizedBox(height: 4),
           const Text('Dark · Cinematic · Editorial', style: nSub),
           const SizedBox(height: 16),

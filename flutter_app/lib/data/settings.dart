@@ -80,7 +80,7 @@ class Settings extends ChangeNotifier {
     'assets/ebooks/ebooks-pair.png',
   ];
   static const fashionImageNames = <String>[
-    'Fashion',
+    'Zen',
     'Store',
     'Word Atelier',
     'Meanings Clean',

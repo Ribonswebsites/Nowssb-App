@@ -132,10 +132,10 @@ class _S extends State<DoorFashionPlusPage> with TickerProviderStateMixin, DoorP
             IgnorePointer(child: CustomPaint(painter: _VectorStorm(t))),
             SafeArea(
               child: Column(children: [
-                DoorTopBar(slot: _slot, sub: 'Fashion Plus', onBack: widget.onBack),
+                DoorTopBar(slot: _slot, sub: 'Zen Plus', onBack: widget.onBack),
                 Expanded(
                   child: ListView(padding: const EdgeInsets.only(bottom: 28), children: [
-                    DoorTicker(items: const ['Fashion Plus', 'Your film', 'Your header', 'Your doors'], t: t),
+                    DoorTicker(items: const ['Zen Plus', 'Your film', 'Your header', 'Your doors'], t: t),
                     _streakCard(t),
                     const DoorKicker('$_slot.kDial', 'Film visibility'),
                     FilmDial(value: _dim, onChanged: _setDim, onChangeEnd: widget.onDimChangeEnd, debugPhase: t),
@@ -467,7 +467,7 @@ class _VectorStorm extends CustomPainter {
       c.drawPath(p, Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.2
-        ..shader = LinearGradient(colors: [Colors.transparent, (k == 0 ? doorGoldSoft : const Color(0xFFB98CFF)).withValues(alpha: .55), Colors.transparent])
+        ..shader = LinearGradient(colors: [Colors.transparent, (k == 0 ? doorGoldSoft : const Color(0xFFE8E8EE)).withValues(alpha: .55), Colors.transparent])
             .createShader(Offset.zero & s));
     }
     // sparks

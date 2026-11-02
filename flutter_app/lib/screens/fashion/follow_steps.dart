@@ -315,7 +315,7 @@ const kFstSteps = <FstStep>[
     points: [
       ('Hero header', 'Three ways the top can look — this is one of them.'),
       (
-        'Fashion Plus',
+        'Zen Plus',
         'Turns the app to film. The tiles and cards start '
             'moving.'
       ),

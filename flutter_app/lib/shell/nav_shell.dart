@@ -276,7 +276,7 @@ class _NavShellState extends State<NavShell> {
             ),
             const SizedBox(width: 6),
             Text(
-              _fashion ? 'Normal home' : 'Fashion home',
+              _fashion ? 'Normal home' : 'Zen home',
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,

@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 
 import '../../data/models.dart';
 import '../../widgets/concept/ritual_card.dart';
+import '../../widgets/concept/ritual_paper_card.dart';
 
 class HeroData {
   const HeroData({
@@ -116,7 +117,8 @@ class HeroCarouselState extends State<_Carousel> {
     _tick?.cancel();
     _tick = Timer.periodic(const Duration(seconds: 6), (_) {
       if (held || !mounted || !_page.hasClients) return;
-      _page.nextPage(duration: const Duration(milliseconds: 900), curve: Curves.easeInOutCubic);
+      final cur = (_page.page ?? _page.initialPage.toDouble()).round();
+      _page.animateToPage(cur + 1, duration: const Duration(milliseconds: 600), curve: Curves.easeInOutCubic);
     });
   }
 
@@ -132,9 +134,10 @@ class HeroCarouselState extends State<_Carousel> {
   Widget build(BuildContext context) => Listener(
         onPointerDown: (_) {
           _resume?.cancel();
+          _tick?.cancel();
           held = true;
         },
-        onPointerUp: (_) => _resume = Timer(const Duration(seconds: 3), () {
+        onPointerUp: (_) => _resume = Timer(const Duration(seconds: 5), () {
           held = false;
           _start();
         }),
@@ -143,15 +146,21 @@ class HeroCarouselState extends State<_Carousel> {
           child: PageView.builder(
             key: const ValueKey('hero-concept-pages'),
             controller: _page,
+            padEnds: true,
+            physics: const PageScrollPhysics(parent: BouncingScrollPhysics()),
             onPageChanged: (_) => HapticFeedback.selectionClick(),
             itemBuilder: (context, i) => AnimatedBuilder(
               animation: _page,
               builder: (context, _) {
                 final p = _page.hasClients && _page.position.haveDimensions ? (_page.page ?? i.toDouble()) : (_loop * widget.count).toDouble();
                 final off = (i - p).clamp(-1.0, 1.0);
-                return Transform.scale(
-                  scale: 1 - off.abs() * .06,
-                  child: widget.builder(context, i % widget.count, off),
+                final e = Curves.easeOutCubic.transform(off.abs());
+                return Transform.translate(
+                  offset: Offset(off * -14, 0),
+                  child: Transform.scale(
+                    scale: 1 - e * .05,
+                    child: Opacity(opacity: 1 - e * .18, child: widget.builder(context, i % widget.count, off)),
+                  ),
                 );
               },
             ),
@@ -200,9 +209,9 @@ class _World {
 }
 
 const _worlds = [
-  _World('Breath', 'hc-b-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B)),
-  _World('Sound', 'hc-b-sound', Color(0xFFC9A46A), Color(0xFF2A2219)),
-  _World('Sleep', 'hc-b-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433)),
+  _World('Breath', 'hc-d-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B)),
+  _World('Sound', 'hc-d-sound', Color(0xFFC9A46A), Color(0xFF2A2219)),
+  _World('Sleep', 'hc-d-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433)),
 ];
 
 class _WordLook {
@@ -226,14 +235,13 @@ class MixedHero extends StatelessWidget {
   Widget build(BuildContext context) {
     Word? w(int i) => data.words.isEmpty ? null : data.words[i % data.words.length];
     final cards = <Widget Function(double off)>[
-      (off) => _CinemaCard(photo: 'hc-a-breath', kicker: 'Breath', tone: const Color(0xFF16100C), data: data, word: w(0), parallax: off),
+      (off) => _PaperRitualSlot(data: data),
       (off) => _DepthCard(data: data, parallax: off),
       (off) => _WordCard2(look: const _WordLook('hc-c-word', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
       (off) => _CinemaCard(photo: 'hc-b-sleep', kicker: 'Dusk', tone: const Color(0xFF0E1230), data: data, word: w(1), parallax: off),
       (off) => _WordCard2(look: const _WordLook('hc-b-heal', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
-      (off) => _RitualSlot(data: data),
       (off) => _CinemaCard(photo: 'hc-b-sound', kicker: 'Sound', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('hc-b-breath', Color(0xFFF2C9A8), Color(0xFF4A2418)), data: data, word: w(2), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('hc-e-word', Color(0xFFE2D4F0), Color(0xFF1E1530)), data: data, word: w(2), parallax: off),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 14),
@@ -437,7 +445,7 @@ class _DepthCardState extends State<_DepthCard> {
           child: Stack(fit: StackFit.expand, children: [
             DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [world.a, world.b]))),
             Opacity(opacity: .85, child: _plate(world.photo, -tilt, k: 14)),
-            if (front) _plate('${world.photo}-fg', -tilt, k: 22),
+            if (front && !world.photo.startsWith('hc-d-')) _plate('${world.photo}-fg', -tilt, k: 22),
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
@@ -537,7 +545,7 @@ class _WordCard2 extends StatelessWidget {
                   ),
                 ),
               ),
-              _plate('${look.photo}-fg', parallax, k: 30, dy: drop),
+              if (!look.photo.startsWith('hc-e-')) _plate('${look.photo}-fg', parallax, k: 30, dy: drop),
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
@@ -615,32 +623,28 @@ class _SaveButton extends StatelessWidget {
   }
 }
 
-/// Night/Morning Ritual card (time of day) as a hero slide.
-class _RitualSlot extends StatelessWidget {
-  const _RitualSlot({required this.data});
+
+/// Night/Morning ritual as a hero slide: the white-neumorphic cut-paper card
+/// (Ribon 11-02), following the time of day, with real progress.
+class _PaperRitualSlot extends StatelessWidget {
+  const _PaperRitualSlot({required this.data});
   final HeroData data;
   @override
-  Widget build(BuildContext context) => ClipRRect(
+  Widget build(BuildContext context) => FittedBox(
         key: const ValueKey('hero-ritual'),
-        borderRadius: BorderRadius.circular(28),
-        child: ColoredBox(
-          color: const Color(0xFF000000),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: 360,
-              child: RitualCard(
-                completed: data.done,
-                total: data.total,
-                sessionCount: data.sessions,
-                streak: data.streak,
-                time: data.ritualTime,
-                title: data.title,
-                onBegin: data.onBegin,
-                onSeeProgress: data.onProgress ?? data.onBegin,
-              ),
-            ),
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.topCenter,
+        child: SizedBox(
+          width: 360,
+          child: PaperRitualCard(
+            completed: data.done,
+            total: data.total,
+            sessionCount: data.sessions,
+            streak: data.streak,
+            time: data.ritualTime,
+            title: data.title,
+            onBegin: data.onBegin,
+            onSeeProgress: data.onProgress ?? data.onBegin,
           ),
         ),
       );

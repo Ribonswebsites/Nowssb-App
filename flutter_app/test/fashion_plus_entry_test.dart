@@ -35,13 +35,13 @@ void main() {
     await _size(t, 390);
     await Settings.instance.setFashionHome(false);
     await t.pumpWidget(_app(const NFashionPlusEntryLive()));
-    await t.tap(find.text('Fashion Plus'));
+    await t.tap(find.text('Zen Plus'));
     await t.pump(const Duration(milliseconds: 700));
     expect(Settings.instance.fashionHome, isTrue);
     await Settings.instance.setFashionHome(false);
   });
 
-  testWidgets('bgDim reflects the stored FashionBgDim and updates live', (t) async {
+  testWidgets('bgDim reflects the stored ZenBgDim and updates live', (t) async {
     await FashionBgDim.instance.load();
     await t.pumpWidget(_app(const NFashionPlusEntryLive()));
     double dim() => t.widget<NFashionPlusEntry>(find.byType(NFashionPlusEntry)).bgDim!;
@@ -88,44 +88,15 @@ void main() {
   testWidgets('reduced motion: tap enters at once', (t) async {
     var hit = 0;
     await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () => hit++), reduced: true));
-    await t.tap(find.text('Fashion Plus'));
+    await t.tap(find.text('Zen Plus'));
     await t.pump();
     expect(hit, 1);
   });
 
-  testWidgets('dim overlay sits below the ripples and the neon', (t) async {
+  testWidgets('Zen Plus shows the lotus animation and no photo', (t) async {
     await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: .7)));
-    final order = [
-      for (final e in find.byWidgetPredicate((w) => w.key is ValueKey<String>).evaluate())
-        (e.widget.key! as ValueKey<String>).value
-    ].where((k) => k.startsWith('fp-entry-')).toList();
-    expect(order, ['fp-entry-dim', 'fp-entry-rings', 'fp-entry-neon']);
-  });
-
-  Future<Uint8List> grab(WidgetTester t, double dim) async {
-    await _size(t, 390);
-    await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: dim)));
-    await precacheAll(t);
-    await t.pump(const Duration(milliseconds: 300));
-    final b = t.renderObject<RenderRepaintBoundary>(find.byKey(const ValueKey('shot')));
-    late Uint8List out;
-    await t.runAsync(() async {
-      final img = await b.toImage(pixelRatio: 1);
-      out = (await img.toByteData(format: ImageByteFormat.rawRgba))!.buffer.asUint8List();
-    });
-    return out;
-  }
-
-  // Mean brightness of the brightest pixels = the neon plus and its outline.
-  double neon(Uint8List px) {
-    final v = <int>[for (var i = 0; i < px.length; i += 4) if (px[i + 2] > px[i + 1] + 40) px[i] + px[i + 1] + px[i + 2]]..sort();
-    final top = v.sublist(v.length - 300);
-    return top.reduce((a, b) => a + b) / top.length;
-  }
-
-  testWidgets('neon plus is as bright at dim 0.7 as at dim 0', (t) async {
-    final a = neon(await grab(t, 0)), b = neon(await grab(t, .7));
-    expect(b, greaterThan(a * .95), reason: 'dim 0: $a, dim .7: $b');
+    expect(find.byKey(const ValueKey('zen-plus-lotus')), findsOneWidget);
+    expect(find.byType(Image), findsNothing);
   });
 
   for (final (name, w, s) in const [('390', 390.0, 1.0), ('320-1.3', 320.0, 1.3)]) {

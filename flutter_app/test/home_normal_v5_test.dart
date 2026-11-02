@@ -57,7 +57,7 @@ void main() {
     }
 
     for (final l in ['Open rewards', 'Invite a friend', 'Open Om', 'Open Shanti', 'Everything you own',
-        'Join Frequency', 'Open partner program', 'Browse eBooks', 'Enter Fashion Plus']) {
+        'Join Frequency', 'Open partner program', 'Browse eBooks', 'Enter Zen Plus']) {
       if (_act(l).evaluate().isEmpty) continue;
       await tap(l);
     }

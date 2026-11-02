@@ -435,7 +435,7 @@ class _SetupState extends State<_Setup> {
               Row(children: [
                 _look('neu', 'NowssB', _themeNeu),
                 const SizedBox(width: 12),
-                _look('glass', 'NowssB Fashion', _themeGlass),
+                _look('glass', 'NowssB Zen', _themeGlass),
               ]),
             ],
           ),
@@ -801,7 +801,7 @@ class _Home extends StatelessWidget {
                   ],
                 ),
         ),
-        const _Hd('The New Fashion Trend'),
+        const _Hd('The New Meditation Trend'),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           child: GridView.count(
@@ -1018,7 +1018,7 @@ class _Profile extends StatelessWidget {
           child: Row(children: [
             _themePick(context, 'neu', 'NowssB', _themeNeu),
             const SizedBox(width: 12),
-            _themePick(context, 'glass', 'NowssB Fashion', _themeGlass),
+            _themePick(context, 'glass', 'NowssB Zen', _themeGlass),
           ]),
         ),
         const Padding(

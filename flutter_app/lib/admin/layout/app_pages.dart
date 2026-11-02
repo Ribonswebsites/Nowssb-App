@@ -63,7 +63,7 @@ List<Word> _words() => ContentStore.instance.library;
 
 final List<AppPage> kAppPages = [
   AppPage('home.normal', 'Normal home', 'Home', Icons.home_rounded, () => const HomeNormal()),
-  AppPage('home.fashion', 'Fashion home', 'Home', Icons.auto_awesome_rounded, () => const HomeFashion()),
+  AppPage('home.fashion', 'Zen home', 'Home', Icons.auto_awesome_rounded, () => const HomeFashion()),
   AppPage('footer', 'Footer', 'Home', Icons.vertical_align_bottom_rounded, () => const HomeNormal(),
       jumpTo: ('home.normal', 'footer')),
   AppPage('store.home', 'Store', 'Stores', Icons.storefront_rounded, () => const StoreScreen(), tab: 3),
@@ -90,7 +90,7 @@ final List<AppPage> kAppPages = [
   AppPage('notifications', 'Notification settings', 'You', Icons.notifications_rounded, () => const NotificationsSettingsPage()),
   AppPage('notifications.preferences', 'Notification preferences', 'You', Icons.tune_rounded, () => const NotifPreferencesScreen()),
   AppPage('fashion.dropstudio', 'Drop Studio', 'Explore', Icons.local_mall_rounded, () => const DropStudioScreen()),
-  AppPage('fashionplus', 'Fashion Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
+  AppPage('fashionplus', 'Zen Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
   AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
   AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const EarnHubScreen()),
   AppPage('earn.program', 'NowssB Earn (program)', 'Programs', Icons.savings_rounded, () => const EarnProgramPage()),

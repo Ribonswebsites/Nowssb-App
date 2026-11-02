@@ -64,7 +64,7 @@ void main() {
     'Subscription': const SubscriptionScreen(),
     'Profile': const ProfileScreen(),
     'Sound Library': const SoundLibraryScreen(),
-    'Fashion Plus': const FashionPlusScreen(),
+    'Zen Plus': const FashionPlusScreen(),
     'Settings': const WidgetsPage(),
   };
 
@@ -94,7 +94,7 @@ void main() {
     expect(find.text('OPEN LIBRARY'), findsNothing);
   });
 
-  testWidgets('Fashion Plus really moves the setting', (tester) async {
+  testWidgets('Zen Plus really moves the setting', (tester) async {
     await Settings.instance.setFashionPlus(false);
     await pump(tester, const FashionPlusScreen());
 

@@ -582,7 +582,7 @@ class _MakeRail extends StatelessWidget {
         children: [
           _GoCard(
             icon: Icons.auto_awesome_motion_outlined,
-            title: 'Fashion Plus',
+            title: 'Zen Plus',
             sub: 'The motion mode',
             onTap: onFashionPlusPage,
             trailing: Switch(
@@ -594,7 +594,7 @@ class _MakeRail extends StatelessWidget {
           ),
           _GoCard(
             icon: Icons.dark_mode_outlined,
-            title: 'Fashion home',
+            title: 'Zen home',
             sub: 'Dark film home',
             onTap: () => onToggleHome(!fashionHome),
             trailing: Switch(

@@ -341,7 +341,7 @@ class NmFashionSwitch extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     EditableLabel('normal_sections_bottom.NmFashionSwitch',
-                      'Fashion Mode',
+                      'Zen Mode',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,

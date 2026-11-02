@@ -768,7 +768,7 @@ class CalmFashionSwitch extends StatelessWidget {
               Text('DISCOVER THE EXPERIENCE',
                   style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFBFD3C8), letterSpacing: 1.6)),
               SizedBox(height: 8),
-              Text('Fashion Mode', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
+              Text('Zen Mode', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
               SizedBox(height: 4),
               Text('Dark · Cinematic · Editorial', style: TextStyle(fontSize: 13.5, color: Color(0xE6FFFFFF))),
             ]),

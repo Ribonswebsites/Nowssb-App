@@ -107,7 +107,10 @@ class R27SoundHero extends StatelessWidget {
 /// Black meditation banner — replaces the purple banner-sit art. Poster
 /// on the right fades into black; giant SIT word; greeting lines.
 class R27MeditationBanner extends StatelessWidget {
-  const R27MeditationBanner({super.key, required this.hourCount, required this.onTap});
+  const R27MeditationBanner({super.key, required this.hourCount, required this.onTap, this.light = false});
+
+  /// Normal home: white neumorphic card, dark text.
+  final bool light;
   /// Real count of hour words in the library.
   final int hourCount;
   final VoidCallback onTap;
@@ -119,27 +122,29 @@ class R27MeditationBanner extends StatelessWidget {
           child: Semantics(
             button: true,
             label: 'NowssB Meditation',
-            child: ClipRRect(
+            child: DecoratedBox(
+             decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), boxShadow: light ? r27LNeu : null),
+             child: ClipRRect(
               borderRadius: BorderRadius.circular(22),
               child: ColoredBox(
-                color: r27Black,
+                color: light ? r27LSurf : r27Black,
                 child: Stack(children: [
                   const SizedBox(width: double.infinity),
                   Positioned.fill(child: FractionallySizedBox(widthFactor: .58, heightFactor: 1, alignment: Alignment.centerRight,
                       child: Stack(fit: StackFit.expand, children: [
-                        const R27Img('ojas', sat: .55),
-                        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: [r27Black, Color(0x00000000)], stops: [0, .7]))),
+                        if (light) const Center(child: R27Meditator(color: Color(0xFFB07A1A), size: Size(150, 150))) else const R27Img('ojas', sat: .55),
+                        DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(colors: light ? const [r27LSurf, Color(0x00F0F2F7)] : const [r27Black, Color(0x00000000)], stops: const [0, .7]))),
                       ]))),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 20, 0, 20),
                     child: FractionallySizedBox(
                       widthFactor: .6,
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                        const Text('NowssB Meditation', style: dHello),
+                        Text('NowssB Meditation', style: light ? dHello.copyWith(color: r27LInk) : dHello),
                         const SizedBox(height: 6),
-                        const SizedBox(height: 70, child: R27Word('SIT', color: r27Gold)),
+                        SizedBox(height: 70, child: R27Word('SIT', color: light ? const Color(0xFF8A5A0B) : r27Gold, shadow: !light)),
                         const SizedBox(height: 8),
-                        Text('$hourCount hour words · sit with one', style: dSub),
+                        Text('$hourCount hour words · sit with one', style: light ? dSub.copyWith(color: r27LSub) : dSub),
                         const SizedBox(height: 12),
                         R27Pill('Begin', onTap: onTap),
                       ]),
@@ -147,6 +152,7 @@ class R27MeditationBanner extends StatelessWidget {
                   ),
                 ]),
               ),
+             ),
             ),
           ),
         ),

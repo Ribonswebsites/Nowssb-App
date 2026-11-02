@@ -38,7 +38,6 @@
 library;
 
 import 'package:nowssb/widgets/concept/ref_sections.dart' show RefHomeSections;
-import 'package:nowssb/widgets/concept/r27/hero.dart' show R27MeditationBanner;
 import 'package:nowssb/data/content.dart' show ContentStore;
 import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'dart:async';
@@ -197,7 +196,7 @@ const kNormalSectionTitles = <String, String>{
   'ebooks': 'eBooks',
   'connectban': 'Connect banner',
   'healing': 'Healing path',
-  'fashsw': 'Switch to Fashion home',
+  'fashsw': 'Switch to Zen home',
   'footer': 'Footer',
 };
 
@@ -404,7 +403,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            R27MeditationBanner(hourCount: ContentStore.instance.library.length, onTap: () => _go(1)),
+            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
             MainOptionsSection(onGo: _go, onAction: _openMainOption),
           ],
         )),

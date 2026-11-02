@@ -92,7 +92,7 @@ class DoorStartArtScreen extends StatelessWidget {
 /// Start art tiles show the text-free doors art (the real stills carry
 /// printed type). Display only: [Settings.fashionImages] is unchanged.
 String doorStillArt(String name, String asset) {
-  if (name == 'Fashion') return 'assets/doors/fashion_plus_tv.webp';
+  if (name == 'Zen') return 'assets/doors/fashion_plus_tv.webp';
   if (name == 'Store') return 'assets/doors/store.webp';
   if (name.startsWith('Word')) return 'assets/doors/wordscience.webp';
   if (name == 'Meanings Clean') return 'assets/doors/meanings.webp';
@@ -225,9 +225,9 @@ class _DoorFashionPlusScreenState extends State<DoorFashionPlusScreen> {
   ];
 
   static List<DoorJump> make(Settings s) => [
-        DoorJump('fashionPlus', 'Fashion Plus', 'The motion mode', 'assets/video/fashion-plus-bg-6-poster.webp',
+        DoorJump('fashionPlus', 'Zen Plus', 'The motion mode', 'assets/video/fashion-plus-bg-6-poster.webp',
             toggle: s.fashionPlus),
-        DoorJump('fashionHome', 'Fashion home', 'Dark film home', 'assets/video/hero-bg-poster.webp',
+        DoorJump('fashionHome', 'Zen home', 'Dark film home', 'assets/video/hero-bg-poster.webp',
             toggle: s.fashionHome),
         const DoorJump('player', 'Player Settings', 'AURA playback', 'assets/doors/hour-prana.webp'),
         const DoorJump('homeButtons', 'Home buttons', 'Quick Access bar', 'assets/video/player-bg-loop-poster.webp'),

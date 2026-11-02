@@ -26,6 +26,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../../widgets/tv_frame.dart';
 import '../start_today_carousel.dart';
 import '../streak_store_carousel.dart';
+import '../../widgets/concept/r27/anims.dart' show R27BreathFlame;
+import '../../data/practice_progress.dart' show PracticeProgress;
 import '../../admin/template/editable.dart';
 
 /// 1 · greet — index.html:1758. Not wrapped; it sits loose under the hero.
@@ -614,17 +616,24 @@ class FashStreakVideo extends StatelessWidget {
   /// Kept for call-site compatibility; Store is restored on [FashStore].
   final VoidCallback? onStoreTap;
 
+  // Ribon 11-02: no 'Chose Your Path' film — the breathing streak flame.
   @override
-  Widget build(BuildContext context) {
-    return SectionPane(
-      child: TvFrame(
-        asset: StreakStoreCarousel.streakAsset,
-        frame: DeviceFrame.tabletLandscape,
-        priority: ClipPriority.feature,
-        onTap: onTap,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => SectionPane(
+        child: GestureDetector(
+          onTap: onTap,
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: ColoredBox(
+              key: const ValueKey('fash-streak-anim'),
+              color: const Color(0xFF000000),
+              child: ListenableBuilder(
+                listenable: PracticeProgress.instance,
+                builder: (_, __) => Center(child: R27BreathFlame(streak: PracticeProgress.instance.streak, size: 150)),
+              ),
+            ),
+          ),
+        ),
+      );
 }
 
 /// Start Building Your Streak Today — heading, cubes, Daily Streak banner.

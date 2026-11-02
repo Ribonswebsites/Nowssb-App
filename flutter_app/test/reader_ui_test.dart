@@ -62,7 +62,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  test('reader hub page film is the Fashion home backdrop, not reader-section', () {
+  test('reader hub page film is the Zen home backdrop, not reader-section', () {
     final hub = File('lib/screens/reader/reader_hub.dart').readAsStringSync();
     expect(hub, contains('AppBackdrop'));
     expect(hub, contains('reader-section.mp4'));

@@ -148,7 +148,7 @@ void main() {
           await t.tap(home.last, warnIfMissed: false);
           await _settle(t, 10);
         }
-        final chip = find.textContaining(skin == 'normal' ? 'Normal home' : 'Fashion home').hitTestable();
+        final chip = find.textContaining(skin == 'normal' ? 'Normal home' : 'Zen home').hitTestable();
         if (chip.evaluate().isNotEmpty) {
           await t.tap(chip.first, warnIfMissed: false);
           await _settle(t, 15);

@@ -71,7 +71,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
     if (widget.mode != FashionPlusMode.all) {
       final video = widget.mode == FashionPlusMode.background;
       return PageShell(
-        eyebrow: 'Fashion Plus',
+        eyebrow: 'Zen Plus',
         title: video ? 'Background' : 'Start art',
         film: 'assets/video/fashion-plus-bg-6.mp4',
         fashionDim: true,
@@ -92,22 +92,22 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
     }
 
     return IntroGate(
-      tag: 'Fashion · Plus',
+      tag: 'Zen · Plus',
       eyebrow: 'Experience',
       title: 'The still ones\nstart moving.',
-      body: 'The Fashion home in motion — the tiles, the practice card, and '
+      body: 'The Zen home in motion — the tiles, the practice card, and '
           'every page that was wearing a photograph. One switch, and the '
           'battery it costs.',
       stats: [
         '${_changes.length} changes',
-        'Fashion home',
+        'Zen home',
         on ? 'On' : 'Off by default',
       ],
       art: 'assets/fashion/fp-intro.webp',
       enterLabel: 'ENTER FASHION PLUS',
       child: PageShell(
         eyebrow: 'Experience',
-        title: 'Fashion Plus',
+        title: 'Zen Plus',
         film: 'assets/video/fashion-plus-bg-6.mp4',
         fashionDim: true,
         onBack: () => Navigator.of(context).maybePop(),
@@ -119,7 +119,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
                 children: layoutChildren(context, 'fashionplus', [
               LSection(
                   'switch',
-                  'Fashion Plus switch',
+                  'Zen Plus switch',
                   _Switch(
                     on: on,
                     onChanged: (v) => Settings.instance.setFashionPlus(v),
@@ -253,7 +253,7 @@ class _BackgroundChooser extends StatelessWidget {
             children: [
               Text(
                 motionOn
-                    ? 'Selected Fashion Plus video'
+                    ? 'Selected Zen Plus video'
                     : pinnedStill
                         ? 'Start art'
                         : 'Background when motion is off',

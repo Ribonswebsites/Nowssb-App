@@ -394,9 +394,6 @@ class _HeroCard extends StatelessWidget {
             asset: 'assets/tv/home-words-tv.mp4',
             frame: DeviceFrame.tvLandscape,
             autoplay: live,
-            // Ribon 10-27: the hero screen is a meditation image now, not
-            // the old word clip (Pexels, credited in assets/CREDITS.md).
-            showVideo: false,
             onTap: onExplore,
             // `.hero-content` IS the screen — index.html:1705. The wordmark,
             // the tagline, the strapline and the big word sit ON it; only
@@ -408,15 +405,7 @@ class _HeroCard extends StatelessWidget {
             // and the tagline, the word, the picture rail and the two
             // buttons go" (part084.js:398). The thing you tapped is the
             // thing that answers.
-            overlay: guide
-                ? const FstTitle()
-                : Stack(fit: StackFit.expand, children: [
-                    Image.asset('assets/home/hc/hc-a-breath.webp', fit: BoxFit.cover, alignment: const Alignment(0, -.35),
-                        errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black)),
-                    const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                        colors: [Color(0x99000000), Color(0x33000000), Color(0xB3000000)]))),
-                    _Screen(live: live),
-                  ]),
+            overlay: guide ? const FstTitle() : _Screen(live: live),
           ),
           const SizedBox(height: 10),
           // `.hs-foot` — Explore and App Guide on the left, then Learn and

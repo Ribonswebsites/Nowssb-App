@@ -32,13 +32,13 @@ class _Shell extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!fashion) {
       return R27NeuFrame(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child: R27Tone(light: true, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(padding: const EdgeInsets.only(right: 18), child: head),
         const SizedBox(height: 16),
         ClipRect(child: row),
         const SizedBox(height: 4),
         ...links,
-      ]));
+      ])));
     }
     return ColoredBox(
       color: r27Black,
@@ -123,7 +123,8 @@ class R27TornTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final a = offset.abs().clamp(0.0, 1.0);
-    final Widget face = Stack(fit: StackFit.expand, children: [
+    final light = R27Tone.isLight(context);
+    final Widget face = light ? _lightFace() : Stack(fit: StackFit.expand, children: [
       Transform.translate(offset: Offset(offset * -24, 0), child: Transform.scale(scale: 1.15, child: R27Img(d.hour))),
       const DecoratedBox(decoration: r27Scrim),
       Padding(
@@ -159,8 +160,7 @@ class R27TornTile extends StatelessWidget {
                       debugPeel: debugPeel,
                       onOpen: d.onTap,
                       under: Stack(fit: StackFit.expand, children: [
-                        R27Img(d.hour),
-                        const ColoredBox(color: Color(0xB3000000)),
+                        if (light) const ColoredBox(color: Color(0xFFE6E9F0)) else ...[R27Img(d.hour), const ColoredBox(color: Color(0xB3000000))],
                         const Center(child: Icon(Icons.redeem_rounded, color: r27Gold, size: 40)),
                       ]),
                       child: face,
@@ -218,6 +218,27 @@ String r27GiftWord(String label) {
   return '${w.first}\n${w.skip(1).join(' ')}';
 }
 
+extension on R27TornTile {
+  static const _icons = {'Coins': Icons.toll_rounded, 'Day streak': Icons.local_fire_department_rounded, 'To next chest': Icons.inventory_2_rounded};
+  Widget _lightFace() => ColoredBox(
+        color: r27LCard,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 16, 14, 14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              R27IconWell(_icons[d.tag] ?? Icons.wb_sunny_rounded, size: 38, color: const Color(0xFFB07A1A)),
+              const SizedBox(width: 8),
+              Flexible(child: R27TagLabel(d.tag)),
+            ]),
+            const Spacer(),
+            Flexible(flex: 3, child: R27Word(d.value, color: r27LInk, shadow: false, align: Alignment.bottomLeft)),
+            const SizedBox(height: 6),
+            Text(d.line, style: dSub.copyWith(color: r27LSub)),
+          ]),
+        ),
+      );
+}
+
 class R27GiftPoster extends StatelessWidget {
   const R27GiftPoster(this.g, {super.key, required this.hour, required this.onGift, this.offset = 0});
   final R27Gift g;
@@ -251,7 +272,10 @@ class R27GiftPoster extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(200), bottom: Radius.circular(4)),
                     child: Stack(fit: StackFit.expand, children: [
-                      R27Img(hour, sat: .6),
+                      if (R27Tone.isLight(context))
+                        const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFE9E4F7), Color(0xFFF6E3CF)])))
+                      else
+                        R27Img(hour, sat: .6),
                       R27Anim(period: const Duration(seconds: 5), builder: (_, t) => CustomPaint(painter: R27Ribbon(t))),
                     ]),
                   ),
@@ -326,18 +350,18 @@ class R27RankStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final rise = 1 - .3 * offset.abs().clamp(0.0, 1.0);
     final f = top <= 0 ? .4 : (.3 + .45 * (r.ratePct / top)) * rise;
+    final light = R27Tone.isLight(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: NPress(
         onTap: onTap,
         label: '${r.title} ${_n(r.ratePct)} percent',
         child: Container(
-          foregroundDecoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: current ? r27Gold : r27Line, width: current ? 2 : 1)),
+          foregroundDecoration: BoxDecoration(borderRadius: BorderRadius.circular(14), border: Border.all(color: current ? r27Gold : (light ? const Color(0x1F000000) : r27Line), width: current ? 2 : 1)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: Stack(fit: StackFit.expand, children: [
-              R27Img(r27Hours[(index + 5) % r27Hours.length]),
-              const ColoredBox(color: Color(0x99000000)),
+              if (light) const ColoredBox(color: r27LCard) else ...[R27Img(r27Hours[(index + 5) % r27Hours.length]), const ColoredBox(color: Color(0x99000000))],
               LayoutBuilder(
                   builder: (c, box) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                         Expanded(
@@ -345,8 +369,8 @@ class R27RankStep extends StatelessWidget {
                             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
                               if (current) ...[const R27TagLabel('You'), const SizedBox(height: 8)],
-                              Text(r.title, style: dSub.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
-                              Text('${r.minWords}+ words', style: dSub),
+                              Text(r.title, style: dSub.copyWith(color: light ? r27LInk : Colors.white, fontWeight: FontWeight.w800)),
+                              Text('${r.minWords}+ words', style: light ? dSub.copyWith(color: r27LSub) : dSub),
                             ]),
                           ),
                         ),
@@ -355,7 +379,7 @@ class R27RankStep extends StatelessWidget {
                           child: ClipPath(
                             clipper: R27Torn(seed: index + 4, bottom: false, depth: 6),
                             child: ColoredBox(
-                              color: current ? r27Gold : r27Paper,
+                              color: current ? r27Gold : (light ? const Color(0xFFE6E9F0) : r27Paper),
                               child: Padding(padding: const EdgeInsets.fromLTRB(10, 12, 10, 8), child: R27Word('${_n(r.ratePct)}%', color: r27PaperInk, shadow: false, align: Alignment.bottomLeft)),
                             ),
                           ),
@@ -436,11 +460,11 @@ class R27Stub extends StatelessWidget {
               Expanded(
                 flex: 36,
                 child: ColoredBox(
-                    color: r27Coal,
+                    color: R27Tone.isLight(context) ? r27Gold : r27Coal,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(12, 16, 8, 14),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Expanded(child: R27Word('${c.pct}%', color: r27Gold)),
+                        Expanded(child: R27Word('${c.pct}%', color: R27Tone.isLight(context) ? r27PaperInk : r27Gold, shadow: !R27Tone.isLight(context))),
                         const SizedBox(height: 6),
                         const R27TagLabel('Off'),
                       ]),
@@ -478,7 +502,7 @@ class R27FoilCard extends StatelessWidget {
         child: NPress(
           onTap: onTap,
           label: '$tag $word',
-          child: R27Anim(
+          child: R27Tone.isLight(context) ? _light() : R27Anim(
             period: const Duration(seconds: 4),
             builder: (_, t) => CustomPaint(
               painter: R27Foil(t, tint),
@@ -510,5 +534,32 @@ class R27FoilCard extends StatelessWidget {
             ),
           ),
         ),
+      );
+}
+
+extension on R27FoilCard {
+  Widget _light() => Container(
+        decoration: BoxDecoration(
+          color: r27LCard,
+          borderRadius: BorderRadius.circular(16),
+          border: Border(left: BorderSide(color: tint, width: 6)),
+        ),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: LayoutBuilder(builder: (_, box) {
+          final info = [
+            R27TagLabel(tag, color: Color.lerp(tint, Colors.white, .25)!),
+            const SizedBox(height: 6),
+            Text(line, style: dSub.copyWith(color: r27LSub)),
+          ];
+          final w = R27Word(word, color: r27LInk, shadow: false, align: Alignment.centerLeft);
+          if (box.maxWidth < 220) {
+            return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Expanded(child: w), const SizedBox(height: 6), ...info]);
+          }
+          return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Expanded(flex: 5, child: w),
+            const SizedBox(width: 14),
+            Expanded(flex: 6, child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: info)),
+          ]);
+        }),
       );
 }

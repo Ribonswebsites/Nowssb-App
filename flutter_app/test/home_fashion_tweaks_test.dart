@@ -17,7 +17,7 @@ void main() {
   });
 
   testWidgets(
-      'Fashion: Make it yours heading + heavy practice banner, no overflow at 320@1.3',
+      'Zen: Make it yours heading + heavy practice banner, no overflow at 320@1.3',
       (t) async {
     t.view.physicalSize = const Size(320 * 1.3, 800 * 1.3);
     t.view.devicePixelRatio = 1.3;

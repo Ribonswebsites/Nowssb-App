@@ -99,7 +99,7 @@ void main() {
     );
   });
 
-  testWidgets('the Fashion home builds at phone size without overflowing',
+  testWidgets('the Zen home builds at phone size without overflowing',
       (tester) async {
     await pump(tester);
     expect(tester.takeException(), isNull);
@@ -137,7 +137,7 @@ void main() {
     }
   });
 
-  testWidgets('every black bar on the Fashion home goes somewhere',
+  testWidgets('every black bar on the Zen home goes somewhere',
       (tester) async {
     await pump(tester);
 

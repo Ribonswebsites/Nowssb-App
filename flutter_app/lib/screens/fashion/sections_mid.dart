@@ -598,8 +598,8 @@ class _CustomizeCardPagerState extends State<_CustomizeCardPager> {
         _CustPage(
           kind: _CustKind.door,
           title: 'Background',
-          sub: 'Fashion backdrop',
-          body: 'The motion behind Fashion home. Pick the film you want.',
+          sub: 'Zen backdrop',
+          body: 'The motion behind Zen home. Pick the film you want.',
           icon: Icons.wallpaper_rounded,
           image:
               'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png',
@@ -936,7 +936,7 @@ class _CustPanelCard extends StatelessWidget {
         ),
         _FashionCustomizeRow(
           title: 'Background',
-          sub: 'Fashion backdrop',
+          sub: 'Zen backdrop',
           image:
               'https://media.nowssb.com/migrated-images/cfc84fc5478b4b63_file_00000000b11472098a225d3703b04a60_phr6ph.png',
           icon: Icons.wallpaper_rounded,
@@ -1187,7 +1187,7 @@ class FashPlusMini extends StatelessWidget {
                       ),
                     ),
                     const EditableLabel('sections_mid.FashPlusMini',
-                      'Fashion Plus',
+                      'Zen Plus',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,

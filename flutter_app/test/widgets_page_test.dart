@@ -151,7 +151,7 @@ void main() {
     testWidgets('Make it yours cards open their screens', (tester) async {
       final obs = await pump(tester);
       for (final (title, screen) in [
-        ('Fashion Plus', 'FashionPlusScreen'),
+        ('Zen Plus', 'FashionPlusScreen'),
         ('Player Settings', 'PlayerSettingsScreen'),
         ('Home buttons', 'QuickAccessScreen'),
         ('Personalised Healing', 'HealingPathScreen'),
@@ -162,7 +162,7 @@ void main() {
       await tapAndSee(tester, obs, find.byKey(const ValueKey('go-card-Profile')).last, 'ProfileScreen');
     });
 
-    testWidgets('Make it yours switches and the Fashion home card toggle', (tester) async {
+    testWidgets('Make it yours switches and the Zen home card toggle', (tester) async {
       await Settings.instance.setFashionPlus(false);
       await Settings.instance.setFashionHome(false);
       await Settings.instance.setShowHealing(false);
@@ -170,8 +170,8 @@ void main() {
       Finder sw(String title) =>
           find.descendant(of: find.byKey(ValueKey('go-card-$title')), matching: find.byType(Switch));
       for (final (title, read) in [
-        ('Fashion Plus', () => Settings.instance.fashionPlus),
-        ('Fashion home', () => Settings.instance.fashionHome),
+        ('Zen Plus', () => Settings.instance.fashionPlus),
+        ('Zen home', () => Settings.instance.fashionHome),
         ('Personalised Healing', () => Settings.instance.showHealing),
       ]) {
         await tester.ensureVisible(sw(title));
@@ -179,7 +179,7 @@ void main() {
         await tester.pumpAndSettle();
         expect(read(), isTrue, reason: '$title switch');
       }
-      final home = find.byKey(const ValueKey('go-card-Fashion home'));
+      final home = find.byKey(const ValueKey('go-card-Zen home'));
       await tester.ensureVisible(home);
       await tester.tapAt(tester.getBottomLeft(home) + const Offset(20, -10));
       await tester.pumpAndSettle();

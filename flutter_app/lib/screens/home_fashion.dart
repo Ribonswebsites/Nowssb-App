@@ -25,7 +25,6 @@
 /// further down come and go.
 library;
 
-import 'package:nowssb/widgets/concept/r27/hero.dart' show R27MeditationBanner;
 import 'package:nowssb/data/content.dart' show ContentStore;
 import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'poster/poster_pages.dart' show TrendingScreen, posterPush;
@@ -179,7 +178,7 @@ const kFashionSectionTitles = <String, String>{
   'store': "Today's offer",
   'trendwd': 'Trending words',
   'custom': 'Customize',
-  'fashplus': 'Fashion Plus',
+  'fashplus': 'Zen Plus',
   'enterCurve': 'Enter curve',
   'rx': 'Word prescription',
   'trendvid': 'Shop now video',
@@ -569,7 +568,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('mainops', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            R27MeditationBanner(hourCount: ContentStore.instance.library.length, onTap: () => _go(1)),
+            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true, glassIcon: true),
             SizedBox(height: kFashSectionGap),
             FashTiles(onTile: _go, onOpen: _openEnter),
             SizedBox(height: kFashSectionGap),
@@ -736,7 +735,7 @@ class _HomeFashionState extends State<HomeFashion> {
     assert(() {
       final keys = built.map((e) => e.$1).toList();
       if (keys.toString() != kFashionSectionOrder.toString()) {
-        debugPrint('NowssB: Fashion section registry drift: $keys');
+        debugPrint('NowssB: Zen section registry drift: $keys');
       }
       return true;
     }());
@@ -810,7 +809,19 @@ class _HomeFashionState extends State<HomeFashion> {
         children: [
           // One selected Fashion Plus film is shared with every destination;
           // with motion off this resolves to the chosen still or black.
-          const Positioned.fill(child: AppBackdrop()),
+          // Zen home is black/neutral only: the shared backdrop (a purple
+          // swirl film by default) is rendered in greyscale here.
+          const Positioned.fill(
+            child: ColorFiltered(
+              colorFilter: ColorFilter.matrix(<double>[
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0.2126, 0.7152, 0.0722, 0, 0,
+                0, 0, 0, 1, 0,
+              ]),
+              child: AppBackdrop(),
+            ),
+          ),
           const Positioned.fill(child: FashionBgDimOverlay()),
           // `#fpBgVeil` — nowssb-nm.css:10853. TWO layers, and the point of
           // both is that the MIDDLE OF THE SCREEN IS LEFT ALONE: a radial
