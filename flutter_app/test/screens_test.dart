@@ -19,7 +19,7 @@ import 'package:nowssb/screens/profile.dart';
 import 'package:nowssb/screens/sound_library.dart';
 import 'package:nowssb/screens/store.dart';
 import 'package:nowssb/screens/subscription.dart';
-import 'package:nowssb/screens/widgets_page.dart';
+import 'package:nowssb/screens/app_settings.dart';
 
 import 'fake_video_platform.dart';
 
@@ -45,7 +45,7 @@ void main() {
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(MaterialApp(home: screen));
-    if (screen is WidgetsPage) {
+    if (screen is AppSettingsScreen) {
       // Settings' film dial (FashionBgDimControl → FilmDial) spins for as
       // long as the page is open, so the tree never settles. Give it a
       // bounded couple of seconds instead.
@@ -65,7 +65,7 @@ void main() {
     'Profile': const ProfileScreen(),
     'Sound Library': const SoundLibraryScreen(),
     'Zen Plus': const FashionPlusScreen(),
-    'Settings': const WidgetsPage(),
+    'Settings': const AppSettingsScreen(),
   };
 
   screens.forEach((name, screen) {

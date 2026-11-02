@@ -4,7 +4,6 @@ import 'package:nowssb/screens/concept/doors/door_kit.dart';
 import 'package:nowssb/data/fashion_bg_dim.dart';
 import 'package:nowssb/data/home_widget_sync.dart';
 import 'package:nowssb/data/practice_progress.dart';
-import 'package:nowssb/screens/concept/doors/door_fashion_plus.dart';
 import 'package:nowssb/screens/concept/doors/door_checkout.dart';
 import 'package:nowssb/features/social/connect_screen.dart';
 import 'package:nowssb/screens/concept/drop_v4_type.dart';
@@ -31,7 +30,6 @@ import 'package:nowssb/screens/fashion_plus.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/screens/quick_access.dart';
 import 'package:nowssb/screens/store/cart_pages.dart';
-import 'package:nowssb/screens/widgets_page.dart';
 import 'package:nowssb/screens/word_detail.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/enter_curve_stage.dart';
@@ -129,51 +127,6 @@ void main() {
       (await t.runAsync(SharedPreferences.getInstance))!;
 
   group('customize doors use the home\'s real state', () {
-    testWidgets('Themes → DoorZenPlusScreen, real data, hero style + dim saved', (t) async {
-      await openDoor(t, 'Themes');
-      expect(find.byType(DoorFashionPlusScreen), findsOneWidget);
-      final page = t.widget<DoorFashionPlusPage>(find.byType(DoorFashionPlusPage));
-      expect(page.streak, PracticeProgress.instance.streak);
-      final w = HomeWidgetSync.wordFor(DateTime.now(), ContentStore.instance.library);
-      if (w != null) expect(page.wordOfDay, w.word);
-      for (final j in [...page.jumps, ...page.make]) {
-        expect(File(j.art).existsSync(), isTrue, reason: j.art);
-        expect(File('pubspec.yaml').readAsStringSync(), contains('- ${j.art}'), reason: 'not bundled: ${j.art}');
-      }
-      expect(page.make.where((j) => j.id == 'profile'), isEmpty, reason: 'Profile is already a jump');
-      // Door header brand reads 'NowssB' with no dot.
-      expect(find.descendant(of: find.byType(DoorTopBar), matching: find.text('NowssB')), findsOneWidget);
-      expect(find.descendant(of: find.byType(DoorTopBar), matching: find.text('NowssB.')), findsNothing);
-      // Practise / Apply now / Applied pills are text only.
-      var pills = 0;
-      for (final label in ['Practise', 'Apply now', 'Applied']) {
-        for (final e in find.text(label, skipOffstage: false).evaluate()) {
-          final pill = find.ancestor(of: find.byWidget(e.widget), matching: find.byWidgetPredicate((w) => w is Semantics && w.properties.label == label && w.properties.button == true));
-          if (pill.evaluate().isEmpty) continue; // the same word elsewhere, not a pill
-          pills++;
-          expect(find.descendant(of: pill.first, matching: find.byType(Icon), skipOffstage: false).evaluate(), isEmpty, reason: label);
-        }
-      }
-      expect(pills, greaterThanOrEqualTo(2));
-      expect(page.jumps.where((j) => j.id == 'profile'), hasLength(1));
-      page.onJump!('connect');
-      await settle(t, 2);
-      expect(find.byType(ConnectScreen), findsOneWidget);
-      t.state<NavigatorState>(find.byType(Navigator).first).pop();
-      await settle(t, 2);
-      expect(page.heroStyle, Settings.instance.heroStyle);
-      final next = Settings.instance.heroStyle == 'full' ? 'tv' : 'full';
-      await t.runAsync(() async => page.onPickStyle!(next));
-      await settle(t, 2);
-      expect(Settings.instance.heroStyle, next);
-      expect((await prefs(t)).getString('nwsb_hero_style'), next);
-      await t.runAsync(() async => page.onDimChangeEnd!(0.7));
-      await settle(t, 2);
-      expect(FashionBgDim.instance.value, closeTo(0.3, 1e-9));
-      await t.runAsync(Settings.instance.load);
-      expect(Settings.instance.heroStyle, next);
-    });
-
     testWidgets('Background → DoorBackgroundScreen, film + motion saved', (t) async {
       await t.runAsync(() => Settings.instance.setFashionPlus(true));
       await openDoor(t, 'Background');
@@ -557,7 +510,7 @@ void main() {
   });
 
   group('Drop doors v4 (prism)', () {
-    for (final (i, label) in [(0, 'Themes'), (1, 'Background'), (2, 'Start art'), (3, 'Access')]) {
+    for (final (i, label) in [(0, 'Background'), (1, 'Start art'), (2, 'Access')]) {
       testWidgets('tab $label turns the prism; front tap fires its hook', (t) async {
         final hits = <String>[];
         await boot(
@@ -566,7 +519,6 @@ void main() {
                 body: ListView(children: [
               DoorsPrismV5(
                   hooks: DoorHooks(
-                onOpenThemes: () => hits.add('Themes'),
                 onOpenBackground: () => hits.add('Background'),
                 onOpenStartArt: () => hits.add('Start art'),
                 onOpenAccess: () => hits.add('Access'),
@@ -612,8 +564,7 @@ void main() {
       await boot(t, const HomeFashion());
       var sawOld = false;
       for (var i = 0; i < 60; i++) {
-        if (find.byType(FashCustomize).evaluate().isNotEmpty ||
-            find.byWidgetPredicate((w) => w is EnterCurveStage && !w.embedded).evaluate().isNotEmpty ||
+        if (find.byWidgetPredicate((w) => w is EnterCurveStage && !w.embedded).evaluate().isNotEmpty ||
             find.text('A featured drop for this hour').evaluate().isNotEmpty) {
           sawOld = true;
         }
@@ -632,7 +583,6 @@ void main() {
     testWidgets('whole home has no Make this home yours / Today\'s offers', (t) async {
       await boot(t, const HomeFashion());
       for (var i = 0; i < 80; i++) {
-        expect(find.byType(FashCustomize), findsNothing);
         expect(find.byWidgetPredicate((w) => w is EnterCurveStage && !w.embedded), findsNothing);
         expect(find.text('Customized\nyou app experience'), findsNothing);
         await t.drag(find.byType(Scrollable).first, const Offset(0, -400));

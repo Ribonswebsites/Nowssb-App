@@ -15,11 +15,9 @@ import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/theme/theme.dart';
 import 'package:nowssb/features/coins/coins_screen.dart';
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
-import 'package:nowssb/features/earn/earn_hub_screen.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
 import 'package:nowssb/features/economy/coupon_screen.dart';
 import 'package:nowssb/features/economy/partner_screen.dart';
-import 'package:nowssb/features/economy/reference_screen.dart';
 import 'package:nowssb/features/gifts/gifts_screen.dart';
 import 'package:nowssb/features/notifications/inbox_screen.dart';
 import 'package:nowssb/features/notifications/notif_preferences_screen.dart';
@@ -33,7 +31,6 @@ import 'package:nowssb/features/social/connect_screen.dart';
 import 'package:nowssb/features/vault/vault_screen.dart';
 import 'package:nowssb/screens/app_settings.dart';
 import 'package:nowssb/screens/daily_tasks.dart';
-import 'package:nowssb/screens/features_page.dart';
 import 'package:nowssb/screens/library.dart';
 import 'package:nowssb/screens/player_settings.dart';
 import 'package:nowssb/screens/practice.dart';
@@ -104,13 +101,10 @@ Map<String, Widget Function()> _pages() {
     'subscription': () => const SubscriptionScreen(),
     if (words.isNotEmpty) 'word_detail': () => WordDetail(word: words.first),
     'coins': () => const CoinsScreen(),
-    'rewards': () => const RewardsProgramPage(),
     'vault': () => const VaultScreen(),
     'draw': () => const LuckyDrawScreen(),
     'coupons': () => const CouponScreen(),
-    'coupons_program': () => const CouponsProgramPage(),
     'gifts': () => const GiftsScreen(),
-    'gifts_program': () => const GiftsProgramPage(),
     'profile': () => const ProfileScreen(),
     'recent_activity': () => const RecentActivityScreen(),
     'saved_words': () => const SavedWordsScreen(),
@@ -124,15 +118,9 @@ Map<String, Widget Function()> _pages() {
     'sound_library': () => const SoundLibraryScreen(),
     'ebooks': () => const EbooksStoreScreen(),
     'reader_hub': () => const ReaderHubScreen(),
-    'earn_hub': () => const EarnHubScreen(),
-    'earn_program': () => const EarnProgramPage(),
     'earnings': () => const EarningsScreen(),
     'partner': () => const PartnerScreen(),
-    'partner_program': () => const PartnerProgramPage(),
-    'reference': () => const ReferenceScreen(),
-    'reference_program': () => const ReferenceProgramPage(),
     'daily_tasks': () => const DailyTasksPage(),
-    'features': () => const FeaturesPage(),
   };
 }
 

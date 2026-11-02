@@ -34,40 +34,14 @@ const kEarnSpec = ProgramSpec(
     ProgramTab('sales', 'Sales', _sales),
     ProgramTab('targets', 'Targets and Bonuses', _targets),
     ProgramTab('payouts', 'Payouts', _payouts),
+    ProgramTab('invite', 'Invite friends', referenceHubTab),
     ProgramTab('academy', 'Academy', _academy),
     ProgramTab('rules', 'Rules and Disclaimer', _rules),
   ],
 );
 
-/// Kept for every existing entry point: opens the one Earn page.
-class EarnProgramPage extends StatelessWidget {
-  const EarnProgramPage({super.key, this.initialTab});
-  final int? initialTab;
-
-  @override
-  Widget build(BuildContext context) => initialTab == null
-      ? const CircleScreen()
-      : EarnTabsPage(tab: kEarnSpec.tabs[initialTab!.clamp(0, kEarnSpec.tabs.length - 1)].id);
-}
-
 /// Index of an Earn tab id ('sales', 'payouts'…), for [EarnProgramPage].
 int earnTabIndex(String id) => kEarnSpec.tabs.indexWhere((t) => t.id == id).clamp(0, kEarnSpec.tabs.length - 1);
-
-/// The Earn tabs opened at one tab. One Android back returns to the caller.
-class EarnTabsPage extends StatelessWidget {
-  const EarnTabsPage({super.key, required this.tab});
-  final String tab;
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xFF07070C),
-        body: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [ProgramTabsBlock(spec: kEarnSpec, initialTab: tab, scrollTo: true, showDisclaimer: false)],
-          ),
-        ),
-      );
-}
 
 /// Payout countries. Payouts go through a global provider (Wise / PayPal);
 /// nothing here is tied to one country's ID or bank rails.

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/settings.dart';
-import 'package:nowssb/screens/concept/doors/door_fashion_plus.dart';
 import 'package:nowssb/screens/fashion/door_screens.dart';
 import 'package:nowssb/screens/quick_access.dart';
 
@@ -37,19 +36,9 @@ void main() {
       expect(a, startsWith('assets/doors/'), reason: Settings.fashionImageName(i));
       expect(File(a).existsSync(), isTrue, reason: a);
     }
-    final store = DoorFashionPlusScreen.jumps.firstWhere((j) => j.id == 'store').art;
-    expect(store, 'assets/doors/fashion_plus_store.webp');
-    expect(DoorHeroStyle.all.firstWhere((h) => h.id == 'tv').art, 'assets/doors/fashion_plus_tv.webp');
     for (final f in ['meanings', 'ebooks', 'fashion_plus_store', 'fashion_plus_tv']) {
       expect(File('assets/doors/$f.webp').existsSync(), isTrue, reason: f);
     }
-    // Hero 'Full screen' + Store jump: no printed 'FASHION' / model face under the title.
-    expect(DoorHeroStyle.all.firstWhere((h) => h.id == 'full').art, 'assets/doors/hour-ananda.webp');
-    expect(DoorFashionPlusScreen.jumps.firstWhere((j) => j.id == 'practice').art, 'assets/doors/practice.webp');
-    // Make it yours: Player Settings + Healing carry no printed 'Chose Your Path'.
-    final make = DoorFashionPlusScreen.make(Settings.instance);
-    expect(make.firstWhere((j) => j.id == 'player').art, 'assets/doors/hour-prana.webp');
-    expect(make.firstWhere((j) => j.id == 'healing').art, 'assets/doors/hour-aarogya.webp');
     expect(File('pubspec.yaml').readAsStringSync(), contains('- assets/doors/'));
     for (final f in Directory('assets/doors').listSync()) {
       expect(File('pubspec.yaml').readAsStringSync(), contains('- ${f.path}'), reason: 'not bundled');

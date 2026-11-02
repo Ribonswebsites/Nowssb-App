@@ -39,7 +39,6 @@ import 'auth_gate.dart';
 import 'quick_access.dart';
 import 'quotes_live.dart';
 import 'store/request_words.dart';
-import 'widgets_page.dart';
 import '../admin/template/editable.dart';
 
 class AppSettingsScreen extends StatefulWidget {
@@ -136,7 +135,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     final groups = <List<WorkCard>>[
       [
         WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', image: 'assets/rails/02.png', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
-        WorkCard(category: 'Look', title: 'Hero header', meta: 'TV, full, plain, shortcuts', action: 'Open widgets', image: 'assets/rails/03.png', onTap: () => _push(const WidgetsPage())),
         WorkCard(category: 'Look', title: 'Zen Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Zen Plus', image: 'assets/rails/04.png', onTap: () => _push(const FashionPlusScreen())),
         WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', image: 'assets/rails/05.png', onTap: () => _push(const QuickAccessScreen())),
         WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', image: 'assets/rails/06.png', onTap: () => _push(const NotificationsSettingsPage())),

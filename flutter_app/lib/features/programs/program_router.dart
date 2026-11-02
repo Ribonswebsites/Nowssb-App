@@ -6,31 +6,26 @@ library;
 import 'package:flutter/material.dart';
 
 import '../economy/partner_screen.dart';
-import '../economy/reference_screen.dart';
-import 'program_hub.dart';
+import '../circle/circle_screen.dart';
+import '../earn/earnings_screen.dart';
+import '../economy/coupon_screen.dart';
+import '../gifts/gifts_screen.dart';
+import '../vault/vault_screen.dart';
 
 enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings }
 
-typedef ProgrammeBuilder = Widget Function(String? tab);
 
 abstract final class Programmes {
-  static final Map<Programme, ProgrammeBuilder> _bound = {};
-
-  /// Real pages register here so this file does not import them (they already
-  /// import this router).
-  static void bind(Programme p, ProgrammeBuilder builder) => _bound[p] = builder;
-
   static Widget page(Programme p, {String? tab}) {
-    final built = _bound[p];
-    if (built != null) return built(tab);
     return switch (p) {
-        Programme.earn => const ProgramHub(title: 'NowssB Earn', subs: ['Ranks', 'Team', 'Payouts']),
-        Programme.rewards => const ProgramHub(title: 'NowssB Rewards', subs: ['Wallet', 'Streaks', 'Quests']),
-        Programme.coupons => const ProgramHub(title: 'NowssB Coupons', subs: ['Scratch', 'My coupons', 'Shop']),
-        Programme.gifts => const ProgramHub(title: 'NowssB Gifts', subs: ['Send', 'Redeem', 'History']),
-        Programme.reference => ReferenceScreen(initialTab: tab),
+        Programme.earn => CircleScreen(initialTab: tab),
+        Programme.rewards => VaultScreen(initialTab: tab),
+        Programme.coupons => CouponScreen(initialTab: tab),
+        Programme.gifts => GiftsScreen(initialTab: tab),
+        // Invite link lives in Earn now (one page, its 'invite' tab).
+        Programme.reference => CircleScreen(initialTab: tab ?? 'invite'),
         Programme.partner => PartnerScreen(initialTab: tab),
-        Programme.earnings => const ProgramHub(title: 'Earnings', subs: ['Sales', 'Referrals', 'Payouts']),
+        Programme.earnings => const EarningsScreen(),
       };
   }
 

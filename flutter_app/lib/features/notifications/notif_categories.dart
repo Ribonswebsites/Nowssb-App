@@ -75,7 +75,7 @@ class NotifCategories {
     channelId: 'nwsb_streak',
     channelName: 'Streak reminders',
     importance: Importance.high,
-    defaultRoute: 'progress',
+    defaultRoute: 'home',
     legacyKind: 'streak',
   );
   static const weekly = NotifCategory(
@@ -85,7 +85,7 @@ class NotifCategories {
     channelId: 'nwsb_weekly',
     channelName: 'Weekly summary',
     importance: Importance.low,
-    defaultRoute: 'progress',
+    defaultRoute: 'home',
   );
   static const reader = NotifCategory(
     id: 'reader',

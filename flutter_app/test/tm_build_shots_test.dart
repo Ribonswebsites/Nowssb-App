@@ -10,7 +10,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/models.dart';
 import 'package:nowssb/data/today_ritual.dart';
 import 'package:nowssb/screens/normal/calm_hero.dart';
-import 'package:nowssb/widgets/concept/ref_sections.dart';
 
 const _out = String.fromEnvironment('RITUAL_OUT', defaultValue: '/tmp/tm');
 
@@ -78,13 +77,6 @@ void main() {
   }
 
   for (final (width, scale) in [(390.0, 1.0), (320.0, 1.3)]) {
-    testWidgets('ref sections $width', (t) async {
-      final key = GlobalKey();
-      await pump(t, const RefHomeSections(), width, scale, key);
-      expect(t.takeException(), isNull);
-      await save(t, key, 'ref-sections-${width.toInt()}');
-    });
-
     testWidgets('hero cards $width', (t) async {
       final key = GlobalKey();
       var begun = 0;

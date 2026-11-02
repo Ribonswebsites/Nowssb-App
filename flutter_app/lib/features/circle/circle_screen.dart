@@ -13,7 +13,7 @@ import '../../widgets/routine_deck.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
 import '../../data/firebase.dart';
-import '../earn/earn_topic_page.dart';
+import '../../widgets/brand_top_banner.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../../admin/template/editable.dart';
@@ -457,3 +457,48 @@ class _TierRailState extends State<_TierRail> {
   }
 }
 
+
+/// One agent tier, opened from the tier rail (was EarnTopicPage; folded in
+/// here in the Nov 2 cleanup). The banner opens Earn at Targets and Bonuses.
+class AgentTierPage extends StatelessWidget {
+  const AgentTierPage({super.key, required this.name, required this.detail, required this.note});
+  final String name;
+  final String detail;
+  final String note;
+
+  @override
+  Widget build(BuildContext context) {
+    return EconomyPage(
+      goodToKnow: kEarnDisclaimer,
+      title: name,
+      mark: NwsbMarks.piggy,
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+        children: [
+          BrandTopBanner(
+            bare: true,
+            title: name,
+            mark: NwsbMarks.piggy,
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'targets')),
+            ),
+          ),
+          const SizedBox(height: 14),
+          GlassWrap(
+            margin: EdgeInsets.zero,
+            padding: const EdgeInsets.all(10),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(18)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(detail, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 8),
+                Text(note, style: const TextStyle(color: Color(0xCCFFFFFF), height: 1.4)),
+              ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

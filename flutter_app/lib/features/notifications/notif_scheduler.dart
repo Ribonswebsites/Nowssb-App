@@ -193,7 +193,7 @@ class NotifPlanner {
           body: alive
               ? 'One short practice before midnight keeps it going.'
               : 'A few minutes with one word is all it takes.',
-          route: 'progress',
+          route: 'home',
           silent: quiet(when),
         ));
       }
@@ -248,7 +248,7 @@ class NotifPlanner {
             ? 'No practice this week yet. A few minutes tonight starts a new streak.'
             : '$sessions session${sessions == 1 ? '' : 's'} · ${words.length} word${words.length == 1 ? '' : 's'}'
                 '${minutes > 0 ? ' · $minutes min' : ''}. Streak: ${i.streak} day${i.streak == 1 ? '' : 's'}.',
-        route: 'progress',
+        route: 'home',
       ));
     }
 

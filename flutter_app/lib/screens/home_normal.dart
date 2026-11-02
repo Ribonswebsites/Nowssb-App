@@ -37,7 +37,6 @@
 /// [HomeSkinScope] is what tells them which home they are on.
 library;
 
-import 'package:nowssb/widgets/concept/ref_sections.dart' show RefHomeSections;
 import 'package:nowssb/data/content.dart' show ContentStore;
 import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'dart:async';
@@ -85,7 +84,6 @@ import 'fashion/sections_mid.dart';
 import 'sound_library.dart';
 import 'notifications_sheet.dart';
 import 'quick_access.dart';
-import 'widgets_page.dart';
 import '../widgets/home_menu_drawer.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
@@ -95,7 +93,7 @@ import 'quotes_live.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
 import '../widgets/sections/spotlight_section.dart';
-import '../features/earn/earn_hub_screen.dart';
+import '../features/circle/circle_screen.dart';
 import 'app_settings.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
@@ -104,7 +102,7 @@ import 'subscription.dart';
 import 'store/cart_pages.dart';
 import 'store/ebooks_store.dart';
 import 'store/meaning_store.dart';
-import 'features_page.dart';
+import 'about_page.dart';
 import '../shell/nwsb_links.dart';
 import '../widgets/home_keep_alive.dart';
 import '../admin/layout/layout_sections.dart';
@@ -381,8 +379,6 @@ class _HomeNormalState extends State<HomeNormal> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             V4SoundLibrary(onTap: () => _go(2)),
-            V4GetStarted(onPlay: () => _go(1)),
-            V4EarthDay(onTap: () => _go(1)),
             V4Doors(onOpen: _openGrid),
           ],
         )),
@@ -402,7 +398,7 @@ class _HomeNormalState extends State<HomeNormal> {
               onSupport: () => _go(4),
               onCoach: () => _push(const PersonalCoachScreen()))
         ),
-        ('catTiles', const RefHomeSections()),
+        ('catTiles', const SizedBox.shrink()), // dup of spotlight (cleanup 11-02)
         ('spotlight', const R27LiveSections()),
         ('tiles', const SizedBox.shrink()),
         ('storiesFind', const SizedBox.shrink()),
@@ -418,7 +414,6 @@ class _HomeNormalState extends State<HomeNormal> {
           V5RewardsInvite(
             onOpenRewards: () => _push(const VaultScreen()),
             onSignIn: () => NwsbSignInPage.open(context),
-            onInvite: () => _push(const ReferenceProgramPage()),
           ),
         ),
         ('trendwd', V5Trending(onWord: (w) => _push(WordDetail(word: w)), onLibrary: () => _go(2),
@@ -442,7 +437,6 @@ class _HomeNormalState extends State<HomeNormal> {
           'edition',
           V5EditionPartner(
             onJoin: (t) => _push(SubscriptionScreen(initialTier: t)),
-            onPartner: () => _push(const PartnerProgramPage()),
           )
         ),
         ('ebooks', V5Ebooks(onBrowse: () => _push(const EbooksStoreScreen()))),

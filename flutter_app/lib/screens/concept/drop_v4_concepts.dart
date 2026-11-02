@@ -35,16 +35,14 @@ const _ink = Color(0xFF0B0B10);
 const _paper = Color(0xFFF3EADB);
 const _serif = 'CormorantGaramond';
 
-enum DoorKind { themes, background, startArt, access }
+enum DoorKind { background, startArt, access }
 
 class DoorHooks {
-  const DoorHooks({this.onOpenThemes, this.onOpenBackground, this.onOpenStartArt, this.onOpenAccess});
-  final VoidCallback? onOpenThemes;
+  const DoorHooks({this.onOpenBackground, this.onOpenStartArt, this.onOpenAccess});
   final VoidCallback? onOpenBackground;
   final VoidCallback? onOpenStartArt;
   final VoidCallback? onOpenAccess;
   VoidCallback? of(DoorKind k) => switch (k) {
-        DoorKind.themes => onOpenThemes,
         DoorKind.background => onOpenBackground,
         DoorKind.startArt => onOpenStartArt,
         DoorKind.access => onOpenAccess,
@@ -52,7 +50,6 @@ class DoorHooks {
 }
 
 String doorTitle(DoorKind k) => switch (k) {
-      DoorKind.themes => 'Themes',
       DoorKind.background => 'Background',
       DoorKind.startArt => 'Start art',
       DoorKind.access => 'Access',
@@ -62,7 +59,6 @@ String doorTitle(DoorKind k) => switch (k) {
 String doorState(DoorKind k) {
   final s = Settings.instance;
   return switch (k) {
-    DoorKind.themes => 'Hero: ${switch (s.heroStyle) { 'full' => 'Full banner', 'tv' => 'TV frame', _ => 'Plain' }}',
     DoorKind.background => s.fashionPlus ? Settings.fashionVideoNames[s.fashionVideoIndex] : 'Motion off',
     DoorKind.startArt => s.fashionImageIndex < 0 ? 'NowssB black' : Settings.fashionImageName(s.fashionImageIndex),
     DoorKind.access => '${s.navSlots.length} tabs, ${s.navShape} bar',
@@ -98,31 +94,6 @@ class SettingPreview extends StatelessWidget {
         child: Image.asset(a, fit: BoxFit.cover, alignment: al, width: double.infinity, height: double.infinity));
     const lbl = TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800, shadows: [Shadow(blurRadius: 4)]);
     final Widget body = switch (kind) {
-      DoorKind.themes => Container(
-          color: _deep,
-          padding: const EdgeInsets.all(6),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            for (final st in const ['plain', 'full', 'tv'])
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(st == 'tv' ? 10 : 3),
-                    border: Border.all(color: s.heroStyle == st ? _gold : Colors.white24, width: s.heroStyle == st ? 2 : 1),
-                    color: st == 'plain' ? _plum : null,
-                    image: st == 'plain'
-                        ? null
-                        : DecorationImage(
-                            image: AssetImage(st == 'tv' ? 'assets/video/tv-screen-poster.webp' : 'assets/video/hero-bg-poster.webp'),
-                            fit: BoxFit.cover),
-                  ),
-                  alignment: Alignment.bottomLeft,
-                  padding: const EdgeInsets.all(4),
-                  child: Text(switch (st) { 'full' => 'Full', 'tv' => 'TV', _ => 'Plain' }, style: lbl),
-                ),
-              ),
-          ]),
-        ),
       DoorKind.background => Stack(fit: StackFit.expand, children: [img(film, scale: drift), const _Scrim()]),
       DoorKind.startArt =>
         Stack(fit: StackFit.expand, children: [img(still, al: Alignment.topCenter, scale: drift), const _Scrim()]),
@@ -226,319 +197,9 @@ mixin _Pick<T extends StatefulWidget> on State<T> {
 
 // ─── DOORS A · folding screen ───────────────────────────────────────────
 
-class DoorsFoldingScreen extends StatefulWidget {
-  const DoorsFoldingScreen({super.key, this.hooks = const DoorHooks(), this.debugOpen = 1});
-  final DoorHooks hooks;
-  final int debugOpen;
-  @override
-  State<DoorsFoldingScreen> createState() => _FoldState();
-}
-
-class _FoldState extends State<DoorsFoldingScreen> with _Pick {
-  @override
-  int get initial => widget.debugOpen;
-  @override
-  Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const V4Heading('Make this home yours', 'Unfold a panel', 'Tap a panel to see it on your home. Tap again to change it.'),
-      Breath(
-        builder: (context, t) => SizedBox(
-          height: 340,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              for (var i = 0; i < 4; i++)
-                Expanded(
-                  flex: open == i ? 5 : 1,
-                  child: GestureDetector(onTap: () => pick(i, widget.hooks), child: _Panel(i: i, open: open == i, t: t)),
-                ),
-            ]),
-          ),
-        ),
-      ),
-    ]);
-  }
-}
-
-class _Panel extends StatelessWidget {
-  const _Panel({required this.i, required this.open, required this.t});
-  final int i;
-  final bool open;
-  final double t;
-  @override
-  Widget build(BuildContext context) {
-    final k = DoorKind.values[i];
-    final lean = open ? 0.0 : (i.isEven ? .5 : -.5) + .06 * math.sin(2 * math.pi * (t + i * .2));
-    return Transform(
-      alignment: i.isEven ? Alignment.centerLeft : Alignment.centerRight,
-      transform: Matrix4.identity()
-        ..setEntry(3, 2, .0016)
-        ..rotateY(lean),
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 1.5),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [i.isEven ? _plum : const Color(0xFF3B1E6E), _deep]),
-          border: Border.all(color: _gold, width: 1.4),
-          boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 14, offset: Offset(4, 8))],
-        ),
-        child: open
-            ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Expanded(child: Padding(padding: const EdgeInsets.all(6), child: SettingPreview(kind: k, t: t))),
-                Container(color: _ink, padding: const EdgeInsets.fromLTRB(12, 8, 12, 12), child: _Plate(k, cta: true)),
-              ])
-            : Column(children: [
-                const SizedBox(height: 10),
-                Text('${i + 1}', style: V4Type.sub().copyWith(color: _goldSoft, fontWeight: FontWeight.w800)),
-                Expanded(
-                  child: RotatedBox(
-                    quarterTurns: 3,
-                    child: Center(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(doorTitle(k), style: V4Type.title().copyWith(fontSize: 20)),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 48, child: Padding(padding: const EdgeInsets.all(4), child: SettingPreview(kind: k, t: t))),
-              ]),
-      ),
-    );
-  }
-}
-
 // ─── DOORS B · prism ────────────────────────────────────────────────────
 
-class DoorsPrism extends StatefulWidget {
-  const DoorsPrism({super.key, this.hooks = const DoorHooks(), this.debugAngle});
-  final DoorHooks hooks;
-  final double? debugAngle; // in faces (0..4)
-  @override
-  State<DoorsPrism> createState() => _PrismState();
-}
-
-class _PrismState extends State<DoorsPrism> {
-  double _a = 0;
-  double get a => widget.debugAngle ?? _a;
-  int get front => (a.round() % 4 + 4) % 4;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const V4Heading('Make this home yours', 'Turn the prism', 'Swipe to turn. Tap the front face to change it.'),
-      LayoutBuilder(builder: (context, c) {
-        final w = math.min(c.maxWidth - 90, 250.0);
-        return Breath(builder: (context, t) {
-          final aa = a + (widget.debugAngle == null ? .06 * math.sin(2 * math.pi * t) : 0);
-          final faces = [for (var i = 0; i < 4; i++) (i, (i - aa) * math.pi / 2)]
-            ..sort((x, y) => math.cos(x.$2).compareTo(math.cos(y.$2)));
-          return GestureDetector(
-            onHorizontalDragUpdate: (d) => setState(() => _a -= d.delta.dx / w),
-            onHorizontalDragEnd: (_) => setState(() => _a = _a.roundToDouble()),
-            onTap: () => widget.hooks.of(DoorKind.values[front])?.call(),
-            child: SizedBox(
-              height: 340,
-              width: double.infinity,
-              child: Stack(alignment: Alignment.center, children: [
-                Positioned.fill(
-                  child: DecoratedBox(
-                      decoration: BoxDecoration(
-                          gradient: RadialGradient(
-                              radius: .7,
-                              colors: [_violet.withValues(alpha: .35 + .2 * Stillwater.lungs(t)), Colors.transparent]))),
-                ),
-                for (final f in faces)
-                  if (math.cos(f.$2) > .02)
-                    Transform(
-                      alignment: Alignment.center,
-                      transform: Matrix4.identity()
-                        ..setEntry(3, 2, .0018)
-                        ..translateByDouble(0, 0, w / 2, 1)
-                        ..rotateY(f.$2)
-                        ..translateByDouble(0, 0, -w / 2, 1),
-                      child: Container(
-                        width: w,
-                        height: 310,
-                        decoration: BoxDecoration(border: Border.all(color: _gold, width: 1.5), color: _ink),
-                        foregroundDecoration:
-                            BoxDecoration(color: Colors.black.withValues(alpha: (1 - math.cos(f.$2)).clamp(0.0, 1.0) * .75)),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                          Expanded(child: SettingPreview(kind: DoorKind.values[f.$1], t: t)),
-                          Container(
-                            color: _paper,
-                            padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
-                            child: _Plate(DoorKind.values[f.$1], dark: false, cta: f.$1 == front),
-                          ),
-                        ]),
-                      ),
-                    ),
-              ]),
-            ),
-          );
-        });
-      }),
-      const SizedBox(height: 8),
-      // engraved face index: 4 notches on the base
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(children: [
-          for (var i = 0; i < 4; i++)
-            Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => _a = i.toDouble()),
-                child: Column(children: [
-                  Container(height: 3, color: front == i ? _gold : Colors.white24),
-                  const SizedBox(height: 6),
-                  FittedBox(fit: BoxFit.scaleDown, child: Text(doorTitle(DoorKind.values[i]),
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      style: V4Type.sub().copyWith(color: front == i ? Colors.white : null, fontWeight: front == i ? FontWeight.w800 : null))),
-                ]),
-              ),
-            ),
-        ]),
-      ),
-    ]);
-  }
-}
-
 // ─── DOORS C · garment tags on one pin ──────────────────────────────────
-
-class DoorsTagStack extends StatefulWidget {
-  const DoorsTagStack({super.key, this.hooks = const DoorHooks(), this.debugOpen = 2});
-  final DoorHooks hooks;
-  final int debugOpen;
-  @override
-  State<DoorsTagStack> createState() => _TagState();
-}
-
-class _TagState extends State<DoorsTagStack> with _Pick {
-  @override
-  int get initial => widget.debugOpen;
-  @override
-  Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const V4Heading('Make this home yours', 'Pull a tag', 'Each tag shows the setting on your home. Pull one, tap it to change it.'),
-      LayoutBuilder(builder: (context, c) {
-        final w = c.maxWidth;
-        final tagW = math.min(w * .58, 220.0);
-        final pin = Offset(w / 2, 14);
-        return Breath(builder: (context, t) {
-          final order = [for (var i = 0; i < 4; i++) if (i != open) i, open];
-          return SizedBox(
-            height: 470,
-            child: Stack(clipBehavior: Clip.none, children: [
-              CustomPaint(size: Size(w, 30), painter: _PinPainter(pin)),
-              for (final i in order)
-                () {
-                  final isOpen = i == open;
-                  final rest = order.indexOf(i);
-                  final ang = isOpen
-                      ? .025 * math.sin(2 * math.pi * t)
-                      : (-.5 + rest * .5) + .03 * math.sin(2 * math.pi * (t + i * .25));
-                  return AnimatedPositioned(
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeOutBack,
-                    left: pin.dx - tagW / 2,
-                    top: pin.dy + (isOpen ? 70 : 0),
-                    child: Transform.rotate(
-                      angle: ang,
-                      alignment: Alignment.topCenter,
-                      child: GestureDetector(
-                        onTap: () => pick(i, widget.hooks),
-                        child: _Tag(kind: DoorKind.values[i], open: isOpen, width: tagW, t: t, string: isOpen ? 70 : 0),
-                      ),
-                    ),
-                  );
-                }(),
-            ]),
-          );
-        });
-      }),
-    ]);
-  }
-}
-
-class _PinPainter extends CustomPainter {
-  _PinPainter(this.pin);
-  final Offset pin;
-  @override
-  void paint(Canvas c, Size s) {
-    final p = Paint()
-      ..color = _gold
-      ..strokeWidth = 2.4
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-    c.drawLine(pin.translate(-40, 0), pin.translate(34, 0), p);
-    c.drawCircle(pin.translate(39, 3), 5, p);
-    c.drawArc(Rect.fromCircle(center: pin.translate(-40, 4), radius: 4), math.pi / 2, math.pi, false, p);
-    c.drawLine(pin.translate(-40, 8), pin.translate(30, 8), p);
-  }
-
-  @override
-  bool shouldRepaint(_PinPainter o) => o.pin != pin;
-}
-
-class _TagClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size s) {
-    const c = 26.0;
-    final p = Path()
-      ..moveTo(c, 0)
-      ..lineTo(s.width - c, 0)
-      ..lineTo(s.width, c)
-      ..lineTo(s.width, s.height)
-      ..lineTo(0, s.height)
-      ..lineTo(0, c)
-      ..close();
-    return Path.combine(
-        PathOperation.difference, p, Path()..addOval(Rect.fromCircle(center: Offset(s.width / 2, 14), radius: 6)));
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> o) => false;
-}
-
-class _Tag extends StatelessWidget {
-  const _Tag({required this.kind, required this.open, required this.width, required this.t, required this.string});
-  final DoorKind kind;
-  final bool open;
-  final double width;
-  final double t;
-  final double string;
-  @override
-  Widget build(BuildContext context) {
-    return Stack(clipBehavior: Clip.none, children: [
-      if (string > 0)
-        Positioned(left: width / 2 - .75, top: -string, child: Container(width: 1.5, height: string + 14, color: _goldSoft)),
-      ClipPath(
-        clipper: _TagClipper(),
-        child: Container(
-          width: width,
-          decoration: BoxDecoration(
-            color: open ? _paper : null,
-            gradient: open
-                ? null
-                : LinearGradient(
-                    begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [kind.index.isEven ? _plum : const Color(0xFF3B1E6E), _deep]),
-          ),
-          padding: const EdgeInsets.fromLTRB(14, 28, 14, 14),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text('No. ${kind.index + 1} · NowssB', style: V4Type.sub(dark: !open)),
-            const SizedBox(height: 6),
-            if (open) ...[
-              SizedBox(height: 170, child: ClipRRect(borderRadius: BorderRadius.circular(3), child: SettingPreview(kind: kind, t: t))),
-              const SizedBox(height: 10),
-            ],
-            _Plate(kind, dark: !open, cta: open),
-            if (!open) const SizedBox(height: 160),
-          ]),
-        ),
-      ),
-    ]);
-  }
-}
 
 // ─── ENTRY CARD (Fashion home → Drop Studio) ────────────────────────────
 

@@ -26,7 +26,6 @@ import 'store/cart_pages.dart';
 import '../data/earn_wallet.dart';
 import '../features/bazaar/bazaar_screen.dart';
 import '../features/circle/circle_screen.dart';
-import '../features/earn/earn_hub_screen.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/economy/economy_api.dart';
 import '../features/economy/economy_theme.dart';
@@ -160,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       case 'Settings':
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AppSettingsScreen()));
       default:
-        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const QuickAccessScreen()));
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AppSettingsScreen()));
     }
   }
 
@@ -581,7 +580,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const rows = ['NowssB coins', 'Cart', 'Wishlist', 'Order history'];
         final counts = [coins, cart, wish, orders];
         final openers = <VoidCallback>[
-          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen())),
+          () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen())),
           () => _openShop('Cart'),
           () => _openShop('Wishlist'),
           () => _openShop('Order history'),

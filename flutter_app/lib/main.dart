@@ -36,7 +36,6 @@ import 'features/economy/economy_api.dart';
 import 'features/economy/money.dart';
 import 'features/economy/play_billing.dart';
 import 'features/economy/reward_overlay.dart';
-import 'features/programs/program_bind.dart';
 import 'data/device_flags.dart';
 import 'data/notifications.dart';
 import 'data/phone_notifications.dart';
@@ -62,8 +61,6 @@ import 'widgets/faint_film.dart';
 import 'widgets/hype_open.dart';
 
 Future<void> main() async {
-  // Keeps the programme pages registered (Earn, Rewards, Coupons, Gifts, Earnings).
-  if (!programPagesBound) return;
   WidgetsFlutterBinding.ensureInitialized();
   ensureHypeRoutes();
 

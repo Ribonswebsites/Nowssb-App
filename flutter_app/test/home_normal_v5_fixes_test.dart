@@ -10,8 +10,6 @@ import 'package:nowssb/shell/nav_shell.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/screens/subscription.dart';
 import 'package:nowssb/widgets/concept/normal/edition.dart';
-import 'package:nowssb/widgets/concept/normal/invite.dart';
-import 'package:nowssb/widgets/concept/normal/partner.dart';
 import 'package:nowssb/widgets/concept/normal/surface.dart';
 
 import 'fake_video_platform.dart';
@@ -105,11 +103,9 @@ void main() {
 
   testWidgets('6: no server config hides Invite and Partner entirely', (t) async {
     await _pump(t, Column(children: [
-      V5RewardsInvite(onOpenRewards: () {}, onSignIn: () {}, onInvite: () {}),
-      V5EditionPartner(onJoin: (_) {}, onPartner: () {}),
+      V5RewardsInvite(onOpenRewards: () {}, onSignIn: () {}),
+      V5EditionPartner(onJoin: (_) {}),
     ]));
-    expect(find.byType(NInvite), findsNothing);
-    expect(find.byType(NPartner), findsNothing);
     expect(find.text('Invite a friend'), findsNothing);
     expect(find.text('Partner points'), findsNothing);
     expect(find.byType(NEdition), findsOneWidget);

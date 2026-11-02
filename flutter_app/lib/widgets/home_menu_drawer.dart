@@ -14,7 +14,7 @@ import '../data/app_control.dart';
 import '../data/content.dart';
 import '../screens/app_settings.dart';
 import '../features/bazaar/bazaar_screen.dart';
-import '../features/earn/earn_hub_screen.dart';
+import '../features/circle/circle_screen.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/social/connect_screen.dart';
 import '../features/social/echo_wall_screen.dart';
@@ -22,7 +22,7 @@ import '../features/gifts/gifts_screen.dart';
 import '../features/economy/coupon_screen.dart';
 import '../features/vault/vault_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
-import '../screens/features_page.dart';
+import '../screens/about_page.dart';
 import '../screens/notifications_settings.dart';
 import '../screens/reader/reader_hub.dart';
 import '../screens/shared_sections.dart';
@@ -263,7 +263,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/gen-11.jpg', onTap: () => _push(context, const AppSettingsScreen())),
                           WorkCard(category: 'Plans', title: 'Plans', meta: 'Resonance, Frequency, Frequency X', action: 'Open plans', image: 'assets/rails/rewards-03.jpg', onTap: () => _push(context, const SubscriptionScreen())),
                           WorkCard(category: 'Alerts', title: 'Notifications', meta: 'This phone', action: 'Open alerts', image: 'assets/rails/glass-01.jpg', onTap: () => _push(context, const NotificationsSettingsPage())),
-                          WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => _push(context, const EarnHubScreen())),
+                          WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => _push(context, const CircleScreen())),
                           WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Coins, quests, invite', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => _push(context, const VaultScreen())),
                           WorkCard(category: 'Gifts', title: 'NowssB Gifts', meta: 'Boxes and gift cards', action: 'Open gifts', image: 'assets/rails/gifts-01.jpg', onTap: () => _push(context, const GiftsScreen())),
                           WorkCard(category: 'Coupons', title: 'NowssB Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/coupons-01.jpg', onTap: () => _push(context, const CouponScreen())),

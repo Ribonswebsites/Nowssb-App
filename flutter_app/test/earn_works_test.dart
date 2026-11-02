@@ -32,7 +32,7 @@ Map<String, dynamic> _summary({bool ready = false, num available = 0}) => {
       ],
     };
 
-Future<List<(String, Map<String, dynamic>)>> _open(WidgetTester tester, String tab, {bool ready = false, num available = 0, bool content = true}) async {
+Future<List<(String, Map<String, dynamic>)>> _open(WidgetTester tester, String tab, {bool ready = false, num available = 0}) async {
   SharedPreferences.setMockInitialValues({});
   final calls = <(String, Map<String, dynamic>)>[];
   EconomyApi.debugHandler = (name, data) async {
@@ -48,9 +48,7 @@ Future<List<(String, Map<String, dynamic>)>> _open(WidgetTester tester, String t
         body: Center(
           child: TextButton(
             onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-              builder: (_) => content
-                  ? Scaffold(body: ListView(children: kEarnSpec.tabs[earnTabIndex(tab)].build(context, const {})))
-                  : EarnProgramPage(initialTab: earnTabIndex(tab)),
+              builder: (_) => Scaffold(body: ListView(children: kEarnSpec.tabs[earnTabIndex(tab)].build(context, const {}))),
             )),
             child: const Text('go'),
           ),
@@ -69,17 +67,6 @@ String _allText(WidgetTester tester) => tester.widgetList<Text>(find.byType(Text
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-
-  testWidgets('Earn tab opens in one page and Android back returns', (tester) async {
-    await _open(tester, 'sales', content: false);
-    expect(find.byType(EarnTabsPage), findsOneWidget);
-    await tester.binding.handlePopRoute();
-    for (var i = 0; i < 10; i++) {
-      await tester.pump(const Duration(milliseconds: 100));
-    }
-    expect(find.text('go'), findsOneWidget);
-    expect(find.byType(EarnTabsPage), findsNothing);
-  });
 
   testWidgets('Sales ledger: no rupee sign, no "null"', (tester) async {
     await _open(tester, 'sales');

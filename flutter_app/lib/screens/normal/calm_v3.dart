@@ -26,9 +26,8 @@ import '../../data/firebase.dart';
 import '../../data/models.dart';
 import '../../data/practice_progress.dart';
 import '../../features/circle/circle_screen.dart';
+import '../../features/economy/partner_screen.dart';
 import '../../features/economy/economy_api.dart';
-import '../../features/programs/partner_program.dart';
-import '../../features/programs/reference_program.dart';
 import '../../features/progress/progress_popup.dart';
 import '../../features/vault/vault_screen.dart';
 import '../../media/nwsb_video.dart';
@@ -518,7 +517,7 @@ class CalmReaderRewards extends StatelessWidget {
                     icon: Icons.favorite_outline_rounded,
                     title: 'Invite a friend',
                     sub: 'Share your link. Your friend gets a discount; you earn when they buy for real.',
-                    onTap: () => _push(context, const ReferenceProgramPage()),
+                    onTap: () => _push(context, const CircleScreen(initialTab: 'invite')),
                   ),
                 ]),
               );
@@ -691,8 +690,8 @@ class CalmMembership extends StatelessWidget {
               child: _Row(
                 icon: Icons.workspace_premium_outlined,
                 title: '${EconomyMirror.instance.partnerPoints} partner points',
-                sub: 'Spark · Glow · Radiant. Points come only from real purchases through your links.',
-                onTap: () => _push(context, const PartnerProgramPage()),
+                sub: 'Breath · Stillness · Awakening. Points come only from real purchases through your links.',
+                onTap: () => _push(context, const PartnerScreen()),
               ),
             ),
           ),

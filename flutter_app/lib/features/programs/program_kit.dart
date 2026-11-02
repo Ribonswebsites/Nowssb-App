@@ -260,56 +260,6 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
   }
 }
 
-/// A programme page: the shared shell (back button, coin pill, Good to
-/// know), the programme's own [hero] and play area ([top]), then its tabs.
-class ProgramPage extends StatefulWidget {
-  const ProgramPage({
-    super.key,
-    required this.pageId,
-    required this.title,
-    required this.mark,
-    required this.tabs,
-    required this.disclaimer,
-    this.initialTab = 0,
-    this.header,
-  });
-
-  final String pageId;
-  final String title;
-  final String mark;
-  final List<ProgramTab> tabs;
-  final String disclaimer;
-  final int initialTab;
-  final Widget? header;
-
-  @override
-  State<ProgramPage> createState() => _ProgramPageState();
-}
-
-class _ProgramPageState extends State<ProgramPage> {
-  Future<void> _refresh() => EconomyMirror.instance.refresh();
-
-  @override
-  Widget build(BuildContext context) {
-    final spec = ProgramSpec(pageId: widget.pageId, title: widget.title, mark: widget.mark, tabs: widget.tabs, disclaimer: widget.disclaimer);
-    return EconomyPage(
-      title: widget.title,
-      mark: widget.mark,
-      child: RefreshIndicator(
-        color: NwsbColors.gold,
-        onRefresh: _refresh,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
-          children: [
-            if (widget.header != null) widget.header!,
-            ProgramTabsBlock(spec: spec, initialTab: widget.tabs[widget.initialTab.clamp(0, widget.tabs.length - 1)].id),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 /// Glass card holding a column.
 class PCard extends StatelessWidget {
   const PCard({super.key, required this.children, this.glow});

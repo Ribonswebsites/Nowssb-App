@@ -3,12 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:nowssb/features/bazaar/bazaar_screen.dart';
 import 'package:nowssb/features/circle/circle_screen.dart';
 import 'package:nowssb/features/coins/coins_screen.dart';
-import 'package:nowssb/features/earn/earn_hub_screen.dart';
-import 'package:nowssb/features/earn/earn_topic_page.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
 import 'package:nowssb/features/economy/coupon_screen.dart';
 import 'package:nowssb/features/economy/partner_screen.dart';
-import 'package:nowssb/features/economy/reference_screen.dart';
 import 'package:nowssb/features/gifts/gifts_screen.dart';
 import 'package:nowssb/features/gifts/spin_wheel.dart';
 import 'package:nowssb/features/notifications/inbox_screen.dart';
@@ -18,14 +15,14 @@ import 'package:nowssb/features/programs/coupons_program.dart';
 import 'package:nowssb/features/programs/earn_program.dart';
 import 'package:nowssb/features/programs/gifts_program.dart';
 import 'package:nowssb/features/programs/partner_program.dart';
-import 'package:nowssb/features/programs/program_hub.dart';
 import 'package:nowssb/features/programs/reference_program.dart';
 import 'package:nowssb/features/programs/rewards_program.dart';
 import 'package:nowssb/features/social/connect_screen.dart';
 import 'package:nowssb/features/social/echo_wall_screen.dart';
 import 'package:nowssb/features/vault/vault_screen.dart';
 import 'package:nowssb/features/wordprint/word_print_screen.dart';
-import 'package:nowssb/screens/app_settings.dart';
+import 'package:nowssb/screens/about_page.dart';
+import 'package:nowssb/screens//app_settings.dart';
 import 'package:nowssb/screens/aura_sound_library.dart';
 import 'package:nowssb/screens/concept/drop_v4_concepts.dart';
 import 'package:nowssb/screens/daily_tasks.dart';
@@ -33,7 +30,6 @@ import 'package:nowssb/screens/fashion/door_screens.dart';
 import 'package:nowssb/screens/fashion/drop_studio.dart';
 import 'package:nowssb/screens/fashion/sections_mid.dart';
 import 'package:nowssb/screens/fashion_plus.dart';
-import 'package:nowssb/screens/features_page.dart';
 import 'package:nowssb/screens/healing_path.dart';
 import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/screens/home_normal.dart';
@@ -59,7 +55,6 @@ import 'package:nowssb/screens/store.dart';
 import 'package:nowssb/screens/store/cart_pages.dart';
 import 'package:nowssb/screens/store/request_words.dart';
 import 'package:nowssb/screens/subscription.dart';
-import 'package:nowssb/screens/widgets_page.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/screens/notifications_sheet.dart';
 final btScreens = <String, Widget Function()>{
@@ -76,24 +71,17 @@ final btScreens = <String, Widget Function()>{
   'CircleScreen': () => const CircleScreen(),
   'ConnectScreen': () => const ConnectScreen(),
   'CouponScreen': () => const CouponScreen(),
-  'CouponsProgramPage': () => const CouponsProgramPage(),
   'DailyTasksPage': () => const DailyTasksPage(),
   'DoorAccessScreen': () => const DoorAccessScreen(),
   'DoorBackgroundScreen': () => const DoorBackgroundScreen(),
   'DoorCheckoutScreen': () => const DoorCheckoutScreen(),
-  'DoorFashionPlusScreen': () => const DoorFashionPlusScreen(),
   'DoorStartArtScreen': () => const DoorStartArtScreen(),
-  'DoorsFoldingScreen': () => const DoorsFoldingScreen(),
   'DropStudioScreen': () => const DropStudioScreen(),
-  'EarnHubScreen': () => const EarnHubScreen(),
-  'EarnProgramPage': () => const EarnProgramPage(),
   'EarningsScreen': () => const EarningsScreen(),
   'EbooksStoreScreen': () => const EbooksStoreScreen(),
   'EchoWallScreen': () => const EchoWallScreen(),
   'FashStore': () => const FashStore(),
   'FashionPlusScreen': () => const FashionPlusScreen(),
-  'FeaturesPage': () => const FeaturesPage(),
-  'GiftsProgramPage': () => const GiftsProgramPage(),
   'GiftsScreen': () => const GiftsScreen(),
   'HealingPathScreen': () => const HealingPathScreen(),
   'InboxScreen': () => const InboxScreen(),
@@ -104,7 +92,6 @@ final btScreens = <String, Widget Function()>{
   'NotifPreferencesScreen': () => const NotifPreferencesScreen(),
   'NotificationsSettingsPage': () => const NotificationsSettingsPage(),
   'NwsbSignInPage': () => const NwsbSignInPage(),
-  'PartnerProgramPage': () => const PartnerProgramPage(),
   'PartnerScreen': () => const PartnerScreen(),
   'PersonalCoachScreen': () => const PersonalCoachScreen(),
   'PlayerSettingsScreen': () => const PlayerSettingsScreen(),
@@ -113,22 +100,17 @@ final btScreens = <String, Widget Function()>{
   'QuickAccessScreen': () => const QuickAccessScreen(),
   'QuotesWeekScreen': () => const QuotesWeekScreen(),
   'ReaderHubScreen': () => const ReaderHubScreen(),
-  'ReferenceProgramPage': () => const ReferenceProgramPage(),
-  'ReferenceScreen': () => const ReferenceScreen(),
   'RequestWordsScreen': () => const RequestWordsScreen(),
-  'RewardsProgramPage': () => const RewardsProgramPage(),
   'SavedWordsScreen': () => const SavedWordsScreen(),
   'SelectLevelScreen': () => const SelectLevelScreen(),
   'SentenceBuilderScreen': () => const SentenceBuilderScreen(),
   'SoundLibraryScreen': () => const SoundLibraryScreen(),
-  'SpinWheelPage': () => const SpinWheelPage(),
   'StoreScreen': () => const StoreScreen(),
   'SubscriptionScreen': () => const SubscriptionScreen(),
   'SubscriptionTermsScreen': () => const SubscriptionTermsScreen(),
   'TrendingScreen': () => const TrendingScreen(),
   'VaultScreen': () => const VaultScreen(),
   'CoinsScreen': () => const CoinsScreen(),
-  'WidgetsPage': () => const WidgetsPage(),
   'WishlistPage': () => const WishlistPage(),
   'WordAtelierScreen': () => const WordAtelierScreen(),
   'WordPrintScreen': () => const WordPrintScreen(),

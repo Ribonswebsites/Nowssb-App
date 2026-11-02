@@ -8,7 +8,7 @@ import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_theme.dart';
-import '../earn/earn_hub_screen.dart';
+import '../circle/circle_screen.dart';
 
 /// Account activity — the page form of the bell inbox (messages, request
 /// replies, orders, offers and on-phone reminders). Opened from Journal,
@@ -31,7 +31,7 @@ class InboxScreen extends StatelessWidget {
           rightColor: const Color(0xFFC8A96E),
           art: SplitPromoArts.egyptianGold,
           onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()),
+            MaterialPageRoute<void>(builder: (_) => const CircleScreen()),
           ),
         ),
       ),

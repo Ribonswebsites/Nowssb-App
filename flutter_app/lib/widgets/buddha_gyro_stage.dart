@@ -9,8 +9,6 @@ import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kQuotesLottie
 import 'dart:async';
 import 'dart:math' as math;
 
-import '../theme/white_neu.dart';
-import '../theme/tokens.dart';
 import 'package:flutter/material.dart';
 
 import 'glass_wrap.dart';
@@ -147,19 +145,15 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
   @override
   Widget build(BuildContext context) {
     final week = weekQuotes(_now, override: _override);
-    // Normal home: white neumorphic stage, ink type. Zen keeps the black.
-    final white = onNormal(context);
-    final bg = white ? NwsbColors.surface : Colors.black;
     return LayoutBuilder(builder: (context, c) {
       final w = c.maxWidth;
       final h = (w * 1.18).clamp(400.0, 480.0);
-      return Container(
+      return SizedBox(
         height: h,
-        decoration: white ? wnBox(radius: 16) : null,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: ColoredBox(
-            color: bg,
+            color: Colors.black,
             child: Stack(
               fit: StackFit.expand,
               children: [
@@ -179,10 +173,10 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
                   ),
                 ),
                 // Black falls off left-to-right so type sits on clean black.
-                DecoratedBox(
+                const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [bg, bg, bg.withValues(alpha: 0)],
+                      colors: [Colors.black, Colors.black, Color(0x00000000)],
                       stops: [0, 0.42, 0.72],
                     ),
                   ),
@@ -196,7 +190,7 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(20, 58, w * 0.42, 40),
-                      child: _QuotePoster(white: white, quote: week[i].quote, variant: i == 0
+                      child: _QuotePoster(quote: week[i].quote, variant: i == 0
                           ? quoteIndexFor(week[i].day) % 4
                           : (quoteIndexFor(week[i].day) + i) % 4),
                     ),
@@ -211,7 +205,7 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
-                      child: _pill(week[_page], _page == 0, white),
+                      child: _pill(week[_page], _page == 0),
                     ),
                   ),
                 ),
@@ -223,22 +217,20 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
     });
   }
 
-  Widget _pill(DatedQuote q, bool today, [bool white = false]) {
+  Widget _pill(DatedQuote q, bool today) {
     final text = today
         ? 'TODAY  ·  ${_dateLabel(q.day)}  ·  ${_timeLabel(_now)}'
         : '${_page == 1 ? 'YESTERDAY' : 'THIS WEEK'}  ·  ${_dateLabel(q.day)}';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: white
-          ? wnBox(radius: 20)
-          : BoxDecoration(
-              color: const Color(0x1FFFFFFF),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0x33FFFFFF)),
-            ),
+      decoration: BoxDecoration(
+        color: const Color(0x1FFFFFFF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0x33FFFFFF)),
+      ),
       child: Text(text,
-          style: TextStyle(
-              color: white ? NwsbColors.ink : _gold, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
+          style: const TextStyle(
+              color: _gold, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 1.1)),
     );
   }
 
@@ -246,16 +238,15 @@ class _DailyQuoteCardState extends State<DailyQuoteCard> {
 
 /// Poster type that always fits its box: tries big, shrinks until it fits.
 class _QuotePoster extends StatelessWidget {
-  const _QuotePoster({required this.quote, required this.variant, this.white = false});
-  final bool white;
+  const _QuotePoster({required this.quote, required this.variant});
   final DailyQuote quote;
   final int variant;
 
   List<InlineSpan> _spans(double base) {
     final text = quote.text.toUpperCase();
     final emph = quote.emphasis?.toUpperCase();
-    final accent = white ? (variant.isEven ? NwsbColors.ink : const Color(0xFF8A6418)) : variant.isEven ? Colors.white : _gold;
-    final body = white ? const Color(0xFF2A2D3A) : variant.isEven ? const Color(0xFFEDEDED) : Colors.white;
+    final accent = variant.isEven ? Colors.white : _gold;
+    final body = variant.isEven ? const Color(0xFFEDEDED) : Colors.white;
     final ratio = const [2.3, 1.9, 2.1, 1.7][variant];
     final at = emph == null ? -1 : text.indexOf(emph);
     if (at < 0) return [TextSpan(text: text, style: _poster(base, body))];

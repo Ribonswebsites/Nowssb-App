@@ -75,7 +75,6 @@ import 'fashion_plus.dart';
 import 'notifications_sheet.dart';
 import 'normal/header_actions_sheet.dart';
 import 'sound_library.dart';
-import 'widgets_page.dart';
 import 'quick_access.dart';
 import '../widgets/home_menu_drawer.dart';
 import 'word_detail.dart';
@@ -94,10 +93,11 @@ import 'app_settings.dart';
 import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
 import '../widgets/sections/spotlight_section.dart';
-import '../features/earn/earn_hub_screen.dart';
+import '../features/circle/circle_screen.dart';
+import '../features/vault/vault_screen.dart';
 import '../features/programs/program_router.dart';
 import '../shell/nwsb_links.dart';
-import 'features_page.dart';
+import 'about_page.dart';
 import '../widgets/home_keep_alive.dart';
 import 'store/meaning_store.dart';
 
@@ -351,7 +351,7 @@ class _HomeFashionState extends State<HomeFashion> {
       case 'settings':
         _push(const AppSettingsScreen());
       case 'quick-access':
-        _push(const QuickAccessScreen());
+        _push(const AppSettingsScreen());
       case 'sentence':
         _push(const SentenceBuilderScreen());
       case 'request-words':
@@ -363,9 +363,7 @@ class _HomeFashionState extends State<HomeFashion> {
       case 'about':
         _push(const AboutNowssbScreen());
       case 'features':
-        _push(const FeaturesPage());
-      case 'widgets':
-        _push(const WidgetsPage());
+        _push(const AboutNowssbScreen());
       case 'connect':
         NwsbLinks.connect(context);
       default:
@@ -392,8 +390,8 @@ class _HomeFashionState extends State<HomeFashion> {
 
   /// Pool for the daily 8-card quick row; every entry opens a real page.
   List<QuickCard> _quickPool() => [
-        QuickCard('rewards', 'Rewards', 'Your coins & perks', Icons.workspace_premium_rounded, () => _push(const RewardsProgramPage()), lottie: kRewardsLottie),
-        QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const EarnHubScreen()), lottie: kCoinsLottie),
+        QuickCard('rewards', 'Rewards', 'Your coins & perks', Icons.workspace_premium_rounded, () => _push(const VaultScreen()), lottie: kRewardsLottie),
+        QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const CircleScreen()), lottie: kCoinsLottie),
         QuickCard('gifts', 'Gifts', 'Send or redeem', Icons.card_giftcard_rounded, () => _push(const GiftsScreen()), lottie: kGiftLottie),
         QuickCard('coupons', 'Coupons', 'Deals for you', Icons.local_offer_rounded, () => _push(const CouponScreen())),
         QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
@@ -401,7 +399,6 @@ class _HomeFashionState extends State<HomeFashion> {
         QuickCard('tasks', 'Daily tasks', 'Tick off today', Icons.checklist_rounded, () => _push(const DailyTasksPage())),
         QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen()), lottie: kSpeakerLottie),
         QuickCard('meanings', 'Meanings', 'Where words come from', Icons.auto_stories_rounded, () => _push(const MeaningStoreScreen())),
-        QuickCard('features', 'Features', 'Everything in NowssB', Icons.grid_view_rounded, () => _push(const FeaturesPage())),
         QuickCard('atelier', 'Atelier', 'Word Atelier', Icons.spellcheck_rounded, () => _push(const WordAtelierScreen())),
         QuickCard('healing', 'Healing', 'Your healing path', Icons.spa_rounded, () => _push(const HealingPathScreen())),
       ];
@@ -444,7 +441,7 @@ class _HomeFashionState extends State<HomeFashion> {
               left: '${coins?.done ?? 0}/${coins?.total ?? 2} coins',
               right: '${((coins?.value ?? 0) * 100).round()}%',
               icon: Icons.toll_rounded,
-              onTap: () => _push(const EarnHubScreen()),
+              onTap: () => _push(const VaultScreen()),
             ),
             NowProgressItem(
               title: 'Your progress',
@@ -530,14 +527,8 @@ class _HomeFashionState extends State<HomeFashion> {
             ],
           ))),
         ('practice', const SizedBox.shrink()),
-        (
-          'herorow',
-          FashHeroRow(
-            onCustomize: () => _push(const WidgetsPage()),
-            onFeatures: () => _push(const FeaturesPage()),
-            onEarn: () => _push(const EarnHubScreen()),
-          ),
-        ),
+        // Cleanup (Nov 2): Customize/Features/Earn strip removed (Earn has its own section).
+        ('herorow', const SizedBox.shrink()),
         ('routineCards', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -658,14 +649,13 @@ class _HomeFashionState extends State<HomeFashion> {
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
         ),
         ('enterCurve', const SizedBox.shrink()),
-        ('rx', FashPrescription(onTap: () => _go(1), onWord: _openWord)),
-        ('trendvid', FashShopNow(onTap: () => _go(3))),
+        // Cleanup (Nov 2): one Practice card, one Store promo.
+        ('rx', const SizedBox.shrink()),
+        ('trendvid', const SizedBox.shrink()),
         ('storeban', Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             StoreBannerSection(onTap: () => _go(3)),
-            SizedBox(height: kFashSectionGap),
-            const EarnUmbrellaSection(),
           ],
         )),
         ('subvid', const SizedBox.shrink()),
@@ -675,12 +665,10 @@ class _HomeFashionState extends State<HomeFashion> {
             EditionSection(onTap: () => _push(const SubscriptionScreen())),
             const SizedBox(height: 24),
             const PartnerHomeSection(),
-            const SizedBox(height: 24),
-            const ProgramTrioRail(),
           ])
         ),
-        ('routines', RoutinesSection(onTap: () => _go(1), fashion: true)),
-        ('offer', FashOffer(onTap: () => _go(3))),
+        ('routines', const SizedBox.shrink()),
+        ('offer', const SizedBox.shrink()),
         // NowssB Coupons: below NowssB Gifts, a contained glass block.
         ('roundring', const R27LiveSections(fashion: true)),
         ('cube', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -689,8 +677,6 @@ class _HomeFashionState extends State<HomeFashion> {
             onWishlist: () => NwsbLinks.wishlist(context),
             onOrders: () => _go(4),
           ),
-          const SizedBox(height: 24),
-          const ReferenceHomeSection(),
         ])),
         ('shabda', FashShabdapathy(onTap: () => _go(2))),
         ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
@@ -713,7 +699,8 @@ class _HomeFashionState extends State<HomeFashion> {
         ('promovid', const SizedBox.shrink()),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
-        ('shabvid', FashShabdaVideo(onTap: () => _go(2))),
+        // Cleanup (Nov 2): one Sound Library promo (shabda above).
+        ('shabvid', const SizedBox.shrink()),
         ('footer', HomeFooterSection(onLink: _footerLink)),
       ];
 
@@ -762,7 +749,7 @@ class _HomeFashionState extends State<HomeFashion> {
               HeroQuickRow(pool: _quickPool()),
               FashionHero(
                 onExplore: () => _go(2),
-                onGuide: () => _push(const FeaturesPage()),
+                onGuide: () => _push(const AboutNowssbScreen()),
                 onSearch: () => showDestinationSearchSheet(
                   context,
                   onSelect: _openSearchDest,
@@ -801,19 +788,7 @@ class _HomeFashionState extends State<HomeFashion> {
         children: [
           // One selected Fashion Plus film is shared with every destination;
           // with motion off this resolves to the chosen still or black.
-          // Zen home is black/neutral only: the shared backdrop (a purple
-          // swirl film by default) is rendered in greyscale here.
-          const Positioned.fill(
-            child: ColorFiltered(
-              colorFilter: ColorFilter.matrix(<double>[
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0, 0, 0, 1, 0,
-              ]),
-              child: AppBackdrop(),
-            ),
-          ),
+          const Positioned.fill(child: AppBackdrop()),
           const Positioned.fill(child: FashionBgDimOverlay()),
           // `#fpBgVeil` — nowssb-nm.css:10853. TWO layers, and the point of
           // both is that the MIDDLE OF THE SCREEN IS LEFT ALONE: a radial

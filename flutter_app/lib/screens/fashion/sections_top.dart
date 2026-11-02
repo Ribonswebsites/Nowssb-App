@@ -195,79 +195,6 @@ class _PracticeBannerCarouselState extends State<PracticeBannerCarousel>
   }
 }
 
-/// 2 · herorow — index.html:1766. `.hhr-blk` — three buttons on a strip of
-/// `word-acts.mp4`, separated by hairlines.
-class FashHeroRow extends StatelessWidget {
-  const FashHeroRow(
-      {super.key, this.onCustomize, this.onFeatures, this.onEarn});
-
-  final VoidCallback? onCustomize;
-  final VoidCallback? onFeatures;
-  final VoidCallback? onEarn;
-
-  @override
-  Widget build(BuildContext context) {
-    return SectionPane(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Same label style as the NowssB Store header (home_cards.dart).
-          const Padding(
-            padding: EdgeInsets.fromLTRB(2, 0, 2, 10),
-            child: Text('Make it yours',
-                key: ValueKey('fash-herorow-heading'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, decoration: TextDecoration.none)),
-          ),
-          TvFrame(
-        asset: 'assets/video/word-acts.mp4',
-        frame: DeviceFrame.wordActs,
-        priority: ClipPriority.feature,
-        autoplay: true,
-        showVideo: true,
-        overlay: Stack(
-          fit: StackFit.expand,
-          children: [
-            const DecoratedBox(
-              decoration: BoxDecoration(color: Color(0x40000000)),
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: _HhrButton(
-                    icon: Icons.tune,
-                    label: 'Customize',
-                    onTap: onCustomize,
-                  ),
-                ),
-                const _HhrSep(),
-                Expanded(
-                  child: _HhrButton(
-                    icon: Icons.grid_view,
-                    label: 'Features',
-                    onTap: onFeatures,
-                  ),
-                ),
-                const _HhrSep(),
-                Expanded(
-                  child: _HhrButton(
-                    icon: Icons.savings_outlined,
-                    label: 'Earn',
-                    onTap: onEarn,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-        ],
-      ),
-    );
-  }
-}
-
 /// The three glass boxes — index.html:1913, `.fash-streak`.
 ///
 /// On the web this is ONE picture: a render of three glass blocks, with the
@@ -379,44 +306,6 @@ class _BoxLabel extends StatelessWidget {
         letterSpacing: 1.5,
         height: 1.15,
         color: color,
-      ),
-    );
-  }
-}
-
-class _HhrSep extends StatelessWidget {
-  const _HhrSep();
-  @override
-  Widget build(BuildContext context) =>
-      Container(width: 1, height: 40, color: const Color(0x24FFFFFF));
-}
-
-class _HhrButton extends StatelessWidget {
-  const _HhrButton({required this.icon, required this.label, this.onTap});
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 21, color: Colors.white),
-          const SizedBox(height: 7),
-          EditableLabel(
-            'fashion_sections_top.HhrButton',
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-          ),
-        ],
       ),
     );
   }

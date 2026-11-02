@@ -39,17 +39,6 @@ const kGiftsSpec = ProgramSpec(
   ],
 );
 
-/// Kept for every existing entry point: opens the one Gifts page.
-class GiftsProgramPage extends StatelessWidget {
-  const GiftsProgramPage({super.key, this.initialTab});
-  final int? initialTab;
-
-  @override
-  Widget build(BuildContext context) => GiftsScreen(
-        initialTab: initialTab == null ? null : kGiftsSpec.tabs[initialTab!.clamp(0, kGiftsSpec.tabs.length - 1)].id,
-      );
-}
-
 List<Widget> _free(BuildContext context, Map<String, dynamic> s) {
   final t = sMap(s['today']);
   final ladder = sList(t['ladder']);

@@ -29,10 +29,7 @@ import '../economy/economy_theme.dart';
 import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
 import '../economy/coupon_screen.dart';
-import '../programs/coupons_program.dart';
-import '../programs/gifts_program.dart';
-import '../programs/partner_program.dart';
-import '../programs/reference_program.dart';
+import '../economy/partner_screen.dart';
 import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
@@ -713,7 +710,7 @@ class YourRewardsSection extends StatelessWidget {
                     title: 'Invite a friend',
                     sub: 'Share your link. Your friend gets a discount; you earn when they buy for real.',
                     mark: NwsbMarks.verified,
-                    onTap: () => EarnUmbrellaSection._open(context, const ReferenceProgramPage()),
+                    onTap: () => EarnUmbrellaSection._open(context, const CircleScreen(initialTab: 'invite')),
                   ),
                 ],
               );
@@ -770,7 +767,7 @@ class GiftsHomeSection extends StatelessWidget {
                 title: 'Gift rules and history',
                 sub: 'Free boxes, gift cards, what you sent and received',
                 mark: NwsbMarks.bag,
-                onTap: () => EarnUmbrellaSection._open(context, const GiftsProgramPage()),
+                onTap: () => EarnUmbrellaSection._open(context, const GiftsScreen()),
               ),
             ],
           ),
@@ -844,7 +841,7 @@ class _OutsidePromoState extends State<_OutsidePromo> {
       _Dest.rewards => const VaultScreen(),
       _Dest.gifts => const GiftsScreen(),
       _Dest.resell => const BazaarScreen(),
-      _Dest.reference => const ReferenceProgramPage(),
+      _Dest.reference => const CircleScreen(initialTab: 'invite'),
     };
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
@@ -1050,7 +1047,7 @@ class CouponsHomeSection extends StatelessWidget {
                 title: 'Your coupons and odds',
                 sub: 'Rarity shelves, codes and what each card can hold',
                 mark: NwsbMarks.verified,
-                onTap: () => EarnUmbrellaSection._open(context, const CouponsProgramPage()),
+                onTap: () => EarnUmbrellaSection._open(context, const CouponScreen()),
               ),
             ],
           ),
@@ -1094,7 +1091,7 @@ class ReferenceHomeSection extends StatelessWidget {
                   title: EconomyMirror.instance.code.isEmpty ? 'Get your link' : 'Your code ${EconomyMirror.instance.code}',
                   sub: 'Friends get a discount on their first real purchase. You earn coins and rewards.',
                   mark: NwsbMarks.reference,
-                  onTap: () => EarnUmbrellaSection._open(context, const ReferenceProgramPage()),
+                  onTap: () => EarnUmbrellaSection._open(context, const CircleScreen(initialTab: 'invite')),
                 ),
               ],
             ),
@@ -1105,7 +1102,7 @@ class ReferenceHomeSection extends StatelessWidget {
   }
 }
 
-/// Home door for the NowssB Partner Program (Spark, Glow, Radiant).
+/// Home door for the NowssB Partner Program (Breath, Stillness, Awakening).
 class PartnerHomeSection extends StatelessWidget {
   const PartnerHomeSection({super.key});
 
@@ -1117,14 +1114,14 @@ class PartnerHomeSection extends StatelessWidget {
         builder: (context, _) => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const PaneHead(eyebrow: 'NowssB Partner', title: 'Spark · Glow · Radiant', mark: NwsbMarks.crown),
+            const PaneHead(eyebrow: 'NowssB Partner', title: 'Breath · Stillness · Awakening', mark: NwsbMarks.crown),
             const SizedBox(height: 12),
             SecBanner(
               title: '${EconomyMirror.instance.partnerPoints} partner points',
               sub: 'Points come only from real purchases through your links.',
               mark: NwsbMarks.crown,
               lottie: kPartnerLottie,
-              onTap: () => EarnUmbrellaSection._open(context, const PartnerProgramPage()),
+              onTap: () => EarnUmbrellaSection._open(context, const PartnerScreen()),
             ),
           ],
         ),

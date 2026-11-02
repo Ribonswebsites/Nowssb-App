@@ -1003,12 +1003,6 @@ class RmWordCard extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            if (signature)
-                              const Positioned(
-                                top: 6,
-                                left: 6,
-                                child: _SignatureTag(),
-                              ),
                             Positioned(
                               left: 6,
                               bottom: 6,
@@ -1226,31 +1220,6 @@ class _CenteredPrice extends StatelessWidget {
   }
 }
 
-class _SignatureTag extends StatelessWidget {
-  const _SignatureTag();
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFE8D5A3), Color(0xFFC8A96E)],
-        ),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: const EditableLabel('store_cards.SignatureTag',
-        'Signature',
-        style: TextStyle(
-          fontSize: 8,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.8,
-          color: Color(0xFF060C18),
-        ),
-      ),
-    );
-  }
-}
-
 class _BagMarkDisc extends StatelessWidget {
   const _BagMarkDisc();
 
@@ -1367,10 +1336,8 @@ class MsCard extends StatelessWidget {
                   ),
                 ),
               ),
-              if (signature)
-                const Positioned(top: 6, left: 6, child: _SignatureTag()),
               Positioned(
-                top: signature ? 32 : 6,
+                top: 6,
                 left: 6,
                 child: const FriendDiscountBadge(kind: 'meaning'),
               ),

@@ -16,7 +16,6 @@ import '../economy/economy_api.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
 import 'program_heroes.dart';
-import '../economy/reference_screen.dart';
 
 const kReferenceDisclaimer =
     'Rewards are given only after a friend completes a real purchase or 3 active days. Buying through your own link, or '
@@ -30,7 +29,7 @@ const kReferenceSpec = ProgramSpec(
   disclaimer: kReferenceDisclaimer,
   accent: ProgramAccent.reference,
   tabs: [
-    ProgramTab('hub', 'Link Hub', _hub),
+    ProgramTab('hub', 'Link Hub', referenceHubTab),
     ProgramTab('friends', 'Friends', _friends),
     ProgramTab('rewards', 'Rewards', _rewards),
     ProgramTab('cards', 'Share Cards', _cards),
@@ -39,24 +38,13 @@ const kReferenceSpec = ProgramSpec(
   ],
 );
 
-/// Kept for every existing entry point: opens the one Reference page.
-class ReferenceProgramPage extends StatelessWidget {
-  const ReferenceProgramPage({super.key, this.initialTab});
-  final int? initialTab;
-
-  @override
-  Widget build(BuildContext context) => ReferenceScreen(
-        initialTab: initialTab == null ? null : kReferenceSpec.tabs[initialTab!.clamp(0, kReferenceSpec.tabs.length - 1)].id,
-      );
-}
-
 void _copy(BuildContext context, String text, [String done = 'Link copied.']) {
   Clipboard.setData(ClipboardData(text: text));
   RewardHaptics.tick();
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(done)));
 }
 
-List<Widget> _hub(BuildContext context, Map<String, dynamic> s) => [
+List<Widget> referenceHubTab(BuildContext context, Map<String, dynamic> s) => [
       LSection('hub', 'Link hub', ServerView(
         action: 'linkHub',
         builder: (context, r, reload) {

@@ -255,7 +255,7 @@ Future<void> openGiftBox(
 }
 
 GiftBox giftBoxFor(String cardId) => switch (cardId) {
-      'bundle' || 'signature3' => kGiftBoxes[2],
+      'bundle' => kGiftBoxes[2],
       'basic7' || 'ebook7' || 'standard30' || 'premium30' || 'ebook30' => kGiftBoxes[1],
       _ => kGiftBoxes[0],
     };
@@ -271,7 +271,6 @@ class GiftPlanGrid extends StatelessWidget {
     ('7-day ebook', 'After the trial.', 'assets/gifts/box-gold.webp', 'ebook'),
     ('30-day Standard', 'Gifted is not a rate.', 'assets/gifts/box-gold.webp', 'standard'),
     ('30-day Premium', 'Higher tier.', 'assets/gifts/box-gold.webp', 'premium'),
-    ('3-day Signature', 'Does not unlock Partner.', 'assets/gifts/box-black.webp', 'signature'),
   ];
 
   @override

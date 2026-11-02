@@ -47,9 +47,10 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
   late final AnimationController _c =
       AnimationController.unbounded(vsync: this, value: (widget.debugFront ?? 0).toDouble());
   double get a => widget.debugAngle ?? _c.value;
-  final _tabKeys = List.generate(4, (_) => GlobalKey());
+  static final int _n = DoorKind.values.length;
+  final _tabKeys = List.generate(_n, (_) => GlobalKey());
 
-  int get front => (a.round() % 4 + 4) % 4;
+  int get front => (a.round() % _n + _n) % _n;
 
   @override
   void initState() {
@@ -76,8 +77,8 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
 
   void _toFace(int i) {
     final cur = _c.value;
-    var d = (i - cur) % 4;
-    if (d > 2) d -= 4;
+    var d = (i - cur) % _n;
+    if (d > _n / 2) d -= _n;
     _turnTo((cur + d).roundToDouble());
   }
 
@@ -92,7 +93,7 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
           FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
-              child: Text('Four doors. One tap.', key: const ValueKey('drop-prism-heading'), maxLines: 1, style: V4Type.title())),
+              child: Text('Three doors. One tap.', key: const ValueKey('drop-prism-heading'), maxLines: 1, style: V4Type.title())),
           const SizedBox(height: 3),
           Text('Turn the prism. Tap the front to change it.', style: V4Type.sub()),
         ]),
@@ -103,7 +104,9 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
           animation: _c,
           builder: (context, _) => Breath(builder: (context, t) {
             // a resting quarter-turn bias so the next side face always peeks
-            final faces = [for (var i = 0; i < 4; i++) (i, (i - a - .2) * math.pi / 2)]
+            final step = 2 * math.pi / _n;
+            final depth = w / (2 * math.tan(math.pi / _n));
+            final faces = [for (var i = 0; i < _n; i++) (i, (i - a - .2) * step)]
               ..sort((x, y) => math.cos(x.$2).compareTo(math.cos(y.$2)));
             final fr = front;
             return Semantics(
@@ -139,9 +142,9 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                           alignment: Alignment.center,
                           transform: Matrix4.identity()
                             ..setEntry(3, 2, .0018)
-                            ..translateByDouble(0, 0, w / 2, 1)
+                            ..translateByDouble(0, 0, depth, 1)
                             ..rotateY(f.$2)
-                            ..translateByDouble(0, 0, -w / 2, 1),
+                            ..translateByDouble(0, 0, -depth, 1),
                           child: _Face(kind: DoorKind.values[f.$1], w: w, t: t, isFront: f.$1 == fr, shade: 1 - math.cos(f.$2)),
                         ),
                   ]),
@@ -162,7 +165,7 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
               // scrollable tab row: icon + label, one text size, never squeezed
               // all four tabs always visible: wrap to a second row when narrow
               Wrap(spacing: 8, runSpacing: 8, children: [
-                  for (var i = 0; i < 4; i++)
+                  for (var i = 0; i < _n; i++)
                     Semantics(
                       key: _tabKeys[i],
                       button: true,
@@ -217,7 +220,6 @@ class _Face extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget preview = switch (kind) {
-      DoorKind.themes => _ThemesPreview(t: t),
       DoorKind.startArt => const _StillPreview(),
       _ => SettingPreview(kind: kind, t: t),
     };
@@ -265,101 +267,6 @@ class _StillPreview extends StatelessWidget {
         ),
       ),
     ]);
-  }
-}
-
-/// Themes face: three real mini homes (Plain, Full, TV) — the current one in gold.
-class _ThemesPreview extends StatelessWidget {
-  const _ThemesPreview({required this.t});
-  final double t;
-  @override
-  Widget build(BuildContext context) {
-    final cur = Settings.instance.heroStyle;
-    Widget tile(String st) {
-      final on = cur == st;
-      final Widget hero = switch (st) {
-        'full' => Image.asset('assets/video/hero-bg-poster.webp', fit: BoxFit.cover),
-        'tv' => Padding(
-            padding: const EdgeInsets.fromLTRB(26, 4, 26, 4),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.white38),
-                  image: const DecorationImage(image: AssetImage('assets/video/tv-screen-poster.webp'), fit: BoxFit.cover)),
-            )),
-        _ => const _MiniPlainHome(),
-      };
-      return Expanded(
-        child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 2),
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            color: _deep,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: on ? _gold : Colors.white24, width: on ? 2 : 1),
-          ),
-          child: Stack(fit: StackFit.expand, children: [
-            hero,
-            if (st != 'plain') Positioned(
-              left: 5,
-              bottom: 3,
-              child: Text(switch (st) { 'full' => 'Full', 'tv' => 'TV', _ => 'Plain' },
-                  style: st == 'plain'
-                      ? const TextStyle(color: _ink, fontSize: 9, fontWeight: FontWeight.w800)
-                      : const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800, shadows: [Shadow(blurRadius: 4)])),
-            ),
-          ]),
-        ),
-      );
-    }
-
-    return Container(
-      color: _deep,
-      padding: const EdgeInsets.all(6),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [for (final s in const ['plain', 'full', 'tv']) tile(s)]),
-    );
-  }
-}
-
-/// A miniature of the Plain home: greeting ramp + a rail of real stills.
-class _MiniPlainHome extends StatelessWidget {
-  const _MiniPlainHome();
-  @override
-  Widget build(BuildContext context) {
-    final imgs = Settings.fashionImages;
-    return Container(
-      color: const Color(0xFFF7F4EF),
-      padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
-      child: Row(children: [
-        Expanded(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              ListenableBuilder(
-                  listenable: DayClock.tick,
-                  builder: (context, _) => Text(dayPartFor(DayClock.now()).greeting,
-                      key: const ValueKey('drop-prism-greeting'), style: TextStyle(fontSize: 7, fontWeight: FontWeight.w300, color: Colors.black.withValues(alpha: .55)))),
-              const Text('Healer', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: _ink, height: 1)),
-              const SizedBox(height: 3),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: BoxDecoration(color: _ink, borderRadius: BorderRadius.circular(3)),
-                child: const Text('Plain', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w800)),
-              ),
-            ]),
-          ),
-        ),
-        for (var i = 0; i < 3 && i < imgs.length; i++)
-          Container(
-            width: 16,
-            margin: const EdgeInsets.only(left: 4),
-            clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(3)),
-            child: Image.asset(imgs[i], fit: BoxFit.cover, height: double.infinity, alignment: Alignment.topCenter),
-          ),
-      ]),
-    );
   }
 }
 

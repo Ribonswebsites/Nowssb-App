@@ -19,9 +19,7 @@ import '../../data/trending_chart.dart';
 import '../../features/economy/economy_api.dart';
 import '../../widgets/concept/normal/ebooks.dart';
 import '../../widgets/concept/normal/edition.dart';
-import '../../widgets/concept/normal/invite.dart';
 import '../../widgets/concept/normal/own.dart';
-import '../../widgets/concept/normal/partner.dart';
 import '../../widgets/concept/normal/rewards.dart';
 import '../../widgets/concept/normal/trending.dart';
 
@@ -31,8 +29,8 @@ int? _int(Object? o) => o is num ? o.toInt() : int.tryParse('${o ?? ''}');
 /// Rewards + Invite, from EconomyMirror (coins, streak, referral code and
 /// the server's `config.reference.friendDiscount`).
 class V5RewardsInvite extends StatelessWidget {
-  const V5RewardsInvite({super.key, required this.onOpenRewards, required this.onSignIn, required this.onInvite});
-  final VoidCallback onOpenRewards, onSignIn, onInvite;
+  const V5RewardsInvite({super.key, required this.onOpenRewards, required this.onSignIn});
+  final VoidCallback onOpenRewards, onSignIn;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: EconomyMirror.instance,
@@ -42,15 +40,6 @@ class V5RewardsInvite extends StatelessWidget {
           final fd = _map(_map(_map(w.summary['config'])['reference'])['friendDiscount']);
           return Column(key: const ValueKey('v5-rewards-invite'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             NRewards(coins: w.coins, streak: w.streak, signedIn: signedIn, onOpenRewards: onOpenRewards, onSignIn: onSignIn),
-            // no server config: no Invite card at all (no empty stub)
-            if (_int(fd['wordPct']) != null || _int(fd['subscriptionPct']) != null)
-              NInvite(
-                onInvite: onInvite,
-                wordPct: _int(fd['wordPct']),
-                wordFirstN: _int(fd['wordFirstN']),
-                subscriptionPct: _int(fd['subscriptionPct']),
-                code: signedIn && w.code.isNotEmpty ? w.code : null,
-              ),
           ]);
         },
       );
@@ -127,21 +116,14 @@ class V5Own extends StatelessWidget {
 /// Edition (Play prices, availability, active tier) + Partner (points and
 /// the server's `config.partner.levels`).
 class V5EditionPartner extends StatelessWidget {
-  const V5EditionPartner({super.key, required this.onJoin, required this.onPartner});
+  const V5EditionPartner({super.key, required this.onJoin});
   final void Function(String tier) onJoin;
-  final VoidCallback onPartner;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: Listenable.merge([PlaySubscriptions.instance, EconomyMirror.instance]),
         builder: (context, _) {
           final ps = PlaySubscriptions.instance;
           final w = EconomyMirror.instance;
-          final levels = <(String, int)>[
-            for (final l in (_map(_map(w.summary['config'])['partner'])['levels'] is List
-                ? _map(_map(w.summary['config'])['partner'])['levels'] as List
-                : const []))
-              if (l is Map && l['title'] != null && _int(l['points']) != null) ('${l['title']}', _int(l['points'])!),
-          ];
           return Column(key: const ValueKey('v5-edition-partner'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             NEdition(
               onJoin: onJoin,
@@ -152,8 +134,6 @@ class V5EditionPartner extends StatelessWidget {
               playAvailable: ps.available,
               currentTier: ps.activeTier,
             ),
-            // no server partner levels: no Partner card at all
-            if (levels.isNotEmpty) NPartner(points: w.partnerPoints, levels: levels, onPartner: onPartner),
           ]);
         },
       );

@@ -3,7 +3,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import '../features/earn/earn_hub_screen.dart';
+import '../features/circle/circle_screen.dart';
 import '../screens/profile.dart';
 import '../shell/nwsb_links.dart';
 import 'hype_rail.dart';
@@ -17,7 +17,7 @@ void ensureHypeRoutes() {
       case 'gifts':
         NwsbLinks.cta(context, 'gift');
       case 'earn':
-        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarnHubScreen()));
+        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen()));
       case 'rewards':
         NwsbLinks.cta(context, 'reward');
       case 'library':

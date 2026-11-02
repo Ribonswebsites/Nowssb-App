@@ -207,55 +207,6 @@ abstract final class MeaningMix {
       _seed(SectionTypeId.glassyCarousel, glassyId, _storeDoors(skip: 'meaning'));
 }
 
-// ─── Signature Store ────────────────────────────────────────────────────────
-
-/// Signature Store mix: artistCards → glassyCarousel → hypedRow (existing) →
-/// spotlight (registered; once per page).
-abstract final class SignatureMix {
-  static const artistsId = 'store.signature.artists';
-  static const glassyId = 'store.signature.glassy';
-  static const spotlightId = 'store.signature.spotlight';
-
-  /// Rarest signature words as artist cards (id = signature key).
-  static final SectionConfig artists = _seed(SectionTypeId.artistCards, artistsId, [
-        for (final c in kRmCategories.where((c) => c.signature != null).take(6))
-          SectionMediaItem(
-            id: c.signature!.key,
-            imageUrl: c.signature!.img,
-            title: c.signature!.name,
-            subtitle: 'Most Exclusive',
-            meta: {'footer': c.label},
-          ),
-      ]);
-
-  /// Other store doors; media admin-filled.
-  static final SectionConfig glassy =
-      _seed(SectionTypeId.glassyCarousel, glassyId, _storeDoors(skip: 'signature'));
-
-  /// Signature highlights — empty media → black/gold placeholders.
-  static final SectionConfig spotlight = _seed(SectionTypeId.spotlight, spotlightId, const [
-        SectionMediaItem(
-          id: 'sig.words',
-          title: 'Signature Words',
-          subtitle: 'One per collection — the rarest',
-          meta: {'badge': 'Rare'},
-        ),
-        SectionMediaItem(
-          id: 'sig.meanings',
-          title: 'Signature Meanings',
-          subtitle: 'Full decoded origin',
-          meta: {'badge': 'Exclusive'},
-        ),
-        SectionMediaItem(
-          id: 'sig.request',
-          title: 'Request a Signature',
-          subtitle: 'Crafted within 48 hours',
-          ctaLink: 'request',
-          meta: {'badge': 'Custom'},
-        ),
-      ]);
-}
-
 // ─── eBooks Store ───────────────────────────────────────────────────────────
 
 /// eBooks Store mix: couponBanner → categoryTiles → glassyCarousel →

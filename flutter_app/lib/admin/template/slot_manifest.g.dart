@@ -506,7 +506,6 @@ const kSlotManifest = <List<String>>[
   ['store.StoreHomeContent.player-bg-loop', 'video', 'assets/video/player-bg-loop.mp4', 'screens/store.dart'],
   ['store.StoreTermsSheet.hands-offer', 'image', 'assets/notifications/hands-offer.webp', 'screens/store/store_terms_sheet.dart'],
   ['store_cards.RmWordCard.buy-now', 'text', 'Buy Now', 'screens/store/store_cards.dart'],
-  ['store_cards.SignatureTag.signature', 'text', 'Signature', 'screens/store/store_cards.dart'],
   ['store_cards.StoreDisclaimer.disclaimer-confidentiality', 'text', 'Disclaimer & Confidentiality', 'screens/store/store_cards.dart'],
   ['store_cards.StoreDisclaimer.nowssb-2026-adv-sanjaykumar-gadge-shabda-5096388f', 'text', 'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy', 'screens/store/store_cards.dart'],
   ['store_cards.StoreSearchBar.go', 'text', 'GO', 'screens/store/store_cards.dart'],

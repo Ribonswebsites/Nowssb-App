@@ -7,9 +7,7 @@ import 'package:nowssb/widgets/concept/normal/ebooks.dart';
 import 'package:nowssb/widgets/concept/normal/edition.dart';
 import 'package:nowssb/widgets/concept/normal/fashion_plus_entry.dart';
 import 'package:nowssb/widgets/concept/normal/footer.dart';
-import 'package:nowssb/widgets/concept/normal/invite.dart';
 import 'package:nowssb/widgets/concept/normal/own.dart';
-import 'package:nowssb/widgets/concept/normal/partner.dart';
 import 'package:nowssb/widgets/concept/normal/rewards.dart';
 import 'package:nowssb/widgets/concept/normal/surface.dart';
 import 'package:nowssb/widgets/concept/normal/trending.dart';
@@ -34,11 +32,9 @@ final _books = [for (final b in kEbBooks) (b.key, b.title)];
 
 List<Widget> _all(List<String> log) => [
       NRewards(coins: 120, streak: 3, signedIn: true, onOpenRewards: () => log.add('rewards'), onSignIn: () => log.add('signin')),
-      NInvite(onInvite: () => log.add('invite'), wordPct: null, wordFirstN: null, subscriptionPct: null),
       NTrending(words: const ['Om', 'Shanti', 'Prana'], onWord: (w) => log.add('word:$w'), onLibrary: () => log.add('library')),
       NOwn(onCart: () => log.add('cart'), onWishlist: () => log.add('wish'), onOrders: () => log.add('orders'), cartCount: 2, wishlistCount: 0, orderCount: 1),
       NEdition(onJoin: (t) => log.add('join:$t'), prices: const {}, playAvailable: null),
-      NPartner(points: 0, levels: null, onPartner: () => log.add('partner')),
       NEbooks(onBrowse: () => log.add('ebooks'), books: _books),
       NFashionPlusEntry(onEnter: () => log.add('fashion')),
       NFooter(onLink: (k) => log.add('foot:$k')),
@@ -67,7 +63,7 @@ void main() {
       await tap(l.$1);
     }
     await t.pump(const Duration(seconds: 1));
-    for (final want in ['rewards', 'invite', 'word:Om', 'word:Shanti', 'join:frequency', 'partner', 'ebooks', 'fashion', 'library',
+    for (final want in ['rewards', 'word:Om', 'word:Shanti', 'join:frequency', 'ebooks', 'fashion', 'library',
       for (final l in NFooter.links) 'foot:${l.$2}']) {
       expect(log, contains(want), reason: want);
     }
@@ -104,12 +100,8 @@ void main() {
 
   testWidgets('real config values are shown as given', (t) async {
     await _pump(t, Column(children: [
-      const NInvite(onInvite: _no, wordPct: 15, wordFirstN: 3, subscriptionPct: 20),
-      const NPartner(points: 120, levels: [('Bronze', 100), ('Silver', 500)], onPartner: _no),
       NEdition(onJoin: (_) {}, prices: const {'resonance': '₹99', 'frequency': '₹99', 'frequencyX': '₹99'}, playAvailable: true),
     ]));
-    expect(find.text('Friends get 20% off a first plan and 15% off 3 words.'), findsOneWidget);
-    expect(find.text('380 points to Silver'), findsOneWidget);
     expect(find.textContaining('₹99'), findsOneWidget);
   });
 
@@ -129,8 +121,6 @@ void main() {
       await _pump(t, Column(children: _all([])), w: w, ts: ts);
       await _pump(t, Column(children: [
         NRewards(coins: 123456, streak: 7, signedIn: true, onOpenRewards: _no, onSignIn: _no),
-        const NInvite(onInvite: _no, wordPct: 15, wordFirstN: 3, subscriptionPct: 20, code: 'ABCD1234'),
-        const NPartner(points: 120, levels: [('Bronze', 100), ('Silver', 500), ('Gold', 2000)], onPartner: _no),
         NEdition(onJoin: (_) {}, prices: const {'resonance': '₹99', 'frequency': '₹199', 'frequencyX': '₹499'}, playAvailable: true),
         const NOwn(onCart: _no, onWishlist: _no, onOrders: _no, cartCount: 12, wishlistCount: 34, orderCount: 56),
       ]), w: w, ts: ts);

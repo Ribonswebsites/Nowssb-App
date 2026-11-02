@@ -31,7 +31,6 @@ import '../quick_access.dart';
 import '../store/store_actions.dart';
 import '../store/store_art.dart';
 import '../store/store_cards.dart' show kWordPriceInr, localizedMoney;
-import '../widgets_page.dart';
 import 'door_screens.dart';
 import '../concept/drop_v4_concepts.dart' show DoorHooks;
 import '../concept/drop_v5.dart';
@@ -93,7 +92,6 @@ class _DropStudioScreenState extends State<DropStudioScreen> {
       },
       onBuy: _buy,
       onOpenCart: () => NwsbLinks.cart(context),
-      onOpenThemes: () => push(const DoorFashionPlusScreen()),
       onOpenBackground: () => push(const DoorBackgroundScreen()),
       onOpenStartArt: () => push(const DoorStartArtScreen()),
       onOpenAccess: () => push(const DoorAccessScreen()),
@@ -154,7 +152,6 @@ class FashionDropStudio extends StatefulWidget {
     this.onOpenDrop,
     this.onOpenWord,
     this.onBuy,
-    this.onOpenThemes,
     this.onOpenBackground,
     this.onOpenStartArt,
     this.onOpenAccess,
@@ -178,7 +175,6 @@ class FashionDropStudio extends StatefulWidget {
   /// "Own this word" → meaning checkout for that word.
   final void Function(Word word)? onBuy;
 
-  final VoidCallback? onOpenThemes; // → WidgetsPage
   final VoidCallback? onOpenBackground; // → FashionPlusScreen (backdrop)
   final VoidCallback? onOpenStartArt; // → FashionPlusScreen (start art)
   final VoidCallback? onOpenAccess; // → QuickAccessScreen
@@ -264,7 +260,6 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
                   const SizedBox(height: 34),
                   DoorsPrismV5(
                     hooks: DoorHooks(
-                      onOpenThemes: widget.onOpenThemes,
                       onOpenBackground: widget.onOpenBackground,
                       onOpenStartArt: widget.onOpenStartArt,
                       onOpenAccess: widget.onOpenAccess,

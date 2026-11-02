@@ -37,17 +37,6 @@ const kPartnerSpec = ProgramSpec(
   ],
 );
 
-/// Kept for every existing entry point: opens the one Partner page.
-class PartnerProgramPage extends StatelessWidget {
-  const PartnerProgramPage({super.key, this.initialTab});
-  final int? initialTab;
-
-  @override
-  Widget build(BuildContext context) => PartnerScreen(
-        initialTab: initialTab == null ? null : kPartnerSpec.tabs[initialTab!.clamp(0, kPartnerSpec.tabs.length - 1)].id,
-      );
-}
-
 Widget _ps(Widget Function(BuildContext, Map<String, dynamic>, VoidCallback) b) => ServerView(action: 'partnerSummary', builder: b);
 
 String _perkLine(Map<String, dynamic> l) => [
@@ -152,7 +141,7 @@ List<Widget> _rules(BuildContext context, Map<String, dynamic> s) => const [
         'Points stay pending until the refund window ends. A refund or chargeback removes them.',
         'Gifted passes and the 3-day Signature card never unlock Partner levels.',
         'Perks are coins, gift boxes, scratch cards, passes and early access. None of them is cash.',
-        'The Partner path also fast-tracks NowssB Earn: Radiant partners start Earn as an Officer once they qualify.',
+        'The Partner path also fast-tracks NowssB Earn: Awakening partners start Earn as an Officer once they qualify.',
       ], slot: 'partner_program.rules')),
     ];
 

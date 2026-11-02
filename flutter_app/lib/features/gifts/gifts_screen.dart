@@ -48,7 +48,6 @@ const _kGiftDefaults = <GiftItem>[
   GiftItem('ebook7', '7-day ebook', 49, productId: 'nowssb_gift_ebook7'),
   GiftItem('standard30', '30-day Standard', 499, productId: 'nowssb_gift_standard30'),
   GiftItem('premium30', '30-day Premium', 999, productId: 'nowssb_gift_premium30'),
-  GiftItem('signature3', '3-day Signature', 199, productId: 'nowssb_gift_signature3'),
   GiftItem('ebook30', '30-day ebook pass', 149, productId: 'nowssb_gift_ebook30'),
   GiftItem('restore', 'Streak Restore', 99, productId: 'nowssb_gift_restore'),
 ];
@@ -68,10 +67,8 @@ String giftCardFor(String itemId) => switch (itemId) {
       'ebook' => 'ebook7',
       'standard' => 'standard30',
       'premium' => 'premium30',
-      'signature' => 'signature3',
       'Word gift' => 'word',
       'Subscription gift' => 'standard30',
-      'Signature gift' => 'signature3',
       _ => itemId,
     };
 

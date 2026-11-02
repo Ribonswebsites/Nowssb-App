@@ -25,12 +25,11 @@ import '../../screens/store/ebooks_store.dart';
 import '../../screens/store/request_words.dart';
 import '../../screens/subscription.dart';
 import '../../screens/word_detail.dart';
-import '../earn/earn_hub_screen.dart';
-import '../economy/reference_screen.dart';
+import '../circle/circle_screen.dart';
+import '../economy/coupon_screen.dart';
+import '../vault/vault_screen.dart';
 import '../gifts/gifts_screen.dart';
-import '../programs/coupons_program.dart';
 import '../gifts/spin_wheel.dart';
-import '../programs/rewards_program.dart';
 import 'inbox_screen.dart';
 import 'notif_preferences_screen.dart';
 
@@ -85,7 +84,7 @@ class NotifRouter {
         'gifts' => 'gifts',
         'spin' => 'spin',
         'update' => 'update',
-        'streak' => 'progress',
+        'streak' => 'home',
         'routine' => 'practice',
         'reader' => 'reader',
         'orders' || 'delivery' || 'cart' => 'store',
@@ -132,24 +131,22 @@ class NotifRouter {
       case 'word':
         final w = _word(arg);
         return w == null ? const RequestWordsScreen() : WordDetail(word: w);
-      case 'progress':
-        return null; // Progress page removed (Ribon 11-02)
       case 'rewards':
-        return const RewardsProgramPage();
+        return const VaultScreen();
       case 'coins':
-        return const RewardsTabPage(tab: 'today');
+        return const VaultScreen();
       case 'spin':
-        return const SpinWheelPage();
+        return const GiftsScreen();
       case 'update':
         return const LatestUpdatePage();
       case 'coupons':
-        return const CouponsProgramPage();
+        return const CouponScreen();
       case 'gifts':
         return const GiftsScreen();
       case 'earn':
-        return const EarnHubScreen();
+        return const CircleScreen();
       case 'reference':
-        return const ReferenceScreen();
+        return const CircleScreen(initialTab: 'invite');
       case 'subscription':
         return const SubscriptionScreen();
       case 'ebooks':

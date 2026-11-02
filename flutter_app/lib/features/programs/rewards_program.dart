@@ -39,49 +39,6 @@ const kRewardsSpec = ProgramSpec(
   ],
 );
 
-/// Opens one Rewards tab on its own page, so a notification can land on
-/// Collect (today) or any other tab and you use it from there.
-class RewardsTabPage extends StatelessWidget {
-  const RewardsTabPage({super.key, required this.tab});
-  final String tab;
-
-  @override
-  Widget build(BuildContext context) {
-    final title = tab == 'today' || tab == 'wallet' ? 'Coins' : 'Rewards';
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070C),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF07070C),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        title: Text(title),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-        children: [
-          ProgramTabsBlock(
-            spec: kRewardsSpec,
-            initialTab: tab,
-            scrollTo: true,
-            showDisclaimer: false,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Kept for every existing entry point: opens the one Rewards page.
-class RewardsProgramPage extends StatelessWidget {
-  const RewardsProgramPage({super.key, this.initialTab});
-  final int? initialTab;
-
-  @override
-  Widget build(BuildContext context) => VaultScreen(
-        initialTab: initialTab == null ? null : kRewardsSpec.tabs[initialTab!.clamp(0, kRewardsSpec.tabs.length - 1)].id,
-      );
-}
-
 Map<String, dynamic> _cfg(Map<String, dynamic> s) => sMap(s['config']);
 Map<String, dynamic> _r(Map<String, dynamic> s) => sMap(_cfg(s)['rewards']);
 

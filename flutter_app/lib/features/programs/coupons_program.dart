@@ -41,18 +41,6 @@ const kCouponsSpec = ProgramSpec(
   ],
 );
 
-/// Kept for every existing entry point: opens the one Coupons page
-/// (CouponScreen), at tab [initialTab] when given.
-class CouponsProgramPage extends StatelessWidget {
-  const CouponsProgramPage({super.key, this.initialTab});
-  final int? initialTab;
-
-  @override
-  Widget build(BuildContext context) => CouponScreen(
-        initialTab: initialTab == null ? null : kCouponsSpec.tabs[initialTab!.clamp(0, kCouponsSpec.tabs.length - 1)].id,
-      );
-}
-
 List<Widget> _mine(BuildContext context, Map<String, dynamic> s) {
   final coupons = sList(s['coupons']);
   final tokens = sList(s['tokens']);
