@@ -10,6 +10,7 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
+import '../../widgets/concept/r27/anims.dart' show R27SoundOrb, R27BreathFlame, R27Coin;
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -335,7 +336,7 @@ class V4SoundLibrary extends StatelessWidget {
           const _Well(
             circle: true,
             size: Size.square(96),
-            child: V4Film('assets/video/orb-loop.mp4', slot: 'sound', circle: true),
+            child: ClipOval(child: ColoredBox(color: Color(0xFF0B0B0F), child: Center(child: R27SoundOrb(size: 92)))),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -558,10 +559,10 @@ class V4Streak extends StatelessWidget {
                     Text(s == 1 ? 'day in a row' : 'days in a row', style: _sub),
                   ]),
                 ),
-                const _Well(
+                _Well(
                   circle: true,
-                  size: Size.square(92),
-                  child: V4Film('assets/video/player-aura-bg.mp4', slot: 'streak', circle: true),
+                  size: const Size.square(92),
+                  child: ClipOval(child: ColoredBox(color: const Color(0xFF0B0B0F), child: Center(child: R27BreathFlame(streak: s, size: 88)))),
                 ),
               ]),
               const SizedBox(height: 14),
@@ -672,7 +673,7 @@ class V4StoreEarn extends StatelessWidget {
       V4Card(
         onTap: earn,
         child: Row(children: [
-          const _Well(circle: true, size: Size.square(64), child: V4Lottie(kCoinsLottie, size: 52)),
+          const _Well(circle: true, size: Size.square(64), child: R27Coin(size: 52)),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

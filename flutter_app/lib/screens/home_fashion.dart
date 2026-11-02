@@ -25,6 +25,7 @@
 /// further down come and go.
 library;
 
+import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'poster/poster_pages.dart' show TrendingScreen, posterPush;
 import '../data/fashion_bg_dim.dart';
 import 'package:flutter/material.dart';
@@ -688,7 +689,7 @@ class _HomeFashionState extends State<HomeFashion> {
         ('routines', RoutinesSection(onTap: () => _go(1), fashion: true)),
         ('offer', FashOffer(onTap: () => _go(3))),
         // NowssB Coupons: below NowssB Gifts, a contained glass block.
-        ('roundring', const SizedBox.shrink()),
+        ('roundring', const R27LiveSections(fashion: true)),
         ('cube', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           QuickAccessSection(
             onCart: () => NwsbLinks.cart(context),
