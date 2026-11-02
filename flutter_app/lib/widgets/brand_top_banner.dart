@@ -64,15 +64,21 @@ class BrandTopBanner extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (mark != null) ...[
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
+                        // Mark gives way when the 3-line title grows.
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Container(
+                              width: 42,
+                              height: 42,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              alignment: Alignment.center,
+                              child: NwsbIcon(mark!, size: 20, color: Colors.black),
+                            ),
                           ),
-                          alignment: Alignment.center,
-                          child: NwsbIcon(mark!, size: 20, color: Colors.black),
                         ),
                         const SizedBox(height: 10),
                       ],

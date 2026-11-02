@@ -338,7 +338,9 @@ class NowProgressCard extends StatelessWidget {
                 Text(item.title.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
                     style: _ink.copyWith(fontSize: 15, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 4),
-                Text(item.sub, maxLines: 2, overflow: TextOverflow.ellipsis,
+                // Fixed-height card: one sub line once text is scaled up.
+                Text(item.sub, maxLines: MediaQuery.textScalerOf(context).scale(10) > 11.5 ? 1 : 2,
+                    overflow: TextOverflow.ellipsis,
                     style: _ink.copyWith(fontSize: 12.5, color: const Color(0x99FFFFFF), height: 1.25)),
                 const Spacer(),
                 LayoutBuilder(builder: (_, c) {
