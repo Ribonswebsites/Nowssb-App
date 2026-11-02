@@ -353,7 +353,7 @@ class R27CouponsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = r27CouponCards(data, onScratch: onScratch, onOpen: onOpen, onCoupon: onCoupon);
-    final h = r27H(context, fashion ? 176 : 164, 52);
+    final h = r27H(context, fashion ? 176 : 164, 80);
     final title = data.coupons.isNotEmpty
         ? '${data.coupons.length} ${data.coupons.length == 1 ? 'discount' : 'discounts'} ready'
         : (!data.scratchedToday ? "Today's card is ready" : 'Cards and discounts');

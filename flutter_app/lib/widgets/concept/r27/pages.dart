@@ -223,20 +223,20 @@ class R27CouponsPage extends StatelessWidget {
           title: data.scratchedToday ? 'Cards and discounts' : "Today's card is ready",
           sub: '${data.sealedTotal} sealed · ${data.coupons.length} ${data.coupons.length == 1 ? 'discount' : 'discounts'} · use them at checkout'),
       children: [
-        R27AutoRow(count: items.length, height: r27H(context, 180, 52), fraction: .86, every: const Duration(milliseconds: 4000),
+        R27AutoRow(count: items.length, height: r27H(context, 180, 70), fraction: .86, every: const Duration(milliseconds: 4000),
             builder: (c, i, off) => Transform.scale(scale: 1 - .08 * off.abs().clamp(0.0, 1.0), child: items[i])),
         if (data.sealed.isNotEmpty) ...[
           _label('Sealed cards'),
           _pad(Wrap(spacing: 0, runSpacing: 0, children: [
             for (final e in data.sealed.entries)
-              FractionallySizedBox(widthFactor: .5, child: SizedBox(height: r27H(context, 118, 52),
+              FractionallySizedBox(widthFactor: .5, child: SizedBox(height: r27H(context, 118, 64),
                   child: R27FoilCard(tint: rarityColor(e.key), tag: rarityTitle(e.key), word: '×${e.value}', line: 'Tap to scratch', onTap: () => onSealed(e.key)))),
           ])),
         ],
         if (data.coupons.isNotEmpty) ...[
           _label('Discounts'),
           for (var i = 0; i < data.coupons.length; i++)
-            _pad(SizedBox(height: r27H(context, 120, 52), child: R27Stub(data.coupons[i], onTap: () => onCoupon(i)))),
+            _pad(SizedBox(height: r27H(context, 120, 64), child: R27Stub(data.coupons[i], onTap: () => onCoupon(i)))),
         ],
         const SizedBox(height: 14),
         _pad(Wrap(spacing: 10, runSpacing: 10, children: [
