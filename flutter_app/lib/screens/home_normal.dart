@@ -37,6 +37,7 @@
 /// [HomeSkinScope] is what tells them which home they are on.
 library;
 
+import 'package:nowssb/widgets/concept/ref_sections.dart' show RefHomeSections;
 import 'package:nowssb/widgets/concept/r27/hero.dart' show R27MeditationBanner;
 import 'package:nowssb/data/content.dart' show ContentStore;
 import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
@@ -413,7 +414,7 @@ class _HomeNormalState extends State<HomeNormal> {
               onSupport: () => _go(4),
               onCoach: () => _push(const PersonalCoachScreen()))
         ),
-        ('catTiles', const SizedBox.shrink()),
+        ('catTiles', const RefHomeSections()),
         ('spotlight', const R27LiveSections()),
         ('tiles', const SizedBox.shrink()),
         ('storiesFind', const SizedBox.shrink()),

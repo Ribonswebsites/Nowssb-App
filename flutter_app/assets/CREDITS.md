@@ -48,3 +48,4 @@ Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are u
 | `meditation/meditation-lotus.webp` | StockSnap VC8IOCGVII "Lotus Flower", https://stocksnap.io/photo/lotus-flower-VC8IOCGVII, CC0 1.0 | Cut-out. Drop Studio word deck |
 | `meditation/meditation-candle.webp` | rawpixel 5963227, https://www.rawpixel.com/image/5963227, CC0 1.0 | Cut-out. Enter-curve stage subject |
 | `meditation/meditation-cairn.webp` | rawpixel 5902834 "Stacked wellness zen stones", https://www.rawpixel.com/image/5902834, CC0 1.0 | Cut-out. Hero-curve stage subject |
+- rs-candle — Pexels (free licence), https://www.pexels.com/photo/3822622/ — Offers & earning image and ref-style sections

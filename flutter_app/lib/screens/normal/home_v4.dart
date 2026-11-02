@@ -658,9 +658,12 @@ class V4StoreEarn extends StatelessWidget {
       V4Card(
         onTap: onStore,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          // Ribon 10-27: the purple liquid clip is gone — a meditation photo
+          // from Pexels (rs-candle, credited) with a slow drift instead.
           const AspectRatio(
             aspectRatio: 2.2,
-            child: _Well(child: V4Film('assets/video/hero-meaning-store.mp4', slot: 'store', radius: 18)),
+            child: _Well(child: ClipRRect(borderRadius: BorderRadius.all(Radius.circular(18)),
+                child: Image(image: AssetImage('assets/home/hc/rs-candle.webp'), fit: BoxFit.cover, alignment: Alignment(0, .35)))),
           ),
           const SizedBox(height: 14),
           const Text('Words that carry meaning', style: _h),
