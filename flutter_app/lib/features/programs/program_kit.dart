@@ -89,10 +89,8 @@ void reportExploreOnce(String page) {
   final now = DateTime.now().toUtc().add(const Duration(minutes: 330));
   final k = '${now.year}-${now.month}-${now.day}:$page';
   if (!_explored.add(k)) return;
-  EconomyApi.call('reportAction', {'action': 'explore', 'key': page}).then((r) {
-    final gained = coinsIn(r);
-    if (gained > 0) unawaited(playCoins(null, gained, balanceAfter: balanceIn(r), title: 'Explorer coins'));
-  }).catchError((_) {});
+  // Offered, not credited: the user collects it from the Collect card.
+  reportEarn('explore', key: page);
 }
 
 /// The tab chips + the selected tab's sections + the disclaimer, as a

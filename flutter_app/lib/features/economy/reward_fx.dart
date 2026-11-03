@@ -17,6 +17,7 @@ import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import 'economy_api.dart';
 import 'reward_overlay.dart';
+import 'coin_collect.dart';
 
 /// Rarity palette (Common → Mythic).
 Color rarityColor(String? rarity) => switch ((rarity ?? '').toLowerCase()) {
@@ -552,15 +553,9 @@ class SwitchingOnCard extends StatelessWidget {
 }
 
 
-/// Reports a real in-app activity once per IST day per key (the server
-/// still enforces every cap); any coins play the reveal and fly.
-final _reportedToday = <String>{};
+/// A real in-app activity happened. Its coins are NOT credited here: they
+/// wait in [PendingCoins] and the user collects them from the Collect card
+/// (the server still enforces every cap when they do).
 void reportEarn(String action, {String? key}) {
-  final now = DateTime.now().toUtc().add(const Duration(minutes: 330));
-  final k = '${now.year}-${now.month}-${now.day}:$action:${key ?? ''}';
-  if (!_reportedToday.add(k)) return;
-  EconomyApi.call('reportAction', {'action': action, if (key != null && key.isNotEmpty) 'key': key}).then((r) {
-    final gained = coinsIn(r);
-    if (gained > 0) unawaited(playCoins(null, gained, balanceAfter: balanceIn(r)));
-  }, onError: (_) {});
+  unawaited(PendingCoins.instance.offer(action, key: key));
 }

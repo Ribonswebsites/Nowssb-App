@@ -1,6 +1,7 @@
 /// The bottom nav — #ig-bottomnav. Five destinations, the active one gold.
 library;
 
+import '../features/economy/coin_collect.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -133,6 +134,8 @@ class _NavShellState extends State<NavShell> {
     _widgetTaps = HomeWidgetSync.instance.clicks.listen(_onWidgetTap);
     // Daily 'open the app' activity (server caps it at once a day).
     reportEarn('open');
+    // Coins left uncollected earlier today come back to collect.
+    unawaited(PendingCoins.instance.show());
     NotifRouter.instance.attach(context, goTab: _goToTab, popToRoot: _popShellOverlays);
     if (SplashGate.done.value) {
       WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_openDay()));

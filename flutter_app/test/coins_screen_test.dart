@@ -96,7 +96,7 @@ void main() {
     await t.pumpWidget(frame(key, const Align(alignment: Alignment.topCenter, child: Padding(padding: EdgeInsets.only(top: 10), child: CoinWalletPill(total: 1250, width: 358)))));
     expect(find.text('1250'), findsOneWidget);
     expect(find.byIcon(Icons.account_balance_wallet_rounded), findsOneWidget);
-    expect(find.text('today 63 / 250'), findsOneWidget);
+    expect(find.text('today 63 · 26 left'), findsOneWidget);
     await shot(t, key, '3-pill');
   });
 }

@@ -12,11 +12,15 @@ import 'package:flutter/services.dart';
 import '../admin/template/editable.dart';
 import '../features/economy/economy_api.dart' show EconomyMirror;
 import '../features/economy/reward_overlay.dart' show CoinPillAnchor;
+import '../features/economy/coin_collect.dart' show CoinDay;
 
 class NwsbCoinFly {
   NwsbCoinFly._();
 
   static const disc = 'assets/icons/nwsb-coin.webp';
+
+  /// Renders: let the flight play inside widget tests.
+  static bool debugPlayInTests = false;
 
   static Future<void> show(
     BuildContext context, {
@@ -50,7 +54,7 @@ class _FlyStage extends StatefulWidget {
 
 class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixin {
   late final AnimationController _move;
-  bool get _quiet => WidgetsBinding.instance.runtimeType.toString().contains('Test');
+  bool get _quiet => !NwsbCoinFly.debugPlayInTests && WidgetsBinding.instance.runtimeType.toString().contains('Test');
 
   @override
   void initState() {
@@ -217,6 +221,8 @@ class CoinWalletPill extends StatelessWidget {
     final earned = (today['freeCoins'] as num?)?.toInt();
     final cap = ((today['ceilingNow'] ?? today['ceiling']) as num?)?.toInt();
     final hasCap = earned != null && cap != null && cap > 0;
+    // Collected today vs still earnable today (open activities, under the cap).
+    final day = CoinDay.fromSummary(EconomyMirror.instance.summary);
     return Container(
       width: width,
       height: height,
@@ -240,7 +246,7 @@ class CoinWalletPill extends StatelessWidget {
                     style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, height: 1.1)),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(hasCap ? 'today $earned / $cap' : 'coins',
+                  child: Text(day != null ? 'today ${day.collected} · ${day.left} left' : 'coins',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11, fontWeight: FontWeight.w600)),
@@ -251,7 +257,7 @@ class CoinWalletPill extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(99),
                   child: LinearProgressIndicator(
-                    value: (earned / cap).clamp(0.0, 1.0),
+                    value: day?.fraction ?? (earned! / cap!).clamp(0.0, 1.0),
                     minHeight: 4,
                     color: const Color(0xFFE4C56A),
                     backgroundColor: const Color(0x33FFFFFF),
