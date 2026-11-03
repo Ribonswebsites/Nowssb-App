@@ -17,7 +17,6 @@
 /// something to read, and something to hear.
 library;
 
-import '../data/device_flags.dart';
 import '../data/word_voice.dart';
 import '../features/downloads/download_button.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +47,6 @@ class _WordDetailState extends State<WordDetail> {
   void initState() {
     super.initState();
     _word = widget.word;
-    DeviceFlags.secureWindow(true);
     Entitlements.instance.addListener(_onEntitlements);
     _loadPaid();
   }
@@ -65,7 +63,6 @@ class _WordDetailState extends State<WordDetail> {
   @override
   void dispose() {
     Entitlements.instance.removeListener(_onEntitlements);
-    DeviceFlags.secureWindow(false);
     super.dispose();
   }
 

@@ -95,27 +95,14 @@ Earn backs and coupon hero now WebP (q80); cut-outs palette-compressed PNG (<200
 | `footer/tab-ancient-calm-new-sound.webp` | Tibetan monk on pink | Cleopatra figure |
 | `footer/tab-find-your-frequency.webp` (+ root `file_…ad2f6542de.webp`) | Polynesian man, top bun, on red | Red-haired woman |
 | `gifts/coupon-banner.webp` | Grey-bearded man holding coupons | Red-haired woman |
-| `hero-curve/banner-library.webp` | Indian woman, purple saree | Red-haired woman |
-| `hero-curve/banner-reader.webp` | Middle-Eastern young man, black suit, kneeling | Red-haired woman |
 | `hero-curve/cleopatra.webp` (root) | Black woman, shaved head, purple robe, seated (cut-out) | Cleopatra figure |
-| `hero-curve/cosmos.webp` | Mongolian man, long black hair, on the moon | Red-haired woman |
-| `hero-curve/countries.webp` | Nigerian woman in purple gele | Cleopatra figure |
-| `hero-curve/subject.webp` | Filipino woman, black pixie cut, black suit (cut-out) | Red-haired woman |
 | `player/guide/03.webp` | Brazilian man, curly hair, floating lotus | Red-haired woman |
 | `store/signature-portrait.jpg` | Older South Indian man, salt-and-pepper hair, black kurta | Red-haired woman |
 | `banners/course-bubble.jpg` | Young woman, curly black hair, white linen | Red-haired woman |
 | `banners/programs/bonus.webp` | Pakistani bearded man, purple kurta | Cleopatra figure |
 | `banners/programs/gift.webp` | Chinese grandmother, silver bun, black jacket | Red-haired woman |
-| `flip_brand/img2.jpg` (+ root `file_…7ac46978d6.webp`) | Sri Lankan woman, purple dress (PLAYER) | Red-haired woman |
-| `flip_brand/img3.jpg` (+ root `file_…cc603420a8.webp`) | Arab man, purple thobe, prayer hands (WORD SCIENCE) | Cleopatra figure |
-| `flip_brand/img4.jpg` (+ root `file_…eee1d06ccf.webp`) | Black man with locs, black suit, lotus (SOUND LIBRARY) | Red-haired woman |
-| `flip_brand/img9.jpg` (+ root `file_…d03c79a021.webp`) | Thai woman, short silver hair, kneeling (READER) | Red-haired woman |
 | root `file_…674c…79f.webp` | Andean woman, black braids, woven poncho | Red-haired woman |
 | root `file_…acd4…257.webp` | Malaysian man, purple baju melayu | Cleopatra figure |
-| `login/card-02.jpg` | Ghanaian woman, shaved head, on yellow | Red-haired woman |
-| `login/card-03.jpg` | Older Persian man, grey beard, on blue | Cleopatra figure |
-| `login/card-20.jpg` | Woman with curly brown hair, on white | Red-haired woman |
-| `profile/rails/avatar_a.jpg` | Painted Indonesian woman, straight black hair | Painted red-haired woman |
 | root `subscription/tier-{bag,nile,sun}-{back,front}.png` | Synced to the clean flutter_app versions | Red-haired / Cleopatra figures |
 
 ## Sweep 4 – dedupe blonde / text fixes (Nov 2026)
@@ -128,8 +115,6 @@ All images below are original AI-generated artwork made for NowssB (Grok Bot ima
 | assets/subscription/tier-sun-front.webp | new distinct meditation figure (gen f11fc68f) |
 | flutter_app/assets/banners/programs/bonus.webp | new distinct meditation figure (gen 47809ad7) |
 | flutter_app/assets/gifts/coupon-banner.webp | new distinct meditation figure (gen 7fca5658) |
-| flutter_app/assets/hero-curve/countries.webp | new distinct meditation figure (gen 78bd0b17) |
-| flutter_app/assets/hero-curve/banner-reader.webp | new distinct meditation figure (gen e516c8df) |
 | file_00000000674c820889c49845ef98b79f.webp | new distinct meditation figure (gen 4f3cf888) |
 | flutter_app/assets/banners/banner-gold.webp | new distinct meditation figure (gen 2cabe3f4) |
 | flutter_app/assets/banners/banner-sit.webp | new distinct meditation figure (gen cd6541f6) |
@@ -141,27 +126,15 @@ All images below are original AI-generated artwork made for NowssB (Grok Bot ima
 | flutter_app/assets/banners/promo/pose-04.webp | new distinct meditation figure (gen ddcc58e8) |
 | flutter_app/assets/banners/promo/pose-05.webp | new distinct meditation figure (gen e54ff8f0) |
 | flutter_app/assets/banners/stories/pitta.webp | new distinct meditation figure (gen c4ab3feb) |
-| flutter_app/assets/flip_brand/img1.jpg | new distinct meditation figure (gen f6488283) |
-| flutter_app/assets/flip_brand/img8.jpg | new distinct meditation figure (gen 423606e2) |
 | flutter_app/assets/footer/tab-calm-new-loud.webp | new distinct meditation figure (gen 209de98e) |
 | flutter_app/assets/footer/tab-still-mind-still-style.webp | new distinct meditation figure (gen 3fddd0cc) |
 | flutter_app/assets/gifts/gift-hero.webp | new distinct meditation figure (gen 75cb876b) |
-| flutter_app/assets/hero-curve/body.webp | new distinct meditation figure (gen ccf2d9a6) |
-| flutter_app/assets/hero-curve/listen.webp | new distinct meditation figure (gen 30ee7f36) |
 | flutter_app/assets/hero-curve/tab-stool.webp | new distinct meditation figure (gen e751022b) |
-| flutter_app/assets/hero-curve/tab-beach.webp | new distinct meditation figure (gen baffc67a) |
-| flutter_app/assets/hero-curve/tab-desert.webp | new distinct meditation figure (gen 935b7ecf) |
-| flutter_app/assets/hero-curve/tab-forest.webp | new distinct meditation figure (gen 89fc757f) |
-| flutter_app/assets/hero-curve/tab-rain.webp | new distinct meditation figure (gen 39b754e8) |
-| flutter_app/assets/hero-curve/tab-window.webp | new distinct meditation figure (gen 3ce3b978) |
-| flutter_app/assets/hero-curve/tab-subject.webp | new distinct meditation figure (gen bb865d82) |
-| flutter_app/assets/hero-curve/stillness.webp | new distinct meditation figure (gen e4234419) |
 | flutter_app/assets/player/intro/02.webp | new distinct meditation figure (gen 5c41bc21) |
 | flutter_app/assets/player/intro/03.webp | new distinct meditation figure (gen 866db098) |
 | flutter_app/assets/player/intro/07.webp | new distinct meditation figure (gen a1f7835e) |
 | flutter_app/assets/player/guide/06.webp | new distinct meditation figure (gen 622adcac) |
 | flutter_app/assets/player/guide/08.webp | new distinct meditation figure (gen 0b97b61e) |
-| flutter_app/assets/login/card-04.jpg | new distinct meditation figure (gen 6d0ae85a) |
 | flutter_app/assets/login/login-neon.webp | new distinct meditation figure (gen 9ec8b3d1) |
 | flutter_app/assets/notifications/hands-offer.webp | new distinct meditation figure (gen 7f3a6c18) |
 | flutter_app/assets/routine/positive-self-talk.webp | new distinct meditation figure (gen 0a5c0aca) |
@@ -176,16 +149,9 @@ All images below are original AI-generated artwork made for NowssB (Grok Bot ima
 | flutter_app/assets/store/collections/nature.webp | new distinct meditation figure (gen a7cc1c7e) |
 | flutter_app/assets/store/collections/peace.webp | new distinct meditation figure (gen 40aa9654) |
 | flutter_app/assets/store/collections/sacred.webp | new distinct meditation figure (gen 9260ae94) |
-| flutter_app/assets/flip_brand/img2.jpg | italic tagline repainted in plain Inter |
 | file_00000000813081f594f7597ac46978d6.webp | italic tagline repainted in plain Inter |
-| flutter_app/assets/flip_brand/img3.jpg | italic tagline repainted in plain Inter |
 | file_00000000b77c82119c4127cc603420a8.webp | italic tagline repainted in plain Inter |
-| flutter_app/assets/flip_brand/img4.jpg | italic tagline repainted in plain Inter |
 | file_00000000b56c820aade81ceee1d06ccf.webp | italic tagline repainted in plain Inter |
-| flutter_app/assets/flip_brand/img5.jpg | italic tagline repainted in plain Inter |
-| flutter_app/assets/flip_brand/img6.jpg | italic tagline repainted in plain Inter |
-| flutter_app/assets/flip_brand/img7.jpg | italic tagline repainted in plain Inter |
-| flutter_app/assets/flip_brand/img9.jpg | italic tagline repainted in plain Inter |
 | file_000000005f8881f48b6867d03c79a021.webp | italic tagline repainted in plain Inter |
 | flutter_app/assets/footer/tab-ancient-calm-new-sound.webp | italic tagline repainted in plain Inter |
 | flutter_app/assets/footer/tab-breathe-new-noise.webp | italic tagline repainted in plain Inter |
@@ -193,4 +159,6 @@ All images below are original AI-generated artwork made for NowssB (Grok Bot ima
 | file_00000000500081f4924f93ad2f6542de.webp | italic tagline repainted in plain Inter |
 | flutter_app/assets/footer/tab-sound-of-stillness.webp | italic tagline repainted in plain Inter |
 | assets/gifts/coupon-banner.webp | garbled 'Moanit' earcup logo removed (local retouch) |
-| flutter_app/assets/flip_brand/img4.jpg (+ root file_…eee1…ccf.webp) | tagline backdrop re-blended into gradient |
+
+
+_Nov 3 2026: the flutter_app copies of hero-curve, flip_brand, login cards and profile/rails/avatar_a were restored to their Oct 21 versions, so their Nov 2 replacement rows were removed. Root `file_…` webp edits noted above still apply to the root assets._

@@ -5,7 +5,6 @@
 /// text-to-speech and completed words are recorded locally.
 library;
 
-import '../data/device_flags.dart';
 import '../features/downloads/download_button.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -146,7 +145,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   @override
   void initState() {
     super.initState();
-    DeviceFlags.secureWindow(true);
     _bottomPageController = PageController();
     _marqueeController = AnimationController(
       vsync: this,
@@ -241,7 +239,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   @override
   void dispose() {
-    DeviceFlags.secureWindow(false);
     _bottomAutoTimer?.cancel();
     _sleepTimer?.cancel();
     _bottomPageController.dispose();

@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import '../admin/template/editable.dart';
 
-/// Brand stills — committed under assets/flip_brand (no recompression).
+/// Brand stills — committed under assets/flip_brand (q82 progressive JPEG, 1254px).
 const kFlipBrandAssets = <String>[
   'assets/flip_brand/img1.jpg',
   'assets/flip_brand/img2.jpg',
