@@ -26,7 +26,6 @@
 library;
 
 import 'package:nowssb/data/content.dart' show ContentStore;
-import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'poster/poster_pages.dart' show TrendingScreen, posterPush;
 import '../data/fashion_bg_dim.dart';
 import 'package:flutter/material.dart';
@@ -366,13 +365,27 @@ class _HomeFashionState extends State<HomeFashion> {
 
   /// Pool for the daily 8-card quick row; every entry opens a real page.
   List<QuickCard> _quickPool() => [
-        QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const CircleScreen()), lottie: kCoinsLottie),
-        QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
-        QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1), lottie: kPlayLottie),
-        QuickCard('tasks', 'Daily tasks', 'Tick off today', Icons.checklist_rounded, () => _push(const DailyTasksPage())),
-        QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen()), lottie: kSpeakerLottie),
-        QuickCard('meanings', 'Meanings', 'Where words come from', Icons.auto_stories_rounded, () => _push(const MeaningStoreScreen())),
-        QuickCard('atelier', 'Atelier', 'Word Atelier', Icons.spellcheck_rounded, () => _push(const WordAtelierScreen())),
+        QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded,
+            () => _push(const CircleScreen()),
+            lottie: kCoinsLottie),
+        QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded,
+            () => _go(3)),
+        QuickCard('practice', 'Practice', 'Start a session',
+            Icons.play_circle_fill_rounded, () => _go(1),
+            lottie: kPlayLottie),
+        QuickCard('tasks', 'Daily tasks', 'Tick off today',
+            Icons.checklist_rounded, () => _push(const DailyTasksPage())),
+        QuickCard('sounds', 'Sound library', 'Every word sound',
+            Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen()),
+            lottie: kSpeakerLottie),
+        QuickCard(
+            'meanings',
+            'Meanings',
+            'Where words come from',
+            Icons.auto_stories_rounded,
+            () => _push(const MeaningStoreScreen())),
+        QuickCard('atelier', 'Atelier', 'Word Atelier',
+            Icons.spellcheck_rounded, () => _push(const WordAtelierScreen())),
       ];
 
   /// Today's Store words (real deals), priced in local currency; each
@@ -383,15 +396,21 @@ class _HomeFashionState extends State<HomeFashion> {
             word: d.title,
             category: d.category,
             percent: realDealPercent(d.word),
-            price: money(StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
+            price: money(
+                StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
             onTap: () => openAtelierWord(context,
-                word: d.word, root: d.root, img: kHomeStoreArt, price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}')),
+                word: d.word,
+                root: d.root,
+                img: kHomeStoreArt,
+                price: StorePrices.instance
+                    .priceFor('word:${d.word.toLowerCase()}')),
           ),
       ];
 
   /// Currently Playing–style rail: coins, progress, profile, two tasks.
   Widget _progressRail() => ListenableBuilder(
-        listenable: Listenable.merge([ProgressCenter.instance, DailyTasks.items]),
+        listenable:
+            Listenable.merge([ProgressCenter.instance, DailyTasks.items]),
         builder: (context, _) {
           final pc = ProgressCenter.instance;
           final coins = pc.itemOf(ProgressKind.coins);
@@ -399,14 +418,22 @@ class _HomeFashionState extends State<HomeFashion> {
           final done = all.fold<int>(0, (a, e) => a + e.done);
           final total = all.fold<int>(0, (a, e) => a + e.total);
           final tasks = DailyTasks.items.value;
-          final open = [...tasks.where((t) => !t.done), ...tasks.where((t) => t.done)].take(2).toList();
+          final open = [
+            ...tasks.where((t) => !t.done),
+            ...tasks.where((t) => t.done)
+          ].take(2).toList();
           final tasksDone = tasks.where((t) => t.done).length;
-          const taskArt = ['assets/banners/earn/sit-dark.webp', 'assets/banners/earn/hands-raise.webp'];
+          const taskArt = [
+            'assets/banners/earn/sit-dark.webp',
+            'assets/banners/earn/hands-raise.webp'
+          ];
           final pct = (_profileDone * 100).round();
           return NowProgressRail(items: [
             NowProgressItem(
               title: 'Next coins',
-              sub: coins == null || coins.done < coins.total ? 'Collect your next daily coins' : 'All daily coins collected',
+              sub: coins == null || coins.done < coins.total
+                  ? 'Collect your next daily coins'
+                  : 'All daily coins collected',
               caption: 'Coins',
               image: 'assets/rails/rewards-coins.png',
               value: coins?.value ?? 0,
@@ -428,7 +455,9 @@ class _HomeFashionState extends State<HomeFashion> {
             ),
             NowProgressItem(
               title: pct >= 100 ? 'Profile complete' : 'Profile not finished',
-              sub: pct >= 100 ? 'Everything is set' : '$_profileLeft step${_profileLeft == 1 ? '' : 's'} left: name, photo, banner, reminder',
+              sub: pct >= 100
+                  ? 'Everything is set'
+                  : '$_profileLeft step${_profileLeft == 1 ? '' : 's'} left: name, photo, banner, reminder',
               caption: 'Profile',
               image: 'assets/profile_source/img-ring.png',
               value: _profileDone,
@@ -446,7 +475,9 @@ class _HomeFashionState extends State<HomeFashion> {
                 value: open[i].done ? 1 : 0,
                 left: '$tasksDone of ${tasks.length} done',
                 right: open[i].done ? 'Done' : 'To do',
-                icon: open[i].done ? Icons.check_rounded : Icons.checklist_rounded,
+                icon: open[i].done
+                    ? Icons.check_rounded
+                    : Icons.checklist_rounded,
                 onTap: () => _push(const DailyTasksPage()),
               ),
           ]);
@@ -455,15 +486,24 @@ class _HomeFashionState extends State<HomeFashion> {
 
   /// Daily pool for the Today's Practice carousel; each opens a real page.
   List<PracticeBannerSpec> _practicePool() => [
-        PracticeBannerSpec("Today's Practice", 'Begin today’s session', () => _go(1)),
-        PracticeBannerSpec('Sit with one word', 'Five quiet minutes', () => _go(1)),
-        PracticeBannerSpec('Your word ritual', 'Pick up where you left', () => _go(1)),
-        PracticeBannerSpec('Listen, then repeat', 'Three, seven or twenty-one reps', () => _go(1)),
-        PracticeBannerSpec('Morning practice', 'The card knows the hour', () => _go(1)),
-        PracticeBannerSpec('Speak it back', 'Scored from 0 to 100', () => _go(1)),
-        PracticeBannerSpec('Words for today', 'Queued and ready to play', () => _go(1)),
-        PracticeBannerSpec('Breathe and repeat', 'Start a word session', () => _go(1)),
-        PracticeBannerSpec('Close with a sentence', 'Healing words from your session', () => _go(1)),
+        PracticeBannerSpec(
+            "Today's Practice", 'Begin today’s session', () => _go(1)),
+        PracticeBannerSpec(
+            'Sit with one word', 'Five quiet minutes', () => _go(1)),
+        PracticeBannerSpec(
+            'Your word ritual', 'Pick up where you left', () => _go(1)),
+        PracticeBannerSpec('Listen, then repeat',
+            'Three, seven or twenty-one reps', () => _go(1)),
+        PracticeBannerSpec(
+            'Morning practice', 'The card knows the hour', () => _go(1)),
+        PracticeBannerSpec(
+            'Speak it back', 'Scored from 0 to 100', () => _go(1)),
+        PracticeBannerSpec(
+            'Words for today', 'Queued and ready to play', () => _go(1)),
+        PracticeBannerSpec(
+            'Breathe and repeat', 'Start a word session', () => _go(1)),
+        PracticeBannerSpec('Close with a sentence',
+            'Healing words from your session', () => _go(1)),
       ];
 
   void _openQuickActions() {
@@ -486,7 +526,10 @@ class _HomeFashionState extends State<HomeFashion> {
   List<(String, Widget)> _sections() => [
         // Today's Practice rides inside the greeting so it always sits
         // directly under the heading (a saved layout can't split them).
-        ('greet', FashGreeting(below: Column(
+        (
+          'greet',
+          FashGreeting(
+              below: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               FashPractice(
@@ -495,54 +538,71 @@ class _HomeFashionState extends State<HomeFashion> {
                 onTap: () => _go(1),
               ),
               // NowssB Store sits directly under Today's Practice (Ribon, Oct 24).
-              StoreNowCarousel(items: _storeItems(), onHeader: () => _push(const WordAtelierScreen())),
+              StoreNowCarousel(
+                  items: _storeItems(),
+                  onHeader: () => _push(const WordAtelierScreen())),
             ],
-          ))),
+          ))
+        ),
         ('practice', const SizedBox.shrink()),
         // Cleanup (Nov 2): Customize/Features/Earn strip removed (Earn has its own section).
         ('herorow', const SizedBox.shrink()),
-        ('routineCards', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
-              child: TrioRail(),
-            ),
-            const NmHorizontalRoutineCards(fashion: true),
-            SizedBox(height: kFashSectionGap),
-            const EarthDayFilm(),
-            SizedBox(height: kFashSectionGap),
-            PromoColorGrid(onOpen: _openGrid),
-            SizedBox(height: kFashSectionGap),
-            // Up next: coins, progress, profile, tasks — mid-page.
-            _progressRail(),
-          ],
-        )),
+        (
+          'routineCards',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
+                child: TrioRail(),
+              ),
+              const NmHorizontalRoutineCards(fashion: true),
+              SizedBox(height: kFashSectionGap),
+              const EarthDayFilm(),
+              SizedBox(height: kFashSectionGap),
+              PromoColorGrid(onOpen: _openGrid),
+              SizedBox(height: kFashSectionGap),
+              // Up next: coins, progress, profile, tasks — mid-page.
+              _progressRail(),
+            ],
+          )
+        ),
 
         ('coachCards', const SizedBox.shrink()),
-        ('mainops', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true, glassIcon: true),
-            SizedBox(height: kFashSectionGap),
-            FashTiles(onTile: _go, onOpen: _openEnter),
-            SizedBox(height: kFashSectionGap),
-            // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
-            const HomeRowHeading('Quick picks', sub: 'Tap a colour to jump in'),
-            HeroQuickRow(pool: [for (final c in _quickPool()) if (c.id != 'rewards' && c.id != 'tasks') c], squaresOnly: true, pinned: const {}),
-            // 'Start today's practice now' — moved mid-page (Ribon, Oct 24).
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: ColoredSplitPromoBanner.forSurface(
-                SplitPromoSurface.fashionHome,
-                onTap: () => _go(1),
-                margin: EdgeInsets.zero,
+        (
+          'mainops',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MeditationFlipBanner(
+                  onTap: () => _go(1), leadingIcons: true, glassIcon: true),
+              SizedBox(height: kFashSectionGap),
+              FashTiles(onTile: _go, onOpen: _openEnter),
+              SizedBox(height: kFashSectionGap),
+              // Quick picks: colourful boxes, drifting — mid-page (Ribon, Oct 24).
+              const HomeRowHeading('Quick picks',
+                  sub: 'Tap a colour to jump in'),
+              HeroQuickRow(
+                  pool: [
+                    for (final c in _quickPool())
+                      if (c.id != 'rewards' && c.id != 'tasks') c
+                  ],
+                  squaresOnly: true,
+                  pinned: const {}),
+              // 'Start today's practice now' — moved mid-page (Ribon, Oct 24).
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: ColoredSplitPromoBanner.forSurface(
+                  SplitPromoSurface.fashionHome,
+                  onTap: () => _go(1),
+                  margin: EdgeInsets.zero,
+                ),
               ),
-            ),
-            SizedBox(height: kFashSectionGap),
-            MainOptionsSection(onGo: _go, onAction: _openMainOption),
-          ],
-        )),
+              SizedBox(height: kFashSectionGap),
+              MainOptionsSection(onGo: _go, onAction: _openMainOption),
+            ],
+          )
+        ),
         (
           'actionbar',
           NmSuppliedActionBar(
@@ -578,15 +638,24 @@ class _HomeFashionState extends State<HomeFashion> {
         ('tiles', const SizedBox.shrink()),
         // Removed on Ribon's order (Oct 23): Sound That Finds You.
         ('storiesFind', const SizedBox.shrink()),
-        ('buddhaGyro', BuddhaGyroStage(
-          onOpenQuotes: () => _push(const QuotesWeekScreen()),
-        )),
+        (
+          'buddhaGyro',
+          BuddhaGyroStage(
+            onOpenQuotes: () => _push(const QuotesWeekScreen()),
+          )
+        ),
         // Removed on Ribon's order (Oct 23): 'Build a library' banner.
         ('store', const SizedBox.shrink()),
-        ('trendwd', FashTrending(onTap: () => posterPush(context, const TrendingScreen()))),
+        (
+          'trendwd',
+          FashTrending(onTap: () => posterPush(context, const TrendingScreen()))
+        ),
         // "Make this home yours" and "Today's offers" now live in Drop
         // Studio; this card is the one way in.
-        ('custom', DropStudioEntry(onTap: () => _push(const DropStudioScreen()))),
+        (
+          'custom',
+          DropStudioEntry(onTap: () => _push(const DropStudioScreen()))
+        ),
         (
           'fashplus',
           FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
@@ -595,12 +664,15 @@ class _HomeFashionState extends State<HomeFashion> {
         // Cleanup (Nov 2): one Practice card, one Store promo.
         ('rx', const SizedBox.shrink()),
         ('trendvid', const SizedBox.shrink()),
-        ('storeban', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            StoreBannerSection(onTap: () => _go(3)),
-          ],
-        )),
+        (
+          'storeban',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              StoreBannerSection(onTap: () => _go(3)),
+            ],
+          )
+        ),
         ('subvid', const SizedBox.shrink()),
         (
           'edition',
@@ -610,17 +682,29 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         ('offer', const SizedBox.shrink()),
         // NowssB Earn: a contained glass block.
-        ('roundring', const R27LiveSections(fashion: true)),
-        ('cube', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          QuickAccessSection(
-            onCart: () => NwsbLinks.cart(context),
-            onWishlist: () => NwsbLinks.wishlist(context),
-            onOrders: () => _go(4),
-          ),
-        ])),
+        (
+          'roundring',
+          const SizedBox.shrink()
+        ), // NowssB Earn section removed (Ribon 11-04)
+        (
+          'cube',
+          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            QuickAccessSection(
+              onCart: () => NwsbLinks.cart(context),
+              onWishlist: () => NwsbLinks.wishlist(context),
+              onOrders: () => _go(4),
+            ),
+          ])
+        ),
         ('shabda', FashShabdapathy(onTap: () => _go(2))),
-        ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
-        ('connectban', ConnectBannerSection(onTap: () => NwsbLinks.connect(context))),
+        (
+          'ebooks',
+          EbooksSection(onTap: () => _push(const EbooksStoreScreen()))
+        ),
+        (
+          'connectban',
+          ConnectBannerSection(onTap: () => NwsbLinks.connect(context))
+        ),
         ('journey', const SizedBox.shrink()),
         ('personalCoach', const SizedBox.shrink()),
         ('promovid', const SizedBox.shrink()),
@@ -690,20 +774,21 @@ class _HomeFashionState extends State<HomeFashion> {
         ),
         for (final (k, w) in built)
           if (w is SizedBox && w.width == 0 && w.height == 0)
+            Padding(
+              padding: EdgeInsets.zero,
+              child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
+            )
+          else
+            LSection(
+              k,
+              kFashionSectionTitles[k] ?? k,
               Padding(
-                padding: EdgeInsets.zero,
+                padding: EdgeInsets.only(
+                    bottom: air.contains(k) ? 26 : kFashSectionGap),
                 child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
-              )
-            else
-              LSection(
-                k,
-                kFashionSectionTitles[k] ?? k,
-                Padding(
-                  padding: EdgeInsets.only(bottom: air.contains(k) ? 26 : kFashSectionGap),
-                  child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
-                ),
-                carousel: kFashionCarousels.contains(k),
               ),
+              carousel: kFashionCarousels.contains(k),
+            ),
       ],
       hiddenByDefault: kFashionDefOff,
     );
@@ -795,9 +880,10 @@ class _HomeFashionState extends State<HomeFashion> {
                   padding: EdgeInsets.zero,
                   itemCount: shown.length + 1,
                   itemBuilder: (context, i) => i == shown.length
-                  // Last item: room to scroll the footer clear of the nav bar.
-                  ? const ColoredBox(color: Colors.black, child: NavClearanceSpacer())
-                  : HomeKeepAlive(child: shown[i]),
+                      // Last item: room to scroll the footer clear of the nav bar.
+                      ? const ColoredBox(
+                          color: Colors.black, child: NavClearanceSpacer())
+                      : HomeKeepAlive(child: shown[i]),
                 ),
               ),
             ],

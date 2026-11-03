@@ -36,7 +36,6 @@
 library;
 
 import 'package:nowssb/data/content.dart' show ContentStore;
-import 'package:nowssb/widgets/concept/r27/live.dart' show R27LiveSections;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -354,41 +353,61 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         // v4: everything from here to the footer is lib/screens/normal/home_v4.dart,
         // apart from the flip banners and the Buddha quote card (kept as-is).
-        ('routineCards', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            V4SoundLibrary(onTap: () => _go(2)),
-            V4Doors(onOpen: _openGrid),
-          ],
-        )),
+        (
+          'routineCards',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              V4SoundLibrary(onTap: () => _go(2)),
+              V4Doors(onOpen: _openGrid),
+            ],
+          )
+        ),
         ('herovid', V4Streak(onPractice: () => _go(1), onOffers: () => _go(3))),
         ('streak', const SizedBox.shrink()),
         ('practice', const SizedBox.shrink()),
-        ('mainops', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
-            MainOptionsSection(onGo: _go, onAction: _openMainOption),
-          ],
-        )),
+        (
+          'mainops',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
+              MainOptionsSection(onGo: _go, onAction: _openMainOption),
+            ],
+          )
+        ),
         (
           'actionbar',
           V4HelpCoach(
               onSupport: () => _go(4),
               onCoach: () => _push(const PersonalCoachScreen()))
         ),
-        ('catTiles', const SizedBox.shrink()), // dup of spotlight (cleanup 11-02)
-        ('spotlight', const R27LiveSections()),
+        (
+          'catTiles',
+          const SizedBox.shrink()
+        ), // dup of spotlight (cleanup 11-02)
+        (
+          'spotlight',
+          const SizedBox.shrink()
+        ), // NowssB Earn section removed (Ribon 11-04)
         ('tiles', const SizedBox.shrink()),
         ('storiesFind', const SizedBox.shrink()),
         // Exactly as at bcb6baf.
-        ('buddhaGyro', BuddhaGyroStage(
-          neumorphic: true,
-          onOpenQuotes: () => _push(const QuotesWeekScreen()),
-        )),
+        (
+          'buddhaGyro',
+          BuddhaGyroStage(
+            neumorphic: true,
+            onOpenQuotes: () => _push(const QuotesWeekScreen()),
+          )
+        ),
         ('store', V4StoreEarn(onStore: () => _go(3))),
-        ('trendwd', V5Trending(onWord: (w) => _push(WordDetail(word: w)), onLibrary: () => _go(2),
-            onSeeAll: () => _push(const TrendingScreen()))),
+        (
+          'trendwd',
+          V5Trending(
+              onWord: (w) => _push(WordDetail(word: w)),
+              onLibrary: () => _go(2),
+              onSeeAll: () => _push(const TrendingScreen()))
+        ),
         ('custom', null),
         ('rx', null),
         ('condisc', const SizedBox.shrink()),
@@ -398,7 +417,8 @@ class _HomeNormalState extends State<HomeNormal> {
           V5Own(
             onCart: () => NwsbLinks.cart(context),
             onWishlist: () => NwsbLinks.wishlist(context),
-            onOrders: () => _push(const CartPage()), // the bag + "Your purchases", as Profile > Orders
+            onOrders: () => _push(
+                const CartPage()), // the bag + "Your purchases", as Profile > Orders
           )
         ),
         ('trendshop', const SizedBox.shrink()),
@@ -615,7 +635,8 @@ class _TopRow extends StatelessWidget {
           child: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: EditableLabel('home_normal.TopRow',
+            child: EditableLabel(
+              'home_normal.TopRow',
               'NowssB',
               maxLines: 1,
               softWrap: false,
