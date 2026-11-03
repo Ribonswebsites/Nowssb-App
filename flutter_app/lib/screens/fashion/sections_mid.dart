@@ -513,7 +513,7 @@ class FashPlusMini extends StatelessWidget {
   Widget build(BuildContext context) {
     final on = Settings.instance.fashionPlus;
     return ZenGlassTile(style: ZenGlassStyle.breath, on: on, onTap: onTap,
-        media: const GoldenBreathClip(slot: 'sections_mid.FashPlusMini'));
+        media: const GoldenBreathClip(asset: kZenTileClip, poster: kZenTilePoster, slot: 'sections_mid.FashPlusMini'));
   }
 }
 

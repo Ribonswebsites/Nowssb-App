@@ -217,7 +217,7 @@ class _MeditationFlipBannerState extends State<MeditationFlipBanner> with Single
                       child: SizedBox(
                         width: _cardW,
                         height: _cardH,
-                        child: _Card(slide: _slides[i], cycle: _cycle, amount: _amount, onTap: widget.onTap, white: !widget.glassIcon),
+                        child: _Card(slide: _slides[i], cycle: _cycle, amount: _amount, onTap: widget.onTap),
                       ),
                     ),
                   ),

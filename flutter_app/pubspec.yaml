@@ -123,8 +123,12 @@ flutter:
     - assets/video/hero-sound-poster.webp
     - assets/video/hero-release.mp4
     - assets/video/hero-release-poster.webp
-    - assets/video/golden-breath-tile.mp4
-    - assets/video/golden-breath-tile-poster.webp
+    - assets/video/hero-dusk.mp4
+    - assets/video/hero-dusk-poster.webp
+    - assets/video/zen-tile.mp4
+    - assets/video/zen-tile-poster.webp
+    - assets/video/zen-card.mp4
+    - assets/video/zen-card-poster.webp
     - assets/video/nm-calm-clouds.mp4
     - assets/video/nm-calm-clouds-poster.webp
     - assets/video/nm-calm-stream.mp4
@@ -161,6 +165,7 @@ flutter:
     - assets/home/
     - assets/home/ez/
     - assets/home/hc/
+    - assets/home/dl/
     - assets/home/sh/
     - assets/home/ref/
     - assets/video/hero-bg-poster.webp

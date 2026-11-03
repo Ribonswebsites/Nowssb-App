@@ -1,13 +1,17 @@
 /// The Normal-home hero: one rounded card carousel (auto-rotates, swipe,
-/// pauses on touch, no dots): four dot-light film cards (Breath, Sound, Rise,
-/// Release) and the day's ritual card, each with one primary action: begin
-/// today's session. Films: the client's own clips, muted seamless loops.
+/// pauses on touch, no dots) mixing three card designs — Cinema, Depth
+/// stack and Word — each with one primary action: begin today's session.
+///
+/// Visuals (Ribon 11-04): the dot-light portrait style — the client's own
+/// clips plus new stills and films in the same look. Every slot is unique.
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart' show SpringDescription, SpringSimulation;
 import 'package:flutter/services.dart';
 
 import '../../data/models.dart';
@@ -54,6 +58,44 @@ class HeroData {
 
 
 const _serif = 'CormorantGaramond';
+const _hc = 'assets/home/hc';
+
+/// Film grain, drawn over everything at low strength.
+class _Grain extends StatelessWidget {
+  const _Grain({this.opacity = .07, this.shift = 0});
+  final double opacity;
+  final double shift;
+  @override
+  Widget build(BuildContext context) => IgnorePointer(
+        child: Opacity(
+          opacity: opacity,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: const AssetImage('$_hc/hc-grain.webp'),
+                repeat: ImageRepeat.repeat,
+                scale: 2,
+                alignment: Alignment(shift, -shift),
+                colorFilter: const ColorFilter.mode(Colors.white, BlendMode.dst),
+              ),
+            ),
+            child: const SizedBox.expand(),
+          ),
+        ),
+      );
+}
+
+/// A visual is either a film ('film:hero-dusk' → assets/video, muted loop,
+/// poster under reduced motion, paused offscreen) or a still in assets/home/dl.
+Widget _img(String name, {Alignment align = Alignment.topCenter}) {
+  if (name.startsWith('film:')) {
+    final clip = name.substring(5);
+    return GoldenBreathClip(asset: 'assets/video/$clip.mp4', poster: 'assets/video/$clip-poster.webp', alignment: align, slot: 'calm_hero.$clip');
+  }
+  return Image.asset('assets/home/dl/$name.webp',
+      fit: BoxFit.cover, alignment: align, filterQuality: FilterQuality.medium, gaplessPlayback: true,
+      errorBuilder: (_, __, ___) => const SizedBox.shrink());
+}
 
 /// Rotation + gesture plumbing shared by A and C.
 class _Carousel extends StatefulWidget {
@@ -169,6 +211,26 @@ class _GlassChip extends StatelessWidget {
       );
 }
 
+class _World {
+  const _World(this.name, this.photo, this.a, this.b, {this.align = Alignment.center});
+  final String name;
+  final String photo;
+  final Color a, b;
+  final Alignment align;
+}
+
+const _worlds = [
+  _World('Breath', 'dl-depth-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B), align: Alignment(0, -.3)),
+  _World('Sound', 'dl-depth-sound', Color(0xFFC9A46A), Color(0xFF2A2219), align: Alignment(0, -.3)),
+  _World('Sleep', 'dl-depth-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433), align: Alignment(0, -.3)),
+];
+
+class _WordLook {
+  const _WordLook(this.photo, this.top, this.bottom);
+  final String photo;
+  final Color top, bottom;
+}
+
 // ───────────────────────────── Mixed carousel (v2) ─────────────────────────────
 //
 // All three ideas as cards in one carousel. Every card is the same height,
@@ -183,14 +245,14 @@ class MixedHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Word? w(int i) => data.words.isEmpty ? null : data.words[i % data.words.length];
-    // Ribon 11-03: the dot-light films — black, gold and white — one per card,
-    // with the day's ritual card kept as the only non-film slide.
     final cards = <Widget Function(double off)>[
-      (off) => _FilmCard(film: _films[0], data: data, word: w(0), parallax: off),
       (off) => _PaperRitualSlot(data: data),
-      (off) => _FilmCard(film: _films[1], data: data, word: w(1), parallax: off),
-      (off) => _FilmCard(film: _films[2], data: data, word: w(2), parallax: off),
-      (off) => _FilmCard(film: _films[3], data: data, word: w(3), parallax: off),
+      (off) => _DepthCard(data: data, parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-breath', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
+      (off) => _CinemaCard(photo: 'film:hero-dusk', kicker: 'Dusk', tone: const Color(0xFF0E1230), data: data, word: w(1), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-sound', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
+      (off) => _CinemaCard(photo: 'film:hero-release', kicker: 'Sound', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-rise', Color(0xFFE2D4F0), Color(0xFF1E1530)), data: data, word: w(2), parallax: off),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 14),
@@ -207,6 +269,10 @@ class MixedHero extends StatelessWidget {
     );
   }
 }
+
+/// Soft, shared photo plate: parallax shift against the card on swipe.
+Widget _plate(String photo, double off, {double k = 28, double dy = 0, Alignment align = Alignment.topCenter}) =>
+    Transform.translate(offset: Offset(off * k, dy), child: Transform.scale(scale: 1.06, alignment: Alignment.bottomCenter, child: _img(photo, align: align)));
 
 TextStyle _kick(Color c) => TextStyle(color: c, fontSize: 10, letterSpacing: 2.4, fontWeight: FontWeight.w600);
 
@@ -242,6 +308,327 @@ class _PlayPill extends StatelessWidget {
 }
 
 String _progress(HeroData d) => d.total == 0 ? '' : '${d.done} of ${d.total} done';
+
+// A2 · Cinema: photo, grain, serif title, a clean solid play pill.
+class _CinemaCard extends StatelessWidget {
+  const _CinemaCard({required this.photo, required this.kicker, required this.tone, required this.data, required this.word, required this.parallax});
+  final String photo, kicker;
+  final Color tone;
+  final HeroData data;
+  final Word? word;
+  final double parallax;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: data.onBegin,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(28),
+          child: Stack(fit: StackFit.expand, children: [
+            ColoredBox(color: tone),
+            _plate(photo, parallax),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                    colors: [tone.withValues(alpha: .45), tone.withValues(alpha: 0), tone.withValues(alpha: 0), tone.withValues(alpha: .94)],
+                    stops: const [0, .2, .45, 1]),
+              ),
+            ),
+            const _Grain(opacity: .07),
+            Positioned(
+              left: 22, top: 20, right: 20,
+              child: Row(children: [
+                Expanded(child: Text('TODAY · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xE6FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                if (data.total > 0) _GlassChip(text: _progress(data)),
+                const SizedBox(width: 8),
+                _SaveButton(data: data, word: word?.word),
+              ]),
+            ),
+            Positioned(
+              left: 22, right: 22, bottom: 22,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                Text(kicker.toUpperCase(), style: _kick(const Color(0xB3FFFFFF))),
+                const SizedBox(height: 8),
+                Text(data.title,
+                    maxLines: 2,
+                    style: const TextStyle(fontFamily: _serif, color: Colors.white, fontSize: 40, height: .98, fontWeight: FontWeight.w500, letterSpacing: -.6)),
+                const SizedBox(height: 18),
+                Row(children: [
+                  Flexible(child: _PlayPill(onTap: data.onBegin, ink: tone)),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(word == null ? data.wordsLine : '${word!.word}  ·  ${word!.meaning}',
+                        maxLines: 2, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: const Color(0xCCFFFFFF), fontSize: 11.5, height: 1.35)),
+                  ),
+                ]),
+              ]),
+            ),
+          ]),
+        ),
+      );
+}
+
+// B2 · Depth: three practices stacked in perspective, fully inside the card.
+class _DepthCard extends StatefulWidget {
+  const _DepthCard({required this.data, required this.parallax});
+  final HeroData data;
+  final double parallax;
+  @override
+  State<_DepthCard> createState() => _DepthCardState();
+}
+
+/// The stack scrolls vertically: swipe up brings the next practice to the
+/// front, swipe down brings the previous one back (wraps around).
+class _DepthCardState extends State<_DepthCard> with SingleTickerProviderStateMixin {
+  static const _bg = Color(0xFF0B0B0D);
+  static const _spring = SpringDescription(mass: 1, stiffness: 260, damping: 24);
+  /// Continuous stack position (0 = world 0 in front); springs between ints.
+  late final AnimationController _pos = AnimationController.unbounded(vsync: this)..addListener(() => setState(() {}));
+  double _drag = 0, _start = 0;
+  int get front => _pos.value.round() % _worlds.length;
+  HeroData get data => widget.data;
+  double get parallax => widget.parallax;
+
+  @override
+  void dispose() {
+    _pos.dispose();
+    super.dispose();
+  }
+
+  void _settle(double target, double velocity) {
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+      _pos.value = target;
+      return;
+    }
+    _pos.animateWith(SpringSimulation(_spring, _pos.value, target, velocity));
+  }
+
+  void _step(int d) {
+    HapticFeedback.selectionClick();
+    _settle(_start + d, 0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final n = _worlds.length;
+    // back → front, as indexes into _worlds; depth = position from front.
+    final raw = _pos.value;
+    final p = (raw - raw.round()).abs() < .02 ? raw.roundToDouble() : raw;
+    double depth(int i) => (i - p) % n; // 0 = front, fractional while moving
+    final order = [for (var i = 0; i < n; i++) i]..sort((a, b) => depth(b).compareTo(depth(a)));
+    return GestureDetector(
+      key: const ValueKey('hero-depth'),
+      onTap: data.onBegin,
+      onVerticalDragStart: (_) {
+        _pos.stop();
+        _drag = 0;
+        _start = _pos.value.roundToDouble();
+      },
+      // The front sheet follows the finger (one practice per 140px)…
+      onVerticalDragUpdate: (u) {
+        _drag += u.delta.dy;
+        _pos.value = _start + (-_drag / 140).clamp(-1.0, 1.0);
+      },
+      // …then a spring carries it home, keeping the fling's speed.
+      onVerticalDragEnd: (e) {
+        final v = e.primaryVelocity ?? 0;
+        final d = (_drag < -24 || v < -250) ? 1 : (_drag > 24 || v > 250) ? -1 : 0;
+        if (d != 0) HapticFeedback.selectionClick();
+        _pos.animateWith(SpringSimulation(_spring, _pos.value, _start + d, -v / 140));
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(fit: StackFit.expand, children: [
+          // White neumorphic plate behind the photo sheets (Normal home is all white).
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(center: Alignment(0, -.6), radius: 1.2, colors: [Color(0xFFFFFFFF), Color(0xFFE9ECF3)]),
+            ),
+          ),
+          Positioned(
+            left: 22, top: 20, right: 20,
+            child: Row(children: [
+              Expanded(child: Text('PRACTICES · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xCC1A1A2E)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              _SaveButton(data: data, word: data.words.isEmpty ? null : data.words.first.word, light: true),
+            ]),
+          ),
+          // The stack lives in its own inset box; nothing escapes the card.
+          Positioned(
+            left: 16, right: 16, top: 50, bottom: 16,
+            child: LayoutBuilder(builder: (context, c) {
+              return Stack(clipBehavior: Clip.hardEdge, alignment: Alignment.bottomCenter, children: [
+                for (final i in order) _sheet(c, i, depth(i)),
+              ]);
+            }),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _sheet(BoxConstraints c, int wi, double dd) {
+    final world = _worlds[wi];
+    final n = _worlds.length;
+    // A sheet leaving the front (dd just under n) lifts away and fades.
+    final leaving = dd > n - 1 ? dd - n : 0.0; // -1..0
+    final d = leaving < 0 ? 0.0 : dd;
+    final front = wi == this.front;
+    final h = c.maxHeight - 88;
+    final tilt = parallax.clamp(-1.0, 1.0);
+    final m = Matrix4.identity()
+      ..setEntry(3, 2, .001)
+      ..translateByDouble(tilt * d * 10, -d * 44.0 + leaving * 160, 0, 1)
+      ..scaleByDouble(1 - d * .06, 1 - d * .06, 1, 1)
+      ..rotateY(-tilt * .18 * (1 + d * .4));
+    return Positioned(
+      left: 0, right: 0, bottom: 0, height: h,
+      child: Opacity(opacity: (1 + leaving).clamp(0.0, 1.0), child: Transform(
+        alignment: Alignment.bottomCenter,
+        transform: m,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Stack(fit: StackFit.expand, children: [
+            DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [world.a, world.b]))),
+            Opacity(opacity: .85, child: _plate(world.photo, -tilt, k: 14, align: world.align)),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                    colors: [world.b.withValues(alpha: .4), world.b.withValues(alpha: 0), world.b.withValues(alpha: .95)], stops: const [0, .35, 1]),
+              ),
+            ),
+            if (!front) ColoredBox(color: Colors.black.withValues(alpha: .18 * d)),
+            const _Grain(opacity: .07),
+            Positioned(
+              left: 16, top: front ? 14 : 8, right: 14,
+              child: Row(children: [
+                Expanded(child: Text(world.name.toUpperCase(), style: _kick(front ? Colors.white : const Color(0xB3FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                if (front) ...[
+                  Text('${wi + 1}/${_worlds.length}', style: _kick(const Color(0xCCFFFFFF))),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.swipe_vertical_rounded, size: 14, color: Color(0xCCFFFFFF)),
+                ],
+              ]),
+            ),
+            if (front)
+              Positioned(
+                left: 16, right: 14, bottom: 14,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  Text(data.title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontFamily: _serif, color: Colors.white, fontSize: 30, height: 1, fontWeight: FontWeight.w500, letterSpacing: -.4)),
+                  const SizedBox(height: 12),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0x24FFFFFF),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0x38FFFFFF), width: .6),
+                        ),
+                        child: Row(children: [
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                              Text(data.words.isEmpty ? data.wordsLine : data.words.first.word,
+                                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700, letterSpacing: .4)),
+                              const SizedBox(height: 1),
+                              Text(_progress(data).isEmpty ? data.partLabel : _progress(data),
+                                  maxLines: 1,
+                                  style: TextStyle(color: const Color(0xB3FFFFFF), fontSize: 10.5)),
+                            ]),
+                          ),
+                          Flexible(child: _PlayPill(onTap: data.onBegin, ink: world.b)),
+                        ]),
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
+          ]),
+        ),
+      )),
+    );
+  }
+}
+
+// C2 · Word: the day's word set large ABOVE the head, fully readable.
+class _WordCard2 extends StatelessWidget {
+  const _WordCard2({required this.look, required this.data, required this.word, required this.parallax});
+  final _WordLook look;
+  final HeroData data;
+  final Word? word;
+  final double parallax;
+  @override
+  Widget build(BuildContext context) {
+    final text = (word?.word ?? 'NOWSSB').toUpperCase();
+    final hasAudio = word != null && (word!.audio.isNotEmpty || word!.audioMale.isNotEmpty || word!.audioFemale.isNotEmpty);
+    const drop = 96.0; // photo sits lower so the word has open air above the head
+    return Builder(builder: (context) => GestureDetector(
+          onTap: data.onBegin,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: Stack(fit: StackFit.expand, children: [
+              DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [look.top, look.bottom]))),
+              ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (r) => const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                    colors: [Color(0x00000000), Color(0xFF000000)], stops: [.18, .42]).createShader(r),
+                child: Opacity(opacity: .6, child: _plate(look.photo, parallax, k: 18, dy: drop)),
+              ),
+              Positioned(
+                left: 18, right: 18, top: 44,
+                child: Transform.translate(
+                  offset: Offset(parallax * -40, 0),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(text,
+                        maxLines: 1,
+                        style: TextStyle(fontFamily: 'Anton', fontSize: 104, height: 1.0, letterSpacing: 4.5, color: const Color(0xFFFFFBF5))),
+                  ),
+                ),
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                      colors: [look.bottom.withValues(alpha: 0), look.bottom.withValues(alpha: .82), look.bottom], stops: const [.42, .66, .9]),
+                ),
+              ),
+              const _Grain(opacity: .08),
+              Positioned(
+                left: 22, top: 14, right: 16,
+                child: Row(children: [
+                  Expanded(child: Text("TODAY'S WORD · ${data.partLabel.toUpperCase()}", style: _kick(look.bottom.withValues(alpha: .85)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  _SaveButton(data: data, word: word?.word),
+                ]),
+              ),
+              Positioned(
+                left: 22, right: 22, bottom: 22,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  if (word != null && word!.phonetic.isNotEmpty)
+                    Text(word!.phonetic, style: const TextStyle(fontFamily: 'DM Sans', color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: .4, height: 1.1)),
+                  if (word != null && word!.meaning.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(word!.meaning, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: const Color(0xD9FFFFFF), fontSize: 12)),
+                  ],
+                  const SizedBox(height: 12),
+                  _GlassChip(
+                        key: const ValueKey('hero-hear'),
+                        icon: hasAudio ? Icons.graphic_eq_rounded : Icons.schedule_rounded,
+                        text: hasAudio ? 'Hear it' : 'Recording soon',
+                        dim: !hasAudio,
+                        onTap: hasAudio ? () => data.onHear?.call(word!) : null,
+                  ),
+                  const SizedBox(height: 14),
+                  _PlayPill(onTap: data.onBegin, ink: look.bottom, label: 'Begin ${data.title}'),
+                ]),
+              ),
+            ]),
+          ),
+        ));
+  }
+}
 
 class _SaveButton extends StatelessWidget {
   const _SaveButton({required this.data, required this.word, this.light = false});
@@ -280,93 +667,6 @@ class _SaveButton extends StatelessWidget {
   }
 }
 
-
-// D · Film: one dot-light clip (muted, seamless loop; poster under reduced
-// motion; NwsbVideo pauses it offscreen), black ground, gold and white type.
-class _Film {
-  const _Film(this.clip, this.kicker, this.line, {this.align = Alignment.center});
-  final String clip, kicker, line;
-  final Alignment align;
-}
-
-const _films = [
-  _Film('hero-breath', 'Breath', 'Let the word leave you as light', align: Alignment(0, -.2)),
-  _Film('hero-sound', 'Sound', 'Every sound returns to its root'),
-  _Film('hero-rise', 'Rise', 'Feel it climb, then let it go'),
-  _Film('hero-release', 'Release', 'Breathe out what you carry'),
-];
-
-const _gold = Color(0xFFE8C98A);
-
-class _FilmCard extends StatelessWidget {
-  const _FilmCard({required this.film, required this.data, required this.word, required this.parallax});
-  final _Film film;
-  final HeroData data;
-  final Word? word;
-  final double parallax;
-  @override
-  Widget build(BuildContext context) {
-    final hasAudio = word != null && (word!.audio.isNotEmpty || word!.audioMale.isNotEmpty || word!.audioFemale.isNotEmpty);
-    return GestureDetector(
-      key: ValueKey('hero-film-${film.kicker.toLowerCase()}'),
-      onTap: data.onBegin,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(fit: StackFit.expand, children: [
-          const ColoredBox(color: Colors.black),
-          Transform.translate(
-            offset: Offset(parallax * 24, 0),
-            child: Transform.scale(scale: 1.06, child: GoldenBreathClip(
-              asset: 'assets/video/${film.clip}.mp4', poster: 'assets/video/${film.clip}-poster.webp',
-              alignment: film.align, slot: 'calm_hero.FilmCard')),
-          ),
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                  colors: [Color(0x99000000), Color(0x00000000), Color(0x00000000), Color(0xF2000000)],
-                  stops: [0, .22, .5, .92]),
-            ),
-          ),
-          Positioned(
-            left: 22, top: 20, right: 20,
-            child: Row(children: [
-              Expanded(child: Text('TODAY · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xE6FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              if (data.total > 0) _GlassChip(text: _progress(data)),
-              const SizedBox(width: 8),
-              _SaveButton(data: data, word: word?.word),
-            ]),
-          ),
-          Positioned(
-            left: 22, right: 22, bottom: 22,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              Row(children: [
-                for (var i = 0; i < 3; i++) Container(width: 3, height: 3, margin: const EdgeInsets.only(right: 4),
-                    decoration: BoxDecoration(shape: BoxShape.circle, color: _gold.withValues(alpha: 1 - i * .3))),
-                const SizedBox(width: 4),
-                Text(film.kicker.toUpperCase(), style: _kick(_gold)),
-              ]),
-              const SizedBox(height: 8),
-              Text(data.title, maxLines: 2,
-                  style: const TextStyle(fontFamily: _serif, color: Colors.white, fontSize: 40, height: .98, fontWeight: FontWeight.w500, letterSpacing: -.6)),
-              const SizedBox(height: 6),
-              Text(word == null ? film.line : '${word!.word}  ·  ${word!.meaning}',
-                  maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12, height: 1.35)),
-              const SizedBox(height: 16),
-              Row(children: [
-                Flexible(child: _PlayPill(onTap: data.onBegin, ink: Colors.black)),
-                if (hasAudio) ...[
-                  const SizedBox(width: 10),
-                  _GlassChip(key: const ValueKey('hero-hear'), icon: Icons.graphic_eq_rounded, text: 'Hear it', onTap: () => data.onHear?.call(word!)),
-                ],
-              ]),
-            ]),
-          ),
-        ]),
-      ),
-    );
-  }
-}
 
 /// Night/Morning ritual as a hero slide: the white-neumorphic cut-paper card
 /// (Ribon 11-02), following the time of day, with real progress.

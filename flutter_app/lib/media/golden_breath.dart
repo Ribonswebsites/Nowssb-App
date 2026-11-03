@@ -5,8 +5,12 @@ library;
 import 'package:flutter/material.dart';
 import 'nwsb_video.dart';
 
-const kGoldenBreathClip = 'assets/video/golden-breath-tile.mp4';
-const kGoldenBreathPoster = 'assets/video/golden-breath-tile-poster.webp';
+/// Zen Plus card (white home): its own dot-light film, used nowhere else.
+const kGoldenBreathClip = 'assets/video/zen-card.mp4';
+const kGoldenBreathPoster = 'assets/video/zen-card-poster.webp';
+/// Zen Plus tile (Zen home): its own dot-light film, used nowhere else.
+const kZenTileClip = 'assets/video/zen-tile.mp4';
+const kZenTilePoster = 'assets/video/zen-tile-poster.webp';
 
 class GoldenBreathClip extends StatelessWidget {
   const GoldenBreathClip({super.key, this.alignment = const Alignment(.55, -.15), this.slot,
