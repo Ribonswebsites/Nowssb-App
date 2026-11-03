@@ -14,6 +14,7 @@ import 'package:flutter/physics.dart' show SpringDescription, SpringSimulation;
 import 'package:flutter/services.dart';
 
 import '../../data/models.dart';
+import '../../media/golden_breath.dart';
 import '../../widgets/concept/ritual_card.dart';
 import '../../widgets/concept/ritual_paper_card.dart';
 
@@ -235,14 +236,14 @@ class MixedHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Word? w(int i) => data.words.isEmpty ? null : data.words[i % data.words.length];
+    // Ribon 11-03: the dot-light films — black, gold and white — one per card,
+    // with the day's ritual card kept as the only non-film slide.
     final cards = <Widget Function(double off)>[
+      (off) => _FilmCard(film: _films[0], data: data, word: w(0), parallax: off),
       (off) => _PaperRitualSlot(data: data),
-      (off) => _DepthCard(data: data, parallax: off),
-      (off) => _WordCard2(look: const _WordLook('hc-c-word', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
-      (off) => _CinemaCard(photo: 'hc-b-sleep', kicker: 'Dusk', tone: const Color(0xFF0E1230), data: data, word: w(1), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('hc-f-heal', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
-      (off) => _CinemaCard(photo: 'hc-b-sound', kicker: 'Sound', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('hc-e-word', Color(0xFFE2D4F0), Color(0xFF1E1530)), data: data, word: w(2), parallax: off),
+      (off) => _FilmCard(film: _films[1], data: data, word: w(1), parallax: off),
+      (off) => _FilmCard(film: _films[2], data: data, word: w(2), parallax: off),
+      (off) => _FilmCard(film: _films[3], data: data, word: w(3), parallax: off),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 14),
@@ -660,6 +661,93 @@ class _SaveButton extends StatelessWidget {
   }
 }
 
+
+// D · Film: one dot-light clip (muted, seamless loop; poster under reduced
+// motion; NwsbVideo pauses it offscreen), black ground, gold and white type.
+class _Film {
+  const _Film(this.clip, this.kicker, this.line, {this.align = Alignment.center});
+  final String clip, kicker, line;
+  final Alignment align;
+}
+
+const _films = [
+  _Film('hero-breath', 'Breath', 'Let the word leave you as light', align: Alignment(0, -.2)),
+  _Film('hero-sound', 'Sound', 'Every sound returns to its root'),
+  _Film('hero-rise', 'Rise', 'Feel it climb, then let it go'),
+  _Film('hero-release', 'Release', 'Breathe out what you carry'),
+];
+
+const _gold = Color(0xFFE8C98A);
+
+class _FilmCard extends StatelessWidget {
+  const _FilmCard({required this.film, required this.data, required this.word, required this.parallax});
+  final _Film film;
+  final HeroData data;
+  final Word? word;
+  final double parallax;
+  @override
+  Widget build(BuildContext context) {
+    final hasAudio = word != null && (word!.audio.isNotEmpty || word!.audioMale.isNotEmpty || word!.audioFemale.isNotEmpty);
+    return GestureDetector(
+      key: ValueKey('hero-film-${film.kicker.toLowerCase()}'),
+      onTap: data.onBegin,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(fit: StackFit.expand, children: [
+          const ColoredBox(color: Colors.black),
+          Transform.translate(
+            offset: Offset(parallax * 24, 0),
+            child: Transform.scale(scale: 1.06, child: GoldenBreathClip(
+              asset: 'assets/video/${film.clip}.mp4', poster: 'assets/video/${film.clip}-poster.webp',
+              alignment: film.align, slot: 'calm_hero.FilmCard')),
+          ),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                  colors: [Color(0x99000000), Color(0x00000000), Color(0x00000000), Color(0xF2000000)],
+                  stops: [0, .22, .5, .92]),
+            ),
+          ),
+          Positioned(
+            left: 22, top: 20, right: 20,
+            child: Row(children: [
+              Expanded(child: Text('TODAY · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xE6FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              if (data.total > 0) _GlassChip(text: _progress(data)),
+              const SizedBox(width: 8),
+              _SaveButton(data: data, word: word?.word),
+            ]),
+          ),
+          Positioned(
+            left: 22, right: 22, bottom: 22,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              Row(children: [
+                for (var i = 0; i < 3; i++) Container(width: 3, height: 3, margin: const EdgeInsets.only(right: 4),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: _gold.withValues(alpha: 1 - i * .3))),
+                const SizedBox(width: 4),
+                Text(film.kicker.toUpperCase(), style: _kick(_gold)),
+              ]),
+              const SizedBox(height: 8),
+              Text(data.title, maxLines: 2,
+                  style: const TextStyle(fontFamily: _serif, color: Colors.white, fontSize: 40, height: .98, fontWeight: FontWeight.w500, letterSpacing: -.6)),
+              const SizedBox(height: 6),
+              Text(word == null ? film.line : '${word!.word}  ·  ${word!.meaning}',
+                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12, height: 1.35)),
+              const SizedBox(height: 16),
+              Row(children: [
+                Flexible(child: _PlayPill(onTap: data.onBegin, ink: Colors.black)),
+                if (hasAudio) ...[
+                  const SizedBox(width: 10),
+                  _GlassChip(key: const ValueKey('hero-hear'), icon: Icons.graphic_eq_rounded, text: 'Hear it', onTap: () => data.onHear?.call(word!)),
+                ],
+              ]),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+}
 
 /// Night/Morning ritual as a hero slide: the white-neumorphic cut-paper card
 /// (Ribon 11-02), following the time of day, with real progress.
