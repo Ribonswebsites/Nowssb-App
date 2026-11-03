@@ -162,3 +162,7 @@ All images below are original AI-generated artwork made for NowssB (Grok Bot ima
 
 
 _Nov 3 2026: the flutter_app copies of hero-curve, flip_brand, login cards and profile/rails/avatar_a were restored to their Oct 21 versions, so their Nov 2 replacement rows were removed. Root `file_…` webp edits noted above still apply to the root assets._
+
+## Sound-healing section photos (Nov 3, home/sh/) — real photos, warm cinematic grade, ~1600px webp
+- sh-bowl-hands — Anastasia Shuraeva, Pexels (Pexels licence), https://www.pexels.com/photo/a-person-playing-a-singing-bowl-6013481/ — Normal home "Offers and earning / Words that carry meaning" card
+- sh-bowls-candle — Daka, Pexels (Pexels licence), https://www.pexels.com/photo/metal-singing-bowls-20278603/ — Normal home "Your programmes" large tile

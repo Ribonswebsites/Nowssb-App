@@ -553,7 +553,7 @@ class V4StoreEarn extends StatelessWidget {
           const AspectRatio(
             aspectRatio: 2.2,
             child: _Well(child: ClipRRect(borderRadius: BorderRadius.all(Radius.circular(18)),
-                child: Image(image: AssetImage('assets/home/hc/rs-candle.webp'), fit: BoxFit.cover, alignment: Alignment(0, .35)))),
+                child: Image(image: AssetImage('assets/home/sh/sh-bowl-hands.webp'), fit: BoxFit.cover, alignment: Alignment(0, .35)))),
           ),
           const SizedBox(height: 14),
           const Text('Words that carry meaning', style: _h),
