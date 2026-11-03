@@ -28,6 +28,7 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/glass_list_card.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -55,7 +56,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   bool _screenWake = true;
   bool _appearDiscover = true;
   int _set = 0;
-  int _pick = 0;
 
   @override
   void initState() {
@@ -131,6 +131,31 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     HapticFeedback.selectionClick();
   }
 
+  static const _setIcon = [Icons.palette_outlined, Icons.smartphone_rounded, Icons.person_outline_rounded];
+
+  static IconData _rowIcon(String title) => switch (title) {
+        'Player Guide' => Icons.play_circle_outline_rounded,
+        'Zen Plus' => Icons.auto_awesome_outlined,
+        'Quick Access' => Icons.dashboard_customize_outlined,
+        'Notifications' => Icons.notifications_none_rounded,
+        'Player Settings' => Icons.equalizer_rounded,
+        "Today's quote" => Icons.format_quote_rounded,
+        'Keep Screen Awake' => Icons.light_mode_outlined,
+        'Nav Bar' => Icons.space_bar_rounded,
+        'Your profile' => Icons.person_outline_rounded,
+        'Appear in Discover' => Icons.travel_explore_rounded,
+        'Privacy Policy' => Icons.privacy_tip_outlined,
+        'Delete Account' => Icons.delete_outline_rounded,
+        'Cached Data' => Icons.cleaning_services_outlined,
+        'Clear Practice History' => Icons.history_rounded,
+        'Request Words' => Icons.edit_note_rounded,
+        'Admin' => Icons.admin_panel_settings_outlined,
+        'About NowssB' => Icons.info_outline_rounded,
+        'Terms of Service' => Icons.description_outlined,
+        'Sign Out' => Icons.logout_rounded,
+        _ => Icons.chevron_right_rounded,
+      };
+
   Widget _settingsFace(Settings s) {
     final groups = <List<WorkCard>>[
       [
@@ -190,7 +215,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         child: GestureDetector(
                           onTap: () => setState(() {
                             _set = i;
-                            _pick = 0;
                           }),
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -219,119 +243,30 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           ],
         ),
         const SizedBox(height: 14),
-        if (cards.isNotEmpty) ...[
-          _settingsBanner(cards[_pick.clamp(0, cards.length - 1)], _pick.clamp(0, cards.length - 1), cards.length),
-          const SizedBox(height: 14),
-        ],
         if (cards.isEmpty)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 24),
             child: Text('Nothing in this filter.', textAlign: TextAlign.center, style: TextStyle(color: Color(0x99FFFFFF))),
           )
         else
-          for (var n = 0; n < cards.length; n++) ...[
-            GestureDetector(
-              onTap: () {
-                setState(() => _pick = n);
-                cards[n].onTap();
-              },
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: const Color(0xF0101016), borderRadius: BorderRadius.circular(22)),
-                child: Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: SizedBox(
-                        width: 84,
-                        height: 84,
-                        child: Image.asset(cards[n].image ?? 'assets/rails/02.png', fit: BoxFit.cover),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(cards[n].title, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, height: 1.1)),
-                          const SizedBox(height: 6),
-                          Text(cards[n].meta, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(color: Color(0xFF2A2A32), shape: BoxShape.circle),
-                      child: const Icon(Icons.chevron_right, color: Colors.white, size: 18),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-      ],
-    );
-  }
-
-  Widget _settingsBanner(WorkCard card, int index, int total) {
-    return GestureDetector(
-      onTap: card.onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: SizedBox(
-          height: 240,
-          child: Stack(
-            fit: StackFit.expand,
+          GlassListCard(
+            icon: _setIcon[_set.clamp(0, 2)],
+            overline: 'Settings · ${names[_set.clamp(0, 2)]}',
+            title: const ['Look and sound', 'This phone', 'Your account'][_set.clamp(0, 2)],
             children: [
-              Image.asset(card.image ?? 'assets/rails/02.png', fit: BoxFit.cover),
-              const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x33000000), Color(0x00000000), Color(0xCC7A2EA8)],
-                  ),
+              for (var n = 0; n < cards.length; n++)
+                GlassTile(
+                  icon: _rowIcon(cards[n].title),
+                  title: cards[n].title,
+                  sub: cards[n].meta,
+                  danger: cards[n].title == 'Delete Account' || cards[n].title == 'Sign Out',
+                  onTap: () {
+                    cards[n].onTap();
+                  },
                 ),
-              ),
-              Positioned(
-                top: 14,
-                right: 14,
-                child: DecoratedBox(
-                  decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(20))),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Text(card.category, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 18,
-                right: 18,
-                bottom: 16,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(card.title, maxLines: 2, style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w700, height: 1.05)),
-                    const SizedBox(height: 6),
-                    Text(card.meta, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 13)),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text('${index + 1} of $total', style: const TextStyle(color: Color(0xCCFFFFFF))),
-                        const Spacer(),
-                        Text(card.action, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                        const Icon(Icons.chevron_right, color: Colors.white, size: 18),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
-        ),
-      ),
+      ],
     );
   }
 

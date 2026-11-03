@@ -68,11 +68,9 @@ class FourBanners extends StatelessWidget {
 }
 
 Programme _next(Programme? p) => switch (p) {
-      Programme.rewards => Programme.earnings,
-      Programme.reference => Programme.partner,
-      Programme.partner => Programme.reference,
+      Programme.earnings => Programme.reference,
       Programme.earn => Programme.reference,
-      _ => Programme.rewards,
+      _ => Programme.earnings,
     };
 
 /// The Earn-page banner. The left photograph is full height. The cards on
@@ -121,10 +119,8 @@ class _TrioRailState extends State<TrioRail> {
 
   static const _loop = 80;
   static const _all = <_RailFace>[
-    _RailFace('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), Programme.rewards),
     _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
-    // The coin ledger (Rewards · Wallet), not the Rewards front again.
-    _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),
+    _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.earn),
     _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.webp', Color(0xFF1F4E7A), Programme.reference),
   ];
 

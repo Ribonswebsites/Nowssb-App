@@ -107,8 +107,6 @@ List<SectionMediaItem> _programmeChips(String requestLabel) => [
         ctaLink: 'request',
         meta: const {'kind': 'chip'},
       ),
-      const SectionMediaItem(
-          id: 'chip.rewards', title: 'Rewards', ctaLink: 'rewards', meta: {'kind': 'chip'}),
     ];
 
 // ─── Word Atelier ───────────────────────────────────────────────────────────

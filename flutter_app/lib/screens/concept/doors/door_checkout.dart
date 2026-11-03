@@ -352,7 +352,7 @@ class _HowYouPay extends StatelessWidget {
           tile('INCLUDED', 'Your plan', 'Every piece here is already in your plan. Nothing to pay.',
               'assets/video/earth-evening-poster.webp', 21, -.03, false)
         else
-          tile('PAY', 'Google Play', 'Securely, in your own currency. Coupons and coins lower the price.',
+          tile('PAY', 'Google Play', 'Securely, in your own currency. Coins lower the price.',
               'assets/video/earth-evening-poster.webp', 21, -.03, false),
         const SizedBox(height: 10),
         tile('UNLOCK', 'Digital', 'Words, meanings and eBooks are digital. Nothing is shipped.',

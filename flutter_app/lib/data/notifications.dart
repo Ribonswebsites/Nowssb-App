@@ -135,12 +135,9 @@ class NotifStore extends ChangeNotifier {
     NotifGroup(name: 'Your Practice', items: [
       NotifKind(k: 'routine', label: 'Daily words', sub: 'A reminder in your morning, local time'),
       NotifKind(k: 'streak', label: 'Streak', sub: 'Evening reminder if you have not practiced'),
-      NotifKind(k: 'reader', label: 'Reading', sub: 'Reminders you set in the Reader'),
     ]),
-    NotifGroup(name: 'Rewards', items: [
+    NotifGroup(name: 'Coins', items: [
       NotifKind(k: 'coins', label: 'Coins', sub: 'When coins are waiting to collect'),
-      NotifKind(k: 'rewards', label: 'Rewards', sub: 'Streaks, quests and the wallet'),
-      NotifKind(k: 'spin', label: 'Spinning wheel', sub: 'The daily spin'),
       NotifKind(k: 'update', label: 'Latest update', sub: 'What changed in the app'),
     ]),
     NotifGroup(name: 'Offers', items: [
@@ -299,15 +296,13 @@ class NotifStore extends ChangeNotifier {
   }
 
   /// One of each live door, refreshed each day, so the bell is never empty.
-  /// These are the rows you tap: coins, rewards, gifts, the wheel, the update.
+  /// These are the rows you tap: coins and the update.
   Future<void> ensureLiveBoard() async {
     if (!_loaded || !_master) return;
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
     const rows = <(String, String, String)>[
       ('coins', 'Go collect', 'Your coins are waiting. Open them and collect.'),
-      ('rewards', 'Rewards', 'Streaks, quests and today’s coins.'),
-      ('spin', 'Spinning wheel', 'Your free spin is ready. Open the wheel.'),
       ('update', 'Latest update', 'Home, the player and the store were updated.'),
     ];
     var changed = false;

@@ -1,4 +1,4 @@
-/// Rewards card auto-peel (the Drop Studio entry's corner peel).
+/// Corner peel (the Drop Studio entry's corner peel).
 /// Run: flutter test test/peel_shots_test.dart --dart-define=RITUAL_OUT=/workspace/team-plan/shots/tm-build
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -8,11 +8,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/screens/concept/drop_v5.dart';
-import 'package:nowssb/widgets/concept/r27/data.dart';
-import 'package:nowssb/widgets/concept/r27/sections.dart';
 
 const _out = String.fromEnvironment('RITUAL_OUT', defaultValue: '/tmp/tm');
-const rewards = R27Rewards(coins: 492, streak: 3, loginToday: false);
 
 Future<void> _fonts() async {
   final dm = FontLoader('DM Sans');
@@ -91,30 +88,4 @@ void main() {
     expect(opened, 1);
     await t.pumpWidget(const SizedBox());
   });
-
-  testWidgets('rewards card: tapping a tile peels it, then opens Rewards', (t) async {
-    var opened = 0;
-    await t.pumpWidget(MaterialApp(home: Scaffold(body: SingleChildScrollView(
-        child: R27RewardsSection(data: rewards, onOpen: () => opened++, onClaim: () {}, onSignIn: () {})))));
-    await t.pump(const Duration(milliseconds: 100));
-    expect(find.byType(CornerPeel), findsWidgets);
-    await t.tap(find.byKey(const ValueKey('rewards-peel-3')).hitTestable().first);
-    await t.pump();
-    await t.pump(const Duration(milliseconds: 700));
-    await t.pump();
-    expect(opened, 1);
-    await t.pumpWidget(const SizedBox());
-  });
-
-  for (final (width, scale) in [(390.0, 1.0), (320.0, 1.3)]) {
-    for (final (name, p) in [('rest', 0.0), ('mid', .45), ('full', .85)]) {
-      testWidgets('peel-$name-${width.toInt()}', (t) async {
-        final key = GlobalKey();
-        await pump(t, R27RewardsSection(data: rewards, debugPeel: p, onOpen: () {}, onClaim: () {}, onSignIn: () {}), width, scale, key);
-        expect(t.takeException(), isNull);
-        await save(t, key, 'peel-$name-${width.toInt()}');
-        await t.pumpWidget(const SizedBox());
-      });
-    }
-  }
 }

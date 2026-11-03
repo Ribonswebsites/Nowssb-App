@@ -20,16 +20,11 @@ import '../../data/content.dart';
 import '../../data/home_widget_sync.dart';
 import '../../data/models.dart';
 import '../../screens/practice_player.dart';
-import '../../screens/reader/reader_hub.dart';
 import '../../screens/store/ebooks_store.dart';
 import '../../screens/store/request_words.dart';
 import '../../screens/subscription.dart';
 import '../../screens/word_detail.dart';
 import '../circle/circle_screen.dart';
-import '../economy/coupon_screen.dart';
-import '../vault/vault_screen.dart';
-import '../gifts/gifts_screen.dart';
-import '../gifts/spin_wheel.dart';
 import 'inbox_screen.dart';
 import 'notif_preferences_screen.dart';
 
@@ -80,16 +75,16 @@ class NotifRouter {
   /// Where a feed row goes. Each kind opens its own page, then you use it.
   static String routeFor(NotifItem item) => switch (item.type) {
         'coins' => 'coins',
-        'rewards' => 'rewards',
-        'gifts' => 'gifts',
-        'spin' => 'spin',
+        'rewards' => 'coins',
+        'gifts' => 'inbox',
+        'spin' => 'coins',
         'update' => 'update',
         'streak' => 'home',
         'routine' => 'practice',
-        'reader' => 'reader',
+        'reader' => 'ebooks',
         'orders' || 'delivery' || 'cart' => 'store',
         'subscription' => 'subscription',
-        'offers' => 'rewards',
+        'offers' => 'store',
         'arrivals' => 'library',
         _ => 'inbox',
       };
@@ -131,18 +126,10 @@ class NotifRouter {
       case 'word':
         final w = _word(arg);
         return w == null ? const RequestWordsScreen() : WordDetail(word: w);
-      case 'rewards':
-        return const VaultScreen();
       case 'coins':
-        return const VaultScreen();
-      case 'spin':
-        return const VaultScreen();
+        return const CircleScreen();
       case 'update':
         return const LatestUpdatePage();
-      // Gifts / Coupons pages were removed; old alerts open Rewards.
-      case 'coupons':
-      case 'gifts':
-        return const VaultScreen();
       case 'earn':
         return const CircleScreen();
       case 'reference':
@@ -153,8 +140,6 @@ class NotifRouter {
         return const EbooksStoreScreen();
       case 'requests':
         return const RequestWordsScreen();
-      case 'reader':
-        return const ReaderHubScreen();
       case 'inbox':
         return const InboxScreen();
       case 'notifications':
@@ -194,10 +179,7 @@ class LatestUpdatePage extends StatelessWidget {
     const lines = <(String, String)>[
       ('Home', 'A cleaner home: your daily practice card now comes first.'),
       ('Morning film', 'The short morning video above "Open a door" plays again.'),
-      ('Coins', 'Tap "Go collect" to open Today and collect your daily coins.'),
-      ('Rewards', 'Rewards shows your streaks and quests in one place.'),
-      ('Gifts', 'Gifts is where you send a gift or redeem one you received.'),
-      ('Wheel', 'The spinning wheel gives you one free spin every day.'),
+      ('Coins', 'Your coins wallet shows what you have earned.'),
     ];
     return Scaffold(
       backgroundColor: const Color(0xFF07070C),

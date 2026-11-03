@@ -28,8 +28,6 @@
 /// its store card with no heading, no device and no bar under it, while the
 /// Fashion home carried the same thing as a proper block. Both build it now.
 ///
-/// My Routines remains `defOff`; Personalized Healing is visible so its
-/// Explore action opens the native Healing Path gender selector.
 ///
 /// Nine of the sections here are the SAME widgets the Fashion home uses, out
 /// of lib/screens/shared_sections.dart. index.html writes each of them once
@@ -57,9 +55,7 @@ import 'normal/home_v4.dart';
 import 'normal/home_v5.dart';
 import '../widgets/concept/normal/fashion_plus_entry_live.dart';
 import '../widgets/concept/normal/footer.dart';
-import '../features/programs/partner_program.dart';
 import '../features/programs/reference_program.dart';
-import '../features/vault/vault_screen.dart';
 import 'nwsb_sign_in_sheet.dart';
 import 'word_detail.dart';
 import '../widgets/program_shelf.dart';
@@ -67,7 +63,6 @@ import '../widgets/home_skin.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/neomorphic_dashboard.dart';
 import 'personal_coach.dart';
-import 'healing_path.dart';
 import '../media/video_pool.dart';
 import 'normal/glassmorphism_theme.dart';
 import 'normal/header_actions_sheet.dart';
@@ -97,7 +92,6 @@ import '../features/circle/circle_screen.dart';
 import 'app_settings.dart';
 import 'player_settings.dart';
 import 'practice_player.dart';
-import 'reader/reader_hub.dart';
 import 'subscription.dart';
 import 'store/cart_pages.dart';
 import 'store/ebooks_store.dart';
@@ -133,11 +127,9 @@ const kNormalSectionOrder = <String>[
   'storiesFind',
   'buddhaGyro',
   'store',
-  'reader',
   'trendwd',
   'custom',
   'rx',
-  'routines',
   'condisc',
   'feed',
   'quickrow',
@@ -146,8 +138,6 @@ const kNormalSectionOrder = <String>[
   'edition',
   'ebooks',
   'connectban',
-  'healing',
-  'genderpath',
   'wsearch',
   'msearch',
   'fashsw',
@@ -160,7 +150,7 @@ const kNormalSectionOrder = <String>[
 const kNormalNoMarkup = <String>{'custom', 'rx', 'wsearch', 'msearch'};
 
 /// The two `defOff` entries that DO have markup. Built, not placed.
-const kNormalDefOff = <String>{'routines'};
+const kNormalDefOff = <String>{};
 
 /// Plain-words names for the UI Editor.
 const kNormalSectionTitles = <String, String>{
@@ -182,9 +172,7 @@ const kNormalSectionTitles = <String, String>{
   'storiesFind': 'Stories find you',
   'buddhaGyro': 'Buddha quotes stage',
   'store': 'Offer, earn, rewards & gifts',
-  'reader': 'Reader',
   'trendwd': 'Trending words',
-  'routines': 'Routines (off by default)',
   'condisc': 'Connect disc',
   'feed': 'Feed',
   'quickrow': 'Quick access row',
@@ -192,14 +180,13 @@ const kNormalSectionTitles = <String, String>{
   'edition': 'Edition',
   'ebooks': 'eBooks',
   'connectban': 'Connect banner',
-  'healing': 'Healing path',
   'fashsw': 'Switch to Zen home',
   'footer': 'Footer',
 };
 
 /// Sideways carousels wired to the Animation tab's transitions and
 /// auto-rotate (carouselFxItem / CarouselAutoRotate inside them).
-const kNormalCarousels = <String>{'herovid', 'tiles', 'healing'};
+const kNormalCarousels = <String>{'herovid', 'tiles'};
 
 class HomeNormal extends StatefulWidget {
   const HomeNormal({super.key, this.name = 'Healer'});
@@ -285,10 +272,6 @@ class _HomeNormalState extends State<HomeNormal> {
         _go(2);
       case 'store':
         _go(3);
-      case 'reader':
-        _push(const ReaderHubScreen());
-      case 'healing':
-        _push(const HealingPathScreen());
       case 'subscription':
         _push(const SubscriptionScreen());
       case 'player':
@@ -306,12 +289,8 @@ class _HomeNormalState extends State<HomeNormal> {
         _push(const SoundLibraryScreen());
       case 'store':
         _go(3);
-      case 'reader':
-        _push(const ReaderHubScreen());
       case 'ebook':
         _push(const EbooksStoreScreen());
-      case 'healing':
-        _push(const HealingPathScreen());
     }
   }
 
@@ -408,19 +387,10 @@ class _HomeNormalState extends State<HomeNormal> {
           onOpenQuotes: () => _push(const QuotesWeekScreen()),
         )),
         ('store', V4StoreEarn(onStore: () => _go(3))),
-        (
-          'reader',
-          // v5: Rewards + Invite only (the old v4 'NOWSSB READER' card is not in the v5 mocks)
-          V5RewardsInvite(
-            onOpenRewards: () => _push(const VaultScreen()),
-            onSignIn: () => NwsbSignInPage.open(context),
-          ),
-        ),
         ('trendwd', V5Trending(onWord: (w) => _push(WordDetail(word: w)), onLibrary: () => _go(2),
             onSeeAll: () => _push(const TrendingScreen()))),
         ('custom', null),
         ('rx', null),
-        ('routines', const SizedBox.shrink()),
         ('condisc', const SizedBox.shrink()),
         ('feed', V4Community(onTap: () => NwsbLinks.connect(context))),
         (
@@ -441,19 +411,6 @@ class _HomeNormalState extends State<HomeNormal> {
         ),
         ('ebooks', V5Ebooks(onBrowse: () => _push(const EbooksStoreScreen()))),
         ('connectban', const SizedBox.shrink()),
-        (
-          'healing',
-          V4Healing(
-            onTap: () => _push(const HealingPathScreen()),
-            onFemale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.female)),
-            onMale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.male)),
-          ),
-        ),
-        // Choose Your Path is slide 2 of HealingSection — do not inject a
-        // second banner/section (that caused stacked banners + blank pages).
-        ('genderpath', const SizedBox.shrink()),
         ('wsearch', null),
         ('msearch', null),
         (
@@ -499,7 +456,7 @@ class _HomeNormalState extends State<HomeNormal> {
       'home.normal',
       [
         for (final (k, w) in built)
-          if (w != null && (k != 'healing' || Settings.instance.showHealing))
+          if (w != null)
             if (w is SizedBox && w.width == 0 && w.height == 0)
               // Retired rows keep their key for the admin but take no room.
               KeyedSubtree(key: ValueKey('nm-$k'), child: w)

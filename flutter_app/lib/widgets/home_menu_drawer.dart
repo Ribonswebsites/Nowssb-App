@@ -18,13 +18,9 @@ import '../features/circle/circle_screen.dart';
 import '../features/earn/earnings_screen.dart';
 import '../features/social/connect_screen.dart';
 import '../features/social/echo_wall_screen.dart';
-import '../features/gifts/gifts_screen.dart';
-import '../features/economy/coupon_screen.dart';
-import '../features/vault/vault_screen.dart';
 import '../features/wordprint/word_print_screen.dart';
 import '../screens/about_page.dart';
 import '../screens/notifications_settings.dart';
-import '../screens/reader/reader_hub.dart';
 import '../screens/shared_sections.dart';
 import '../screens/sound_library.dart';
 import '../screens/store/meaning_store.dart';
@@ -36,7 +32,7 @@ import '../theme/tokens.dart';
 import '../widgets/nwsb_icon.dart';
 import 'black_glass_banner.dart';
 import 'hub_rails.dart';
-import 'routine_deck.dart';
+import 'glass_list_card.dart';
 import '../admin/template/editable.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
@@ -102,7 +98,6 @@ class HomeMenuDrawer extends StatelessWidget {
   static const _mark = {
     'home': NwsbMarks.house,
     'practice': NwsbMarks.play,
-    'routines': NwsbMarks.flame,
     'library': NwsbMarks.sound,
     'science': NwsbMarks.book,
     'shabda': NwsbMarks.signature,
@@ -236,39 +231,34 @@ class HomeMenuDrawer extends StatelessWidget {
                       bottom + 40,
                     ),
                     children: [
-                      RoutineDeck(
-                        title: 'Go',
-                        banner: 'Your menu',
-                        bannerSub: 'Home, practice, library',
-                        onBanner: () => _goTab(context, 0),
-                        cards: [
-                          WorkCard(category: 'Home', title: 'Home', meta: 'Dashboard', action: 'Open home', image: 'assets/rails/gen-01.jpg', onTap: () => _goTab(context, 0)),
-                          WorkCard(category: 'Practice', title: 'Daily Practice', meta: 'Morning ritual', action: 'Open practice', image: 'assets/rails/gen-02.jpg', onTap: () => _goTab(context, 1)),
-                          WorkCard(category: 'Practice', title: 'My Routines', meta: 'Five routine slots', action: 'Open routines', image: 'assets/rails/gen-03.jpg', onTap: () => _push(context, const _RoutinesPage())),
-                          WorkCard(category: 'Library', title: 'Sound Library', meta: 'Root frequencies', action: 'Open library', image: 'assets/rails/gen-04.jpg', onTap: () => _push(context, const SoundLibraryScreen())),
-                          WorkCard(category: 'Science', title: 'Word Science', meta: 'The NowssB system', action: 'Open science', image: 'assets/rails/gen-05.jpg', onTap: () => _push(context, const AboutNowssbScreen(science: true))),
-                          WorkCard(category: 'Read', title: 'Shabdapathy', meta: 'Foundations', action: 'Open reader', image: 'assets/rails/gen-06.jpg', onTap: () => _push(context, const ReaderHubScreen())),
+                      GlassListCard(
+                        icon: Icons.explore_outlined,
+                        overline: 'NowssB menu · Go',
+                        title: 'Home, practice, library',
+                        children: [
+                          GlassTile(icon: Icons.home_rounded, title: 'Home', sub: 'Dashboard', onTap: () => _goTab(context, 0)),
+                          GlassTile(icon: Icons.self_improvement_rounded, title: 'Daily Practice', sub: 'Morning ritual', onTap: () => _goTab(context, 1)),
+                          GlassTile(icon: Icons.graphic_eq_rounded, title: 'Sound Library', sub: 'Root frequencies', onTap: () => _push(context, const SoundLibraryScreen())),
+                          GlassTile(icon: Icons.science_outlined, title: 'Word Science', sub: 'The NowssB system', onTap: () => _push(context, const AboutNowssbScreen(science: true))),
                         ],
                       ),
-                      RoutineDeck(
-                        title: 'Account',
-                        banner: 'You',
-                        bannerSub: 'Progress, store, settings',
-                        onBanner: () => _goTab(context, 4),
-                        cards: [
-                          WorkCard(category: 'Store', title: 'NowssB Store', meta: 'Word and meaning libraries', action: 'Open store', image: 'assets/rails/gen-08.jpg', onTap: () => _goTab(context, 3)),
-                          WorkCard(category: 'Store', title: 'Meaning Store', meta: 'Hidden meanings', action: 'Open meanings', image: 'assets/rails/gen-09.jpg', onTap: () => _push(context, const MeaningStoreScreen())),
-                          WorkCard(category: 'You', title: 'Profile', meta: 'Account and earnings', action: 'Open profile', image: 'assets/rails/gen-10.jpg', onTap: () => _goTab(context, 4)),
-                          WorkCard(category: 'Gear', title: 'Settings', meta: 'Player, look, alerts', action: 'Open settings', image: 'assets/rails/gen-11.jpg', onTap: () => _push(context, const AppSettingsScreen())),
-                          WorkCard(category: 'Plans', title: 'Plans', meta: 'Resonance, Frequency, Frequency X', action: 'Open plans', image: 'assets/rails/rewards-03.jpg', onTap: () => _push(context, const SubscriptionScreen())),
-                          WorkCard(category: 'Alerts', title: 'Notifications', meta: 'This phone', action: 'Open alerts', image: 'assets/rails/glass-01.jpg', onTap: () => _push(context, const NotificationsSettingsPage())),
-                          WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => _push(context, const CircleScreen())),
-                          WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Coins, quests, invite', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => _push(context, const VaultScreen())),
-                          WorkCard(category: 'You', title: 'Word Print', meta: 'Public profile', action: 'Open print', image: 'assets/rails/glass-02.jpg', onTap: () => _push(context, const WordPrintScreen())),
-                          WorkCard(category: 'Wall', title: 'Echo Wall', meta: 'Reflections', action: 'Open the wall', image: 'assets/rails/glass-03.jpg', onTap: () => _push(context, const EchoWallScreen())),
-                          WorkCard(category: 'Cash', title: 'Earnings', meta: 'Payouts and commissions', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => _push(context, const EarningsScreen())),
-                          WorkCard(category: 'Ledger', title: 'Activity', meta: 'Coin and cash ledger', action: 'Open activity', image: 'assets/rails/clear-04.jpg', onTap: () => _push(context, const EarningsScreen())),
-                          WorkCard(category: 'Connect', title: 'NowssB Connect', meta: 'Community', action: 'Open connect', image: 'assets/rails/glass-04.jpg', onTap: () => _push(context, const ConnectScreen())),
+                      GlassListCard(
+                        icon: Icons.person_rounded,
+                        overline: 'NowssB menu · Account',
+                        title: 'Store, profile, settings',
+                        children: [
+                          GlassTile(icon: Icons.shopping_bag_outlined, title: 'NowssB Store', sub: 'Word and meaning libraries', onTap: () => _goTab(context, 3)),
+                          GlassTile(icon: Icons.menu_book_rounded, title: 'Meaning Store', sub: 'Hidden meanings', onTap: () => _push(context, const MeaningStoreScreen())),
+                          GlassTile(icon: Icons.person_outline_rounded, title: 'Profile', sub: 'Account and earnings', onTap: () => _goTab(context, 4)),
+                          GlassTile(icon: Icons.settings_outlined, title: 'Settings', sub: 'Player, look, alerts', onTap: () => _push(context, const AppSettingsScreen())),
+                          GlassTile(icon: Icons.workspace_premium_outlined, title: 'Plans', sub: 'Resonance, Frequency, Frequency X', onTap: () => _push(context, const SubscriptionScreen())),
+                          GlassTile(icon: Icons.notifications_none_rounded, title: 'Notifications', sub: 'This phone', onTap: () => _push(context, const NotificationsSettingsPage())),
+                          GlassTile(icon: Icons.toll_rounded, title: 'NowssB Earn', sub: 'Agents, codes, commission', onTap: () => _push(context, const CircleScreen())),
+                          GlassTile(icon: Icons.fingerprint_rounded, title: 'Word Print', sub: 'Public profile', onTap: () => _push(context, const WordPrintScreen())),
+                          GlassTile(icon: Icons.forum_outlined, title: 'Echo Wall', sub: 'Reflections', onTap: () => _push(context, const EchoWallScreen())),
+                          GlassTile(icon: Icons.account_balance_wallet_outlined, title: 'Earnings', sub: 'Payouts and commissions', onTap: () => _push(context, const EarningsScreen())),
+                          GlassTile(icon: Icons.receipt_long_outlined, title: 'Activity', sub: 'Coin and cash ledger', onTap: () => _push(context, const EarningsScreen())),
+                          GlassTile(icon: Icons.people_outline_rounded, title: 'NowssB Connect', sub: 'Community', onTap: () => _push(context, const ConnectScreen())),
                         ],
                       ),
                       Padding(
@@ -539,35 +529,6 @@ class _Row extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// The five routine slots, opened from the menu — not the practice tab.
-class _RoutinesPage extends StatelessWidget {
-  const _RoutinesPage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF060C18),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF060C18),
-        foregroundColor: Colors.white,
-        title: const EditableLabel('home_menu_drawer.RoutinesPage', 'My Routines'),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
-        children: [
-          RoutinesSection(
-            fashion: true,
-            onTap: () {
-              Navigator.of(context).pop();
-              NavScope.goTo(context, 1);
-            },
-          ),
-        ],
       ),
     );
   }

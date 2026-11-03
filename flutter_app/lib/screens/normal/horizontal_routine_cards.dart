@@ -87,66 +87,6 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
             PracticePlayerScreen(words: List<Word>.of(words), title: card.title)));
   }
 
-  /// "My Routine · Customize your practice": the routine builder sheet.
-  void _openBuilder() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(0xFF0B0B10),
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (sheet) => SafeArea(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(sheet).size.height * .8),
-          child: ListView(
-            key: const ValueKey('routine-builder'),
-            shrinkWrap: true,
-            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-            children: [
-              const Text('Customize your practice',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              const Text('Choose the session for today, or start one now.',
-                  style: TextStyle(color: Colors.white70, fontSize: 13)),
-              const SizedBox(height: 12),
-              for (var i = 0; i < _cards.length; i++)
-                ListTile(
-                  key: ValueKey('routine-builder-$i'),
-                  contentPadding: EdgeInsets.zero,
-                  leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(_cards[i].image,
-                          width: 52, height: 52, fit: BoxFit.cover)),
-                  title: Text(_cards[i].title,
-                      style: const TextStyle(color: Colors.white)),
-                  subtitle: Text(_cards[i].meta,
-                      style: const TextStyle(color: Colors.white70)),
-                  trailing: IconButton(
-                    tooltip: _cards[i].action,
-                    icon: const Icon(Icons.play_circle_fill_rounded,
-                        color: Colors.white),
-                    onPressed: () {
-                      Navigator.of(sheet).pop();
-                      _start(i);
-                    },
-                  ),
-                  selected: i == _activeCard,
-                  onTap: () {
-                    Navigator.of(sheet).pop();
-                    _select(i);
-                  },
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   static const _cards = <_EssentialCardData>[
     _EssentialCardData(
         'Get Started',
@@ -195,7 +135,7 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
   @override
   Widget build(BuildContext context) {
     final glass = NormalGlassMode.of(context);
-    final title = widget.fashion ? 'My Routine' : 'Get Started';
+    const title = 'Get Started';
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 0, 0, 20),
       child: Column(
@@ -216,16 +156,6 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
               ],
             ),
           ),
-          if (widget.fashion)
-            Padding(
-              padding: const EdgeInsets.only(right: 20, bottom: 12),
-              child: RoutineStyleBlackBanner(
-                key: const ValueKey('routine-customize'),
-                title: 'My Routine',
-                subtitle: 'Customize your practice',
-                onTap: _openBuilder,
-              ),
-            ),
           Padding(
             padding: const EdgeInsets.only(right: 20, bottom: 16, top: 4),
             child: NmEssentialsProcessLine(

@@ -9,7 +9,6 @@ import 'package:flutter/widgets.dart';
 
 import 'artist_cards_section.dart';
 import 'category_tiles_section.dart';
-import 'coupon_banner_section.dart';
 import 'glassy_carousel_section.dart';
 import 'spotlight_section.dart';
 import 'section_config.dart';

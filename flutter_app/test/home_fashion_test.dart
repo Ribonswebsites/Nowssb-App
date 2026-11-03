@@ -62,9 +62,9 @@ void main() {
     // fresh install shows twenty-six — plus `mainops`, which is this app's
     // own: six doors on one panel, so the app can be used without knowing
     // where anything is.
-    expect(kFashionSectionOrder, hasLength(41));
-    expect(kFashionDefOff, hasLength(4));
-    expect(kFashionSectionOrder.toSet(), hasLength(41),
+    expect(kFashionSectionOrder, hasLength(36));
+    expect(kFashionDefOff, hasLength(3));
+    expect(kFashionSectionOrder.toSet(), hasLength(36),
         reason: 'two sections share a key');
     for (final k in kFashionDefOff) {
       expect(kFashionSectionOrder, contains(k),
@@ -72,7 +72,7 @@ void main() {
     }
     expect(
       kFashionSectionOrder.where((k) => !kFashionDefOff.contains(k)).length,
-      37,
+      33,
     );
     expect(
       kFashionSectionOrder.indexOf('catTiles'),
@@ -210,12 +210,11 @@ void main() {
 
     expect(find.text('Tap to restyle'), findsWidgets);
 
-    // Current layout: the four tiles are Player, Sound Library, Store and
-    // Reader, and the home wires every one of them to a real destination.
+    // Current layout: the tiles are Player, Sound Library and Store, and the home wires every one of them to a real destination.
     // ("The Store" elsewhere on the page is the Where to Begin grid.)
     expect(
       [for (final d in EnterCurveAssets.destinations) d.id],
-      ['player', 'library', 'store', 'reader'],
+      ['player', 'library', 'store'],
     );
     final tiles = tester.widget<FashTiles>(find.byType(FashTiles));
     expect(tiles.onOpen, isNotNull, reason: 'the tiles go nowhere');

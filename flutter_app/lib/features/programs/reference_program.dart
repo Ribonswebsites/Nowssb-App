@@ -18,8 +18,8 @@ import 'program_kit.dart';
 import 'program_heroes.dart';
 
 const kReferenceDisclaimer =
-    'Rewards are given only after a friend completes a real purchase or 3 active days. Buying through your own link, or '
-    'through accounts you control, never counts. Discounts and rewards may change with notice. Your link contains only a '
+    'Bonuses are given only after a friend completes a real purchase or 3 active days. Buying through your own link, or '
+    'through accounts you control, never counts. Discounts and bonuses may change with notice. Your link contains only a '
     'code, not personal details.';
 
 const kReferenceSpec = ProgramSpec(
@@ -31,7 +31,7 @@ const kReferenceSpec = ProgramSpec(
   tabs: [
     ProgramTab('hub', 'Link Hub', referenceHubTab),
     ProgramTab('friends', 'Friends', _friends),
-    ProgramTab('rewards', 'Rewards', _rewards),
+    ProgramTab('rewards', 'Bonuses', _rewards),
     ProgramTab('cards', 'Share Cards', _cards),
     ProgramTab('board', 'Leaderboard', _board),
     ProgramTab('rules', 'Rules', _rules),
@@ -283,7 +283,7 @@ List<Widget> _rules(BuildContext context, Map<String, dynamic> s) {
       'The first valid link a friend opens within 30 days is theirs; it locks at their first purchase.',
       'Friend discount: ${sInt(fd['wordPct'])}% off their first ${sInt(fd['wordFirstN'])} words, ${sInt(fd['subscriptionPct'])}% off the first plan period.',
       'Your own purchases, accounts you control, the same device or the same payout identity never count.',
-      'Rewards land only when a real Google Play purchase clears. Refunds and chargebacks reverse them.',
+      'Bonuses land only when a real Google Play purchase clears. Refunds and chargebacks reverse them.',
     ], slot: 'reference_program.rules')),
   ];
 }

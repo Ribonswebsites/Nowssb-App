@@ -369,11 +369,6 @@ class _NavShellState extends State<NavShell> {
       'img':
           'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'
     },
-    'routines': {
-      'label': 'Routines',
-      'img':
-          'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'
-    },
     'chat': {
       'label': 'Chat',
       'img':
@@ -595,9 +590,7 @@ class _NavShellState extends State<NavShell> {
                         final background = settings.navColor == 'black'
                             ? const Color(0xF5000000)
                             : const Color(0xF5182033);
-                        final slots = settings.navSlots;
-                        final found = slots.indexWhere((s) => _primaryTab(s) == 0);
-                        final homeSlot = found >= 0 ? found : 0;
+                        final slots = [for (final s in settings.navSlots) if (s != 'routines') s];
                         return Container(
                           height: 58,
                           decoration: lightHome
@@ -621,12 +614,9 @@ class _NavShellState extends State<NavShell> {
                                 child: _NavSlot(
                                   light: lightHome,
                                   active: _primaryTab(slots[i]) == _i,
-                                  asHome: _i != 0 && i == homeSlot,
                                   image: _navFeatures[slots[i]]?['img'] ?? '',
                                   label: _navFeatures[slots[i]]?['label'] ?? slots[i],
-                                  onTap: () => _i != 0 && i == homeSlot
-                                      ? _goToTab(0)
-                                      : _goToSlot(slots[i]),
+                                  onTap: () => _goToSlot(slots[i]),
                                 ),
                               ),
                             ],
@@ -656,7 +646,6 @@ class _NavShellState extends State<NavShell> {
 class _NavSlot extends StatelessWidget {
   const _NavSlot({
     required this.active,
-    required this.asHome,
     required this.image,
     required this.label,
     required this.onTap,
@@ -665,7 +654,6 @@ class _NavSlot extends StatelessWidget {
 
   final bool light;
   final bool active;
-  final bool asHome;
   final String image;
   final String label;
   final VoidCallback onTap;
@@ -681,9 +669,7 @@ class _NavSlot extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (asHome)
-            NwsbIcon(NwsbMarks.house, size: 26, color: light ? NwsbColors.ink : const Color(0xF2FFFFFF), strokeWidth: 1.9)
-          else if (image.startsWith('asset:'))
+          if (image.startsWith('asset:'))
             EditableImage.asset(
               image.substring(6),
               width: 28,
@@ -702,7 +688,7 @@ class _NavSlot extends StatelessWidget {
             ),
           const SizedBox(height: 3),
           Text(
-            asHome ? 'Home' : label,
+            label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(

@@ -10,14 +10,9 @@ import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../features/notifications/notif_preferences_screen.dart';
 import '../../features/circle/circle_screen.dart';
-import '../../features/economy/coupon_screen.dart';
-import '../../features/economy/partner_screen.dart';
-import '../../features/gifts/gifts_screen.dart';
-import '../../features/vault/vault_screen.dart';
 import '../../screens/app_settings.dart';
 import '../../screens/fashion/drop_studio.dart';
 import '../../screens/fashion_plus.dart';
-import '../../screens/healing_path.dart';
 import '../../screens/home_fashion.dart';
 import '../../screens/home_normal.dart';
 import '../../screens/library.dart';
@@ -29,7 +24,6 @@ import '../../screens/practice_player.dart';
 import '../../screens/profile.dart';
 import '../../screens/quick_access.dart';
 import '../../screens/quotes_live.dart';
-import '../../screens/reader/reader_hub.dart';
 import '../../screens/saved_words.dart';
 import '../../screens/sentence_builder.dart';
 import '../../screens/sound_library.dart';
@@ -73,7 +67,6 @@ final List<AppPage> kAppPages = [
   AppPage('player.settings', 'Player settings', 'Player', Icons.tune_rounded, () => const PlayerSettingsScreen()),
   AppPage('sound.library', 'Sound Library', 'Player', Icons.graphic_eq_rounded, () => const SoundLibraryScreen(embedded: true)),
   AppPage('library', 'Library', 'Learn', Icons.local_library_rounded, () => const LibraryScreen(), tab: 2),
-  AppPage('reader', 'Reader', 'Learn', Icons.chrome_reader_mode_rounded, () => const ReaderHubScreen()),
   AppPage('saved', 'Saved words', 'Learn', Icons.bookmark_rounded, () => const SavedWordsScreen()),
   AppPage('sentence', 'Sentence builder', 'Learn', Icons.short_text_rounded, () => const SentenceBuilderScreen()),
   AppPage('quotes', 'Quotes of the week', 'Learn', Icons.format_quote_rounded, () => const QuotesWeekScreen()),
@@ -85,10 +78,7 @@ final List<AppPage> kAppPages = [
   AppPage('notifications.preferences', 'Notification preferences', 'You', Icons.tune_rounded, () => const NotifPreferencesScreen()),
   AppPage('fashion.dropstudio', 'Drop Studio', 'Explore', Icons.local_mall_rounded, () => const DropStudioScreen()),
   AppPage('fashionplus', 'Zen Plus', 'Explore', Icons.checkroom_rounded, () => const FashionPlusScreen()),
-  AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
-  AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const CircleScreen()),
-  AppPage('rewards.program', 'NowssB Rewards', 'Programs', Icons.star_rounded, () => const VaultScreen()),
-  AppPage('partner.program', 'Partner Program', 'Programs', Icons.workspace_premium_rounded, () => const PartnerScreen()),
+  AppPage('earn', 'Earn', 'Explore', Icons.toll_rounded, () => const CircleScreen()),
   AppPage('coach', 'Personal coach', 'Explore', Icons.support_agent_rounded, () => const PersonalCoachScreen()),
 ];
 

@@ -87,45 +87,15 @@ class NotifCategories {
     importance: Importance.low,
     defaultRoute: 'home',
   );
-  static const reader = NotifCategory(
-    id: 'reader',
-    label: 'Reading reminders',
-    sub: 'The “remind me” times you set in the Reader',
-    channelId: 'nwsb_reader',
-    channelName: 'Reading reminders',
-    importance: Importance.high,
-    defaultRoute: 'reader',
-    legacyKind: 'reader',
-  );
-  static const dailyRewards = NotifCategory(
-    id: 'daily_rewards',
-    label: 'Daily spin & scratch',
-    sub: 'When a new day’s spin and scratch card are ready',
-    channelId: 'nwsb_daily_rewards',
-    channelName: 'Daily spin & scratch',
-    importance: Importance.defaultImportance,
-    defaultRoute: 'rewards',
-    group: 'Rewards',
-  );
   static const rewards = NotifCategory(
     id: 'rewards',
-    label: 'Coins & rewards',
+    label: 'Coins & earnings',
     sub: 'Coins earned, a friend joining with your link, team and payout news',
     channelId: 'nwsb_rewards',
-    channelName: 'Coins & rewards',
+    channelName: 'Coins & earnings',
     importance: Importance.defaultImportance,
     defaultRoute: 'earn',
-    group: 'Rewards',
-  );
-  static const gifts = NotifCategory(
-    id: 'gifts',
-    label: 'Gifts',
-    sub: 'When a gift you sent is opened',
-    channelId: 'nwsb_gifts',
-    channelName: 'Gifts',
-    importance: Importance.high,
-    defaultRoute: 'gifts',
-    group: 'Rewards',
+    group: 'Coins',
   );
   static const requests = NotifCategory(
     id: 'requests',
@@ -188,10 +158,7 @@ class NotifCategories {
     wordOfDay,
     streak,
     weekly,
-    reader,
-    dailyRewards,
     rewards,
-    gifts,
     requests,
     newContent,
     subscription,
@@ -199,7 +166,7 @@ class NotifCategories {
     offers,
   ];
 
-  static const groups = <String>['Your practice', 'Rewards', 'Content', 'Account'];
+  static const groups = <String>['Your practice', 'Coins', 'Content', 'Account'];
 
   static NotifCategory byId(String? id) {
     for (final c in all) {
@@ -216,11 +183,11 @@ class NotifCategories {
     for (final c in all) {
       if (c.id == k) return c;
     }
-    if (k == 'gift' || k.startsWith('gift')) return gifts;
     if (k == 'request_done' || k == 'arrivals') return requests;
     if (k == 'plan' || k.startsWith('sub')) return subscription;
     if (k == 'reference' || k == 'earn' || k == 'payout' || k == 'economy' ||
-        k == 'coins' || k == 'reward' || k == 'badge') {
+        k == 'coins' || k == 'reward' || k == 'badge' ||
+        k == 'daily_rewards' || k.startsWith('gift')) {
       return rewards;
     }
     if (k == 'broadcast' || k == 'offer' || k == 'offers' || k == 'promo') {

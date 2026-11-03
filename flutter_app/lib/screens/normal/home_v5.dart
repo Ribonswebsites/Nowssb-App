@@ -20,30 +20,10 @@ import '../../features/economy/economy_api.dart';
 import '../../widgets/concept/normal/ebooks.dart';
 import '../../widgets/concept/normal/edition.dart';
 import '../../widgets/concept/normal/own.dart';
-import '../../widgets/concept/normal/rewards.dart';
 import '../../widgets/concept/normal/trending.dart';
 
 Map<String, dynamic> _map(Object? o) => o is Map ? Map<String, dynamic>.from(o) : const {};
 int? _int(Object? o) => o is num ? o.toInt() : int.tryParse('${o ?? ''}');
-
-/// Rewards + Invite, from EconomyMirror (coins, streak, referral code and
-/// the server's `config.reference.friendDiscount`).
-class V5RewardsInvite extends StatelessWidget {
-  const V5RewardsInvite({super.key, required this.onOpenRewards, required this.onSignIn});
-  final VoidCallback onOpenRewards, onSignIn;
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) {
-          final w = EconomyMirror.instance;
-          final signedIn = NwsbFirebase.ready && w.uid != null;
-          final fd = _map(_map(_map(w.summary['config'])['reference'])['friendDiscount']);
-          return Column(key: const ValueKey('v5-rewards-invite'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            NRewards(coins: w.coins, streak: w.streak, signedIn: signedIn, onOpenRewards: onOpenRewards, onSignIn: onSignIn),
-          ]);
-        },
-      );
-}
 
 /// The day's library pick (same rule as the old Trending row).
 /// The first three of the shared Trending ranking (same as TrendingScreen).

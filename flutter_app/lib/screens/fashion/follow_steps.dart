@@ -157,29 +157,6 @@ const kFstSteps = <FstStep>[
     ],
   ),
   FstStep(
-    mark: FstMarks.clock,
-    title: 'My Routines',
-    goLabel: 'Open routines',
-    goTab: 1,
-    lead: 'Five slots you own — rename any of them, set any time.',
-    points: [
-      ('The NOW badge', 'Marks whichever routine matches this hour.'),
-      ('Words and Library', 'Build the list, tap + to add from what you own.'),
-      ('History', 'Every session, its word count and how much you finished.'),
-    ],
-  ),
-  FstStep(
-    mark: FstMarks.book,
-    title: 'The Reader',
-    goLabel: 'Open the Reader',
-    goTab: 2,
-    lead: 'Meanings and eBooks in one place — the word science, read.',
-    points: [
-      ('Any meaning', 'Origin, organ and frequency, laid out as a page.'),
-      ('It keeps your place', 'So a long piece survives being put down.'),
-    ],
-  ),
-  FstStep(
     mark: FstMarks.bag,
     title: 'The NowssB Store',
     goLabel: 'Enter the store',

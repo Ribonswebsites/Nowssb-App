@@ -4,6 +4,7 @@
 /// notifications-tab language (glass cards, gold accents, soft film).
 library;
 
+import '../widgets/glass_list_card.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -83,12 +84,6 @@ const quickAccessFeatures = <Map<String, String>>[
     'label': 'Wishlist',
     'img':
         'https://media.nowssb.com/migrated-images/a74a9935fb237eb8_file_0000000055d8720895f7ba98c4a7bf4a_s2lzab.png'
-  },
-  {
-    'id': 'routines',
-    'label': 'Routines',
-    'img':
-        'https://media.nowssb.com/migrated-images/307233cd22669455_file_00000000f740820ba6aaa761133e8889_fitm0p.png'
   },
   {
     'id': 'chat',
@@ -246,61 +241,12 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
           sliver: SliverList.list(
             // Server-driven order (Admin → UI Editor); bundled order by default.
             children: layoutChildren(context, 'quickaccess', [
-                      const LSection('intro', 'Intro', _GlassCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            EditableLabel('quick_access.QuickAccessScreen',
-                              'CUSTOMIZE YOUR NAVIGATION',
-                              style: TextStyle(
-                                color: NwsbColors.mist,
-                                letterSpacing: 2.5,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            EditableLabel('quick_access.QuickAccessScreen',
-                              'Quick access',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -0.3,
-                              ),
-                            ),
-                            SizedBox(height: 6),
-                            EditableLabel('quick_access.QuickAccessScreen',
-                              'Reshape your bottom navigation — shape, colour, and the icons it shows.',
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 13,
-                                height: 1.5,
-                              ),
-                            ),
-                            SizedBox(height: 14),
-                            Row(
-                              children: [
-                                AppThinkingLoader(
-                                  size: 30,
-                                  state: OrbState.solving,
-                                  circlePad: 7,
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: EditableLabel('quick_access.QuickAccessScreen',
-                                    'Live preview updates as you pick tiles',
-                                    style: TextStyle(
-                                      color: Color(0xCCFFFFFF),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                      const LSection('intro', 'Intro', GlassListCard(
+                        margin: EdgeInsets.zero,
+                        icon: Icons.dashboard_customize_outlined,
+                        overline: 'Customize your navigation',
+                        title: 'Quick access',
+                        subtitle: 'Reshape your bottom navigation — shape, colour, and the icons it shows. Live preview updates as you pick tiles.',
                       )),
                       const SizedBox(height: 14),
                       const LSection('banners', 'Banner mix', BannerMix(seed: 1)),
@@ -495,16 +441,16 @@ class _GlassCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
+      borderRadius: BorderRadius.circular(28),
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
         child: Container(
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
           decoration: BoxDecoration(
-            color: const Color(0x28FFFFFF),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: const Color(0x33FFFFFF)),
+            color: const Color(0x8C14141C),
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: const Color(0x26FFFFFF)),
             boxShadow: const [
               BoxShadow(
                 color: Color(0x66000000),
@@ -526,15 +472,23 @@ class _SecLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      text.toUpperCase(),
-      style: const TextStyle(
-        color: NwsbColors.goldLight,
-        letterSpacing: 2,
-        fontSize: 10,
-        fontWeight: FontWeight.w700,
+    return Row(children: [
+      Container(
+        width: 34,
+        height: 34,
+        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        child: const Icon(Icons.tune_rounded, size: 17, color: Color(0xFF0B0B10)),
       ),
-    );
+      const SizedBox(width: 10),
+      Expanded(
+        child: EditableLabel('quick_access.SecLabel',
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+        ),
+      ),
+    ]);
   }
 }
 

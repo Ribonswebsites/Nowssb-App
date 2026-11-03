@@ -21,11 +21,9 @@ import '../widgets/glass_wrap.dart';
 import '../widgets/home_skin.dart';
 import '../widgets/neumorphic.dart';
 import '../widgets/scroll_progress_rail.dart';
-import 'healing_path.dart';
 import 'notifications_sheet.dart';
 import 'player_settings.dart';
 import 'practice.dart';
-import 'reader/reader_hub.dart';
 import 'sound_library.dart';
 import 'store.dart';
 import 'subscription.dart';
@@ -363,24 +361,6 @@ class _QuotesWeekScreenState extends State<QuotesWeekScreen> {
                                 () => Navigator.of(context).push(
                                   MaterialPageRoute<void>(
                                     builder: (_) => const PlayerSettingsScreen(),
-                                  ),
-                                ),
-                              ),
-                              _blackOption(
-                                'Reader',
-                                'Meanings and ebooks',
-                                () => Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const ReaderHubScreen(),
-                                  ),
-                                ),
-                              ),
-                              _blackOption(
-                                'Healing path',
-                                'Choose where to begin',
-                                () => Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder: (_) => const HealingPathScreen(),
                                   ),
                                 ),
                               ),

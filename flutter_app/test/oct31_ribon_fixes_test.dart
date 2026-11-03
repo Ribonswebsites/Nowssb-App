@@ -43,22 +43,12 @@ void main() {
     m.setMockMethodCallHandler(const MethodChannel('plugins.flutter.io/path_provider'), (c) async => '/tmp/pp');
   });
 
-  testWidgets('1: programme rail is Rewards only (Gifts/Coupons removed)', (t) async {
-    await _phone(t, const Scaffold(body: SingleChildScrollView(child: ProgramTrioRail(autoRotate: true))));
-    expect(find.byType(YourRewardsSection), findsOneWidget);
-    expect(find.byKey(const ValueKey('program-trio-pages')), findsNothing);
-    expect(find.text('NowssB Gifts'), findsNothing);
-    expect(find.text('NowssB Coupons'), findsNothing);
-    await t.pumpWidget(const SizedBox());
-    await _pumps(t, 100);
-  });
-
   testWidgets('2: nav clearance = nav + pill + safe area', (t) async {
     await _phone(t, NavClearance(height: NavClearance.navAndPill, child: const Scaffold(body: NavClearanceSpacer())));
     expect(t.getSize(find.byKey(const ValueKey('nav-clearance'))).height, greaterThanOrEqualTo(136));
   });
 
-  testWidgets('4: routine has no counter; banner, dots and cards work', (t) async {
+  testWidgets('4: routine has no counter; dots and cards work', (t) async {
     await _phone(t, const Scaffold(body: SingleChildScrollView(child: NmHorizontalRoutineCards(fashion: true))));
     expect(find.text('6 cards'), findsNothing);
     final dot = find.byKey(const ValueKey('routine-step-2'));
@@ -66,11 +56,8 @@ void main() {
       await t.tap(dot);
       await _pumps(t, 6);
     }
-    await t.tap(find.byKey(const ValueKey('routine-customize')));
-    await _pumps(t, 6);
-    expect(find.byKey(const ValueKey('routine-builder')), findsOneWidget);
-    await t.tap(find.byKey(const ValueKey('routine-builder-1')));
-    await _pumps(t, 6);
+    // The "My Routine" builder was deleted.
+    expect(find.byKey(const ValueKey('routine-customize')), findsNothing);
   });
 
   testWidgets('5: queue sheet scrolls and swipes down to dismiss', (t) async {

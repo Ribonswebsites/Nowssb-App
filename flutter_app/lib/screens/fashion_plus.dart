@@ -10,6 +10,7 @@
 /// and it is the honest one — "7 changes · Fashion home · Off by default".
 library;
 
+import '../widgets/glass_list_card.dart';
 import '../widgets/nwsb_choice_chip.dart';
 import 'package:flutter/material.dart';
 
@@ -131,17 +132,24 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
               const LSection(
                   'backgrounds', 'Background chooser', _BackgroundChooser()),
               const SizedBox(height: 24),
-              const LSection(
+              LSection(
                   'changes',
                   'What the switch touches',
-                  DarkHead(
-                    eyebrow: 'What the switch touches',
-                    title: 'Seven things',
+                  GlassListCard(
+                    margin: EdgeInsets.zero,
                     icon: Icons.auto_awesome_motion_outlined,
+                    overline: 'What the switch touches',
+                    title: 'Seven things',
+                    children: [
+                      for (final (title, sub) in _changes)
+                        GlassTile(
+                          icon: on ? Icons.play_arrow_rounded : Icons.image_outlined,
+                          title: title,
+                          sub: sub,
+                          trailing: const SizedBox.shrink(),
+                        ),
+                    ],
                   )),
-              const SizedBox(height: 14),
-              for (final (title, sub) in _changes)
-                _ChangeRow(title: title, sub: sub, on: on),
               const SizedBox(height: 18),
               const LSection('cost', 'Cost', _Cost()),
             ])),
@@ -166,59 +174,18 @@ class _Switch extends StatelessWidget {
         return GestureDetector(
           onTap: () => onChanged(!currentOn),
           behavior: HitTestBehavior.opaque,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color:
-                  currentOn ? const Color(0x1FC8A96E) : const Color(0x14FFFFFF),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: currentOn
-                    ? const Color(0x59C8A96E)
-                    : const Color(0x1FFFFFFF),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  currentOn ? Icons.play_circle : Icons.pause_circle_outline,
-                  size: 32,
-                  color: on ? NwsbColors.goldLight : const Color(0x8CFFFFFF),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        currentOn ? 'Motion is on' : 'Motion is off',
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        currentOn
-                            ? 'Backgrounds are playing'
-                            : 'Backgrounds are holding their first frame',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0x99FFFFFF),
-                          height: 1.4,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Switch(
-                  value: currentOn,
-                  onChanged: onChanged,
-                  activeThumbColor: NwsbColors.goldLight,
-                ),
-              ],
+          child: GlassListCard(
+            margin: EdgeInsets.zero,
+            icon: currentOn ? Icons.play_arrow_rounded : Icons.pause_rounded,
+            overline: 'Zen Plus',
+            title: currentOn ? 'Motion is on' : 'Motion is off',
+            subtitle: currentOn
+                ? 'Backgrounds are playing'
+                : 'Backgrounds are holding their first frame',
+            trailing: Switch(
+              value: currentOn,
+              onChanged: onChanged,
+              activeThumbColor: NwsbColors.goldLight,
             ),
           ),
         );
@@ -332,60 +299,6 @@ class _BackgroundChoice extends StatelessWidget {
         selected: selected,
         onSelected: (_) => onTap(),
       );
-}
-
-class _ChangeRow extends StatelessWidget {
-  const _ChangeRow({required this.title, required this.sub, required this.on});
-  final String title;
-  final String sub;
-  final bool on;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x14FFFFFF)),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            on ? Icons.play_arrow : Icons.image_outlined,
-            size: 15,
-            color: on ? NwsbColors.goldLight : const Color(0x66FFFFFF),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                EditableLabel(
-                  'fashion_plus.ChangeRow',
-                  title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                EditableLabel(
-                  'fashion_plus.ChangeRow',
-                  sub,
-                  style:
-                      const TextStyle(fontSize: 11.5, color: Color(0x8CFFFFFF)),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _Cost extends StatelessWidget {

@@ -463,7 +463,7 @@ abstract final class SplitPromoExtras {
     ),
     (
       'Meanings that\nstay with you.',
-      'Open Reader',
+      'Open Meanings',
       0xFF2A1840,
       0xFFE07A5F,
       SplitPromoArts.pose04,

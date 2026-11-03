@@ -281,7 +281,7 @@ class CoinsBody extends StatelessWidget {
               '${perRupee != null && perRupee > 0 ? ' ${perRupee.round()} coins take ${fx.formatPrice(1, whole: true)} off.' : ''}'
               '${perRupee != null && perRupee > 0 && _coins > 0 ? ' Your coins can take up to ${fx.formatPrice((_coins / perRupee).floor(), whole: true)} off.' : ''}'),
       row(Icons.local_fire_department_rounded, 'Keep a streak', 'Repair a missed day with coins when the streak screen offers it.'),
-      row(Icons.style_rounded, 'Scratch cards', 'Buy an extra scratch card with coins in Coupons.'),
+      row(Icons.style_rounded, 'Scratch cards', 'Scratch cards from earlier stay in your history.'),
       row(Icons.info_outline_rounded, 'Coins are not money', 'They can\u2019t be cashed out or sent, and expire after a long time without opening the app.'),
     ];
   }

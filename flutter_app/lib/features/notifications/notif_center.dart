@@ -208,7 +208,7 @@ class NotifCenter {
       color: const Color(0xFFE8D5A3),
       styleInformation: BigTextStyleInformation(body, contentTitle: title),
       category: switch (c.id) {
-        'streak' || 'word_of_day' || 'reader' || 'daily_rewards' => AndroidNotificationCategory.reminder,
+        'streak' || 'word_of_day' => AndroidNotificationCategory.reminder,
         'inbox' => AndroidNotificationCategory.message,
         'offers' => AndroidNotificationCategory.promo,
         'subscription' => AndroidNotificationCategory.status,

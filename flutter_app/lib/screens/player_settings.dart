@@ -1,6 +1,7 @@
 /// Native counterpart of the AURA `player-settings.html` settings page.
 library;
 
+import '../widgets/glass_list_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -131,8 +132,12 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
       body: ListView(
         padding: EdgeInsets.fromLTRB(22, 0, 16, 28 + bottomInset),
         // Server-driven order (Admin → UI Editor); bundled order by default.
-        children: layoutChildren(context, 'player.settings', [
-          const SizedBox(height: 4),
+        children: [
+          GlassListCard(
+            icon: Icons.headphones_rounded,
+            overline: 'Settings · Player',
+            title: 'Music player',
+            children: layoutChildren(context, 'player.settings', [
           LSection(
               'promo',
               'Promo banner',
@@ -146,7 +151,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                 ),
                 margin: EdgeInsets.zero,
               )),
-          const SizedBox(height: 8),
           LSection(
               'eq',
               'Equalizer',
@@ -222,7 +226,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                   () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying,
                       s.setNowPlaying),
                   last: true)),
-          const SizedBox(height: 24),
           LSection(
               'battery',
               'Battery note',
@@ -242,76 +245,28 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                   ),
                 ],
               )),
+          ]),
+          ),
           SizedBox(height: 12 + bottomInset),
-        ]),
+        ],
       ),
     );
   }
 
   Widget _nav(IconData icon, String label, String value, VoidCallback onTap,
           {bool last = false}) =>
-      InkWell(
-        onTap: onTap,
-        child: Container(
-          height: 50,
-          decoration: BoxDecoration(
-            border: last
-                ? null
-                : const Border(bottom: BorderSide(color: Color(0x24F2F4F7))),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: Colors.white, size: 18),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 12, letterSpacing: 2),
-                ),
-              ),
-              if (value.isNotEmpty)
-                Text(
-                  value.toUpperCase(),
-                  style: const TextStyle(
-                      color: Color(0x99B3BDCA),
-                      fontSize: 11,
-                      letterSpacing: 1.4),
-                ),
-              const SizedBox(width: 6),
-              const Icon(Icons.chevron_right,
-                  color: Color(0x73B3BDCA), size: 18),
-            ],
-          ),
-        ),
-      );
+      GlassTile(icon: icon, title: label, sub: value, onTap: onTap);
 
   Widget _toggle(IconData icon, String label, bool value, VoidCallback onTap) =>
-      InkWell(
+      GlassTile(
+        icon: icon,
+        title: label,
+        sub: value ? 'On' : 'Off',
         onTap: onTap,
-        child: Container(
-          height: 50,
-          decoration: const BoxDecoration(
-            border: Border(bottom: BorderSide(color: Color(0x24F2F4F7))),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: Colors.white, size: 18),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  label.toUpperCase(),
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 12, letterSpacing: 2),
-                ),
-              ),
-              Switch.adaptive(
-                value: value,
-                onChanged: (_) => onTap(),
-                activeColor: Colors.white,
-              ),
-            ],
-          ),
+        trailing: Switch.adaptive(
+          value: value,
+          onChanged: (_) => onTap(),
+          activeColor: Colors.white,
         ),
       );
 }

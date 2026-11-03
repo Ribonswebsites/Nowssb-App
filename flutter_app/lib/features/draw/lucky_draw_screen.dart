@@ -393,7 +393,7 @@ class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
                         ],
                       ),
                     ),
-                    PPill(p.kind == 'coupon' ? 'Coupon' : 'Gift', color: NwsbColors.goldLight),
+                    PPill('Prize', color: NwsbColors.goldLight),
                   ],
                 ),
               ),

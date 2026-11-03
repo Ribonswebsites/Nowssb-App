@@ -199,24 +199,6 @@ class NotifPlanner {
       }
     }
 
-    // ── daily spin & scratch ──
-    if (i.isOn(NotifCategories.dailyRewards) && i.economyLive) {
-      for (var d = 0; d < 3; d++) {
-        final date = DateTime(today.year, today.month, today.day + d);
-        final when = unquiet(at(date, rewardsMinute));
-        if (!when.isAfter(now)) continue;
-        if (i.claimedToday && serverDay(when) == serverDay(now)) continue;
-        out.add(PlannedNotice(
-          id: rewardsBase + d,
-          category: NotifCategories.dailyRewards,
-          at: when,
-          title: 'Your daily spin is ready',
-          body: 'Spin the wheel and scratch today’s card in Rewards.',
-          route: 'rewards',
-        ));
-      }
-    }
-
     // ── weekly summary ──
     if (i.isOn(NotifCategories.weekly) && i.hasHistory) {
       final toSunday = (DateTime.sunday - today.weekday) % 7;
@@ -278,25 +260,6 @@ class NotifPlanner {
       ));
     }
 
-    // ── reader reminders (the person picked the time: kept, silent in quiet hours) ──
-    if (i.isOn(NotifCategories.reader)) {
-      final due = [...i.readerReminders]..sort((a, b) => a.at.compareTo(b.at));
-      var k = 0;
-      for (final r in due) {
-        final when = DateTime.fromMillisecondsSinceEpoch(r.at);
-        if (!when.isAfter(now) || k >= readerMax) continue;
-        out.add(PlannedNotice(
-          id: readerBase + k,
-          category: NotifCategories.reader,
-          at: when,
-          title: 'Back to “${r.title}”',
-          body: 'You asked to be reminded about this page.',
-          route: 'reader',
-          silent: quiet(when),
-        ));
-        k++;
-      }
-    }
     return spaced(out);
   }
 

@@ -1220,7 +1220,7 @@ class _SlmFeed extends StatelessWidget {
       ),
       _StoreVid(
         title: 'Offers & bundles',
-        sub: 'Coupons on words and meanings',
+        sub: 'Bundles of words and meanings',
         asset: 'assets/video/coupon-a.mp4',
         onTap: onStore,
       ),

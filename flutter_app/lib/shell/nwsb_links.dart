@@ -11,7 +11,6 @@ import '../features/social/connect_screen.dart';
 import '../screens/daily_tasks.dart';
 import '../screens/fashion/drop_studio.dart';
 import '../screens/personal_coach.dart';
-import '../screens/reader/reader_hub.dart';
 import '../screens/saved_words.dart';
 import '../screens/store/cart_pages.dart';
 import '../screens/store/ebooks_store.dart';
@@ -29,7 +28,6 @@ abstract final class NwsbLinks {
   static void subscription(BuildContext context) => push(context, const SubscriptionScreen());
   static void meanings(BuildContext context) => push(context, const MeaningStoreScreen());
   static void ebooks(BuildContext context) => push(context, const EbooksStoreScreen());
-  static void reader(BuildContext context) => push(context, const ReaderHubScreen());
   static void requestWord(BuildContext context) => push(context, const RequestWordsScreen());
   static void connect(BuildContext context) => push(context, const ConnectScreen());
   static void cart(BuildContext context) => push(context, const CartPage());
@@ -40,11 +38,14 @@ abstract final class NwsbLinks {
   static void tasks(BuildContext context) => push(context, const DailyTasksPage());
   static void dropStudio(BuildContext context) => push(context, const DropStudioScreen());
 
-  /// Links to the removed Gifts / Coupons pages. Rails and tiles drop any
+  /// Links to removed pages (Gifts, Coupons, Rewards, Partner, Reader,
+  /// Healing Path, Routines, Daily Streak). Rails and tiles drop any
   /// item whose link matches, so no door points at a page that is gone.
   static bool isRemoved(String? link) {
     final c = (link ?? '').toLowerCase();
-    return c.contains('gift') || c.contains('coupon') || c.contains('scratch') || c.contains('redeem');
+    return c.contains('gift') || c.contains('coupon') || c.contains('scratch') || c.contains('redeem') ||
+        c.contains('reward') || c.contains('partner') || c.contains('reader') || c.contains('healing') ||
+        c.contains('routine') || c.contains('streak') || c.contains('vault') || c.contains('quest');
   }
 
   /// The destination a banner's own button text promises.
@@ -53,24 +54,13 @@ abstract final class NwsbLinks {
     if (c.contains('sound library') || c.contains('open library')) return tab(context, 2);
     if (c.contains('ebook')) return ebooks(context);
     if (c.contains('meaning')) return meanings(context);
-    if (c.contains('reader') || c.contains('science')) return reader(context);
     if (c.contains('request')) return requestWord(context);
     if (c.contains('share') || c.contains('link')) {
       Programmes.open(context, Programme.reference);
       return;
     }
-    // Gifts and Coupons pages were removed; an old banner that still
-    // names them lands on Rewards instead of a dead page.
-    if (isRemoved(c)) {
-      Programmes.open(context, Programme.rewards);
-      return;
-    }
     if (c.contains('payout') || c.contains('sales') || c.contains('agents')) {
       Programmes.open(context, Programme.earn);
-      return;
-    }
-    if (c.contains('reward')) {
-      Programmes.open(context, Programme.rewards);
       return;
     }
     if (c.contains('practice') || c.contains('keep going') || c.contains('begin')) return tab(context, 1);

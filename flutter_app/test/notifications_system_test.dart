@@ -113,14 +113,6 @@ void main() {
       expect(NotifPlanner.plan(_input(now: now, hasHistory: false)).where((p) => p.category.id == 'streak'), isEmpty);
     });
 
-    test('daily spin: not again on a server day already claimed', () {
-      final open = NotifPlanner.plan(_input(now: now)).where((p) => p.category.id == 'daily_rewards').toList();
-      expect(open.first.at, DateTime(2026, 10, 3, 12, 30));
-      final used = NotifPlanner.plan(_input(now: now, claimedToday: true)).where((p) => p.category.id == 'daily_rewards').toList();
-      expect(used.first.at.day, 4);
-      expect(NotifPlanner.plan(_input(now: now, economyLive: false)).where((p) => p.category.id == 'daily_rewards'), isEmpty);
-    });
-
     test('weekly summary is Sunday evening with the week\'s numbers', () {
       final w = NotifPlanner.plan(_input(now: now, dates: ['2026-09-28', '2026-10-01', '2026-09-20']))
           .singleWhere((p) => p.category.id == 'weekly');
@@ -144,18 +136,10 @@ void main() {
       expect(plan.where((p) => p.category.id == 'streak'), isNotEmpty);
     });
 
-    test('reader reminders keep their exact time', () {
-      final at = DateTime(2026, 10, 3, 23, 15);
-      final r = NotifPlanner.plan(_input(now: now, reader: [(at: at.millisecondsSinceEpoch, title: 'Om')]))
-          .singleWhere((p) => p.category.id == 'reader');
-      expect(r.at, at);
-      expect(r.silent, isTrue); // inside quiet hours
-    });
-
     test('two plans for the same minute are spaced apart', () {
       final at = DateTime(2026, 10, 4, 20);
       final a = PlannedNotice(id: 1, category: NotifCategories.streak, at: at, title: 'a', body: '', route: '');
-      final b = PlannedNotice(id: 2, category: NotifCategories.reader, at: at, title: 'b', body: '', route: '');
+      final b = PlannedNotice(id: 2, category: NotifCategories.weekly, at: at, title: 'b', body: '', route: '');
       final s = NotifPlanner.spaced([a, b]);
       expect(s[1].at.difference(s[0].at), NotifPlanner.gap);
     });
@@ -198,12 +182,12 @@ void main() {
     test('the same notification is shown once', () async {
       final p = await prefs();
       final noon = DateTime(2026, 10, 3, 12);
-      expect(await NotifCenter.decide(n(NotifCategories.gifts), p, now: noon), isNull);
-      expect(await NotifCenter.decide(n(NotifCategories.gifts), p, now: noon), NotifSkip.duplicate);
+      expect(await NotifCenter.decide(n(NotifCategories.requests), p, now: noon), isNull);
+      expect(await NotifCenter.decide(n(NotifCategories.requests), p, now: noon), NotifSkip.duplicate);
       // Same text through another path (push vs inbox watch) within minutes.
-      expect(await NotifCenter.decide(n(NotifCategories.gifts, key: 'other'), p, now: noon.add(const Duration(minutes: 2))),
+      expect(await NotifCenter.decide(n(NotifCategories.requests, key: 'other'), p, now: noon.add(const Duration(minutes: 2))),
           NotifSkip.duplicate);
-      expect(await NotifCenter.decide(n(NotifCategories.gifts, key: 'k2', body: 'new'), p, now: noon), isNull);
+      expect(await NotifCenter.decide(n(NotifCategories.requests, key: 'k2', body: 'new'), p, now: noon), isNull);
     });
 
     test('promos skip admins and quiet hours; switches and sign-out stop everything', () async {
@@ -212,7 +196,7 @@ void main() {
       expect(await NotifCenter.decide(n(NotifCategories.offers), p, now: noon), NotifSkip.adminPromo);
       p = await prefs();
       expect(await NotifCenter.decide(n(NotifCategories.offers, key: 'q'), p, now: DateTime(2026, 10, 3, 23)), NotifSkip.quietPromo);
-      expect(await NotifCenter.decide(n(NotifCategories.gifts, key: 'q2'), p, now: DateTime(2026, 10, 3, 23)), isNull);
+      expect(await NotifCenter.decide(n(NotifCategories.requests, key: 'q2'), p, now: DateTime(2026, 10, 3, 23)), isNull);
       await p.setOn(NotifCategories.rewards, false);
       expect(await NotifCenter.decide(n(NotifCategories.rewards, key: 'r'), p, now: noon), NotifSkip.switchedOff);
       p = await prefs(uid: '');
@@ -244,7 +228,7 @@ void main() {
     });
 
     test('server kinds map like functions/_lib/notify/push.js', () {
-      expect(NotifCategories.forKind('gift').id, 'gifts');
+      expect(NotifCategories.forKind('gift').id, 'rewards');
       expect(NotifCategories.forKind('request_done').id, 'requests');
       expect(NotifCategories.forKind('plan').id, 'subscription');
       expect(NotifCategories.forKind('earn').id, 'rewards');
@@ -266,7 +250,7 @@ void main() {
 
     test('inbox rows route to the word that was added', () {
       expect(NotifWatchers.routeForInbox({'kind': 'request_done', 'wordKey': 'om'}), 'word:om');
-      expect(NotifWatchers.routeForInbox({'kind': 'gift'}), 'gifts');
+      expect(NotifWatchers.routeForInbox({'kind': 'gift'}), 'earn');
       expect(NotifWatchers.routeForInbox({'kind': 'admin', 'route': 'store'}), 'store');
     });
 

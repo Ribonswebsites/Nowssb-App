@@ -13,7 +13,7 @@ import '../theme/tokens.dart';
 import '../widgets/glass_wrap.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/nwsb_icon.dart';
-import 'healing_path.dart';
+import 'store/meaning_store.dart';
 import 'sound_library.dart';
 
 /// About NowssB, with the Word Science explainer as its own section.
@@ -39,11 +39,11 @@ class AboutNowssbScreen extends StatelessWidget {
       title: 'Why a word, said aloud',
       body: const [
         'Each word is recorded so you can hear how it is meant to sound, then repeat it in your own voice.',
-        'The Reader carries the meaning and background of each word, so practice and understanding go together.',
+        'Every word carries its meaning and background, so practice and understanding go together.',
         'Your progress page shows what you practised, for how long, and how steady the week has been.',
       ],
-      cta: 'Open the Reader',
-      onCta: () => NwsbLinks.reader(context),
+      cta: 'Open the Meaning Store',
+      onCta: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const MeaningStoreScreen())),
     ));
     return EconomyPage(
       title: science ? 'Word Science' : 'About NowssB',

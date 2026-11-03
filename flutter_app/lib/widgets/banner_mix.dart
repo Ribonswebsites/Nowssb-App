@@ -41,7 +41,6 @@ class BannerMix extends StatelessWidget {
           () => switch (i) {
                 0 => NwsbLinks.subscription(context),
                 1 => NwsbLinks.tab(context, 2),
-                2 => Programmes.open(context, Programme.rewards, tab: 'streaks'),
                 _ => NwsbLinks.tab(context, 1),
               },
     );
@@ -52,11 +51,12 @@ class BannerMix extends StatelessWidget {
     final bar = SecBanner(
       title: _barTitle,
       sub: _barSub,
-      mark: NwsbMarks.gift,
+      mark: NwsbMarks.bag,
       onTap: onTap ??
           () => switch (i) {
                 0 => NwsbLinks.tab(context, 3),
-                1 => Programmes.open(context, Programme.rewards),
+                1 => NwsbLinks.tab(context, 2),
+                2 => NwsbLinks.tab(context, 1),
                 _ => NwsbLinks.tasks(context),
               },
     );
@@ -97,8 +97,8 @@ class BannerMix extends StatelessWidget {
   String get _barTitle {
     const titles = [
       'Enter the store',
-      'Rewards are waiting',
-      'Send a gift',
+      'Open the library',
+      'Start a session',
       'Your practice',
     ];
     return titles[seed.abs() % titles.length];
@@ -107,8 +107,8 @@ class BannerMix extends StatelessWidget {
   String get _barSub {
     const subs = [
       'Words, meanings, and the plans.',
-      'Coins from practice. Not for sale.',
-      'A real purchase, sent as a code.',
+      'Every sound you own, in one place.',
+      'One word, five quiet minutes.',
       'The tasks you set for this account.',
     ];
     return subs[seed.abs() % subs.length];

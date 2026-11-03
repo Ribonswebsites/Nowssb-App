@@ -28,9 +28,9 @@ import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
-/// 7 · tiles — the four destination buttons only.
+/// 7 · tiles — the destination buttons only.
 ///
-/// Player, Sound Library, Store, Reader. The flip showcase and the
+/// Player, Sound Library, Store. The flip showcase and the
 /// Connect / Progress / Word Science / Profile page are gone.
 class FashTiles extends StatelessWidget {
   const FashTiles({super.key, this.onTile, this.onOpen});
@@ -38,7 +38,7 @@ class FashTiles extends StatelessWidget {
   /// Unused. Kept so existing call sites still compile.
   final void Function(int)? onTile;
 
-  /// Player / Library / Store / Reader.
+  /// Player / Library / Store.
   final void Function(String id)? onOpen;
 
   @override
@@ -144,8 +144,10 @@ class _TwoByTwo extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               cell(2),
-              const SizedBox(width: 10),
-              cell(3),
+              if (children.length > 3) ...[
+                const SizedBox(width: 10),
+                cell(3),
+              ],
             ],
           ),
         ),

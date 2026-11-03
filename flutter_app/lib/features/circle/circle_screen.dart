@@ -67,9 +67,6 @@ class _CircleScreenState extends State<CircleScreen> {
       case 'See plans':
         Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()));
       break;
-      case 'Rewards':
-        Programmes.open(context, Programme.rewards);
-      break;
       case 'Earnings':
       case 'Payouts':
       case 'Sales':
@@ -89,7 +86,6 @@ class _CircleScreenState extends State<CircleScreen> {
       case 'Apply a code':
         _apply(context, signedIn, referredBy);
       break;
-      case 'Partner':
       case 'Starter Agent':
       case 'Rising Agent':
       case 'Pro Agent':
@@ -176,7 +172,7 @@ class _CircleScreenState extends State<CircleScreen> {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Become a Partner in our journey and make this journey your Earn.\n\n'
+                  'Join our journey and make this journey your Earn.\n\n'
                   'Commission is a percent of NowssB’s net after the store fee, never the sticker price. '
                   'Master Agent stops at 30%. A direct recruit pays you 5% of their commission, and only while both paid plans are active. '
                   'There is no third level. An invite by itself pays nothing. Payouts wait for review before money moves.',
@@ -231,7 +227,6 @@ class _CircleScreenState extends State<CircleScreen> {
                 onBanner: () => Programmes.open(context, Programme.reference),
                 cards: [
                   WorkCard(category: 'Rank', title: signedIn ? w.circleTier : 'Sign in', meta: signedIn ? '$units of $next to the next tier' : 'Your rank is on this account', action: signedIn ? 'See plans' : 'Sign in', image: 'assets/rails/gen-49.jpg', onTap: () { if (!signedIn) { NwsbSignInPage.open(context); } else { Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())); } }),
-                  WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you earn', action: 'Open rewards', image: 'assets/rails/gen-50.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
                   WorkCard(category: 'Cash', title: 'Earnings', meta: 'Sales and payouts', action: 'Open earnings', image: 'assets/rails/gen-53.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
                 ],
               ),

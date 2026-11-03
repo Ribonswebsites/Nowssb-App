@@ -101,9 +101,8 @@ void main() {
     await t.pump(const Duration(minutes: 2));
   }, skip: !homeFontsReady);
 
-  testWidgets('6: no server config hides Invite and Partner entirely', (t) async {
+  testWidgets('6: the edition shows no Invite or Partner', (t) async {
     await _pump(t, Column(children: [
-      V5RewardsInvite(onOpenRewards: () {}, onSignIn: () {}),
       V5EditionPartner(onJoin: (_) {}),
     ]));
     expect(find.text('Invite a friend'), findsNothing);

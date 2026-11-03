@@ -26,10 +26,8 @@ import '../../data/firebase.dart';
 import '../../data/models.dart';
 import '../../data/practice_progress.dart';
 import '../../features/circle/circle_screen.dart';
-import '../../features/economy/partner_screen.dart';
 import '../../features/economy/economy_api.dart';
 import '../../features/progress/progress_popup.dart';
-import '../../features/vault/vault_screen.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../widgets/colored_split_promo_banner.dart';
@@ -466,67 +464,6 @@ class CalmStoreAndEarn extends StatelessWidget {
 
 // ───────────────────────────── reader + rewards ─────────────────────────────
 
-class CalmReaderRewards extends StatelessWidget {
-  const CalmReaderRewards({super.key, required this.onReader});
-  final VoidCallback onReader;
-  @override
-  Widget build(BuildContext context) => Column(
-        key: const ValueKey('cv3-reader'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _Calm(
-            onTap: onReader,
-            image: 'assets/home/nm-calm-calm-waters.webp',
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('NOWSSB READER', style: _eyebrow),
-              const SizedBox(height: 8),
-              const Text('Read every meaning, and every eBook.', style: _h),
-              const SizedBox(height: 4),
-              const Text('Meanings and eBooks, in one place', style: _sub),
-              const SizedBox(height: 14),
-              CalmGo(label: 'Open Reader', onTap: onReader),
-            ]),
-          ),
-          ListenableBuilder(
-            listenable: EconomyMirror.instance,
-            builder: (context, _) {
-              final w = EconomyMirror.instance;
-              final signedIn = NwsbFirebase.ready && w.uid != null;
-              final nextChest = 40 - (w.coins % 40);
-              return _Calm(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('NOWSSB REWARDS', style: _eyebrow),
-                  const SizedBox(height: 8),
-                  if (!signedIn) ...[
-                    const Text('Sign in to see your rewards', style: _h),
-                    const SizedBox(height: 4),
-                    const Text('Your coins and streak stay on your account', style: _sub),
-                    const SizedBox(height: 14),
-                    CalmGo(label: 'Sign in', onTap: () => NwsbSignInPage.open(context)),
-                  ] else ...[
-                    Text('${w.coins} coins', style: _h),
-                    const SizedBox(height: 4),
-                    Text('Streak ${w.streak} · $nextChest coins to the next chest', style: _sub),
-                    const SizedBox(height: 14),
-                    CalmGo(label: 'Open rewards', onTap: () => _push(context, const VaultScreen())),
-                  ],
-                  const SizedBox(height: 16),
-                  const Divider(height: 1, color: _mist),
-                  const SizedBox(height: 12),
-                  _Row(
-                    icon: Icons.favorite_outline_rounded,
-                    title: 'Invite a friend',
-                    sub: 'Share your link. Your friend gets a discount; you earn when they buy for real.',
-                    onTap: () => _push(context, const CircleScreen(initialTab: 'invite')),
-                  ),
-                ]),
-              );
-            },
-          ),
-        ],
-      );
-}
-
 class _Row extends StatelessWidget {
   const _Row({required this.icon, required this.title, required this.sub, this.onTap});
   final IconData icon;
@@ -661,46 +598,6 @@ class CalmQuickRow extends StatelessWidget {
 
 // ───────────────────────────── edition ─────────────────────────────
 
-class CalmMembership extends StatelessWidget {
-  const CalmMembership({super.key, required this.onEdition});
-  final VoidCallback onEdition;
-  @override
-  Widget build(BuildContext context) => Column(
-        key: const ValueKey('cv3-edition'),
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _Calm(
-            onTap: onEdition,
-            image: 'assets/home/nm-calm-mountain-reflection.webp',
-            dark: true,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('FREE PLAN · UPGRADE ANY TIME',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFFBFD3C8), letterSpacing: 1.6)),
-              const SizedBox(height: 8),
-              const Text('NowssB Edition', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
-              const SizedBox(height: 4),
-              const Text('Get your subscription today', style: TextStyle(fontSize: 13.5, color: Color(0xE6FFFFFF))),
-              const SizedBox(height: 14),
-              CalmGo(label: 'Join NowssB', light: true, onTap: onEdition),
-            ]),
-          ),
-          ListenableBuilder(
-            listenable: EconomyMirror.instance,
-            builder: (context, _) => _Calm(
-              child: _Row(
-                icon: Icons.workspace_premium_outlined,
-                title: '${EconomyMirror.instance.partnerPoints} partner points',
-                sub: 'Breath · Stillness · Awakening. Points come only from real purchases through your links.',
-                onTap: () => _push(context, const PartnerScreen()),
-              ),
-            ),
-          ),
-        ],
-      );
-}
-
-// ───────────────────────────── ebooks ─────────────────────────────
-
 class CalmEbooks extends StatelessWidget {
   const CalmEbooks({super.key, required this.onTap});
   final VoidCallback onTap;
@@ -732,30 +629,6 @@ class CalmEbooks extends StatelessWidget {
 }
 
 // ───────────────────────────── healing ─────────────────────────────
-
-class CalmHealing extends StatelessWidget {
-  const CalmHealing({super.key, this.onTap, this.onFemale, this.onMale});
-  final VoidCallback? onTap;
-  final VoidCallback? onFemale;
-  final VoidCallback? onMale;
-  @override
-  Widget build(BuildContext context) => _Calm(
-        key: const ValueKey('cv3-healing'),
-        onTap: onTap,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('HEALTH JOURNEY', style: _eyebrow),
-          const SizedBox(height: 8),
-          const Text('Customise your healing path', style: _h),
-          const SizedBox(height: 14),
-          Wrap(spacing: 10, runSpacing: 10, children: [
-            CalmGo(label: 'Her path', onTap: onFemale),
-            CalmGo(label: 'His path', light: true, onTap: onMale),
-          ]),
-        ]),
-      );
-}
-
-// ───────────────────────────── fashsw ─────────────────────────────
 
 class CalmFashionSwitch extends StatelessWidget {
   const CalmFashionSwitch({super.key, this.onTap});

@@ -6,7 +6,6 @@ import '../../widgets/app_thinking_loader.dart';
 import '../../widgets/glass_system.dart';
 import '../../widgets/glass_wrap.dart';
 import '../coins/coins_screen.dart';
-import '../programs/rewards_program.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';

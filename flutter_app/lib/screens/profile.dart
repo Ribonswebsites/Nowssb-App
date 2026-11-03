@@ -30,8 +30,6 @@ import '../features/earn/earnings_screen.dart';
 import '../features/economy/economy_api.dart';
 import '../features/economy/economy_theme.dart';
 import '../features/economy/money.dart';
-import '../features/gifts/gifts_screen.dart';
-import '../features/vault/vault_screen.dart';
 import '../data/phone_notifications.dart';
 import '../data/practice_progress.dart';
 import '../shell/nav_shell.dart';
@@ -1133,11 +1131,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return RoutineDeck(
       title: 'Programs',
       banner: 'NowssB',
-      bannerSub: 'Earn and rewards',
+      bannerSub: 'Earn',
       onBanner: () => Programmes.open(context, Programme.earn),
       cards: [
         WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/member-card.png', onTap: () => Programmes.open(context, Programme.earn)),
-        WorkCard(category: 'Rewards', title: '$coins coins', meta: 'Streak $streak', action: 'Open rewards', image: 'assets/rails/rewards-coins.png', onTap: () => Programmes.open(context, Programme.rewards)),
         WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/earnings-02.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
       ],
     );
@@ -1175,7 +1172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
           child: LayoutBuilder(builder: (context, box) {
             final coins = GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const VaultScreen())),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen())),
               child: _TeaserStat(
                 '${EconomyMirror.instance.coins}',
                 'Coins',
@@ -1205,12 +1202,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ? Row(children: [
                     coins,
                     const SizedBox(width: 10),
-                    Expanded(child: InkWell(onTap: null, child: Row(children: [streak, const SizedBox(width: 10), sessions, const SizedBox(width: 10), words]))),
+                    Expanded(child: Row(children: [streak, const SizedBox(width: 10), sessions, const SizedBox(width: 10), words])),
                   ])
                 : Column(key: const ValueKey('stats-2x2'), children: [
                     IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: coins), const SizedBox(width: 10), streak])),
                     const SizedBox(height: 10),
-                    InkWell(onTap: null, child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [sessions, const SizedBox(width: 10), words]))),
+                    IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [sessions, const SizedBox(width: 10), words])),
                   ]);
             return Row(
             children: [
@@ -1293,8 +1290,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     final k = r.split(':').first;
     const names = {
-      'login': 'Daily sign-in', 'quest': 'Quest', 'scratch': 'Scratch card', 'checkout': 'Coins at checkout', 'checkout-release': 'Coins returned',
-      'sale-coins': 'Sale coins', 'expired': 'Coins expired', 'gift': 'Gift', 'box': 'Gift box', 'spin': 'Spin', 'season': 'Season reward',
+      'login': 'Daily sign-in', 'quest': 'Coins', 'scratch': 'Scratch card', 'checkout': 'Coins at checkout', 'checkout-release': 'Coins returned',
+      'sale-coins': 'Sale coins', 'expired': 'Coins expired', 'gift': 'Coins', 'box': 'Coins', 'spin': 'Coins', 'season': 'Coins',
       'league': 'League reward', 'mastery': 'Mastery', 'practice': 'Practice', 'explore': 'Explored a page', 'coins-back': 'Coins back on a purchase',
       'streak': 'Streak reward', 'comeback': 'Welcome back reward', 'time': 'Practice time reward', 'draw': 'Lucky draw', 'ref': 'Friend invite',
     };

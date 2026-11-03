@@ -201,7 +201,6 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final coupons = (EconomyMirror.instance.summary['coupons'] as List?)?.whereType<Map>().toList() ?? const [];
     final q = _q;
     final usedCoins = (q?['coins'] as num?)?.toInt() ?? 0;
     final shown = _coins ?? usedCoins;
@@ -215,23 +214,6 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
           ]),
         );
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (coupons.isNotEmpty) ...[
-        DropdownButtonFormField<String?>(
-          initialValue: _couponId,
-          dropdownColor: const Color(0xFF141820),
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(labelText: 'Coupon', labelStyle: TextStyle(color: NwsbColors.mist)),
-          items: [
-            const DropdownMenuItem<String?>(value: null, child: EditableLabel('store_extras.CheckoutPanel', 'No coupon')),
-            for (final c in coupons) DropdownMenuItem<String?>(value: '${c['id']}', child: Text('${c['label'] ?? 'Coupon'}')),
-          ],
-          onChanged: (v) {
-            setState(() => _couponId = v);
-            _quote(probeMax: true);
-          },
-        ),
-        const SizedBox(height: 8),
-      ],
       if (_maxCoins > 0) ...[
         Row(children: [
           EditableImage.asset(NwsbCoinFly.disc, width: 18, height: 18, slot: 'store_extras.CheckoutPanel'),
@@ -254,7 +236,6 @@ class _CheckoutPanelState extends State<CheckoutPanel> {
       if (q != null) ...[
         row('List price', _money(q['listINR'])),
         if (((q['linkOffINR'] as num?) ?? 0) > 0) row('Friend discount', '−${_money(q['linkOffINR'])}'),
-        if (((q['couponOffINR'] as num?) ?? 0) > 0) row('Coupon', '−${_money(q['couponOffINR'])}'),
         if (((q['coinsINR'] as num?) ?? 0) > 0) row('Coins (${q['coins']})', '−${_money(q['coinsINR'])}'),
         if (((q['absorbedINR'] as num?) ?? 0) > 0) row('NowssB rounds down', '−${_money(q['absorbedINR'])}'),
         const Divider(color: Color(0x33FFFFFF)),

@@ -37,7 +37,7 @@ class EconomyApi {
   static final ValueNotifier<bool> switchingOn = ValueNotifier(false);
 
   static const switchingOnMessage =
-      'Rewards are switching on. Nothing was lost — your coins and gifts start counting as soon as it is live.';
+      'Coins are switching on. Nothing was lost — your coins start counting as soon as it is live.';
 
   static Future<String> installId() async {
     final prefs = await SharedPreferences.getInstance();

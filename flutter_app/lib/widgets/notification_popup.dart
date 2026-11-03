@@ -532,11 +532,7 @@ class NotifCategoryBadge extends StatelessWidget {
   static const known = <String>{
     'routine',
     'streak',
-    'reader',
     'coins',
-    'rewards',
-    'gifts',
-    'spin',
     'update',
     'offers',
     'subscription',

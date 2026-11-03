@@ -13,7 +13,7 @@
 /// lib/screens/fashion/, each carrying the index.html line it was
 /// transcribed from. Read the two side by side and they say the same thing.
 ///
-/// Four entries are `defOff` — My Routines, Shabdapathy Foundations, Word
+/// Three entries are `defOff` — Shabdapathy Foundations, Word
 /// Search, Meaning Search. They are built like any other section and hidden
 /// on a fresh install, which is what a fresh install shows. 26 of 30 are
 /// visible. Reordering and hiding at runtime (the web's `hlApplyLayout`) is
@@ -55,9 +55,6 @@ import 'fashion/hero_quick_row.dart';
 import 'fashion/home_cards.dart';
 import 'store/product_detail.dart' show openAtelierWord;
 import '../features/progress/progress_center.dart';
-import '../features/programs/rewards_program.dart';
-import '../features/gifts/gifts_screen.dart';
-import '../features/economy/coupon_screen.dart';
 import '../features/progress/progress_popup.dart';
 import 'store/daily_deals.dart';
 import 'store/word_atelier.dart';
@@ -67,7 +64,7 @@ import 'daily_tasks.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
-import 'normal/home_v4.dart' show kRewardsLottie, kCoinsLottie, kSpeakerLottie, kPlayLottie;
+import 'normal/home_v4.dart' show kCoinsLottie, kSpeakerLottie, kPlayLottie;
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -81,10 +78,8 @@ import 'word_detail.dart';
 import 'normal/neomorphic_action_bar.dart';
 import 'normal/horizontal_routine_cards.dart';
 import 'personal_coach.dart';
-import 'healing_path.dart';
 import 'subscription.dart';
 import 'store/ebooks_store.dart';
-import 'reader/reader_hub.dart';
 import 'store/request_words.dart';
 import 'sentence_builder.dart';
 import '../widgets/program_shelf.dart';
@@ -94,7 +89,6 @@ import '../features/earn/earn_home_sections.dart';
 import '../widgets/sections/category_tiles_section.dart';
 import '../widgets/sections/spotlight_section.dart';
 import '../features/circle/circle_screen.dart';
-import '../features/vault/vault_screen.dart';
 import '../features/programs/program_router.dart';
 import '../shell/nwsb_links.dart';
 import 'about_page.dart';
@@ -120,9 +114,7 @@ const kFashionSectionOrder = <String>[
   // MK-6 home mix (ref 5): category tiles + spotlight, high on the page.
   'catTiles',
   'spotlight',
-  'reader',
-  'herovid',
-  'streak',
+  'splitPromo',
   'tiles',
   'storiesFind',
   'buddhaGyro',
@@ -136,17 +128,14 @@ const kFashionSectionOrder = <String>[
   'storeban',
   'subvid',
   'edition',
-  'routines',
   'offer',
   'roundring',
   'cube',
   'shabda',
   'ebooks',
   'connectban',
-  'healing',
   'journey',
   'personalCoach',
-  'genderpath',
   'promovid',
   'wsearch',
   'msearch',
@@ -154,23 +143,21 @@ const kFashionSectionOrder = <String>[
   'footer',
 ];
 
-/// The four `defOff` entries. Built, not placed.
-const kFashionDefOff = <String>{'routines', 'shabda', 'wsearch', 'msearch'};
+/// The `defOff` entries. Built, not placed.
+const kFashionDefOff = <String>{'shabda', 'wsearch', 'msearch'};
 
 /// Plain-words names for the UI Editor.
 const kFashionSectionTitles = <String, String>{
   'greet': 'Greeting line',
   'herorow': 'Hero row & split banner',
-  'roundring': 'NowssB Coupons',
+  'roundring': 'NowssB Earn',
   'practice': 'Practice card',
   'routineCards': 'Routine cards, Earth Day film & colour grid',
   'mainops': 'Main options',
   'actionbar': 'Support & coach bar',
   'catTiles': 'Category tiles & filters',
   'spotlight': 'In the spotlight',
-  'reader': 'Reader & promo banner',
-  'herovid': 'Streak & store videos',
-  'streak': 'Streak',
+  'splitPromo': 'Promo banner',
   'tiles': 'Feature tiles',
   'storiesFind': 'Stories find you',
   'buddhaGyro': 'Buddha quotes stage',
@@ -181,15 +168,13 @@ const kFashionSectionTitles = <String, String>{
   'enterCurve': 'Enter curve',
   'rx': 'Word prescription',
   'trendvid': 'Shop now video',
-  'storeban': 'Store banner, earn, rewards & gifts',
+  'storeban': 'Store banner',
   'edition': 'Edition',
-  'routines': 'Routines (off by default)',
   'offer': 'Offer',
   'cube': 'Quick access cube',
   'shabda': 'Shabdapathy foundations (off by default)',
   'ebooks': 'eBooks',
   'connectban': 'Connect banner',
-  'healing': 'Healing path',
   'wsearch': 'Word search (off by default)',
   'msearch': 'Meaning search (off by default)',
   'shabvid': 'Shabdapathy video',
@@ -198,7 +183,7 @@ const kFashionSectionTitles = <String, String>{
 
 /// Sideways carousels wired to the Animation tab's transitions and
 /// auto-rotate (carouselFxItem / CarouselAutoRotate inside them).
-const kFashionCarousels = <String>{'tiles', 'healing'};
+const kFashionCarousels = <String>{'tiles'};
 
 class HomeFashion extends StatefulWidget {
   const HomeFashion({super.key, this.name = 'Healer'});
@@ -285,16 +270,16 @@ class _HomeFashionState extends State<HomeFashion> {
         _go(2);
       case 'store':
         _go(3);
-      case 'reader':
-        _push(const ReaderHubScreen());
-      case 'healing':
-        _push(const HealingPathScreen());
       case 'subscription':
         _push(const SubscriptionScreen());
       case 'player':
         _push(const PlayerSettingsScreen());
       case 'quotes':
         _push(const QuotesWeekScreen());
+      case 'ebooks':
+        _push(const EbooksStoreScreen());
+      case 'meanings':
+        _push(const MeaningStoreScreen());
     }
   }
 
@@ -306,12 +291,8 @@ class _HomeFashionState extends State<HomeFashion> {
         _push(const SoundLibraryScreen());
       case 'store':
         _go(3);
-      case 'reader':
-        _push(const ReaderHubScreen());
       case 'ebook':
         _push(const EbooksStoreScreen());
-      case 'healing':
-        _push(const HealingPathScreen());
     }
   }
 
@@ -333,17 +314,12 @@ class _HomeFashionState extends State<HomeFashion> {
         _push(const SoundLibraryScreen());
       case 'store':
         _go(3);
-      case 'reader':
-        _push(const ReaderHubScreen());
       case 'meaning-store':
         _push(const MeaningStoreScreen());
       case 'practice':
         _go(1);
       case 'profile':
         _go(4);
-      case 'healing':
-      case 'healer':
-        _push(const HealingPathScreen());
       case 'fashion':
         _push(const FashionPlusScreen());
       case 'coach':
@@ -390,7 +366,6 @@ class _HomeFashionState extends State<HomeFashion> {
 
   /// Pool for the daily 8-card quick row; every entry opens a real page.
   List<QuickCard> _quickPool() => [
-        QuickCard('rewards', 'Rewards', 'Your coins & perks', Icons.workspace_premium_rounded, () => _push(const VaultScreen()), lottie: kRewardsLottie),
         QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const CircleScreen()), lottie: kCoinsLottie),
         QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
         QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1), lottie: kPlayLottie),
@@ -398,7 +373,6 @@ class _HomeFashionState extends State<HomeFashion> {
         QuickCard('sounds', 'Sound library', 'Every word sound', Icons.graphic_eq_rounded, () => _push(const SoundLibraryScreen()), lottie: kSpeakerLottie),
         QuickCard('meanings', 'Meanings', 'Where words come from', Icons.auto_stories_rounded, () => _push(const MeaningStoreScreen())),
         QuickCard('atelier', 'Atelier', 'Word Atelier', Icons.spellcheck_rounded, () => _push(const WordAtelierScreen())),
-        QuickCard('healing', 'Healing', 'Your healing path', Icons.spa_rounded, () => _push(const HealingPathScreen())),
       ];
 
   /// Today's Store words (real deals), priced in local currency; each
@@ -439,7 +413,7 @@ class _HomeFashionState extends State<HomeFashion> {
               left: '${coins?.done ?? 0}/${coins?.total ?? 2} coins',
               right: '${((coins?.value ?? 0) * 100).round()}%',
               icon: Icons.toll_rounded,
-              onTap: () => _push(const VaultScreen()),
+              onTap: () => _push(const CircleScreen()),
             ),
             NowProgressItem(
               title: 'Your progress',
@@ -481,7 +455,7 @@ class _HomeFashionState extends State<HomeFashion> {
 
   /// Daily pool for the Today's Practice carousel; each opens a real page.
   List<PracticeBannerSpec> _practicePool() => [
-        PracticeBannerSpec("Today's Practice", 'Begin your healing path', () => _go(1)),
+        PracticeBannerSpec("Today's Practice", 'Begin today’s session', () => _go(1)),
         PracticeBannerSpec('Sit with one word', 'Five quiet minutes', () => _go(1)),
         PracticeBannerSpec('Your word ritual', 'Pick up where you left', () => _go(1)),
         PracticeBannerSpec('Listen, then repeat', 'Three, seven or twenty-one reps', () => _go(1)),
@@ -592,44 +566,15 @@ class _HomeFashionState extends State<HomeFashion> {
           ),
         ),
         (
-          'reader',
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                child: ColoredSplitPromoBanner(
-                  spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
-                  margin: EdgeInsets.zero,
-                ),
-              ),
-              FashReader(onTap: () => _push(const ReaderHubScreen())),
-            ],
-          ),
-        ),
-        (
-          'herovid',
-          FashStreakVideo(
-            onTap: () => _go(1),
-            onStoreTap: () => _go(3),
-          ),
-        ),
-        ('streak', Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-              child: BlackGlassBanner(
-                margin: EdgeInsets.zero,
-                title: 'NowssB Rewards',
-                subtitle: 'Your streak, quests and season.',
-                mark: NwsbMarks.rewards,
-                onTap: () => Programmes.open(context, Programme.rewards, tab: 'streaks'),
-              ),
+          'splitPromo',
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: ColoredSplitPromoBanner(
+              spec: SplitPromoExtras.at(1, onTap: () => _go(1)),
+              margin: EdgeInsets.zero,
             ),
-            FashStreak(onTap: () => _go(1)),
-          ],
-        )),
+          ),
+        ),
         ('tiles', const SizedBox.shrink()),
         // Removed on Ribon's order (Oct 23): Sound That Finds You.
         ('storiesFind', const SizedBox.shrink()),
@@ -661,13 +606,10 @@ class _HomeFashionState extends State<HomeFashion> {
           'edition',
           Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             EditionSection(onTap: () => _push(const SubscriptionScreen())),
-            const SizedBox(height: 24),
-            const PartnerHomeSection(),
           ])
         ),
-        ('routines', const SizedBox.shrink()),
         ('offer', const SizedBox.shrink()),
-        // NowssB Coupons: below NowssB Gifts, a contained glass block.
+        // NowssB Earn: a contained glass block.
         ('roundring', const R27LiveSections(fashion: true)),
         ('cube', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           QuickAccessSection(
@@ -679,21 +621,8 @@ class _HomeFashionState extends State<HomeFashion> {
         ('shabda', FashShabdapathy(onTap: () => _go(2))),
         ('ebooks', EbooksSection(onTap: () => _push(const EbooksStoreScreen()))),
         ('connectban', ConnectBannerSection(onTap: () => NwsbLinks.connect(context))),
-        (
-          'healing',
-          HealingSection(
-            onTap: () => _push(const HealingPathScreen()),
-            onFemale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.female)),
-            onMale: () => _push(
-                const HealingPathScreen(initialGender: HealingGender.male)),
-          ),
-        ),
         ('journey', const SizedBox.shrink()),
         ('personalCoach', const SizedBox.shrink()),
-        // Choose Your Path is slide 2 of HealingSection — do not inject a
-        // second banner/section (that caused stacked banners + blank pages).
-        ('genderpath', const SizedBox.shrink()),
         ('promovid', const SizedBox.shrink()),
         ('wsearch', FashWordSearch(onOpen: (_) => _go(2))),
         ('msearch', FashMeaningSearch(onOpen: (_) => _go(2))),
@@ -719,7 +648,7 @@ class _HomeFashionState extends State<HomeFashion> {
 
     const air = {
       'herorow',
-      'reader',
+      'splitPromo',
       'storiesFind',
       'store',
       'storeban',
@@ -760,8 +689,7 @@ class _HomeFashionState extends State<HomeFashion> {
           carousel: true,
         ),
         for (final (k, w) in built)
-          if (k != 'healing' || Settings.instance.showHealing)
-            if (w is SizedBox && w.width == 0 && w.height == 0)
+          if (w is SizedBox && w.width == 0 && w.height == 0)
               Padding(
                 padding: EdgeInsets.zero,
                 child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),

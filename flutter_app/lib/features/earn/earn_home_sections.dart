@@ -26,10 +26,6 @@ import '../bazaar/bazaar_screen.dart';
 import '../circle/circle_screen.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
-import '../gifts/gifts_screen.dart';
-import '../vault/vault_screen.dart';
-import '../economy/coupon_screen.dart';
-import '../economy/partner_screen.dart';
 import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
@@ -636,95 +632,7 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
   }
 }
 
-class YourRewardsSection extends StatelessWidget {
-  const YourRewardsSection({super.key, this.fill = false});
-
-  /// Stretch the pane to the height it is given (equal-height rail pages).
-  final bool fill;
-
-  @override
-  Widget build(BuildContext context) {
-    final pane = SectionPane(
-          child: ListenableBuilder(
-            listenable: EconomyMirror.instance,
-            builder: (context, _) {
-              final w = EconomyMirror.instance;
-              final signedIn = NwsbFirebase.ready && w.uid != null;
-              final nextChest = 40 - (w.coins % 40);
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const PaneHead(
-                    eyebrow: 'NowssB Rewards',
-                    title: 'Coins and streak',
-                    mark: NwsbMarks.rewards,
-                  ),
-                  const SizedBox(height: 10),
-                  const BrandTopBanner(
-                    bare: true,
-                    compact: true,
-                    title: 'NowssB Rewards',
-                    mark: NwsbMarks.rewards,
-                    art: 'assets/rails/art-coins.jpg',
-                    artFit: BoxFit.cover,
-                    artAlignment: Alignment.center,
-                  ),
-                  const SizedBox(height: 12),
-                  if (!signedIn)
-                    SecBanner(
-                      title: 'Sign in to see your rewards',
-                      sub: 'Your coins and streak stay on your account',
-                      mark: NwsbMarks.user,
-                      onTap: () => NwsbSignInPage.open(context),
-                    )
-                  else ...[
-                    CoinCount(
-                      value: w.coins,
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        color: HomeSkinScope.of(context) == HomeSkin.normal
-                            ? NwsbColors.ink
-                            : NwsbColors.goldLight,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Streak ${w.streak} · $nextChest coins to the next chest',
-                      style: TextStyle(
-                        color: HomeSkinScope.of(context) == HomeSkin.normal
-                            ? NwsbColors.inkSoft
-                            : NwsbColors.mist,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SecBanner(
-                      title: 'Open rewards',
-                      sub: 'Daily coins, quests, and chests',
-                      mark: NwsbMarks.rewards,
-                      onTap: () => EarnUmbrellaSection._open(context, const VaultScreen()),
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  SecBanner(
-                    title: 'Invite a friend',
-                    sub: 'Share your link. Your friend gets a discount; you earn when they buy for real.',
-                    mark: NwsbMarks.verified,
-                    onTap: () => EarnUmbrellaSection._open(context, const CircleScreen(initialTab: 'invite')),
-                  ),
-                ],
-              );
-            },
-          ),
-        );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [fill ? Expanded(child: pane) : pane],
-    );
-  }
-}
-
-enum _Dest { earn, rewards, resell, reference }
+enum _Dest { earn, resell, reference }
 
 class _Slide {
   const _Slide({
@@ -783,7 +691,6 @@ class _OutsidePromoState extends State<_OutsidePromo> {
   void _go(_Slide slide) {
     final page = switch (slide.dest) {
       _Dest.earn => const CircleScreen(),
-      _Dest.rewards => const VaultScreen(),
       _Dest.resell => const BazaarScreen(),
       _Dest.reference => const CircleScreen(initialTab: 'invite'),
     };
@@ -847,24 +754,6 @@ Future<void> copyFriendInvite(BuildContext context) async {
 }
 
 
-/// Rewards, Gifts, and Coupons as one swipeable row. All three pages share
-/// the tallest card's height. It turns on its own every few seconds, and any
-/// touch pauses it so the user can swipe or tap straight to the card they want.
-class ProgramTrioRail extends StatefulWidget {
-  const ProgramTrioRail({super.key, this.autoRotate = !_flutterTest});
-
-  final bool autoRotate;
-
-  @override
-  State<ProgramTrioRail> createState() => _ProgramTrioRailState();
-}
-
-class _ProgramTrioRailState extends State<ProgramTrioRail> {
-  // Gifts and Coupons were removed; only Rewards is left in this rail.
-  @override
-  Widget build(BuildContext context) => const YourRewardsSection();
-}
-
 /// Home door for NowssB Reference (your links, friend discount, ladder).
 class ReferenceHomeSection extends StatelessWidget {
   const ReferenceHomeSection({super.key});
@@ -910,30 +799,3 @@ class ReferenceHomeSection extends StatelessWidget {
   }
 }
 
-/// Home door for the NowssB Partner Program (Breath, Stillness, Awakening).
-class PartnerHomeSection extends StatelessWidget {
-  const PartnerHomeSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SectionPane(
-      child: ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) => Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const PaneHead(eyebrow: 'NowssB Partner', title: 'Breath · Stillness · Awakening', mark: NwsbMarks.crown),
-            const SizedBox(height: 12),
-            SecBanner(
-              title: '${EconomyMirror.instance.partnerPoints} partner points',
-              sub: 'Points come only from real purchases through your links.',
-              mark: NwsbMarks.crown,
-              lottie: kPartnerLottie,
-              onTap: () => EarnUmbrellaSection._open(context, const PartnerScreen()),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -15,16 +15,12 @@ import 'support/test_fonts.dart';
 const samples = <String, (String, String)>{
   'routine': ('Today’s word: Shanti', 'Peace that settles the mind. Two minutes to say it with intent.'),
   'streak': ('Keep your 12-day streak', 'You have not practised today. One word keeps it alive.'),
-  'reader': ('Time to read', 'Pick up “The Sound of Calm” where you left off, page 42.'),
   'coins': ('40 coins are waiting', 'Collect them before midnight to keep your bonus.'),
-  'rewards': ('Quest complete', 'You finished 5 sessions this week. Your reward is ready.'),
-  'gifts': ('Anaya sent you a gift', 'Open your gift box to see what is inside.'),
-  'spin': ('Your daily spin is ready', 'Spin the wheel for coins and coupons.'),
-  'update': ('New in NowssB', 'The Rewards hub is here, with Free coins and Coinback.'),
+  'update': ('New in NowssB', 'Home, the player and the store were updated.'),
   'offers': ('20% off Meaning Store', 'This weekend only, on every word print.'),
   'subscription': ('Your plan renews soon', 'NowssB Plus renews on 2 Nov. Manage it anytime.'),
   'orders': ('Order confirmed', 'Your Signature print #NW-2041 is being prepared.'),
-  'support': ('Reply from support', 'We have looked into your question about the Reader.'),
+  'support': ('Reply from support', 'We have looked into your question about the Store.'),
 };
 
 void main() {

@@ -34,7 +34,6 @@ import '../../widgets/neu_wrap.dart';
 import '../../widgets/neumorphic.dart';
 import '../../widgets/black_glass_banner.dart';
 import '../start_today_carousel.dart';
-import '../streak_store_carousel.dart';
 import '../../admin/template/editable.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
@@ -249,136 +248,6 @@ class _SearchBarState extends State<_SearchBar> {
   }
 }
 
-/// 3 · herovid — Streak carousel: streak VIDEO wrapper + Start Building wrapper.
-/// Store video is NOT here — see [NmStore].
-class NmStreakVideo extends StatelessWidget {
-  const NmStreakVideo({super.key, this.onTap, this.onStoreTap});
-  final VoidCallback? onTap;
-  /// Kept for call-site compatibility; Store is restored on [NmStore].
-  final VoidCallback? onStoreTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreakStoreCarousel(
-      onStreakTap: onTap,
-      secondCard: NmStreakBody(onTap: onTap),
-    );
-  }
-}
-
-/// Start Building Your Streak Today — full wrapper used as carousel page 2.
-class NmStreakBody extends StatelessWidget {
-  const NmStreakBody({super.key, this.days = 0, this.onTap});
-  final int days;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const EditableLabel('normal_sections_top.NmStreakBody',
-          'Start Building Your Streak Today',
-          style: TextStyle(
-            fontSize: 21,
-            fontWeight: FontWeight.w800,
-            color: NwsbColors.ink,
-            height: 1.2,
-            letterSpacing: -0.4,
-          ),
-        ),
-        const SizedBox(height: 6),
-        const EditableLabel('normal_sections_top.NmStreakBody',
-          'Practice daily to keep it alive — and unlock exclusive offers',
-          style: TextStyle(
-            fontSize: 13,
-            color: NwsbColors.inkSoft,
-            height: 1.45,
-          ),
-        ),
-        Container(
-          margin: const EdgeInsets.only(top: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: NwsbColors.surface,
-            borderRadius: BorderRadius.circular(NwsbRadius.bar),
-            boxShadow: NwsbShadows.raisedXs,
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: const BoxDecoration(
-                  color: NwsbColors.surface,
-                  shape: BoxShape.circle,
-                  boxShadow: NwsbShadows.raisedXs,
-                ),
-                child: const Icon(Icons.water_drop,
-                    size: 26, color: NwsbColors.gold),
-              ),
-              const SizedBox(width: 14),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    '$days',
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: NwsbColors.ink,
-                      height: 1,
-                    ),
-                  ),
-                  const EditableLabel('normal_sections_top.NmStreakBody',
-                    'day streak',
-                    style: TextStyle(fontSize: 11, color: NwsbColors.inkFaint),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              const SizedBox(width: 10),
-              const Flexible(
-                child: EditableLabel('normal_sections_top.NmStreakBody',
-                  'KEEP GOING',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1,
-                    color: Color(0x4D000000),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        SecBanner(
-          title: 'Daily Streak',
-          sub: 'Practice daily to keep your healing streak alive',
-          mark: NwsbMarks.flame,
-          onTap: onTap,
-        ),
-      ],
-    );
-  }
-}
-
-/// 4 · streak — content moved into [StreakStoreCarousel] page 2 via
-/// [NmStreakBody]. Slot kept as shrink so registry order stays intact.
-class NmStreak extends StatelessWidget {
-  const NmStreak({super.key, this.days = 0, this.onTap});
-  final int days;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
-}
-
-
 /// 5 · storedisc and 14 · condisc — index.html:1033 and :1358. `.npc-card`.
 ///
 /// A wide plate — 1080:411 — with a spinning ring around a disc at one end
@@ -427,7 +296,7 @@ class NmPromoDisc extends StatefulWidget {
     ),
     (
       'https://media.nowssb.com/migrated-images/256d08a157cfa2a2_c9c4e860-56cf-11f1-8fad-095787cce754_t6k8gb.png',
-      ['Your cart is waiting.', 'Coupons up to 50% off today.'],
+      ['Your cart is waiting.', 'Coins lower the price today.'],
     ),
   ];
 
@@ -1054,60 +923,6 @@ class NmStore extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ],
-    );
-  }
-}
-
-
-/// 9 · reader — index.html:1250. `.nmh-rdsec-wrap`: the spill, the clip,
-/// the copy, and the bar. Nothing is laid over the clip.
-class NmReader extends StatelessWidget {
-  const NmReader({super.key, this.onTap});
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SecWrap(
-      children: [
-        Spill(
-          label: 'Meanings and eBooks, in one place',
-          mark: NwsbMarks.reader,
-          onTap: onTap,
-        ),
-        GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: const ReaderFilm(slot: 'normal_sections_top.NmReader'),
-          ),
-        ),
-        const EditableLabel('normal_sections_top.NmReader',
-          'NowssB',
-          style: TextStyle(fontSize: 14, color: NwsbColors.inkSoft),
-        ),
-        TitleWithGlassEnter(
-          title: 'Reader',
-          onTap: onTap,
-          style: const TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            color: NwsbColors.ink,
-            height: 1.15,
-            letterSpacing: -0.5,
-          ),
-        ),
-        const EditableLabel('normal_sections_top.NmReader',
-          'Read every meaning, and every eBook.',
-          style: TextStyle(fontSize: 13, color: NwsbColors.inkSoft),
-        ),
-        SecBanner(
-          title: 'Reader',
-          sub: 'Meanings and eBooks, in one place',
-          mark: NwsbMarks.reader,
-          onTap: onTap,
         ),
       ],
     );

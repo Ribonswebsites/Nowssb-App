@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/app_settings.dart';
 import 'package:nowssb/widgets/home_menu_drawer.dart';
-import 'package:nowssb/widgets/routine_deck.dart';
+import 'package:nowssb/widgets/glass_list_card.dart';
 import 'fake_video_platform.dart';
 
 Future<void> _settle(WidgetTester t, [int n = 10]) async {
@@ -69,18 +69,16 @@ void main() {
     ))));
     await t.tap(find.text('open'));
     await _settle(t);
-    final cards = <WorkCard>[];
+    final cards = <GlassTile>[];
     for (var i = 0; i < 12; i++) {
-      for (final d in t.widgetList<RoutineDeck>(find.byType(RoutineDeck))) {
-        for (final c in d.cards) {
-          if (!cards.any((x) => x.title == c.title)) cards.add(c);
-        }
+      for (final c in t.widgetList<GlassTile>(find.byType(GlassTile))) {
+        if (!cards.any((x) => x.title == c.title)) cards.add(c);
       }
       await t.drag(find.byType(ListView).first, const Offset(0, -300));
       await t.pump(const Duration(milliseconds: 200));
     }
     expect(cards.map((c) => c.title), containsAll(['Settings', 'Notifications', 'Activity']));
-    cards.firstWhere((c) => c.title == 'Settings').onTap();
+    cards.firstWhere((c) => c.title == 'Settings').onTap!();
     await _settle(t);
     expect(find.byType(AppSettingsScreen), findsOneWidget);
     await t.binding.handlePopRoute();

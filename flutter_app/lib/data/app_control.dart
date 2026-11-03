@@ -151,7 +151,7 @@ class AppControl extends ChangeNotifier {
         'payouts' => 'Payouts are paused on this account. Write to us if you think this is a mistake.',
         'gifting' => 'Gifts are switched off on this account.',
         'referrals' => 'Invites are switched off on this account.',
-        'earning' => 'Rewards are paused on this account.',
+        'earning' => 'Coins are paused on this account.',
         'community' => 'Posting is paused on this account.',
         'requests' => 'Requests are paused on this account.',
         _ => 'This is switched off on this account.',

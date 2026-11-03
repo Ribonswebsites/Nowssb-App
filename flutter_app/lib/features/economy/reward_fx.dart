@@ -539,7 +539,7 @@ class SwitchingOnCard extends StatelessWidget {
               Expanded(
                 child: EditableLabel(
                   'reward_fx.SwitchingOnCard',
-                  'Rewards are switching on. Nothing was lost — coins, cards and gifts start counting as soon as it is live.',
+                  'Coins are switching on. Nothing was lost — coins start counting as soon as it is live.',
                   style: TextStyle(color: NwsbColors.mist, height: 1.35, fontSize: 13),
                 ),
               ),

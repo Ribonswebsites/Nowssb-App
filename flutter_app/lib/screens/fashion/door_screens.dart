@@ -10,7 +10,6 @@ import '../../data/fashion_bg_dim.dart';
 import '../../data/home_widget_sync.dart';
 import '../../data/practice_progress.dart';
 import '../../data/settings.dart';
-import '../healing_path.dart';
 import '../notifications_settings.dart';
 import '../player_settings.dart';
 import '../practice.dart';
@@ -114,7 +113,6 @@ const _accessArt = <String, String>{
   'search': 'assets/doors/search.webp',
   'cart': 'assets/doors/cart.webp',
   'wishlist': 'assets/doors/wishlist.webp',
-  'routines': 'assets/doors/routines.webp',
   'chat': 'assets/doors/chat.webp',
   'ai': 'assets/doors/ai.webp',
   'streak': 'assets/doors/streak.webp',
@@ -138,7 +136,6 @@ const _accessIcon = <String, IconData>{
   'search': Icons.search,
   'cart': Icons.shopping_cart_outlined,
   'wishlist': Icons.favorite_border,
-  'routines': Icons.event_repeat,
   'chat': Icons.chat_bubble_outline,
   'ai': Icons.auto_awesome,
   'streak': Icons.local_fire_department_outlined,

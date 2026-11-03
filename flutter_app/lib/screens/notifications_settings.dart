@@ -1,6 +1,7 @@
 /// Full notifications manage page — `#sub-notifications` / part064 `render()`.
 library;
 
+import '../widgets/glass_list_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -86,33 +87,35 @@ class NotificationsSettingsPage extends StatelessWidget {
                     else
                       _FeedList(store: store),
                     const LSection('kinds', 'What you get', _SecHead(label: 'What you get')),
-                    for (final g in NotifStore.groups) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 4, top: 16, bottom: 8),
-                        child: Text(
-                          g.name.toUpperCase(),
-                          style: const TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 2,
-                            color: Color(0x99E8D5A3),
-                          ),
+                    const SizedBox(height: 8),
+                    for (final g in NotifStore.groups)
+                      Opacity(
+                        opacity: store.master ? 1 : 0.42,
+                        child: GlassListCard(
+                          icon: Icons.notifications_active_outlined,
+                          overline: 'What you get',
+                          title: g.name,
+                          children: [
+                            for (final k in g.items)
+                              GlassTile(
+                                icon: Icons.notifications_none_rounded,
+                                title: k.label,
+                                sub: k.sub,
+                                onTap: () {
+                                  store.toggleKind(k.k);
+                                  HapticFeedback.lightImpact();
+                                },
+                                trailing: _NtSwitch(
+                                  on: store.master && !store.offSet.contains(k.k),
+                                  onTap: () {
+                                    store.toggleKind(k.k);
+                                    HapticFeedback.lightImpact();
+                                  },
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                      GlassWrap(
-                        margin: EdgeInsets.zero,
-                        padding: const EdgeInsets.all(8),
-                        child: _KindGroup(
-                          group: g,
-                          masterOn: store.master,
-                          off: store.offSet,
-                          onToggle: (k) {
-                            store.toggleKind(k);
-                            HapticFeedback.lightImpact();
-                          },
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 24),
                   ]),
                 );
@@ -132,70 +135,15 @@ class _MasterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 4, bottom: 6),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: on
-            ? const Color(0x12E8D5A3)
-            : const Color(0x0DFFFFFF),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: on
-              ? const Color(0x52E8D5A3)
-              : const Color(0x1AFFFFFF),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: const Color(0x66000000),
-              borderRadius: BorderRadius.circular(13),
-              border: Border.all(
-                color: on
-                    ? const Color(0x59E8D5A3)
-                    : const Color(0x24FFFFFF),
-              ),
-            ),
-            child: Icon(
-              Icons.notifications_none,
-              size: 21,
-              color: on ? NwsbColors.goldLight : const Color(0x8CFFFFFF),
-            ),
-          ),
-          const SizedBox(width: 13),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const EditableLabel('notifications_settings.MasterCard',
-                  'All Notifications',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  on
-                      ? 'You are receiving notifications'
-                      : 'Everything is muted',
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0x7AFFFFFF),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _NtSwitch(on: on, onTap: onToggle),
-        ],
+    return GestureDetector(
+      onTap: onToggle,
+      child: GlassListCard(
+        margin: const EdgeInsets.only(top: 4, bottom: 6),
+        icon: on ? Icons.notifications_none : Icons.notifications_off_outlined,
+        overline: 'Notifications',
+        title: 'All Notifications',
+        subtitle: on ? 'You are receiving notifications' : 'Everything is muted',
+        trailing: _NtSwitch(on: on, onTap: onToggle),
       ),
     );
   }
@@ -414,99 +362,6 @@ class _FeedRow extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _KindGroup extends StatelessWidget {
-  const _KindGroup({
-    required this.group,
-    required this.masterOn,
-    required this.off,
-    required this.onToggle,
-  });
-
-  final NotifGroup group;
-  final bool masterOn;
-  final List<String> off;
-  final ValueChanged<String> onToggle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      opacity: masterOn ? 1 : 0.42,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0x0AFFFFFF),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0x17FFFFFF)),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          children: [
-            for (var i = 0; i < group.items.length; i++) ...[
-              if (i > 0)
-                const Divider(height: 1, color: Color(0x0FFFFFFF)),
-              _KindRow(
-                kind: group.items[i],
-                isOn: masterOn && !off.contains(group.items[i].k),
-                onToggle: () => onToggle(group.items[i].k),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _KindRow extends StatelessWidget {
-  const _KindRow({
-    required this.kind,
-    required this.isOn,
-    required this.onToggle,
-  });
-
-  final NotifKind kind;
-  final bool isOn;
-  final VoidCallback onToggle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      child: Row(
-        children: [
-          _IconBox(url: NotifIcons.urlFor(kind.k)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  kind.label,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  kind.sub,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0x6BFFFFFF),
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          _NtSwitch(on: isOn, onTap: onToggle),
-        ],
       ),
     );
   }

@@ -16,19 +16,11 @@ import 'package:nowssb/theme/theme.dart';
 import 'package:nowssb/features/coins/coins_screen.dart';
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
-import 'package:nowssb/features/economy/coupon_screen.dart';
-import 'package:nowssb/features/economy/partner_screen.dart';
-import 'package:nowssb/features/gifts/gifts_screen.dart';
 import 'package:nowssb/features/notifications/inbox_screen.dart';
 import 'package:nowssb/features/notifications/notif_preferences_screen.dart';
-import 'package:nowssb/features/programs/coupons_program.dart';
 import 'package:nowssb/features/programs/earn_program.dart';
-import 'package:nowssb/features/programs/gifts_program.dart';
-import 'package:nowssb/features/programs/partner_program.dart';
 import 'package:nowssb/features/programs/reference_program.dart';
-import 'package:nowssb/features/programs/rewards_program.dart';
 import 'package:nowssb/features/social/connect_screen.dart';
-import 'package:nowssb/features/vault/vault_screen.dart';
 import 'package:nowssb/screens/app_settings.dart';
 import 'package:nowssb/screens/daily_tasks.dart';
 import 'package:nowssb/screens/library.dart';
@@ -37,7 +29,6 @@ import 'package:nowssb/screens/practice.dart';
 import 'package:nowssb/screens/practice_player.dart';
 import 'package:nowssb/screens/profile.dart';
 import 'package:nowssb/screens/quick_access.dart';
-import 'package:nowssb/screens/reader/reader_hub.dart';
 import 'package:nowssb/screens/saved_words.dart';
 import 'package:nowssb/screens/sound_library.dart';
 import 'package:nowssb/screens/store.dart';
@@ -101,7 +92,6 @@ Map<String, Widget Function()> _pages() {
     'subscription': () => const SubscriptionScreen(),
     if (words.isNotEmpty) 'word_detail': () => WordDetail(word: words.first),
     'coins': () => const CoinsScreen(),
-    'vault': () => const VaultScreen(),
     'draw': () => const LuckyDrawScreen(),
     'profile': () => const ProfileScreen(),
     'recent_activity': () => const RecentActivityScreen(),
@@ -115,9 +105,7 @@ Map<String, Widget Function()> _pages() {
       'player': () => PracticePlayerScreen(words: words.take(8).toList(), title: 'Evening mix', showIntro: false),
     'sound_library': () => const SoundLibraryScreen(),
     'ebooks': () => const EbooksStoreScreen(),
-    'reader_hub': () => const ReaderHubScreen(),
     'earnings': () => const EarningsScreen(),
-    'partner': () => const PartnerScreen(),
     'daily_tasks': () => const DailyTasksPage(),
   };
 }

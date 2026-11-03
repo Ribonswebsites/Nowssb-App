@@ -8,7 +8,6 @@ import 'package:nowssb/widgets/concept/normal/edition.dart';
 import 'package:nowssb/widgets/concept/normal/fashion_plus_entry.dart';
 import 'package:nowssb/widgets/concept/normal/footer.dart';
 import 'package:nowssb/widgets/concept/normal/own.dart';
-import 'package:nowssb/widgets/concept/normal/rewards.dart';
 import 'package:nowssb/widgets/concept/normal/surface.dart';
 import 'package:nowssb/widgets/concept/normal/trending.dart';
 
@@ -31,7 +30,6 @@ Future<void> _pump(WidgetTester t, Widget child, {double w = 390, double ts = 1}
 final _books = [for (final b in kEbBooks) (b.key, b.title)];
 
 List<Widget> _all(List<String> log) => [
-      NRewards(coins: 120, streak: 3, signedIn: true, onOpenRewards: () => log.add('rewards'), onSignIn: () => log.add('signin')),
       NTrending(words: const ['Om', 'Shanti', 'Prana'], onWord: (w) => log.add('word:$w'), onLibrary: () => log.add('library')),
       NOwn(onCart: () => log.add('cart'), onWishlist: () => log.add('wish'), onOrders: () => log.add('orders'), cartCount: 2, wishlistCount: 0, orderCount: 1),
       NEdition(onJoin: (t) => log.add('join:$t'), prices: const {}, playAvailable: null),
@@ -52,8 +50,8 @@ void main() {
       await t.pump(const Duration(milliseconds: 600));
     }
 
-    for (final l in ['Open rewards', 'Invite a friend', 'Open Om', 'Open Shanti', 'Everything you own',
-        'Join Frequency', 'Open partner program', 'Browse eBooks', 'Enter Zen Plus']) {
+    for (final l in ['Open Om', 'Open Shanti', 'Everything you own',
+        'Join Frequency', 'Browse eBooks', 'Enter Zen Plus']) {
       if (_act(l).evaluate().isEmpty) continue;
       await tap(l);
     }
@@ -63,7 +61,7 @@ void main() {
       await tap(l.$1);
     }
     await t.pump(const Duration(seconds: 1));
-    for (final want in ['rewards', 'word:Om', 'word:Shanti', 'join:frequency', 'ebooks', 'fashion', 'library',
+    for (final want in ['word:Om', 'word:Shanti', 'join:frequency', 'ebooks', 'fashion', 'library',
       for (final l in NFooter.links) 'foot:${l.$2}']) {
       expect(log, contains(want), reason: want);
     }
@@ -77,15 +75,6 @@ void main() {
       await t.pump(const Duration(milliseconds: 600));
     }
     expect(log, ['cart', 'wish', 'orders']);
-  });
-
-  testWidgets('signed out rewards ask to sign in', (t) async {
-    final log = <String>[];
-    await _pump(t, NRewards(coins: 0, streak: 0, signedIn: false, onOpenRewards: () => log.add('r'), onSignIn: () => log.add('s')));
-    expect(find.text('Sign in for rewards'), findsOneWidget);
-    await t.tap(_act('Sign in').first, warnIfMissed: false);
-    await t.pump(const Duration(milliseconds: 600));
-    expect(log, ['s']);
   });
 
   testWidgets('no fabricated values when sources are missing', (t) async {
@@ -120,7 +109,6 @@ void main() {
       };
       await _pump(t, Column(children: _all([])), w: w, ts: ts);
       await _pump(t, Column(children: [
-        NRewards(coins: 123456, streak: 7, signedIn: true, onOpenRewards: _no, onSignIn: _no),
         NEdition(onJoin: (_) {}, prices: const {'resonance': '₹99', 'frequency': '₹199', 'frequencyX': '₹499'}, playAvailable: true),
         const NOwn(onCart: _no, onWishlist: _no, onOrders: _no, cartCount: 12, wishlistCount: 34, orderCount: 56),
       ]), w: w, ts: ts);

@@ -21,9 +21,7 @@ import '../../data/firebase.dart';
 import '../../data/practice_progress.dart';
 import '../../features/circle/circle_screen.dart';
 import '../../features/economy/economy_api.dart';
-import '../../features/programs/partner_program.dart';
 import '../../features/programs/reference_program.dart';
-import '../../features/vault/vault_screen.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../theme/tokens.dart';
@@ -363,8 +361,6 @@ class V4Doors extends StatelessWidget {
     ('practice', 'Practice', NwsbMarks.play24),
     ('library', 'Library', NwsbMarks.sound),
     ('store', 'Store', NwsbMarks.bag),
-    ('reader', 'Reader', NwsbMarks.reader),
-    ('healing', 'Healing', NwsbMarks.wishlist),
     ('subscription', 'Subscribe', NwsbMarks.crown),
     ('player', 'Player', NwsbMarks.play),
     ('quotes', 'Quotes', NwsbMarks.word),
@@ -374,8 +370,6 @@ class V4Doors extends StatelessWidget {
     'practice': kPlayLottie,
     'library': kHeadphonesLottie,
     'store': kBagLottie,
-    'healing': kHeartLottie,
-    'reader': kReaderLottie,
     'subscription': kPremiumLottie,
     'progress': kProgressLottie,
     'quotes': kQuotesLottie,
@@ -634,35 +628,6 @@ class V4Community extends StatelessWidget {
           ]),
           const SizedBox(height: 12),
           Align(alignment: Alignment.centerLeft, child: CalmGo(label: 'Open Connect', onTap: onTap)),
-        ]),
-      );
-}
-
-// ───────────────────────── healing ─────────────────────────
-
-class V4Healing extends StatelessWidget {
-  const V4Healing({super.key, this.onTap, this.onFemale, this.onMale});
-  final VoidCallback? onTap;
-  final VoidCallback? onFemale;
-  final VoidCallback? onMale;
-  @override
-  Widget build(BuildContext context) => V4Card(
-        key: const ValueKey('v4-healing'),
-        onTap: onTap,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const AspectRatio(
-            aspectRatio: 2.4,
-            child: _Well(child: V4Film('assets/video/healing-path-bg.mp4', slot: 'healing', radius: 18)),
-          ),
-          const SizedBox(height: 14),
-          const Text('HEALTH JOURNEY', style: _eyebrow),
-          const SizedBox(height: 6),
-          const Text('Customise your healing path', style: _h),
-          const SizedBox(height: 12),
-          Wrap(spacing: 10, runSpacing: 10, children: [
-            CalmGo(label: 'Her path', onTap: onFemale),
-            CalmGo(label: 'His path', light: true, onTap: onMale),
-          ]),
         ]),
       );
 }

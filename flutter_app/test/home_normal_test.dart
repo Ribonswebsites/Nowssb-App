@@ -56,8 +56,8 @@ void main() {
   }
 
   test('the registry is complete', () {
-    expect(kNormalSectionOrder, hasLength(37));
-    expect(kNormalSectionOrder.toSet(), hasLength(37),
+    expect(kNormalSectionOrder, hasLength(33));
+    expect(kNormalSectionOrder.toSet(), hasLength(33),
         reason: 'two sections share a key');
     expect(kNormalSectionOrder.indexOf('herovid'),
         kNormalSectionOrder.indexOf('streak') - 1,
@@ -91,7 +91,7 @@ void main() {
         .where((k) => !kNormalNoMarkup.contains(k))
         .where((k) => !kNormalDefOff.contains(k))
         .length;
-    expect(shown, 32);
+    expect(shown, 29);
     expect(
       kNormalSectionOrder.indexOf('catTiles'),
       kNormalSectionOrder.indexOf('actionbar') + 1,

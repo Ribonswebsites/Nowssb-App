@@ -78,8 +78,8 @@ void main() {
             e.renderObject! as RenderParagraph
       ];
 
-  test('the registry still holds 37 keys', () {
-    expect(kNormalSectionOrder, hasLength(37));
+  test('the registry still holds 33 keys', () {
+    expect(kNormalSectionOrder, hasLength(33));
   });
 
   testWidgets('each section and each heading appears once', (t) async {
@@ -124,12 +124,6 @@ void main() {
     expect(t.getTopLeft(head).dy, lessThan(t.getTopLeft(rail).dy));
     expect(t.getTopLeft(rail).dy,
         lessThan(t.getTopLeft(find.text('Your essentials')).dy));
-    await finish(t);
-  }, skip: !homeFontsReady); // needs real fonts, see support/home_render.dart
-
-  testWidgets('signed out, rewards ask to sign in', (t) async {
-    await pumpAt(t, 390, 1);
-    expect(find.text('Sign in for rewards'), findsOneWidget);
     await finish(t);
   }, skip: !homeFontsReady); // needs real fonts, see support/home_render.dart
 

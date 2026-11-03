@@ -284,7 +284,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    for (final page in ['reader', 'store.request', 'quotes', 'sentence', 'sound.library']) {
+    for (final page in ['store.request', 'quotes', 'sentence', 'sound.library']) {
       testWidgets('$page (one block before) takes a section and an orb', (tester) async {
         _ignoreOverflow();
         final c = await _open(tester, page);
@@ -317,7 +317,7 @@ void main() {
 
     // Pages built as one block (a lazy list, a staged flow): the block is a
     // section, so an orb lands on it and a section can go above it.
-    for (final page in ['saved', 'healing']) {
+    for (final page in ['saved']) {
       testWidgets('$page (no sections before) takes an orb and a section above its block', (tester) async {
         _ignoreOverflow();
         final c = await _open(tester, page);
