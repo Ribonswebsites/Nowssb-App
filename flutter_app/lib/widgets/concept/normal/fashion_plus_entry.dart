@@ -1,19 +1,15 @@
 /// Zen Plus entry (Ribon 11-02): a white neumorphic card holding a brand-new
-/// Flutter animation — a breathing lotus around a soft plus, with ripple
-/// rings and three orbiting beads. No photo. Tapping blooms the lotus open,
+/// Flutter animation — a dark video window (golden_breath.dart), Ribon 11-03.
+/// Tapping eases the clip forward,
 /// then calls [onEnter].
 ///
 /// [bgDim] is kept for call-site compatibility (the Zen home's dim setting)
 /// and only deepens the lotus tint slightly, so the card previews it.
 library;
 
-import 'dart:math' as math;
-import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
+import '../../../media/golden_breath.dart';
 import 'surface.dart';
-
-const _lav = Color(0xFF7B61D9);
-const _peach = Color(0xFFE9A46B);
 
 class NFashionPlusEntry extends StatefulWidget {
   const NFashionPlusEntry({super.key, required this.onEnter, this.bgDim});
@@ -58,70 +54,21 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with SingleTicker
             decoration: neu(r: 22, pressed: true),
             child: TweenAnimationBuilder<double>(
               tween: Tween(end: _opening ? 1 : 0), duration: _reduced ? Duration.zero : const Duration(milliseconds: 480), curve: Curves.easeOutCubic,
-              builder: (_, open, __) => AnimatedBuilder(
-                animation: loop,
-                builder: (_, __) => CustomPaint(
-                  key: const ValueKey('zen-plus-lotus'),
-                  size: Size.infinite,
-                  painter: ZenLotusPainter(t: loop.value, open: open, tint: (widget.bgDim ?? 0).clamp(0.0, 1.0)),
-                ),
+              builder: (_, open, __) => ClipRRect(
+                key: const ValueKey('zen-plus-lotus'),
+                borderRadius: BorderRadius.circular(22),
+                child: Stack(fit: StackFit.expand, children: [
+                  Transform.scale(scale: 1 + .06 * open, child: const GoldenBreathClip(slot: 'fashion_plus_entry.NFashionPlusEntry',
+                      asset: kGoldenBreathClip, poster: kGoldenBreathPoster, alignment: Alignment(.3, -.1))),
+                  // a lavender breath at the foot ties the dark window to the white card
+                  const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                      colors: [Color(0x00000000), Color(0x00000000), Color(0x447B61D9)], stops: [0, .6, 1]))),
+                  DecoratedBox(decoration: BoxDecoration(borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: Colors.white.withValues(alpha: .5), width: 1.4))),
+                ]),
               ),
             ),
           ),
         ]),
       )));
-}
-
-/// Breathing lotus + plus, ripple rings and orbiting beads (t = 0..1 loop).
-class ZenLotusPainter extends CustomPainter {
-  ZenLotusPainter({required this.t, this.open = 0, this.tint = 0});
-  final double t, open, tint;
-
-  @override
-  void paint(Canvas canvas, Size s) {
-    final c = s.center(Offset.zero);
-    final r0 = math.min(s.width, s.height) * .5;
-    final breathe = math.sin(t * math.pi * 2) * .5 + .5;
-    // ripples
-    for (var i = 0; i < 3; i++) {
-      final k = (t + i / 3) % 1;
-      canvas.drawCircle(c, r0 * (.35 + .6 * k), Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6
-        ..color = _lav.withValues(alpha: .35 * (1 - k)));
-    }
-    // petals
-    final petal = r0 * lerpDouble(.52, .62, breathe)! * (1 + .25 * open);
-    final spread = lerpDouble(.18, .32, breathe)! + .3 * open;
-    for (var i = 0; i < 8; i++) {
-      final a = i * math.pi / 4 + t * math.pi / 8;
-      final tip = c + Offset(math.cos(a), math.sin(a)) * petal;
-      final l = c + Offset(math.cos(a - spread), math.sin(a - spread)) * petal * .45;
-      final r = c + Offset(math.cos(a + spread), math.sin(a + spread)) * petal * .45;
-      final p = Path()
-        ..moveTo(c.dx, c.dy)
-        ..quadraticBezierTo(l.dx, l.dy, tip.dx, tip.dy)
-        ..quadraticBezierTo(r.dx, r.dy, c.dx, c.dy);
-      final col = Color.lerp(_lav, _peach, i.isEven ? .15 : .6)!;
-      canvas.drawPath(p, Paint()..color = col.withValues(alpha: .20 + .12 * tint));
-      canvas.drawPath(p, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.4..color = col.withValues(alpha: .75));
-    }
-    // soft plus in the heart
-    final arm = r0 * lerpDouble(.16, .2, breathe)!, th = r0 * .06;
-    final plus = RRect.fromRectAndRadius(Rect.fromCenter(center: c, width: arm * 2, height: th * 2), Radius.circular(th));
-    final plusV = RRect.fromRectAndRadius(Rect.fromCenter(center: c, width: th * 2, height: arm * 2), Radius.circular(th));
-    canvas.drawCircle(c, arm * 1.25, Paint()..color = const Color(0xFFFFFFFF));
-    final pp = Paint()..color = _lav;
-    canvas.drawRRect(plus, pp);
-    canvas.drawRRect(plusV, pp);
-    // orbiting beads
-    for (var i = 0; i < 3; i++) {
-      final a = t * math.pi * 2 * (i.isEven ? 1 : -1) + i * 2.1;
-      final rr = r0 * (.72 + .08 * i);
-      canvas.drawCircle(c + Offset(math.cos(a), math.sin(a)) * rr, 3.5 + i.toDouble(), Paint()..color = i == 1 ? _peach : _lav);
-    }
-  }
-
-  @override
-  bool shouldRepaint(ZenLotusPainter o) => o.t != t || o.open != open || o.tint != tint;
 }
