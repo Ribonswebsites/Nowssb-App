@@ -146,7 +146,7 @@ void main() {
     expect(calls['boardPost']!['image'], 'connect/me1/1730000000000.jpg');
   });
 
-  testWidgets('filter, hide, report and delete go to the server', (t) async {
+  testWidgets('filter, hide and report go to the server; no Delete until boardDelete ships', (t) async {
     final calls = <String, Map<String, dynamic>>{};
     EconomyApi.debugHandler = (name, data) async {
       calls[name] = data;
@@ -172,15 +172,9 @@ void main() {
     await t.tap(find.text('Hide this'));
     await t.pumpAndSettle();
     expect(calls['boardReport'], {'day': '20261102', 'postId': 'a', 'hideOnly': true});
-    await t.tap(find.byTooltip('Delete'));
-    await t.pumpAndSettle();
-    await t.tap(find.text('Delete'));
-    await t.pumpAndSettle();
-    expect(find.text('Delete this post?'), findsOneWidget);
-    await t.tap(find.text('Delete').last);
-    await t.pumpAndSettle();
-    expect(calls['boardDelete'], {'day': '20261102', 'postId': 'm'});
-    expect(find.text('Mine'), findsNothing);
+    // boardDelete isn't deployed yet: your own post shows no dead Delete.
+    expect(find.byTooltip('Delete'), findsNothing);
+    expect(calls.containsKey('boardDelete'), isFalse);
   });
 
   testWidgets('an earlier day is read-only', (t) async {

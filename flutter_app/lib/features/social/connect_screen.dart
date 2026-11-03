@@ -533,6 +533,11 @@ class _ConnectScreenState extends State<ConnectScreen> {
 
 // ───────────────────────── pieces ─────────────────────────
 
+/// Delete needs the boardDelete server action (functions/_lib/economy/connect.js),
+/// which is written but not deployed yet. Until then your own posts show no
+/// menu instead of a Delete that fails.
+const kBoardDeleteLive = false;
+
 class _PostTile extends StatelessWidget {
   const _PostTile({super.key, required this.post, required this.onHide, required this.onReport, required this.onDelete});
   final BoardPost post;
@@ -562,7 +567,7 @@ class _PostTile extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: kGlassMuted, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: .2)),
           ),
-          PopupMenuButton<String>(
+          if (!p.mine || kBoardDeleteLive) PopupMenuButton<String>(
             tooltip: p.mine ? 'Delete' : 'Hide or report',
             icon: const Icon(Icons.more_horiz_rounded, color: kGlassMuted),
             color: const Color(0xFF15151C),

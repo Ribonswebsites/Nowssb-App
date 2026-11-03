@@ -31,6 +31,8 @@ import 'store/meaning_store.dart';
 import 'store/request_words.dart';
 import 'store/word_atelier.dart';
 import 'subscription.dart';
+import 'verify_screen.dart';
+import '../features/social/connect_screen.dart';
 import 'store/store_terms_sheet.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
@@ -186,18 +188,26 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
       const _StoreDepartmentLabel('NOWSSB CONNECT'),
       _StoreGlassSection(
         children: [
-          const HomeKeepAlive(
+          HomeKeepAlive(
             child: _StoreVideoBanner(
               asset: 'assets/video/store-verify-banner.mp4',
               poster: 'assets/video/store-verify-banner-poster.webp',
+              onTap: () => _push(context, const ConnectScreen()),
             ),
+          ),
+          _MiniStoreCard(
+            eyebrow: 'Thoughts · Quotes · Images',
+            title: 'Open NowssB Connect',
+            sub: "Post a thought, a quote or an image, and read today's board.",
+            icon: Icons.forum_outlined,
+            onTap: () => _push(context, const ConnectScreen()),
           ),
           _MiniStoreCard(
             eyebrow: 'Verified · Badges',
             title: 'Get Verified',
             sub: 'Blue, Silver, Gold or Diamond — stand out on your profile.',
             icon: Icons.verified_outlined,
-            onTap: () => _requestVerification(context),
+            onTap: () => _push(context, const VerifyScreen()),
           ),
         ],
       ),
@@ -342,23 +352,6 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
 
-  /// Verification badges are granted by the team (Admin → People → verify
-  /// tier); this files a real request in the admin Requests queue.
-  static Future<void> _requestVerification(BuildContext context) async {
-    final messenger = ScaffoldMessenger.of(context);
-    String msg;
-    try {
-      await WordRequestStore.instance.submit(
-        word: 'Verification badge',
-        notes: 'Please review my profile for a NowssB verification badge (Blue, Silver, Gold or Diamond).',
-        kind: 'verify',
-      );
-      msg = 'Verification requested. The team will reply in your notifications.';
-    } catch (e) {
-      msg = e is ArgumentError ? '${e.message}' : 'The request could not be sent. Try again.';
-    }
-    messenger.showSnackBar(SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating));
-  }
 }
 
 class _StoreTab extends StatelessWidget {

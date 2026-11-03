@@ -258,7 +258,7 @@ class HomeMenuDrawer extends StatelessWidget {
                           GlassTile(icon: Icons.forum_outlined, title: 'Echo Wall', sub: 'Reflections', onTap: () => _push(context, const EchoWallScreen())),
                           GlassTile(icon: Icons.account_balance_wallet_outlined, title: 'Earnings', sub: 'Payouts and commissions', onTap: () => _push(context, const EarningsScreen())),
                           GlassTile(icon: Icons.receipt_long_outlined, title: 'Activity', sub: 'Coin and cash ledger', onTap: () => _push(context, const EarningsScreen())),
-                          GlassTile(icon: Icons.people_outline_rounded, title: 'NowssB Connect', sub: 'Community', onTap: () => _push(context, const ConnectScreen())),
+                          GlassTile(icon: Icons.people_outline_rounded, title: 'NowssB Connect', sub: 'Thoughts, quotes & images', onTap: () => _push(context, const ConnectScreen())),
                         ],
                       ),
                       Padding(
