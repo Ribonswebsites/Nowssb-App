@@ -1,5 +1,5 @@
 /// Zen Plus tile clips (Ribon 11-03): Golden Breath (default), Sound Wave,
-/// Release. Each is a that dips through black at the seam, muted, 720px.
+/// Release. Each is a seamless loop that dips through black at the seam, muted, 720px.
 /// NwsbVideo pauses it offscreen; under reduced motion only the poster shows.
 library;
 
@@ -19,8 +19,16 @@ class GoldenBreathClip extends StatelessWidget {
   final Alignment alignment;
   final String asset, poster;
   final String? slot;
+
+  /// Renders/tests only: paint this frame instead of the clip.
+  static ImageProvider Function(String asset)? debugFrame;
+
   @override
   Widget build(BuildContext context) {
+    final dbg = debugFrame;
+    if (dbg != null) {
+      return Image(image: dbg(asset), fit: BoxFit.cover, alignment: alignment, gaplessPlayback: true);
+    }
     final still = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     if (still) {
       return Image.asset(poster, fit: BoxFit.cover, alignment: alignment, gaplessPlayback: true);
