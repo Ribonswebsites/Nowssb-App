@@ -14,6 +14,8 @@ import 'package:nowssb/widgets/concept/ritual_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/home_render.dart';
+import 'fake_video_platform.dart';
+import 'package:nowssb/media/video_pool.dart';
 
 const _out = String.fromEnvironment('RITUAL_OUT');
 
@@ -58,6 +60,11 @@ void _wordsWhole(WidgetTester t, double scale) {
 }
 
 void main() {
+  // The hero film cards are videos: fake player, no pool deadlines.
+  setUpAll(() {
+    FakeVideoPlatform();
+    VideoPool.debugDeadlines = false;
+  });
   setUpAll(setUpHomeRender);
   setUp(() => SharedPreferences.setMockInitialValues({}));
   tearDown(() => DayClock.clock = null);

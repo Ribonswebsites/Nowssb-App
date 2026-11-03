@@ -10,6 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/models.dart';
 import 'package:nowssb/data/today_ritual.dart';
 import 'package:nowssb/screens/normal/calm_hero.dart';
+import 'fake_video_platform.dart';
+import 'package:nowssb/media/video_pool.dart';
 
 const _out = String.fromEnvironment('RITUAL_OUT', defaultValue: '/tmp/tm');
 
@@ -35,6 +37,11 @@ Future<void> _fonts() async {
 }
 
 void main() {
+  // The hero film cards are videos: fake player, no pool deadlines.
+  setUpAll(() {
+    FakeVideoPlatform();
+    VideoPool.debugDeadlines = false;
+  });
   setUpAll(_fonts);
 
   test('hero words: owned first, then saved, then routine; routine is the fallback', () {

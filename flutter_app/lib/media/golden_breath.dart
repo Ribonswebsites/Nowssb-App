@@ -1,5 +1,4 @@
-/// Zen Plus tile clips (Ribon 11-03): Golden Breath (default), Sound Wave,
-/// Release. Each is a seamless loop that dips through black at the seam, muted, 720px.
+/// Zen Plus clip (Ribon 11-03): Golden Breath; the hero films reuse the widget. Each is a seamless loop that dips through black at the seam, muted, 720px.
 /// NwsbVideo pauses it offscreen; under reduced motion only the poster shows.
 library;
 
@@ -8,10 +7,6 @@ import 'nwsb_video.dart';
 
 const kGoldenBreathClip = 'assets/video/golden-breath-tile.mp4';
 const kGoldenBreathPoster = 'assets/video/golden-breath-tile-poster.webp';
-const kSoundWaveClip = 'assets/video/zen-soundwave-tile.mp4';
-const kSoundWavePoster = 'assets/video/zen-soundwave-tile-poster.webp';
-const kReleaseClip = 'assets/video/zen-release-tile.mp4';
-const kReleasePoster = 'assets/video/zen-release-tile-poster.webp';
 
 class GoldenBreathClip extends StatelessWidget {
   const GoldenBreathClip({super.key, this.alignment = const Alignment(.55, -.15), this.slot,

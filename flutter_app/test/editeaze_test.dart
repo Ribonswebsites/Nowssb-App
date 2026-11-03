@@ -5,6 +5,8 @@ import 'package:nowssb/screens/normal/calm_hero.dart';
 import 'package:nowssb/screens/profile_mind.dart';
 import 'package:nowssb/widgets/editeaze.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'fake_video_platform.dart';
+import 'package:nowssb/media/video_pool.dart';
 
 const _slides = [
   EzSlide(image: 'assets/home/ez/ez-med-beach.webp', title: 'A'),
@@ -29,6 +31,11 @@ Future<void> _pumpCarousel(WidgetTester t) async {
 EzOrangeCarouselState _state(WidgetTester t) => t.state(find.byType(EzOrangeCarousel));
 
 void main() {
+  // The hero film cards are videos: fake player, no pool deadlines.
+  setUpAll(() {
+    FakeVideoPlatform();
+    VideoPool.debugDeadlines = false;
+  });
   SharedPreferences.setMockInitialValues({});
 
   testWidgets('carousel: swipe moves, no dots or indicators anywhere', (t) async {

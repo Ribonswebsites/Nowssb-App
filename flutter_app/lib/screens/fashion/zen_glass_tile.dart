@@ -113,8 +113,8 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
             // IntrinsicHeight: in the page the tile's height is unbounded; the
             // words set it and the Enter column stretches to match.
             child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Expanded(flex: 56, child: Padding(padding: const EdgeInsets.fromLTRB(14, 20, 10, 20), child: _content(t, enter: false))),
-              Expanded(flex: 44, child: Align(alignment: const Alignment(.85, .8), child: Padding(padding: const EdgeInsets.all(10), child: _enter(t)))),
+              Expanded(flex: 62, child: Padding(padding: const EdgeInsets.fromLTRB(14, 20, 10, 20), child: _content(t, enter: false))),
+              Expanded(flex: 38, child: Align(alignment: const Alignment(.85, .8), child: Padding(padding: const EdgeInsets.all(10), child: _enter(t)))),
             ])),
           ),
         ]),
