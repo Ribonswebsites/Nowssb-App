@@ -4,6 +4,7 @@
 /// storeban
 library;
 
+import 'zen_glass_tile.dart';
 import 'package:nowssb/widgets/home_text.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'dart:async';
@@ -510,77 +511,7 @@ class FashPlusMini extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final on = Settings.instance.fashionPlus;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: const Color(0x0FFFFFFF),
-            border: Border.all(color: const Color(0x1FFFFFFF)),
-          ),
-          child: Row(
-            children: [
-              SizedBox(
-                width: 46,
-                height: 46,
-                child: EditableImage.asset(
-                  'assets/fashion/fashion-icon.webp',
-                  errorBuilder: (_, __, ___) => const Icon(
-                      Icons.auto_awesome_motion_outlined,
-                      size: 22,
-                      color: NwsbColors.goldLight),
-                      slot: 'sections_mid.FashPlusMini',
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const EditableLabel('sections_mid.FashPlusMini',
-                      'Experience',
-                      style: TextStyle(
-                        fontSize: 11,
-                        letterSpacing: 1.5,
-                        color: NwsbColors.gold,
-                      ),
-                    ),
-                    const EditableLabel('sections_mid.FashPlusMini',
-                      'Zen Plus',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        height: 1.25,
-                      ),
-                    ),
-                    Text(
-                      on
-                          ? 'On — the tiles, the practice card and every '
-                              'photo background are playing'
-                          : 'Off — pages keep their photographs',
-                      // Wraps on words; never ellipsised.
-                      softWrap: true,
-                      style: const TextStyle(
-                        fontSize: 11.5,
-                        color: Color(0x8CFFFFFF),
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              EnterPill(onTap: onTap),
-            ],
-          ),
-        ),
-      ),
-    );
+    return ZenGlassTile(style: ZenGlassStyle.prism, on: on, onTap: onTap);
   }
 }
 
