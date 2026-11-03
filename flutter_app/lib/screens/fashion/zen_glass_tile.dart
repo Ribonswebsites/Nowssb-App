@@ -110,10 +110,12 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
             painter: _GlassPainter(t: t, style: ZenGlassStyle.prism, r: r, body: false),
             // words stay on the frosted pane; Enter sits low in the window, under
             // the chin, so the particle stream above stays clear
-            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            // IntrinsicHeight: in the page the tile's height is unbounded; the
+            // words set it and the Enter column stretches to match.
+            child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Expanded(flex: 56, child: Padding(padding: const EdgeInsets.fromLTRB(14, 20, 10, 20), child: _content(t, enter: false))),
               Expanded(flex: 44, child: Align(alignment: const Alignment(.85, .8), child: Padding(padding: const EdgeInsets.all(10), child: _enter(t)))),
-            ]),
+            ])),
           ),
         ]),
       );

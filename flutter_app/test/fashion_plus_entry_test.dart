@@ -7,10 +7,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/fashion_bg_dim.dart';
 import 'package:nowssb/data/settings.dart';
+import 'package:nowssb/media/golden_breath.dart';
 import 'package:nowssb/widgets/concept/normal/fashion_plus_entry.dart';
 import 'package:nowssb/widgets/concept/normal/fashion_plus_entry_live.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:nowssb/media/video_pool.dart';
+
+import 'fake_video_platform.dart';
 import 'support/home_render.dart';
 
 Widget _app(Widget child, {double scale = 1, bool reduced = false}) => MaterialApp(
@@ -28,7 +32,11 @@ Future<void> _size(WidgetTester t, double w) async {
 }
 
 void main() {
-  setUpAll(setUpHomeRender);
+  setUpAll(() async {
+    await setUpHomeRender();
+    FakeVideoPlatform();
+    VideoPool.debugDeadlines = false;
+  });
   setUp(() => SharedPreferences.setMockInitialValues({FashionBgDim.prefKey: 0.7}));
 
   testWidgets('tap opens the Fashion Plus home (Settings.fashionHome)', (t) async {
@@ -93,10 +101,14 @@ void main() {
     expect(hit, 1);
   });
 
-  testWidgets('Zen Plus shows the lotus animation and no photo', (t) async {
+  testWidgets('Zen Plus shows the Golden Breath clip, no other photo', (t) async {
     await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: .7)));
     expect(find.byKey(const ValueKey('zen-plus-lotus')), findsOneWidget);
-    expect(find.byType(Image), findsNothing);
+    expect(find.byType(GoldenBreathClip), findsOneWidget);
+    // The only picture is the clip's own poster.
+    for (final e in find.byType(Image).evaluate()) {
+      expect(find.ancestor(of: find.byWidget(e.widget), matching: find.byType(GoldenBreathClip)), findsOneWidget);
+    }
   });
 
   for (final (name, w, s) in const [('390', 390.0, 1.0), ('320-1.3', 320.0, 1.3)]) {
