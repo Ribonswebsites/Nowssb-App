@@ -22,7 +22,7 @@ import 'package:nowssb/features/social/echo_wall_screen.dart';
 import 'package:nowssb/features/vault/vault_screen.dart';
 import 'package:nowssb/features/wordprint/word_print_screen.dart';
 import 'package:nowssb/screens/about_page.dart';
-import 'package:nowssb/screens//app_settings.dart';
+import 'package:nowssb/screens/app_settings.dart';
 import 'package:nowssb/screens/aura_sound_library.dart';
 import 'package:nowssb/screens/concept/drop_v4_concepts.dart';
 import 'package:nowssb/screens/daily_tasks.dart';

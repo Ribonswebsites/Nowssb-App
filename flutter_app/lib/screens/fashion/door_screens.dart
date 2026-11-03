@@ -109,7 +109,6 @@ const _accessArt = <String, String>{
   'library': 'assets/doors/library.webp',
   'store': 'assets/doors/store.webp',
   'profile': 'assets/doors/profile.webp',
-  'progress': 'assets/doors/progress.webp',
   'wordscience': 'assets/doors/wordscience.webp',
   'meaningstore': 'assets/doors/meaningstore.webp',
   'search': 'assets/doors/search.webp',

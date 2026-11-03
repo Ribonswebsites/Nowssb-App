@@ -118,7 +118,13 @@ void main() {
     await t.tap(find.bySemanticsLabel("Begin today's session").hitTestable().first);
     await t.pump();
     expect(opened, 1);
-    // Save is its own button: it never opens the session.
+    // Save is its own button: it never opens the session. The hero is a
+    // carousel and not every card carries Save, so swipe to one that does.
+    final save = find.bySemanticsLabel(RegExp(r'^Saved?$')).hitTestable();
+    for (var i = 0; i < 6 && save.evaluate().isEmpty; i++) {
+      await t.drag(find.byType(PageView).first, const Offset(-300, 0));
+      await t.pumpAndSettle(const Duration(milliseconds: 50));
+    }
     await t.tap(find.bySemanticsLabel(RegExp(r'^Saved?$')).hitTestable().first);
     await t.pump(const Duration(milliseconds: 50));
     expect(opened, 1);

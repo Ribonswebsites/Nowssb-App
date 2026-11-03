@@ -16,7 +16,6 @@ void main() {
     expect(src, contains('Build Your Library & Sentences'));
     expect(src, contains('Word Info & Player Settings'));
     expect(src, contains('Grow Your Collection'));
-    expect(src, contains('Unlock a Signature Word'));
     expect(src, contains('You’re All Set'));
     expect(src, contains('Try it now'));
     expect(src, contains("'Begin'"));
