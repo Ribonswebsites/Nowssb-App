@@ -44,11 +44,12 @@ void main() {
         'lib/screens/store/meaning_store.dart': 'posterMeaningPage(',
         'lib/screens/store/ebooks_store.dart': 'posterEbooksPage(',
       };
+      // Restored to the 18 Oct pages (PageShell), not the poster wrappers.
       wrappers.forEach((path, page) {
         final src = File(path).readAsStringSync();
         expect(src, isNot(contains('IntroGate')), reason: path);
-        expect(src, contains('StoreTermsHost('), reason: path);
-        expect(src, contains(page), reason: path);
+        expect(src, contains('PageShell('), reason: path);
+        expect(src, isNot(contains(page)), reason: path);
       });
 
       final pages =

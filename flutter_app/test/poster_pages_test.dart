@@ -148,13 +148,13 @@ final specs = <PosterSpec>[
     final lib = ContentStore.instance.library;
     return {for (final i in PosterTrending.chart(lib, _now)) 'word:${lib[i].word.toLowerCase()}'};
   }, 'Own · ', 'Hear it'),
-  PosterSpec('atelier', () => WordAtelierScreen(now: _now), () => {
+  PosterSpec('atelier', () => Scaffold(body: Builder(builder: (x) => posterAtelierPage(x, now: _now))), () => {
         for (final c in kRmCategories)
           for (final w in c.words) 'word:${w.word.toLowerCase()}',
       }, 'Own · ', 'Open'),
-  PosterSpec('meaning', () => MeaningStoreScreen(now: _now), () => {for (final m in kMsBaseMeanings) 'meaning:${m.word.toLowerCase()}'}, 'Own · ',
+  PosterSpec('meaning', () => Scaffold(body: Builder(builder: (x) => posterMeaningPage(x, now: _now))), () => {for (final m in kMsBaseMeanings) 'meaning:${m.word.toLowerCase()}'}, 'Own · ',
       PosterMeaning.pick(_now).word),
-  PosterSpec('ebooks', () => const EbooksStoreScreen(), () => {for (final b in kEbBooks) 'ebook:${b.title.toLowerCase()}'}, 'Own · ',
+  PosterSpec('ebooks', () => Scaffold(body: Builder(builder: (x) => posterEbooksPage(x))), () => {for (final b in kEbBooks) 'ebook:${b.title.toLowerCase()}'}, 'Own · ',
       'Look inside'),
 ];
 
