@@ -6,6 +6,7 @@ library;
 
 import '../../../screens/concept/drop_v5.dart' show CornerPeel;
 import 'package:flutter/material.dart';
+import '../../../features/economy/money.dart' show FxBook;
 
 import '../../../features/economy/reward_fx.dart' show rarityColor, rarityTitle;
 import 'anims.dart';
@@ -218,7 +219,7 @@ class R27GiftsSection extends StatelessWidget {
 /// (null when there is nothing to say).
 String? r27GiftsLine(R27Gifts d, num low) {
   final parts = [
-    if (d.cards.isNotEmpty) '${d.cards.length} gift cards from ₹$low',
+    if (d.cards.isNotEmpty) '${d.cards.length} gift cards from ${FxBook.instance.formatPrice(low, whole: true)}',
     if (d.sent > 0) '${d.sent} sent',
     if (d.received > 0) '${d.received} received',
   ];
@@ -319,7 +320,7 @@ class R27GiftPoster extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Wrap(alignment: WrapAlignment.spaceBetween, crossAxisAlignment: WrapCrossAlignment.center, spacing: 8, runSpacing: 6, children: [
-                  Text('₹${g.priceInr}', style: nTitle.copyWith(color: r27PaperInk)),
+                  Text(FxBook.instance.formatPrice(g.priceInr, whole: true), style: nTitle.copyWith(color: r27PaperInk)),
                   R27Pill('Gift it', light: true, onTap: onGift),
                 ]),
               ]),
@@ -518,7 +519,7 @@ class R27Stub extends StatelessWidget {
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
                         Text(c.label.isEmpty ? '${c.pct}% off' : c.label, style: nSub.copyWith(color: r27PaperInk, fontWeight: FontWeight.w800)),
                         const SizedBox(height: 4),
-                        Text('On ${c.scope} · cap ₹${_n(c.capInr)}', style: nSub.copyWith(color: const Color(0xC7000000))),
+                        Text('On ${c.scope} · cap ${FxBook.instance.formatPrice(c.capInr, whole: true)}', style: nSub.copyWith(color: const Color(0xC7000000))),
                         if (c.expiresAt > 0) Text('Until ${_shortDate(c.expiresAt)}', style: nSub.copyWith(color: const Color(0xC7000000))),
                       ]),
                     )),
