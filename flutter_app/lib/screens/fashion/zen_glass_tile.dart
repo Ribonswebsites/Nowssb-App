@@ -108,7 +108,12 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
               ))))))),
           CustomPaint(
             painter: _GlassPainter(t: t, style: ZenGlassStyle.prism, r: r, body: false),
-            child: Padding(padding: const EdgeInsets.fromLTRB(14, 22, 14, 22), child: _content(t)),
+            // words stay on the frosted pane; Enter sits low in the window, under
+            // the chin, so the particle stream above stays clear
+            child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Expanded(flex: 56, child: Padding(padding: const EdgeInsets.fromLTRB(14, 20, 10, 20), child: _content(t, enter: false))),
+              Expanded(flex: 44, child: Align(alignment: const Alignment(.85, .8), child: Padding(padding: const EdgeInsets.all(10), child: _enter(t)))),
+            ]),
           ),
         ]),
       );
@@ -136,7 +141,7 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
           ),
       ];
 
-  Widget _content(double t) => Row(children: [
+  Widget _content(double t, {bool enter = true}) => Row(children: [
         SizedBox(width: 52, height: 52, child: CustomPaint(painter: _GemPainter(t: t, style: widget.style))),
         const SizedBox(width: 14),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
@@ -147,8 +152,8 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
           Text(widget.on ? 'On — the tiles, the practice card and every photo background are playing' : 'Off — pages keep their photographs',
               softWrap: true, style: const TextStyle(fontSize: 11.5, color: Color(0xB3FFFFFF), height: 1.35)),
         ])),
-        const SizedBox(width: 10),
-        _enter(t),
+        if (enter) const SizedBox(width: 10),
+        if (enter) _enter(t),
       ]);
 
   Widget _enter(double t) => Container(
