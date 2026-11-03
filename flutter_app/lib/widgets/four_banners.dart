@@ -121,7 +121,7 @@ class _TrioRailState extends State<TrioRail> {
   static const _all = <_RailFace>[
     _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
     _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.earn),
-    _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.webp', Color(0xFF1F4E7A), Programme.reference),
+    _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.png', Color(0xFF1F4E7A), Programme.reference),
   ];
 
   late final List<_RailFace> _faces = [
@@ -175,7 +175,7 @@ class _TrioRailState extends State<TrioRail> {
                 width: 112,
                 height: 176,
                 child: Image(
-                  image: AssetImage('assets/banners/earn/hands-raise.webp'),
+                  image: AssetImage('assets/banners/earn/hands-raise.png'),
                   fit: BoxFit.cover,
                   alignment: Alignment(0, -0.05),
                 ),

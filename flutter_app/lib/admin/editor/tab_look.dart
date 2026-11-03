@@ -28,9 +28,9 @@ const kLookGradients = <List<int>>[
 /// Pictures that ship with the app, ready as section backgrounds.
 const kLookPictures = <String>[
   'assets/banners/stories/aura.png',
-  'assets/banners/stories/prana.webp',
-  'assets/banners/stories/soma.webp',
-  'assets/banners/stories/pitta.webp',
+  'assets/banners/stories/prana.png',
+  'assets/banners/stories/soma.png',
+  'assets/banners/stories/pitta.png',
 ];
 
 const kLookCorners = <int>[0, 8, 16, 24, 40];

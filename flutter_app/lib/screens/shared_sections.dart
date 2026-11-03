@@ -1061,12 +1061,12 @@ class _HomeFooterSectionState extends State<HomeFooterSection>
     with SingleTickerProviderStateMixin {
   /// Bundled footer-tab studio shots (commit as-is; no recompress).
   static const _shots = [
-    'assets/footer/tab-sound-of-stillness.webp',
-    'assets/footer/tab-breathe-new-noise.webp',
-    'assets/footer/tab-calm-new-loud.webp',
-    'assets/footer/tab-find-your-frequency.webp',
-    'assets/footer/tab-still-mind-still-style.webp',
-    'assets/footer/tab-ancient-calm-new-sound.webp',
+    'assets/footer/tab-sound-of-stillness.png',
+    'assets/footer/tab-breathe-new-noise.png',
+    'assets/footer/tab-calm-new-loud.png',
+    'assets/footer/tab-find-your-frequency.png',
+    'assets/footer/tab-still-mind-still-style.png',
+    'assets/footer/tab-ancient-calm-new-sound.png',
   ];
 
   static const _links = [

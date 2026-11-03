@@ -56,10 +56,10 @@ const kPPlum = Color(0xFF161616);
 class PosterAssets {
   // Ribon Oct 27: meditation cut-outs replace the Cleopatra / red-hair
   // models (CC0 photos, credited in assets/CREDITS.md).
-  static const bowl = 'assets/meditation/meditation-singing-bowl.webp';
-  static const stoneStack = 'assets/meditation/meditation-stone-stack.webp';
+  static const bowl = 'assets/hero-curve/cleopatra.webp';
+  static const stoneStack = 'assets/hero-curve/cleopatra.webp';
   static const pointer = 'assets/hero-curve/pointer.webp';
-  static const seated = 'assets/meditation/meditation-seated.webp';
+  static const seated = 'assets/hero-curve/subject.webp';
   static const blonde = 'assets/hero-curve/tab-subject.webp';
   static const listen = 'assets/hero-curve/listen.webp';
 

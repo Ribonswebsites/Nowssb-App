@@ -38,7 +38,7 @@ class EnterCurveDest {
 
 class EnterCurveAssets {
   static const pointer = 'assets/hero-curve/pointer.webp';
-  static const candle = 'assets/meditation/meditation-candle.webp';
+  static const candle = 'assets/hero-curve/cleopatra.webp';
   static const subject = HeroCurveAssets.tabSubject;
 
   static const destinations = <EnterCurveDest>[

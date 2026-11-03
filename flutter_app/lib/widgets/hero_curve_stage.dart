@@ -21,7 +21,7 @@ import '../admin/template/editable.dart';
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
 class HeroCurveAssets {
-  static const subject = 'assets/meditation/meditation-cairn.webp';
+  static const subject = 'assets/hero-curve/subject.webp';
   static const cards = <String>[
     'assets/hero-curve/stillness.webp',
     'assets/hero-curve/countries.webp',

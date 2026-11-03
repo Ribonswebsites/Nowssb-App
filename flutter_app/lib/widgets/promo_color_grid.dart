@@ -33,11 +33,11 @@ class _Cell {
 
 const _cells = <_Cell>[
   _Cell('practice', 'Practice', Color(0xFFE07A32), 'assets/banners/promo/pose-01.png', NwsbMarks.play24),
-  _Cell('library', 'Library', Color(0xFF7C4DFF), 'assets/banners/promo/pose-02.webp', NwsbMarks.sound),
+  _Cell('library', 'Library', Color(0xFF7C4DFF), 'assets/banners/promo/pose-02.png', NwsbMarks.sound),
   _Cell('store', 'Store', Color(0xFF2EC4B6), 'assets/banners/promo/pose-03.png', NwsbMarks.bag),
-  _Cell('ebooks', 'eBooks', Color(0xFFE85D9A), 'assets/banners/promo/pose-04.webp', NwsbMarks.book),
-  _Cell('meanings', 'Meanings', Color(0xFF3D8BDB), 'assets/banners/promo/pose-05.webp', NwsbMarks.meaning),
-  _Cell('subscription', 'Subscribe', Color(0xFFD4A017), 'assets/banners/promo/pose-06.webp', NwsbMarks.crown),
+  _Cell('ebooks', 'eBooks', Color(0xFFE85D9A), 'assets/banners/promo/pose-04.png', NwsbMarks.book),
+  _Cell('meanings', 'Meanings', Color(0xFF3D8BDB), 'assets/banners/promo/pose-05.png', NwsbMarks.meaning),
+  _Cell('subscription', 'Subscribe', Color(0xFFD4A017), 'assets/banners/promo/pose-06.png', NwsbMarks.crown),
   _Cell('player', 'Player', Color(0xFF27AE60), 'assets/banners/promo/pose-07.png', NwsbMarks.play),
   _Cell('progress', 'Progress', Color(0xFF9B59B6), 'assets/banners/promo/pose-08.png', NwsbMarks.bars),
   _Cell('quotes', 'Quotes', Color(0xFFE67E22), 'assets/banners/promo/pose-09.png', NwsbMarks.word),

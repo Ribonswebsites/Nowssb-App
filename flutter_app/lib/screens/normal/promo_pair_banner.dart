@@ -82,7 +82,7 @@ class _PromoPairBannerState extends State<PromoPairBanner> {
         ),
         PromoPairSlide(
           color: const Color(0xFF1F7A55),
-          asset: 'assets/banners/promo/pose-02.webp',
+          asset: 'assets/banners/promo/pose-02.png',
           word: 'QUOTES',
           line: 'A LINE\nFOR TODAY',
           ink: Colors.white,
@@ -90,7 +90,7 @@ class _PromoPairBannerState extends State<PromoPairBanner> {
         ),
         PromoPairSlide(
           color: const Color(0xFF1C4FBF),
-          asset: 'assets/banners/promo/pose-05.webp',
+          asset: 'assets/banners/promo/pose-05.png',
           word: 'EARN',
           line: 'COINS FOR\nEVERY DAY',
           ink: Colors.white,

@@ -377,8 +377,8 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                     fit: StackFit.expand,
                     children: [
                       FlipPortrait(
-                        front: 'assets/banners/earn/hands-light.webp',
-                        back: 'assets/banners/earn/hands-dark.webp',
+                        front: 'assets/banners/earn/hands-light.png',
+                        back: 'assets/banners/earn/hands-dark.png',
                         fit: BoxFit.cover,
                         alignment: Alignment(0, -0.08),
                       ),
@@ -514,8 +514,8 @@ class _EarnUmbrellaSectionState extends State<EarnUmbrellaSection> {
                         fit: StackFit.expand,
                         children: [
                           FlipPortrait(
-                            front: 'assets/banners/earn/sit-light.webp',
-                            back: 'assets/banners/earn/sit-dark.webp',
+                            front: 'assets/banners/earn/sit-light.png',
+                            back: 'assets/banners/earn/sit-dark.png',
                             fit: BoxFit.cover,
                             alignment: Alignment(0, 0.82),
                           ),

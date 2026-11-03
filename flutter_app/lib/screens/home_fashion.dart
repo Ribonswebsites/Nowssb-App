@@ -424,8 +424,8 @@ class _HomeFashionState extends State<HomeFashion> {
           ].take(2).toList();
           final tasksDone = tasks.where((t) => t.done).length;
           const taskArt = [
-            'assets/banners/earn/sit-dark.webp',
-            'assets/banners/earn/hands-raise.webp'
+            'assets/banners/earn/sit-dark.png',
+            'assets/banners/earn/hands-raise.png'
           ];
           final pct = (_profileDone * 100).round();
           return NowProgressRail(items: [
