@@ -161,3 +161,143 @@ class GlassTile extends StatelessWidget {
     );
   }
 }
+
+/// One item, one card — the "NowssB Reference / Your links" look: its own
+/// glass pane, white circle icon, small label over a big title, and a single
+/// black pill row (subtitle · arrow). Menu and Settings use one per item so
+/// nothing is stacked into a grouped list.
+class GlassItemCard extends StatelessWidget {
+  const GlassItemCard({
+    super.key,
+    required this.icon,
+    required this.overline,
+    required this.title,
+    required this.pill,
+    this.pillSub,
+    this.pillIcon,
+    this.onTap,
+    this.trailing,
+    this.danger = false,
+    this.margin = const EdgeInsets.only(bottom: 14),
+  });
+
+  final IconData icon;
+  final String overline;
+  final String title;
+  final String pill;
+  final String? pillSub;
+  final IconData? pillIcon;
+  final VoidCallback? onTap;
+  final Widget? trailing;
+  final bool danger;
+  final EdgeInsets margin;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: GlassListCard(
+        margin: margin,
+        icon: icon,
+        overline: overline,
+        title: title,
+        children: [
+          GlassTile(
+            icon: pillIcon ?? icon,
+            title: pill,
+            sub: pillSub,
+            onTap: onTap,
+            trailing: trailing,
+            danger: danger,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The glass search field at the top of Menu and Settings.
+class GlassSearchField extends StatelessWidget {
+  const GlassSearchField({
+    super.key,
+    required this.controller,
+    this.hint = 'Search settings and pages',
+  });
+
+  final TextEditingController controller;
+  final String hint;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          height: 50,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xB30B0B10),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0x26FFFFFF)),
+          ),
+          child: Row(children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF0B0B10)),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                key: const ValueKey('glass-search'),
+                controller: controller,
+                style: const TextStyle(color: Colors.white, fontSize: 15),
+                cursorColor: Colors.white,
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: hint,
+                  hintStyle: const TextStyle(color: kGlassMuted, fontSize: 14),
+                ),
+              ),
+            ),
+            ListenableBuilder(
+              listenable: controller,
+              builder: (_, __) => controller.text.isEmpty
+                  ? const SizedBox(width: 8)
+                  : IconButton(
+                      onPressed: controller.clear,
+                      icon: const Icon(Icons.close_rounded, color: kGlassMuted, size: 18),
+                    ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// A darker veil laid over the purple film behind Menu and Settings so the
+/// video sits quietly under the cards.
+class QuietFilmVeil extends StatelessWidget {
+  const QuietFilmVeil({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const IgnorePointer(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xC7060C18), Color(0xB3060C18), Color(0xD9060C18)],
+          ),
+        ),
+      ),
+    );
+  }
+}

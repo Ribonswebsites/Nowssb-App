@@ -213,6 +213,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
     // Settings sub-page shell — white round back, heading and glass
     // cards like Notifications / Fashion Plus / Settings.
     return PageShell(
+      quietFilm: true,
       eyebrow: 'Your nav',
       title: 'Quick access',
       film: 'assets/video/hero-bg.mp4',
@@ -248,8 +249,6 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                         title: 'Quick access',
                         subtitle: 'Reshape your bottom navigation — shape, colour, and the icons it shows. Live preview updates as you pick tiles.',
                       )),
-                      const SizedBox(height: 14),
-                      const LSection('banners', 'Banner mix', BannerMix(seed: 1)),
                       const SizedBox(height: 14),
                       LSection('nav', 'Nav preview', _GlassCard(
                         child: Column(

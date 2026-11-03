@@ -133,24 +133,7 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
         padding: EdgeInsets.fromLTRB(22, 0, 16, 28 + bottomInset),
         // Server-driven order (Admin → UI Editor); bundled order by default.
         children: [
-          GlassListCard(
-            icon: Icons.headphones_rounded,
-            overline: 'Settings · Player',
-            title: 'Music player',
-            children: layoutChildren(context, 'player.settings', [
-          LSection(
-              'promo',
-              'Promo banner',
-              ColoredSplitPromoBanner(
-                spec: const SplitPromoSpec(
-                  title: 'Unlock every\ntone and plan.',
-                  cta: 'View plans',
-                  leftColor: Color(0xFF1A2744),
-                  rightColor: Color(0xFFC9A227),
-                  art: SplitPromoArts.pose09,
-                ),
-                margin: EdgeInsets.zero,
-              )),
+          ...layoutChildren(context, 'player.settings', [
           LSection(
               'eq',
               'Equalizer',
@@ -246,7 +229,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                 ],
               )),
           ]),
-          ),
           SizedBox(height: 12 + bottomInset),
         ],
       ),
@@ -255,18 +237,20 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
 
   Widget _nav(IconData icon, String label, String value, VoidCallback onTap,
           {bool last = false}) =>
-      GlassTile(icon: icon, title: label, sub: value, onTap: onTap);
+      GlassItemCard(icon: icon, overline: 'Player', title: label, pill: value, pillSub: 'Tap to change', onTap: onTap);
 
   Widget _toggle(IconData icon, String label, bool value, VoidCallback onTap) =>
-      GlassTile(
+      GlassItemCard(
         icon: icon,
+        overline: 'Player',
         title: label,
-        sub: value ? 'On' : 'Off',
+        pill: value ? 'On' : 'Off',
+        pillSub: 'Tap to switch',
         onTap: onTap,
         trailing: Switch.adaptive(
           value: value,
           onChanged: (_) => onTap(),
-          activeColor: Colors.white,
+          activeThumbColor: Colors.white,
         ),
       );
 }

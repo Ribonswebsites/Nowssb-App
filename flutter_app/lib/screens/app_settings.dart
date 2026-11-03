@@ -28,6 +28,7 @@ import '../media/onboarding_warmup.dart';
 import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
+import '../widgets/app_destinations.dart';
 import '../widgets/glass_list_card.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
@@ -131,140 +132,118 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     HapticFeedback.selectionClick();
   }
 
-  static const _setIcon = [Icons.palette_outlined, Icons.smartphone_rounded, Icons.person_outline_rounded];
+  Widget _toggle(bool v, VoidCallback onTap) => Switch.adaptive(
+        value: v,
+        onChanged: (_) => onTap(),
+        activeThumbColor: Colors.white,
+      );
 
-  static IconData _rowIcon(String title) => switch (title) {
-        'Player Guide' => Icons.play_circle_outline_rounded,
-        'Zen Plus' => Icons.auto_awesome_outlined,
-        'Quick Access' => Icons.dashboard_customize_outlined,
-        'Notifications' => Icons.notifications_none_rounded,
-        'Player Settings' => Icons.equalizer_rounded,
-        "Today's quote" => Icons.format_quote_rounded,
-        'Keep Screen Awake' => Icons.light_mode_outlined,
-        'Nav Bar' => Icons.space_bar_rounded,
-        'Your profile' => Icons.person_outline_rounded,
-        'Appear in Discover' => Icons.travel_explore_rounded,
-        'Privacy Policy' => Icons.privacy_tip_outlined,
-        'Delete Account' => Icons.delete_outline_rounded,
-        'Cached Data' => Icons.cleaning_services_outlined,
-        'Clear Practice History' => Icons.history_rounded,
-        'Request Words' => Icons.edit_note_rounded,
-        'Admin' => Icons.admin_panel_settings_outlined,
-        'About NowssB' => Icons.info_outline_rounded,
-        'Terms of Service' => Icons.description_outlined,
-        'Sign Out' => Icons.logout_rounded,
-        _ => Icons.chevron_right_rounded,
-      };
+  List<List<GlassItemCard>> _groups(Settings s) {
+    void wake() {
+      final v = !_screenWake;
+      setState(() => _screenWake = v);
+      _saveBool('ss_screen_wake', v);
+      DeviceFlags.keepAwake(v);
+    }
 
-  Widget _settingsFace(Settings s) {
-    final groups = <List<WorkCard>>[
+    return [
       [
-        WorkCard(category: 'Player', title: 'Player Guide', meta: 'Replay the setup', action: 'Open the guide', image: 'assets/rails/02.png', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
-        WorkCard(category: 'Look', title: 'Zen Plus', meta: s.fashionPlus ? 'Motion on' : 'Still backgrounds', action: 'Open Zen Plus', image: 'assets/rails/04.png', onTap: () => _push(const FashionPlusScreen())),
-        WorkCard(category: 'Nav', title: 'Quick Access', meta: 'Bottom navigation', action: 'Customize', image: 'assets/rails/05.png', onTap: () => _push(const QuickAccessScreen())),
-        WorkCard(category: 'Alerts', title: 'Notifications', meta: 'Daily words and streak', action: 'Open alerts', image: 'assets/rails/06.png', onTap: () => _push(const NotificationsSettingsPage())),
-        WorkCard(category: 'Player', title: 'Player Settings', meta: 'Equalizer, quality, sleep', action: 'Open player', image: 'assets/rails/07.png', onTap: () => _push(const PlayerSettingsScreen())),
-        WorkCard(category: 'Words', title: "Today's quote", meta: s.todayQuote.trim().isEmpty ? 'Quotes to live by' : s.todayQuote.trim(), action: 'Open quotes', image: 'assets/rails/08.png', onTap: () => _push(const QuotesWeekScreen())),
+        GlassItemCard(icon: Icons.equalizer_rounded, overline: 'Player', title: 'Player Settings', pill: 'Equalizer, quality, sleep', pillSub: 'How words play', onTap: () => _push(const PlayerSettingsScreen())),
+        GlassItemCard(icon: Icons.play_circle_outline_rounded, overline: 'Player', title: 'Player Guide', pill: 'Replay the setup', pillSub: 'A short tour of the player', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
+        GlassItemCard(icon: Icons.auto_awesome_outlined, overline: 'Look', title: 'Zen Plus', pill: s.fashionPlus ? 'Motion on' : 'Still backgrounds', pillSub: 'Moving or still backgrounds', onTap: () => _push(const FashionPlusScreen())),
+        GlassItemCard(icon: Icons.dashboard_customize_outlined, overline: 'Navigation', title: 'Quick Access', pill: 'Bottom navigation', pillSub: 'Shape, colour and icons', onTap: () => _push(const QuickAccessScreen())),
+        GlassItemCard(icon: Icons.space_bar_rounded, overline: 'Navigation', title: 'Nav Bar', pill: s.navColor == 'glass' ? 'Glass' : 'Black', pillSub: 'Tap to switch glass or black', onTap: _cycleNav),
       ],
       [
-        WorkCard(category: 'Screen', title: 'Keep Screen Awake', meta: _screenWake ? 'Stays on' : 'Can sleep', action: _screenWake ? 'Turn off' : 'Turn on', image: 'assets/rails/01.png', onTap: () { final v = !_screenWake; setState(() => _screenWake = v); _saveBool('ss_screen_wake', v); DeviceFlags.keepAwake(v); }),
-        WorkCard(category: 'Nav', title: 'Nav Bar', meta: s.navColor == 'glass' ? 'Glass' : 'Black', action: 'Switch', image: 'assets/rails/09.png', onTap: _cycleNav),
-        WorkCard(category: 'You', title: 'Your profile', meta: 'Account, plan, edit', action: 'Open profile', image: 'assets/rails/10.png', onTap: () => NavScope.goTo(context, 4)),
-        WorkCard(category: 'Discover', title: 'Appear in Discover', meta: _appearDiscover ? 'Others can find you' : 'Hidden', action: _appearDiscover ? 'Hide' : 'Show', image: 'assets/rails/11.png', onTap: () => _setDiscover(!_appearDiscover)),
+        GlassItemCard(icon: Icons.notifications_none_rounded, overline: 'Alerts', title: 'Notifications', pill: 'Daily words and reminders', pillSub: 'What this phone tells you', onTap: () => _push(const NotificationsSettingsPage())),
+        GlassItemCard(icon: Icons.light_mode_outlined, overline: 'Screen', title: 'Keep Screen Awake', pill: _screenWake ? 'Stays on' : 'Can sleep', pillSub: 'While a word is playing', onTap: wake, trailing: _toggle(_screenWake, wake)),
+        GlassItemCard(icon: Icons.cleaning_services_outlined, overline: 'Storage', title: 'Cached Data', pill: 'Clear cache', pillSub: 'Temporary images and video', onTap: () { _clearCache(); }),
+        GlassItemCard(icon: Icons.history_rounded, overline: 'History', title: 'Clear Practice History', pill: 'Clear history', pillSub: 'Session logs on this account', onTap: () { _confirmClearHistory(); }),
       ],
       [
-        WorkCard(category: 'Privacy', title: 'Privacy Policy', meta: 'What NowssB keeps', action: 'Read', image: 'assets/rails/02.png', onTap: () => _openUrl('https://nowssb.com/privacy')),
-        WorkCard(category: 'Account', title: 'Delete Account', meta: 'Erase this account', action: 'Delete', image: 'assets/rails/03.png', onTap: _deleteAccount),
-        WorkCard(category: 'Cache', title: 'Cached Data', meta: 'Temporary media', action: 'Clear cache', image: 'assets/rails/04.png', onTap: () { _clearCache(); }),
-        WorkCard(category: 'History', title: 'Clear Practice History', meta: 'Session logs', action: 'Clear history', image: 'assets/rails/05.png', onTap: () { _confirmClearHistory(); }),
-        WorkCard(category: 'Words', title: 'Request Words', meta: 'Ask the atelier', action: 'Request', image: 'assets/rails/06.png', onTap: () => openRequestWords(context)),
-        if (AdminState.instance.isAdmin) WorkCard(category: 'Admin', title: 'Admin', meta: 'Words, quotes, editor', action: 'Open admin', image: 'assets/rails/07.png', onTap: () => openAdminHome(context)),
-        WorkCard(category: 'About', title: 'About NowssB', meta: 'v9.5.0', action: 'About', image: 'assets/rails/08.png', onTap: () { _openAbout(); }),
-        WorkCard(category: 'Terms', title: 'Terms of Service', meta: 'nowssb.com/terms', action: 'Read terms', image: 'assets/rails/09.png', onTap: () => _openUrl('https://nowssb.com/terms')),
-        WorkCard(category: 'Session', title: 'Sign Out', meta: 'End this session', action: 'Sign out', image: 'assets/rails/10.png', onTap: _signOut),
+        GlassItemCard(icon: Icons.travel_explore_rounded, overline: 'Privacy', title: 'Appear in Discover', pill: _appearDiscover ? 'Others can find you' : 'Hidden', pillSub: 'Your Word Print in Discover', onTap: () => _setDiscover(!_appearDiscover), trailing: _toggle(_appearDiscover, () => _setDiscover(!_appearDiscover))),
+        GlassItemCard(icon: Icons.edit_note_rounded, overline: 'Words', title: 'Request Words', pill: 'Ask the atelier', pillSub: 'Request a word to be made', onTap: () => openRequestWords(context)),
+        if (AdminState.instance.isAdmin) GlassItemCard(icon: Icons.admin_panel_settings_outlined, overline: 'Admin', title: 'Admin', pill: 'Words, quotes, editor', onTap: () => openAdminHome(context)),
+        GlassItemCard(icon: Icons.info_outline_rounded, overline: 'About', title: 'About NowssB', pill: 'Version 9.5.0', pillSub: 'nowssb.com', onTap: () { _openAbout(); }),
+        GlassItemCard(icon: Icons.privacy_tip_outlined, overline: 'Legal', title: 'Privacy Policy', pill: 'What NowssB keeps', pillSub: 'nowssb.com/privacy', onTap: () => _openUrl('https://nowssb.com/privacy')),
+        GlassItemCard(icon: Icons.description_outlined, overline: 'Legal', title: 'Terms of Service', pill: 'Read terms', pillSub: 'nowssb.com/terms', onTap: () => _openUrl('https://nowssb.com/terms')),
+        GlassItemCard(icon: Icons.logout_rounded, overline: 'Session', title: 'Sign Out', pill: 'End this session', danger: true, onTap: _signOut),
+        GlassItemCard(icon: Icons.delete_outline_rounded, overline: 'Account', title: 'Delete Account', pill: 'Erase this account', pillSub: 'Cannot be undone', danger: true, onTap: _deleteAccount),
       ],
     ];
-    final names = ['Look', 'Phone', 'Account'];
-    final cards = groups[_set.clamp(0, 2)].where((c) => _match(c.title, c.meta)).toList();
+  }
+
+  Widget _settingsFace(Settings s) {
+    final groups = _groups(s);
+    const names = ['Look and sound', 'This phone', 'Account'];
+    final searching = _q.isNotEmpty;
+    final cards = searching
+        ? [for (final g in groups) ...g.where((c) => _match('${c.overline} ${c.title}', '${c.pill} ${c.pillSub ?? ''}'))]
+        : groups[_set.clamp(0, 2)];
+    final settingIds = {for (final g in groups) for (final c in g) c.title.toLowerCase()};
+    final pages = searching
+        ? [...menuDestinations, ...settingsDestinations]
+            .where((d) => d.id != 'settings' && !settingIds.contains(d.title.toLowerCase()) && d.matches(_q))
+            .toList()
+        : const <AppDest>[];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            GestureDetector(
-              onTap: () => NavScope.goTo(context, 4),
-              child: const CircleAvatar(
-                radius: 22,
-                backgroundColor: Color(0xFF2A2038),
-                child: Icon(Icons.settings, color: Colors.white, size: 22),
-              ),
+        GlassSearchField(controller: _search, hint: 'Search settings and pages'),
+        const SizedBox(height: 14),
+        if (!searching) ...[
+          Container(
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              color: const Color(0xB30B0B10),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: const Color(0x26FFFFFF)),
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  color: const Color(0x33110A18),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0x33FFFFFF)),
-                ),
-                child: Row(
-                  children: [
-                    for (var i = 0; i < names.length; i++)
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setState(() {
-                            _set = i;
-                          }),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: i == _set ? const Color(0xCC2A2038) : Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              names[i],
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 13,
-                                fontWeight: i == _set ? FontWeight.w700 : FontWeight.w500,
-                              ),
-                            ),
+            child: Row(
+              children: [
+                for (var i = 0; i < names.length; i++)
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _set = i),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 9),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: i == _set ? Colors.white : Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          names[i],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: i == _set ? const Color(0xFF0B0B10) : Colors.white,
+                            fontSize: 13,
+                            fontWeight: i == _set ? FontWeight.w800 : FontWeight.w500,
                           ),
                         ),
                       ),
-                  ],
-                ),
-              ),
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 14),
-        if (cards.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 24),
-            child: Text('Nothing in this filter.', textAlign: TextAlign.center, style: TextStyle(color: Color(0x99FFFFFF))),
-          )
-        else
-          GlassListCard(
-            icon: _setIcon[_set.clamp(0, 2)],
-            overline: 'Settings · ${names[_set.clamp(0, 2)]}',
-            title: const ['Look and sound', 'This phone', 'Your account'][_set.clamp(0, 2)],
-            children: [
-              for (var n = 0; n < cards.length; n++)
-                GlassTile(
-                  icon: _rowIcon(cards[n].title),
-                  title: cards[n].title,
-                  sub: cards[n].meta,
-                  danger: cards[n].title == 'Delete Account' || cards[n].title == 'Sign Out',
-                  onTap: () {
-                    cards[n].onTap();
-                  },
-                ),
-            ],
+          ),
+          const SizedBox(height: 14),
+        ],
+        if (searching && cards.isEmpty && pages.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Text('Nothing called "${_search.text.trim()}" in NowssB.', textAlign: TextAlign.center, style: const TextStyle(color: Color(0x99FFFFFF))),
+          ),
+        ...cards,
+        for (final d in pages)
+          GlassItemCard(
+            icon: d.icon,
+            overline: d.overline,
+            title: d.title,
+            pill: d.pill,
+            pillSub: d.sub,
+            onTap: () => openDest(context, d),
           ),
       ],
     );
@@ -283,6 +262,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       title: 'Settings',
       film: 'assets/video/subscription-bg.mp4',
       usePageFilm: true,
+      quietFilm: true,
       onBack: () => Navigator.of(context).maybePop(),
       slivers: [
         SliverPadding(

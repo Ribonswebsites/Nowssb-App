@@ -22,6 +22,7 @@ class NotificationsSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PageShell(
+      quietFilm: true,
       eyebrow: 'What reaches you',
       title: 'Notifications',
       film: 'assets/video/hero-bg.mp4',
@@ -80,8 +81,6 @@ class NotificationsSettingsPage extends StatelessWidget {
                             ),
                     )),
                     const SizedBox(height: 12),
-                    const LSection('banners', 'Banner mix', BannerMix(seed: 0)),
-                    const SizedBox(height: 6),
                     if (store.feed.isEmpty)
                       const _SettingsEmpty()
                     else
@@ -91,16 +90,15 @@ class NotificationsSettingsPage extends StatelessWidget {
                     for (final g in NotifStore.groups)
                       Opacity(
                         opacity: store.master ? 1 : 0.42,
-                        child: GlassListCard(
-                          icon: Icons.notifications_active_outlined,
-                          overline: 'What you get',
-                          title: g.name,
+                        child: Column(
                           children: [
                             for (final k in g.items)
-                              GlassTile(
+                              GlassItemCard(
                                 icon: Icons.notifications_none_rounded,
+                                overline: g.name,
                                 title: k.label,
-                                sub: k.sub,
+                                pill: store.master && !store.offSet.contains(k.k) ? 'On' : 'Off',
+                                pillSub: k.sub,
                                 onTap: () {
                                   store.toggleKind(k.k);
                                   HapticFeedback.lightImpact();

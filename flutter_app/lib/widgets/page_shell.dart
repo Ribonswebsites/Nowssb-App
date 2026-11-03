@@ -19,6 +19,7 @@ import '../media/video_pool.dart';
 import 'app_backdrop.dart';
 import '../screens/store/bag_ui.dart';
 import '../admin/template/editable.dart';
+import 'glass_list_card.dart';
 
 class PageShell extends StatefulWidget {
   const PageShell({
@@ -34,7 +35,11 @@ class PageShell extends StatefulWidget {
     this.background,
     this.actions = const [],
     this.fashionDim = false,
+    this.quietFilm = false,
   });
+
+  /// Menu and Settings: a darker veil so the film sits quietly behind cards.
+  final bool quietFilm;
 
   /// Lay the saved [FashionBgDim] overlay over the background video.
   final bool fashionDim;
@@ -105,6 +110,8 @@ class _PageShellState extends State<PageShell> {
                   )
                 : (widget.background ?? const AppBackdrop()),
           ),
+          if (widget.quietFilm)
+            const Positioned.fill(child: QuietFilmVeil()),
           if (widget.fashionDim)
             const Positioned.fill(child: FashionBgDimOverlay()),
           // Fashion-home #fpBgVeil language so AppBackdrop / page film reads

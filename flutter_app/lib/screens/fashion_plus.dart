@@ -73,6 +73,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
     if (widget.mode != FashionPlusMode.all) {
       final video = widget.mode == FashionPlusMode.background;
       return PageShell(
+        quietFilm: true,
         eyebrow: 'Zen Plus',
         title: video ? 'Background' : 'Start art',
         film: 'assets/video/fashion-plus-bg-6.mp4',
@@ -108,6 +109,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
       art: 'assets/fashion/fp-intro.webp',
       enterLabel: 'ENTER ZEN PLUS',
       child: r27Guide('plus', r27PlusGuide, PageShell(
+        quietFilm: true,
         eyebrow: 'Experience',
         title: 'Zen Plus',
         film: 'assets/video/fashion-plus-bg-6.mp4',
