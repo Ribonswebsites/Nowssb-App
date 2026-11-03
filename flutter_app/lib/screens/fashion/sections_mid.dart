@@ -4,6 +4,7 @@
 /// storeban
 library;
 
+import '../../media/golden_breath.dart';
 import 'zen_glass_tile.dart';
 import 'package:nowssb/widgets/home_text.dart';
 import 'package:nowssb/data/day_part.dart';
@@ -511,7 +512,8 @@ class FashPlusMini extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final on = Settings.instance.fashionPlus;
-    return ZenGlassTile(style: ZenGlassStyle.prism, on: on, onTap: onTap);
+    return ZenGlassTile(style: ZenGlassStyle.breath, on: on, onTap: onTap,
+        media: const GoldenBreathClip(slot: 'sections_mid.FashPlusMini'));
   }
 }
 

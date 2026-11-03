@@ -7,18 +7,21 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
-enum ZenGlassStyle { prism, strata, lens }
+enum ZenGlassStyle { prism, strata, lens, breath }
 
 const _gold = Color(0xFFC8A96E);
 const _goldLight = Color(0xFFE8D5A3);
 const _vio = Color(0xFFB9A6FF);
 
 class ZenGlassTile extends StatefulWidget {
-  const ZenGlassTile({super.key, required this.style, required this.on, this.onTap, this.debugT});
+  const ZenGlassTile({super.key, required this.style, required this.on, this.onTap, this.debugT, this.media});
   final ZenGlassStyle style;
   final bool on;
   final VoidCallback? onTap;
   final double? debugT;
+
+  /// [ZenGlassStyle.breath]: the moving picture behind the glass.
+  final Widget? media;
   @override
   State<ZenGlassTile> createState() => _ZenGlassTileState();
 }
@@ -66,7 +69,7 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
                 final t = _c.value;
                 return Stack(clipBehavior: Clip.none, children: [
                   if (widget.style == ZenGlassStyle.strata) ..._strata(t, r),
-                  ClipRRect(
+                  if (widget.media != null) _window(t, r) else ClipRRect(
                     borderRadius: BorderRadius.circular(r),
                     child: BackdropFilter(
                       filter: ui.ImageFilter.blur(sigmaX: 28, sigmaY: 28),
@@ -85,6 +88,27 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
       ),
     );
   }
+
+  /// Golden Breath: the clip is a clear window on the right; a frosted pane
+  /// holds the words on the left, its edge catching the light.
+  Widget _window(double t, double r) => ClipRRect(
+        borderRadius: BorderRadius.circular(r),
+        child: Stack(children: [
+          Positioned.fill(child: widget.media!),
+          const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
+              colors: [Color(0xCC0B0716), Color(0x660B0716), Color(0x000B0716), Color(0x330B0716)], stops: [0, .45, .75, 1])))),
+          Positioned.fill(child: Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: .66, heightFactor: 1,
+            child: ClipRect(child: BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: DecoratedBox(decoration: BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.white.withValues(alpha: .10), Colors.white.withValues(alpha: .04)]),
+                border: Border(right: BorderSide(color: _goldLight.withValues(alpha: .25 + .2 * math.sin(t * math.pi * 2).abs()), width: 1)),
+              ))))))),
+          CustomPaint(
+            painter: _GlassPainter(t: t, style: ZenGlassStyle.prism, r: r, body: false),
+            child: Padding(padding: const EdgeInsets.fromLTRB(14, 22, 14, 22), child: _content(t)),
+          ),
+        ]),
+      );
 
   List<Widget> _strata(double t, double r) => [
         for (var i = 2; i >= 1; i--)
@@ -143,19 +167,22 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
 
 /// Frosted body: translucent fill, inner light pooling, moving caustic.
 class _GlassPainter extends CustomPainter {
-  _GlassPainter({required this.t, required this.style, required this.r});
+  _GlassPainter({required this.t, required this.style, required this.r, this.body = true});
   final double t, r;
+  final bool body;
   final ZenGlassStyle style;
   @override
   void paint(Canvas canvas, Size s) {
     final rr = RRect.fromRectAndRadius(Offset.zero & s, Radius.circular(r));
-    canvas.drawRRect(rr, Paint()..shader = ui.Gradient.linear(Offset.zero, Offset(s.width, s.height),
-        [Colors.white.withValues(alpha: .20), Colors.white.withValues(alpha: .06), Colors.white.withValues(alpha: .10)], [0, .6, 1]));
     final ph = t * math.pi * 2;
-    // a pool of coloured light drifting under the glass
-    final g = Offset(s.width * (.3 + .25 * math.sin(ph)), s.height * (.5 + .3 * math.cos(ph)));
-    canvas.drawCircle(g, s.height * 1.1, Paint()..shader = ui.Gradient.radial(g, s.height * 1.1,
-        [_vio.withValues(alpha: .22), _vio.withValues(alpha: 0)]));
+    if (body) {
+      canvas.drawRRect(rr, Paint()..shader = ui.Gradient.linear(Offset.zero, Offset(s.width, s.height),
+          [Colors.white.withValues(alpha: .20), Colors.white.withValues(alpha: .06), Colors.white.withValues(alpha: .10)], [0, .6, 1]));
+      // a pool of coloured light drifting under the glass
+      final g = Offset(s.width * (.3 + .25 * math.sin(ph)), s.height * (.5 + .3 * math.cos(ph)));
+      canvas.drawCircle(g, s.height * 1.1, Paint()..shader = ui.Gradient.radial(g, s.height * 1.1,
+          [_vio.withValues(alpha: .22), _vio.withValues(alpha: 0)]));
+    }
     if (style == ZenGlassStyle.prism) {
       // diagonal spectral band — light split by the glass edge
       final x = (t * 1.6 - .3) * (s.width + s.height);
@@ -249,6 +276,7 @@ class _GemPainter extends CustomPainter {
               Paint()..color = [_goldLight, Colors.white, _vio][i].withValues(alpha: .75));
         }
       case ZenGlassStyle.lens:
+      case ZenGlassStyle.breath:
         final d = Path()
           ..moveTo(c.dx, c.dy - R * .62)
           ..cubicTo(c.dx + R * .5, c.dy - R * .1, c.dx + R * .45, c.dy + R * .5, c.dx, c.dy + R * .52)
