@@ -591,10 +591,10 @@ class V4Community extends StatelessWidget {
   const V4Community({super.key, required this.onTap});
   final VoidCallback onTap;
   static const _rows = [
-    (NwsbMarks.feed, 'Community Feed', 'Share your daily practice'),
-    (NwsbMarks.stories, 'Stories', '24-hour frequency moments'),
-    (NwsbMarks.reels, 'Reels', 'Short healing reels'),
-    (NwsbMarks.discover, 'Discover Creators', 'People worth following'),
+    (NwsbMarks.thought, 'Thoughts', 'A few honest lines'),
+    (NwsbMarks.quote, 'Quotes', 'Words that stayed with you'),
+    (NwsbMarks.feed, 'Images', 'A moment, in a picture'),
+    (NwsbMarks.shield, 'Calm and anonymous', 'No profiles, no counts'),
   ];
   @override
   Widget build(BuildContext context) => V4Card(
@@ -608,7 +608,7 @@ class V4Community extends StatelessWidget {
           const SizedBox(height: 14),
           const Text('NOWSSB CONNECT', style: _eyebrow),
           const SizedBox(height: 6),
-          const Text('Practise together', style: _h),
+          const Text('Share a thought, quote or image', style: _h),
           const SizedBox(height: 12),
           _twoCol(gap: 10, [
             for (final r in _rows)

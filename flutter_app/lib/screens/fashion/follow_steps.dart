@@ -240,11 +240,11 @@ const kFstSteps = <FstStep>[
     title: 'NowssB Connect',
     goLabel: 'Open Connect',
     goTab: 0,
-    lead: 'The social side — share the practice, find the people doing the '
-        'same work.',
+    lead: 'A quiet board: post a thought, a quote or an image, and read what '
+        'others shared.',
     points: [
-      ('Follow and react', 'Creators and practitioners further along.'),
-      ('Your own space', 'A profile about the practice rather than about you.'),
+      ('Thoughts, quotes, images', 'Three simple ways to share. Up to 3 a day.'),
+      ('Calm and anonymous', 'No profiles, follows or counts. Hide or report anything.'),
     ],
   ),
   FstStep(

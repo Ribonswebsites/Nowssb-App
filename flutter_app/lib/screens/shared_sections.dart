@@ -1012,19 +1012,10 @@ class ConnectBannerSection extends StatelessWidget {
 
   /// FEATURES — app/js/part049.js:200. Connect's own five.
   static const _features = [
-    (
-      NwsbMarks.feed,
-      'Community Feed',
-      'Share your daily practice with the world',
-    ),
-    (NwsbMarks.stories, 'Stories', 'Drop 24-hour frequency moments'),
-    (
-      NwsbMarks.reels,
-      'Reels',
-      'Watch & post short healing reels',
-    ),
-    (NwsbMarks.discover, 'Discover Creators', 'Find people worth following'),
-    (NwsbMarks.verified, 'Verified', 'Earn your NowssB check-mark'),
+    (NwsbMarks.thought, 'Thoughts', 'A few honest lines'),
+    (NwsbMarks.quote, 'Quotes', 'Words that stayed with you'),
+    (NwsbMarks.feed, 'Images', 'A moment, in a picture'),
+    (NwsbMarks.shield, 'Calm and anonymous', 'No profiles, no counts'),
   ];
 
   @override

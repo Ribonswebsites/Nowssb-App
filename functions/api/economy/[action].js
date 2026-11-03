@@ -106,6 +106,7 @@ export const ACTIONS = {
   boardPost: cn.boardPost,
   boardFelt: cn.boardFelt,
   boardReport: cn.boardReport,
+  boardDelete: cn.boardDelete,
   // Community
   createEchoPost: so.createEchoPost,
   commentOnPost: so.commentOnPost,
@@ -138,7 +139,7 @@ const AREA = {
   claimWeeklyGift: 'earning', claimMonthlyGift: 'earning', claimMonthlyMark: 'earning', claimSeason: 'earning', claimLeague: 'earning',
   dailyScratch: 'earning', revealScratch: 'earning', claimTicket: 'earning', spin: 'earning', claimPartnerLevel: 'earning',
   drawEnter: 'earning', drawReview: 'community',
-  boardPost: 'community', boardFelt: 'community', boardReport: 'community',
+  boardPost: 'community', boardFelt: 'community', boardReport: 'community', boardDelete: 'community',
   createEchoPost: 'community', commentOnPost: 'community', toggleEchoLike: 'community',
 };
 const COUPON_ACTIONS = new Set(['dailyScratch', 'revealScratch', 'scratchCoupon', 'buyScratchWithCoins', 'claimTicket']);

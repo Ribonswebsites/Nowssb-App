@@ -1,15 +1,19 @@
-/// NowssB Connect — the daily word board.
+/// NowssB Connect — a quiet dashboard, not a social network.
 ///
-/// Today's word sits at the top as a big poster word with its meaning.
-/// Below it, people share a short thought on how the word felt (up to 280
-/// characters), an optional feeling chip and an optional image. Posts are
-/// anonymous: no profiles, follows, usernames or chats. Others tap one
-/// gentle "felt this". Each day has its own board; earlier days are
-/// read-only. Everything comes from the server (/api/economy/board*).
+/// At the top, a composer with three kinds of post: a Thought (a few lines),
+/// a Quote (words plus who said them) or an Image (with an optional caption).
+/// Below, today's board: thoughts, quotes and images from everyone, newest
+/// first, filterable by kind. Posts are anonymous: no profiles, follows,
+/// counts, stories or chats. Others' posts can be hidden or reported; your
+/// own can be deleted. Earlier days are read-only.
+///
+/// Everything comes from the server (/api/economy/board*); images go to
+/// Firebase Storage at connect/{uid}/{ms}.jpg, as before.
 library;
 
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -17,23 +21,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../data/content.dart';
-import '../../data/day_part.dart';
-import '../../data/home_widget_sync.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
-import '../../widgets/concept/normal/surface.dart';
+import '../../widgets/glass_list_card.dart';
 import '../economy/economy_api.dart';
 
-/// Max characters in one thought (the server enforces the same).
+/// Max characters in one post (the server enforces the same).
 const kBoardMaxText = 280;
+
+/// Max characters for who said a quote.
+const kBoardMaxBy = 40;
 
 /// Max bytes for an uploaded image after compression (about 1 MB).
 const kBoardMaxImageBytes = 1024 * 1024;
 
-/// Feeling chips, in the order shown.
-const kBoardFeelings = ['calm', 'light', 'heavy', 'open', 'warm', 'tender', 'clear', 'restless'];
+/// Posts each person can share a day (the server enforces the same).
+const kBoardPerDay = 3;
+
+const _bg = Color(0xFF07070A);
+const _white = Colors.white;
+const _danger = Color(0xFFF87171);
 
 /// Re-encodes any picked image as a JPEG no larger than
 /// [kBoardMaxImageBytes]: at most 1280 px on the long side, stepping the
@@ -59,28 +66,67 @@ Uint8List? compressBoardImage(Uint8List raw) {
   return null;
 }
 
-const _guideKey = 'nwsb_connect_board_guide_v1';
+enum PostKind { thought, quote, image }
 
-/// One anonymous thought on a day's board.
+extension PostKindLabel on PostKind {
+  String get label => switch (this) { PostKind.thought => 'Thought', PostKind.quote => 'Quote', PostKind.image => 'Image' };
+  IconData get icon => switch (this) {
+        PostKind.thought => Icons.chat_bubble_outline_rounded,
+        PostKind.quote => Icons.format_quote_rounded,
+        PostKind.image => Icons.image_outlined,
+      };
+}
+
+/// A quote is stored as its text: “words” — who said it.
+String encodeQuote(String words, String by) {
+  final w = words.trim().replaceAll('“', '"').replaceAll('”', '"');
+  final b = by.trim();
+  return b.isEmpty ? '“$w”' : '“$w” — $b';
+}
+
+final _quoteRe = RegExp(r'^“([\s\S]+)”(?:\s—\s(.+))?$');
+
+/// One anonymous post on a day's board.
 class BoardPost {
-  const BoardPost({required this.id, required this.text, this.feeling = '', this.image = '', this.felt = 0, this.feltByMe = false, this.mine = false, this.at = 0});
-  final String id, text, feeling, image;
-  final int felt, at;
-  final bool feltByMe, mine;
+  const BoardPost({required this.id, required this.text, this.image = '', this.mine = false, this.at = 0});
+  final String id, text, image;
+  final int at;
+  final bool mine;
 
   factory BoardPost.from(Map m) => BoardPost(
         id: '${m['id'] ?? ''}',
         text: '${m['text'] ?? ''}',
-        feeling: '${m['feeling'] ?? ''}',
         image: '${m['image'] ?? ''}',
-        felt: (m['felt'] as num?)?.toInt() ?? 0,
-        feltByMe: m['feltByMe'] == true,
         mine: m['mine'] == true,
         at: (m['at'] as num?)?.toInt() ?? 0,
       );
 
-  BoardPost withFelt(int n, bool on) => BoardPost(id: id, text: text, feeling: feeling, image: image, felt: n, feltByMe: on, mine: mine, at: at);
+  RegExpMatch? get _q => image.isEmpty ? _quoteRe.firstMatch(text.trim()) : null;
+
+  PostKind get kind => image.isNotEmpty ? PostKind.image : (_q != null ? PostKind.quote : PostKind.thought);
+
+  /// For a quote: the words without the marks. Otherwise the text.
+  String get body => _q?.group(1)?.trim() ?? text;
+
+  /// For a quote: who said it ('' if not given).
+  String get by => _q?.group(2)?.trim() ?? '';
 }
+
+/// "just now", "12 min ago", "3 h ago", "Yesterday", "Nov 2".
+String boardAgo(int at, {DateTime? now}) {
+  if (at <= 0) return '';
+  final n = now ?? DateTime.now();
+  final t = DateTime.fromMillisecondsSinceEpoch(at);
+  final d = n.difference(t);
+  if (d.inMinutes < 1) return 'just now';
+  if (d.inMinutes < 60) return '${d.inMinutes} min ago';
+  if (d.inHours < 24 && t.day == n.day) return '${d.inHours} h ago';
+  final y = DateTime(n.year, n.month, n.day).difference(DateTime(t.year, t.month, t.day)).inDays;
+  if (y == 1) return 'Yesterday';
+  return '${_months[t.month - 1]} ${t.day}';
+}
+
+const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 class ConnectScreen extends StatefulWidget {
   const ConnectScreen({super.key});
@@ -98,9 +144,9 @@ class ConnectScreen extends StatefulWidget {
   State<ConnectScreen> createState() => _ConnectScreenState();
 }
 
-class _ConnectScreenState extends State<ConnectScreen> with SingleTickerProviderStateMixin {
-  late final AnimationController _breath = AnimationController(vsync: this, duration: const Duration(seconds: 6));
+class _ConnectScreenState extends State<ConnectScreen> {
   final _text = TextEditingController();
+  final _by = TextEditingController();
   final _focus = FocusNode();
 
   bool _loading = true;
@@ -110,54 +156,27 @@ class _ConnectScreenState extends State<ConnectScreen> with SingleTickerProvider
   String _day = '';
   String _today = '';
   bool _readOnly = false;
-  String _serverWord = '';
-  String _serverMeaning = '';
   List<BoardPost> _posts = const [];
   List<String> _days = const [];
-  int _left = 3;
-  String _feeling = '';
+  int _left = kBoardPerDay;
+  PostKind _kind = PostKind.thought;
+  PostKind? _filter;
   String? _image;
 
   @override
   void initState() {
     super.initState();
     _text.addListener(() => setState(() {}));
+    _by.addListener(() => setState(() {}));
     _load();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _guideOnce());
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final still = (MediaQuery.maybeDisableAnimationsOf(context) ?? false) || NormalLoop.debugT != null;
-    if (still) {
-      _breath.stop();
-      _breath.value = NormalLoop.debugT ?? .35;
-    } else if (!_breath.isAnimating) {
-      _breath.repeat();
-    }
   }
 
   @override
   void dispose() {
-    _breath.dispose();
     _text.dispose();
+    _by.dispose();
     _focus.dispose();
     super.dispose();
-  }
-
-  // ── today's word (the same word of the day the home uses) ──
-  ({String word, String meaning}) get _todayWord {
-    final w = HomeWidgetSync.wordFor(DayClock.now(), ContentStore.instance.library);
-    return (word: w?.word ?? '', meaning: w?.meaning ?? '');
-  }
-
-  ({String word, String meaning}) get _shownWord {
-    if (!_readOnly) {
-      final t = _todayWord;
-      if (t.word.isNotEmpty) return t;
-    }
-    return (word: _serverWord, meaning: _serverMeaning);
   }
 
   Future<void> _load([String? day]) async {
@@ -172,8 +191,6 @@ class _ConnectScreenState extends State<ConnectScreen> with SingleTickerProvider
         _day = '${r['day'] ?? ''}';
         _today = '${r['today'] ?? _day}';
         _readOnly = r['readOnly'] == true;
-        _serverWord = '${r['word'] ?? ''}';
-        _serverMeaning = '${r['meaning'] ?? ''}';
         _posts = [for (final p in (r['posts'] as List? ?? const [])) if (p is Map) BoardPost.from(p)];
         _days = [for (final d in (r['days'] as List? ?? const [])) '$d'];
         _left = (r['postsLeft'] as num?)?.toInt() ?? 0;
@@ -187,20 +204,6 @@ class _ConnectScreenState extends State<ConnectScreen> with SingleTickerProvider
       });
     }
   }
-
-  // ── instructions: shown once, reopened from '?' ──
-  Future<void> _guideOnce() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool(_guideKey) == true || !mounted) return;
-    await prefs.setBool(_guideKey, true);
-    if (mounted) await _guide();
-  }
-
-  Future<void> _guide() => showDialog<void>(
-        context: context,
-        barrierColor: const Color(0x66000000),
-        builder: (c) => const _GuideDialog(),
-      );
 
   void _snack(String msg) => ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(content: Text(msg)));
 
@@ -241,17 +244,26 @@ class _ConnectScreenState extends State<ConnectScreen> with SingleTickerProvider
     }
   }
 
-  Future<void> _share() async {
-    final text = _text.text.trim();
-    if (_sending || _readOnly || _left <= 0) return;
-    if (text.length < 2 && _image == null) {
-      _snack('Share a thought first.');
-      return;
-    }
+  String get _outgoing {
+    final t = _text.text.trim();
+    return _kind == PostKind.quote && t.isNotEmpty ? encodeQuote(t, _by.text) : t;
+  }
+
+  bool get _canPost {
+    if (_sending || _uploading || _readOnly || _left <= 0) return false;
+    final n = _outgoing.characters.length;
+    if (n > kBoardMaxText) return false;
+    return switch (_kind) {
+      PostKind.image => _image != null,
+      _ => _text.text.trim().length >= 2,
+    };
+  }
+
+  Future<void> _post() async {
+    if (!_canPost) return;
     setState(() => _sending = true);
-    final w = _todayWord;
     try {
-      final r = await EconomyApi.call('boardPost', {'text': text, 'feeling': _feeling, 'image': _image ?? '', 'word': w.word, 'meaning': w.meaning});
+      final r = await EconomyApi.call('boardPost', {'text': _outgoing, 'image': _kind == PostKind.image ? (_image ?? '') : ''});
       final p = r['post'];
       if (!mounted) return;
       HapticFeedback.lightImpact();
@@ -259,79 +271,95 @@ class _ConnectScreenState extends State<ConnectScreen> with SingleTickerProvider
         if (p is Map) _posts = [BoardPost.from(p), ..._posts];
         _left = (r['postsLeft'] as num?)?.toInt() ?? math.max(0, _left - 1);
         _text.clear();
-        _feeling = '';
+        _by.clear();
         _image = null;
       });
       _focus.unfocus();
     } on EconomyException catch (e) {
       _snack(e.message);
     } catch (_) {
-      _snack("That didn't send. Try again.");
+      _snack("That didn't post. Try again.");
     } finally {
       if (mounted) setState(() => _sending = false);
     }
   }
 
-  Future<void> _felt(BoardPost p) async {
-    if (_readOnly || p.mine) return;
-    final on = !p.feltByMe;
-    HapticFeedback.selectionClick();
-    _replace(p.withFelt(math.max(0, p.felt + (on ? 1 : -1)), on));
+  void _drop(BoardPost p) => setState(() => _posts = [for (final x in _posts) if (x.id != p.id) x]);
+
+  Future<void> _hideOrReport(BoardPost p, {required bool report}) async {
+    final before = _posts;
+    _drop(p);
     try {
-      final r = await EconomyApi.call('boardFelt', {'day': _day, 'postId': p.id, 'on': on});
-      _replace(p.withFelt((r['felt'] as num?)?.toInt() ?? p.felt, r['feltByMe'] == true));
+      await EconomyApi.call('boardReport', {'day': _day, 'postId': p.id, if (!report) 'hideOnly': true, if (report) 'reason': 'reported from board'});
+      _snack(report ? 'Thanks. It’s hidden and our team will look.' : 'Hidden. You won’t see it again.');
     } catch (e) {
-      _replace(p);
+      if (mounted) setState(() => _posts = before);
       _snack(e is EconomyException ? e.message : "That didn't go through. Try again.");
     }
   }
 
-  void _replace(BoardPost p) {
-    if (!mounted) return;
-    setState(() => _posts = [for (final x in _posts) x.id == p.id ? p : x]);
+  Future<void> _delete(BoardPost p) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      barrierColor: const Color(0x99000000),
+      builder: (c) => AlertDialog(
+        backgroundColor: const Color(0xFF15151C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24), side: const BorderSide(color: Color(0x26FFFFFF))),
+        title: const Text('Delete this post?', style: TextStyle(color: _white, fontWeight: FontWeight.w800)),
+        content: const Text('It will be removed from the board for everyone.', style: TextStyle(color: kGlassMuted)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel', style: TextStyle(color: kGlassMuted))),
+          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Delete', style: TextStyle(color: _danger, fontWeight: FontWeight.w700))),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    final before = _posts;
+    _drop(p);
+    try {
+      await EconomyApi.call('boardDelete', {'day': _day, 'postId': p.id});
+      _snack('Deleted.');
+    } catch (e) {
+      if (mounted) setState(() => _posts = before);
+      _snack(e is EconomyException ? e.message : "That didn't delete. Try again.");
+    }
   }
 
-  Future<void> _moderate(BoardPost p, {required bool report}) async {
-    setState(() => _posts = [for (final x in _posts) if (x.id != p.id) x]);
-    try {
-      await EconomyApi.call('boardReport', {'day': _day, 'postId': p.id, if (!report) 'hideOnly': true, if (report) 'reason': 'reported from board'});
-      _snack(report ? 'Thanks. We hid it and our team will look.' : 'Hidden. You won’t see it again.');
-    } catch (_) {}
+  String _label(String d) {
+    if (d.length != 8) return d;
+    final mo = int.tryParse(d.substring(4, 6)) ?? 1;
+    return '${_months[(mo - 1).clamp(0, 11)]} ${int.tryParse(d.substring(6)) ?? ''}';
   }
 
   @override
   Widget build(BuildContext context) {
     final canPop = Navigator.of(context).canPop();
     return Scaffold(
-      backgroundColor: nBase,
-      body: SafeArea(
-        bottom: false,
-        child: RefreshIndicator(
-          color: nInk,
-          onRefresh: () => _load(_day.isEmpty || _day == _today ? null : _day),
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-            slivers: [
-              SliverToBoxAdapter(child: _header(canPop)),
-              SliverToBoxAdapter(child: _dayStrip()),
-              SliverToBoxAdapter(child: _poster()),
-              if (!_readOnly) SliverToBoxAdapter(child: _composer()),
-              if (_readOnly)
-                const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(20, 4, 20, 8),
-                    child: Text('This board has closed. You can read it, but not post or react.', style: nSub),
-                  ),
+      backgroundColor: _bg,
+      body: DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(center: Alignment(-.8, -1.1), radius: 1.4, colors: [Color(0xFF1C1A24), _bg]),
+        ),
+        child: SafeArea(
+          bottom: false,
+          child: RefreshIndicator(
+            color: _white,
+            backgroundColor: const Color(0xFF15151C),
+            onRefresh: () => _load(_day.isEmpty || _day == _today ? null : _day),
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+              slivers: [
+                SliverToBoxAdapter(child: _header(canPop)),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  sliver: SliverList.list(children: [
+                    if (!_readOnly) _composer(),
+                    _board(),
+                  ]),
                 ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                  child: Text(_readOnly ? 'What people felt' : 'How today’s word felt', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: nInk)),
-                ),
-              ),
-              ..._feed(),
-              const SliverToBoxAdapter(child: SizedBox(height: 120)),
-            ],
+                const SliverToBoxAdapter(child: SizedBox(height: 110)),
+              ],
+            ),
           ),
         ),
       ),
@@ -339,373 +367,403 @@ class _ConnectScreenState extends State<ConnectScreen> with SingleTickerProvider
   }
 
   Widget _header(bool canPop) => Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
-        child: Row(
-          children: [
-            if (canPop) _RoundBtn(icon: Icons.arrow_back_rounded, label: 'Back', onTap: () => Navigator.of(context).maybePop()) else const SizedBox(width: 8),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('NowssB Connect', style: nTitle),
-                  SizedBox(height: 2),
-                  Text('One word a day. Share how it felt.', style: nSub),
-                ],
-              ),
-            ),
-            _RoundBtn(icon: Icons.question_mark_rounded, label: 'How Connect works', onTap: _guide),
-          ],
-        ),
+        padding: const EdgeInsets.fromLTRB(12, 10, 16, 6),
+        child: Row(children: [
+          if (canPop)
+            _CircleBtn(icon: Icons.arrow_back_rounded, label: 'Back', onTap: () => Navigator.of(context).maybePop())
+          else
+            const SizedBox(width: 4),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('NowssB Connect', style: TextStyle(color: _white, fontSize: 24, fontWeight: FontWeight.w800)),
+              SizedBox(height: 2),
+              Text('Share a thought, a quote or an image.', style: TextStyle(color: kGlassMuted, fontSize: 13)),
+            ]),
+          ),
+        ]),
       );
 
-  String _label(String d) {
-    if (d.length != 8) return d;
-    const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final mo = int.tryParse(d.substring(4, 6)) ?? 1;
-    return '${m[(mo - 1).clamp(0, 11)]} ${int.tryParse(d.substring(6)) ?? ''}';
+  // ── composer ──
+  Widget _composer() {
+    final n = _outgoing.characters.length;
+    final over = n > kBoardMaxText;
+    final out = _left <= 0;
+    return GlassListCard(
+      icon: Icons.edit_outlined,
+      overline: 'Share · anonymous',
+      title: 'Post to the board',
+      subtitle: out ? 'That’s $kBoardPerDay posts for today. Come back tomorrow.' : '$_left of $kBoardPerDay left today',
+      children: out
+          ? const []
+          : [
+              Row(children: [
+                for (final k in PostKind.values) ...[
+                  if (k != PostKind.thought) const SizedBox(width: 8),
+                  Expanded(child: _KindTab(kind: k, selected: _kind == k, onTap: () => setState(() => _kind = k))),
+                ],
+              ]),
+              if (_kind == PostKind.image) _imageSlot(),
+              _Field(
+                controller: _text,
+                focus: _focus,
+                hint: switch (_kind) {
+                  PostKind.thought => 'What’s on your mind?',
+                  PostKind.quote => 'The words, as you remember them',
+                  PostKind.image => 'Add a caption (optional)',
+                },
+                minLines: _kind == PostKind.image ? 1 : 3,
+              ),
+              if (_kind == PostKind.quote) _Field(controller: _by, hint: 'Who said it (optional)', minLines: 1, maxLength: kBoardMaxBy),
+              Row(children: [
+                Expanded(
+                  child: Text('$n / $kBoardMaxText',
+                      style: TextStyle(fontSize: 12.5, color: over ? _danger : kGlassMuted, fontFeatures: const [ui.FontFeature.tabularFigures()])),
+                ),
+                _PostBtn(busy: _sending, enabled: _canPost, onTap: _post),
+              ]),
+            ],
+    );
+  }
+
+  Widget _imageSlot() {
+    if (_image != null) {
+      return Stack(children: [
+        _BoardImage(path: _image!, height: 170),
+        Positioned(
+          right: 8,
+          top: 8,
+          child: _CircleBtn(icon: Icons.close_rounded, label: 'Remove image', size: 36, onTap: () => setState(() => _image = null)),
+        ),
+      ]);
+    }
+    return GlassTile(
+      icon: _uploading ? Icons.hourglass_top_rounded : Icons.add_photo_alternate_outlined,
+      title: _uploading ? 'Uploading…' : 'Choose an image',
+      sub: 'From your gallery. We shrink it to about 1 MB.',
+      onTap: _uploading ? null : _pickImage,
+    );
+  }
+
+  // ── the board ──
+  Widget _board() {
+    final shown = [for (final p in _posts) if (_filter == null || p.kind == _filter) p];
+    final isToday = _day.isEmpty || _day == _today;
+    final count = _posts.length;
+    return GlassListCard(
+      icon: Icons.dashboard_outlined,
+      overline: isToday ? 'Today’s board' : 'Board · ${_label(_day)}',
+      title: _readOnly ? 'What people shared' : 'From everyone',
+      subtitle: _loading
+          ? null
+          : _readOnly
+              ? 'This day has closed. You can read it, but not post.'
+              : count == 0
+                  ? 'Nothing here yet'
+                  : count == 1
+                      ? '1 post today'
+                      : '$count posts today',
+      children: [
+        if (_days.isNotEmpty) _dayStrip(),
+        _filters(),
+        ..._items(shown),
+      ],
+    );
   }
 
   Widget _dayStrip() {
-    if (_days.isEmpty) return const SizedBox(height: 8);
     final all = [_today, ..._days];
     return SizedBox(
-      height: 58,
+      height: 38,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         itemCount: all.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (_, i) {
           final d = all[i];
-          final on = d == _day;
-          return _Pill(
-            label: i == 0 ? 'Today' : _label(d),
-            selected: on,
-            onTap: () => _load(i == 0 ? null : d),
-          );
+          return _Chip(label: i == 0 ? 'Today' : _label(d), selected: d == _day, onTap: () => _load(i == 0 ? null : d));
         },
       ),
     );
   }
 
-  Widget _poster() {
-    final w = _shownWord;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 6),
-      child: AnimatedBuilder(
-        animation: _breath,
-        builder: (context, child) {
-          final t = _breath.value;
-          final glow = .5 + .5 * math.sin(t * 2 * math.pi);
-          return Container(
-            decoration: neu(r: 30),
-            clipBehavior: Clip.antiAlias,
-            child: Stack(
-              children: [
-                // A slow ring of light that breathes behind the word.
-                Positioned(
-                  right: -60 + 10 * glow,
-                  top: -70 + 8 * glow,
-                  child: Container(
-                    width: 220,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(colors: [nGold.withValues(alpha: .20 + .12 * glow), nGold.withValues(alpha: 0)]),
-                    ),
-                  ),
-                ),
-                child!,
-              ],
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(22, 20, 22, 22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(_readOnly ? 'THE WORD ON ${_label(_day).toUpperCase()}' : 'TODAY’S WORD',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.6, color: nSubInk)),
-              const SizedBox(height: 10),
-              if (w.word.isEmpty && _loading)
-                const SizedBox(height: 64)
-              else
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text((w.word.isEmpty ? 'NowssB' : w.word).toUpperCase(), maxLines: 1, style: nPoster.copyWith(fontSize: 64)),
-                ),
-              if (w.meaning.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Text(w.meaning, style: const TextStyle(fontSize: 15, height: 1.4, color: nInk, fontWeight: FontWeight.w500)),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _composer() {
-    final n = _text.text.characters.length;
-    final over = n > kBoardMaxText;
-    final canSend = !_sending && !_uploading && _left > 0 && !over && (n >= 2 || _image != null);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
-      child: Container(
-        decoration: neu(r: 26),
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              decoration: neu(r: 18, pressed: true),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-              child: TextField(
-                controller: _text,
-                focusNode: _focus,
-                enabled: _left > 0,
-                minLines: 2,
-                maxLines: 5,
-                textCapitalization: TextCapitalization.sentences,
-                inputFormatters: [LengthLimitingTextInputFormatter(kBoardMaxText)],
-                style: const TextStyle(fontSize: 15, color: nInk, height: 1.4),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: _left > 0 ? 'How did today’s word feel?' : 'That’s 3 thoughts for today. Come back tomorrow.',
-                  hintStyle: const TextStyle(color: nSubInk, fontSize: 15),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: kBoardFeelings.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (_, i) {
-                  final f = kBoardFeelings[i];
-                  return _Pill(label: f, small: true, selected: _feeling == f, onTap: () => setState(() => _feeling = _feeling == f ? '' : f));
-                },
-              ),
-            ),
-            if (_image != null) ...[
-              const SizedBox(height: 12),
-              Stack(
-                children: [
-                  _BoardImage(path: _image!, height: 140),
-                  Positioned(
-                    right: 6,
-                    top: 6,
-                    child: Semantics(
-                      button: true,
-                      label: 'Remove image',
-                      child: GestureDetector(
-                        onTap: () => setState(() => _image = null),
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(color: Color(0xCCFFFFFF), shape: BoxShape.circle),
-                          child: const Icon(Icons.close_rounded, size: 18, color: nInk),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                _RoundBtn(
-                  icon: _uploading ? Icons.hourglass_top_rounded : Icons.add_photo_alternate_outlined,
-                  label: 'Add an image',
-                  size: 44,
-                  onTap: _left > 0 ? _pickImage : null,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    '$n/$kBoardMaxText · ${_left > 0 ? '$_left of 3 left today' : 'no thoughts left today'}',
-                    style: TextStyle(fontSize: 12.5, color: over ? const Color(0xFFB3261E) : nSubInk),
-                  ),
-                ),
-                Semantics(
-                  button: true,
-                  label: 'Share',
-                  child: GestureDetector(
-                    onTap: canSend ? _share : null,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      decoration: BoxDecoration(color: canSend ? nInk : const Color(0xFFB9BDC8), borderRadius: BorderRadius.circular(999)),
-                      child: Text(_sending ? 'Sharing…' : 'Share', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14.5)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+  Widget _filters() => SizedBox(
+        height: 38,
+        child: ListView(scrollDirection: Axis.horizontal, children: [
+          _Chip(label: 'All', selected: _filter == null, onTap: () => setState(() => _filter = null)),
+          for (final k in PostKind.values) ...[
+            const SizedBox(width: 8),
+            _Chip(label: '${k.label}s', icon: k.icon, selected: _filter == k, onTap: () => setState(() => _filter = k)),
           ],
-        ),
-      ),
-    );
-  }
+        ]),
+      );
 
-  List<Widget> _feed() {
+  List<Widget> _items(List<BoardPost> shown) {
     if (_loading && _posts.isEmpty) {
-      return const [SliverToBoxAdapter(child: Padding(padding: EdgeInsets.all(32), child: Center(child: CircularProgressIndicator(color: nInk, strokeWidth: 2))))];
+      return const [
+        Padding(padding: EdgeInsets.all(28), child: Center(child: CircularProgressIndicator(color: _white, strokeWidth: 2))),
+      ];
     }
-    if (_error != null) {
-      return [SliverToBoxAdapter(child: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 0), child: Text(_error!, style: nSub)))];
-    }
-    if (_posts.isEmpty) {
+    if (_error != null) return [_Note(icon: Icons.cloud_off_rounded, text: _error!)];
+    if (shown.isEmpty) {
+      final what = _filter == null ? 'posts' : '${_filter!.label.toLowerCase()}s';
       return [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
-            child: Text(_readOnly ? 'No one shared a thought that day.' : 'No thoughts yet today. Be the first to share how it felt.', style: nSub.copyWith(fontSize: 14)),
-          ),
+        _Note(
+          icon: Icons.spa_outlined,
+          text: _readOnly
+              ? 'No $what that day.'
+              : _posts.isEmpty
+                  ? 'No posts yet today. Share the first thought, quote or image.'
+                  : 'No $what yet today.',
         ),
       ];
     }
     return [
-      SliverPadding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        sliver: SliverList.separated(
-          itemCount: _posts.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 16),
-          itemBuilder: (_, i) {
-            final p = _posts[i];
-            return _Rise(
-              key: ValueKey(p.id),
-              delay: Duration(milliseconds: 40 * math.min(i, 6)),
-              child: _PostCard(
-                post: p,
-                readOnly: _readOnly,
-                onFelt: () => _felt(p),
-                onHide: () => _moderate(p, report: false),
-                onReport: () => _moderate(p, report: true),
-              ),
-            );
-          },
+      for (final p in shown)
+        _PostTile(
+          key: ValueKey(p.id),
+          post: p,
+          onHide: () => _hideOrReport(p, report: false),
+          onReport: () => _hideOrReport(p, report: true),
+          onDelete: () => _delete(p),
         ),
-      ),
     ];
   }
 }
 
-String _ago(int at) {
-  if (at <= 0) return '';
-  final d = DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(at));
-  if (d.inMinutes < 1) return 'just now';
-  if (d.inMinutes < 60) return '${d.inMinutes} min ago';
-  if (d.inHours < 24) return '${d.inHours} h ago';
-  return '${d.inDays} d ago';
-}
+// ───────────────────────── pieces ─────────────────────────
 
-class _PostCard extends StatelessWidget {
-  const _PostCard({required this.post, required this.readOnly, required this.onFelt, required this.onHide, required this.onReport});
+class _PostTile extends StatelessWidget {
+  const _PostTile({super.key, required this.post, required this.onHide, required this.onReport, required this.onDelete});
   final BoardPost post;
-  final bool readOnly;
-  final VoidCallback onFelt, onHide, onReport;
+  final VoidCallback onHide, onReport, onDelete;
 
   @override
   Widget build(BuildContext context) {
     final p = post;
+    final k = p.kind;
+    final when = boardAgo(p.at);
+    final meta = [k.label, p.mine ? 'You' : 'Anonymous', if (when.isNotEmpty) when].join(' · ');
     return Container(
-      decoration: neu(r: 24),
-      padding: const EdgeInsets.fromLTRB(16, 14, 6, 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              if (p.feeling.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: neu(r: 999, pressed: true),
-                  child: Text('feels ${p.feeling}', style: const TextStyle(fontSize: 12.5, color: nInk, fontWeight: FontWeight.w700)),
-                ),
-              if (p.feeling.isNotEmpty) const SizedBox(width: 8),
-              Expanded(
-                child: Text(p.mine ? 'You · ${_ago(p.at)}' : 'A healer · ${_ago(p.at)}', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12.5, color: nSubInk)),
-              ),
-              if (!p.mine)
-                PopupMenuButton<String>(
-                  tooltip: 'Hide or report',
-                  icon: const Icon(Icons.more_horiz_rounded, color: nSubInk),
-                  color: nBase,
-                  onSelected: (v) => v == 'report' ? onReport() : onHide(),
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'hide', child: Text('Hide this')),
-                    PopupMenuItem(value: 'report', child: Text('Report')),
+      decoration: BoxDecoration(color: kGlassTile, borderRadius: BorderRadius.circular(20)),
+      padding: const EdgeInsets.fromLTRB(12, 10, 4, 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(color: const Color(0x1AFFFFFF), shape: BoxShape.circle, border: Border.all(color: const Color(0x1FFFFFFF))),
+            child: Icon(k.icon, size: 15, color: _white),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(meta,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: kGlassMuted, fontSize: 12, fontWeight: FontWeight.w600, letterSpacing: .2)),
+          ),
+          PopupMenuButton<String>(
+            tooltip: p.mine ? 'Delete' : 'Hide or report',
+            icon: const Icon(Icons.more_horiz_rounded, color: kGlassMuted),
+            color: const Color(0xFF15151C),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: Color(0x26FFFFFF))),
+            onSelected: (v) => switch (v) { 'delete' => onDelete(), 'report' => onReport(), _ => onHide() },
+            itemBuilder: (_) => p.mine
+                ? const [PopupMenuItem(value: 'delete', child: Text('Delete', style: TextStyle(color: _danger)))]
+                : const [
+                    PopupMenuItem(value: 'hide', child: Text('Hide this', style: TextStyle(color: _white))),
+                    PopupMenuItem(value: 'report', child: Text('Report', style: TextStyle(color: _danger))),
                   ],
-                )
-              else
-                const SizedBox(height: 40),
-            ],
           ),
-          if (p.text.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(right: 10, top: 2),
-              child: Text(p.text, style: const TextStyle(fontSize: 15.5, height: 1.45, color: nInk)),
-            ),
-          if (p.image.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(right: 10, top: 10),
-              child: _BoardImage(path: p.image, height: 190),
-            ),
-          const SizedBox(height: 6),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: _FeltButton(count: p.felt, on: p.feltByMe, enabled: !readOnly && !p.mine, onTap: onFelt),
-          ),
-        ],
-      ),
+        ]),
+        Padding(
+          padding: const EdgeInsets.only(right: 10, top: 6),
+          child: switch (k) {
+            PostKind.quote => _quote(p),
+            PostKind.image => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                _BoardImage(path: p.image, height: 210),
+                if (p.text.trim().isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(p.text, style: const TextStyle(color: _white, fontSize: 14.5, height: 1.45)),
+                ],
+              ]),
+            PostKind.thought => Text(p.text, style: const TextStyle(color: _white, fontSize: 15.5, height: 1.5)),
+          },
+        ),
+      ]),
     );
   }
+
+  Widget _quote(BoardPost p) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(14, 4, 4, 2),
+        decoration: const BoxDecoration(border: Border(left: BorderSide(color: Color(0x40FFFFFF), width: 2))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('“${p.body}”', style: const TextStyle(color: _white, fontSize: 18, height: 1.45, fontWeight: FontWeight.w600)),
+          if (p.by.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text('— ${p.by}', style: const TextStyle(color: kGlassMuted, fontSize: 13, fontWeight: FontWeight.w600)),
+          ],
+        ]),
+      );
 }
 
-class _FeltButton extends StatelessWidget {
-  const _FeltButton({required this.count, required this.on, required this.enabled, required this.onTap});
-  final int count;
-  final bool on, enabled;
+class _KindTab extends StatelessWidget {
+  const _KindTab({required this.kind, required this.selected, required this.onTap});
+  final PostKind kind;
+  final bool selected;
   final VoidCallback onTap;
-
   @override
-  Widget build(BuildContext context) {
-    final label = count == 1 ? '1 felt this' : '$count felt this';
-    return Semantics(
-      button: enabled,
-      toggled: on,
-      label: label,
-      excludeSemantics: true,
-      child: GestureDetector(
-        onTap: enabled ? onTap : null,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 44),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: on ? neu(r: 999, pressed: true) : null,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedScale(
-                scale: on ? 1.15 : 1,
-                duration: const Duration(milliseconds: 260),
-                curve: Curves.easeOutBack,
-                child: Icon(on ? Icons.spa_rounded : Icons.spa_outlined, size: 20, color: on ? nGold : nSubInk),
-              ),
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        selected: selected,
+        label: kind.label,
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 46,
+            decoration: BoxDecoration(
+              color: selected ? _white : kGlassTile,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: selected ? _white : const Color(0x1FFFFFFF)),
+            ),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(kind.icon, size: 17, color: selected ? const Color(0xFF0B0B10) : _white),
               const SizedBox(width: 6),
-              Text(label, style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: on ? nInk : nSubInk)),
-            ],
+              Flexible(
+                child: Text(kind.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: selected ? const Color(0xFF0B0B10) : _white)),
+              ),
+            ]),
           ),
         ),
-      ),
-    );
-  }
+      );
+}
+
+class _Field extends StatelessWidget {
+  const _Field({required this.controller, required this.hint, this.focus, this.minLines = 1, this.maxLength = kBoardMaxText});
+  final TextEditingController controller;
+  final FocusNode? focus;
+  final String hint;
+  final int minLines, maxLength;
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(color: kGlassTile, borderRadius: BorderRadius.circular(18)),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+        child: TextField(
+          controller: controller,
+          focusNode: focus,
+          minLines: minLines,
+          maxLines: math.max(minLines, 5),
+          textCapitalization: TextCapitalization.sentences,
+          inputFormatters: [LengthLimitingTextInputFormatter(maxLength)],
+          cursorColor: _white,
+          style: const TextStyle(fontSize: 15, color: _white, height: 1.4),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: hint,
+            hintStyle: const TextStyle(color: Color(0x66FFFFFF), fontSize: 15),
+          ),
+        ),
+      );
+}
+
+class _PostBtn extends StatelessWidget {
+  const _PostBtn({required this.busy, required this.enabled, required this.onTap});
+  final bool busy, enabled;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        enabled: enabled,
+        label: 'Post',
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: enabled ? onTap : null,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+            decoration: BoxDecoration(color: enabled ? _white : const Color(0x26FFFFFF), borderRadius: BorderRadius.circular(999)),
+            child: Text(busy ? 'Posting…' : 'Post',
+                style: TextStyle(color: enabled ? const Color(0xFF0B0B10) : const Color(0x80FFFFFF), fontWeight: FontWeight.w800, fontSize: 14.5)),
+          ),
+        ),
+      );
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({required this.label, required this.selected, required this.onTap, this.icon});
+  final String label;
+  final bool selected;
+  final IconData? icon;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        selected: selected,
+        label: label,
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: selected ? const Color(0x33FFFFFF) : kGlassTile,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: selected ? const Color(0x66FFFFFF) : const Color(0x1AFFFFFF)),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (icon != null) ...[Icon(icon, size: 14, color: selected ? _white : kGlassMuted), const SizedBox(width: 6)],
+              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: selected ? _white : kGlassMuted)),
+            ]),
+          ),
+        ),
+      );
+}
+
+class _Note extends StatelessWidget {
+  const _Note({required this.icon, required this.text});
+  final IconData icon;
+  final String text;
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(color: kGlassTile, borderRadius: BorderRadius.circular(20)),
+        padding: const EdgeInsets.fromLTRB(16, 22, 16, 22),
+        child: Column(children: [
+          Icon(icon, color: kGlassMuted, size: 26),
+          const SizedBox(height: 10),
+          Text(text, textAlign: TextAlign.center, style: const TextStyle(color: kGlassMuted, fontSize: 14, height: 1.45)),
+        ]),
+      );
+}
+
+class _CircleBtn extends StatelessWidget {
+  const _CircleBtn({required this.icon, required this.label, required this.onTap, this.size = 44});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final double size;
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: size,
+            height: size,
+            decoration: const BoxDecoration(color: _white, shape: BoxShape.circle),
+            child: Icon(icon, color: const Color(0xFF0B0B10), size: size * .48),
+          ),
+        ),
+      );
 }
 
 class _BoardImage extends StatefulWidget {
@@ -728,138 +786,16 @@ class _BoardImageState extends State<_BoardImage> {
   @override
   Widget build(BuildContext context) {
     final fake = ConnectScreen.debugImage;
-    Widget child;
-    if (fake != null) {
-      child = fake(widget.path);
-    } else {
-      child = FutureBuilder<String>(
-        future: _url,
-        builder: (_, s) => s.hasData
-            ? Image.network(s.data!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFFE3E6EE)))
-            : const ColoredBox(color: Color(0xFFE3E6EE)),
-      );
-    }
+    const blank = ColoredBox(color: Color(0xFF15151C));
+    final child = fake != null
+        ? fake(widget.path)
+        : FutureBuilder<String>(
+            future: _url,
+            builder: (_, s) => s.hasData ? Image.network(s.data!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => blank) : blank,
+          );
     return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(16),
       child: SizedBox(height: widget.height, width: double.infinity, child: child),
     );
   }
 }
-
-/// A soft fade + rise as a thought appears.
-class _Rise extends StatelessWidget {
-  const _Rise({super.key, required this.child, this.delay = Duration.zero});
-  final Widget child;
-  final Duration delay;
-  @override
-  Widget build(BuildContext context) {
-    final still = (MediaQuery.maybeDisableAnimationsOf(context) ?? false) || NormalLoop.debugT != null;
-    if (still) return child;
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0, end: 1),
-      duration: const Duration(milliseconds: 420) + delay,
-      curve: Curves.easeOutCubic,
-      builder: (_, t, c) => Opacity(opacity: t, child: Transform.translate(offset: Offset(0, 14 * (1 - t)), child: c)),
-      child: child,
-    );
-  }
-}
-
-class _Pill extends StatelessWidget {
-  const _Pill({required this.label, required this.selected, required this.onTap, this.small = false});
-  final String label;
-  final bool selected, small;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        selected: selected,
-        label: label,
-        excludeSemantics: true,
-        child: GestureDetector(
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: EdgeInsets.symmetric(horizontal: small ? 14 : 16, vertical: small ? 9 : 10),
-            decoration: selected ? BoxDecoration(color: nInk, borderRadius: BorderRadius.circular(999)) : neu(r: 999),
-            child: Text(label, style: TextStyle(fontSize: small ? 13 : 13.5, fontWeight: FontWeight.w700, color: selected ? Colors.white : nInk)),
-          ),
-        ),
-      );
-}
-
-class _RoundBtn extends StatelessWidget {
-  const _RoundBtn({required this.icon, required this.label, required this.onTap, this.size = 46});
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-  final double size;
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: label,
-        excludeSemantics: true,
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            width: size,
-            height: size,
-            decoration: neu(r: 999),
-            child: Icon(icon, color: onTap == null ? const Color(0xFFB9BDC8) : nInk, size: 22),
-          ),
-        ),
-      );
-}
-
-class _GuideDialog extends StatefulWidget {
-  const _GuideDialog();
-  @override
-  State<_GuideDialog> createState() => _GuideDialogState();
-}
-
-class _GuideDialogState extends State<_GuideDialog> {
-  static const _steps = [
-    ('One word a day', 'Everyone sees the same word of the day at the top. Sit with it for a moment.'),
-    ('Share how it felt', 'Write a short thought, up to 280 characters. Add a feeling or an image if you like. Up to 3 a day.'),
-    ('Gentle and anonymous', 'No profiles, follows or chats. Tap “felt this” when a thought lands. Hide or report anything that doesn’t belong.'),
-  ];
-  var _i = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    final (title, body) = _steps[_i];
-    final last = _i == _steps.length - 1;
-    return Dialog(
-      backgroundColor: nBase,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(22, 22, 22, 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Step ${_i + 1} of ${_steps.length}', style: const TextStyle(fontSize: 12.5, color: nSubInk, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: nInk)),
-            const SizedBox(height: 8),
-            Text(body, style: const TextStyle(fontSize: 15, height: 1.45, color: nInk)),
-            const SizedBox(height: 18),
-            Row(
-              children: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Skip', style: TextStyle(color: nSubInk))),
-                const Spacer(),
-                FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: nInk, foregroundColor: Colors.white),
-                  onPressed: () => last ? Navigator.pop(context) : setState(() => _i++),
-                  child: Text(last ? 'Got it' : 'Next'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

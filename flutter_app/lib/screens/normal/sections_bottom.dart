@@ -93,11 +93,10 @@ class NmConnect extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'The social space of NowssB — share your daily practice, '
-                    'post your frequency journey, and connect with a '
-                    'community of sound healers and word-science '
-                    'practitioners. Follow creators, react, and grow '
-                    'together.',
+                    'A quiet board inside NowssB. Post a thought, share a '
+                    'quote that stayed with you, or add an image, and read '
+                    'what others shared today. No profiles, no follows, '
+                    'no counts.',
                     maxLines: 6,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -159,15 +158,10 @@ class NmFeed extends StatelessWidget {
 
   /// FEATURES — app/js/part049.js:200.
   static const features = [
-    (
-      NwsbMarks.feed,
-      'Community Feed',
-      'Share your daily practice with the world',
-    ),
-    (NwsbMarks.stories, 'Stories', 'Drop 24-hour frequency moments'),
-    (NwsbMarks.reels, 'Reels', 'Watch & post short healing reels'),
-    (NwsbMarks.discover, 'Discover Creators', 'Find people worth following'),
-    (NwsbMarks.verified, 'Verified', 'Earn your NowssB check-mark'),
+    (NwsbMarks.thought, 'Thoughts', 'A few honest lines'),
+    (NwsbMarks.quote, 'Quotes', 'Words that stayed with you'),
+    (NwsbMarks.feed, 'Images', 'A moment, in a picture'),
+    (NwsbMarks.shield, 'Calm and anonymous', 'No profiles, no counts'),
   ];
 
   @override

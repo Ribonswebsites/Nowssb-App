@@ -15,8 +15,8 @@ import 'support/test_fonts.dart';
 // flutter test test/connect_shots_test.dart --dart-define=CONNECT_SHOTS=/out
 const _out = String.fromEnvironment('CONNECT_SHOTS');
 
-Map<String, dynamic> _p(String id, String text, String feeling, int felt, {bool me = false, bool mine = false, String image = ''}) =>
-    {'id': id, 'text': text, 'feeling': feeling, 'felt': felt, 'feltByMe': me, 'mine': mine, 'image': image, 'at': DateTime(2026, 11, 2, 9 + felt % 8, 12).millisecondsSinceEpoch};
+Map<String, dynamic> _p(String id, String text, int minsAgo, {bool mine = false, String image = ''}) =>
+    {'id': id, 'text': text, 'mine': mine, 'image': image, 'at': DateTime.now().subtract(Duration(minutes: minsAgo)).millisecondsSinceEpoch};
 
 void main() {
   setUpAll(() async {
@@ -25,28 +25,30 @@ void main() {
   });
   final key = GlobalKey();
   for (final cfg in [(320.0, 1.3, '320@1.3x'), (390.0, 1.0, '390')]) {
-    for (final guide in [false, true]) {
-      testWidgets('connect shot ${cfg.$3} guide=$guide', (t) async {
+    for (final empty in [false, true]) {
+      testWidgets('connect shot ${cfg.$3} empty=$empty', (t) async {
         if (_out.isEmpty) return;
-        SharedPreferences.setMockInitialValues({if (!guide) 'nwsb_connect_board_guide_v1': true});
+        SharedPreferences.setMockInitialValues({});
         NormalLoop.debugT = .4;
         addTearDown(() => NormalLoop.debugT = null);
-        final h = guide ? 780.0 : 1700.0;
+        final h = empty ? 1000.0 : 2000.0;
         t.view.physicalSize = Size(cfg.$1 * cfg.$2, h * cfg.$2);
         t.view.devicePixelRatio = cfg.$2;
         addTearDown(t.view.reset);
-        ConnectScreen.debugImage = (_) => const DecoratedBox(
-            decoration: BoxDecoration(gradient: LinearGradient(colors: [Color(0xFFF3D9A4), Color(0xFFB7C6E6)], begin: Alignment.topLeft, end: Alignment.bottomRight)));
+        ConnectScreen.debugImage = (_) => Image.asset('assets/banners/course-bubble.jpg', fit: BoxFit.cover);
         addTearDown(() => ConnectScreen.debugImage = null);
         EconomyApi.debugHandler = (name, data) async => {
               'day': '20261102', 'today': '20261102', 'readOnly': false,
               'word': 'TEJAS', 'meaning': 'Inner radiance — the warm, steady light of a clear mind.',
-              'postsLeft': 2, 'days': ['20261101', '20261031', '20261030'],
-              'posts': [
-                _p('a', 'Felt it on the morning walk. The sun on my face and nothing to prove.', 'warm', 12, me: true),
-                _p('b', 'Hard week. Reading this word helped me sit a little straighter.', 'tender', 7, image: 'connect/x/1.jpg'),
-                _p('c', 'Lit a lamp before work today.', 'calm', 3, mine: true),
-              ],
+              'postsLeft': empty ? 3 : 2, 'days': ['20261101', '20261031', '20261030'],
+              'posts': empty
+                  ? []
+                  : [
+                      _p('a', 'Sat with the bowl for ten minutes before work. The hum stayed with me all morning.', 6),
+                      _p('q', encodeQuote('Silence is a source of great strength.', 'Lao Tzu'), 34),
+                      _p('b', 'Evening light after practice.', 95, image: 'connect/x/1730000000000.jpg'),
+                      _p('c', 'Lit a lamp and breathed slowly. Small, but it helped.', 180, mine: true),
+                    ],
             };
         addTearDown(() => EconomyApi.debugHandler = null);
         await t.pumpWidget(MaterialApp(
@@ -65,7 +67,7 @@ void main() {
         await t.runAsync(() async {
           final img = await ro.toImage(pixelRatio: cfg.$2);
           final b = await img.toByteData(format: ui.ImageByteFormat.png);
-          File('$_out/connect_${cfg.$3}${guide ? '_guide' : ''}.png')
+          File('$_out/connect_${cfg.$3}${empty ? '_empty' : ''}.png')
             ..createSync(recursive: true)
             ..writeAsBytesSync(b!.buffer.asUint8List());
         });

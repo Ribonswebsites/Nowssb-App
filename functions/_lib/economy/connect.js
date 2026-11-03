@@ -132,3 +132,18 @@ export async function boardReport(ctx, uid, data = {}) {
     return { postId, hidden: true, reported: true };
   });
 }
+
+/** The author removes their own post for everyone. */
+export async function boardDelete(ctx, uid, data = {}) {
+  const postId = okId(data.postId);
+  return inTx(ctx, async (s) => {
+    const day = okDay(data.day, s.day);
+    const post = await s.doc(`wordBoard/${day}/posts/${postId}`);
+    if (!post || post.status === 'deleted') fail('That post is gone.', 404, 'not-found');
+    if (post.authorUid !== uid) fail('You can only delete your own posts.', 403, 'permission-denied');
+    const p = await s.edit(`wordBoard/${day}/posts/${postId}`);
+    p.status = 'deleted';
+    p.deletedAt = s.now;
+    return { postId, deleted: true };
+  });
+}

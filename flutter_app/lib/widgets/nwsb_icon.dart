@@ -273,6 +273,15 @@ class NwsbMarks {
       '<circle cx="8.5" cy="9" r="1.7"/>'
       '<path d="M4 17l4.5-4 3.5 2.8L16 12l4 4.2"/>';
 
+  static const thought = '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4 3.5V16h0A2.5 2.5 0 0 1 4 13.5z"/>'
+      '<path d="M8 8.6h8M8 11.6h5"/>';
+
+  static const quote = '<path d="M5 17c0-4 1.2-7 4.4-9"/><path d="M5 12.4h3.6V17H5z"/>'
+      '<path d="M13.4 17c0-4 1.2-7 4.4-9"/><path d="M13.4 12.4H17V17h-3.6z"/>';
+
+  static const shield = '<path d="M12 3l7 2.6v5.6c0 4.4-3 8-7 9.8-4-1.8-7-5.4-7-9.8V5.6z"/>'
+      '<path d="M9 12l2.2 2.2L15.4 10"/>';
+
   static const stories =
       '<circle cx="12" cy="12" r="9" stroke-dasharray="2.6 2.4"/>'
       '<circle cx="12" cy="12" r="4.4"/>';

@@ -555,11 +555,10 @@ class CalmCommunity extends StatelessWidget {
   const CalmCommunity({super.key, required this.onTap});
   final VoidCallback onTap;
   static const _rows = [
-    (Icons.dynamic_feed_outlined, 'Community Feed', 'Share your daily practice with the world'),
-    (Icons.auto_awesome_outlined, 'Stories', 'Drop 24-hour frequency moments'),
-    (Icons.play_circle_outline_rounded, 'Reels', 'Watch & post short healing reels'),
-    (Icons.people_outline_rounded, 'Discover Creators', 'Find people worth following'),
-    (Icons.verified_outlined, 'Verified', 'Earn your NowssB check-mark'),
+    (Icons.chat_bubble_outline_rounded, 'Thoughts', 'A few honest lines'),
+    (Icons.format_quote_rounded, 'Quotes', 'Words that stayed with you'),
+    (Icons.image_outlined, 'Images', 'A moment, in a picture'),
+    (Icons.shield_outlined, 'Calm and anonymous', 'No profiles, no counts'),
   ];
   @override
   Widget build(BuildContext context) => _Calm(
@@ -567,7 +566,7 @@ class CalmCommunity extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           const Text('NOWSSB CONNECT', style: _eyebrow),
           const SizedBox(height: 8),
-          const Text('Practise together', style: _h),
+          const Text('Share a thought, quote or image', style: _h),
           const SizedBox(height: 10),
           for (final r in _rows) _Row(icon: r.$1, title: r.$2, sub: r.$3, onTap: onTap),
         ]),
