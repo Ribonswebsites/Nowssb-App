@@ -94,10 +94,13 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
   Widget _window(double t, double r) => ClipRRect(
         borderRadius: BorderRadius.circular(r),
         child: Stack(children: [
-          Positioned.fill(child: widget.media!),
-          const Positioned.fill(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
-              colors: [Color(0xCC0B0716), Color(0x660B0716), Color(0x000B0716), Color(0x330B0716)], stops: [0, .45, .75, 1])))),
-          Positioned.fill(child: Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: .66, heightFactor: 1,
+          const Positioned.fill(child: ColoredBox(color: Color(0xFF0B0716))),
+          Positioned.fill(child: Align(alignment: Alignment.centerRight, child: FractionallySizedBox(widthFactor: .62, heightFactor: 1,
+              child: ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (b) => const LinearGradient(colors: [Color(0x00000000), Color(0xFF000000)], stops: [0, .35]).createShader(b),
+                child: widget.media!)))),
+          Positioned.fill(child: Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: .56, heightFactor: 1,
             child: ClipRect(child: BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 16, sigmaY: 16),
               child: DecoratedBox(decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [Colors.white.withValues(alpha: .10), Colors.white.withValues(alpha: .04)]),
