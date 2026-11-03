@@ -281,7 +281,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the six doors are one compact panel', (tester) async {
+  testWidgets('the five doors are one compact panel', (tester) async {
     await pump(tester);
 
     final list = find.byType(Scrollable).first;
@@ -292,7 +292,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    expect(MainOptionsSection.options, hasLength(6));
+    expect(MainOptionsSection.options, hasLength(5));
     for (final (mark, _, label, tab) in MainOptionsSection.options) {
       expect(mark.trim(), startsWith('<'),
           reason: '$label must be a drawn path, not a glyph');
@@ -300,9 +300,9 @@ void main() {
           reason: '$label points at a tab that does not exist');
     }
 
-    // Every one of the five tabs is reachable from this panel — that is the
-    // whole point of it.
-    expect(MainOptionsSection.options.map((o) => o.$4).toSet(), hasLength(5));
+    // Progress was removed (1d1b04ae), so the panel reaches the four tabs
+    // with content doors: Connect, Practice, Library and the Store.
+    expect(MainOptionsSection.options.map((o) => o.$4).toSet(), hasLength(4));
 
     // Tall enough to tap. A 40pt row crushed the marks into the labels;
     // 72pt is a real door on both homes without turning the panel into a

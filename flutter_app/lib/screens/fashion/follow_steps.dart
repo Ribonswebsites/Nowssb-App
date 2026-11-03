@@ -259,18 +259,6 @@ const kFstSteps = <FstStep>[
     ],
   ),
   FstStep(
-    mark: FstMarks.chart,
-    title: 'My Progress',
-    goLabel: 'See your progress',
-    goTab: 4,
-    lead: 'What the practice has added up to.',
-    points: [
-      ('Streak and sessions', 'Days in a row, and everything you finished.'),
-      ('Mastered words', 'Scored 90 or above three sessions running.'),
-      ('Body map', 'Organs light as you practise the words that reach them.'),
-    ],
-  ),
-  FstStep(
     mark: FstMarks.people,
     title: 'NowssB Connect',
     goLabel: 'Open Connect',
