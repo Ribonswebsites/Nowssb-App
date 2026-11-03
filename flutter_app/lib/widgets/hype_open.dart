@@ -11,11 +11,6 @@ import 'hype_rail.dart';
 void ensureHypeRoutes() {
   openHypeCard = (context, id) {
     switch (id) {
-      case 'coupons':
-      case 'scratch':
-        NwsbLinks.cta(context, 'coupon');
-      case 'gifts':
-        NwsbLinks.cta(context, 'gift');
       case 'earn':
         Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen()));
       case 'rewards':

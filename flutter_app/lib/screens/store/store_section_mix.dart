@@ -108,10 +108,6 @@ List<SectionMediaItem> _programmeChips(String requestLabel) => [
         meta: const {'kind': 'chip'},
       ),
       const SectionMediaItem(
-          id: 'chip.coupons', title: 'Coupons', ctaLink: 'coupons', meta: {'kind': 'chip'}),
-      const SectionMediaItem(
-          id: 'chip.gifts', title: 'Gifts', ctaLink: 'gifts', meta: {'kind': 'chip'}),
-      const SectionMediaItem(
           id: 'chip.rewards', title: 'Rewards', ctaLink: 'rewards', meta: {'kind': 'chip'}),
     ];
 

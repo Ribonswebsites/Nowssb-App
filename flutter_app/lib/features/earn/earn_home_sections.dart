@@ -724,62 +724,7 @@ class YourRewardsSection extends StatelessWidget {
   }
 }
 
-class GiftsHomeSection extends StatelessWidget {
-  const GiftsHomeSection({super.key, this.fill = false});
-
-  /// Stretch the pane to the height it is given (equal-height rail pages).
-  final bool fill;
-
-  @override
-  Widget build(BuildContext context) {
-    final pane = SectionPane(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const PaneHead(
-                eyebrow: 'NowssB Gifts',
-                title: 'Send a real purchase',
-                mark: NwsbMarks.gift,
-              ),
-              const SizedBox(height: 10),
-              const BrandTopBanner(
-                bare: true,
-                compact: true,
-                title: 'NowssB Gifts',
-                mark: NwsbMarks.gift,
-              ),
-              const SizedBox(height: 12),
-              SecBanner(
-                title: 'Send a gift',
-                sub: 'A word, meaning, bundle, or plan. Paid with Play, not coins.',
-                mark: NwsbMarks.gift,
-                onTap: () => EarnUmbrellaSection._open(context, const GiftsScreen()),
-              ),
-              const SizedBox(height: 8),
-              SecBanner(
-                title: 'Redeem a code',
-                sub: 'Open a gift on this account',
-                mark: NwsbMarks.verified,
-                onTap: () => EarnUmbrellaSection._open(context, const GiftsScreen(startOnRedeem: true)),
-              ),
-              const SizedBox(height: 8),
-              SecBanner(
-                title: 'Gift rules and history',
-                sub: 'Free boxes, gift cards, what you sent and received',
-                mark: NwsbMarks.bag,
-                onTap: () => EarnUmbrellaSection._open(context, const GiftsScreen()),
-              ),
-            ],
-          ),
-        );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [fill ? Expanded(child: pane) : pane],
-    );
-  }
-}
-
-enum _Dest { earn, rewards, gifts, resell, reference }
+enum _Dest { earn, rewards, resell, reference }
 
 class _Slide {
   const _Slide({
@@ -839,7 +784,6 @@ class _OutsidePromoState extends State<_OutsidePromo> {
     final page = switch (slide.dest) {
       _Dest.earn => const CircleScreen(),
       _Dest.rewards => const VaultScreen(),
-      _Dest.gifts => const GiftsScreen(),
       _Dest.resell => const BazaarScreen(),
       _Dest.reference => const CircleScreen(initialTab: 'invite'),
     };
@@ -916,145 +860,9 @@ class ProgramTrioRail extends StatefulWidget {
 }
 
 class _ProgramTrioRailState extends State<ProgramTrioRail> {
-  final _pages = PageController();
-  Timer? _timer;
-  var _i = 0;
-  var _touching = false;
-  DateTime _lastTouch = DateTime.fromMillisecondsSinceEpoch(0);
-
-  static const _resumeAfter = Duration(seconds: 8);
-
+  // Gifts and Coupons were removed; only Rewards is left in this rail.
   @override
-  void initState() {
-    super.initState();
-    if (!widget.autoRotate) return;
-    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
-      if (!mounted || _touching || !_pages.hasClients) return;
-      if (DateTime.now().difference(_lastTouch) < _resumeAfter) return;
-      if (!TickerMode.of(context)) return;
-      _pages.animateToPage((_i + 1) % 3,
-          duration: const Duration(milliseconds: 420), curve: Curves.easeOutCubic);
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pages.dispose();
-    super.dispose();
-  }
-
-  Widget _page(int i, {bool fill = false}) => switch (i) {
-        0 => YourRewardsSection(fill: fill),
-        1 => GiftsHomeSection(fill: fill),
-        _ => const HomeCouponShelf(),
-      };
-
-  void _touch(bool down) {
-    _touching = down;
-    _lastTouch = DateTime.now();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Listener(
-          onPointerDown: (_) => _touch(true),
-          onPointerUp: (_) => _touch(false),
-          onPointerCancel: (_) => _touch(false),
-          child: Stack(
-            children: [
-              // Invisible copies size the rail to the tallest card.
-              for (var i = 0; i < 3; i++)
-                IgnorePointer(
-                  child: ExcludeSemantics(
-                    child: Opacity(opacity: 0, child: TickerMode(enabled: false, child: _page(i))),
-                  ),
-                ),
-              Positioned.fill(
-                child: PageView.builder(
-                  key: const ValueKey('program-trio-pages'),
-                  controller: _pages,
-                  itemCount: 3,
-                  onPageChanged: (i) => setState(() => _i = i),
-                  itemBuilder: (_, i) => KeyedSubtree(
-                      key: ValueKey('program-trio-$i'), child: _page(i, fill: true)),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (var i = 0; i < 3; i++)
-              GestureDetector(
-                key: ValueKey('program-trio-dot-$i'),
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  _touch(false);
-                  _pages.animateToPage(i,
-                      duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: i == _i ? 22 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: HomeSkinScope.of(context) == HomeSkin.normal
-                          ? (i == _i ? NwsbColors.ink : NwsbColors.inkSoft.withValues(alpha: .35))
-                          : (i == _i ? Colors.white : Colors.white38),
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-/// Home door for NowssB Coupons (scratch cards, odds, your coupons).
-class CouponsHomeSection extends StatelessWidget {
-  const CouponsHomeSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SectionPane(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const PaneHead(eyebrow: 'NowssB Coupons', title: 'Scratch, reveal, save', mark: NwsbMarks.coupon),
-              const SizedBox(height: 12),
-              SecBanner(
-                title: 'Today\'s free card',
-                sub: 'Drawn by NowssB. Odds are listed before you scratch.',
-                mark: NwsbMarks.coupon,
-                onTap: () => EarnUmbrellaSection._open(context, const CouponScreen()),
-              ),
-              const SizedBox(height: 8),
-              SecBanner(
-                title: 'Your coupons and odds',
-                sub: 'Rarity shelves, codes and what each card can hold',
-                mark: NwsbMarks.verified,
-                onTap: () => EarnUmbrellaSection._open(context, const CouponScreen()),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context) => const YourRewardsSection();
 }
 
 /// Home door for NowssB Reference (your links, friend discount, ladder).

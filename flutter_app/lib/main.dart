@@ -37,6 +37,7 @@ import 'features/economy/money.dart';
 import 'features/economy/play_billing.dart';
 import 'features/economy/reward_overlay.dart';
 import 'data/device_flags.dart';
+import 'data/secure_downloads.dart';
 import 'data/notifications.dart';
 import 'data/phone_notifications.dart';
 import 'data/presence.dart';
@@ -128,6 +129,7 @@ Future<void> main() async {
   // first open.
   unawaited(VideoPool.instance.warm());
 
+  unawaited(SecureDownloads.instance.load());
   runApp(const NowssbApp());
 }
 
@@ -240,7 +242,13 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
       child: MaterialApp(
         navigatorKey: _navigatorKey,
         navigatorObservers: [_popupRoutes],
-        builder: (context, child) => NwsbUpdateLayer(
+        // Every route, dialog and overlay inherits a real text style here.
+        // Without it, text in a showGeneralDialog / OverlayEntry that has no
+        // Material above it falls back to Flutter's debug style (monospace,
+        // yellow double underline).
+        builder: (context, child) => DefaultTextStyle(
+          style: Theme.of(context).textTheme.bodyMedium ?? const TextStyle(fontSize: 14),
+          child: NwsbUpdateLayer(
             navigatorKey: _navigatorKey,
             child: AppControlLayer(
               navigatorKey: _navigatorKey,
@@ -258,7 +266,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
                   ),
                 ),
               ),
-            )),
+            ))),
         title: 'NowssB',
         debugShowCheckedModeBanner: false,
         theme: NwsbTheme.light,

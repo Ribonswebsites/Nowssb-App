@@ -143,21 +143,6 @@ class _DailyClaimBodyState extends State<DailyClaimBody> {
                     child: Text(_busy ? 'Working' : 'Claim daily coins'),
                   ),
                   const SizedBox(height: 8),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(builder: (_) => const CouponScreen()),
-                      );
-                    },
-                    icon: const NwsbIcon(NwsbMarks.coupon, size: 16, color: Colors.white),
-                    label: const EditableLabel('daily_claim_sheet.DailyClaimBody', 'Open today’s coupon'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Color(0x55FFFFFF)),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: AppThinkingLoader(

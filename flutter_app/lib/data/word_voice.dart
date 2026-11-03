@@ -14,6 +14,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'models.dart';
+import 'secure_downloads.dart';
 
 class WordVoice {
   WordVoice._();
@@ -32,6 +33,9 @@ class WordVoice {
 
   static bool hasVoice(Word w) => w.voice.startsWith('http');
 
+  /// The id a word's recording is downloaded under.
+  static String downloadId(Word w) => 'word:${w.key}';
+
   /// Download ahead of time so the first play is instant. Never throws.
   static Future<void> prefetch(Word w) async {
     if (!hasVoice(w)) return;
@@ -46,11 +50,17 @@ class WordVoice {
     if (!hasVoice(w)) return false;
     final token = ++_token;
     try {
-      final file = await cache.getSingleFile(w.voice).timeout(const Duration(seconds: 15));
+      // A downloaded word plays from its encrypted copy, decrypted in memory.
+      final offline = await SecureDownloads.instance.audioSource(downloadId(w));
+      final file = offline == null ? await cache.getSingleFile(w.voice).timeout(const Duration(seconds: 15)) : null;
       if (token != _token) return true; // stopped or replaced meanwhile
       final p = _player ??= AudioPlayer();
       await p.stop();
-      await p.setFilePath(file.path);
+      if (offline != null) {
+        await p.setAudioSource(offline);
+      } else {
+        await p.setFilePath(file!.path);
+      }
       await p.setVolume(volume.clamp(0.0, 1.0));
       await p.setSpeed(speed.clamp(0.5, 2.0));
       final done = p.playerStateStream

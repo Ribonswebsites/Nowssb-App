@@ -236,7 +236,6 @@ class HomeMenuDrawer extends StatelessWidget {
                       bottom + 40,
                     ),
                     children: [
-                      const IdentityRails(RailKind.menu),
                       RoutineDeck(
                         title: 'Go',
                         banner: 'Your menu',
@@ -265,8 +264,6 @@ class HomeMenuDrawer extends StatelessWidget {
                           WorkCard(category: 'Alerts', title: 'Notifications', meta: 'This phone', action: 'Open alerts', image: 'assets/rails/glass-01.jpg', onTap: () => _push(context, const NotificationsSettingsPage())),
                           WorkCard(category: 'Earn', title: 'NowssB Earn', meta: 'Agents, codes, commission', action: 'Open earn', image: 'assets/rails/earn-01.jpg', onTap: () => _push(context, const CircleScreen())),
                           WorkCard(category: 'Rewards', title: 'NowssB Rewards', meta: 'Coins, quests, invite', action: 'Open rewards', image: 'assets/rails/rewards-01.jpg', onTap: () => _push(context, const VaultScreen())),
-                          WorkCard(category: 'Gifts', title: 'NowssB Gifts', meta: 'Boxes and gift cards', action: 'Open gifts', image: 'assets/rails/gifts-01.jpg', onTap: () => _push(context, const GiftsScreen())),
-                          WorkCard(category: 'Coupons', title: 'NowssB Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/coupons-01.jpg', onTap: () => _push(context, const CouponScreen())),
                           WorkCard(category: 'You', title: 'Word Print', meta: 'Public profile', action: 'Open print', image: 'assets/rails/glass-02.jpg', onTap: () => _push(context, const WordPrintScreen())),
                           WorkCard(category: 'Wall', title: 'Echo Wall', meta: 'Reflections', action: 'Open the wall', image: 'assets/rails/glass-03.jpg', onTap: () => _push(context, const EchoWallScreen())),
                           WorkCard(category: 'Cash', title: 'Earnings', meta: 'Payouts and commissions', action: 'Open earnings', image: 'assets/rails/earnings-01.jpg', onTap: () => _push(context, const EarningsScreen())),

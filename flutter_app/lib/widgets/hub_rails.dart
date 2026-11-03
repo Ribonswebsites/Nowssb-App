@@ -25,72 +25,11 @@ const kRailArt = <String>[
   'assets/rails/11.png',
 ];
 
-const kProfileArt = <String>[
-  'assets/profile/rails/01.jpg',
-  'assets/profile/rails/02.jpg',
-  'assets/profile/rails/03.jpg',
-  'assets/profile/rails/04.jpg',
-  'assets/profile/rails/05.jpg',
-  'assets/profile/rails/06.jpg',
-  'assets/profile/rails/07.jpg',
-  'assets/profile/rails/08.jpg',
-  'assets/profile/rails/09.jpg',
-  'assets/profile/rails/10.jpg',
-  'assets/profile/rails/11.jpg',
-  'assets/profile/rails/12.jpg',
-  'assets/profile/rails/13.jpg',
-  'assets/profile/rails/14.jpg',
-  'assets/profile/rails/15.jpg',
-];
 
-const kEarnArt = <String>[
-  'assets/rails/earn-01.jpg',
-  'assets/rails/earn-02.jpg',
-  'assets/rails/earn-03.jpg',
-  'assets/rails/earn-04.jpg',
-  'assets/rails/earn-05.jpg',
-  'assets/rails/earn-06.jpg',
-  'assets/rails/earn-07.jpg',
-];
 
-const kRewardsArt = <String>[
-  'assets/rails/rewards-01.jpg',
-  'assets/rails/rewards-02.jpg',
-  'assets/rails/rewards-03.jpg',
-  'assets/rails/rewards-04.jpg',
-  'assets/rails/rewards-05.jpg',
-  'assets/rails/rewards-06.jpg',
-  'assets/rails/rewards-07.jpg',
-];
 
-const kCouponArt = <String>[
-  'assets/rails/coupons-01.jpg',
-  'assets/rails/coupons-02.jpg',
-  'assets/rails/coupons-03.jpg',
-  'assets/rails/coupons-04.jpg',
-  'assets/rails/coupons-05.jpg',
-  'assets/rails/coupons-06.jpg',
-  'assets/rails/coupons-07.jpg',
-];
 
-const kGiftArt = <String>[
-  'assets/rails/gifts-01.jpg',
-  'assets/rails/gifts-02.jpg',
-  'assets/rails/gifts-03.jpg',
-  'assets/rails/gifts-04.jpg',
-  'assets/rails/gifts-05.jpg',
-  'assets/rails/gifts-06.jpg',
-  'assets/rails/gifts-07.jpg',
-];
 
-const kEarningsArt = <String>[
-  'assets/rails/earnings-01.jpg',
-  'assets/rails/earnings-02.jpg',
-  'assets/rails/earnings-03.jpg',
-  'assets/rails/earnings-04.jpg',
-  'assets/rails/earnings-05.jpg',
-  'assets/rails/earnings-06.jpg',
-];
 
 const kGlassArt = <String>[
   'assets/rails/glass-01.jpg',
@@ -132,100 +71,7 @@ List<RailCard> railSet(List<String> titles, String meta) => [
       for (var i = 0; i < titles.length; i++) RailCard(titles[i], '${i + 1} of ${titles.length}', meta),
     ];
 
-List<RailCard> _pack(List<String> titles, List<String> about) => [
-      for (var i = 0; i < titles.length; i++) RailCard(titles[i], '${i + 1} of ${titles.length}', about[i]),
-    ];
 
-enum RailKind { profile, settings, menu, earn, rewards, coupons, gifts, earnings }
-
-/// One page's three rails, with that page's own pictures and titles.
-class IdentityRails extends StatelessWidget {
-  const IdentityRails(this.kind, {super.key});
-  final RailKind kind;
-
-  @override
-  Widget build(BuildContext context) {
-    final spec = switch (kind) {
-      RailKind.profile => (
-          labels: const ['Your practice', 'Saved seats', 'Challenges'],
-          arts: kProfileArt,
-          a: _pack(const ['Trusting the Breath', 'Quiet Inhale', 'Lotus at Dusk', 'Sheer Stillness', 'The First Breath'], const ['A short sit', 'Soft start', 'Evening', 'Still', 'Begin']),
-          b: _pack(const ['Listening Room', 'Heart of Sound', 'Still Water', 'Violet Silk', 'Morning Seat'], const ['Saved', 'Sound', 'Lake', 'Cloth', 'Dawn']),
-          c: _pack(const ['Seven Days of Breath', 'The Quiet Path', 'Rings of Sound', 'Night Shore', 'Shabdapathy'], const ['A week of sitting', 'Walk it slowly', 'Sound in circles', 'Night practice', 'The root of a word']),
-        ),
-      RailKind.settings => (
-          labels: const ['Sound & play', 'Your account', 'Quick steps'],
-          arts: kRailArt,
-          a: _pack(const ['Sound', 'Player', 'Routine', 'Theme', 'Alerts'], const ['Keep', 'Keep', 'Keep', 'Look', 'Alerts']),
-          b: _pack(const ['Account', 'Privacy', 'Downloads', 'Language', 'Help'], const ['You', 'You', 'On this phone', 'Words', 'Help']),
-          c: _pack(const ['Reduce effects', 'Notifications', 'Backup', 'Sign out', 'About'], const ['Calm the motion', 'What can ping you', 'Keep a copy', 'Leave this phone', 'The build']),
-        ),
-      RailKind.menu => (
-          labels: const ['Open', 'Go', 'Today'],
-          arts: const [
-            'assets/rails/06.png',
-            'assets/rails/07.png',
-            'assets/rails/08.png',
-            'assets/rails/09.png',
-            'assets/rails/10.png',
-            'assets/rails/11.png',
-            'assets/rails/01.png',
-            'assets/rails/02.png',
-            'assets/rails/03.png',
-            'assets/rails/04.png',
-            'assets/rails/05.png',
-          ],
-          a: _pack(const ['Earn', 'Rewards', 'Gifts', 'Coupons', 'Profile'], const ['Open', 'Open', 'Open', 'Open', 'You']),
-          b: _pack(const ['Library', 'Store', 'Practice', 'Settings', 'Words'], const ['Sounds', 'Shop', 'Sit', 'Gear', 'Roots']),
-          c: _pack(const ['Streak', 'Today', 'Saved', 'Invite', 'Rank'], const ['Come back tomorrow', 'What is open now', 'Hearted words', 'One person', 'Where you stand']),
-        ),
-      RailKind.earn => (
-          labels: const ['Ranks', 'Your team', 'Challenges'],
-          arts: kEarnArt,
-          a: _pack(const ['Your rank', 'Team today', 'Fast start', 'Payout ready', 'Academy'], const ['Standing', 'People', 'Bonus', 'Money', 'Learn']),
-          b: _pack(const ['Bronze', 'Silver', 'Gold', 'Diamond', 'Master'], const ['First metal', 'Next', 'Rate', 'Top', 'Hold']),
-          c: _pack(const ['7 day push', 'First sale', 'Invite one', 'Hold rank', 'Request payout'], const ['Seven days of sales', 'One cleared purchase', 'A direct recruit', 'Keep the words', 'After the hold']),
-        ),
-      RailKind.rewards => (
-          labels: const ['Active', 'Wallet', 'Streaks'],
-          arts: kRewardsArt,
-          a: _pack(const ['Daily login', 'Quest board', 'Streak flame', 'Season', 'Badges'], const ['Today', 'Quests', 'Fire', 'Season', 'Marks']),
-          b: _pack(const ['Wallet', 'Spend', 'Freezes', 'League', 'Mastery'], const ['Coins', 'Shop', 'Saved days', 'Table', 'Skill']),
-          c: _pack(const ['Day 7 streak', 'First quest', 'Come back', 'Claim box', 'Invite'], const ['A week of logins', 'One finished quest', 'Tomorrow’s coin', 'Open the box', 'One friend']),
-        ),
-      RailKind.coupons => (
-          labels: const ['Scratch', 'My coupons', 'Shop'],
-          arts: kCouponArt,
-          a: _pack(const ['Scratch today', 'My coupons', 'Shop card', 'Expiring', 'Odds'], const ['Foil', 'Tickets', 'Buy', 'Soon', 'Rules']),
-          b: _pack(const ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'], const ['Often', 'Less often', 'Thin', 'Rare', 'Rarest']),
-          c: _pack(const ['First scratch', 'Daily card', 'Save one', 'Share odds', 'Set a limit'], const ['Uncover the first', 'One card a day', 'Keep it sealed', 'Read the odds', 'A monthly cap']),
-        ),
-      RailKind.gifts => (
-          labels: const ['Send', 'Received', 'Redeem'],
-          arts: kGiftArt,
-          a: _pack(const ['Free box', 'Send a gift', 'Received', 'Redeem', 'Gift cards'], const ['Today', 'Give', 'Inbox', 'Code', 'Play']),
-          b: _pack(const ['Stage', 'Word', 'Bundle', 'Opened', 'Waiting'], const ['Small', 'A word', 'Large', 'Done', 'Sealed']),
-          c: _pack(const ['Today’s box', 'Send one', 'Redeem a code', 'History', 'Rules'], const ['Minutes open a better box', 'A real purchase', 'Paste the code', 'What you sent', 'What a gift is']),
-        ),
-      RailKind.earnings => (
-          labels: const ['Sales', 'Pending', 'Payouts'],
-          arts: kEarningsArt,
-          a: _pack(const ['Lifetime', 'Available', 'Pending', 'This week', 'Paid out'], const ['All', 'Ready', 'Hold', 'Now', 'Sent']),
-          b: _pack(const ['Sales', 'Referrals', 'Bank', 'Wise', 'PayPal'], const ['Ledger', 'People', 'Local', 'Abroad', 'Abroad']),
-          c: _pack(const ['First payout', 'Hold window', 'Add payout', 'Invite sale', 'Review'], const ['When the minimum clears', 'Thirty days', 'Bank or wallet', 'A paid plan', 'A person checks it']),
-        ),
-    };
-    return HubRails(
-      a: spec.a,
-      b: spec.b,
-      c: spec.c,
-      d: _pack(const ['Fog Practice', 'Lotus Hour', 'Sound Rings', 'Soft Cloth'], const ['A glass seat', 'Still water', 'In circles', 'Morning']),
-      e: _pack(const ['30 days of breath', 'Forest pool', 'Night shore', 'The case'], const ['A month of sitting', 'One still hour', 'After dark', 'Keep it close']),
-      arts: spec.arts,
-      labels: [...spec.labels, 'Glass', 'Clear'],
-    );
-  }
-}
 
 class HubRails extends StatelessWidget {
   const HubRails({
@@ -238,7 +84,6 @@ class HubRails extends StatelessWidget {
     this.arts = kRailArt,
     this.labels = const ['Continue', 'Your list', 'Challenges'],
     this.onOpen,
-    this.openGuide = true,
   });
 
   final List<RailCard> a;
@@ -249,7 +94,6 @@ class HubRails extends StatelessWidget {
   final List<String> arts;
   final List<String> labels;
   final void Function(RailCard card)? onOpen;
-  final bool openGuide;
 
   @override
   Widget build(BuildContext context) {
@@ -307,7 +151,6 @@ class HubRails extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 onOpen?.call(card);
-                if (openGuide) openRailGuide(context, card, art);
               },
               child: child,
             ),
@@ -761,113 +604,4 @@ class _ClearChallengeCard extends StatelessWidget {
     );
   }
 }
-
-void openRailGuide(BuildContext context, RailCard card, String art) {
-  showGeneralDialog<void>(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: 'Guide',
-    barrierColor: const Color(0x99000000),
-    pageBuilder: (ctx, _, __) => _RailGuide(card: card, art: art),
-  );
-}
-
-class _RailGuide extends StatelessWidget {
-  const _RailGuide({required this.card, required this.art});
-  final RailCard card;
-  final String art;
-
-  Programme? _match() {
-    final t = '${card.title} ${card.meta}'.toLowerCase();
-    return Programmes.forPoster(card.title) ??
-        (t.contains('earn') || t.contains('payout') || t.contains('rank') || t.contains('sale')
-            ? Programme.earn
-            : t.contains('reward') || t.contains('coin') || t.contains('streak') || t.contains('quest')
-                ? Programme.rewards
-                : t.contains('coupon') || t.contains('scratch')
-                    ? Programme.coupons
-                    : t.contains('gift')
-                        ? Programme.gifts
-                        : null);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final next = _match();
-    return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 360),
-                padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                decoration: BoxDecoration(
-                  color: const Color(0x14FFFFFF),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: const Color(0x66FFFFFF)),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0x88FFFFFF), width: 2),
-                        image: DecorationImage(image: railImage(art), fit: BoxFit.cover),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        gradient: const LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [Color(0xF2FFFFFF), Color(0x99FFFFFF), Color(0x22FFFFFF)],
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(card.title, style: const TextStyle(color: Color(0xFF1A1A1A), fontSize: 22, fontWeight: FontWeight.w800)),
-                          const SizedBox(height: 6),
-                          Text(card.meta, style: const TextStyle(color: Color(0xFF333333), fontSize: 13, height: 1.35)),
-                          const SizedBox(height: 14),
-                          Row(
-                            children: [
-                              TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Skip', style: TextStyle(color: Color(0xFF333333)))),
-                              const Spacer(),
-                              FilledButton(
-                                style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  if (next != null) Programmes.open(context, next);
-                                },
-                                child: Text(next == null ? 'Close' : 'Next'),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
 

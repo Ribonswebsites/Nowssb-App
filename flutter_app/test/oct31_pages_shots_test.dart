@@ -103,8 +103,6 @@ Map<String, Widget Function()> _pages() {
     'coins': () => const CoinsScreen(),
     'vault': () => const VaultScreen(),
     'draw': () => const LuckyDrawScreen(),
-    'coupons': () => const CouponScreen(),
-    'gifts': () => const GiftsScreen(),
     'profile': () => const ProfileScreen(),
     'recent_activity': () => const RecentActivityScreen(),
     'saved_words': () => const SavedWordsScreen(),

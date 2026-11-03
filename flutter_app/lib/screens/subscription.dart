@@ -88,7 +88,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       monthly: 'Price on Google Play',
       yearly: 'Price on Google Play',
       accent: NwsbColors.mist,
-      front: 'assets/subscription/tier-sun-front.webp',
+      front: 'assets/subscription/tier-sun-front.png',
       back: 'assets/subscription/tier-sun-back.png',
       benefits: [
         'Unlimited word practice',

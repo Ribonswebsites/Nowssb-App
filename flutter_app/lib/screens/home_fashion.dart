@@ -67,7 +67,7 @@ import 'daily_tasks.dart';
 import 'fashion/hero.dart';
 import 'fashion/sections_bottom.dart';
 import 'shared_sections.dart';
-import 'normal/home_v4.dart' show kRewardsLottie, kCoinsLottie, kGiftLottie, kSpeakerLottie, kPlayLottie;
+import 'normal/home_v4.dart' show kRewardsLottie, kCoinsLottie, kSpeakerLottie, kPlayLottie;
 import 'fashion/sections_mid.dart';
 import 'fashion/sections_top.dart';
 import '../widgets/colored_split_promo_banner.dart';
@@ -392,8 +392,6 @@ class _HomeFashionState extends State<HomeFashion> {
   List<QuickCard> _quickPool() => [
         QuickCard('rewards', 'Rewards', 'Your coins & perks', Icons.workspace_premium_rounded, () => _push(const VaultScreen()), lottie: kRewardsLottie),
         QuickCard('earn', 'Earn', 'Coins for practice', Icons.savings_rounded, () => _push(const CircleScreen()), lottie: kCoinsLottie),
-        QuickCard('gifts', 'Gifts', 'Send or redeem', Icons.card_giftcard_rounded, () => _push(const GiftsScreen()), lottie: kGiftLottie),
-        QuickCard('coupons', 'Coupons', 'Deals for you', Icons.local_offer_rounded, () => _push(const CouponScreen())),
         QuickCard('store', 'Store', 'Deal of the Day', Icons.storefront_rounded, () => _go(3)),
         QuickCard('practice', 'Practice', 'Start a session', Icons.play_circle_fill_rounded, () => _go(1), lottie: kPlayLottie),
         QuickCard('tasks', 'Daily tasks', 'Tick off today', Icons.checklist_rounded, () => _push(const DailyTasksPage())),

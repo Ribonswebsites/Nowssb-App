@@ -285,11 +285,10 @@ const kFstSteps = <FstStep>[
   FstStep(
     mark: FstMarks.spark,
     title: 'Make it yours',
-    goLabel: 'Change the hero header',
+    goLabel: 'Open your profile',
     goTab: 4,
     lead: 'The last step is the app itself. Almost nothing here is fixed.',
     points: [
-      ('Hero header', 'Three ways the top can look — this is one of them.'),
       (
         'Zen Plus',
         'Turns the app to film. The tiles and cards start '

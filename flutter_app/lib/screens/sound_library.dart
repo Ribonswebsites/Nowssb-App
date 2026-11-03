@@ -9,6 +9,9 @@
 /// Artwork is Word Atelier collection renders in `assets/store/collections/`.
 library;
 
+import '../features/downloads/downloads_screen.dart';
+import '../data/word_voice.dart';
+import '../features/downloads/download_button.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -447,7 +450,13 @@ class _SlmFeed extends StatelessWidget {
                   }, noCopy: const {'feed'}, [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                      child: _libraryLead(pool),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _libraryLead(pool),
+                          const DownloadsEntry(onlyWhenAny: true),
+                        ],
+                      ),
                     ),
                     if (chip == 'Currently Playing') ...[
                       CurrentlyPlayingAlbum(
@@ -1170,6 +1179,14 @@ class _SlmFeed extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            DownloadButton(
+              id: WordVoice.downloadId(w),
+              title: w.word,
+              kind: 'word',
+              url: w.voice,
+              compact: true,
+              color: const Color(0x99FFFFFF),
             ),
             IconButton(
               onPressed: () => onOpenWord(w),

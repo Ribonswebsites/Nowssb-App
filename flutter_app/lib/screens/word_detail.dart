@@ -17,6 +17,9 @@
 /// something to read, and something to hear.
 library;
 
+import '../data/device_flags.dart';
+import '../data/word_voice.dart';
+import '../features/downloads/download_button.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -45,6 +48,7 @@ class _WordDetailState extends State<WordDetail> {
   void initState() {
     super.initState();
     _word = widget.word;
+    DeviceFlags.secureWindow(true);
     Entitlements.instance.addListener(_onEntitlements);
     _loadPaid();
   }
@@ -61,6 +65,7 @@ class _WordDetailState extends State<WordDetail> {
   @override
   void dispose() {
     Entitlements.instance.removeListener(_onEntitlements);
+    DeviceFlags.secureWindow(false);
     super.dispose();
   }
 
@@ -114,6 +119,18 @@ class _WordDetailState extends State<WordDetail> {
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
                     children: [
                       _Headline(word: word),
+                      // Offline copy of this word's real recording (paid
+                      // words only once open). Hidden when there is none.
+                      if (open && WordVoice.hasVoice(word))
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: DownloadButton(
+                            id: WordVoice.downloadId(word),
+                            title: word.word,
+                            kind: 'word',
+                            url: word.voice,
+                          ),
+                        ),
                       const SizedBox(height: 26),
                       if (!open) ...[
                         _LockedCard(word: word),

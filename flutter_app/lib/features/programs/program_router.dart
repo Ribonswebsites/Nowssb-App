@@ -8,11 +8,9 @@ import 'package:flutter/material.dart';
 import '../economy/partner_screen.dart';
 import '../circle/circle_screen.dart';
 import '../earn/earnings_screen.dart';
-import '../economy/coupon_screen.dart';
-import '../gifts/gifts_screen.dart';
 import '../vault/vault_screen.dart';
 
-enum Programme { earn, rewards, coupons, gifts, reference, partner, earnings }
+enum Programme { earn, rewards, reference, partner, earnings }
 
 
 abstract final class Programmes {
@@ -20,8 +18,6 @@ abstract final class Programmes {
     return switch (p) {
         Programme.earn => CircleScreen(initialTab: tab),
         Programme.rewards => VaultScreen(initialTab: tab),
-        Programme.coupons => CouponScreen(initialTab: tab),
-        Programme.gifts => GiftsScreen(initialTab: tab),
         // Invite link lives in Earn now (one page, its 'invite' tab).
         Programme.reference => CircleScreen(initialTab: tab ?? 'invite'),
         Programme.partner => PartnerScreen(initialTab: tab),
@@ -36,10 +32,8 @@ abstract final class Programmes {
   static Programme? forPoster(String title) => switch (title.toLowerCase()) {
         'earn' => Programme.earn,
         'rewards' => Programme.rewards,
-        'gift' || 'gifts' => Programme.gifts,
         'bonus' => Programme.earn,
         'partner' => Programme.partner,
-        'coupons' => Programme.coupons,
         'reference' => Programme.reference,
         _ => null,
       };

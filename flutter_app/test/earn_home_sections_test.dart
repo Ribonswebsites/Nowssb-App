@@ -19,7 +19,6 @@ void main() {
             children: const [
               EarnUmbrellaSection(),
               YourRewardsSection(),
-              GiftsHomeSection(),
             ],
           ),
         ),
@@ -31,7 +30,7 @@ void main() {
     expect(find.text('Open Earn'), findsWidgets);
     expect(find.text('Commission on net. Two levels. Never a third.'), findsOneWidget);
     expect(find.text('NowssB Rewards'), findsWidgets);
-    expect(find.text('NowssB Gifts'), findsWidgets);
+    expect(find.text('NowssB Gifts'), findsNothing);
     expect(find.text('Sign in to see your rewards'), findsOneWidget);
     expect(find.text('Networking'), findsNothing);
     expect(find.text('Circle'), findsNothing);

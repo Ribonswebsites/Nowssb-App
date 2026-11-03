@@ -91,7 +91,10 @@ bool _showBookmark(SectionMediaItem item) {
 }
 
 List<SectionMediaItem> _itemsFromConfig(SectionConfig? config) {
-  final items = config?.items ?? const <SectionMediaItem>[];
+  final items = [
+    for (final it in config?.items ?? const <SectionMediaItem>[])
+      if (!NwsbLinks.isRemoved(it.ctaLink)) it,
+  ];
   if (items.isNotEmpty) {
     final cap = config?.behavior.itemCount;
     return cap == null ? List<SectionMediaItem>.from(items) : items.take(cap).toList();

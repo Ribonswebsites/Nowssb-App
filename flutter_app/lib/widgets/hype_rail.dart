@@ -30,8 +30,6 @@ class HypeCard {
 }
 
 const kHypeCards = <HypeCard>[
-  HypeCard('coupons', 'assets/gifts/coupon-hero.webp', 'NowssB Coupons', 'Scratch today'),
-  HypeCard('gifts', 'assets/gifts/gift-hero.webp', 'NowssB Gifts', 'Daily spin'),
   HypeCard('earn', 'assets/banners/programs/earn.webp', 'NowssB Earn', 'Coins on real sales'),
   HypeCard('library', 'assets/hero-curve/banner-library.webp', 'Sound Library', 'Hear a word'),
 ];
@@ -84,7 +82,7 @@ List<_RailItem> _itemsFor({
   List<HypeCard>? cards,
 }) {
   if (config != null && config.items.isNotEmpty) {
-    final raw = config.items;
+    final raw = [for (final it in config.items) if (!NwsbLinks.isRemoved(it.ctaLink)) it];
     final start = config.behavior.startIndex.clamp(0, raw.length - 1);
     var ordered = <SectionMediaItem>[
       ...raw.sublist(start),

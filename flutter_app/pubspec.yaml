@@ -69,6 +69,8 @@ dependencies:
   home_widget: ^0.10.0
   # UI Editor entrance / loop effects (lib/admin/layout/anims/effects.dart).
   flutter_animate: ^4.5.2
+  flutter_secure_storage: ^9.2.4
+  cryptography: ^2.7.0
 
 dependency_overrides:
   # record 5.2.1's broad Linux constraint otherwise resolves to 0.7.2,

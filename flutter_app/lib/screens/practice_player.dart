@@ -5,6 +5,8 @@
 /// text-to-speech and completed words are recorded locally.
 library;
 
+import '../data/device_flags.dart';
+import '../features/downloads/download_button.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
@@ -144,6 +146,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   @override
   void initState() {
     super.initState();
+    DeviceFlags.secureWindow(true);
     _bottomPageController = PageController();
     _marqueeController = AnimationController(
       vsync: this,
@@ -238,6 +241,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   @override
   void dispose() {
+    DeviceFlags.secureWindow(false);
     _bottomAutoTimer?.cancel();
     _sleepTimer?.cancel();
     _bottomPageController.dispose();
@@ -2624,6 +2628,14 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                     ),
                                                   ],
                                                 ),
+                                              ),
+                                              DownloadButton(
+                                                id: WordVoice.downloadId(w),
+                                                title: w.word,
+                                                kind: 'session',
+                                                url: w.voice,
+                                                compact: true,
+                                                color: const Color(0xFF8E8E93),
                                               ),
                                               const Padding(
                                                 padding: EdgeInsets.symmetric(

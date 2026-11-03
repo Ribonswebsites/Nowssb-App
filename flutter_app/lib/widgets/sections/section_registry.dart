@@ -131,7 +131,8 @@ void ensureSectionRegistry() {
       behavior: SectionBehavior(autoplay: true, autoplayMs: 4000, loop: true),
       style: SectionStyle(glowColor: 0x66E8A23A, accent: 0xFFE8A23A),
     ),
-    builder: (context, config) => CouponBannerSection(config: config),
+    // The Coupons page was removed; this banner had nowhere to go.
+    builder: (context, config) => const SizedBox.shrink(),
   ));
   r.register(SectionTypeEntry(
     type: SectionTypeId.hypedRow,

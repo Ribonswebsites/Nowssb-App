@@ -66,7 +66,6 @@ class _VaultBodyState extends State<_VaultBody> {
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
           children: [
-            const IdentityRails(RailKind.rewards),
             RoutineDeck(
               title: 'Rewards',
               banner: 'NowssB Rewards',
@@ -304,27 +303,6 @@ class _TodayCardState extends State<_TodayCard> {
             label: claimed ? 'Collected' : 'Claim today’s coins',
             onTap: claimed ? null : _claim,
           ),
-          const SizedBox(height: 8),
-          GoldButton(
-            label: 'Open today’s coupon',
-            filled: false,
-            onTap: () => Programmes.open(context, Programme.coupons),
-          ),
-          const SizedBox(height: 14),
-          const EditableLabel('vault_screen.TodayCard',
-            'SCRATCH',
-            style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          // The one real daily card: persistent, never re-seals.
-          const DailyScratchCard(),
-          const SizedBox(height: 14),
-          const EditableLabel('vault_screen.TodayCard',
-            'GIFT',
-            style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.4, fontSize: 12, fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 8),
-          const GiftOpenCard(),
         ],
       ),
     );

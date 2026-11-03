@@ -69,7 +69,10 @@ class PaperRitualCard extends StatefulWidget {
   final VoidCallback? onSeeProgress; // unused: Progress page removed
   /// Real ritual title (TodayRitual.title); null = the time of day's.
   final String? title;
-  const PaperRitualCard({this.title,
+  /// Hero-carousel mode: the scene fills the slot edge to edge (same size,
+  /// radius and style as the other hero cards), no white frame or strip.
+  final bool fullBleed;
+  const PaperRitualCard({this.title, this.fullBleed = false,
     super.key, required this.completed, required this.total, required this.sessionCount,
     required this.streak, required this.onBegin, this.onSeeProgress, this.time,
   });
@@ -118,6 +121,7 @@ class _PaperRitualCardState extends State<PaperRitualCard> with TickerProviderSt
   Widget build(BuildContext context) {
     final p = PaperRitualPalette.of(widget.time ?? ritualTimeFor(DateTime.now()));
     final int done = widget.completed.clamp(0, math.max(widget.total, 0)).toInt();
+    if (widget.fullBleed) return _bleed(p, done);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
       child: Container(
@@ -201,6 +205,59 @@ class _PaperRitualCardState extends State<PaperRitualCard> with TickerProviderSt
         ]),
       ),
     );
+  }
+}
+
+extension on _PaperRitualCardState {
+  Widget _bleed(PaperRitualPalette p, int done) {
+    final light = p.moon || p.word == 'DUSK';
+    final ink = light ? Colors.white : const Color(0xFF1A1A2E);
+    final scene = GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      excludeFromSemantics: true, // the Begin button carries the action
+      onTap: () => _tap(widget.onBegin),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: AnimatedBuilder(
+          animation: Listenable.merge([_breath, _intro]),
+          builder: (_, __) {
+            final b = Curves.easeInOutSine.transform(_breath.value);
+            return Stack(fit: StackFit.expand, children: [
+              CustomPaint(
+                painter: _ScenePainter(
+                  p: p, breath: (b - .5) * p.motion, tilt: Offset.zero,
+                  intro: Curves.easeOutCubic.transform(_intro.value),
+                  done: done, total: widget.total,
+                ),
+              ),
+              Positioned(
+                left: 0, right: 0, top: 0, bottom: 74,
+                child: _SceneOverlay(p: p, done: done, total: widget.total, streak: widget.streak, breath: b),
+              ),
+              Positioned(
+                left: 22, right: 20, top: 20,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('TODAY · ${widget.sessionCount} SESSIONS', maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontFamily: 'DM Sans', fontSize: 10, letterSpacing: 2.2,
+                          fontWeight: FontWeight.w700, color: ink.withValues(alpha: .8))),
+                  const SizedBox(height: 6),
+                  Text(widget.title ?? p.title, maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontFamily: 'CormorantGaramond', fontSize: 34, height: 1,
+                          fontWeight: FontWeight.w500, color: ink)),
+                ]),
+              ),
+            ]);
+          },
+        ),
+      ),
+    );
+    return Semantics(container: true, explicitChildNodes: true, child: Stack(fit: StackFit.expand, children: [
+      scene,
+      Positioned(
+        left: 22, bottom: 20,
+        child: _BeginButton(p: p, onTap: () => _tap(widget.onBegin)),
+      ),
+    ]));
   }
 }
 

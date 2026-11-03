@@ -40,6 +40,13 @@ abstract final class NwsbLinks {
   static void tasks(BuildContext context) => push(context, const DailyTasksPage());
   static void dropStudio(BuildContext context) => push(context, const DropStudioScreen());
 
+  /// Links to the removed Gifts / Coupons pages. Rails and tiles drop any
+  /// item whose link matches, so no door points at a page that is gone.
+  static bool isRemoved(String? link) {
+    final c = (link ?? '').toLowerCase();
+    return c.contains('gift') || c.contains('coupon') || c.contains('scratch') || c.contains('redeem');
+  }
+
   /// The destination a banner's own button text promises.
   static void cta(BuildContext context, String cta) {
     final c = cta.toLowerCase();
@@ -48,20 +55,14 @@ abstract final class NwsbLinks {
     if (c.contains('meaning')) return meanings(context);
     if (c.contains('reader') || c.contains('science')) return reader(context);
     if (c.contains('request')) return requestWord(context);
-    if (c.contains('redeem')) {
-      Programmes.open(context, Programme.gifts, tab: 'redeem');
-      return;
-    }
-    if (c.contains('gift')) {
-      Programmes.open(context, Programme.gifts);
-      return;
-    }
     if (c.contains('share') || c.contains('link')) {
       Programmes.open(context, Programme.reference);
       return;
     }
-    if (c.contains('coupon') || c.contains('scratch')) {
-      Programmes.open(context, Programme.coupons);
+    // Gifts and Coupons pages were removed; an old banner that still
+    // names them lands on Rewards instead of a dead page.
+    if (isRemoved(c)) {
+      Programmes.open(context, Programme.rewards);
       return;
     }
     if (c.contains('payout') || c.contains('sales') || c.contains('agents')) {

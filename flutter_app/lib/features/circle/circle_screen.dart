@@ -70,12 +70,6 @@ class _CircleScreenState extends State<CircleScreen> {
       case 'Rewards':
         Programmes.open(context, Programme.rewards);
       break;
-      case 'Coupons':
-        Programmes.open(context, Programme.coupons);
-      break;
-      case 'Gifts':
-        Programmes.open(context, Programme.gifts);
-      break;
       case 'Earnings':
       case 'Payouts':
       case 'Sales':
@@ -230,7 +224,6 @@ class _CircleScreenState extends State<CircleScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
             children: [
-              const IdentityRails(RailKind.earn),
               RoutineDeck(
                 title: 'Earn',
                 banner: signedIn ? w.circleTier : 'NowssB Earn',
@@ -239,8 +232,6 @@ class _CircleScreenState extends State<CircleScreen> {
                 cards: [
                   WorkCard(category: 'Rank', title: signedIn ? w.circleTier : 'Sign in', meta: signedIn ? '$units of $next to the next tier' : 'Your rank is on this account', action: signedIn ? 'See plans' : 'Sign in', image: 'assets/rails/gen-49.jpg', onTap: () { if (!signedIn) { NwsbSignInPage.open(context); } else { Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())); } }),
                   WorkCard(category: 'Rewards', title: 'Rewards', meta: 'Coins you earn', action: 'Open rewards', image: 'assets/rails/gen-50.jpg', onTap: () => Programmes.open(context, Programme.rewards)),
-                  WorkCard(category: 'Coupons', title: 'Coupons', meta: 'Scratch and codes', action: 'Open coupons', image: 'assets/rails/gen-51.jpg', onTap: () => Programmes.open(context, Programme.coupons)),
-                  WorkCard(category: 'Gifts', title: 'Gifts', meta: 'Send or redeem', action: 'Open gifts', image: 'assets/rails/gen-52.jpg', onTap: () => Programmes.open(context, Programme.gifts)),
                   WorkCard(category: 'Cash', title: 'Earnings', meta: 'Sales and payouts', action: 'Open earnings', image: 'assets/rails/gen-53.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
                 ],
               ),

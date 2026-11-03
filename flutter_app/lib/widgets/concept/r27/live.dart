@@ -49,27 +49,11 @@ class R27LiveSections extends StatelessWidget {
             onClaim: () => _claim(c),
             onSignIn: () => NwsbSignInPage.open(c)),
         const SizedBox(height: 22),
-        R27GiftsSection(
-            key: ValueKey('r27-gifts-$fashion'),
-            fashion: fashion,
-            data: R27Live.gifts(),
-            onGift: (id) => showGiftCardSheet(c, id),
-            onRedeem: () => _push(c, const GiftsScreen(startOnRedeem: true)),
-            onOpen: () => _push(c, const GiftsScreen())),
-        const SizedBox(height: 22),
         R27EarnSection(
             key: ValueKey('r27-earn-$fashion'),
             fashion: fashion,
             data: R27Live.earn(),
             onOpen: () => _push(c, const CircleScreen()),
             onRank: (_) => _push(c, const CircleScreen())),
-        const SizedBox(height: 22),
-        R27CouponsSection(
-            key: ValueKey('r27-coupons-$fashion'),
-            fashion: fashion,
-            data: R27Live.coupons(),
-            onScratch: () => _push(c, const CouponScreen(initialTab: 'scratch')),
-            onOpen: () => _push(c, const CouponScreen()),
-            onCoupon: (_) => _push(c, const CouponScreen())),
       ]));
 }

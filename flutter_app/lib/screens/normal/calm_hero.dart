@@ -667,21 +667,15 @@ class _PaperRitualSlot extends StatelessWidget {
   const _PaperRitualSlot({required this.data});
   final HeroData data;
   @override
-  Widget build(BuildContext context) => FittedBox(
+  Widget build(BuildContext context) => PaperRitualCard(
         key: const ValueKey('hero-ritual'),
-        fit: BoxFit.scaleDown,
-        alignment: Alignment.topCenter,
-        child: SizedBox(
-          width: 360,
-          child: PaperRitualCard(
-            completed: data.done,
-            total: data.total,
-            sessionCount: data.sessions,
-            streak: data.streak,
-            time: data.ritualTime,
-            title: data.title,
-            onBegin: data.onBegin,
-          ),
-        ),
+        fullBleed: true,
+        completed: data.done,
+        total: data.total,
+        sessionCount: data.sessions,
+        streak: data.streak,
+        time: data.ritualTime,
+        title: data.title,
+        onBegin: data.onBegin,
       );
 }

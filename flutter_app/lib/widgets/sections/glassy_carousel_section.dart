@@ -41,7 +41,7 @@ class _GlassyCarouselSectionState extends State<GlassyCarouselSection> {
   SectionConfig get _c => widget.config;
 
   List<SectionMediaItem> get _items {
-    final raw = _c.items;
+    final raw = [for (final it in _c.items) if (!NwsbLinks.isRemoved(it.ctaLink)) it];
     final cap = _c.behavior.itemCount;
     if (raw.isEmpty) {
       // Placeholder slots so the section still shows while admin fills it.

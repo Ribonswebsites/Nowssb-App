@@ -140,7 +140,6 @@ class NotifStore extends ChangeNotifier {
     NotifGroup(name: 'Rewards', items: [
       NotifKind(k: 'coins', label: 'Coins', sub: 'When coins are waiting to collect'),
       NotifKind(k: 'rewards', label: 'Rewards', sub: 'Streaks, quests and the wallet'),
-      NotifKind(k: 'gifts', label: 'Gifts', sub: 'Send, redeem and boxes'),
       NotifKind(k: 'spin', label: 'Spinning wheel', sub: 'The daily spin'),
       NotifKind(k: 'update', label: 'Latest update', sub: 'What changed in the app'),
     ]),
@@ -308,7 +307,6 @@ class NotifStore extends ChangeNotifier {
     const rows = <(String, String, String)>[
       ('coins', 'Go collect', 'Your coins are waiting. Open them and collect.'),
       ('rewards', 'Rewards', 'Streaks, quests and today’s coins.'),
-      ('gifts', 'Gifts', 'Send a gift, or redeem one that is yours.'),
       ('spin', 'Spinning wheel', 'Your free spin is ready. Open the wheel.'),
       ('update', 'Latest update', 'Home, the player and the store were updated.'),
     ];

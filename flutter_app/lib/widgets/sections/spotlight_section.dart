@@ -17,7 +17,10 @@ import '../hype_rail.dart';
 import 'section_config.dart';
 
 List<SectionMediaItem> _itemsFromConfig(SectionConfig? config) {
-  final items = config?.items ?? const <SectionMediaItem>[];
+  final items = [
+    for (final it in config?.items ?? const <SectionMediaItem>[])
+      if (!NwsbLinks.isRemoved(it.ctaLink)) it,
+  ];
   if (items.isNotEmpty) {
     final cap = config?.behavior.itemCount;
     return cap == null

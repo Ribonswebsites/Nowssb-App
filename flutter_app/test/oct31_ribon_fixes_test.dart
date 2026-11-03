@@ -43,30 +43,12 @@ void main() {
     m.setMockMethodCallHandler(const MethodChannel('plugins.flutter.io/path_provider'), (c) async => '/tmp/pp');
   });
 
-  testWidgets('1: rewards carousel swipes, dots jump, cards share one height', (t) async {
+  testWidgets('1: programme rail is Rewards only (Gifts/Coupons removed)', (t) async {
     await _phone(t, const Scaffold(body: SingleChildScrollView(child: ProgramTrioRail(autoRotate: true))));
-    final pv = find.byKey(const ValueKey('program-trio-pages'));
-    expect(pv, findsOneWidget);
-    PageController ctrl() => (t.widget<PageView>(pv)).controller!;
-    await t.drag(pv, const Offset(-300, 0));
-    await _pumps(t, 8);
-    expect(ctrl().page!.round(), 1);
-    await t.tap(find.byKey(const ValueKey('program-trio-dot-2')));
-    await _pumps(t, 8);
-    expect(ctrl().page!.round(), 2);
-    // Touch pauses auto-rotate: hold for 5s, page stays.
-    final g = await t.startGesture(t.getCenter(pv));
-    for (var i = 0; i < 50; i++) {
-      await t.pump(const Duration(milliseconds: 100));
-    }
-    expect(ctrl().page!.round(), 2);
-    await g.up();
-    final hs = <double>{};
-    for (var i = 0; i < 3; i++) {
-      final f = find.byKey(ValueKey('program-trio-$i'));
-      if (f.evaluate().isNotEmpty) hs.add(t.getSize(f).height);
-    }
-    expect(hs.length, 1, reason: 'pages differ in height: $hs');
+    expect(find.byType(YourRewardsSection), findsOneWidget);
+    expect(find.byKey(const ValueKey('program-trio-pages')), findsNothing);
+    expect(find.text('NowssB Gifts'), findsNothing);
+    expect(find.text('NowssB Coupons'), findsNothing);
     await t.pumpWidget(const SizedBox());
     await _pumps(t, 100);
   });

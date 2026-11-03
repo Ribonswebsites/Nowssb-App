@@ -113,7 +113,6 @@ class _StoreShelfState extends State<StoreShelf> {
       d: rails[3],
       e: rails[4],
       labels: const ['Feature', 'Your list', 'Challenge', 'Glass', 'Clear'],
-      openGuide: false,
       onOpen: (card) => byKey['${card.title}|${card.line}']?.onTap(),
     );
   }

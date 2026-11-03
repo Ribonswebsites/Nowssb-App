@@ -88,8 +88,6 @@ final List<AppPage> kAppPages = [
   AppPage('healing', 'Healing path', 'Explore', Icons.spa_rounded, () => const HealingPathScreen()),
   AppPage('earn', 'Earn & gifts', 'Explore', Icons.toll_rounded, () => const CircleScreen()),
   AppPage('rewards.program', 'NowssB Rewards', 'Programs', Icons.star_rounded, () => const VaultScreen()),
-  AppPage('coupons.program', 'NowssB Coupons', 'Programs', Icons.confirmation_number_rounded, () => const CouponScreen()),
-  AppPage('gifts.program', 'NowssB Gifts', 'Programs', Icons.card_giftcard_rounded, () => const GiftsScreen()),
   AppPage('partner.program', 'Partner Program', 'Programs', Icons.workspace_premium_rounded, () => const PartnerScreen()),
   AppPage('coach', 'Personal coach', 'Explore', Icons.support_agent_rounded, () => const PersonalCoachScreen()),
 ];

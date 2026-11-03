@@ -17,24 +17,6 @@ import 'section_config.dart';
 
 const _kDefaultTiles = <SectionMediaItem>[
   SectionMediaItem(
-    id: 'coupons',
-    title: 'Coupons',
-    subtitle: 'Scratch & save',
-    imageUrl: 'assets/gifts/coupon-hero.webp',
-    icon: 'coupon',
-    ctaLink: 'coupons',
-    meta: {'glowColor': 0xFFE8A23A},
-  ),
-  SectionMediaItem(
-    id: 'gifts',
-    title: 'Gifts',
-    subtitle: 'Daily spin',
-    imageUrl: 'assets/gifts/gift-hero.webp',
-    icon: 'gift',
-    ctaLink: 'gifts',
-    meta: {'glowColor': 0xFFE07070},
-  ),
-  SectionMediaItem(
     id: 'store',
     title: 'Store',
     subtitle: 'Shop words',
@@ -48,7 +30,6 @@ const _kDefaultTiles = <SectionMediaItem>[
 const _kDefaultChips = <SectionMediaItem>[
   SectionMediaItem(id: 'chip.popular', title: 'Popular', meta: {'kind': 'chip'}),
   SectionMediaItem(id: 'chip.new', title: 'New', meta: {'kind': 'chip'}),
-  SectionMediaItem(id: 'chip.coupons', title: 'Coupons', meta: {'kind': 'chip'}),
   SectionMediaItem(
     id: 'chip.under499',
     title: 'Budget picks',
@@ -65,7 +46,7 @@ List<SectionMediaItem> _tilesFrom(SectionConfig? config) {
   final items = config?.items ?? const <SectionMediaItem>[];
   final tiles = [
     for (final it in items)
-      if (!_isChip(it)) it,
+      if (!_isChip(it) && !NwsbLinks.isRemoved(it.ctaLink)) it,
   ];
   if (tiles.isEmpty) {
     final cap = config?.behavior.itemCount ?? _kDefaultTiles.length;
@@ -82,7 +63,7 @@ List<SectionMediaItem> _chipsFrom(SectionConfig? config) {
   final items = config?.items ?? const <SectionMediaItem>[];
   final chips = [
     for (final it in items)
-      if (_isChip(it)) it,
+      if (_isChip(it) && !NwsbLinks.isRemoved(it.ctaLink)) it,
   ];
   if (chips.isNotEmpty) return chips;
   // Optional second list on section meta via config — not on SectionConfig

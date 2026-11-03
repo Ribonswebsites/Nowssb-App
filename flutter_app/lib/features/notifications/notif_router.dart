@@ -136,13 +136,13 @@ class NotifRouter {
       case 'coins':
         return const VaultScreen();
       case 'spin':
-        return const GiftsScreen();
+        return const VaultScreen();
       case 'update':
         return const LatestUpdatePage();
+      // Gifts / Coupons pages were removed; old alerts open Rewards.
       case 'coupons':
-        return const CouponScreen();
       case 'gifts':
-        return const GiftsScreen();
+        return const VaultScreen();
       case 'earn':
         return const CircleScreen();
       case 'reference':

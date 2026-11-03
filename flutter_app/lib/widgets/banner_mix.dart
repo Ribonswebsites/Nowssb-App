@@ -57,7 +57,6 @@ class BannerMix extends StatelessWidget {
           () => switch (i) {
                 0 => NwsbLinks.tab(context, 3),
                 1 => Programmes.open(context, Programme.rewards),
-                2 => Programmes.open(context, Programme.gifts, tab: 'send'),
                 _ => NwsbLinks.tasks(context),
               },
     );

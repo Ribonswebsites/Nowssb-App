@@ -8,6 +8,7 @@
 /// filter appears here on its own.
 library;
 
+import '../features/downloads/downloads_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../data/content.dart';
@@ -81,6 +82,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
       // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'library', [
             LSection('search', 'Search', _SearchField(controller: _search)),
+            LSection('downloads', 'Downloads', const DownloadsEntry()),
             if (categories.isNotEmpty) LSection.group('chips', 'Category chips', align: CrossAxisAlignment.stretch, [
               const SizedBox(height: 14),
               SizedBox(

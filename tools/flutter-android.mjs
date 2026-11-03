@@ -482,6 +482,16 @@ class MainActivity : FlutterActivity() {
                         }
                         result.success(null)
                     }
+                    // Player and word screens: no screenshots or screen
+                    // recording while downloaded (encrypted) audio is open.
+                    "secureWindow" -> {
+                        val on = call.argument<Boolean>("on") == true
+                        runOnUiThread {
+                            if (on) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                            else window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+                        }
+                        result.success(null)
+                    }
                     else -> result.notImplemented()
                 }
             }

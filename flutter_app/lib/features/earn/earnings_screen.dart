@@ -196,7 +196,6 @@ class _EarningsScreenState extends State<EarningsScreen> {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
             children: [
-              const IdentityRails(RailKind.earnings),
               RoutineDeck(
                 title: 'Earnings',
                 banner: 'Your earning',

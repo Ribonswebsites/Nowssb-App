@@ -92,7 +92,7 @@ const _tiers = <_Tier>[
     now: 'Google Play price',
     was: '',
     cta: 'See the plan',
-    front: 'assets/subscription/tier-sun-front.webp',
+    front: 'assets/subscription/tier-sun-front.png',
     back: 'assets/subscription/tier-sun-back.png',
     benefits: [
       'Unlimited word practice',

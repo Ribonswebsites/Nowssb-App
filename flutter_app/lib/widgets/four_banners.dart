@@ -68,9 +68,7 @@ class FourBanners extends StatelessWidget {
 }
 
 Programme _next(Programme? p) => switch (p) {
-      Programme.coupons => Programme.gifts,
-      Programme.gifts => Programme.rewards,
-      Programme.rewards => Programme.coupons,
+      Programme.rewards => Programme.earnings,
       Programme.reference => Programme.partner,
       Programme.partner => Programme.reference,
       Programme.earn => Programme.reference,
@@ -123,12 +121,10 @@ class _TrioRailState extends State<TrioRail> {
 
   static const _loop = 80;
   static const _all = <_RailFace>[
-    _RailFace('NowssB Gifts', 'assets/meditation/meditation-singing-bowl.webp', Color(0xFF6A1B4D), Programme.gifts),
     _RailFace('NowssB Rewards', 'assets/banners/earn/yoga-light.png', Color(0xFF1E3A8A), Programme.rewards),
     _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
     // The coin ledger (Rewards · Wallet), not the Rewards front again.
     _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.rewards, 'wallet'),
-    _RailFace('NowssB Coupons', 'assets/banners/earn/hands-light.webp', Color(0xFF7A1F4F), Programme.coupons),
     _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.webp', Color(0xFF1F4E7A), Programme.reference),
   ];
 
