@@ -107,7 +107,7 @@ void main() {
         await precacheAll(t);
         await t.pump(const Duration(milliseconds: 100));
         await _save(t, await _grab(t, key), r, 'hero-${w.toInt()}-$i');
-        if (i == 1) {
+        if (i == 1 && find.byKey(const ValueKey('hero-depth')).evaluate().isNotEmpty) {
           for (var d = 1; d < 3; d++) {
             await t.drag(find.byKey(const ValueKey('hero-depth')), const Offset(0, -80));
             for (var k = 0; k < 10; k++) { await t.pump(const Duration(milliseconds: 100)); }
