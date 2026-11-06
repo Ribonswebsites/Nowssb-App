@@ -13,6 +13,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart' show SpringDescription, SpringSimulation;
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../data/models.dart';
 import '../../media/golden_breath.dart';
@@ -245,7 +246,21 @@ class MixedHero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Word? w(int i) => data.words.isEmpty ? null : data.words[i % data.words.length];
+    final word = w(0);
     final cards = <Widget Function(double off)>[
+      (off) => _PreviewBoxCard(
+        key: const ValueKey('hero-preview'),
+        eyebrow: 'NowssB',
+        title: data.title.trim().isEmpty ? 'NowssB' : data.title.trim(),
+        data: data,
+      ),
+      (off) => _PreviewBoxCard(
+        key: const ValueKey('hero-preview-word'),
+        eyebrow: "Today's word",
+        title: (word == null || word.word.trim().isEmpty) ? 'Practice' : word.word.trim(),
+        data: data,
+        saveWord: word?.word,
+      ),
       (off) => _PaperRitualSlot(data: data),
       (off) => _DepthCard(data: data, parallax: off),
       (off) => _WordCard2(look: const _WordLook('film:hero-breath', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
@@ -268,6 +283,211 @@ class MixedHero extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Dark preview box (the Grok share card): faint grid, huge title, a low
+/// dome, then share / Open / more. Two of these sit in front of the older
+/// hero cards. Open starts today's session.
+class _PreviewBoxCard extends StatelessWidget {
+  const _PreviewBoxCard({super.key, required this.eyebrow, required this.title, required this.data, this.saveWord});
+  final String eyebrow;
+  final String title;
+  final HeroData data;
+  final String? saveWord;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: ColoredBox(
+          color: const Color(0xFF050505),
+          child: Stack(fit: StackFit.expand, children: [
+            const Positioned.fill(child: CustomPaint(painter: _PreviewGridPainter())),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x00050505), Color(0xCC050505), Color(0xFF050505)],
+                  stops: [0.34, 0.68, 1],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(eyebrow,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 13, fontWeight: FontWeight.w500, height: 1.1)),
+                const SizedBox(height: 12),
+                Text(title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 40, height: 1.02, fontWeight: FontWeight.w800, letterSpacing: -1.1)),
+                const Spacer(),
+                const Center(child: SizedBox(width: 176, height: 68, child: CustomPaint(painter: _DomePainter()))),
+                const SizedBox(height: 22),
+                const Center(child: Text('Preview app', style: TextStyle(color: Color(0xFFD0D0D4), fontSize: 16, fontWeight: FontWeight.w500))),
+                const SizedBox(height: 18),
+                Row(children: [
+                  _PreviewCircle(icon: Icons.share, onTap: () => _sharePreview(title)),
+                  const SizedBox(width: 10),
+                  Expanded(child: _PreviewOpen(onTap: data.onBegin)),
+                  const SizedBox(width: 10),
+                  _PreviewMore(data: data, word: saveWord),
+                ]),
+              ]),
+            ),
+          ]),
+        ),
+      );
+}
+
+Future<void> _sharePreview(String title) {
+  final text = title.trim().isEmpty ? 'NowssB' : '$title on NowssB';
+  return SharePlus.instance.share(ShareParams(text: text, subject: 'NowssB'));
+}
+
+class _PreviewCircle extends StatelessWidget {
+  const _PreviewCircle({required this.icon, required this.onTap});
+  final IconData icon;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF1C1C1E),
+            border: Border.all(color: const Color(0xFF2E2E30)),
+          ),
+          child: Icon(icon, color: Colors.white, size: 20),
+        ),
+      );
+}
+
+class _PreviewOpen extends StatelessWidget {
+  const _PreviewOpen({required this.onTap});
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        key: const ValueKey('hero-preview-open'),
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          height: 52,
+          decoration: BoxDecoration(
+            color: const Color(0xFF1C1C1E),
+            borderRadius: BorderRadius.circular(26),
+            border: Border.all(color: const Color(0xFF2E2E30)),
+          ),
+          child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+            SizedBox(width: 6),
+            Text('Open', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+          ]),
+        ),
+      );
+}
+
+class _PreviewMore extends StatelessWidget {
+  const _PreviewMore({required this.data, required this.word});
+  final HeroData data;
+  final String? word;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          final box = context.findRenderObject() as RenderBox?;
+          if (box == null || !box.hasSize) return;
+          final origin = box.localToGlobal(Offset.zero);
+          final selected = await showMenu<String>(
+            context: context,
+            color: const Color(0xFF1C1C1E),
+            position: RelativeRect.fromLTRB(origin.dx, origin.dy, origin.dx + box.size.width, origin.dy + box.size.height),
+            items: [
+              const PopupMenuItem(value: 'open', child: Text('Open', style: TextStyle(color: Colors.white))),
+              if (data.onSave != null)
+                PopupMenuItem(
+                  value: 'save',
+                  child: Text(data.isSaved?.call(word) == true ? 'Saved' : 'Save', style: const TextStyle(color: Colors.white)),
+                ),
+            ],
+          );
+          if (selected == 'open') data.onBegin();
+          if (selected == 'save') data.onSave?.call(word);
+        },
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFF1C1C1E),
+            border: Border.all(color: const Color(0xFF2E2E30)),
+          ),
+          child: const Icon(Icons.more_vert, color: Colors.white, size: 22),
+        ),
+      );
+}
+
+class _PreviewGridPainter extends CustomPainter {
+  const _PreviewGridPainter();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0x18FFFFFF)
+      ..strokeWidth = .6;
+    const step = 18.0;
+    for (double x = 0; x <= size.width; x += step) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+    for (double y = 0; y <= size.height; y += step) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _DomePainter extends CustomPainter {
+  const _DomePainter();
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Rect.fromLTWH(0, 6, size.width, size.height * 1.8);
+    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(42));
+    canvas.save();
+    canvas.clipRect(Offset.zero & size);
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2C2C2E), Color(0xFF121214), Color(0x00050505)],
+          stops: [0, .42, 1],
+        ).createShader(Offset.zero & size),
+    );
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF9A9A9E), Color(0xFF3A3A3C), Color(0x00050505)],
+          stops: [0, .32, .7],
+        ).createShader(Offset.zero & size),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// Soft, shared photo plate: parallax shift against the card on swipe.
