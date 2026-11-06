@@ -88,13 +88,13 @@ class _Grain extends StatelessWidget {
 
 /// A visual is either a film ('film:hero-dusk' → assets/video, muted loop,
 /// poster under reduced motion, paused offscreen) or a still in assets/home/dl.
-Widget _img(String name, {Alignment align = Alignment.topCenter}) {
+Widget _img(String name, {Alignment align = Alignment.center}) {
   if (name.startsWith('film:')) {
     final clip = name.substring(5);
     return GoldenBreathClip(asset: 'assets/video/$clip.mp4', poster: 'assets/video/$clip-poster.webp', alignment: align, slot: 'calm_hero.$clip');
   }
   return Image.asset('assets/home/dl/$name.webp',
-      fit: BoxFit.cover, alignment: align, filterQuality: FilterQuality.medium, gaplessPlayback: true,
+      fit: BoxFit.cover, alignment: align, filterQuality: FilterQuality.high, gaplessPlayback: true,
       errorBuilder: (_, __, ___) => const SizedBox.shrink());
 }
 
@@ -221,9 +221,9 @@ class _World {
 }
 
 const _worlds = [
-  _World('Breath', 'dl-depth-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B), align: Alignment(0, -.3)),
-  _World('Sound', 'dl-depth-sound', Color(0xFFC9A46A), Color(0xFF2A2219), align: Alignment(0, -.3)),
-  _World('Sleep', 'dl-depth-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433), align: Alignment(0, -.3)),
+  _World('Breath', 'dl-depth-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B)),
+  _World('Sound', 'dl-depth-sound', Color(0xFFC9A46A), Color(0xFF2A2219)),
+  _World('Sleep', 'dl-depth-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433)),
 ];
 
 class _WordLook {
@@ -266,7 +266,7 @@ class MixedHero extends StatelessWidget {
       (off) => _WordCard2(look: const _WordLook('film:hero-breath', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
       (off) => _CinemaCard(photo: 'film:hero-dusk', kicker: 'Dusk', tone: const Color(0xFF0E1230), data: data, word: w(1), parallax: off),
       (off) => _WordCard2(look: const _WordLook('film:hero-sound', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
-      (off) => _CinemaCard(photo: 'film:hero-release', kicker: 'Sound', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
+      (off) => _CinemaCard(photo: 'film:hero-release', kicker: 'Release', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
       (off) => _WordCard2(look: const _WordLook('film:hero-rise', Color(0xFFE2D4F0), Color(0xFF1E1530)), data: data, word: w(2), parallax: off),
     ];
     return Padding(
@@ -490,9 +490,10 @@ class _DomePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// Soft, shared photo plate: parallax shift against the card on swipe.
-Widget _plate(String photo, double off, {double k = 28, double dy = 0, Alignment align = Alignment.topCenter}) =>
-    Transform.translate(offset: Offset(off * k, dy), child: Transform.scale(scale: 1.06, alignment: Alignment.bottomCenter, child: _img(photo, align: align)));
+/// Photo plate. No extra scale — the films are already framed wide, and a
+/// zoom made the faces soft.
+Widget _plate(String photo, double off, {double k = 28, double dy = 0, Alignment align = Alignment.center}) =>
+    Transform.translate(offset: Offset(off * k, dy), child: _img(photo, align: align));
 
 TextStyle _kick(Color c) => TextStyle(color: c, fontSize: 10, letterSpacing: 2.4, fontWeight: FontWeight.w600);
 
@@ -783,7 +784,7 @@ class _WordCard2 extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = (word?.word ?? 'NOWSSB').toUpperCase();
     final hasAudio = word != null && (word!.audio.isNotEmpty || word!.audioMale.isNotEmpty || word!.audioFemale.isNotEmpty);
-    const drop = 96.0; // photo sits lower so the word has open air above the head
+    const drop = 28.0; // a little lower so the word sits above the head, without cropping the person out
     return Builder(builder: (context) => GestureDetector(
           onTap: data.onBegin,
           child: ClipRRect(
