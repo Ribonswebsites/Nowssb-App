@@ -16,7 +16,9 @@ void main() {
     expect(File('assets/hero-curve/pointer.webp').existsSync(), isTrue);
     expect(File('assets/hero-curve/banner-player.webp').existsSync(), isTrue);
     expect(File('assets/hero-curve/banner-library.webp').existsSync(), isTrue);
-    expect(EnterCurveAssets.destinations, hasLength(3));
+    expect(File('assets/hero-curve/banner-store.webp').existsSync(), isTrue);
+    expect(File('assets/hero-curve/banner-reader.webp').existsSync(), isTrue);
+    expect(EnterCurveAssets.destinations, hasLength(4));
     expect(File('assets/hero-curve/tab-window.webp').existsSync(), isTrue);
     expect(HeroCurveAssets.tabCards, hasLength(6));
   });

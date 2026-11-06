@@ -40,6 +40,7 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
+import '../widgets/meditation_flip_banner.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
 import '../widgets/stories_find_you_banner.dart';
@@ -289,6 +290,8 @@ class _HomeFashionState extends State<HomeFashion> {
         _push(const SoundLibraryScreen());
       case 'store':
         _go(3);
+      case 'reader':
+        _push(const EbooksStoreScreen());
       case 'ebook':
         _push(const EbooksStoreScreen());
     }
@@ -573,20 +576,8 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: ColoredSplitPromoBanner(
-                  margin: EdgeInsets.zero,
-                  spec: SplitPromoSpec(
-                    title: 'NowssB',
-                    cta: 'Keep going',
-                    leftColor: const Color(0xFF3D2914),
-                    rightColor: const Color(0xFFE4C56A),
-                    art: SplitPromoArts.blondeLotus,
-                    onTap: () => _go(1),
-                  ),
-                ),
-              ),
+              MeditationFlipBanner(
+                  onTap: () => _go(1), leadingIcons: true, glassIcon: true),
               SizedBox(height: kFashSectionGap),
               FashTiles(onTile: _go, onOpen: _openEnter),
               SizedBox(height: kFashSectionGap),

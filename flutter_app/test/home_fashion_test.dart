@@ -210,11 +210,10 @@ void main() {
 
     expect(find.text('Tap to restyle'), findsWidgets);
 
-    // Current layout: the tiles are Player, Sound Library and Store, and the home wires every one of them to a real destination.
-    // ("The Store" elsewhere on the page is the Where to Begin grid.)
+    // 18 Oct: Player, Sound Library, Store and Reader, each wired to a destination.
     expect(
       [for (final d in EnterCurveAssets.destinations) d.id],
-      ['player', 'library', 'store'],
+      ['player', 'library', 'store', 'reader'],
     );
     final tiles = tester.widget<FashTiles>(find.byType(FashTiles));
     expect(tiles.onOpen, isNotNull, reason: 'the tiles go nowhere');

@@ -32,8 +32,7 @@ const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
 /// 7 · tiles — the destination buttons only.
 ///
-/// Player, Sound Library, Store. The flip showcase and the
-/// Connect / Progress / Word Science / Profile page are gone.
+/// Player, Sound Library, Store and Reader — the 18 Oct 2×2.
 class FashTiles extends StatelessWidget {
   const FashTiles({super.key, this.onTile, this.onOpen});
 

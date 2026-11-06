@@ -60,6 +60,12 @@ class EnterCurveAssets {
       label: 'Store',
       mark: NwsbMarks.bag,
     ),
+    EnterCurveDest(
+      id: 'reader',
+      banner: 'assets/hero-curve/banner-reader.webp',
+      label: 'Reader',
+      mark: NwsbMarks.reader,
+    ),
   ];
 
   /// Extra stills so the ring is as full as the hero (7 slots).
