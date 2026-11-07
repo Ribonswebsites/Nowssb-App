@@ -7,6 +7,7 @@ import 'dart:async';
 
 import '../theme/white_neu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../features/programs/program_router.dart';
 import '../screens/subscription.dart';
@@ -15,6 +16,7 @@ import 'colored_split_promo_banner.dart';
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
 import 'program_shelf.dart';
+import '../media/nwsb_video.dart';
 
 class FourBanners extends StatelessWidget {
   const FourBanners({
@@ -161,6 +163,9 @@ class _TrioRailState extends State<TrioRail> {
 
   @override
   Widget build(BuildContext context) {
+    // Fashion home: each programme is its own banner, the store-card shape,
+    // not three tiles inside one glass.
+    if (!onNormal(context)) return const _ProgrammeBanners();
     return GlassWrap(
       margin: EdgeInsets.zero,
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
@@ -174,10 +179,14 @@ class _TrioRailState extends State<TrioRail> {
               child: const SizedBox(
                 width: 112,
                 height: 176,
-                child: Image(
-                  image: AssetImage('assets/banners/earn/hands-raise.png'),
-                  fit: BoxFit.cover,
-                  alignment: Alignment(0, -0.05),
+                child: ColoredBox(
+                  color: Colors.black,
+                  child: NwsbVideo(
+                    asset: 'assets/video/sound-face.mp4',
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    slot: 'four_banners.TrioRail',
+                  ),
                 ),
               ),
             ),
@@ -243,6 +252,106 @@ class _TrioRailState extends State<TrioRail> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// One programme, one banner. Same shape as the store card (picture, label,
+/// big title, round button) and not wrapped together in one glass.
+class _ProgrammeBanners extends StatelessWidget {
+  const _ProgrammeBanners();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        _ProgBanner(
+          art: 'assets/banners/promo/prog-letter.webp',
+          kicker: 'Programme',
+          title: 'Reference',
+          line: 'Your links',
+          programme: Programme.reference,
+        ),
+        SizedBox(height: 10),
+        _ProgBanner(
+          art: 'assets/banners/promo/prog-sill.webp',
+          kicker: 'Programme',
+          title: 'Earning',
+          line: 'What you have earned',
+          programme: Programme.earnings,
+        ),
+        SizedBox(height: 10),
+        _ProgBanner(
+          art: 'assets/banners/promo/prog-bowl.webp',
+          kicker: 'Programme',
+          title: 'Coins',
+          line: 'What you have earned today',
+          programme: Programme.earn,
+        ),
+      ],
+    );
+  }
+}
+
+class _ProgBanner extends StatelessWidget {
+  const _ProgBanner({
+    required this.art,
+    required this.kicker,
+    required this.title,
+    required this.line,
+    required this.programme,
+  });
+
+  final String art;
+  final String kicker;
+  final String title;
+  final String line;
+  final Programme programme;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        Programmes.open(context, programme);
+      },
+      child: Container(
+        height: 136,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xF0111114),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0x33FFFFFF)),
+        ),
+        child: Row(children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Image.asset(art, width: 116, height: 116, fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF161616), child: SizedBox(width: 116, height: 116))),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(kicker.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              Text(title.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: .4)),
+              const SizedBox(height: 6),
+              Text(line, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 13)),
+            ]),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            width: 46,
+            height: 46,
+            decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 22),
+          ),
+        ]),
       ),
     );
   }
