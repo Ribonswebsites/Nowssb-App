@@ -252,12 +252,16 @@ class MixedHero extends StatelessWidget {
         key: const ValueKey('hero-preview'),
         eyebrow: 'NowssB',
         title: data.title.trim().isEmpty ? 'NowssB' : data.title.trim(),
+        image: 'assets/home/dl/preview-session.webp',
+        ground: const Color(0xFF050505),
         data: data,
       ),
       (off) => _PreviewBoxCard(
         key: const ValueKey('hero-preview-word'),
         eyebrow: "Today's word",
         title: (word == null || word.word.trim().isEmpty) ? 'Practice' : word.word.trim(),
+        image: 'assets/home/dl/preview-word.webp',
+        ground: const Color(0xFF863927),
         data: data,
         saveWord: word?.word,
       ),
@@ -285,30 +289,60 @@ class MixedHero extends StatelessWidget {
   }
 }
 
-/// Dark preview box (the Grok share card): faint grid, huge title, a low
-/// dome, then share / Open / more. Two of these sit in front of the older
-/// hero cards. Open starts today's session.
+/// Preview box: the portrait fills the card, whole figure visible (no zoom,
+/// no grid). The photo's own backdrop is gone so it sits on [ground].
 class _PreviewBoxCard extends StatelessWidget {
-  const _PreviewBoxCard({super.key, required this.eyebrow, required this.title, required this.data, this.saveWord});
+  const _PreviewBoxCard({
+    super.key,
+    required this.eyebrow,
+    required this.title,
+    required this.data,
+    required this.image,
+    required this.ground,
+    this.saveWord,
+  });
   final String eyebrow;
   final String title;
   final HeroData data;
+  final String image;
+  final Color ground;
   final String? saveWord;
 
   @override
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(30),
         child: ColoredBox(
-          color: const Color(0xFF050505),
+          color: ground,
           child: Stack(fit: StackFit.expand, children: [
-            const Positioned.fill(child: CustomPaint(painter: _PreviewGridPainter())),
-            const DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0x00050505), Color(0xCC050505), Color(0xFF050505)],
-                  stops: [0.34, 0.68, 1],
+            Image.asset(
+              image,
+              fit: BoxFit.contain,
+              alignment: Alignment.center,
+              filterQuality: FilterQuality.high,
+            ),
+            // Short scrims so the title and the buttons stay readable.
+            // The face in the middle is left alone.
+            Positioned(
+              top: 0, left: 0, right: 0, height: 132,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [ground.withValues(alpha: .62), ground.withValues(alpha: 0)],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 0, left: 0, right: 0, height: 132,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [ground.withValues(alpha: .72), ground.withValues(alpha: 0)],
+                  ),
                 ),
               ),
             ),
@@ -325,8 +359,6 @@ class _PreviewBoxCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(color: Colors.white, fontSize: 40, height: 1.02, fontWeight: FontWeight.w800, letterSpacing: -1.1)),
                 const Spacer(),
-                const Center(child: SizedBox(width: 176, height: 68, child: CustomPaint(painter: _DomePainter()))),
-                const SizedBox(height: 22),
                 const Center(child: Text('Preview app', style: TextStyle(color: Color(0xFFD0D0D4), fontSize: 16, fontWeight: FontWeight.w500))),
                 const SizedBox(height: 18),
                 Row(children: [
@@ -431,63 +463,6 @@ class _PreviewMore extends StatelessWidget {
           child: const Icon(Icons.more_vert, color: Colors.white, size: 22),
         ),
       );
-}
-
-class _PreviewGridPainter extends CustomPainter {
-  const _PreviewGridPainter();
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0x18FFFFFF)
-      ..strokeWidth = .6;
-    const step = 18.0;
-    for (double x = 0; x <= size.width; x += step) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y <= size.height; y += step) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _DomePainter extends CustomPainter {
-  const _DomePainter();
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromLTWH(0, 6, size.width, size.height * 1.8);
-    final rrect = RRect.fromRectAndRadius(rect, const Radius.circular(42));
-    canvas.save();
-    canvas.clipRect(Offset.zero & size);
-    canvas.drawRRect(
-      rrect,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF2C2C2E), Color(0xFF121214), Color(0x00050505)],
-          stops: [0, .42, 1],
-        ).createShader(Offset.zero & size),
-    );
-    canvas.drawRRect(
-      rrect,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2
-        ..shader = const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF9A9A9E), Color(0xFF3A3A3C), Color(0x00050505)],
-          stops: [0, .32, .7],
-        ).createShader(Offset.zero & size),
-    );
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// Photo plate. No extra scale — the films are already framed wide, and a
