@@ -120,8 +120,6 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ],
         ),
       ),
-      StoreDriftBanner(onDeal: _openDeal),
-      StoreSlashBanner(onDeal: _openDeal),
       // Resale is paused (both programme PDFs): the Resell tab shows only
       // when an admin turns on config/app flags.resale.
       if (!AppControl.instance.flag('resale', fallback: false))
@@ -279,6 +277,8 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
         ),
       ),
+      StoreDriftBanner(margin: const EdgeInsets.symmetric(horizontal: 12), onDeal: _openDeal),
+      StoreSlashBanner(margin: const EdgeInsets.symmetric(horizontal: 12), onDeal: _openDeal),
     ];
     final shown = _resell && AppControl.instance.flag('resale', fallback: false)
         ? <Widget>[items[0], items[1], const BazaarScreen(embedded: true)]
@@ -291,9 +291,11 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             items[4],
             LSection.group('atelier', 'Word Atelier', [items[5], items[6]]),
             LSection.group('meaning', 'Meaning Store', [items[7], items[8]]),
+            LSection('today', 'Today', items[19]),
             LSection('promo', 'Split promo banner', items[9]),
             LSection.group('connect', 'NowssB Connect', [items[10], items[11]]),
             LSection.group('ebooks', 'eBooks', [items[12], items[13]]),
+            LSection('sit', 'Sit with it', items[20]),
             LSection.group('plans', 'Subscription plans', [items[14], items[15]]),
             LSection('disclaimer', 'Disclaimer', items[16]),
             LSection('credits', 'Credits', items[17]),

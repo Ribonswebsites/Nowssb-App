@@ -1,38 +1,32 @@
-/// Two store promos that sit on the Store home and between every five
-/// catalogue rows on Word, Meaning and eBooks.
+/// Two store promos.
 ///
-/// [StoreDriftBanner] is the fashion-home store card, shifted: gold button,
-/// a different kicker, and four stills that are not the bag poster.
-/// [StoreSlashBanner] is a different object — a full-bleed cut, not a
-/// product row.
+/// [StoreDriftBanner] is a row of separate cards — the same width and glass
+/// as the catalogue cards, not one card sliding inside a wrapper.
+/// [StoreSlashBanner] is a single full-width picture, same side edges as
+/// the black section bars, cool not gold.
 ///
-/// Neither widget opens a product itself. Callers pass [onDeal] so this
-/// file never imports the product page (that import loops through the
-/// store screens).
+/// Callers pass [onDeal]. This file does not import the product page.
 library;
+
+import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/store_prices.dart';
 import '../../features/economy/money.dart';
-import '../../widgets/auto_cycle.dart';
-import '../fashion/home_cards.dart';
+import '../../widgets/hero_glass.dart';
 import 'daily_deals.dart';
 
-const _driftArts = <String>[
-  'assets/banners/promo/drift-ear.webp',
-  'assets/banners/promo/drift-book.webp',
-  'assets/banners/promo/drift-prism.webp',
-  'assets/banners/promo/drift-seal.webp',
+const _quietArts = <String>[
+  'assets/banners/promo/quiet-water.webp',
+  'assets/banners/promo/quiet-linen.webp',
+  'assets/banners/promo/quiet-mist.webp',
+  'assets/banners/promo/quiet-stone.webp',
 ];
 
-const _slashArts = <String>[
-  'assets/banners/promo/slash-rings.webp',
-  'assets/banners/promo/slash-arch.webp',
-];
-
-const _slashKick = <String>['Vortex', 'The gate'];
+const _roomArt = 'assets/banners/promo/quiet-room.webp';
 
 String _money(num value) {
   if (value <= 0) return 'Included';
@@ -42,245 +36,210 @@ String _money(num value) {
 String _priceOf(DailyDeal d) =>
     _money(StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'));
 
-/// Close cousin of the fashion-home store carousel. New stills, gold bag.
+/// Separate cards in a row. No outer glass, no pager.
+/// [margin] is only for the Store home, which has no page padding.
+/// Word, Meaning and eBooks already pad the page, so they pass nothing.
 class StoreDriftBanner extends StatelessWidget {
-  const StoreDriftBanner({super.key, required this.onDeal});
+  const StoreDriftBanner({super.key, required this.onDeal, this.margin = EdgeInsets.zero});
   final void Function(DailyDeal deal) onDeal;
+  final EdgeInsets margin;
 
   @override
   Widget build(BuildContext context) {
     final deals = dailyDeals(count: 4);
     if (deals.isEmpty) return const SizedBox.shrink();
-    return StoreNowCarousel(
-      title: 'Fresh drop',
-      kicker: 'New art · today',
-      goldButton: true,
-      items: [
-        for (var i = 0; i < deals.length; i++)
-          StoreNowItem(
-            word: deals[i].title,
-            category: deals[i].category,
-            percent: realDealPercent(deals[i].word),
-            price: _priceOf(deals[i]),
-            art: _driftArts[i % _driftArts.length],
-            onTap: () => onDeal(deals[i]),
-          ),
-      ],
-    );
-  }
-}
-
-/// Full-bleed cut. Not the product row — a wide still, a slash, huge type.
-class StoreSlashBanner extends StatefulWidget {
-  const StoreSlashBanner({super.key, required this.onDeal});
-  final void Function(DailyDeal deal) onDeal;
-
-  @override
-  State<StoreSlashBanner> createState() => _StoreSlashBannerState();
-}
-
-class _StoreSlashBannerState extends State<StoreSlashBanner>
-    with SingleTickerProviderStateMixin, AutoCycle {
-  static const _base = 400;
-  late final List<DailyDeal> _deals = dailyDeals(count: 6);
-  late final _page = PageController(viewportFraction: .9, initialPage: _base);
-  late int _ix = _base;
-
-  @override
-  Duration get period => const Duration(milliseconds: 4200);
-
-  @override
-  void onTick() {
-    if (!mounted || !_page.hasClients || _deals.length < 2) return;
-    _ix = (_page.page ?? _ix.toDouble()).round() + 1;
-    _page.animateToPage(_ix, duration: const Duration(milliseconds: 640), curve: Curves.easeOutCubic);
-  }
-
-  @override
-  void dispose() {
-    _page.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_deals.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 10, 8, 6),
-      child: SizedBox(
-        height: 232,
-        child: PageView.builder(
-          controller: _page,
-          padEnds: false,
-          onPageChanged: (i) => _ix = i,
-          itemBuilder: (_, i) {
-            final deal = _deals[i % _deals.length];
-            final art = _slashArts[i % _slashArts.length];
-            final kick = _slashKick[i % _slashKick.length];
-            return Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: _SlashCard(
-                art: art,
-                kick: kick,
-                deal: deal,
-                price: _priceOf(deal),
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  widget.onDeal(deal);
-                },
-              ),
+      padding: margin.add(const EdgeInsets.only(top: 8, bottom: 8)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Today', style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w700, decoration: TextDecoration.none)),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 372,
+          child: LayoutBuilder(builder: (context, box) {
+            final width = math.min(300.0, box.maxWidth);
+            return ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: deals.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              itemBuilder: (_, i) {
+                final d = deals[i];
+                return _QuietCard(
+                  width: width,
+                  art: _quietArts[i % _quietArts.length],
+                  deal: d,
+                  price: _priceOf(d),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    onDeal(d);
+                  },
+                );
+              },
             );
-          },
+          }),
         ),
-      ),
+      ]),
     );
   }
 }
 
-class _SlashCard extends StatelessWidget {
-  const _SlashCard({
-    required this.art,
-    required this.kick,
-    required this.deal,
-    required this.price,
-    required this.onTap,
-  });
-
+class _QuietCard extends StatelessWidget {
+  const _QuietCard({required this.width, required this.art, required this.deal, required this.price, required this.onTap});
+  final double width;
   final String art;
-  final String kick;
   final DailyDeal deal;
   final String price;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: '${deal.title}, ${deal.category}, $price',
+    return SizedBox(
+      width: width,
+      height: 372,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(26),
-          child: Stack(fit: StackFit.expand, children: [
-            Image.asset(art, fit: BoxFit.cover, alignment: Alignment.center,
-                errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF120818))),
-            const DecoratedBox(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: HeroGlassRecipe.blurSigma, sigmaY: HeroGlassRecipe.blurSigma),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0x22000000), Color(0xCC050208), Color(0xF2060208)],
-                  stops: [0.15, 0.62, 1],
-                ),
+                color: HeroGlassRecipe.fill,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: HeroGlassRecipe.line),
               ),
-            ),
-            const CustomPaint(painter: _SlashPainter()),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: const Color(0xE6110C16),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: const Color(0x66E4C56A)),
-                    ),
-                    child: const Text('NOWSSB // CUT',
-                        style: TextStyle(color: Color(0xFFE4C56A), fontSize: 10, letterSpacing: 1.6, fontWeight: FontWeight.w800, decoration: TextDecoration.none)),
-                  ),
-                  const Spacer(),
-                  Text(kick.toUpperCase(),
-                      style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 11, letterSpacing: 2.4, fontWeight: FontWeight.w700, decoration: TextDecoration.none)),
-                ]),
-                const Spacer(),
-                Text(deal.category.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Color(0xB3E4C56A), fontSize: 11, letterSpacing: 2.2, fontWeight: FontWeight.w700, decoration: TextDecoration.none)),
-                const SizedBox(height: 4),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(deal.title.toUpperCase(),
-                      maxLines: 1,
-                      style: const TextStyle(color: Colors.white, fontSize: 40, height: .9, fontWeight: FontWeight.w900, letterSpacing: -0.6, decoration: TextDecoration.none)),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(art, height: 168, width: double.infinity, fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF120818), child: SizedBox(height: 168, width: double.infinity))),
                 ),
-                const SizedBox(height: 10),
-                Row(children: [
-                  Expanded(
-                    child: Text('$price  ·  step through',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 13, fontWeight: FontWeight.w600, decoration: TextDecoration.none)),
+                const SizedBox(height: 14),
+                Text(deal.category, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xC6FFFFFF), fontSize: 12, decoration: TextDecoration.none)),
+                const SizedBox(height: 4),
+                Text(deal.title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
+                const SizedBox(height: 6),
+                Text(price, maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xBFFFFFFF), fontSize: 13, decoration: TextDecoration.none)),
+                const Spacer(),
+                Container(
+                  height: 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    gradient: const LinearGradient(colors: [Color(0xFFF3E4B7), Color(0xFFC8A96E)]),
                   ),
-                  const SizedBox(width: 8),
-                  Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.skewX(-0.22),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                      color: const Color(0xFFE4C56A),
-                      child: Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.skewX(0.22),
-                        child: const Text('STEP IN',
-                            style: TextStyle(color: Color(0xFF1A1200), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.3, decoration: TextDecoration.none)),
-                      ),
-                    ),
-                  ),
-                ]),
+                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text('Open', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF060C18), decoration: TextDecoration.none)),
+                    SizedBox(width: 6),
+                    Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFF060C18)),
+                  ]),
+                ),
               ]),
             ),
-          ]),
+          ),
         ),
       ),
     );
   }
 }
 
-class _SlashPainter extends CustomPainter {
-  const _SlashPainter();
+/// One full-width picture. Same edges as the black section bars.
+/// Not a pager, not a gold slash.
+class StoreSlashBanner extends StatelessWidget {
+  const StoreSlashBanner({super.key, required this.onDeal, this.margin = EdgeInsets.zero});
+  final void Function(DailyDeal deal) onDeal;
+  final EdgeInsets margin;
 
   @override
-  void paint(Canvas canvas, Size size) {
-    final gold = Paint()
-      ..color = const Color(0xCCE4C56A)
-      ..strokeWidth = 1.5
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(Offset(size.width * .78, -4), Offset(size.width * .22, size.height + 4), gold);
-    final haze = Paint()
-      ..color = const Color(0x33C9A4FF)
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    canvas.drawLine(Offset(size.width * .84, 8), Offset(size.width * .30, size.height - 8), haze);
+  Widget build(BuildContext context) {
+    final deals = dailyDeals(count: 4);
+    if (deals.isEmpty) return const SizedBox.shrink();
+    final deal = deals.last;
+    return Padding(
+      padding: margin.add(const EdgeInsets.only(top: 10, bottom: 14)),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onDeal(deal);
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: SizedBox(
+            height: 196,
+            child: Stack(fit: StackFit.expand, children: [
+              Image.asset(_roomArt, fit: BoxFit.cover, alignment: Alignment.center,
+                  errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF100818))),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [Color(0xF0080612), Color(0x99080612), Color(0x33080612)],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
+                child: Row(children: [
+                  Expanded(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Text(deal.category, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14, decoration: TextDecoration.none)),
+                      const SizedBox(height: 6),
+                      Text(deal.title, maxLines: 2, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white, fontSize: 28, height: 1.02, fontWeight: FontWeight.w800, decoration: TextDecoration.none)),
+                      const SizedBox(height: 8),
+                      Text(_priceOf(deal), maxLines: 1, overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14, decoration: TextDecoration.none)),
+                    ]),
+                  ),
+                  const SizedBox(width: 12),
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    child: const Icon(Icons.arrow_forward_rounded, color: Colors.black),
+                  ),
+                ]),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// After every five catalogue rows, drop both promos. A short page still
-/// gets the pair once, at the end, so neither banner is missing.
+/// The card row and the picture sit in different places, never stacked.
+/// A long page gets the row after 5 and 15, the picture after 10 and 20.
+/// A short page gets the row in the middle and the picture at the end.
 List<Widget> everyFiveStoreRows(
   List<Widget> rows, {
   required void Function(DailyDeal deal) onDeal,
 }) {
+  if (rows.isEmpty) return rows;
   final out = <Widget>[];
-  var placed = false;
+  if (rows.length < 10) {
+    final mid = rows.length ~/ 2;
+    for (var i = 0; i < rows.length; i++) {
+      out.add(rows[i]);
+      if (mid > 0 && i + 1 == mid) {
+        out.add(StoreDriftBanner(key: ValueKey('drift-$i'), onDeal: onDeal));
+      }
+    }
+    out.add(StoreSlashBanner(key: const ValueKey('slash-end'), onDeal: onDeal));
+    return out;
+  }
   for (var i = 0; i < rows.length; i++) {
     out.add(rows[i]);
-    if ((i + 1) % 5 == 0) {
-      out.add(StoreDriftBanner(key: ValueKey('drift-$i'), onDeal: onDeal));
-      out.add(StoreSlashBanner(key: ValueKey('slash-$i'), onDeal: onDeal));
-      placed = true;
-    }
-  }
-  if (!placed) {
-    out.add(StoreDriftBanner(key: const ValueKey('drift-end'), onDeal: onDeal));
-    out.add(StoreSlashBanner(key: const ValueKey('slash-end'), onDeal: onDeal));
+    final n = i + 1;
+    if (n % 10 == 5) out.add(StoreDriftBanner(key: ValueKey('drift-$i'), onDeal: onDeal));
+    if (n % 10 == 0) out.add(StoreSlashBanner(key: ValueKey('slash-$i'), onDeal: onDeal));
   }
   return out;
 }
