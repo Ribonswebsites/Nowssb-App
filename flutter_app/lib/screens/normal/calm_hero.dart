@@ -17,6 +17,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../data/models.dart';
 import '../../media/golden_breath.dart';
+import '../../media/nwsb_video.dart';
 import '../../widgets/concept/ritual_card.dart';
 import '../../widgets/concept/ritual_paper_card.dart';
 
@@ -220,10 +221,12 @@ class _World {
   final Alignment align;
 }
 
+const _black = Color(0xFF050505);
+
 const _worlds = [
-  _World('Breath', 'dl-depth-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B)),
-  _World('Sound', 'dl-depth-sound', Color(0xFFC9A46A), Color(0xFF2A2219)),
-  _World('Sleep', 'dl-depth-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433)),
+  _World('Breath', 'dl-depth-breath', _black, _black),
+  _World('Sound', 'dl-depth-sound', _black, _black),
+  _World('Sleep', 'dl-depth-sleep', _black, _black),
 ];
 
 class _WordLook {
@@ -253,7 +256,8 @@ class MixedHero extends StatelessWidget {
         eyebrow: 'NowssB',
         title: data.title.trim().isEmpty ? 'NowssB' : data.title.trim(),
         image: 'assets/home/dl/preview-session.webp',
-        ground: const Color(0xFF050505),
+        video: 'assets/video/sound-face.mp4',
+        ground: _black,
         data: data,
       ),
       (off) => _PreviewBoxCard(
@@ -261,17 +265,17 @@ class MixedHero extends StatelessWidget {
         eyebrow: "Today's word",
         title: (word == null || word.word.trim().isEmpty) ? 'Practice' : word.word.trim(),
         image: 'assets/home/dl/preview-word.webp',
-        ground: const Color(0xFF863927),
+        ground: _black,
         data: data,
         saveWord: word?.word,
       ),
       (off) => _PaperRitualSlot(data: data),
       (off) => _DepthCard(data: data, parallax: off),
-      (off) => _WordCard2(look: const _WordLook('film:hero-breath', Color(0xFFE6C6A4), Color(0xFF6B3F2B)), data: data, word: w(0), parallax: off),
-      (off) => _CinemaCard(photo: 'film:hero-dusk', kicker: 'Dusk', tone: const Color(0xFF0E1230), data: data, word: w(1), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('film:hero-sound', Color(0xFFBFDCD3), Color(0xFF173F40)), data: data, word: w(1), parallax: off),
-      (off) => _CinemaCard(photo: 'film:hero-release', kicker: 'Release', tone: const Color(0xFF1A140C), data: data, word: w(2), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('film:hero-rise', Color(0xFFE2D4F0), Color(0xFF1E1530)), data: data, word: w(2), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-breath', _black, _black), data: data, word: w(0), parallax: off),
+      (off) => _CinemaCard(photo: 'film:hero-dusk', kicker: 'Dusk', tone: _black, data: data, word: w(1), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-sound', _black, _black), data: data, word: w(1), parallax: off),
+      (off) => _CinemaCard(photo: 'film:hero-release', kicker: 'Release', tone: _black, data: data, word: w(2), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-rise', _black, _black), data: data, word: w(2), parallax: off),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 14),
@@ -299,12 +303,14 @@ class _PreviewBoxCard extends StatelessWidget {
     required this.data,
     required this.image,
     required this.ground,
+    this.video,
     this.saveWord,
   });
   final String eyebrow;
   final String title;
   final HeroData data;
   final String image;
+  final String? video;
   final Color ground;
   final String? saveWord;
 
@@ -314,12 +320,21 @@ class _PreviewBoxCard extends StatelessWidget {
         child: ColoredBox(
           color: ground,
           child: Stack(fit: StackFit.expand, children: [
-            Image.asset(
-              image,
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              filterQuality: FilterQuality.high,
-            ),
+            if (video != null)
+              NwsbVideo(
+                asset: video!,
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+                slot: 'calm_hero.preview',
+              )
+            else
+              Image.asset(
+                image,
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
             // Short scrims so the title and the buttons stay readable.
             // The face in the middle is left alone.
             Positioned(
@@ -635,16 +650,12 @@ class _DepthCardState extends State<_DepthCard> with SingleTickerProviderStateMi
         borderRadius: BorderRadius.circular(28),
         child: Stack(fit: StackFit.expand, children: [
           // White neumorphic plate behind the photo sheets (Normal home is all white).
-          const DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(center: Alignment(0, -.6), radius: 1.2, colors: [Color(0xFFFFFFFF), Color(0xFFE9ECF3)]),
-            ),
-          ),
+          const ColoredBox(color: _black),
           Positioned(
             left: 22, top: 20, right: 20,
             child: Row(children: [
-              Expanded(child: Text('PRACTICES · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xCC1A1A2E)), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              _SaveButton(data: data, word: data.words.isEmpty ? null : data.words.first.word, light: true),
+              Expanded(child: Text('PRACTICES · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xE6FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              _SaveButton(data: data, word: data.words.isEmpty ? null : data.words.first.word),
             ]),
           ),
           // The stack lives in its own inset box; nothing escapes the card.
@@ -794,7 +805,7 @@ class _WordCard2 extends StatelessWidget {
               Positioned(
                 left: 22, top: 14, right: 16,
                 child: Row(children: [
-                  Expanded(child: Text("TODAY'S WORD · ${data.partLabel.toUpperCase()}", style: _kick(look.bottom.withValues(alpha: .85)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  Expanded(child: Text("TODAY'S WORD · ${data.partLabel.toUpperCase()}", style: _kick(const Color(0xE6FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   _SaveButton(data: data, word: word?.word),
                 ]),
               ),

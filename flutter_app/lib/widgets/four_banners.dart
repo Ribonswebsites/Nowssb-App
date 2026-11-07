@@ -16,7 +16,6 @@ import 'colored_split_promo_banner.dart';
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
 import 'program_shelf.dart';
-import '../media/nwsb_video.dart';
 
 class FourBanners extends StatelessWidget {
   const FourBanners({
@@ -179,14 +178,10 @@ class _TrioRailState extends State<TrioRail> {
               child: const SizedBox(
                 width: 112,
                 height: 176,
-                child: ColoredBox(
-                  color: Colors.black,
-                  child: NwsbVideo(
-                    asset: 'assets/video/sound-face.mp4',
-                    fit: BoxFit.contain,
-                    alignment: Alignment.center,
-                    slot: 'four_banners.TrioRail',
-                  ),
+                child: Image(
+                  image: AssetImage('assets/banners/earn/hands-raise.png'),
+                  fit: BoxFit.cover,
+                  alignment: Alignment(0, -0.05),
                 ),
               ),
             ),
