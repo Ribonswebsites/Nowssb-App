@@ -114,19 +114,21 @@ class _AutoMarqueeState extends State<AutoMarquee> with SingleTickerProviderStat
 
 /// One Store word for the NOW PLAYING–style card.
 class StoreNowItem {
-  const StoreNowItem({required this.word, required this.category, required this.price, this.percent = 0, required this.onTap});
+  const StoreNowItem({required this.word, required this.category, required this.price, this.percent = 0, required this.onTap, this.art});
   final String word;
   final String category;
   final String price;
   final int percent;
   final VoidCallback onTap;
+  final String? art;
 }
 
 /// Card styled like the Sound library's NOW PLAYING card.
 class StoreNowCard extends StatelessWidget {
-  const StoreNowCard({super.key, required this.item, this.art = kHomeStoreArt});
+  const StoreNowCard({super.key, required this.item, this.art = kHomeStoreArt, this.goldButton = false});
   final StoreNowItem item;
   final String art;
+  final bool goldButton;
 
   static const double h = 136;
 
@@ -177,8 +179,8 @@ class StoreNowCard extends StatelessWidget {
             Container(
               width: 46,
               height: 46,
-              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-              child: const Icon(Icons.shopping_bag_rounded, color: Colors.black, size: 22),
+              decoration: BoxDecoration(color: goldButton ? const Color(0xFFE4C56A) : Colors.white, shape: BoxShape.circle),
+              child: Icon(Icons.shopping_bag_rounded, color: goldButton ? const Color(0xFF1A1200) : Colors.black, size: 22),
             ),
           ]),
         ),
@@ -189,9 +191,11 @@ class StoreNowCard extends StatelessWidget {
 
 /// Glass wrapper holding an auto-moving row of [StoreNowCard]s.
 class StoreNowCarousel extends StatefulWidget {
-  const StoreNowCarousel({super.key, required this.items, this.title = 'NowssB Store', this.onHeader});
+  const StoreNowCarousel({super.key, required this.items, this.title = 'NowssB Store', this.kicker = 'Buy · Sell today', this.goldButton = false, this.onHeader});
   final List<StoreNowItem> items;
   final String title;
+  final String kicker;
+  final bool goldButton;
   final VoidCallback? onHeader;
 
   @override
@@ -244,7 +248,7 @@ class _StoreNowCarouselState extends State<StoreNowCarousel> with SingleTickerPr
               Flexible(
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text('Buy · Sell today', maxLines: 1, overflow: TextOverflow.ellipsis,
+                  child: Text(widget.kicker, maxLines: 1, overflow: TextOverflow.ellipsis,
                       style: _ink.copyWith(fontSize: 12, color: const Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
                 ),
               ),
@@ -257,10 +261,13 @@ class _StoreNowCarouselState extends State<StoreNowCarousel> with SingleTickerPr
             controller: _page,
             padEnds: false,
             onPageChanged: (i) => _ix = i,
-            itemBuilder: (_, i) => Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: StoreNowCard(item: widget.items[i % widget.items.length]),
-            ),
+            itemBuilder: (_, i) {
+              final item = widget.items[i % widget.items.length];
+              return Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: StoreNowCard(item: item, art: item.art ?? kHomeStoreArt, goldButton: widget.goldButton),
+              );
+            },
           ),
         ),
       ]),

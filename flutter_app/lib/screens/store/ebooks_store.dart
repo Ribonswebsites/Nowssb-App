@@ -24,6 +24,7 @@ import 'store_section_mix.dart';
 import 'store_select_sheet.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
+import 'store_drift_banners.dart';
 import '../../widgets/routine_deck.dart';
 import 'store_terms_sheet.dart';
 import '../poster/poster_kit.dart' show inr;
@@ -90,11 +91,7 @@ class _EbooksBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final books = _books;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      // Server-driven order (Admin → UI Editor); bundled order by default.
-      children: [
-        const StoreRoomDeck(current: 'ebooks'),
+    final decks = <Widget>[
         RoutineDeck(
           title: 'Books',
           banner: 'eBooks',
@@ -135,6 +132,21 @@ class _EbooksBody extends StatelessWidget {
                   ),
             ],
           ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const StoreRoomDeck(current: 'ebooks'),
+        ...everyFiveStoreRows(
+          decks,
+          onDeal: (d) => openAtelierWord(
+            context,
+            word: d.word,
+            root: d.root,
+            img: kNowssbStoreMark,
+            price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'),
+          ),
+        ),
       ],
     );
   }

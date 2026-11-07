@@ -15,11 +15,13 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../data/content.dart';
 import '../../data/store_catalog.dart';
+import '../../data/store_prices.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/page_shell.dart';
 import 'store_actions.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
+import 'store_drift_banners.dart';
 import '../../widgets/routine_deck.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/app_thinking_loader.dart';
@@ -248,10 +250,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       (cats[m.category] ??= []).add(m);
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const StoreRoomDeck(current: 'meaning'),
+    final decks = <Widget>[
         for (final cat in cats.keys)
           RoutineDeck(
             title: cat,
@@ -294,6 +293,21 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   ),
             ],
           ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const StoreRoomDeck(current: 'meaning'),
+        ...everyFiveStoreRows(
+          decks,
+          onDeal: (d) => openAtelierWord(
+            context,
+            word: d.word,
+            root: d.root,
+            img: kNowssbStoreMark,
+            price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'),
+          ),
+        ),
       ],
     );
   }

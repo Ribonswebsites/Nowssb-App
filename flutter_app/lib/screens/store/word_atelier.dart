@@ -22,6 +22,8 @@ import 'request_words.dart';
 import 'store_actions.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
+import 'store_drift_banners.dart';
+import 'daily_deals.dart';
 import 'store_shelf.dart';
 import '../../widgets/routine_deck.dart';
 import 'store_terms_sheet.dart';
@@ -132,12 +134,17 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     return out;
   }
 
+  void _openDeal(DailyDeal d) => openAtelierWord(
+        context,
+        word: d.word,
+        root: d.root,
+        img: kNowssbStoreMark,
+        price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'),
+      );
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const StoreRoomDeck(current: 'word'),
+    final decks = <Widget>[
         for (final cat in kRmCategories)
           if (cat.words.any((w) => _match(w.word, w.root)))
             RoutineDeck(
@@ -182,6 +189,12 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                   ),
             ],
           ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const StoreRoomDeck(current: 'word'),
+        ...everyFiveStoreRows(decks, onDeal: _openDeal),
       ],
     );
   }

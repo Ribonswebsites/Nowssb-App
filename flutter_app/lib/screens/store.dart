@@ -19,6 +19,11 @@ import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/nwsb_icon.dart';
 import '../features/bazaar/bazaar_screen.dart';
+import '../data/store_prices.dart';
+import 'store/daily_deals.dart';
+import 'store/product_detail.dart';
+import 'store/store_art.dart';
+import 'store/store_drift_banners.dart';
 import 'store/bag_ui.dart';
 import 'store/store_home_sections.dart';
 
@@ -76,6 +81,14 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     if (mounted) setState(() {});
   }
 
+  void _openDeal(DailyDeal d) => openAtelierWord(
+        context,
+        word: d.word,
+        root: d.root,
+        img: kNowssbStoreMark,
+        price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'),
+      );
+
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
@@ -107,6 +120,8 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ],
         ),
       ),
+      StoreDriftBanner(onDeal: _openDeal),
+      StoreSlashBanner(onDeal: _openDeal),
       // Resale is paused (both programme PDFs): the Resell tab shows only
       // when an admin turns on config/app flags.resale.
       if (!AppControl.instance.flag('resale', fallback: false))
