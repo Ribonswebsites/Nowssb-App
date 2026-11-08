@@ -221,12 +221,10 @@ class _World {
   final Alignment align;
 }
 
-const _black = Color(0xFF050505);
-
 const _worlds = [
-  _World('Breath', 'dl-depth-breath', _black, _black),
-  _World('Sound', 'dl-depth-sound', _black, _black),
-  _World('Sleep', 'dl-depth-sleep', _black, _black),
+  _World('Breath', 'dl-depth-breath', Color(0xFFE88B5A), Color(0xFF3A1E2B)),
+  _World('Sound', 'dl-depth-sound', Color(0xFFC9A46A), Color(0xFF2A2219)),
+  _World('Sleep', 'dl-depth-sleep', Color(0xFF6B7BD6), Color(0xFF0F1433)),
 ];
 
 class _WordLook {
@@ -255,9 +253,17 @@ class MixedHero extends StatelessWidget {
         key: const ValueKey('hero-preview'),
         eyebrow: 'NowssB',
         title: data.title.trim().isEmpty ? 'NowssB' : data.title.trim(),
+        image: 'assets/home/dl/preview-woman.webp',
+        ground: const Color(0xFF050505),
+        data: data,
+      ),
+      (off) => _PreviewBoxCard(
+        key: const ValueKey('hero-preview-clip'),
+        eyebrow: 'NowssB',
+        title: data.title.trim().isEmpty ? 'NowssB' : data.title.trim(),
         image: 'assets/home/dl/preview-session.webp',
         video: 'assets/video/sound-face.mp4',
-        ground: _black,
+        ground: const Color(0xFF19191B),
         data: data,
       ),
       (off) => _PreviewBoxCard(
@@ -265,17 +271,17 @@ class MixedHero extends StatelessWidget {
         eyebrow: "Today's word",
         title: (word == null || word.word.trim().isEmpty) ? 'Practice' : word.word.trim(),
         image: 'assets/home/dl/preview-word.webp',
-        ground: _black,
+        ground: const Color(0xFF863927),
         data: data,
         saveWord: word?.word,
       ),
       (off) => _PaperRitualSlot(data: data),
       (off) => _DepthCard(data: data, parallax: off),
-      (off) => _WordCard2(look: const _WordLook('film:hero-breath', _black, _black), data: data, word: w(0), parallax: off),
-      (off) => _CinemaCard(photo: 'film:hero-dusk', kicker: 'Dusk', tone: _black, data: data, word: w(1), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('film:hero-sound', _black, _black), data: data, word: w(1), parallax: off),
-      (off) => _CinemaCard(photo: 'film:hero-release', kicker: 'Release', tone: _black, data: data, word: w(2), parallax: off),
-      (off) => _WordCard2(look: const _WordLook('film:hero-rise', _black, _black), data: data, word: w(2), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-breath', Color(0xFF050505), Color(0xFF050505)), data: data, word: w(0), parallax: off),
+      (off) => _CinemaCard(photo: 'film:hero-dusk', kicker: 'Dusk', tone: const Color(0xFF050505), data: data, word: w(1), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-sound', Color(0xFF050505), Color(0xFF050505)), data: data, word: w(1), parallax: off),
+      (off) => _CinemaCard(photo: 'film:hero-release', kicker: 'Release', tone: const Color(0xFF050505), data: data, word: w(2), parallax: off),
+      (off) => _WordCard2(look: const _WordLook('film:hero-rise', Color(0xFF050505), Color(0xFF050505)), data: data, word: w(2), parallax: off),
     ];
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 14),
@@ -650,12 +656,16 @@ class _DepthCardState extends State<_DepthCard> with SingleTickerProviderStateMi
         borderRadius: BorderRadius.circular(28),
         child: Stack(fit: StackFit.expand, children: [
           // White neumorphic plate behind the photo sheets (Normal home is all white).
-          const ColoredBox(color: _black),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(center: Alignment(0, -.6), radius: 1.2, colors: [Color(0xFFFFFFFF), Color(0xFFE9ECF3)]),
+            ),
+          ),
           Positioned(
             left: 22, top: 20, right: 20,
             child: Row(children: [
-              Expanded(child: Text('PRACTICES · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xE6FFFFFF)), maxLines: 1, overflow: TextOverflow.ellipsis)),
-              _SaveButton(data: data, word: data.words.isEmpty ? null : data.words.first.word),
+              Expanded(child: Text('PRACTICES · ${data.partLabel.toUpperCase()}', style: _kick(const Color(0xCC1A1A2E)), maxLines: 1, overflow: TextOverflow.ellipsis)),
+              _SaveButton(data: data, word: data.words.isEmpty ? null : data.words.first.word, light: true),
             ]),
           ),
           // The stack lives in its own inset box; nothing escapes the card.

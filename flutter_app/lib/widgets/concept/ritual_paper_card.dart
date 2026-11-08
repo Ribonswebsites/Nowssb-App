@@ -29,35 +29,34 @@ class PaperRitualPalette {
     this.moon = false, required this.arcPos, required this.motion,
   });
 
-  static const _night = Color(0xFF050505);
   static PaperRitualPalette of(RitualTime t) => switch (t) {
         RitualTime.morning => const PaperRitualPalette(
             word: 'MORNING', title: 'Morning Ritual',
-            sky: [_night, _night, _night],
-            orb: Color(0xFFE8E4DC), orbGlow: Color(0x33E8E4DC),
-            far: _night, mid: _night, near: _night,
-            ink: Color(0xFF1A1A1A), accent: Color(0xFFE8E4DC), poster: Color(0x22FFFFFF),
+            sky: [Color(0xFFFFE3C4), Color(0xFFFFC9B0), Color(0xFFF6A79A)],
+            orb: Color(0xFFFF8A3D), orbGlow: Color(0xFFFFD08A),
+            far: Color(0xFFF3B8A6), mid: Color(0xFFE9897A), near: Color(0xFFC85C5C),
+            ink: Color(0xFF3A1E1E), accent: Color(0xFFFF7A3D), poster: Color(0x55FFFFFF),
             arcPos: .22, motion: 1),
         RitualTime.afternoon => const PaperRitualPalette(
             word: 'NOON', title: 'Afternoon Ritual',
-            sky: [_night, _night, _night],
-            orb: Color(0xFFE8E4DC), orbGlow: Color(0x33E8E4DC),
-            far: _night, mid: _night, near: _night,
-            ink: Color(0xFF1A1A1A), accent: Color(0xFFE8E4DC), poster: Color(0x22FFFFFF),
+            sky: [Color(0xFFCFF2FF), Color(0xFF9FDCF5), Color(0xFF7CC6E8)],
+            orb: Color(0xFFFFD447), orbGlow: Color(0xFFFFF1A8),
+            far: Color(0xFFB5E3D2), mid: Color(0xFF6CC3A6), near: Color(0xFF2E8C7A),
+            ink: Color(0xFF10343A), accent: Color(0xFF1C9C86), poster: Color(0x66FFFFFF),
             arcPos: .5, motion: 1),
         RitualTime.evening => const PaperRitualPalette(
             word: 'DUSK', title: 'Evening Ritual',
-            sky: [_night, _night, _night],
-            orb: Color(0xFFE8E4DC), orbGlow: Color(0x33E8E4DC),
-            far: _night, mid: _night, near: _night,
-            ink: Color(0xFF1A1A1A), accent: Color(0xFFE8E4DC), poster: Color(0x22FFFFFF),
+            sky: [Color(0xFF6B4BA8), Color(0xFFD9638A), Color(0xFFFFA569)],
+            orb: Color(0xFFFF5E5B), orbGlow: Color(0xFFFFB36B),
+            far: Color(0xFFB0577F), mid: Color(0xFF7A3B78), near: Color(0xFF3D2152),
+            ink: Color(0xFF2A1638), accent: Color(0xFFE2557A), poster: Color(0x40FFFFFF),
             arcPos: .8, motion: .8),
         RitualTime.night => const PaperRitualPalette(
             word: 'NIGHT', title: 'Night Ritual',
-            sky: [_night, _night, _night],
-            orb: Color(0xFFF4EBC8), orbGlow: Color(0x339FB2FF),
-            far: _night, mid: _night, near: _night,
-            ink: Color(0xFF1A1A1A), accent: Color(0xFFE8E4DC), poster: Color(0x22FFFFFF),
+            sky: [Color(0xFF0B1230), Color(0xFF1B2A5C), Color(0xFF34407A)],
+            orb: Color(0xFFF4EBC8), orbGlow: Color(0xFF9FB2FF),
+            far: Color(0xFF2B3A73), mid: Color(0xFF1C2754), near: Color(0xFF0E1534),
+            ink: Color(0xFF141A33), accent: Color(0xFF6D7EF0), poster: Color(0x26FFFFFF),
             moon: true, arcPos: .64, motion: .55),
       };
 }
@@ -211,7 +210,8 @@ class _PaperRitualCardState extends State<PaperRitualCard> with TickerProviderSt
 
 extension on _PaperRitualCardState {
   Widget _bleed(PaperRitualPalette p, int done) {
-    const ink = Colors.white;
+    final light = p.moon || p.word == 'DUSK';
+    final ink = light ? Colors.white : const Color(0xFF1A1A2E);
     final scene = GestureDetector(
       behavior: HitTestBehavior.opaque,
       excludeFromSemantics: true, // the Begin button carries the action
@@ -270,7 +270,7 @@ class _SceneOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const light = true;
+    final light = p.moon || p.word == 'DUSK';
     return Stack(children: [
       // torn paper ticket: the progress fraction, poster type
       Positioned(
