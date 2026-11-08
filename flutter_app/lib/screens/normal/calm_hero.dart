@@ -266,15 +266,7 @@ class MixedHero extends StatelessWidget {
         ground: const Color(0xFF19191B),
         data: data,
       ),
-      (off) => _PreviewBoxCard(
-        key: const ValueKey('hero-preview-word'),
-        eyebrow: "Today's word",
-        title: (word == null || word.word.trim().isEmpty) ? 'Practice' : word.word.trim(),
-        image: 'assets/home/dl/preview-word.webp',
-        ground: const Color(0xFF863927),
-        data: data,
-        saveWord: word?.word,
-      ),
+      (off) => _SomaReel(data: data, word: word),
       (off) => _PaperRitualSlot(data: data),
       (off) => _DepthCard(data: data, parallax: off),
       (off) => _WordCard2(look: const _WordLook('film:hero-breath', Color(0xFF050505), Color(0xFF050505)), data: data, word: w(0), parallax: off),
@@ -884,6 +876,124 @@ class _SaveButton extends StatelessWidget {
   }
 }
 
+
+/// Today's word. Same hero size, white ground, the new clip contained
+/// (not cropped), and a horizontal strip of actions inside the card.
+class _SomaReel extends StatelessWidget {
+  const _SomaReel({required this.data, required this.word});
+  final HeroData data;
+  final Word? word;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = (word == null || word!.word.trim().isEmpty) ? 'Practice' : word!.word.trim();
+    final saved = data.isSaved?.call(word?.word) == true;
+    final chips = <_SomaChip>[
+      _SomaChip(kicker: 'Open', line: 'Begin', onTap: data.onBegin),
+      if (word != null && data.onHear != null)
+        _SomaChip(kicker: 'Hear', line: word!.word, onTap: () => data.onHear!(word!)),
+      if (data.onSave != null)
+        _SomaChip(kicker: saved ? 'Saved' : 'Save', line: 'This word', onTap: () => data.onSave?.call(word?.word)),
+      _SomaChip(kicker: 'Share', line: title, onTap: () => _sharePreview(title)),
+      if (word != null && word!.meaning.trim().isNotEmpty)
+        _SomaChip(kicker: 'Meaning', line: word!.meaning.trim(), onTap: data.onBegin),
+      for (final w in data.words)
+        if (w.word.trim().isNotEmpty && w.word.trim() != title)
+          _SomaChip(
+            kicker: w.word.trim(),
+            line: w.meaning.trim().isEmpty ? 'Word' : w.meaning.trim(),
+            onTap: data.onBegin,
+          ),
+    ];
+    return ClipRRect(
+      key: const ValueKey('hero-soma-reel'),
+      borderRadius: BorderRadius.circular(30),
+      child: ColoredBox(
+        color: const Color(0xFFFFFFFF),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 16, 0, 14),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Padding(
+              padding: EdgeInsets.only(right: 18),
+              child: Text("TODAY'S WORD",
+                  style: TextStyle(color: Color(0xFF8A8A8E), fontSize: 11, letterSpacing: 1.8, fontWeight: FontWeight.w600)),
+            ),
+            const SizedBox(height: 2),
+            Padding(
+              padding: const EdgeInsets.only(right: 18),
+              child: Text(title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xFF161616), fontSize: 40, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.2)),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 18),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
+                  child: const ColoredBox(
+                    color: Color(0xFFF3F3F1),
+                    child: NwsbVideo(
+                      asset: 'assets/video/soma-white.mp4',
+                      fit: BoxFit.contain,
+                      alignment: Alignment.center,
+                      slot: 'calm_hero.somaReel',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 72,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.only(right: 18),
+                itemCount: chips.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) => chips[i],
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+class _SomaChip extends StatelessWidget {
+  const _SomaChip({required this.kicker, required this.line, required this.onTap});
+  final String kicker;
+  final String line;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          width: 132,
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF6F6F4),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0x14000000)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(kicker,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Color(0xFF8A8A8E), fontSize: 10, letterSpacing: 1.1, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            Text(line,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Color(0xFF161616), fontSize: 13, height: 1.15, fontWeight: FontWeight.w700)),
+          ]),
+        ),
+      );
+}
 
 /// Night/Morning ritual as a hero slide: the white-neumorphic cut-paper card
 /// (Ribon 11-02), following the time of day, with real progress.

@@ -2,20 +2,15 @@
 /// a split promo, a black glass row, and a sideways poster shelf.
 library;
 
-import 'package:nowssb/widgets/word_fit_text.dart';
-import 'dart:async';
-
-import '../theme/white_neu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../features/programs/program_router.dart';
+import '../theme/white_neu.dart';
 import '../screens/subscription.dart';
 import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
-import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
-import 'program_shelf.dart';
 
 class FourBanners extends StatelessWidget {
   const FourBanners({
@@ -88,41 +83,17 @@ class TrioRail extends StatefulWidget {
 }
 
 class _RailFace {
-  const _RailFace(this.label, this.image, this.tint, this.programme, [this.tab]);
-  final String label;
+  const _RailFace(this.image, this.programme);
   final String image;
-  final Color tint;
   final Programme programme;
-  final String? tab;
-  void open(BuildContext context) => Programmes.open(context, programme, tab: tab);
+  void open(BuildContext context) => Programmes.open(context, programme);
 }
 
 class _TrioRailState extends State<TrioRail> {
-  // Normal home: a white neumorphic tile, untinted photo, ink label.
-  Widget _whiteFace(_RailFace face) => Container(
-        margin: const EdgeInsets.fromLTRB(2, 2, 2, 10),
-        padding: const EdgeInsets.all(6),
-        decoration: wnBox(radius: 16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(11),
-              child: Image(image: AssetImage(face.image), fit: BoxFit.cover, alignment: const Alignment(0, -0.3)),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 6, 4, 2),
-            child: Text(face.label, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: wnInk, fontWeight: FontWeight.w800, fontSize: 12.5, height: 1.1)),
-          ),
-        ]),
-      );
-
-  static const _loop = 80;
   static const _all = <_RailFace>[
-    _RailFace('Your Earning', 'assets/banners/earn/man-light.png', Color(0xFF8A5A12), Programme.earnings),
-    _RailFace('NowssB coins earned', 'assets/banners/earn/yoga-dark.png', Color(0xFF0F6E56), Programme.earn),
-    _RailFace('NowssB Reference', 'assets/banners/earn/sit-light.png', Color(0xFF1F4E7A), Programme.reference),
+    _RailFace('assets/banners/promo/rail-well.webp', Programme.earnings),
+    _RailFace('assets/banners/promo/rail-stones.webp', Programme.earn),
+    _RailFace('assets/banners/promo/rail-folio.webp', Programme.reference),
   ];
 
   late final List<_RailFace> _faces = [
@@ -130,126 +101,174 @@ class _TrioRailState extends State<TrioRail> {
       if (f.programme != widget.current) f,
   ];
 
-  late final PageController _pages = PageController(
-    viewportFraction: 0.52,
-    initialPage: _faces.length * (_loop ~/ 2),
-  );
-  Timer? _timer;
-
-  bool get _quiet => WidgetsBinding.instance.runtimeType.toString().contains('Test');
-
   @override
-  void initState() {
-    super.initState();
-    if (_quiet) return;
-    _timer = Timer.periodic(const Duration(milliseconds: 2400), (_) {
-      if (!mounted || !_pages.hasClients) return;
-      final current = _pages.page?.round() ?? _faces.length * (_loop ~/ 2);
-      _pages.animateToPage(
-        current + 1,
-        duration: const Duration(milliseconds: 520),
-        curve: Curves.easeOutCubic,
-      );
-    });
+  Widget build(BuildContext context) {
+    if (!onNormal(context)) return const _ProgrammeBanners();
+    return _ProgrammeDeck(faces: _faces);
   }
+}
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pages.dispose();
-    super.dispose();
-  }
+/// Three programmes, three different cards, scrolled sideways.
+/// Not one glass box, and none of the old photographs.
+class _ProgrammeDeck extends StatelessWidget {
+  const _ProgrammeDeck({required this.faces});
+  final List<_RailFace> faces;
 
   @override
   Widget build(BuildContext context) {
-    // Fashion home: each programme is its own banner, the store-card shape,
-    // not three tiles inside one glass.
-    if (!onNormal(context)) return const _ProgrammeBanners();
-    return GlassWrap(
-      margin: EdgeInsets.zero,
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-      child: SizedBox(
-        height: 176,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: const SizedBox(
-                width: 112,
-                height: 176,
-                child: Image(
-                  image: AssetImage('assets/banners/earn/hands-raise.png'),
-                  fit: BoxFit.cover,
-                  alignment: Alignment(0, -0.05),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: SizedBox(
-                height: 122,
-                child: PageView.builder(
-                  controller: _pages,
-                  padEnds: false,
-                  physics: const ClampingScrollPhysics(),
-                  itemCount: _faces.length * _loop,
-                  itemBuilder: (_, i) {
-                    final face = _faces[i % _faces.length];
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: GestureDetector(
-                        onTap: () => face.open(context),
-                        child: onNormal(context) ? _whiteFace(face) : ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              ColoredBox(color: face.tint),
-                              Image(
-                                image: AssetImage(face.image),
-                                fit: BoxFit.cover,
-                                alignment: const Alignment(0, -0.1),
-                                color: face.tint.withValues(alpha: 0.42),
-                                colorBlendMode: BlendMode.srcATop,
-                              ),
-                              const DecoratedBox(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [Color(0x00000000), Color(0xCC000000)],
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                left: 8,
-                                right: 8,
-                                bottom: 8,
-                                child: WordFitText(
-                                  face.label,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 13,
-                                    height: 1.12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+    return SizedBox(
+      height: 188,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        itemCount: faces.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (_, i) => _DeckCard(face: faces[i]),
       ),
     );
   }
+}
+
+class _DeckCard extends StatelessWidget {
+  const _DeckCard({required this.face});
+  final _RailFace face;
+
+  @override
+  Widget build(BuildContext context) {
+    final child = switch (face.programme) {
+      Programme.reference => _folio(face),
+      Programme.earnings => _well(face),
+      Programme.earn => _ring(face),
+    };
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        face.open(context);
+      },
+      child: SizedBox(width: 246, child: child),
+    );
+  }
+
+  static Widget _folio(_RailFace face) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFFCF8),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFE4DDD2)),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: Row(children: [
+            Image.asset(face.image, width: 78, height: 188, fit: BoxFit.cover),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('01  ·  LINKS', style: TextStyle(color: Color(0xFF8A8175), fontSize: 10, letterSpacing: 1.4, fontWeight: FontWeight.w700)),
+                  const Spacer(),
+                  const Text('Reference', maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Color(0xFF1C1915), fontSize: 22, height: 1, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
+                  const SizedBox(height: 6),
+                  const Text('Your links', maxLines: 2, overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: Color(0xFF6E675E), fontSize: 12.5, height: 1.25)),
+                  const Spacer(),
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: _OpenDot(ink: Color(0xFF1C1915), fill: Color(0xFFF3EDE4)),
+                  ),
+                ]),
+              ),
+            ),
+          ]),
+        ),
+      );
+
+  static Widget _well(_RailFace face) => DecoratedBox(
+        decoration: BoxDecoration(color: const Color(0xFF171412), borderRadius: BorderRadius.circular(22)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              const Expanded(
+                child: Text('02  ·  EARNED', style: TextStyle(color: Color(0xFFC4A574), fontSize: 10, letterSpacing: 1.4, fontWeight: FontWeight.w700)),
+              ),
+              ClipOval(child: Image.asset(face.image, width: 54, height: 54, fit: BoxFit.cover)),
+            ]),
+            const Spacer(),
+            const Text('Earning', maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Colors.white, fontSize: 26, height: 1, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+            const SizedBox(height: 6),
+            const Text('What you have earned', maxLines: 2, overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Color(0xFFB7A99A), fontSize: 12.5, height: 1.25)),
+            const SizedBox(height: 12),
+            const Row(children: [
+              _Tick(on: true), SizedBox(width: 4),
+              _Tick(on: true), SizedBox(width: 4),
+              _Tick(on: true), SizedBox(width: 4),
+              _Tick(on: false), SizedBox(width: 4),
+              _Tick(on: false),
+            ]),
+          ]),
+        ),
+      );
+
+  static Widget _ring(_RailFace face) => DecoratedBox(
+        decoration: BoxDecoration(color: const Color(0xFFF4E7D4), borderRadius: BorderRadius.circular(22)),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(children: [
+            Container(
+              width: 92,
+              height: 92,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFFC4A574), width: 1.5),
+              ),
+              padding: const EdgeInsets.all(6),
+              child: ClipOval(child: Image.asset(face.image, fit: BoxFit.cover)),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text('03  ·  TODAY', style: TextStyle(color: Color(0xFF8A6A3B), fontSize: 10, letterSpacing: 1.4, fontWeight: FontWeight.w700)),
+                SizedBox(height: 8),
+                Text('Coins', maxLines: 1, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Color(0xFF2A2118), fontSize: 24, height: 1, fontWeight: FontWeight.w800)),
+                SizedBox(height: 6),
+                Text('Earned today', maxLines: 2, overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: Color(0xFF6E5A40), fontSize: 12.5, height: 1.25)),
+              ]),
+            ),
+          ]),
+        ),
+      );
+}
+
+class _OpenDot extends StatelessWidget {
+  const _OpenDot({required this.ink, required this.fill});
+  final Color ink;
+  final Color fill;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(color: fill, shape: BoxShape.circle),
+        child: Icon(Icons.arrow_forward_rounded, size: 16, color: ink),
+      );
+}
+
+class _Tick extends StatelessWidget {
+  const _Tick({required this.on});
+  final bool on;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 22,
+        height: 4,
+        decoration: BoxDecoration(
+          color: on ? const Color(0xFFE7C48A) : const Color(0xFF3A332C),
+          borderRadius: BorderRadius.circular(2),
+        ),
+      );
 }
 
 /// One programme, one banner. Same shape as the store card (picture, label,

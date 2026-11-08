@@ -127,6 +127,8 @@ flutter:
     - assets/video/hero-dusk-poster.webp
     - assets/video/sound-face.mp4
     - assets/video/sound-face-poster.webp
+    - assets/video/soma-white.mp4
+    - assets/video/soma-white-poster.webp
     - assets/video/zen-tile.mp4
     - assets/video/zen-tile-poster.webp
     - assets/video/zen-card.mp4

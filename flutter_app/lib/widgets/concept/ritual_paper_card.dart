@@ -365,15 +365,11 @@ class _BeginButton extends StatefulWidget {
 }
 
 class _BeginButtonState extends State<_BeginButton> {
-  bool _down = false;
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true, label: "Begin today's session", hint: widget.p.title, excludeSemantics: true,
       child: GestureDetector(
-        onTapDown: (_) => setState(() => _down = true),
-        onTapCancel: () => setState(() => _down = false),
-        onTapUp: (_) => setState(() => _down = false),
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
@@ -381,14 +377,9 @@ class _BeginButtonState extends State<_BeginButton> {
           height: 46,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F2F7),
+            color: const Color(0xFFFFFFFF),
             borderRadius: BorderRadius.circular(23),
-            boxShadow: _down
-                ? const [BoxShadow(color: Color(0x22000000), offset: Offset(2, 2), blurRadius: 4)]
-                : const [
-                    BoxShadow(color: Color(0x33000000), offset: Offset(6, 6), blurRadius: 14),
-                    BoxShadow(color: Color(0xFFFFFFFF), offset: Offset(-5, -5), blurRadius: 12),
-                  ],
+            border: Border.all(color: const Color(0x1A1A1A2E)),
           ),
           alignment: Alignment.center,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
