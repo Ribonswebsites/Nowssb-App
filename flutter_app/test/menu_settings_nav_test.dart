@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/app_settings.dart';
+import 'package:nowssb/screens/notifications_settings.dart';
 import 'package:nowssb/widgets/home_menu_drawer.dart';
 import 'package:nowssb/widgets/glass_list_card.dart';
 import 'fake_video_platform.dart';
@@ -69,18 +70,42 @@ void main() {
     ))));
     await t.tap(find.text('open'));
     await _settle(t);
-    final cards = <GlassTile>[];
+    // The menu is one GlassItemCard per page (963fb1dd). Settings has its
+    // own card; Notifications lives in Settings and in the menu's search.
+    // The old "Activity" row was a duplicate link to Earnings and was dropped.
+    final cards = <GlassItemCard>[];
     for (var i = 0; i < 12; i++) {
-      for (final c in t.widgetList<GlassTile>(find.byType(GlassTile))) {
+      for (final c in t.widgetList<GlassItemCard>(find.byType(GlassItemCard))) {
         if (!cards.any((x) => x.title == c.title)) cards.add(c);
       }
       await t.drag(find.byType(ListView).first, const Offset(0, -300));
       await t.pump(const Duration(milliseconds: 200));
     }
-    expect(cards.map((c) => c.title), containsAll(['Settings', 'Notifications', 'Activity']));
+    expect(cards.map((c) => c.title), contains('Settings'));
+    expect(cards.every((c) => c.onTap != null), isTrue, reason: 'a menu card goes nowhere');
     cards.firstWhere((c) => c.title == 'Settings').onTap!();
     await _settle(t);
     expect(find.byType(AppSettingsScreen), findsOneWidget);
+    await t.binding.handlePopRoute();
+    await _settle(t);
+    expect(find.text('open'), findsOneWidget);
+    await t.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('menu: search finds Notifications and opens it, back returns', (t) async {
+    sizeUp(t);
+    await t.pumpWidget(MaterialApp(home: Builder(builder: (c) => Scaffold(
+      body: Center(child: TextButton(onPressed: () => showHomeMenuDrawer(c, goTab: (_) {}), child: const Text('open'))),
+    ))));
+    await t.tap(find.text('open'));
+    await _settle(t);
+    await t.enterText(find.byType(TextField).first, 'notif');
+    await _settle(t, 3);
+    final card = find.widgetWithText(GlassItemCard, 'Notifications');
+    expect(card, findsOneWidget);
+    t.widget<GlassItemCard>(card).onTap!();
+    await _settle(t);
+    expect(find.byType(NotificationsSettingsPage), findsOneWidget);
     await t.binding.handlePopRoute();
     await _settle(t);
     expect(find.text('open'), findsOneWidget);
@@ -130,14 +155,22 @@ void main() {
     await _settle(t, 4);
     expect(find.text('Close'), findsNothing);
 
-    await _reveal(t, find.text('Look'));
-    await t.tap(find.text('Look'));
+    // The tabs are now Look and sound / This phone / Account (963fb1dd).
+    await _reveal(t, find.text('Look and sound'));
+    await t.tap(find.text('Look and sound'));
     await _settle(t, 3);
-    expect(find.text('Notifications'), findsWidgets);
-    await _reveal(t, find.text('Phone'));
-    await t.tap(find.text('Phone'));
+    expect(find.text('Player Settings'), findsWidgets);
+    expect(find.text('Zen Plus'), findsWidgets);
+    await t.tap(find.text('This phone'));
     await _settle(t, 3);
     expect(find.text('Keep Screen Awake'), findsWidgets);
+    // Notifications opens its page; back returns to Settings.
+    await t.tap(find.text('Notifications').last);
+    await _settle(t);
+    expect(find.byType(NotificationsSettingsPage), findsOneWidget);
+    await t.binding.handlePopRoute();
+    await _settle(t);
+    expect(find.byType(NotificationsSettingsPage), findsNothing);
 
     await t.binding.handlePopRoute();
     await _settle(t);

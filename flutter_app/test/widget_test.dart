@@ -103,7 +103,26 @@ void main() {
       await tester.tap(find.text(label).last);
       await tester.pump(const Duration(milliseconds: 50));
       expect(tester.takeException(), isNull, reason: '$label threw');
+      if (label == 'Store') {
+        // The Store asks once, on first visit, for its research terms
+        // (store_terms_sheet.dart). It is a deliberate modal over the whole
+        // shell, nav included; a real user agrees (or taps Not Now) first.
+        await tester.pump(const Duration(milliseconds: 400));
+        final sheet = find.ancestor(
+            of: find.text('RESEARCH PROPOSAL'),
+            matching: find.byType(Scrollable));
+        expect(sheet, findsOneWidget, reason: 'Store terms sheet');
+        final agree = find.text('I Agree · Continue');
+        await tester.dragUntilVisible(agree, sheet.first, const Offset(0, -200));
+        await tester.pump(const Duration(milliseconds: 50));
+        await tester.tap(agree);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
+        expect(agree, findsNothing);
+      }
     }
+    // Let any Collect-card debounce (PendingCoins) fire before teardown.
+    await tester.pump(const Duration(seconds: 1));
   });
 
   testWidgets('a section on the home actually goes somewhere', (tester) async {
