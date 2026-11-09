@@ -14,6 +14,8 @@ anything new. Code/animation licences are in `../ATTRIBUTIONS.md`.
 | `fonts/Anton-Regular.ttf` | Anton by Vernon Adams, Google Fonts, SIL Open Font License 1.1 (`fonts/OFL-Anton.txt`) | Home "Daily Quote" poster type |
 | `fonts/CormorantGaramond-Variable.ttf` | Cormorant Garamond by Christian Thalmann, Google Fonts, SIL OFL 1.1 (`fonts/OFL-CormorantGaramond.txt`) | Home "Breathe" card |
 | `icons/notif/*.svg` | Original line icons drawn for NowssB (no third-party source) | In-app notification pop-up category icons |
+| `home/dl/dl-depth-breath.webp`, `dl-depth-sound.webp`, `dl-depth-sleep.webp` | NowssB in-house art, made for the app (first added in d387ff63, Nov 3 2026; replaced with the wider figures in 9403e93e by Ribon Patil, Nov 6 2026). The commits record no third-party source, so no outside licence is claimed | Normal-home hero Depth cards (Breath, Sound, Sleep) in `lib/screens/normal/calm_hero.dart` |
+| `icons/search.webp` | Supplied by Ribon Patil (NowssB owner); restored to `flutter_app/assets/icons` in fb96308c, Oct 20 2026. No third-party source recorded | Search button icon (Fashion home hero, Store cards) |
 
 ## Meditation photos — `assets/home/ez/` (Oct 31, 2026)
 
