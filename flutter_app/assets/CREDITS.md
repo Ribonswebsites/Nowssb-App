@@ -165,3 +165,35 @@ _Nov 3 2026: the flutter_app copies of hero-curve, flip_brand, login cards and p
 
 ## Sound-healing section photos (Nov 3, home/sh/) — real photos, warm cinematic grade, ~1600px webp
 - sh-bowl-hands — Anastasia Shuraeva, Pexels (Pexels licence), https://www.pexels.com/photo/a-person-playing-a-singing-bowl-6013481/ — Normal home "Offers and earning / Words that carry meaning" card
+
+## Store promo stills (Nov 7–8, banners/promo/) — added with the store-banner / programmes-row rebuilds
+
+Committed as "new stills" in 4a1523ef (drift-*, slash-*), cc8d6acc (quiet-*), d36a8bea (prog-*), and 962d3e25 (rail-*). No photographer, Pexels/Unsplash URL, or generation id appears in those commit messages, nearby notes, or `/workspace/ribon-nov3b`. Photographer not invented.
+
+| File | Source | Notes |
+|---|---|---|
+| `banners/promo/drift-book.webp` | source unverified | Store drift / fresh-drop still (4a1523ef) |
+| `banners/promo/drift-ear.webp` | source unverified | Store drift / fresh-drop still (4a1523ef) |
+| `banners/promo/drift-prism.webp` | source unverified | Store drift / fresh-drop still (4a1523ef) |
+| `banners/promo/drift-seal.webp` | source unverified | Store drift / fresh-drop still (4a1523ef) |
+| `banners/promo/quiet-linen.webp` | source unverified | Store quiet promo card (cc8d6acc) |
+| `banners/promo/quiet-mist.webp` | source unverified | Store quiet promo card (cc8d6acc) |
+| `banners/promo/quiet-room.webp` | source unverified | Store quiet full-bleed room (cc8d6acc) |
+| `banners/promo/quiet-stone.webp` | source unverified | Store quiet promo card (cc8d6acc) |
+| `banners/promo/quiet-water.webp` | source unverified | Store quiet promo card (cc8d6acc) |
+| `banners/promo/slash-arch.webp` | source unverified | Store slash full-bleed banner (4a1523ef) |
+| `banners/promo/slash-rings.webp` | source unverified | Store slash full-bleed banner (4a1523ef) |
+| `banners/promo/prog-bowl.webp` | source unverified | Programmes / fashion-home banner (d36a8bea) |
+| `banners/promo/prog-letter.webp` | source unverified | Programmes / fashion-home banner (d36a8bea) |
+| `banners/promo/prog-sill.webp` | source unverified | Programmes / fashion-home banner (d36a8bea) |
+| `banners/promo/rail-folio.webp` | source unverified | Your programmes rail card (962d3e25) |
+| `banners/promo/rail-stones.webp` | source unverified | Your programmes rail card (962d3e25) |
+| `banners/promo/rail-well.webp` | source unverified | Your programmes rail card (962d3e25) |
+
+## Normal-home preview portraits (Nov 7–8, home/dl/preview-*)
+
+| File | Source | Notes |
+|---|---|---|
+| `home/dl/preview-session.webp` | Supplied by Ribon Patil (NowssB owner) — dotted-profile style reference | 9fa1581b ("the dotted profile"). Matches Ribon style-ref `styleref/01M6HSQBQ81K3CC0S72BYNA30B.png` on the box (webp re-encode of the same portrait). |
+| `home/dl/preview-woman.webp` | Supplied by Ribon Patil (NowssB owner) — dotted-profile style reference | e9aec26a. Same portrait as preview-session / Ribon style-ref above (webp re-encode). |
+| `home/dl/preview-word.webp` | source unverified | 9fa1581b ("a different person on terracotta"). No photographer, stock URL, or generation id in commit messages or box notes. |
