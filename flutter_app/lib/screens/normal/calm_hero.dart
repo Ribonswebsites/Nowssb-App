@@ -418,22 +418,30 @@ class _PreviewOpen extends StatelessWidget {
   const _PreviewOpen({required this.onTap});
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        key: const ValueKey('hero-preview-open'),
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        child: Container(
-          height: 52,
-          decoration: BoxDecoration(
-            color: const Color(0xFF1C1C1E),
-            borderRadius: BorderRadius.circular(26),
-            border: Border.all(color: const Color(0xFF2E2E30)),
+  Widget build(BuildContext context) => Semantics(
+        // Same action as every other hero card's Begin pill: screen readers
+        // (and the shell tests) find the session start by this label.
+        container: true,
+        button: true,
+        label: "Begin today's session",
+        excludeSemantics: true,
+        child: GestureDetector(
+          key: const ValueKey('hero-preview-open'),
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Container(
+            height: 52,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C1C1E),
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: const Color(0xFF2E2E30)),
+            ),
+            child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
+              SizedBox(width: 6),
+              Text('Open', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+            ]),
           ),
-          child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.play_arrow_rounded, color: Colors.white, size: 22),
-            SizedBox(width: 6),
-            Text('Open', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-          ]),
         ),
       );
 }
