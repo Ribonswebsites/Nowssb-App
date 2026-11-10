@@ -2,6 +2,8 @@
 /// a split promo, a black glass row, and a sideways poster shelf.
 library;
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,7 +12,9 @@ import '../theme/white_neu.dart';
 import '../screens/subscription.dart';
 import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
+import 'home_text.dart';
 import 'nwsb_icon.dart';
+import 'path_aurora_banner.dart';
 
 class FourBanners extends StatelessWidget {
   const FourBanners({
@@ -271,14 +275,92 @@ class _Tick extends StatelessWidget {
       );
 }
 
-/// One programme, one banner. Same shape as the store card (picture, label,
-/// big title, round button) and not wrapped together in one glass.
-class _ProgrammeBanners extends StatelessWidget {
-  const _ProgrammeBanners();
+/// The Zen home's Programmes block: the animated aurora banner, then the
+/// three programme cards inside ONE frosted-glass panel with its own heading.
+class ProgrammesGlassSection extends StatelessWidget {
+  const ProgrammesGlassSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const PathAuroraBanner(),
+        const SizedBox(height: 14),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(32),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22, tileMode: TileMode.mirror),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(32),
+                // Frosted body, brighter at the top edge like light on glass.
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0x38FFFFFF), Color(0x14FFFFFF), Color(0x0AFFFFFF)],
+                  stops: [0, .45, 1],
+                ),
+                border: Border.all(color: const Color(0x33FFFFFF)),
+              ),
+              child: Stack(children: [
+                // The highlight: a thin bright line along the top edge.
+                Positioned(
+                  left: 44,
+                  right: 44,
+                  top: 0,
+                  child: IgnorePointer(
+                    child: Container(
+                      height: 1.2,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(colors: [Color(0x00FFFFFF), Color(0xB3FFFFFF), Color(0x00FFFFFF)]),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          const Text('YOUR PATH',
+                              key: ValueKey('prog-glass-eyebrow'),
+                              style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.8)),
+                          const SizedBox(height: 6),
+                          Text('Programmes',
+                              key: const ValueKey('prog-glass-title'),
+                              style: HomeText.heading.copyWith(fontSize: 28)),
+                          const SizedBox(height: 4),
+                          const Text('Your links, your earnings and today\u2019s coins, in one calm place.',
+                              key: ValueKey('prog-glass-sub'), style: HomeText.subline),
+                        ]),
+                      ),
+                      const _ProgrammeBanners(glass: true),
+                    ],
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// One programme, one banner. Same shape as the store card (picture, label,
+/// big title, round button). On the Zen home they sit inside one glass panel
+/// ([glass]); elsewhere each stands on its own.
+class _ProgrammeBanners extends StatelessWidget {
+  const _ProgrammeBanners({this.glass = false});
+  final bool glass;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       children: [
         _ProgBanner(
           art: 'assets/banners/promo/prog-letter.webp',
@@ -286,22 +368,25 @@ class _ProgrammeBanners extends StatelessWidget {
           title: 'Reference',
           line: 'Your links',
           programme: Programme.reference,
+          glass: glass,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _ProgBanner(
           art: 'assets/banners/promo/prog-sill.webp',
           kicker: 'Programme',
           title: 'Earning',
           line: 'What you have earned',
           programme: Programme.earnings,
+          glass: glass,
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         _ProgBanner(
           art: 'assets/banners/promo/prog-bowl.webp',
           kicker: 'Programme',
           title: 'Coins',
-          line: 'What you have earned today',
+          line: 'Earned today',
           programme: Programme.earn,
+          glass: glass,
         ),
       ],
     );
@@ -315,8 +400,10 @@ class _ProgBanner extends StatelessWidget {
     required this.title,
     required this.line,
     required this.programme,
+    this.glass = false,
   });
 
+  final bool glass;
   final String art;
   final String kicker;
   final String title;
@@ -325,6 +412,7 @@ class _ProgBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final img = glass ? 96.0 : 116.0;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -332,36 +420,47 @@ class _ProgBanner extends StatelessWidget {
         Programmes.open(context, programme);
       },
       child: Container(
-        height: 136,
+        height: glass ? 116 : 136,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: const Color(0xF0111114),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0x33FFFFFF)),
+          // In the glass panel the cards go see-through dark so the frost
+          // shows around them; on their own they stay near-black.
+          color: glass ? const Color(0x73050507) : const Color(0xF0111114),
+          borderRadius: BorderRadius.circular(glass ? 24 : 22),
+          border: Border.all(color: glass ? const Color(0x24FFFFFF) : const Color(0x33FFFFFF)),
         ),
         child: Row(children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: Image.asset(art, width: 116, height: 116, fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF161616), child: SizedBox(width: 116, height: 116))),
+            borderRadius: BorderRadius.circular(glass ? 16 : 14),
+            child: Image.asset(art, width: img, height: img, fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => ColoredBox(color: const Color(0xFF161616), child: SizedBox(width: img, height: img))),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: glass ? 12 : 14),
           Expanded(
             child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(kicker.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 6),
-              Text(title.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: .4)),
-              const SizedBox(height: 6),
-              Text(line, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 13)),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(kicker.toUpperCase(), maxLines: 1,
+                    style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w600)),
+              ),
+              const SizedBox(height: 4),
+              // Long names shrink instead of being cut.
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(title.toUpperCase(), maxLines: 1,
+                    style: TextStyle(color: Colors.white, fontSize: glass ? 24 : 26, fontWeight: FontWeight.w900, letterSpacing: .4)),
+              ),
+              const SizedBox(height: 4),
+              Text(line, maxLines: 2, overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13, height: 1.25)),
             ]),
           ),
           const SizedBox(width: 8),
           Container(
-            width: 46,
-            height: 46,
+            width: 44,
+            height: 44,
             decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
             child: const Icon(Icons.arrow_forward_rounded, color: Colors.black, size: 22),
           ),
@@ -370,4 +469,3 @@ class _ProgBanner extends StatelessWidget {
     );
   }
 }
-

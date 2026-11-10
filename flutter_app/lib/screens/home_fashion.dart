@@ -555,8 +555,8 @@ class _HomeFashionState extends State<HomeFashion> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 10),
-                child: TrioRail(),
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 14),
+                child: ProgrammesGlassSection(),
               ),
               const NmHorizontalRoutineCards(fashion: true),
               SizedBox(height: kFashSectionGap),
