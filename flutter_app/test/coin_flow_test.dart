@@ -1,6 +1,7 @@
 // The daily "Open the app" coins: the Collect pop-up always shows, nothing is
-// credited without a tap on Collect, Collect shows the top coin bar at once,
-// and Later leaves the coins waiting. Set COINFLOW_SHOTS=<dir> for renders.
+// credited without a tap on Collect, the fly-in and count-up run only after
+// the credit is confirmed, and Later leaves the coins waiting. Set
+// COINFLOW_SHOTS=<dir> for renders.
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -190,7 +191,7 @@ void main() {
     expect(p!.getString('nwsb_pending_coins_v1'), contains('"open"'));
   });
 
-  testWidgets('Collect shows the top coin bar and its flight within 300 ms, even with a slow server', (t) async {
+  testWidgets('Collect does not fly or count up until the credit is confirmed', (t) async {
     final slow = Completer<void>();
     EconomyApi.debugHandler = (name, data) async {
       calls.add('$name:${data['action'] ?? ''}');
@@ -209,18 +210,26 @@ void main() {
     for (var i = 0; i < 10; i++) {
       await t.pump(const Duration(milliseconds: 30)); // real frames, 300 ms in all
     }
-    expect(find.byType(CoinWalletPill), findsOneWidget, reason: 'the bar is up 300 ms after the tap');
-    expect(find.text('today 45 · 10 left'), findsOneWidget, reason: 'with the coins already counted');
-    await _snap(t, '2-bar-300ms');
-    expect(calls, ['reportAction:open'], reason: 'the server call is alongside, not in front');
+    expect(find.byType(CoinWalletPill), findsNothing, reason: 'no fly-in before the credit is confirmed');
+    expect(find.text('today 45 · 10 left'), findsNothing, reason: 'the wallet must not count up early');
+    expect(find.text('1245'), findsNothing);
+    expect(calls, ['reportAction:open'], reason: 'the server call is in flight, nothing credited yet');
     expect(PendingCoins.instance.total, 5, reason: 'still waiting for the server');
-    // The server answers late: everything settles, once.
+    expect(_card, findsOneWidget, reason: 'the card stays up while it waits');
+    // The server answers late: then the fly-in and count-up run, once.
     slow.complete();
+    await t.pump();
     await t.pump(const Duration(milliseconds: 100));
+    for (var i = 0; i < 10; i++) {
+      await t.pump(const Duration(milliseconds: 30));
+    }
+    expect(PendingCoins.instance.total, 0);
+    expect(find.byType(CoinWalletPill), findsOneWidget, reason: 'the bar appears only after the credit');
+    expect(find.text('today 45 · 10 left'), findsOneWidget, reason: 'with the confirmed coins counted');
+    await _snap(t, '2-bar-after-credit');
+    expect(calls.where((c) => c.startsWith('reportAction')).length, 1);
     await t.pump(const Duration(seconds: 4));
     await t.pump(const Duration(seconds: 1));
-    expect(PendingCoins.instance.total, 0);
-    expect(calls.where((c) => c.startsWith('reportAction')).length, 1);
     expect(find.byType(CoinWalletPill), findsNothing, reason: 'the flight has finished');
   });
 
@@ -252,7 +261,7 @@ void main() {
     expect(calls.where((c) => c.startsWith('reportAction')).length, 1);
   });
 
-  testWidgets('offline: the coins are kept and the user is told', (t) async {
+  testWidgets('offline: Collect does not fly or count up; coins stay pending; saved state is shown', (t) async {
     EconomyApi.debugHandler = (name, data) async {
       calls.add('$name:${data['action'] ?? ''}');
       throw EconomyException('offline', code: 'offline');
@@ -261,11 +270,22 @@ void main() {
     await _offer(t, 'open');
     await t.pump(const Duration(milliseconds: 900));
     await t.pump(const Duration(milliseconds: 600));
+    expect(find.text('40 collected · 15 left'), findsOneWidget);
     await t.tap(_card);
+    await t.pump();
+    for (var i = 0; i < 10; i++) {
+      await t.pump(const Duration(milliseconds: 30));
+    }
     await t.pump(const Duration(milliseconds: 200));
-    await t.pump(const Duration(seconds: 4));
-    expect(PendingCoins.instance.total, 5, reason: 'nothing lost');
-    expect(find.textContaining('saved to collect later'), findsOneWidget);
+    expect(find.byType(CoinWalletPill), findsNothing, reason: 'no fly-in when the credit never happened');
+    expect(find.text('1245'), findsNothing, reason: 'the wallet must not count up');
+    expect(find.text('today 45 · 10 left'), findsNothing);
+    expect(PendingCoins.instance.total, 5, reason: 'nothing lost; still pending');
+    expect(find.byKey(const Key('coin-collect-saved')), findsOneWidget);
+    expect(find.text('Saved, will collect when online'), findsOneWidget);
+    // The offer card's today bar is unchanged: no optimistic collected count.
+    expect(find.text('40 collected · 15 left'), findsOneWidget);
+    await _snap(t, '3-saved-offline');
   });
 
   testWidgets('a reward that arrives while the card is open is not collected by that tap', (t) async {

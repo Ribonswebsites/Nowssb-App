@@ -1,8 +1,10 @@
 /// Coins are never credited silently. A real activity (open the app, word of
 /// the day, a full listen, a share, a page visit…) only *offers* its coins:
 /// a gold glass card asks "Collect". Only that tap calls the server
-/// (reportAction), then the coins fly into the wallet and today's bar shows
-/// what is collected and what is still left today.
+/// (reportAction). The coins fly into the wallet and today's bar counts
+/// up only after that credit is confirmed. If the phone is offline, the
+/// coins stay pending and the card shows they will collect when online;
+/// the balance does not change.
 ///
 /// Uncollected offers wait on this phone (SharedPreferences) for the rest of
 /// the IST day; the server's daily limits are per day, so an offer from an
@@ -107,6 +109,9 @@ class PendingCoins extends ChangeNotifier {
   Future<void>? _loading;
   bool _showing = false;
   bool busy = false;
+  /// Snapshot taken at the start of a credit, used only after it confirms.
+  int? _balanceBefore;
+  CoinDay? _dayBefore;
   Timer? _debounce;
   Timer? _retry;
   int _retries = 0;
@@ -177,6 +182,8 @@ class PendingCoins extends ChangeNotifier {
     busy = false;
     _shownIds.clear();
     _retries = 0;
+    _balanceBefore = null;
+    _dayBefore = null;
     _debounce?.cancel();
     _retry?.cancel();
   }
@@ -287,10 +294,10 @@ class PendingCoins extends ChangeNotifier {
                 items: shown,
                 day: CoinDay.fromSummary(EconomyMirror.instance.summary, pending: shown.fold(0, (s, e) => s + e.coins)),
                 onCollect: () {
-                  // The bar and the flight start on this very tap; the
-                  // server call runs alongside, never in front of them.
-                  collecting ??= collectBatch(shown);
-                  Navigator.of(context).pop(true);
+                  // Credit first; the fly-in starts only after this
+                  // resolves with a confirmed gain (see after the route).
+                  collecting ??= collectBatch(shown, animate: false);
+                  return collecting!;
                 },
                 onLater: () => Navigator.of(context).pop(false),
               ),
@@ -307,7 +314,13 @@ class PendingCoins extends ChangeNotifier {
       return;
     }
     _retries = 0;
-    if (collecting != null) await collecting;
+    final pending = collecting;
+    if (pending != null) {
+      final gained = await pending;
+      // The card pops itself once the credit is confirmed; the fly-in
+      // runs only now, on the confirmed amount, never on an optimistic one.
+      if (gained > 0) await _playConfirmed(gained);
+    }
     // A reward that arrived while the card was open gets its own card.
     if (items.any((e) => !_shownIds.contains(e.id))) unawaited(show());
   }
@@ -315,10 +328,18 @@ class PendingCoins extends ChangeNotifier {
   /// Credits everything waiting. Tests and the card's tap both land here.
   Future<int> collect() => collectBatch(List.of(items));
 
-  /// The user tapped Collect for [batch]: show the top coin bar and the
-  /// flight at once with the coins that were offered, and credit them on the
-  /// server in parallel. Returns the coins the server actually credited.
-  Future<int> collectBatch(List<PendingEarn> batch) async {
+  /// The user tapped Collect for [batch]: credit them on the server first.
+  /// The fly-in and the wallet count-up run only after that credit is
+  /// confirmed, and only for the coins the server actually granted.
+  /// When [animate] is false (the Collect card), the caller plays the
+  /// flight after the card has closed. Returns the coins credited.
+  Future<int> collectBatch(List<PendingEarn> batch, {bool animate = true}) async {
+    final gained = await _creditBatch(batch);
+    if (animate && gained > 0) await _playConfirmed(gained);
+    return gained;
+  }
+
+  Future<int> _creditBatch(List<PendingEarn> batch) async {
     await _load();
     final todo = [for (final e in batch) if (items.any((x) => x.id == e.id)) e];
     if (busy || todo.isEmpty) return 0;
@@ -326,14 +347,8 @@ class PendingCoins extends ChangeNotifier {
     notifyListeners();
     final offered = todo.fold(0, (s, e) => s + e.coins);
     final mirror = EconomyMirror.instance;
-    final before = mirror.coins;
-    final day0 = CoinDay.fromSummary(mirror.summary, pending: offered);
-    final dayAfter = day0 == null
-        ? null
-        : CoinDay(collected: day0.collected + offered, left: math.max(0, day0.left - offered), ceiling: day0.ceiling);
-    HapticFeedback.mediumImpact();
-    // Immediate: not queued behind anything, not behind the network.
-    final flight = playCoins(null, offered, balanceAfter: before + offered, day: dayAfter, immediate: true);
+    _balanceBefore = mirror.coins;
+    _dayBefore = CoinDay.fromSummary(mirror.summary, pending: offered);
     var gained = 0;
     var kept = 0;
     try {
@@ -353,16 +368,37 @@ class PendingCoins extends ChangeNotifier {
         }
       }
       await _save();
-      // Today's numbers refresh in the background, after the animation has
-      // already started.
-      unawaited(EconomyApi.call('summary').then((_) {}, onError: (_) {}));
-      if (gained < offered) _tell(kept > 0 ? 'No connection. Your $kept coins are saved to collect later.' : 'Those coins were already collected today.');
+      if (gained > 0) {
+        // Refresh today's numbers in the background; the bar uses the
+        // confirmed gain, not this round-trip.
+        unawaited(EconomyApi.call('summary').then((_) {}, onError: (_) {}));
+      }
+      if (gained == 0 && kept > 0) {
+        // The card shows the saved state itself while it is still up.
+        if (!_showing) _tell('Saved, will collect when online.');
+      } else if (gained > 0 && kept > 0) {
+        _tell('Saved, $kept will collect when online.');
+      } else if (gained < offered) {
+        _tell('Those coins were already collected today.');
+      }
     } finally {
       busy = false;
       notifyListeners();
     }
-    await flight;
     return gained;
+  }
+
+  /// Fly-in and wallet count-up for a confirmed credit only. Never called
+  /// with an optimistic amount, and never when the coins were only saved.
+  Future<void> _playConfirmed(int gained) async {
+    if (gained <= 0) return;
+    HapticFeedback.mediumImpact();
+    final before = _balanceBefore ?? 0;
+    final day0 = _dayBefore;
+    final dayAfter = day0 == null
+        ? null
+        : CoinDay(collected: day0.collected + gained, left: math.max(0, day0.left - gained), ceiling: day0.ceiling);
+    await playCoins(null, gained, balanceAfter: before + gained, day: dayAfter, immediate: true);
   }
 
   void _tell(String text) {
@@ -379,7 +415,8 @@ class CoinOfferCard extends StatefulWidget {
   const CoinOfferCard({super.key, required this.items, required this.day, required this.onCollect, this.onLater});
   final List<PendingEarn> items;
   final CoinDay? day;
-  final VoidCallback onCollect;
+  /// Credits the shown coins. Returns how many the server actually granted.
+  final Future<int> Function() onCollect;
   final VoidCallback? onLater;
 
   @override
@@ -388,6 +425,7 @@ class CoinOfferCard extends StatefulWidget {
 
 class _CoinOfferCardState extends State<CoinOfferCard> with SingleTickerProviderStateMixin {
   bool _tapped = false;
+  bool _saved = false;
   late final AnimationController _t = AnimationController(vsync: this, duration: const Duration(milliseconds: 3600))..repeat();
 
   @override
@@ -461,25 +499,49 @@ class _CoinOfferCardState extends State<CoinOfferCard> with SingleTickerProvider
                       CoinDayBar(day: day),
                     ],
                     const SizedBox(height: 18),
-                    SizedBox(
-                      width: double.infinity,
-                      child: TextButton(
-                        key: const Key('coin-collect-button'),
-                        style: TextButton.styleFrom(
-                          backgroundColor: gold,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                        ),
-                        onPressed: () {
-                          if (_tapped) return;
-                          _tapped = true;
-                          widget.onCollect();
-                        },
-                        child: const Text('Collect', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Colors.black)),
+                    if (_saved) ...[
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Text('Saved, will collect when online',
+                            key: Key('coin-collect-saved'),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: gold, fontWeight: FontWeight.w700, fontSize: 15, height: 1.3)),
                       ),
-                    ),
-                    if (widget.onLater != null)
+                    ] else
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          key: const Key('coin-collect-button'),
+                          style: TextButton.styleFrom(
+                            backgroundColor: gold,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                          ),
+                          onPressed: _tapped
+                              ? null
+                              : () async {
+                                  setState(() => _tapped = true);
+                                  final nav = Navigator.of(context);
+                                  final gained = await widget.onCollect();
+                                  if (!mounted) return;
+                                  if (gained > 0) {
+                                    nav.maybePop(true);
+                                    return;
+                                  }
+                                  final still = widget.items.any((e) => PendingCoins.instance.items.any((x) => x.id == e.id));
+                                  if (still) {
+                                    setState(() => _saved = true);
+                                  } else {
+                                    nav.maybePop(false);
+                                  }
+                                },
+                          child: _tapped
+                              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.black))
+                              : const Text('Collect', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Colors.black)),
+                        ),
+                      ),
+                    if (widget.onLater != null && (!_tapped || _saved))
                       TextButton(
                         onPressed: widget.onLater,
                         child: const Text('Later', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 13)),

@@ -101,7 +101,7 @@ void main() {
         key: key,
         child: Scaffold(
           backgroundColor: const Color(0xFF05070D),
-          body: Center(child: CoinOfferCard(items: items, day: CoinDay.fromSummary(summary()), onCollect: () => tapped = true, onLater: () {})),
+          body: Center(child: CoinOfferCard(items: items, day: CoinDay.fromSummary(summary()), onCollect: () async { tapped = true; return 0; }, onLater: () {})),
         ),
       ),
     ));

@@ -210,3 +210,11 @@ Four stills that were already bundled in `assets/rails/` (in the repo since the 
 | `home/dl/preview-session.webp` | Supplied by Ribon Patil (NowssB owner) — dotted-profile style reference | 9fa1581b ("the dotted profile"). Matches Ribon style-ref `styleref/01M6HSQBQ81K3CC0S72BYNA30B.png` on the box (webp re-encode of the same portrait). |
 | `home/dl/preview-woman.webp` | Supplied by Ribon Patil (NowssB owner) — dotted-profile style reference | e9aec26a. Same portrait as preview-session / Ribon style-ref above (webp re-encode). |
 | `home/dl/preview-word.webp` | source unverified | 9fa1581b ("a different person on terracotta"). No photographer, stock URL, or generation id in commit messages or box notes. |
+
+## Home hour poster (`home/hour-ananda.webp`)
+
+Added in 301edcf1 (concept r27, 27 Oct 2026). Searched git history, commit messages, and box notes: no photographer, stock URL, or generation id is recorded, so none is invented here.
+
+| File | Source | Notes |
+|---|---|---|
+| `home/hour-ananda.webp` | source unverified | Hour poster used in Sound Library glass tiles (`lib/widgets/sound_glass.dart`). An identical copy is at `doors/hour-ananda.webp`. |
