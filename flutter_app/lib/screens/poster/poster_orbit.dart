@@ -24,13 +24,13 @@ class OrbitPoster {
 }
 
 const kOrbitPosters = <OrbitPoster>[
-  // text-free stills only (no printed words on the orbiting posters)
-  OrbitPoster('assets/hero-curve/tab-forest.webp', 'orbit.forest'),
-  OrbitPoster('assets/hero-curve/tab-beach.webp', 'orbit.beach'),
-  OrbitPoster('assets/hero-curve/tab-desert.webp', 'orbit.desert'),
-  OrbitPoster('assets/hero-curve/tab-rain.webp', 'orbit.rain'),
-  OrbitPoster('assets/hero-curve/tab-stool.webp', 'orbit.stool'),
-  OrbitPoster('assets/hero-curve/listen.webp', 'orbit.listen'),
+  // the word frames only (no person photos on the orbiting posters)
+  OrbitPoster('assets/store/words/calm.webp', 'orbit.forest'),
+  OrbitPoster('assets/store/words/breath.webp', 'orbit.beach'),
+  OrbitPoster('assets/store/words/clarity.webp', 'orbit.desert'),
+  OrbitPoster('assets/store/words/aura.webp', 'orbit.rain'),
+  OrbitPoster('assets/store/words/bloom.webp', 'orbit.stool'),
+  OrbitPoster('assets/store/words/blessing.webp', 'orbit.listen'),
 ];
 
 class PosterOrbitStage extends StatefulWidget {
@@ -183,7 +183,7 @@ class _PosterOrbitStageState extends State<PosterOrbitStage> with TickerProvider
           right: -30 + t.dx * 16,
           top: -30 - t.dy * 10,
           bottom: -30 + t.dy * 10,
-          child: Opacity(opacity: .55, child: Photo('assets/hero-curve/tab-window.webp', slot: widget.slot, id: 'orbit.backdrop', align: Alignment.topCenter)),
+          child: Opacity(opacity: .55, child: Photo('assets/store/nowssb-store-mark.png', slot: widget.slot, id: 'orbit.backdrop', align: Alignment.topCenter)),
         ),
         const Positioned.fill(
           child: DecoratedBox(

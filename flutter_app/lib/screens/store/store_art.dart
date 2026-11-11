@@ -2,6 +2,7 @@
 library;
 
 import 'store_flip_art.dart';
+import 'store_word_art.dart';
 
 const kStoreRoomArt = <String, String>{
   'word': 'assets/rails/store-word.jpg',
@@ -162,6 +163,22 @@ String _fromSet(String name, Set<String> known, String folder, String fallback) 
   final slug = _artSlug(name);
   if (slug.isNotEmpty && known.contains(slug)) return 'assets/store/$folder/$slug.webp';
   return fallback;
+}
+
+/// The word's own picture (white leather frame, headphones and the word's
+/// scene), else the Store box. Never a person cut-out.
+String storeWordFrame(String name) => _fromSet(name, kStoreWordFrames, 'words', kNowssbStoreMark);
+
+/// Product art a cart, wishlist or order line may show. The Cleopatra,
+/// blonde and red-haired figure cut-outs and campaign banners are not
+/// product pictures: any of them (also from an older saved bag) shows the
+/// NowssB Store box instead.
+String productArt(String src) {
+  const figures = ['hero-curve/', 'banners/promo/', 'banners/earn/bag-', 'cleopatra', 'aarogya-woman'];
+  for (final f in figures) {
+    if (src.contains(f)) return kNowssbStoreMark;
+  }
+  return src;
 }
 
 /// Person in white headphones with a sound wave, for this word.

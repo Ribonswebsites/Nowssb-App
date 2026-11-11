@@ -20,7 +20,7 @@ import '../../data/settings.dart';
 import '../../widgets/concept/stillwater.dart';
 import 'drop_v4_concepts.dart' show DoorHooks, DoorKind, SettingPreview, doorState, doorTitle, hourWord;
 import 'drop_v4_type.dart';
-import '../store/store_art.dart' show meaningFlipArt, storeSubjectArt;
+import '../store/store_art.dart' show kNowssbStoreMark, meaningFlipArt, storeSubjectArt;
 
 const _gold = Color(0xFFC8A96E);
 const _violet = Color(0xFF7C4DDB);
@@ -647,7 +647,7 @@ class _MoonPainter extends CustomPainter {
 /// The next word's own picture: its meaning art (e.g. Surya → sun), else
 /// the store's picture of the word.
 String _nextArt(Word? w) {
-  if (w == null) return 'assets/hero-curve/cleopatra.webp';
+  if (w == null) return kNowssbStoreMark;
   for (final tok in w.meaning.toLowerCase().split(RegExp(r'[^a-z]+'))) {
     if (tok.isEmpty) continue;
     final a = meaningFlipArt(tok);

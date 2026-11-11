@@ -54,25 +54,24 @@ const kPPlum = Color(0xFF161616);
 
 /// The real cut-outs and photos (all bundled; admin can override per slot).
 class PosterAssets {
-  // Ribon Oct 27: meditation cut-outs replace the Cleopatra / red-hair
-  // models (CC0 photos, credited in assets/CREDITS.md).
-  static const bowl = 'assets/hero-curve/cleopatra.webp';
-  static const stoneStack = 'assets/hero-curve/cleopatra.webp';
-  static const pointer = 'assets/hero-curve/pointer.webp';
-  static const seated = 'assets/hero-curve/subject.webp';
-  static const blonde = 'assets/hero-curve/tab-subject.webp';
-  static const listen = 'assets/hero-curve/listen.webp';
+  // Ribon Nov 11: no Cleopatra / blonde / red-hair figure on a store poster
+  // page; the cut-out slot shows the NowssB Store box.
+  static const bowl = 'assets/store/nowssb-store-mark.png';
+  static const stoneStack = 'assets/store/nowssb-store-mark.png';
+  static const pointer = 'assets/store/nowssb-store-mark.png';
+  static const seated = 'assets/store/nowssb-store-mark.png';
+  static const blonde = 'assets/store/nowssb-store-mark.png';
+  static const listen = 'assets/store/words/aura.webp';
 
-  // Bundled photos only (assets/rails/store/* is NOT in pubspec's bundle).
+  // Word frames only (the store's own pictures; no person photos).
   static const _photos = [
-    // TEXT-FREE stills only (Hunter: never reuse posters with printed words).
-    'assets/hero-curve/tab-forest.webp', 'assets/hero-curve/tab-rain.webp', 'assets/hero-curve/tab-beach.webp',
-    'assets/hero-curve/tab-desert.webp', 'assets/hero-curve/tab-window.webp', 'assets/hero-curve/listen.webp',
-    'assets/hero-curve/tab-stool.webp',
+    'assets/store/words/calm.webp', 'assets/store/words/breath.webp', 'assets/store/words/clarity.webp',
+    'assets/store/words/aura.webp', 'assets/store/words/bloom.webp', 'assets/store/words/blessing.webp',
+    'assets/store/words/belief.webp',
   ];
   static const _named = {
-    'word': 'assets/hero-curve/tab-desert.webp',
-    'ebooks': 'assets/hero-curve/tab-window.webp',
+    'word': 'assets/store/words/body.webp',
+    'ebooks': 'assets/store/words/belief.webp',
   };
 
   /// A real bundled photo for a catalogue category id / page (stable per id;

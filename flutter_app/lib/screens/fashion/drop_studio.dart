@@ -119,11 +119,9 @@ List<Word> dropWordsFor(List<Word> library, DateTime at) {
   return [for (var k = 0; k < kDropSize; k++) pool[(start + k) % pool.length]];
 }
 
-/// The cut-out a word wears on its poster (and in the bag): fixed per word.
-String dropCutoutFor(Word w) {
-  final i = ContentStore.instance.library.indexWhere((x) => x.key == w.key);
-  return _wordCutouts[(i < 0 ? w.word.length : i) % _wordCutouts.length];
-}
+/// The picture a word wears on its poster (and in the bag): the word's own
+/// frame, else the NowssB Store box. Never a person cut-out.
+String dropCutoutFor(Word w) => storeWordFrame(w.word);
 
 const _slot = 'drop_studio.DropStudio';
 const _gold = Color(0xFFC8A96E);
@@ -135,14 +133,8 @@ const _deep = Color(0xFF000000);
 
 /// Media the page uses — the same files the two replaced sections ship.
 class DropStudioAssets {
-  static const figureDrop = 'assets/hero-curve/cleopatra.webp';
-  static const figureHome = 'assets/hero-curve/pointer.webp';
-  static const stillness = 'assets/hero-curve/stillness.webp';
-  static const cosmos = 'assets/hero-curve/cosmos.webp';
-  static const body = 'assets/hero-curve/body.webp';
-  static const player = 'assets/hero-curve/banner-player.webp';
-  static const library = 'assets/hero-curve/banner-library.webp';
-  static const listen = 'assets/hero-curve/listen.webp';
+  /// The centre piece of the drop: the NowssB Store box.
+  static const storeBox = kNowssbStoreMark;
 }
 
 class FashionDropStudio extends StatefulWidget {
@@ -411,28 +403,45 @@ class _RoundIcon extends StatelessWidget {
 
 // ─── 1 · hero collage: the drop ──────────────────────────────────────────
 
-/// A tilted poster on its own depth plane.
-class _Poster extends StatelessWidget {
-  const _Poster(
-      {required this.asset, required this.id, required this.width, required this.angle, this.aspect = 1100 / 618});
-  final String asset;
-  final String id;
+/// A word poster set in type only (no photo), tilted on its own depth plane.
+class _BigWordPoster extends StatelessWidget {
+  const _BigWordPoster(
+      {required this.lines, required this.width, required this.angle, required this.id, this.dark = false});
+  final List<String> lines;
   final double width;
   final double angle;
-  final double aspect;
+  final String id;
+  final bool dark;
   @override
   Widget build(BuildContext context) => Transform.rotate(
         angle: angle,
         child: Container(
           width: width,
-          height: width / aspect,
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
           decoration: BoxDecoration(
+            color: dark ? Colors.black : const Color(0xFFF4EFE6),
             borderRadius: BorderRadius.circular(6),
             boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 24, offset: Offset(0, 14))],
             border: Border.all(color: Colors.white, width: 3),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: EditableImage.asset(asset, slot: _slot, id: id, fit: BoxFit.cover, filterQuality: FilterQuality.high),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            for (final l in lines)
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(l,
+                    softWrap: false,
+                    style: TextStyle(
+                        fontFamily: 'Anton',
+                        fontWeight: FontWeight.w400,
+                        color: dark ? Colors.white : const Color(0xFF14100A),
+                        fontSize: width * .36,
+                        height: .92,
+                        letterSpacing: -1)),
+              ),
+            const SizedBox(height: 4),
+            Container(width: 22, height: 3, color: _gold),
+          ]),
         ),
       );
 }
@@ -525,31 +534,57 @@ class _DropHero extends StatelessWidget {
                     ),
                     // gold ripple rings breathing behind the figure
                     Positioned.fill(child: CustomPaint(painter: _RingsPainter(t))),
-                    // far plane
+                    // far plane: word posters set in type only
                     Positioned(
                       left: -18,
-                      top: 26 - p * .3,
+                      top: 48 - p * .3,
                       child: Plane(
                           depth: .3,
                           phase: t,
                           drift: 3,
-                          child: const _Poster(
-                              asset: DropStudioAssets.stillness, id: 'hero.stillness', width: 200, angle: -.14)),
+                          child: const _BigWordPoster(
+                              lines: ['STILL', 'NESS'], width: 150, angle: -.14, id: 'hero.stillness')),
                     ),
                     Positioned(
                       right: -26,
-                      top: 70 - p * .45,
+                      top: 62 - p * .45,
                       child: Plane(
                           depth: .45,
                           phase: t + .3,
                           drift: 4,
-                          child:
-                              const _Poster(asset: DropStudioAssets.cosmos, id: 'hero.cosmos', width: 190, angle: .12)),
+                          child: const _BigWordPoster(
+                              lines: ['THE', 'COSMOS'], width: 150, angle: .12, dark: true, id: 'hero.cosmos')),
+                    ),
+                    // near plane: the NowssB Store box, the one centre piece
+                    Positioned(
+                      left: 50,
+                      right: 50,
+                      top: 96 + p * .15,
+                      height: 290,
+                      child: Plane(
+                        depth: 1,
+                        phase: t,
+                        drift: 2,
+                        child: ShaderMask(
+                          blendMode: BlendMode.dstIn,
+                          shaderCallback: (r) => const RadialGradient(
+                            radius: .7,
+                            colors: [Colors.white, Colors.white, Color(0x00FFFFFF)],
+                            stops: [0, .62, 1],
+                          ).createShader(r),
+                          child: const EditableImage.asset(DropStudioAssets.storeBox,
+                              slot: _slot,
+                              id: 'hero.figure',
+                              fit: BoxFit.contain,
+                              alignment: Alignment.center,
+                              filterQuality: FilterQuality.high),
+                        ),
+                      ),
                     ),
                     // mid plane
                     Positioned(
-                      left: 6,
-                      bottom: 70 - p * .2,
+                      left: 8,
+                      bottom: 30 - p * .2,
                       child: Plane(
                           depth: .6,
                           phase: t + .55,
@@ -557,31 +592,13 @@ class _DropHero extends StatelessWidget {
                           child: const _TypePoster(lines: ['YOUR', 'CURE'], width: 116, angle: -.08)),
                     ),
                     Positioned(
-                      right: 2,
-                      bottom: 28 - p * .25,
+                      right: 6,
+                      bottom: 14 - p * .25,
                       child: Plane(
                           depth: .7,
                           phase: t + .8,
                           drift: 5,
-                          child: const _Poster(asset: DropStudioAssets.body, id: 'hero.body', width: 170, angle: .09)),
-                    ),
-                    // near plane: cut-out figure
-                    Positioned(
-                      left: 40,
-                      right: 30,
-                      top: 30 + p * .15,
-                      bottom: -6,
-                      child: Plane(
-                        depth: 1,
-                        phase: t,
-                        drift: 2,
-                        child: const EditableImage.asset(DropStudioAssets.figureDrop,
-                            slot: _slot,
-                            id: 'hero.figure',
-                            fit: BoxFit.contain,
-                            alignment: Alignment.bottomCenter,
-                            filterQuality: FilterQuality.high),
-                      ),
+                          child: const _BigWordPoster(lines: ['BODY', 'KNOWS'], width: 128, angle: .09, id: 'hero.body')),
                     ),
                     // label chip
                     Positioned(
@@ -673,14 +690,6 @@ class _Chip extends StatelessWidget {
 }
 
 // ─── 2 · words deck: tilted posters, swipe the top one away ──────────────
-
-/// Cut-outs (alpha) the word posters layer over their giant type.
-const _wordCutouts = [
-  'assets/hero-curve/subject.webp',
-  'assets/hero-curve/cleopatra.webp',
-  'assets/hero-curve/tab-subject.webp',
-  'assets/hero-curve/pointer.webp',
-];
 
 class _WordsDeck extends StatefulWidget {
   const _WordsDeck({required this.words, required this.top, required this.onOpen, this.onBuy});
@@ -907,18 +916,27 @@ class _WordPoster extends StatelessWidget {
                         letterSpacing: -3)),
               ),
             ],
-            // cut-out photo layered over the type
+            // the word's own picture (never a person), framed
             Positioned(
-              right: -44,
-              bottom: 0,
-              width: width * .72,
-              height: width * 1.0,
-              child: EditableImage.asset(cutout,
-                  slot: _slot,
-                  id: 'word.$n.cutout',
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomRight,
-                  filterQuality: FilterQuality.high),
+              right: 12,
+              bottom: 74,
+              width: width * .46,
+              height: width * .46,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 6))],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: EditableImage.asset(cutout,
+                      slot: _slot,
+                      id: 'word.$n.cutout',
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high),
+                ),
+              ),
             ),
             if (front) ...[
               Positioned(
@@ -1098,7 +1116,7 @@ class _HowItFlows extends StatelessWidget {
               child: Transform.rotate(
                 angle: -.09,
                 child: const _FlowTile(
-                    word: 'PICK', sub: 'A WORD THIS HOUR', asset: DropStudioAssets.cosmos, id: 'flow.pick', seed: 3),
+                    word: 'PICK', sub: 'A WORD THIS HOUR', asset: 'assets/store/words/calm.webp', id: 'flow.pick', seed: 3),
               ),
             ),
             Positioned(
@@ -1107,7 +1125,7 @@ class _HowItFlows extends StatelessWidget {
               child: Transform.rotate(
                 angle: .07,
                 child: const _FlowTile(
-                    word: 'HEAR', sub: 'ITS SOUND', asset: DropStudioAssets.listen, id: 'flow.hear', seed: 7),
+                    word: 'HEAR', sub: 'ITS SOUND', asset: 'assets/store/words/breath.webp', id: 'flow.hear', seed: 7),
               ),
             ),
             Positioned(
@@ -1116,7 +1134,7 @@ class _HowItFlows extends StatelessWidget {
               child: Transform.rotate(
                 angle: -.04,
                 child: const _FlowTile(
-                    word: 'OWN', sub: 'KEEP IT', asset: DropStudioAssets.library, id: 'flow.own', seed: 11),
+                    word: 'OWN', sub: 'KEEP IT', asset: DropStudioAssets.storeBox, id: 'flow.own', seed: 11),
               ),
             ),
           ]),

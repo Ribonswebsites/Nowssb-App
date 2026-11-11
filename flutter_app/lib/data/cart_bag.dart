@@ -12,17 +12,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'billing_config.dart';
 import 'firebase.dart';
+import '../screens/store/store_art.dart' show productArt;
 
 class BagItem {
   BagItem({
     required this.id,
     required this.title,
     required this.subtitle,
-    required this.image,
+    required String image,
     required this.price,
     required this.kind,
     this.qty = 1,
-  });
+  }) : image = productArt(image);
 
   final String id;
   final String title;

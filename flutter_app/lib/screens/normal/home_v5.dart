@@ -63,10 +63,10 @@ ImageProvider? v5Thumb(String src) {
   return null;
 }
 
-List<ImageProvider> _thumbs(Iterable<BagItem> items) => [
-      for (final i in items)
-        if (v5Thumb(i.image) case final p?) p,
-    ].take(3).toList();
+/// One bay picture per shelf: the NowssB Store box, standing alone (no
+/// stack, no person art). An empty bay keeps its dashed outline.
+List<ImageProvider> _thumbs(Iterable<BagItem> items) =>
+    items.isEmpty ? const [] : const [AssetImage('assets/home/nowssb-store.webp')];
 
 /// Cart, wishlist and orders from CartBag (counts and item images).
 class V5Own extends StatelessWidget {

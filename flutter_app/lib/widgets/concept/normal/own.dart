@@ -65,7 +65,7 @@ class _Bay extends StatelessWidget {
   final double t;
   @override
   Widget build(BuildContext context) {
-    const w = 44.0, h = 60.0;
+    final w = thumbs.isEmpty ? 44.0 : 62.0, h = thumbs.isEmpty ? 60.0 : 62.0;
     final shown = thumbs.take(3).toList();
     final n = shown.length;
     return SizedBox(height: 72, child: Stack(alignment: Alignment.bottomCenter, clipBehavior: Clip.none, children: [
