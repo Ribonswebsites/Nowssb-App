@@ -133,6 +133,16 @@ flutter:
     - assets/video/zen-tile-poster.webp
     - assets/video/zen-card.mp4
     - assets/video/zen-card-poster.webp
+    - assets/video/zp-man-black.mp4
+    - assets/video/zp-man-black-poster.webp
+    - assets/video/zp-man-asian.mp4
+    - assets/video/zp-man-asian-poster.webp
+    - assets/video/zp-woman-indian.mp4
+    - assets/video/zp-woman-indian-poster.webp
+    - assets/video/zp-woman-silver.mp4
+    - assets/video/zp-woman-silver-poster.webp
+    - assets/video/zp-man-latino.mp4
+    - assets/video/zp-man-latino-poster.webp
     - assets/video/nm-calm-clouds.mp4
     - assets/video/nm-calm-clouds-poster.webp
     - assets/video/nm-calm-stream.mp4

@@ -15,6 +15,7 @@ import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/screens/normal/home_v4.dart';
 import 'package:nowssb/widgets/concept/normal/ebooks.dart';
 import 'package:nowssb/widgets/concept/normal/fashion_plus_entry.dart';
+import 'package:nowssb/widgets/concept/normal/surface.dart' show NormalMotion;
 import 'package:nowssb/widgets/sound_glass.dart';
 
 import 'support/home_render.dart';
@@ -51,14 +52,14 @@ Widget _app(Widget child, {double scale = 1}) => MaterialApp(
       ),
     );
 
-Future<void> _shot(WidgetTester t, String name) async {
+Future<void> _shot(WidgetTester t, String name, {String folder = 'homecards'}) async {
   await precacheAll(t);
   await t.pump(const Duration(milliseconds: 300));
   final b = t.renderObject<RenderRepaintBoundary>(find.byKey(const ValueKey('shot')));
   await t.runAsync(() async {
     final img = await b.toImage(pixelRatio: 2);
     final bytes = await img.toByteData(format: ImageByteFormat.png);
-    final dir = Directory('/workspace/team-plan/shots/homecards');
+    final dir = Directory('/workspace/team-plan/shots/$folder');
     if (dir.existsSync()) File('${dir.path}/$name.png').writeAsBytesSync(bytes!.buffer.asUint8List());
   });
 }
@@ -85,10 +86,21 @@ void main() {
     }
   });
 
-  testWidgets('Zen Plus shot', (t) async {
+  testWidgets('Zen Plus shots (three carousel states)', (t) async {
     await _size(t, 390);
-    await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {})));
-    await _shot(t, 'zenplus');
+    final frames = <String, Uint8List>{};
+    NFashionPlusEntry.debugFrame = (clip) {
+      final k = clip.split('zp-').last.replaceAll('.mp4', '');
+      return MemoryImage(frames.putIfAbsent(k, () => File('/workspace/zp-work/frames/$k.png').readAsBytesSync()));
+    };
+    addTearDown(() => NFashionPlusEntry.debugFrame = null);
+    NormalMotion.freeze = .35;
+    addTearDown(() => NormalMotion.freeze = null);
+    for (final (i, name) in const [(0, 'zenplus-v2-a'), (2, 'zenplus-v2-b'), (3, 'zenplus-v2-c')]) {
+      await t.pumpWidget(_app(NFashionPlusEntry(key: ValueKey(i), onEnter: () {}, startAt: i)));
+      await t.pump(const Duration(milliseconds: 100));
+      await _shot(t, name, folder: 'zenplus-v2');
+    }
     expect(t.takeException(), isNull);
   });
 

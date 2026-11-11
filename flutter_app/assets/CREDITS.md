@@ -223,7 +223,6 @@ Added in 301edcf1 (concept r27, 27 Oct 2026). Searched git history, commit messa
 
 | Asset | Source | Licence / notes |
 |---|---|---|
-| `home/hx/zenplus-terrace.webp` | Self-generated for NowssB with the Grok Bot image tool (prompt: dawn terrace, meditator seen from behind) | Original art made for the app; no third-party source. Zen Plus card |
 | `home/hx/cover-shabdapathy.webp`, `cover-phonetic.webp`, `cover-atlas.webp` | Self-generated for NowssB (same tool): palm-leaf manuscript, sound-wave landscape, singing-bowl still life | Original art; no text in the images, titles are set in Flutter. eBooks covers |
 | `home/hx/offers-bowl.webp` | Self-generated for NowssB (same tool): brass bowl, coins, mala, incense | Original art. Meaning Store offers card |
 | `home/hx/sound-feature.webp` | Self-generated for NowssB (same tool): headphones, singing bowl, lotus | Original art. Sound Library card |
@@ -238,3 +237,16 @@ Three plan pictures replaced so that every front and back on the Subscription pa
 | `subscription/tier-sun-front.png` (Resonance front) | Self-generated for NowssB with the Grok Bot image tool (prompt: close-up of hands in dhyana mudra on dark linen, gold rim light, no face) | Original art made for the app; no third-party source. Resized 720×1280, PNG |
 | `subscription/tier-bag-front.png` (Frequency front) | Self-generated for NowssB (same tool): monk seen from behind in a dark temple under one shaft of gold light | Original art; no third-party source |
 | `subscription/tier-nile-back.png` (Frequency X back) | Self-generated for NowssB (same tool): black raked sand ripples round one dark stone, gold edge light, no people | Original art; no third-party source |
+## Zen Plus reel — `assets/video/zp-*.mp4` and `zp-*-poster.webp` (Nov 12, 2026)
+
+Five people, each a still made with the Grok Bot image tool and then brought to life with its image-to-video tool (6 s, slow orbit, pulsing golden node mesh), in the style of the owner's reference clip. All are fictional, AI-generated people. Re-encoded 720x960, H.264, muted, CRF 25, faststart; the poster is each clip's first frame. Original work for NowssB; no third-party source.
+
+| Clip | Person |
+|---|---|
+| `zp-man-black` | older Black man, grey beard |
+| `zp-man-asian` | young East Asian man |
+| `zp-woman-indian` | South Asian woman, low bun |
+| `zp-woman-silver` | older woman, silver crop |
+| `zp-man-latino` | Latino man, wavy hair and stubble |
+
+The small rail thumbnails `assets/home/hx/zpt-*.webp` are crops of frames from these same clips.

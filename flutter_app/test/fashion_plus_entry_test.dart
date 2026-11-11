@@ -101,15 +101,45 @@ void main() {
     expect(hit, 1);
   });
 
-  testWidgets('Zen Plus shows its own new photo, once, and no video clip', (t) async {
-    await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: .7)));
-    expect(find.byKey(const ValueKey('zen-plus-lotus')), findsOneWidget);
+  testWidgets('Zen Plus is a black reel of five people: no terrace photo, no old clip', (t) async {
+    await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: .7), reduced: true));
+    expect(find.byKey(const ValueKey('zen-plus-reel')), findsOneWidget);
     expect(find.byType(GoldenBreathClip), findsNothing);
-    final names = [
-      for (final e in find.byType(Image).evaluate())
-        if ((e.widget as Image).image case AssetImage(:final assetName)) assetName,
-    ];
-    expect(names, ['assets/home/hx/zenplus-terrace.webp']);
+    for (var i = 0; i < 5; i++) {
+      expect(find.byKey(ValueKey('zen-thumb-$i')), findsOneWidget);
+    }
+    expect(File('assets/home/hx/zenplus-terrace.webp').existsSync(), isFalse);
+    for (final k in ['man-black', 'man-asian', 'woman-indian', 'woman-silver', 'man-latino']) {
+      expect(File('assets/video/zp-$k.mp4').existsSync(), isTrue, reason: k);
+      expect(File('assets/video/zp-$k-poster.webp').existsSync(), isTrue, reason: k);
+    }
+  });
+
+  testWidgets('reel moves on every 5 s, holds under a finger, resumes 5 s after it lifts', (t) async {
+    await _size(t, 390);
+    await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {})));
+    expect(find.text('01 / 05'), findsOneWidget);
+    await t.pump(const Duration(seconds: 4));
+    expect(find.text('01 / 05'), findsOneWidget);
+    await t.pump(const Duration(milliseconds: 1100));
+    await t.pump(const Duration(milliseconds: 700));
+    expect(find.text('02 / 05'), findsOneWidget);
+    // a finger holds it
+    final g = await t.startGesture(t.getCenter(find.byKey(const ValueKey('zen-plus-well'))));
+    await t.pump(const Duration(seconds: 8));
+    expect(find.text('02 / 05'), findsOneWidget);
+    await g.up();
+    await t.pump(const Duration(milliseconds: 1));
+    await t.pump(const Duration(seconds: 4));
+    expect(find.text('02 / 05'), findsOneWidget);
+    await t.pump(const Duration(milliseconds: 1100));
+    await t.pump(const Duration(milliseconds: 700));
+    expect(find.text('03 / 05'), findsOneWidget);
+    // a thumbnail jumps to its person
+    await t.tap(find.byKey(const ValueKey('zen-thumb-0')));
+    await t.pump(const Duration(milliseconds: 100));
+    await t.pump(const Duration(milliseconds: 700));
+    expect(find.text('01 / 05'), findsOneWidget);
   });
 
   for (final (name, w, s) in const [('390', 390.0, 1.0), ('320-1.3', 320.0, 1.3)]) {
