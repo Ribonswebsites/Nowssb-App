@@ -14,15 +14,16 @@ import 'package:nowssb/screens/subscription.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/four_banners.dart';
 import 'package:nowssb/widgets/glass_wrap.dart';
-import 'package:nowssb/widgets/prog_banner_carousel.dart';
+import 'package:nowssb/widgets/glass_tile_row.dart';
+import 'package:nowssb/widgets/word_fit_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_video_platform.dart';
 import 'support/home_render.dart';
 import 'support/offline_google_fonts.dart';
 
-// flutter test test/prog_glass2_test.dart --dart-define=PROGGLASS2_OUT=/out
-const _out = String.fromEnvironment('PROGGLASS2_OUT');
+// flutter test test/prog_glass2_test.dart --dart-define=PROGGLASS_OUT=/out
+const _out = String.fromEnvironment('PROGGLASS_OUT');
 
 // Stand-in for the Zen home's looping backdrop video.
 class _Back extends StatelessWidget {
@@ -64,6 +65,52 @@ Future<void> _pump(WidgetTester t, GlobalKey key, Widget child, double h, {bool 
   }
 }
 
+/// The old Zen programme door, rebuilt only to compare sizes and look.
+class _RefTile extends StatelessWidget {
+  const _RefTile();
+  @override
+  Widget build(BuildContext context) {
+    Widget small(String img, Color tint, String label) => Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              width: 100,
+              child: Stack(fit: StackFit.expand, children: [
+                ColoredBox(color: tint),
+                Image(image: AssetImage(img), fit: BoxFit.cover, alignment: const Alignment(0, -0.1), color: tint.withValues(alpha: 0.42), colorBlendMode: BlendMode.srcATop),
+                const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0xCC000000)]))),
+                Positioned(left: 8, right: 8, bottom: 8, child: WordFitText(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13, height: 1.12))),
+              ]),
+            ),
+          ),
+        );
+    return GlassWrap(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.all(8),
+      child: SizedBox(
+        height: 176,
+        child: Row(children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: const SizedBox(width: 112, height: 176, child: Image(image: AssetImage('assets/banners/earn/hands-raise.png'), fit: BoxFit.cover, alignment: Alignment(0, -0.05))),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: SizedBox(
+              height: 122,
+              child: ListView(scrollDirection: Axis.horizontal, children: [
+                small('assets/banners/earn/man-light.png', const Color(0xFF8A5A12), 'Your Earning'),
+                small('assets/banners/earn/sit-light.png', const Color(0xFF1F4E7A), 'NowssB Reference'),
+              ]),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
 void main() {
   setUpAll(() async {
     FakeVideoPlatform();
@@ -72,38 +119,54 @@ void main() {
     await setUpOfflineGoogleFonts();
   });
   tearDown(() {
-    ProgBannerCarousel.debugT = null;
-    ProgBannerCarousel.debugPage = null;
-    ProgBannerCarousel.debugLive = false;
+    GlassTileRow.debugPage = null;
+    GlassTileRow.debugLive = false;
   });
 
   for (var i = 0; i < 4; i++) {
-    testWidgets('banner slide $i', (t) async {
+    testWidgets('tile card $i', (t) async {
       if (_out.isEmpty) return;
-      ProgBannerCarousel.debugT = .3 + i * .05;
-      ProgBannerCarousel.debugPage = i;
+      GlassTileRow.debugPage = i;
       final key = GlobalKey();
-      await _pump(t, key, const Padding(padding: EdgeInsets.fromLTRB(16, 20, 16, 20), child: ProgBannerCarousel()), 290, backdrop: false);
+      await _pump(t, key, const GlassTileRow(), 250);
       expect(t.takeException(), isNull);
-      await _shot(t, key, 'banner_slide${i + 1}_390');
+      await _shot(t, key, 'card${i + 1}_390');
     });
   }
 
-  testWidgets('banner motion frames (slide 1)', (t) async {
+  // The tile this row copies: the old Zen programme door (hands-raise tall
+  // photo, tinted tiles beside it), rebuilt here only to put beside the row.
+  testWidgets('row next to the reference glass tile', (t) async {
     if (_out.isEmpty) return;
-    for (final f in [0.0, .125, .25, .375]) {
-      ProgBannerCarousel.debugT = f;
-      ProgBannerCarousel.debugPage = 0;
-      final key = GlobalKey();
-      await _pump(t, key, const Padding(padding: EdgeInsets.fromLTRB(16, 20, 16, 20), child: ProgBannerCarousel()), 290, backdrop: false);
-      await _shot(t, key, 'banner_frame_t${(f * 1000).round()}');
+    final key = GlobalKey();
+    await _pump(
+        t,
+        key,
+        const Column(children: [
+          _RefTile(),
+          GlassTileRow(),
+        ]),
+        520);
+    expect(t.takeException(), isNull);
+    await _shot(t, key, 'row_vs_reference_390');
+  });
+
+  testWidgets('every card is the same size as the reference tile', (t) async {
+    t.view.physicalSize = const Size(390 * 2, 600 * 2);
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
+    for (var i = 0; i < 4; i++) {
+      GlassTileRow.debugPage = i;
+      await t.pumpWidget(const MaterialApp(home: Scaffold(body: Column(children: [_RefTile(), GlassTileRow()]))));
+      final glass = find.byType(GlassWrap);
+      final ref = t.getSize(glass.at(0));
+      final card = t.getSize(glass.at(1));
+      expect(card, ref, reason: 'card $i: same width and same height as the reference tile');
       await t.pumpWidget(const SizedBox());
     }
   });
-
   testWidgets('wrapped section beside the Begin card', (t) async {
     if (_out.isEmpty) return;
-    ProgBannerCarousel.debugT = .3;
     final key = GlobalKey();
     await _pump(t, key, const Column(children: [FashGreeting(), ProgrammesGlassSection()]), 1480);
     expect(t.takeException(), isNull);
@@ -112,7 +175,6 @@ void main() {
 
   testWidgets('wrapped section at 320 wide', (t) async {
     if (_out.isEmpty) return;
-    ProgBannerCarousel.debugT = .3;
     final key = GlobalKey();
     t.view.physicalSize = const Size(320 * 2, 1500 * 2);
     t.view.devicePixelRatio = 2;
@@ -129,12 +191,12 @@ void main() {
   });
 
   testWidgets('glass is the shared GlassWrap, heading has the badge pattern', (t) async {
-    ProgBannerCarousel.debugT = .3;
     t.view.physicalSize = const Size(390 * 2, 2000 * 2);
     t.view.devicePixelRatio = 2;
     addTearDown(t.view.reset);
     await t.pumpWidget(MaterialApp(theme: ThemeData(fontFamily: 'DM Sans'), home: const Scaffold(body: SingleChildScrollView(child: ProgrammesGlassSection()))));
-    expect(find.byType(GlassWrap), findsOneWidget);
+    // The row's own card, plus the one pane that holds the programme cards.
+    expect(find.byType(GlassWrap), findsNWidgets(2));
     expect(find.byKey(const ValueKey('prog-glass-eyebrow')), findsOneWidget);
     expect(find.byKey(const ValueKey('prog-glass-title')), findsOneWidget);
     expect(find.text('Your path'), findsOneWidget);
@@ -147,15 +209,15 @@ void main() {
     expect(find.byWidgetPredicate((w) => w is Container && w.constraints?.maxHeight == 1.2), findsNothing);
   });
 
-  group('banner carousel', () {
-    Future<void> mount(WidgetTester t, {void Function(int)? onOpen}) async {
-      ProgBannerCarousel.debugLive = true;
+  group('tile row', () {
+    Future<void> mount(WidgetTester t, {void Function(String)? onOpen}) async {
+      GlassTileRow.debugLive = true;
       t.view.physicalSize = const Size(390 * 2, 400 * 2);
       t.view.devicePixelRatio = 2;
       addTearDown(t.view.reset);
       await t.pumpWidget(MaterialApp(
         theme: ThemeData(fontFamily: 'DM Sans'),
-        home: Scaffold(body: Center(child: Padding(padding: const EdgeInsets.all(16), child: ProgBannerCarousel(onOpen: onOpen)))),
+        home: Scaffold(body: Center(child: GlassTileRow(onOpen: onOpen))),
       ));
     }
 
@@ -167,31 +229,42 @@ void main() {
       return -1;
     }
 
-    testWidgets('four slides, dots, rotates every 5 s over 600 ms', (t) async {
+    testWidgets('four cards, each in its own glass, same size', (t) async {
       await mount(t);
       expect(find.byKey(const ValueKey('prog-dot-3')), findsOneWidget);
-      expect(find.text('Calm that\npays you back'), findsOneWidget);
+      expect(find.byKey(const ValueKey('prog-dot-4')), findsNothing);
+      expect(find.text('Earn coins'), findsOneWidget);
+      // Three photos on a card; one glass pane per card (the next card's
+      // pane is its own, not shared).
+      expect(find.byType(Image), findsNWidgets(3));
+      expect(find.byType(GlassWrap), findsOneWidget);
+      // 16 px of margin each side, 176 px of picture and 8 px of glass.
+      expect(t.getSize(find.byType(GlassWrap)), const Size(390, 176 + 16 + 2 + 16));
+    });
+
+    testWidgets('rotates every 5 s over 600 ms, round to the first', (t) async {
+      await mount(t);
       expect(dot(t), 0);
       await t.pump(const Duration(milliseconds: 4900));
       expect(dot(t), 0);
       await t.pump(const Duration(milliseconds: 200)); // 5.1 s: starts to move
-      await t.pump(const Duration(milliseconds: 700)); // done after 600 ms
+      await t.pump(const Duration(milliseconds: 300)); // 0.3 s in: part way
+      final page = t.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
+      expect(page, greaterThan(1000 * 4 * 390.0), reason: 'it has left the first card');
+      await t.pump(const Duration(milliseconds: 600));
       expect(dot(t), 1);
-      expect(find.text('Share a word,\ngrow together'), findsOneWidget);
-      await t.pump(const Duration(seconds: 5));
-      await t.pump(const Duration(milliseconds: 700));
-      expect(dot(t), 2);
-      await t.pump(const Duration(seconds: 5));
-      await t.pump(const Duration(milliseconds: 700));
-      await t.pump(const Duration(seconds: 5));
-      await t.pump(const Duration(milliseconds: 700));
-      expect(dot(t), 0, reason: 'wraps round to the first slide');
+      expect(find.text('Reference'), findsOneWidget);
+      for (var k = 2; k <= 4; k++) {
+        await t.pump(const Duration(seconds: 5));
+        await t.pump(const Duration(milliseconds: 700));
+        expect(dot(t), k % 4);
+      }
     });
 
     testWidgets('a finger pauses it and it resumes 5 s after lifting', (t) async {
       await mount(t);
       await t.pump(const Duration(seconds: 3));
-      final g = await t.startGesture(t.getCenter(find.byKey(const ValueKey('prog-banner-pager'))));
+      final g = await t.startGesture(t.getCenter(find.byKey(const ValueKey('prog-tile-pager'))));
       await t.pump(const Duration(seconds: 9)); // would have rotated at 5 s
       expect(dot(t), 0);
       await g.cancel();
@@ -202,24 +275,23 @@ void main() {
       expect(dot(t), 1);
     });
 
-    testWidgets('every button opens its page', (t) async {
-      final opened = <int>[];
+    testWidgets('every card opens its page', (t) async {
+      final opened = <String>[];
       await mount(t, onOpen: opened.add);
       for (var i = 0; i < 4; i++) {
-        await t.tap(find.byKey(const ValueKey('prog-banner-pager')));
+        await t.tap(find.byType(WordFitText).first);
         await t.pump();
         await t.pump(const Duration(seconds: 5));
         await t.pump(const Duration(milliseconds: 700));
       }
-      expect(opened.length, 4);
-      expect(opened.toSet().length, 4, reason: 'four different slides, four different buttons');
+      expect(opened, ['earn:tall', 'reference:tall', 'coins:tall', 'plus:tall']);
     });
 
     testWidgets('reduced motion: no rotation', (t) async {
-      ProgBannerCarousel.debugLive = true;
+      GlassTileRow.debugLive = true;
       await t.pumpWidget(MediaQuery(
         data: const MediaQueryData(disableAnimations: true),
-        child: MaterialApp(home: Scaffold(body: Center(child: SizedBox(width: 358, child: ProgBannerCarousel())))),
+        child: const MaterialApp(home: Scaffold(body: Center(child: GlassTileRow()))),
       ));
       await t.pump(const Duration(seconds: 12));
       expect(dot(t), 0);
@@ -227,6 +299,29 @@ void main() {
     });
   });
 
+  group('pictures', () {
+    testWidgets('twelve different pictures, none used anywhere else', (t) async {
+      final art = glassTileRowArt;
+      expect(art.length, 12);
+      expect(art.toSet().length, 12, reason: 'no picture twice in the row');
+      // Not on the old reference tile, nor in any other lib file.
+      final others = StringBuffer();
+      for (final f in Directory('lib').listSync(recursive: true).whereType<File>()) {
+        if (!f.path.endsWith('.dart') || f.path.endsWith('glass_tile_row.dart')) continue;
+        others.write(f.readAsStringSync());
+      }
+      final src = others.toString();
+      for (final a in art) {
+        expect(File(a).existsSync(), isTrue, reason: '$a exists');
+        expect(src.contains(a), isFalse, reason: '$a must not appear elsewhere');
+        expect(a.contains('hands-raise') || a.contains('man-light') || a.contains('sit-light') || a.contains('yoga-dark'), isFalse);
+      }
+      // And not one of the programme cards' own pictures.
+      for (final other in ['prog-letter', 'prog-sill', 'prog-bowl', 'rail-stones', 'quiet-room', 'rail-well']) {
+        expect(art.any((a) => a.contains(other)), isFalse);
+      }
+    });
+  });
   group('routes', () {
     testWidgets('every banner and card destination is a real page', (t) async {
       final cases = <String, Type>{
@@ -245,7 +340,6 @@ void main() {
   testWidgets('in the real Zen home', (t) async {
     if (_out.isEmpty) return;
     SharedPreferences.setMockInitialValues({});
-    ProgBannerCarousel.debugT = .3;
     const w = 390.0, h = 9000.0;
     final key = GlobalKey();
     t.view.physicalSize = const Size(w * 2, h * 2);

@@ -14,7 +14,7 @@ import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
 import 'nwsb_icon.dart';
 import 'glass_wrap.dart';
-import 'prog_banner_carousel.dart';
+import 'glass_tile_row.dart';
 
 class FourBanners extends StatelessWidget {
   const FourBanners({
@@ -275,8 +275,8 @@ class _Tick extends StatelessWidget {
       );
 }
 
-/// The Zen home's Programmes block: the rotating banner, then the
-/// programme cards inside ONE glass pane, the very same [GlassWrap] the
+/// The Zen home's Programmes block: the rotating row of glass tile cards
+/// (each in its own glass), then the programme cards inside ONE glass pane, the very same [GlassWrap] the
 /// other Zen sections sit on, under the same kind of heading (round glass
 /// badge, small grey eyebrow, bold title) as the Word Store.
 class ProgrammesGlassSection extends StatelessWidget {
@@ -287,10 +287,7 @@ class ProgrammesGlassSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Padding(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: ProgBannerCarousel(),
-        ),
+        const GlassTileRow(),
         GlassWrap(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
