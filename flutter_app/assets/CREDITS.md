@@ -192,16 +192,16 @@ Committed as "new stills" in 4a1523ef (drift-*, slash-*), cc8d6acc (quiet-*), d3
 | `banners/promo/rail-stones.webp` | source unverified | Your programmes rail card (962d3e25) |
 | `banners/promo/rail-well.webp` | source unverified | Your programmes rail card (962d3e25) |
 
-## Programme tile row (Nov 11, rails/subj-*)
+## NowssB Earn row (Nov 11, rails/subj-*)
 
-Twelve stills that were already bundled in `assets/rails/` (in the repo since the Oct 19 flutter_app baseline, 1dcf1918) and were not used anywhere in the app until now. Their source is not recorded in the repo, so none is invented here. They carry no people's faces.
+Four stills that were already bundled in `assets/rails/` (in the repo since the Oct 19 flutter_app baseline, 1dcf1918) and were not used anywhere in the app until now. Their source is not recorded in the repo, so none is invented here. They carry no people.
 
 | File | Source | Notes |
 |---|---|---|
-| `rails/subj-dawn.jpg`, `subj-soul.jpg`, `subj-forest.jpg` | source unverified | Programme tile row, Earn card |
-| `rails/subj-harmony.jpg`, `subj-river.jpg`, `subj-star.jpg` | source unverified | Programme tile row, Reference card |
-| `rails/subj-calm.jpg`, `subj-moon.jpg`, `subj-prayer.jpg` | source unverified | Programme tile row, Coins card |
-| `rails/subj-grace.jpg`, `subj-love.jpg`, `subj-ocean.jpg` | source unverified | Programme tile row, Zen Plus card |
+| `rails/subj-dawn.jpg` | source unverified | NowssB Earn row, Earn card (`lib/widgets/earn_now_section.dart`) |
+| `rails/subj-harmony.jpg` | source unverified | NowssB Earn row, Reference card |
+| `rails/subj-moon.jpg` | source unverified | NowssB Earn row, Coins card |
+| `rails/subj-grace.jpg` | source unverified | NowssB Earn row, Zen Plus card |
 
 ## Normal-home preview portraits (Nov 7–8, home/dl/preview-*)
 

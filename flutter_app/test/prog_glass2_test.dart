@@ -14,8 +14,8 @@ import 'package:nowssb/screens/subscription.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/four_banners.dart';
 import 'package:nowssb/widgets/glass_wrap.dart';
-import 'package:nowssb/widgets/glass_tile_row.dart';
-import 'package:nowssb/widgets/word_fit_text.dart';
+import 'package:nowssb/screens/fashion/home_cards.dart';
+import 'package:nowssb/widgets/earn_now_section.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_video_platform.dart';
@@ -65,51 +65,14 @@ Future<void> _pump(WidgetTester t, GlobalKey key, Widget child, double h, {bool 
   }
 }
 
-/// The old Zen programme door, rebuilt only to compare sizes and look.
-class _RefTile extends StatelessWidget {
-  const _RefTile();
-  @override
-  Widget build(BuildContext context) {
-    Widget small(String img, Color tint, String label) => Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: SizedBox(
-              width: 100,
-              child: Stack(fit: StackFit.expand, children: [
-                ColoredBox(color: tint),
-                Image(image: AssetImage(img), fit: BoxFit.cover, alignment: const Alignment(0, -0.1), color: tint.withValues(alpha: 0.42), colorBlendMode: BlendMode.srcATop),
-                const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0xCC000000)]))),
-                Positioned(left: 8, right: 8, bottom: 8, child: WordFitText(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13, height: 1.12))),
-              ]),
-            ),
-          ),
-        );
-    return GlassWrap(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      padding: const EdgeInsets.all(8),
-      child: SizedBox(
-        height: 176,
-        child: Row(children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: const SizedBox(width: 112, height: 176, child: Image(image: AssetImage('assets/banners/earn/hands-raise.png'), fit: BoxFit.cover, alignment: Alignment(0, -0.05))),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: SizedBox(
-              height: 122,
-              child: ListView(scrollDirection: Axis.horizontal, children: [
-                small('assets/banners/earn/man-light.png', const Color(0xFF8A5A12), 'Your Earning'),
-                small('assets/banners/earn/sit-light.png', const Color(0xFF1F4E7A), 'NowssB Reference'),
-              ]),
-            ),
-          ),
-        ]),
-      ),
+/// The real NowssB Store section, as the Zen home builds it.
+Widget _store() => StoreNowCarousel(
+      items: [
+        StoreNowItem(word: 'Sovereign', category: 'Premium', price: '₹99.00', onTap: () {}),
+        StoreNowItem(word: 'Storm', category: 'Elements', price: '\$0.94', percent: 20, onTap: () {}),
+      ],
+      onHeader: () {},
     );
-  }
-}
 
 void main() {
   setUpAll(() async {
@@ -119,52 +82,57 @@ void main() {
     await setUpOfflineGoogleFonts();
   });
   tearDown(() {
-    GlassTileRow.debugPage = null;
-    GlassTileRow.debugLive = false;
   });
 
-  for (var i = 0; i < 4; i++) {
-    testWidgets('tile card $i', (t) async {
-      if (_out.isEmpty) return;
-      GlassTileRow.debugPage = i;
-      final key = GlobalKey();
-      await _pump(t, key, const GlassTileRow(), 250);
-      expect(t.takeException(), isNull);
-      await _shot(t, key, 'card${i + 1}_390');
-    });
-  }
-
-  // The tile this row copies: the old Zen programme door (hands-raise tall
-  // photo, tinted tiles beside it), rebuilt here only to put beside the row.
-  testWidgets('row next to the reference glass tile', (t) async {
+  testWidgets('NowssB Earn stacked under the real NowssB Store', (t) async {
     if (_out.isEmpty) return;
     final key = GlobalKey();
-    await _pump(
-        t,
-        key,
-        const Column(children: [
-          _RefTile(),
-          GlassTileRow(),
-        ]),
-        520);
+    await _pump(t, key, Column(children: [_store(), const EarnNowSection()]), 520);
     expect(t.takeException(), isNull);
-    await _shot(t, key, 'row_vs_reference_390');
+    await _shot(t, key, 'earn_under_store_390');
   });
 
-  testWidgets('every card is the same size as the reference tile', (t) async {
-    t.view.physicalSize = const Size(390 * 2, 600 * 2);
-    t.view.devicePixelRatio = 2;
-    addTearDown(t.view.reset);
+  testWidgets('each Earn card', (t) async {
+    if (_out.isEmpty) return;
     for (var i = 0; i < 4; i++) {
-      GlassTileRow.debugPage = i;
-      await t.pumpWidget(const MaterialApp(home: Scaffold(body: Column(children: [_RefTile(), GlassTileRow()]))));
-      final glass = find.byType(GlassWrap);
-      final ref = t.getSize(glass.at(0));
-      final card = t.getSize(glass.at(1));
-      expect(card, ref, reason: 'card $i: same width and same height as the reference tile');
+      final key = GlobalKey();
+      await _pump(t, key, const EarnNowSection(), 260);
+      // Bring card i to the front.
+      final pager = find.byType(PageView);
+      for (var k = 0; k < i; k++) {
+        await t.drag(pager, const Offset(-300, 0));
+        await t.pump(const Duration(milliseconds: 700));
+      }
+      await t.pump(const Duration(milliseconds: 200));
+      await _shot(t, key, 'earn_card${i + 1}_390');
       await t.pumpWidget(const SizedBox());
     }
   });
+
+  testWidgets('the Earn section is the Store section: same glass, header, card, height', (t) async {
+    t.view.physicalSize = const Size(390 * 2, 600 * 2);
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(
+      theme: ThemeData(fontFamily: 'DM Sans'),
+      home: Scaffold(body: Column(children: [_store(), const EarnNowSection()])),
+    ));
+    final carousels = find.byType(StoreNowCarousel);
+    expect(carousels, findsNWidgets(2));
+    expect(find.byType(GlassWrap), findsNWidgets(2), reason: 'the Store wrapper and the Earn wrapper');
+    expect(t.getSize(carousels.at(0)), t.getSize(carousels.at(1)), reason: 'same wrapper size');
+    final cards = find.byType(StoreNowCard);
+    expect(t.getSize(cards.at(0)), t.getSize(cards.last), reason: 'same card size');
+    expect(t.getSize(cards.first).height, StoreNowCard.h);
+    expect(find.text('NowssB Store'), findsOneWidget);
+    expect(find.text('NowssB Earn'), findsOneWidget);
+    expect(find.text('Buy · Sell today'), findsOneWidget);
+    expect(find.text('Earn · Collect today'), findsOneWidget);
+    expect(find.text('EARN COINS'), findsOneWidget);
+    expect(find.text('EARN'), findsOneWidget);
+    expect(find.text('Daily coins'), findsOneWidget);
+  });
+
   testWidgets('wrapped section beside the Begin card', (t) async {
     if (_out.isEmpty) return;
     final key = GlobalKey();
@@ -203,125 +171,127 @@ void main() {
     expect(find.text('Programmes'), findsOneWidget);
     // Five cards always (the lucky draw one only while the draw is on).
     expect(find.text('PROGRAMME'), findsNWidgets(4));
-    expect(find.text('MEMBERSHIP'), findsOneWidget);
+    expect(find.text('MEMBERSHIP'), findsWidgets);
     expect(find.text('Earned today'), findsOneWidget);
     // No stray highlight line along the top edge.
     expect(find.byWidgetPredicate((w) => w is Container && w.constraints?.maxHeight == 1.2), findsNothing);
   });
 
-  group('tile row', () {
+  group('Earn row', () {
     Future<void> mount(WidgetTester t, {void Function(String)? onOpen}) async {
-      GlassTileRow.debugLive = true;
       t.view.physicalSize = const Size(390 * 2, 400 * 2);
       t.view.devicePixelRatio = 2;
       addTearDown(t.view.reset);
       await t.pumpWidget(MaterialApp(
         theme: ThemeData(fontFamily: 'DM Sans'),
-        home: Scaffold(body: Center(child: GlassTileRow(onOpen: onOpen))),
+        home: Scaffold(body: Center(child: EarnNowSection(onOpen: onOpen))),
       ));
     }
 
-    int dot(WidgetTester t) {
-      for (var i = 0; i < 4; i++) {
-        final w = t.widget<AnimatedContainer>(find.byKey(ValueKey('prog-dot-$i')));
-        if ((w.constraints?.maxWidth ?? 0) > 10) return i;
+    // Frames like a phone's: the cycle only counts a wrap it sees.
+    Future<void> elapse(WidgetTester t, int ms) async {
+      for (var spent = 0; spent < ms; spent += 100) {
+        await t.pump(Duration(milliseconds: ms - spent < 100 ? ms - spent : 100));
       }
-      return -1;
     }
 
-    testWidgets('four cards, each in its own glass, same size', (t) async {
+    double px(WidgetTester t) => t.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
+
+    testWidgets('four different cards, the next one peeking in from the right', (t) async {
       await mount(t);
-      expect(find.byKey(const ValueKey('prog-dot-3')), findsOneWidget);
-      expect(find.byKey(const ValueKey('prog-dot-4')), findsNothing);
-      expect(find.text('Earn coins'), findsOneWidget);
-      // Three photos on a card; one glass pane per card (the next card's
-      // pane is its own, not shared).
-      expect(find.byType(Image), findsNWidgets(3));
-      expect(find.byType(GlassWrap), findsOneWidget);
-      // 16 px of margin each side, 176 px of picture and 8 px of glass.
-      expect(t.getSize(find.byType(GlassWrap)), const Size(390, 176 + 16 + 2 + 16));
+      for (final w in ['EARN', 'REFERENCE', 'COINS', 'ZEN PLUS']) {
+        // Built as the user scrolls; the first two are on screen already.
+        if (w == 'EARN' || w == 'REFERENCE') expect(find.text(w), findsOneWidget);
+      }
+      expect(find.text('EARN COINS'), findsOneWidget);
+      expect(find.text('YOUR LINKS'), findsOneWidget, reason: 'the second card peeks in');
     });
 
-    testWidgets('rotates every 5 s over 600 ms, round to the first', (t) async {
+    testWidgets('moves every 5 s over 600 ms with easeInOutCubic', (t) async {
       await mount(t);
-      expect(dot(t), 0);
-      await t.pump(const Duration(milliseconds: 4900));
-      expect(dot(t), 0);
-      await t.pump(const Duration(milliseconds: 200)); // 5.1 s: starts to move
-      await t.pump(const Duration(milliseconds: 300)); // 0.3 s in: part way
-      final page = t.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
-      expect(page, greaterThan(1000 * 4 * 390.0), reason: 'it has left the first card');
-      await t.pump(const Duration(milliseconds: 600));
-      expect(dot(t), 1);
-      expect(find.text('Reference'), findsOneWidget);
-      for (var k = 2; k <= 4; k++) {
-        await t.pump(const Duration(seconds: 5));
-        await t.pump(const Duration(milliseconds: 700));
-        expect(dot(t), k % 4);
-      }
+      final start = px(t);
+      await elapse(t, 4900);
+      expect(px(t), start, reason: 'still on the first card at 4.9 s');
+      await elapse(t, 200); // starts moving at 5 s
+      await elapse(t, 250); // part way
+      final mid = px(t);
+      expect(mid, greaterThan(start));
+      await elapse(t, 600);
+      final one = px(t) - start;
+      expect(one, greaterThan(250), reason: 'one card along');
+      expect(mid - start, lessThan(one * 0.9));
+      await elapse(t, 5000);
+      await elapse(t, 700);
+      expect(px(t) - start, closeTo(one * 2, 2));
     });
 
     testWidgets('a finger pauses it and it resumes 5 s after lifting', (t) async {
       await mount(t);
-      await t.pump(const Duration(seconds: 3));
-      final g = await t.startGesture(t.getCenter(find.byKey(const ValueKey('prog-tile-pager'))));
-      await t.pump(const Duration(seconds: 9)); // would have rotated at 5 s
-      expect(dot(t), 0);
+      final start = px(t);
+      await elapse(t, 3000);
+      final g = await t.startGesture(t.getCenter(find.byType(PageView)));
+      await elapse(t, 9000); // would have moved at 5 s
+      expect(px(t), start);
       await g.cancel();
-      await t.pump(const Duration(milliseconds: 4800));
-      expect(dot(t), 0);
-      await t.pump(const Duration(milliseconds: 400));
-      await t.pump(const Duration(milliseconds: 700));
-      expect(dot(t), 1);
+      await elapse(t, 4800);
+      expect(px(t), start, reason: 'not before 5 s after the lift');
+      await elapse(t, 500);
+      await elapse(t, 700);
+      expect(px(t), greaterThan(start + 250));
+    });
+
+    testWidgets('the Store row keeps its own drift (3 s, no pause)', (t) async {
+      t.view.physicalSize = const Size(390 * 2, 400 * 2);
+      t.view.devicePixelRatio = 2;
+      addTearDown(t.view.reset);
+      await t.pumpWidget(MaterialApp(home: Scaffold(body: Center(child: _store()))));
+      final start = t.state<ScrollableState>(find.byType(Scrollable).first).position.pixels;
+      await elapse(t, 3200);
+      await elapse(t, 700);
+      expect(t.state<ScrollableState>(find.byType(Scrollable).first).position.pixels, greaterThan(start));
     });
 
     testWidgets('every card opens its page', (t) async {
       final opened = <String>[];
       await mount(t, onOpen: opened.add);
       for (var i = 0; i < 4; i++) {
-        await t.tap(find.byType(WordFitText).first);
+        final cards = find.byType(StoreNowCard).evaluate().map((e) => e.renderObject! as RenderBox).toList();
+        final onScreen = cards.firstWhere((b) {
+          final x = b.localToGlobal(Offset.zero).dx;
+          return x >= 0 && x < 100;
+        });
+        await t.tapAt(onScreen.localToGlobal(onScreen.size.center(Offset.zero)));
         await t.pump();
-        await t.pump(const Duration(seconds: 5));
-        await t.pump(const Duration(milliseconds: 700));
+        await elapse(t, 5300);
+        await elapse(t, 700);
       }
-      expect(opened, ['earn:tall', 'reference:tall', 'coins:tall', 'plus:tall']);
-    });
-
-    testWidgets('reduced motion: no rotation', (t) async {
-      GlassTileRow.debugLive = true;
-      await t.pumpWidget(MediaQuery(
-        data: const MediaQueryData(disableAnimations: true),
-        child: const MaterialApp(home: Scaffold(body: Center(child: GlassTileRow()))),
-      ));
-      await t.pump(const Duration(seconds: 12));
-      expect(dot(t), 0);
-      expect(t.binding.transientCallbackCount, 0);
+      expect(opened.length, 4);
+      expect(opened.toSet().length, 4);
+      expect(opened, containsAll(['earn', 'reference', 'coins', 'plus']));
     });
   });
 
   group('pictures', () {
-    testWidgets('twelve different pictures, none used anywhere else', (t) async {
-      final art = glassTileRowArt;
-      expect(art.length, 12);
-      expect(art.toSet().length, 12, reason: 'no picture twice in the row');
-      // Not on the old reference tile, nor in any other lib file.
+    testWidgets('four different pictures, none used anywhere else', (t) async {
+      final art = kEarnNowArt;
+      expect(art.length, 4);
+      expect(art.toSet().length, 4);
       final others = StringBuffer();
       for (final f in Directory('lib').listSync(recursive: true).whereType<File>()) {
-        if (!f.path.endsWith('.dart') || f.path.endsWith('glass_tile_row.dart')) continue;
+        if (!f.path.endsWith('.dart') || f.path.endsWith('earn_now_section.dart')) continue;
         others.write(f.readAsStringSync());
       }
       final src = others.toString();
       for (final a in art) {
         expect(File(a).existsSync(), isTrue, reason: '$a exists');
         expect(src.contains(a), isFalse, reason: '$a must not appear elsewhere');
-        expect(a.contains('hands-raise') || a.contains('man-light') || a.contains('sit-light') || a.contains('yoga-dark'), isFalse);
       }
-      // And not one of the programme cards' own pictures.
-      for (final other in ['prog-letter', 'prog-sill', 'prog-bowl', 'rail-stones', 'quiet-room', 'rail-well']) {
+      for (final other in ['prog-letter', 'prog-sill', 'prog-bowl', 'rail-stones', 'quiet-room', 'rail-well', 'hands-raise', 'nowssb-store']) {
         expect(art.any((a) => a.contains(other)), isFalse);
       }
     });
   });
+
   group('routes', () {
     testWidgets('every banner and card destination is a real page', (t) async {
       final cases = <String, Type>{

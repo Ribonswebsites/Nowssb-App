@@ -23,6 +23,16 @@ mixin AutoCycle<T extends StatefulWidget> on State<T>, SingleTickerProviderState
       ..repeat();
   }
 
+  /// Stand still (a finger is on the row).
+  void pauseCycle() => _cycle.stop();
+
+  /// Carry on, a whole [period] from now.
+  void restartCycle() {
+    _last = 0;
+    _cycle.value = 0;
+    _cycle.repeat();
+  }
+
   @override
   void dispose() {
     _cycle.dispose();

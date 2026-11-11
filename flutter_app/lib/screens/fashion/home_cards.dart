@@ -114,13 +114,33 @@ class _AutoMarqueeState extends State<AutoMarquee> with SingleTickerProviderStat
 
 /// One Store word for the NOW PLAYING–style card.
 class StoreNowItem {
-  const StoreNowItem({required this.word, required this.category, required this.price, this.percent = 0, required this.onTap, this.art});
+  const StoreNowItem({
+    required this.word,
+    required this.category,
+    required this.price,
+    this.percent = 0,
+    required this.onTap,
+    this.art,
+    this.eyebrow,
+    this.line,
+    this.icon,
+  });
   final String word;
   final String category;
   final String price;
   final int percent;
   final VoidCallback onTap;
   final String? art;
+
+  /// The small caps line over the title. Store words leave it empty and get
+  /// "TODAY'S WORD" / "TODAY'S DEAL".
+  final String? eyebrow;
+
+  /// The grey line under the title. Empty: "category · price".
+  final String? line;
+
+  /// The glyph in the round button. Empty: the shopping bag.
+  final IconData? icon;
 }
 
 /// Card styled like the Sound library's NOW PLAYING card.
@@ -134,7 +154,7 @@ class StoreNowCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = item.percent > 0 ? "TODAY'S DEAL · -${item.percent}%" : "TODAY'S WORD";
+    final label = item.eyebrow ?? (item.percent > 0 ? "TODAY'S DEAL · -${item.percent}%" : "TODAY'S WORD");
     return Semantics(
       button: true,
       label: '${item.word}, ${item.category}, ${item.price}',
@@ -171,7 +191,7 @@ class StoreNowCard extends StatelessWidget {
                       style: _ink.copyWith(fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: .5)),
                 ),
                 const SizedBox(height: 6),
-                Text('${item.category} · ${item.price}', maxLines: 1, overflow: TextOverflow.ellipsis,
+                Text(item.line ?? '${item.category} · ${item.price}', maxLines: 1, overflow: TextOverflow.ellipsis,
                     style: _ink.copyWith(fontSize: 13, color: const Color(0x99FFFFFF))),
               ]),
             ),
@@ -180,7 +200,7 @@ class StoreNowCard extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(color: goldButton ? const Color(0xFFE4C56A) : Colors.white, shape: BoxShape.circle),
-              child: Icon(Icons.shopping_bag_rounded, color: goldButton ? const Color(0xFF1A1200) : Colors.black, size: 22),
+              child: Icon(item.icon ?? Icons.shopping_bag_rounded, color: goldButton ? const Color(0xFF1A1200) : Colors.black, size: 22),
             ),
           ]),
         ),
@@ -191,8 +211,25 @@ class StoreNowCard extends StatelessWidget {
 
 /// Glass wrapper holding an auto-moving row of [StoreNowCard]s.
 class StoreNowCarousel extends StatefulWidget {
-  const StoreNowCarousel({super.key, required this.items, this.title = 'NowssB Store', this.kicker = 'Buy · Sell today', this.goldButton = false, this.onHeader});
+  const StoreNowCarousel({
+    super.key,
+    required this.items,
+    this.title = 'NowssB Store',
+    this.kicker = 'Buy · Sell today',
+    this.goldButton = false,
+    this.onHeader,
+    this.every,
+    this.glide = const Duration(milliseconds: 520),
+    this.curve = Curves.easeOutCubic,
+  });
   final List<StoreNowItem> items;
+
+  /// Time per card. Empty keeps the Store's own drift (3 s, no pause). Set,
+  /// the row also holds while a finger is on it and carries on [every] after
+  /// the finger lifts.
+  final Duration? every;
+  final Duration glide;
+  final Curve curve;
   final String title;
   final String kicker;
   final bool goldButton;
@@ -209,13 +246,13 @@ class _StoreNowCarouselState extends State<StoreNowCarousel> with SingleTickerPr
   late int _ix = _base * widget.items.length.clamp(1, 999);
 
   @override
-  Duration get period => const Duration(milliseconds: 3000);
+  Duration get period => widget.every ?? const Duration(milliseconds: 3000);
 
   @override
   void onTick() {
     if (!mounted || !_page.hasClients || widget.items.length < 2) return;
     _ix = (_page.page ?? _ix.toDouble()).round() + 1;
-    _page.animateToPage(_ix, duration: const Duration(milliseconds: 520), curve: Curves.easeOutCubic);
+    _page.animateToPage(_ix, duration: widget.glide, curve: widget.curve);
   }
 
   @override
@@ -257,17 +294,29 @@ class _StoreNowCarouselState extends State<StoreNowCarousel> with SingleTickerPr
         ),
         SizedBox(
           height: StoreNowCard.h,
-          child: PageView.builder(
-            controller: _page,
-            padEnds: false,
-            onPageChanged: (i) => _ix = i,
-            itemBuilder: (_, i) {
-              final item = widget.items[i % widget.items.length];
-              return Padding(
-                padding: const EdgeInsets.only(left: 12),
-                child: StoreNowCard(item: item, art: item.art ?? kHomeStoreArt, goldButton: widget.goldButton),
-              );
+          child: Listener(
+            // Only a row with its own pace pauses under a finger.
+            onPointerDown: (_) {
+              if (widget.every != null) pauseCycle();
             },
+            onPointerUp: (_) {
+              if (widget.every != null) restartCycle();
+            },
+            onPointerCancel: (_) {
+              if (widget.every != null) restartCycle();
+            },
+            child: PageView.builder(
+              controller: _page,
+              padEnds: false,
+              onPageChanged: (i) => _ix = i,
+              itemBuilder: (_, i) {
+                final item = widget.items[i % widget.items.length];
+                return Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: StoreNowCard(item: item, art: item.art ?? kHomeStoreArt, goldButton: widget.goldButton),
+                );
+              },
+            ),
           ),
         ),
       ]),
