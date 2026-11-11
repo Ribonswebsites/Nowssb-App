@@ -358,7 +358,7 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              V4SoundLibrary(onTap: () => _go(2)),
+              V4SoundLibrary(onTap: () => _go(2), onPlay: _openDashboardSession),
               V4Doors(onOpen: _openGrid),
             ],
           )

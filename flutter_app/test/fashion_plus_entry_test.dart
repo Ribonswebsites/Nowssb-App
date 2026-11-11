@@ -101,14 +101,15 @@ void main() {
     expect(hit, 1);
   });
 
-  testWidgets('Zen Plus shows the Golden Breath clip, no other photo', (t) async {
+  testWidgets('Zen Plus shows its own new photo, once, and no video clip', (t) async {
     await t.pumpWidget(_app(NFashionPlusEntry(onEnter: () {}, bgDim: .7)));
     expect(find.byKey(const ValueKey('zen-plus-lotus')), findsOneWidget);
-    expect(find.byType(GoldenBreathClip), findsOneWidget);
-    // The only picture is the clip's own poster.
-    for (final e in find.byType(Image).evaluate()) {
-      expect(find.ancestor(of: find.byWidget(e.widget), matching: find.byType(GoldenBreathClip)), findsOneWidget);
-    }
+    expect(find.byType(GoldenBreathClip), findsNothing);
+    final names = [
+      for (final e in find.byType(Image).evaluate())
+        if ((e.widget as Image).image case AssetImage(:final assetName)) assetName,
+    ];
+    expect(names, ['assets/home/hx/zenplus-terrace.webp']);
   });
 
   for (final (name, w, s) in const [('390', 390.0, 1.0), ('320-1.3', 320.0, 1.3)]) {

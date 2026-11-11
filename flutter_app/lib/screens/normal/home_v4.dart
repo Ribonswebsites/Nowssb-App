@@ -10,7 +10,10 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
-import '../../widgets/concept/r27/anims.dart' show R27SoundOrb, R27BreathFlame, R27Coin;
+import 'dart:math' as math;
+import '../../widgets/concept/r27/anims.dart' show R27BreathFlame, R27Coin;
+import '../../data/models.dart' show Word;
+import '../../widgets/sound_glass.dart' show SlPlayer, SessionPlayer;
 import 'package:nowssb/data/day_part.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -31,6 +34,7 @@ import '../../widgets/nwsb_icon.dart';
 import '../daily_tasks.dart';
 import '../nwsb_sign_in_sheet.dart';
 import 'calm_v3.dart' show CalmGo;
+import '../../widgets/home_parts.dart' show GentleMarqueeText;
 
 const _ink = NwsbColors.ink;
 const _soft = Color(0xFF5F6475);
@@ -175,7 +179,7 @@ class V4Card extends StatelessWidget {
 
 /// A pressed-in well, for numbers and films.
 class _Well extends StatelessWidget {
-  const _Well({required this.child, this.size, this.circle = false, this.pad = 6});
+  const _Well({super.key, required this.child, this.size, this.circle = false, this.pad = 6});
   final Widget child;
   final Size? size;
   final bool circle;
@@ -220,11 +224,11 @@ Widget _twoCol(List<Widget> cells, {double gap = 14}) => Column(children: [
       for (var i = 0; i < cells.length; i += 2) ...[
         if (i > 0) SizedBox(height: gap),
         IntrinsicHeight(
-          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          child: IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Expanded(child: cells[i]),
             SizedBox(width: gap),
             Expanded(child: i + 1 < cells.length ? cells[i + 1] : const SizedBox()),
-          ]),
+          ])),
         ),
       ],
     ]);
@@ -322,34 +326,277 @@ class V4RichRow extends StatelessWidget {
 
 // ───────────────────────── routineCards ─────────────────────────
 
-/// Sound Library: an orb film set into a pressed well, beside the call.
-class V4SoundLibrary extends StatelessWidget {
-  const V4SoundLibrary({super.key, required this.onTap});
+/// The equaliser-bars animation (LottieFiles "Sound Equalizer Bars - Music" by
+/// Creator Mahesh, Lottie Simple License; recoloured black and gold).
+const kSoundEqLottie = 'assets/home/nm-sound-eq.json';
+
+/// Sound Library (Ribon 11-11 redesign): today's featured track from the
+/// library, three quick track rows, a Listen CTA and live equaliser bars while
+/// the real player is playing. White neumorphism throughout.
+class V4SoundLibrary extends StatefulWidget {
+  const V4SoundLibrary({super.key, required this.onTap, this.onPlay, this.words, this.player, this.day});
+
+  /// Open the Sound Library tab.
   final VoidCallback onTap;
+
+  /// Open the real player on a queue. Without it Listen opens the library.
+  final void Function(List<Word> words, String title)? onPlay;
+
+  /// The library to pick from (tests); defaults to the live [ContentStore].
+  final List<Word>? words;
+
+  /// The player (tests); defaults to the app's [PlaybackSession].
+  final SlPlayer? player;
+
+  /// Day number that rotates today's pick (tests); defaults to today.
+  final int? day;
+
   @override
-  Widget build(BuildContext context) => V4Card(
-        key: const ValueKey('v4-sound'),
-        onTap: onTap,
-        child: Row(children: [
-          const _Well(
-            circle: true,
-            size: Size.square(96),
-            child: ClipOval(child: ColoredBox(color: Color(0xFFF0F2F7), child: Center(child: R27SoundOrb(size: 92, light: true)))),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Row(children: [
-                Expanded(child: Text('SOUND LIBRARY', style: _eyebrow)),
-                V4Lottie(kSpeakerLottie, size: 30),
-              ]),
-              const SizedBox(height: 6),
-              const Text("Open today's Sound Library.", style: _h),
-              const SizedBox(height: 12),
-              CalmGo(label: 'Listen', onTap: onTap),
-            ]),
-          ),
+  State<V4SoundLibrary> createState() => _V4SoundLibraryState();
+}
+
+class _V4SoundLibraryState extends State<V4SoundLibrary> {
+  final SlPlayer _default = SessionPlayer();
+  SlPlayer get _player => widget.player ?? _default;
+
+  static int _today() => DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
+
+  List<Word> _queue(List<Word> lib) {
+    final usable = [for (final w in lib) if (w.word.trim().isNotEmpty) w];
+    if (usable.isEmpty) return const [];
+    final start = (widget.day ?? _today()) % usable.length;
+    return [for (var i = 0; i < math.min(4, usable.length); i++) usable[(start + i) % usable.length]];
+  }
+
+  static String _timeLabel(String t) => switch (t) {
+        'morning' => 'Morning',
+        'evening' => 'Evening',
+        'night' => 'Night',
+        _ => 'Any time',
+      };
+
+  static String _line(Word w) {
+    final bits = [w.translit.trim(), w.meaning.trim()].where((e) => e.isNotEmpty).toList();
+    return bits.isEmpty ? w.phonetic.trim() : bits.join(' · ');
+  }
+
+  void _listen(List<Word> queue) {
+    if (queue.isEmpty || widget.onPlay == null) {
+      widget.onTap();
+    } else {
+      widget.onPlay!(queue, "Today's Sound Library");
+    }
+  }
+
+  Widget _chip(IconData? icon, String text) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+        decoration: BoxDecoration(color: _base, borderRadius: BorderRadius.circular(30), boxShadow: _raisedSm),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (icon != null) ...[Icon(icon, size: 14, color: const Color(0xFFB8821C)), const SizedBox(width: 5)],
+          Text(text, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _ink, height: 1.1)),
         ]),
+      );
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Listenable.merge([_player, ContentStore.instance]),
+        builder: (context, _) {
+          final lib = widget.words ?? ContentStore.instance.library;
+          final queue = _queue(lib);
+          final live = _player.active ? _player.word : null;
+          final playing = _player.active && _player.playing;
+          final featured = live ?? (queue.isEmpty ? null : queue.first);
+          final rows = [for (final w in queue) if (w != featured) w].take(3).toList();
+          final cats = featured == null ? const <String>[] : featured.categories.where((c) => c.trim().isNotEmpty).take(2).toList();
+          return V4Card(
+            key: const ValueKey('v4-sound'),
+            onTap: widget.onTap,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Row(children: [
+                const Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('SOUND LIBRARY', style: _eyebrow),
+                    SizedBox(height: 6),
+                    Text("Open today's Sound Library.", style: _h),
+                  ]),
+                ),
+                const SizedBox(width: 10),
+                _Well(
+                  key: const ValueKey('v4-sound-eq'),
+                  size: const Size.square(58),
+                  pad: 5,
+                  child: Center(
+                    child: Lottie.asset(
+                      kSoundEqLottie,
+                      width: 44,
+                      height: 44,
+                      fit: BoxFit.contain,
+                      repeat: true,
+                      animate: playing && !_still(context),
+                      errorBuilder: (_, __, ___) => const SizedBox.square(dimension: 44),
+                    ),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 14),
+              AspectRatio(
+                aspectRatio: 1.9,
+                child: _Well(
+                  pad: 5,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(19),
+                    child: Stack(fit: StackFit.expand, children: [
+                      const Image(image: AssetImage('assets/home/hx/sound-feature.webp'), fit: BoxFit.cover, alignment: Alignment(0, -.1)),
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            stops: [0, .45, 1],
+                            colors: [Color(0x00000000), Color(0x10000000), Color(0xE6000000)],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 10,
+                        top: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(30)),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Text(live != null ? (playing ? 'NOW PLAYING' : 'PAUSED') : 'TODAY\u2019S PICK',
+                                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: Colors.white)),
+                            if (featured != null) ...[
+                              const SizedBox(width: 7),
+                              Text(_timeLabel(featured.time).toUpperCase(),
+                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: Color(0xFFE0B04C))),
+                            ],
+                          ]),
+                        ),
+                      ),
+                      Positioned(
+                        left: 14,
+                        right: 70,
+                        bottom: 12,
+                        child: featured == null
+                            ? const Text('Words you can hear, practise and keep.',
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2))
+                            : Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text(featured.word,
+                                    maxLines: 1,
+                                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white, height: 1.15)),
+                                if (_line(featured).isNotEmpty)
+                                  Text(_line(featured),
+                                      maxLines: 2,
+                                      style: const TextStyle(fontSize: 12.5, color: Color(0xE6FFFFFF), height: 1.3)),
+                              ]),
+                      ),
+                      Positioned(
+                        right: 12,
+                        bottom: 12,
+                        child: Semantics(
+                          button: true,
+                          label: playing ? 'Pause' : 'Play',
+                          child: GestureDetector(
+                            key: const ValueKey('v4-sound-play'),
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              if (_player.active) {
+                                _player.toggle();
+                              } else {
+                                _listen(queue);
+                              }
+                            },
+                            child: Container(
+                              width: 46,
+                              height: 46,
+                              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x55000000), blurRadius: 10, offset: Offset(0, 4))]),
+                              child: Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, color: Colors.black, size: 28),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+              if (featured != null) ...[
+                const SizedBox(height: 12),
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  _chip(Icons.schedule_rounded, _timeLabel(featured.time)),
+                  for (final c in cats) _chip(Icons.graphic_eq_rounded, c),
+                  if (queue.isNotEmpty) _chip(Icons.queue_music_rounded, '${queue.length} in today\u2019s mix'),
+                ]),
+              ],
+              if (rows.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                  decoration: BoxDecoration(gradient: _inset, borderRadius: BorderRadius.circular(22)),
+                  child: Column(children: [
+                    for (var i = 0; i < rows.length; i++)
+                      InkWell(
+                        key: ValueKey('v4-sound-row-$i'),
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () => widget.onPlay != null ? widget.onPlay!([rows[i]], rows[i].word) : widget.onTap(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 9),
+                          child: Row(children: [
+                            SizedBox(width: 22, child: Text('${i + 1}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFFB8821C)))),
+                            Expanded(
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text(rows[i].word, maxLines: 1, overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: _ink, height: 1.2)),
+                                if (_line(rows[i]).isNotEmpty)
+                                  Text(_line(rows[i]), maxLines: 1, overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(fontSize: 12, color: _soft, height: 1.25)),
+                              ]),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: const BoxDecoration(color: _base, shape: BoxShape.circle, boxShadow: _raisedSm),
+                              child: const Icon(Icons.play_arrow_rounded, size: 20, color: _ink),
+                            ),
+                          ]),
+                        ),
+                      ),
+                  ]),
+                ),
+              ],
+              const SizedBox(height: 14),
+              Row(children: [
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    label: 'Listen',
+                    child: GestureDetector(
+                      key: const ValueKey('v4-sound-listen'),
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => _player.active ? _player.toggle() : _listen(queue),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(40),
+                          boxShadow: const [BoxShadow(color: Color(0x33000000), offset: Offset(0, 5), blurRadius: 10)],
+                        ),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded, size: 20, color: Colors.white),
+                          const SizedBox(width: 6),
+                          Text(playing ? 'Pause' : 'Listen', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                        ]),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                CalmGo(label: 'Open library', light: true, onTap: widget.onTap),
+              ]),
+            ]),
+          );
+        },
       );
 }
 
@@ -546,21 +793,112 @@ class V4StoreEarn extends StatelessWidget {
     return Column(key: const ValueKey('v4-store'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       _head('Meaning Store', 'Offers and earning', _sand),
       V4Card(
+        key: const ValueKey('v4-offers'),
         onTap: onStore,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          // Ribon 10-27: the purple liquid clip is gone — a meditation photo
-          // from Pexels (rs-candle, credited) with a slow drift instead.
-          const AspectRatio(
-            aspectRatio: 2.2,
-            child: _Well(child: ClipRRect(borderRadius: BorderRadius.all(Radius.circular(18)),
-                child: Image(image: AssetImage('assets/home/hc/rs-candle.webp'), fit: BoxFit.cover, alignment: Alignment(0, .35)))),
+          // Ribon 11-11: a sharp, new still (assets/home/hx/offers-bowl.webp,
+          // self-generated) with a black pill + gold tag and the home marquee.
+          AspectRatio(
+            aspectRatio: 1.8,
+            child: _Well(
+              pad: 5,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(19)),
+                child: Stack(fit: StackFit.expand, children: [
+                  const Image(image: AssetImage('assets/home/hx/offers-bowl.webp'), fit: BoxFit.cover, alignment: Alignment(-.2, 0)),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: [0, .4, 1],
+                        colors: [Color(0x44000000), Color(0x00000000), Color(0xE6000000)],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 10,
+                    top: 10,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(30)),
+                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text('MEANING STORE', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: Colors.white)),
+                        SizedBox(width: 7),
+                        Text('OFFERS', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: Color(0xFFE0B04C))),
+                      ]),
+                    ),
+                  ),
+                  const Positioned(
+                    left: 14,
+                    right: 14,
+                    bottom: 44,
+                    child: Text('All of today\u2019s offers.',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2, shadows: [Shadow(color: Color(0x99000000), blurRadius: 8)])),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      height: 34,
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      alignment: Alignment.centerLeft,
+                      color: const Color(0x99000000),
+                      child: const GentleMarqueeText(
+                        'Word Store  ·  Meaning Store  ·  eBooks  ·  Daily deals  ·  Earn with NowssB  ·  ',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white, height: 1.2),
+                      ),
+                    ),
+                  ),
+                ]),
+              ),
+            ),
           ),
           const SizedBox(height: 14),
           const Text('Words that carry meaning', style: _h),
           const SizedBox(height: 4),
           const Text('Every word in the store comes with its sound and its story.', style: _sub),
           const SizedBox(height: 12),
-          Align(alignment: Alignment.centerLeft, child: CalmGo(label: 'Open the store', onTap: onStore)),
+          IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (final t in const [
+              (Icons.record_voice_over_outlined, 'Sound', 'every word'),
+              (Icons.auto_stories_outlined, 'Story', 'its origin'),
+              (Icons.local_offer_outlined, 'Deals', 'every day'),
+            ]) ...[
+              if (t.$2 != 'Sound') const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
+                  decoration: BoxDecoration(gradient: _inset, borderRadius: BorderRadius.circular(16)),
+                  child: Column(children: [
+                    Icon(t.$1, size: 19, color: _accent),
+                    const SizedBox(height: 5),
+                    Text(t.$2, textAlign: TextAlign.center, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _ink, height: 1.15)),
+                    Text(t.$3, textAlign: TextAlign.center, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _soft, height: 1.2)),
+                  ]),
+                ),
+              ),
+            ],
+          ])),
+          const SizedBox(height: 14),
+          Row(children: [
+            const Expanded(child: Text('Browse, listen, keep.', style: _sub)),
+            const SizedBox(width: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(40),
+                boxShadow: const [BoxShadow(color: Color(0x33000000), offset: Offset(0, 5), blurRadius: 10)],
+              ),
+              child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                Text('Open the store', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                SizedBox(width: 6),
+                Icon(Icons.arrow_forward_rounded, size: 16, color: Color(0xFFE0B04C)),
+              ]),
+            ),
+          ]),
         ]),
       ),
       V4Card(

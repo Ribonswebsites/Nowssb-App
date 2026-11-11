@@ -218,3 +218,13 @@ Added in 301edcf1 (concept r27, 27 Oct 2026). Searched git history, commit messa
 | File | Source | Notes |
 |---|---|---|
 | `home/hour-ananda.webp` | source unverified | Hour poster used in Sound Library glass tiles (`lib/widgets/sound_glass.dart`). An identical copy is at `doors/hour-ananda.webp`. |
+
+## Normal-home cards rebuild — `assets/home/hx/`, `assets/home/nm-sound-eq.json` (Nov 11, 2026)
+
+| Asset | Source | Licence / notes |
+|---|---|---|
+| `home/hx/zenplus-terrace.webp` | Self-generated for NowssB with the Grok Bot image tool (prompt: dawn terrace, meditator seen from behind) | Original art made for the app; no third-party source. Zen Plus card |
+| `home/hx/cover-shabdapathy.webp`, `cover-phonetic.webp`, `cover-atlas.webp` | Self-generated for NowssB (same tool): palm-leaf manuscript, sound-wave landscape, singing-bowl still life | Original art; no text in the images, titles are set in Flutter. eBooks covers |
+| `home/hx/offers-bowl.webp` | Self-generated for NowssB (same tool): brass bowl, coins, mala, incense | Original art. Meaning Store offers card |
+| `home/hx/sound-feature.webp` | Self-generated for NowssB (same tool): headphones, singing bowl, lotus | Original art. Sound Library card |
+| `home/nm-sound-eq.json` | "Sound Equalizer Bars - Music" by Creator Mahesh, LottieFiles — https://lottiefiles.com/free-animation/sound-equalizer-bars-music-QF5HEZf3gR | [Lottie Simple License](https://lottiefiles.com/page/license) (free, commercial use allowed). Unzipped from the free `.lottie` download and recoloured (blue → near-black, yellow → NowssB gold); shapes and timing untouched. Plays only while the player is playing |
