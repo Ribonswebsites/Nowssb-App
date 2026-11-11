@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/media/video_pool.dart';
@@ -42,6 +44,32 @@ void main() {
     expect(File('assets/subscription/tier-sun-back.png').existsSync(), isTrue);
     expect(File('assets/subscription/tier-bag-front.png').existsSync(), isTrue);
     expect(File('assets/subscription/tier-nile-back.png').existsSync(), isTrue);
+  });
+
+  test('every plan front and back is a different picture, used nowhere else', () {
+    final src = File('lib/screens/subscription.dart').readAsStringSync();
+    final paths = RegExp(r"(?:front|back): '(assets/subscription/[^']+)'")
+        .allMatches(src.substring(0, src.indexOf('class _Plan {')))
+        .map((m) => m.group(1)!)
+        .toList();
+    expect(paths.length, 8, reason: '4 plans x front + back');
+    expect(paths.toSet().length, 8, reason: 'no path reused');
+    String digest(File f) => base64.encode(sha1.convert(f.readAsBytesSync()).bytes);
+    final byHash = <String, String>{};
+    for (final p in paths) {
+      final h = digest(File(p));
+      expect(byHash.containsKey(h), isFalse,
+          reason: '$p has the same pixels as ${byHash[h]}');
+      byHash[h] = p;
+    }
+    // Not a copy of any other bundled picture (the hero and other pages).
+    for (final f in Directory('assets').listSync(recursive: true, followLinks: false)) {
+      if (f is! File || f.path.contains('assets/subscription/')) continue;
+      if (!RegExp(r'\.(png|jpe?g|webp)$').hasMatch(f.path)) continue;
+      if (f.lengthSync() < 30000) continue;
+      final other = byHash[digest(f)];
+      expect(other, isNull, reason: '${f.path} duplicates $other');
+    }
   });
 
   testWidgets('subscription page shows the pricing carousel', (tester) async {

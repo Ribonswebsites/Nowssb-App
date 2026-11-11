@@ -228,3 +228,13 @@ Added in 301edcf1 (concept r27, 27 Oct 2026). Searched git history, commit messa
 | `home/hx/offers-bowl.webp` | Self-generated for NowssB (same tool): brass bowl, coins, mala, incense | Original art. Meaning Store offers card |
 | `home/hx/sound-feature.webp` | Self-generated for NowssB (same tool): headphones, singing bowl, lotus | Original art. Sound Library card |
 | `home/nm-sound-eq.json` | "Sound Equalizer Bars - Music" by Creator Mahesh, LottieFiles — https://lottiefiles.com/free-animation/sound-equalizer-bars-music-QF5HEZf3gR | [Lottie Simple License](https://lottiefiles.com/page/license) (free, commercial use allowed). Unzipped from the free `.lottie` download and recoloured (blue → near-black, yellow → NowssB gold); shapes and timing untouched. Plays only while the player is playing |
+
+## Subscription plan cards — `assets/subscription/` (Nov 12, 2026)
+
+Three plan pictures replaced so that every front and back on the Subscription page is a different image with no faces. The other five (`tier-blazer-front/back`, `tier-sun-back`, `tier-bag-back`, `tier-nile-front`) keep their Oct 21 art, which has no recorded third-party source.
+
+| File | Source | Licence / notes |
+|---|---|---|
+| `subscription/tier-sun-front.png` (Resonance front) | Self-generated for NowssB with the Grok Bot image tool (prompt: close-up of hands in dhyana mudra on dark linen, gold rim light, no face) | Original art made for the app; no third-party source. Resized 720×1280, PNG |
+| `subscription/tier-bag-front.png` (Frequency front) | Self-generated for NowssB (same tool): monk seen from behind in a dark temple under one shaft of gold light | Original art; no third-party source |
+| `subscription/tier-nile-back.png` (Frequency X back) | Self-generated for NowssB (same tool): black raked sand ripples round one dark stone, gold edge light, no people | Original art; no third-party source |
