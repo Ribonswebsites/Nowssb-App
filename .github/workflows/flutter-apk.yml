@@ -55,7 +55,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'          # AGP lint (List.removeLast) needs JDK 21
 
       - uses: subosito/flutter-action@v2
         with:
@@ -289,7 +289,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'          # AGP lint (List.removeLast) needs JDK 21
 
       - uses: subosito/flutter-action@v2
         with:
