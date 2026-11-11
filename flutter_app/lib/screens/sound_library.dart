@@ -413,9 +413,9 @@ class _SlmFeed extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0x99060C18),
-                    Color(0xCC060C18),
-                    Color(0xE6060C18),
+                    Color(0x40060C18),
+                    Color(0x66060C18),
+                    Color(0x8C060C18),
                   ],
                 ),
               ),
@@ -693,8 +693,15 @@ class _SlmFeed extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
+              // The banner is the one thing this tab is about, so it takes a
+              // decoder ahead of decoration clips (ClipPriority.feature), and
+              // nothing sits on it but a short fade under the title: the old
+              // full-height 13%→80% black gradient dimmed the swirl so far it
+              // read as a still picture.
               const NwsbVideo(
+                key: ValueKey('sl-banner-video'),
                 asset: 'assets/video/sound-library-banner.mp4',
+                priority: ClipPriority.feature,
                 fit: BoxFit.cover,
                 autoplay: true,
                 loop: true,
@@ -704,16 +711,16 @@ class _SlmFeed extends StatelessWidget {
               const DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topCenter,
+                    begin: Alignment.center,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0x22000000), Color(0xCC000000)],
+                    colors: [Color(0x00000000), Color(0x80000000)],
                   ),
                 ),
               ),
               const Positioned(
                 left: 16,
                 bottom: 14,
-                child: Text('Sound Library', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                child: Text('Sound Library', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, shadows: [Shadow(color: Color(0x99000000), blurRadius: 8)])),
               ),
             ],
           ),

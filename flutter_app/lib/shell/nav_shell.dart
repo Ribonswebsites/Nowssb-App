@@ -3,6 +3,7 @@ library;
 
 import '../features/economy/coin_collect.dart';
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import '../widgets/hero_glass.dart';
@@ -594,36 +595,83 @@ class _NavShellState extends State<NavShell> {
                             ? const Color(0xF5000000)
                             : const Color(0xF5182033);
                         final slots = [for (final s in settings.navSlots) if (s != 'routines') s];
+                        // Normal home: the same plain black bar the Zen home
+                        // (and every other tab) uses, inside one glass wrapper
+                        // (HeroGlassRecipe — blur, 8% fill, hairline, no top
+                        // highlight). Same 58px outside, so the nav never
+                        // changes height between tabs. Zen is untouched.
+                        final glassed = lightHome;
+                        final inner = glassed ? 4.0 : 0.0;
+                        final barRadius = radius - inner;
+                        final row = Row(children: [
+                          for (var i = 0; i < slots.length; i++) ...[
+                            if (i > 0)
+                              Container(
+                                width: 1,
+                                height: 18,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 2),
+                                color: const Color(0x33FFFFFF),
+                              ),
+                            Expanded(
+                              child: _NavSlot(
+                                active: _primaryTab(slots[i]) == _i,
+                                image: _navFeatures[slots[i]]?['img'] ?? '',
+                                label: _navFeatures[slots[i]]?['label'] ?? slots[i],
+                                onTap: () => _goToSlot(slots[i]),
+                              ),
+                            ),
+                          ],
+                        ]);
+                        if (!glassed) {
+                          return Container(
+                            height: 58,
+                            decoration: BoxDecoration(
+                              color: background,
+                              borderRadius: BorderRadius.circular(radius),
+                              border: Border.all(color: const Color(0x22FFFFFF)),
+                            ),
+                            child: row,
+                          );
+                        }
                         return Container(
+                          key: const ValueKey('nav-glass'),
                           height: 58,
-                          decoration: lightHome
-                              ? wnBox(radius: radius)
-                              : BoxDecoration(
-                                  color: background,
-                                  borderRadius: BorderRadius.circular(radius),
-                                  border: Border.all(color: const Color(0x22FFFFFF)),
-                                ),
-                          child: Row(children: [
-                            for (var i = 0; i < slots.length; i++) ...[
-                              if (i > 0)
-                                Container(
-                                  width: 1,
-                                  height: 18,
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 2),
-                                  color: lightHome ? const Color(0x22000000) : const Color(0x33FFFFFF),
-                                ),
-                              Expanded(
-                                child: _NavSlot(
-                                  light: lightHome,
-                                  active: _primaryTab(slots[i]) == _i,
-                                  image: _navFeatures[slots[i]]?['img'] ?? '',
-                                  label: _navFeatures[slots[i]]?['label'] ?? slots[i],
-                                  onTap: () => _goToSlot(slots[i]),
-                                ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(radius),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x33000000),
+                                offset: Offset(0, 6),
+                                blurRadius: 18,
                               ),
                             ],
-                          ]),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(radius),
+                            child: BackdropFilter(
+                              filter: ui.ImageFilter.blur(
+                                  sigmaX: HeroGlassRecipe.blurSigma,
+                                  sigmaY: HeroGlassRecipe.blurSigma),
+                              child: Container(
+                                padding: EdgeInsets.all(inner),
+                                decoration: BoxDecoration(
+                                  color: HeroGlassRecipe.fill,
+                                  borderRadius: BorderRadius.circular(radius),
+                                  border: Border.all(color: HeroGlassRecipe.line),
+                                ),
+                                child: Container(
+                                  key: const ValueKey('nav-glass-bar'),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xF5000000),
+                                    borderRadius:
+                                        BorderRadius.circular(barRadius),
+                                  ),
+                                  child: row,
+                                ),
+                              ),
+                            ),
+                          ),
                         );
                       }),
                     ),

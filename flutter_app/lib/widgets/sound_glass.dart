@@ -38,7 +38,14 @@ abstract class SlPlayer implements Listenable {
   Future<void> toggle();
 }
 
-class SessionPlayer implements SlPlayer {
+/// A [SlPlayer] that can also skip. The big Currently Playing hero needs
+/// previous / next; the smaller layouts only ever toggle.
+abstract class SlTransport implements SlPlayer {
+  Future<void> next();
+  Future<void> previous();
+}
+
+class SessionPlayer implements SlTransport {
   SessionPlayer([PlaybackSession? session])
       : _s = session ?? PlaybackSession.instance;
   final PlaybackSession _s;
@@ -51,6 +58,10 @@ class SessionPlayer implements SlPlayer {
   Word? get word => _s.word;
   @override
   Future<void> toggle() => _s.togglePlay();
+  @override
+  Future<void> next() => _s.next();
+  @override
+  Future<void> previous() => _s.previous();
   @override
   void addListener(VoidCallback listener) => _s.addListener(listener);
   @override

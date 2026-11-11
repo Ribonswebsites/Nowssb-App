@@ -1,12 +1,15 @@
 /// YouTube Music album page used by the Sound Library "Currently Playing" chip.
 library;
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/models.dart';
 import '../data/word_voice.dart';
-import '../widgets/app_thinking_loader.dart';
+import '../data/playback_session.dart';
+import '../widgets/hero_glass.dart';
+import '../widgets/sound_glass.dart' show SessionPlayer, SlTransport;
 import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../admin/template/editable.dart';
@@ -60,115 +63,14 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        AppThinkingLoader(
-                          size: 36,
-                          state: OrbState.composing,
-                          circlePad: 1,
-                        ),
-                        NwsbIcon(NwsbMarks.play, size: 14, color: Colors.white),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const EditableLabel('currently_playing_album.CurrentlyPlayingAlbum',
-                    'NOWSSB',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.4,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Currently Playing · $year',
-                style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
-              ),
-              const SizedBox(height: 18),
-              Center(
-                child: GlassWrap(
-                  margin: EdgeInsets.zero,
-                  padding: const EdgeInsets.all(8),
-                  radius: 18,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: SizedBox(
-                      width: 228,
-                      height: 228,
-                      child: EditableImage.asset(
-                        cover,
-                        fit: BoxFit.cover,
-                        word: head.word,
-                        errorBuilder: (_, __, ___) =>
-                            const ColoredBox(color: Color(0xFF1A1A1A)),
-                            slot: 'currently_playing_album.CurrentlyPlayingAlbum',
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 22),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
-                child: Text(
-                  head.word,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    height: 1.1,
-                    letterSpacing: -0.6,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _round(Icons.download_outlined, onTap: () => _saveOffline(context)),
-                  const SizedBox(width: 14),
-                  _round(Icons.bookmark_border, onTap: () => onOpen(head)),
-                  const SizedBox(width: 16),
-                  GestureDetector(
-                    onTap: () => onPlay(head),
-                    child: Container(
-                      width: 68,
-                      height: 68,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      alignment: Alignment.center,
-                      child: const AppThinkingLoader(
-                        size: 42,
-                        state: OrbState.composing,
-                        circlePad: 7,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  _round(Icons.chat_bubble_outline, onTap: () => onOpen(head)),
-                  const SizedBox(width: 14),
-                  _round(Icons.more_vert, onTap: () => onOpen(head)),
-                ],
-              ),
-              const SizedBox(height: 18),
+        CurrentlyPlayingHero(
+          words: words,
+          art: art,
+          onPlay: onPlay,
+          onOpen: onOpen,
+          onDownload: () => _saveOffline(context),
+        ),
+        const SizedBox(height: 18),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
@@ -300,18 +202,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
                           ],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () => onPlay(head),
-                        child: const AppThinkingLoader(
-                          size: 28,
-                          state: OrbState.composing,
-                          circlePad: 5,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => onPlay(head),
-                        icon: const Icon(Icons.pause_rounded, color: Colors.white),
-                      ),
+                      _MiniToggle(head: head, onPlay: onPlay),
                     ],
                   ),
                 ),
@@ -419,6 +310,350 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+const String _kSlot = 'currently_playing_album.CurrentlyPlayingAlbum';
+
+/// The whole Currently Playing block in ONE glass wrapper: NOWSSB mark and
+/// label on top, the artwork on the LEFT, and on the RIGHT the eyebrow,
+/// title, subtitle, progress and the previous / play-pause / next controls,
+/// with the download / save / chat / more actions along the bottom.
+///
+/// Wired to the real [PlaybackSession] through [SlTransport]. With a live
+/// session the buttons drive it; with none, play starts the session on the
+/// shown word ([onPlay]) and previous / next step through [words].
+///
+/// There is deliberately no thinking orb here. The play button is a plain
+/// white disc with a play or pause glyph.
+class CurrentlyPlayingHero extends StatefulWidget {
+  const CurrentlyPlayingHero({
+    super.key,
+    required this.words,
+    required this.art,
+    required this.onPlay,
+    required this.onOpen,
+    required this.onDownload,
+    this.player,
+  });
+
+  final List<Word> words;
+  final String Function(String) art;
+  final ValueChanged<Word> onPlay;
+  final ValueChanged<Word> onOpen;
+  final VoidCallback onDownload;
+  final SlTransport? player;
+
+  @override
+  State<CurrentlyPlayingHero> createState() => _CurrentlyPlayingHeroState();
+}
+
+class _CurrentlyPlayingHeroState extends State<CurrentlyPlayingHero>
+    with SingleTickerProviderStateMixin {
+  late final SlTransport _p = widget.player ?? SessionPlayer();
+  late final AnimationController _bar =
+      AnimationController(vsync: this, duration: const Duration(seconds: 9));
+  int _i = 0;
+
+  bool get _live => _p.active && _p.word != null;
+  bool get _playing => _live && _p.playing;
+
+  Word get _word {
+    if (_live) return _p.word!;
+    return widget.words[_i % widget.words.length];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _p.addListener(_onSession);
+    _sync();
+  }
+
+  @override
+  void dispose() {
+    _p.removeListener(_onSession);
+    _bar.dispose();
+    super.dispose();
+  }
+
+  void _onSession() {
+    if (!mounted) return;
+    _sync();
+    setState(() {});
+  }
+
+  void _sync() {
+    if (_playing) {
+      if (!_bar.isAnimating) _bar.repeat();
+    } else {
+      _bar.stop();
+      if (!_live) _bar.value = 0;
+    }
+  }
+
+  void _toggle() {
+    if (_live) {
+      unawaited(_p.toggle());
+    } else {
+      widget.onPlay(_word);
+    }
+  }
+
+  void _step(int by) {
+    if (_live) {
+      unawaited(by > 0 ? _p.next() : _p.previous());
+      return;
+    }
+    final n = widget.words.length;
+    setState(() {
+      _i = (_i + by) % n;
+      if (_i < 0) _i += n;
+      _bar.value = 0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final w = _word;
+    final year = DateTime.now().year;
+    final sub = [
+      if (w.origin.isNotEmpty) w.origin else if (w.organ.isNotEmpty) w.organ,
+      if (w.meaning.isNotEmpty) w.meaning,
+    ].join(' · ');
+    final eyebrow = _live
+        ? (_playing ? 'NOW PLAYING' : 'PAUSED')
+        : 'READY TO PLAY';
+    return GlassWrap(
+      key: const ValueKey('cp-hero'),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 26,
+                height: 26,
+                decoration: const BoxDecoration(
+                    color: Color(0x33000000), shape: BoxShape.circle),
+                child: const Center(
+                  child: NwsbIcon(NwsbMarks.play, size: 11, color: Colors.white),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const EditableLabel(
+                _kSlot,
+                'NOWSSB',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                'Currently Playing · $year',
+                style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: SizedBox(
+                  key: const ValueKey('cp-hero-art'),
+                  width: 136,
+                  height: 136,
+                  child: EditableImage.asset(
+                    widget.art(w.word),
+                    fit: BoxFit.cover,
+                    word: w.word,
+                    errorBuilder: (_, __, ___) =>
+                        const ColoredBox(color: Color(0xFF1A1A1A)),
+                    slot: _kSlot,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      eyebrow,
+                      key: const ValueKey('cp-hero-eyebrow'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xB3FFFFFF),
+                        fontSize: 10.5,
+                        letterSpacing: 1.3,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      w.word,
+                      key: const ValueKey('cp-hero-title'),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        height: 1.1,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    if (sub.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        sub,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Color(0xCCFFFFFF), fontSize: 12.5),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    AnimatedBuilder(
+                      animation: _bar,
+                      builder: (_, __) => ClipRRect(
+                        borderRadius: BorderRadius.circular(99),
+                        child: SizedBox(
+                          height: 4,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              const ColoredBox(color: Color(0x33FFFFFF)),
+                              FractionallySizedBox(
+                                alignment: Alignment.centerLeft,
+                                widthFactor: _bar.value.clamp(0.0, 1.0),
+                                child: const ColoredBox(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _glassButton(const ValueKey('cp-hero-prev'),
+                            Icons.skip_previous_rounded, 'Previous', () => _step(-1)),
+                        Semantics(
+                          button: true,
+                          label: _playing ? 'Pause' : 'Play',
+                          excludeSemantics: true,
+                          child: GestureDetector(
+                            key: const ValueKey('cp-hero-toggle'),
+                            behavior: HitTestBehavior.opaque,
+                            onTap: _toggle,
+                            child: Container(
+                              width: 56,
+                              height: 56,
+                              decoration: const BoxDecoration(
+                                  color: Colors.white, shape: BoxShape.circle),
+                              child: Icon(
+                                _playing
+                                    ? Icons.pause_rounded
+                                    : Icons.play_arrow_rounded,
+                                color: const Color(0xFF111118),
+                                size: 34,
+                              ),
+                            ),
+                          ),
+                        ),
+                        _glassButton(const ValueKey('cp-hero-next'),
+                            Icons.skip_next_rounded, 'Next', () => _step(1)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _glassButton(const ValueKey('cp-hero-download'),
+                  Icons.download_outlined, 'Save offline', widget.onDownload),
+              _glassButton(const ValueKey('cp-hero-save'),
+                  Icons.bookmark_border, 'Save', () => widget.onOpen(w)),
+              _glassButton(const ValueKey('cp-hero-chat'),
+                  Icons.chat_bubble_outline, 'Chat', () => widget.onOpen(w)),
+              _glassButton(const ValueKey('cp-hero-more'), Icons.more_vert,
+                  'More', () => widget.onOpen(w)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _glassButton(Key key, IconData icon, String label, VoidCallback onTap) {
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        key: key,
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: HeroGlassRecipe.fill,
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0x33FFFFFF)),
+          ),
+          child: Icon(icon, color: Colors.white, size: 22),
+        ),
+      ),
+    );
+  }
+}
+
+/// Play / pause on the mini row at the bottom — the real session, no orb.
+class _MiniToggle extends StatelessWidget {
+  const _MiniToggle({required this.head, required this.onPlay});
+  final Word head;
+  final ValueChanged<Word> onPlay;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = PlaybackSession.instance;
+    return ListenableBuilder(
+      listenable: s,
+      builder: (context, _) {
+        final playing = s.active && s.playing;
+        return IconButton(
+          key: const ValueKey('cp-mini-toggle'),
+          tooltip: playing ? 'Pause' : 'Play',
+          onPressed: () {
+            if (s.active) {
+              unawaited(s.togglePlay());
+            } else {
+              onPlay(head);
+            }
+          },
+          icon: Icon(
+            playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+            color: Colors.white,
+          ),
+        );
+      },
     );
   }
 }
