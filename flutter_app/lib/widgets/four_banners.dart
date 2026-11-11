@@ -2,19 +2,19 @@
 /// a split promo, a black glass row, and a sideways poster shelf.
 library;
 
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../features/draw/lucky_draw_gate.dart';
+import '../features/draw/lucky_draw_screen.dart';
 import '../features/programs/program_router.dart';
 import '../theme/white_neu.dart';
 import '../screens/subscription.dart';
 import 'black_glass_banner.dart';
 import 'colored_split_promo_banner.dart';
-import 'home_text.dart';
 import 'nwsb_icon.dart';
-import 'path_aurora_banner.dart';
+import 'glass_wrap.dart';
+import 'prog_banner_carousel.dart';
 
 class FourBanners extends StatelessWidget {
   const FourBanners({
@@ -275,8 +275,10 @@ class _Tick extends StatelessWidget {
       );
 }
 
-/// The Zen home's Programmes block: the animated aurora banner, then the
-/// three programme cards inside ONE frosted-glass panel with its own heading.
+/// The Zen home's Programmes block: the rotating banner, then the
+/// programme cards inside ONE glass pane, the very same [GlassWrap] the
+/// other Zen sections sit on, under the same kind of heading (round glass
+/// badge, small grey eyebrow, bold title) as the Word Store.
 class ProgrammesGlassSection extends StatelessWidget {
   const ProgrammesGlassSection({super.key});
 
@@ -285,65 +287,49 @@ class ProgrammesGlassSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const PathAuroraBanner(),
-        const SizedBox(height: 14),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 22, sigmaY: 22, tileMode: TileMode.mirror),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(32),
-                // Frosted body, brighter at the top edge like light on glass.
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0x38FFFFFF), Color(0x14FFFFFF), Color(0x0AFFFFFF)],
-                  stops: [0, .45, 1],
-                ),
-                border: Border.all(color: const Color(0x33FFFFFF)),
-              ),
-              child: Stack(children: [
-                // The highlight: a thin bright line along the top edge.
-                Positioned(
-                  left: 44,
-                  right: 44,
-                  top: 0,
-                  child: IgnorePointer(
-                    child: Container(
-                      height: 1.2,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(colors: [Color(0x00FFFFFF), Color(0xB3FFFFFF), Color(0x00FFFFFF)]),
-                      ),
-                    ),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+          child: ProgBannerCarousel(),
+        ),
+        GlassWrap(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: const Color(0x14FFFFFF),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0x2EFFFFFF)),
                   ),
+                  child: const Center(child: NwsbIcon(NwsbMarks.compass, size: 21)),
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
+                const SizedBox(width: 12),
+                const Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 16),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          const Text('YOUR PATH',
-                              key: ValueKey('prog-glass-eyebrow'),
-                              style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 1.8)),
-                          const SizedBox(height: 6),
-                          Text('Programmes',
-                              key: const ValueKey('prog-glass-title'),
-                              style: HomeText.heading.copyWith(fontSize: 28)),
-                          const SizedBox(height: 4),
-                          const Text('Your links, your earnings and today\u2019s coins, in one calm place.',
-                              key: ValueKey('prog-glass-sub'), style: HomeText.subline),
-                        ]),
-                      ),
-                      const _ProgrammeBanners(glass: true),
+                      Text('Your path',
+                          key: ValueKey('prog-glass-eyebrow'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 13.5, color: Color(0x99FFFFFF), height: 1.2)),
+                      Text('Programmes',
+                          key: ValueKey('prog-glass-title'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2, letterSpacing: -0.4)),
                     ],
                   ),
                 ),
               ]),
-            ),
+              const SizedBox(height: 12),
+              const _GlassCards(),
+            ],
           ),
         ),
       ],
@@ -351,12 +337,81 @@ class ProgrammesGlassSection extends StatelessWidget {
   }
 }
 
+/// The six programme cards of the glass pane. Each opens a page that exists.
+class _GlassCards extends StatelessWidget {
+  const _GlassCards();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget gap() => const SizedBox(height: 10);
+    return Column(children: [
+      _ProgBanner(
+        art: 'assets/banners/promo/prog-letter.webp',
+        kicker: 'Programme',
+        title: 'Reference',
+        line: 'Your links',
+        glass: true,
+        onOpen: (c) => Programmes.open(c, Programme.reference),
+      ),
+      gap(),
+      _ProgBanner(
+        art: 'assets/banners/promo/prog-sill.webp',
+        kicker: 'Programme',
+        title: 'Earning',
+        line: 'What you have earned',
+        glass: true,
+        onOpen: (c) => Programmes.open(c, Programme.earnings),
+      ),
+      gap(),
+      _ProgBanner(
+        art: 'assets/banners/promo/prog-bowl.webp',
+        kicker: 'Programme',
+        title: 'Coins',
+        line: 'Earned today',
+        glass: true,
+        onOpen: openCoinsPage,
+      ),
+      gap(),
+      _ProgBanner(
+        art: 'assets/banners/promo/rail-stones.webp',
+        kicker: 'Programme',
+        title: 'Bonuses',
+        line: 'Targets and rewards',
+        glass: true,
+        onOpen: (c) => Programmes.open(c, Programme.earn, tab: 'targets'),
+      ),
+      gap(),
+      _ProgBanner(
+        art: 'assets/banners/promo/quiet-room.webp',
+        kicker: 'Membership',
+        title: 'Zen Plus',
+        line: 'The full library',
+        glass: true,
+        onOpen: (c) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())),
+      ),
+      // Only while the draw is switched on, so it never opens "coming soon".
+      LuckyDrawGate(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: _ProgBanner(
+            art: 'assets/banners/promo/rail-well.webp',
+            kicker: 'Daily',
+            title: 'Lucky draw',
+            line: 'Free to enter today',
+            glass: true,
+            onOpen: (c) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => const LuckyDrawScreen())),
+          ),
+        ),
+      ),
+    ]);
+  }
+}
+
 /// One programme, one banner. Same shape as the store card (picture, label,
 /// big title, round button). On the Zen home they sit inside one glass panel
 /// ([glass]); elsewhere each stands on its own.
 class _ProgrammeBanners extends StatelessWidget {
-  const _ProgrammeBanners({this.glass = false});
-  final bool glass;
+  const _ProgrammeBanners();
 
   @override
   Widget build(BuildContext context) {
@@ -368,7 +423,6 @@ class _ProgrammeBanners extends StatelessWidget {
           title: 'Reference',
           line: 'Your links',
           programme: Programme.reference,
-          glass: glass,
         ),
         const SizedBox(height: 10),
         _ProgBanner(
@@ -377,7 +431,6 @@ class _ProgrammeBanners extends StatelessWidget {
           title: 'Earning',
           line: 'What you have earned',
           programme: Programme.earnings,
-          glass: glass,
         ),
         const SizedBox(height: 10),
         _ProgBanner(
@@ -386,7 +439,6 @@ class _ProgrammeBanners extends StatelessWidget {
           title: 'Coins',
           line: 'Earned today',
           programme: Programme.earn,
-          glass: glass,
         ),
       ],
     );
@@ -399,16 +451,18 @@ class _ProgBanner extends StatelessWidget {
     required this.kicker,
     required this.title,
     required this.line,
-    required this.programme,
+    this.programme,
+    this.onOpen,
     this.glass = false,
   });
 
   final bool glass;
+  final void Function(BuildContext)? onOpen;
   final String art;
   final String kicker;
   final String title;
   final String line;
-  final Programme programme;
+  final Programme? programme;
 
   @override
   Widget build(BuildContext context) {
@@ -417,7 +471,11 @@ class _ProgBanner extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         HapticFeedback.selectionClick();
-        Programmes.open(context, programme);
+        if (onOpen != null) {
+          onOpen!(context);
+        } else {
+          Programmes.open(context, programme!);
+        }
       },
       child: Container(
         height: glass ? 116 : 136,
@@ -425,9 +483,9 @@ class _ProgBanner extends StatelessWidget {
         decoration: BoxDecoration(
           // In the glass panel the cards go see-through dark so the frost
           // shows around them; on their own they stay near-black.
-          color: glass ? const Color(0x73050507) : const Color(0xF0111114),
-          borderRadius: BorderRadius.circular(glass ? 24 : 22),
-          border: Border.all(color: glass ? const Color(0x24FFFFFF) : const Color(0x33FFFFFF)),
+          color: glass ? Colors.black : const Color(0xF0111114),
+          borderRadius: BorderRadius.circular(glass ? 20 : 22),
+          border: Border.all(color: glass ? const Color(0x1FFFFFFF) : const Color(0x33FFFFFF)),
         ),
         child: Row(children: [
           ClipRRect(

@@ -61,7 +61,8 @@ class RewardHaptics {
 /// even if the widget that asked has already gone (context may be stale).
 /// Coins only: no "You won" card in the middle of the flow any more — the
 /// coins fly straight into the top wallet pill, which shows the new total.
-Future<void> playCoins(BuildContext? context, int gained, {int? balanceAfter, String title = 'NowssB coins', bool reveal = false}) async {
+Future<void> playCoins(BuildContext? context, int gained,
+    {int? balanceAfter, String title = 'NowssB coins', bool reveal = false, CoinDay? day, bool immediate = false}) async {
   if (gained <= 0) return;
   unawaited(NotifStore.instance.pingCoins(gained));
   final after = balanceAfter ?? EconomyMirror.instance.coins;
@@ -71,7 +72,7 @@ Future<void> playCoins(BuildContext? context, int gained, {int? balanceAfter, St
       {'type': 'coins', 'coins': gained, 'label': '$gained coins'},
     ]));
   }
-  await RewardOverlay.coins(gained, from: before, to: after);
+  await RewardOverlay.coins(gained, from: before, to: after, day: day, immediate: immediate);
 }
 
 /// Sum of coins in a server response (effects / items / coins).

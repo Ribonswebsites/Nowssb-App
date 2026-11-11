@@ -554,10 +554,7 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 14),
-                child: ProgrammesGlassSection(),
-              ),
+              const ProgrammesGlassSection(),
               const NmHorizontalRoutineCards(fashion: true),
               SizedBox(height: kFashSectionGap),
               const EarthDayFilm(),

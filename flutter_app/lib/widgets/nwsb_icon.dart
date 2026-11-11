@@ -188,6 +188,11 @@ class NwsbMarks {
 
   // ── Section marks ────────────────────────────────────────────────────
 
+  /// The Programmes mark: a compass, a ring and a needle (24 box, stroke).
+  static const compass = '<circle cx="12" cy="12" r="8.6"/>'
+      '<path d="M15.9 8.1l-2.1 5.7-5.7 2.1 2.1-5.7z"/>'
+      '<path d="M12 3.4v1.5M12 19.1v1.5M3.4 12h1.5M19.1 12h1.5"/>';
+
   /// Limited Time Free — hourglass mark (24 box, stroke). Replaces emoji ⏳.
   static const hourglass =
       '<path d="M6.4 3.6h11.2"/>'

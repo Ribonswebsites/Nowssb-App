@@ -27,6 +27,7 @@ class NwsbCoinFly {
     required int coins,
     required int from,
     required int to,
+    CoinDay? day,
   }) {
     final count = (coins.clamp(1, 40) + 6).clamp(8, 18);
     return showGeneralDialog<void>(
@@ -34,13 +35,14 @@ class NwsbCoinFly {
       useRootNavigator: true,
       barrierDismissible: false,
       barrierColor: const Color(0x40000000),
-      pageBuilder: (context, _, __) => _FlyStage(count: count, from: from, to: to, target: CoinPillAnchor.target()),
+      pageBuilder: (context, _, __) => _FlyStage(count: count, from: from, to: to, day: day, target: CoinPillAnchor.target()),
     );
   }
 }
 
 class _FlyStage extends StatefulWidget {
-  const _FlyStage({required this.count, required this.from, required this.to, this.target});
+  const _FlyStage({required this.count, required this.from, required this.to, this.day, this.target});
+  final CoinDay? day;
   final int count;
   final int from;
   final int to;
@@ -112,7 +114,7 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
                   child: Center(
                     child: Opacity(
                       opacity: fade.clamp(0.0, 1.0),
-                      child: CoinWalletPill(total: shown, punch: punch, width: _pillWidth),
+                      child: CoinWalletPill(total: shown, punch: punch, width: _pillWidth, day: widget.day),
                     ),
                   ),
                 ),
@@ -180,7 +182,8 @@ class NwsbCoinDisc extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EditableImage.asset(
+    // Round, so the picture's black corners never show as a square.
+    return ClipOval(child: EditableImage.asset(
       NwsbCoinFly.disc,
       width: size,
       height: size,
@@ -196,7 +199,7 @@ class NwsbCoinDisc extends StatelessWidget {
         ),
       ),
       slot: 'nwsb_coin_fly.NwsbCoinDisc',
-    );
+    ));
   }
 }
 
@@ -205,7 +208,10 @@ class NwsbCoinDisc extends StatelessWidget {
 /// today's free-coin progress on the app's gold progress bar, and on the
 /// right a round glass wallet the coins fly into.
 class CoinWalletPill extends StatelessWidget {
-  const CoinWalletPill({super.key, required this.total, this.punch = 0, this.width = 340});
+  const CoinWalletPill({super.key, required this.total, this.punch = 0, this.width = 340, this.day});
+
+  /// Today's numbers to show; the server summary when null.
+  final CoinDay? day;
 
   static const height = 56.0;
   static const circle = 44.0;
@@ -222,7 +228,7 @@ class CoinWalletPill extends StatelessWidget {
     final cap = ((today['ceilingNow'] ?? today['ceiling']) as num?)?.toInt();
     final hasCap = earned != null && cap != null && cap > 0;
     // Collected today vs still earnable today (open activities, under the cap).
-    final day = CoinDay.fromSummary(EconomyMirror.instance.summary);
+    final day = this.day ?? CoinDay.fromSummary(EconomyMirror.instance.summary);
     return Container(
       width: width,
       height: height,

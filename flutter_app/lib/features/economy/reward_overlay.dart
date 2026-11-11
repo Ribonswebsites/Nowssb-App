@@ -17,6 +17,7 @@ import '../../theme/tokens.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/swipe_away.dart';
+import 'coin_collect.dart' show CoinDay;
 import 'reward_fx.dart' show ConfettiBurst;
 
 class RewardOverlay {
@@ -27,19 +28,55 @@ class RewardOverlay {
 
   static Future<void> _chain = Future<void>.value();
 
+  /// Tests: let plays run (they are skipped under the test binding).
+  static bool debugPlayInTests = false;
+
   static bool get _quiet =>
-      WidgetsBinding.instance.runtimeType.toString().contains('Test');
+      !debugPlayInTests && WidgetsBinding.instance.runtimeType.toString().contains('Test');
+
+  /// True when plays are switched off (widget tests), so nothing should
+  /// keep retrying.
+  static bool get quiet => _quiet;
+
+  static DateTime? _busySince;
+
+  /// Longest a single play may hold the queue. A flight takes ~3 s and a
+  /// card waits for a tap, so anything past this is a play that never ended
+  /// (its route was removed, its navigator rebuilt): the queue moves on
+  /// instead of keeping every later reward, the Collect card included,
+  /// waiting behind it forever.
+  static const _stuckAfter = Duration(seconds: 45);
+
+  /// Tests: forget any play still queued from an earlier test.
+  @visibleForTesting
+  static void debugReset() {
+    _chain = Future<void>.value();
+    _busySince = null;
+  }
+
+  /// Whether a play could start right now (a navigator is on screen).
+  static bool get canPlay {
+    final nav = navigatorKey.currentState;
+    return nav != null && nav.mounted && !_quiet;
+  }
 
   /// Queue a play. Returns when this play has finished.
   static Future<void> enqueue(Future<void> Function(NavigatorState nav) play) {
     final done = Completer<void>();
+    final since = _busySince;
+    if (since != null && DateTime.now().difference(since) > _stuckAfter) {
+      _chain = Future<void>.value();
+    }
     _chain = _chain.then((_) async {
       final nav = navigatorKey.currentState;
       if (nav == null || !nav.mounted || _quiet) return;
+      _busySince = DateTime.now();
       try {
         await play(nav);
       } catch (e) {
         debugPrint('NowssB reward overlay: $e');
+      } finally {
+        _busySince = null;
       }
     }).whenComplete(() {
       if (!done.isCompleted) done.complete();
@@ -75,13 +112,21 @@ class RewardOverlay {
         )));
   }
 
-  /// Coins flying into the balance pill with a count-up.
-  static Future<void> coins(int gained, {required int from, required int to}) {
+  /// Coins flying into the balance pill with a count-up. [immediate] skips
+  /// the queue: the flight starts now, even if another play is on screen
+  /// (the Collect card's own tap uses it, so the top bar never waits).
+  static Future<void> coins(int gained, {required int from, required int to, CoinDay? day, bool immediate = false}) {
     if (gained <= 0) return Future<void>.value();
-    return enqueue((nav) {
+    Future<void> fly(NavigatorState nav) {
       final ctx = nav.overlay?.context ?? nav.context;
-      return NwsbCoinFly.show(ctx, coins: gained, from: from, to: to);
-    });
+      return NwsbCoinFly.show(ctx, coins: gained, from: from, to: to, day: day);
+    }
+    if (immediate) {
+      final nav = navigatorKey.currentState;
+      if (nav == null || !nav.mounted || _quiet) return Future<void>.value();
+      return fly(nav);
+    }
+    return enqueue(fly);
   }
 }
 

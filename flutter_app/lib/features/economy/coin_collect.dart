@@ -19,10 +19,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../screens/quotes_live.dart' show DailyQuoteGate;
+import '../../screens/splash.dart' show SplashGate;
 import '../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 import '../../widgets/swipe_away.dart';
 import 'economy_api.dart';
-import 'reward_fx.dart' show coinsIn, balanceIn, playCoins;
+import 'reward_fx.dart' show coinsIn, playCoins;
 import 'reward_overlay.dart';
 
 /// One activity's coins waiting for a Collect tap.
@@ -102,9 +104,20 @@ class PendingCoins extends ChangeNotifier {
   final Set<String> _handled = {}; // collected (or offered) today
   String _day = '';
   bool _loaded = false;
+  Future<void>? _loading;
   bool _showing = false;
   bool busy = false;
   Timer? _debounce;
+  Timer? _retry;
+  int _retries = 0;
+
+  /// Ids already put in front of the user this run (so "Later" is not asked
+  /// again in a loop, but a reward that arrives while the card is up is).
+  final Set<String> _shownIds = {};
+
+  /// Tests: do not wait for the splash and the daily quote.
+  @visibleForTesting
+  static bool debugIgnoreGates = false;
 
   /// Tests: skip the overlay and storage timing.
   @visibleForTesting
@@ -117,12 +130,20 @@ class PendingCoins extends ChangeNotifier {
     return '${n.year}-${n.month.toString().padLeft(2, '0')}-${n.day.toString().padLeft(2, '0')}';
   }
 
-  Future<void> _load() async {
+  /// One load at a time: an offer and a show that start together used to
+  /// both clear and refill the list, which could drop or double an offer.
+  Future<void> _load() {
+    if (_loaded && _day == today()) return Future<void>.value();
+    return _loading ??= _doLoad().whenComplete(() => _loading = null);
+  }
+
+  Future<void> _doLoad() async {
     final d = today();
     if (_loaded && _day == d) return;
     _day = d;
     items.clear();
     _handled.clear();
+    _shownIds.clear();
     try {
       final p = await SharedPreferences.getInstance();
       final raw = p.getString(_prefsKey);
@@ -151,9 +172,13 @@ class PendingCoins extends ChangeNotifier {
     items.clear();
     _handled.clear();
     _loaded = false;
+    _loading = null;
     _showing = false;
     busy = false;
+    _shownIds.clear();
+    _retries = 0;
     _debounce?.cancel();
+    _retry?.cancel();
   }
 
   Map? _serverAction(String action) {
@@ -188,83 +213,162 @@ class PendingCoins extends ChangeNotifier {
     _debounce = Timer(const Duration(milliseconds: 700), () => unawaited(show()));
   }
 
+  /// Resolves once the splash and the daily quote are out of the way (the
+  /// card used to open underneath them and was never seen), or after a
+  /// failsafe so it can never wait forever.
+  Future<void> _whenClear() {
+    bool clear() => debugIgnoreGates || (SplashGate.done.value && DailyQuoteGate.done.value);
+    if (clear()) return Future<void>.value();
+    final c = Completer<void>();
+    late VoidCallback on;
+    Timer? cap;
+    void finish() {
+      SplashGate.done.removeListener(on);
+      DailyQuoteGate.done.removeListener(on);
+      cap?.cancel();
+      if (!c.isCompleted) c.complete();
+    }
+    on = () {
+      if (clear()) finish();
+    };
+    SplashGate.done.addListener(on);
+    DailyQuoteGate.done.addListener(on);
+    cap = Timer(const Duration(seconds: 12), finish);
+    return c.future;
+  }
+
+  void _retryLater() {
+    if (RewardOverlay.quiet || _retries >= 40) return;
+    _retries++;
+    _retry?.cancel();
+    _retry = Timer(const Duration(milliseconds: 600), () => unawaited(show()));
+  }
+
   /// Shows the Collect card for everything waiting (no-op when empty).
+  ///
+  /// It always shows for an uncollected reward: if the screen is not ready
+  /// (no navigator yet, splash or the daily quote still up) it waits and
+  /// tries again instead of silently giving up. Coins move only on the
+  /// Collect tap; Later and a dismissed card leave them waiting.
   Future<void> show() async {
     await _load();
-    if (items.isEmpty || _showing) return;
+    // Widget tests switch plays off: no gate waits or retries to leave behind.
+    if (items.isEmpty || _showing || RewardOverlay.quiet) return;
     _showing = true;
-    var take = false;
+    Future<int>? collecting;
+    List<PendingEarn> shown = const [];
+    var played = false;
     try {
+      await _whenClear();
+      if (items.isEmpty) return;
+      shown = List.of(items);
       await RewardOverlay.enqueue((nav) async {
-        take = await nav.push<bool>(RawDialogRoute<bool>(
-              barrierDismissible: true,
-              barrierLabel: 'later',
-              barrierColor: const Color(0xCC03060C),
-              transitionDuration: const Duration(milliseconds: 420),
-              transitionBuilder: (context, a, _, child) => FadeTransition(
-                opacity: a,
-                child: SlideTransition(
-                  position: Tween(begin: const Offset(0, 0.08), end: Offset.zero)
-                      .animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic)),
-                  child: child,
-                ),
+        played = true;
+        _shownIds.addAll(shown.map((e) => e.id));
+        await nav.push<bool>(RawDialogRoute<bool>(
+          // Only Collect, Later or a swipe closes it: a stray tap on the
+          // dim area must not make the reward vanish.
+          barrierDismissible: false,
+          barrierLabel: 'coins',
+          barrierColor: const Color(0xCC03060C),
+          transitionDuration: const Duration(milliseconds: 420),
+          transitionBuilder: (context, a, _, child) => FadeTransition(
+            opacity: a,
+            child: SlideTransition(
+              position: Tween(begin: const Offset(0, 0.08), end: Offset.zero)
+                  .animate(CurvedAnimation(parent: a, curve: Curves.easeOutCubic)),
+              child: child,
+            ),
+          ),
+          pageBuilder: (context, _, __) => SwipeAway(
+            onDismissed: () => Navigator.of(context).maybePop(false),
+            child: Center(
+              child: CoinOfferCard(
+                items: shown,
+                day: CoinDay.fromSummary(EconomyMirror.instance.summary, pending: shown.fold(0, (s, e) => s + e.coins)),
+                onCollect: () {
+                  // The bar and the flight start on this very tap; the
+                  // server call runs alongside, never in front of them.
+                  collecting ??= collectBatch(shown);
+                  Navigator.of(context).pop(true);
+                },
+                onLater: () => Navigator.of(context).pop(false),
               ),
-              pageBuilder: (context, _, __) => SwipeAway(
-                onDismissed: () => Navigator.of(context).maybePop(false),
-                child: Center(
-                  child: CoinOfferCard(
-                    items: List.of(items),
-                    day: CoinDay.fromSummary(EconomyMirror.instance.summary, pending: total),
-                    onCollect: () => Navigator.of(context).pop(true),
-                    onLater: () => Navigator.of(context).pop(false),
-                  ),
-                ),
-              ),
-            )) ??
-            false;
+            ),
+          ),
+        ));
       });
     } finally {
       _showing = false;
     }
-    if (take) await collect();
+    if (!played) {
+      // The overlay could not play (no navigator yet): try again soon.
+      _retryLater();
+      return;
+    }
+    _retries = 0;
+    if (collecting != null) await collecting;
+    // A reward that arrived while the card was open gets its own card.
+    if (items.any((e) => !_shownIds.contains(e.id))) unawaited(show());
   }
 
-  /// The user tapped Collect: credit on the server, then fly the coins.
-  /// Returns the coins actually credited.
-  Future<int> collect() async {
+  /// Credits everything waiting. Tests and the card's tap both land here.
+  Future<int> collect() => collectBatch(List.of(items));
+
+  /// The user tapped Collect for [batch]: show the top coin bar and the
+  /// flight at once with the coins that were offered, and credit them on the
+  /// server in parallel. Returns the coins the server actually credited.
+  Future<int> collectBatch(List<PendingEarn> batch) async {
     await _load();
-    if (busy || items.isEmpty) return 0;
+    final todo = [for (final e in batch) if (items.any((x) => x.id == e.id)) e];
+    if (busy || todo.isEmpty) return 0;
     busy = true;
     notifyListeners();
+    final offered = todo.fold(0, (s, e) => s + e.coins);
+    final mirror = EconomyMirror.instance;
+    final before = mirror.coins;
+    final day0 = CoinDay.fromSummary(mirror.summary, pending: offered);
+    final dayAfter = day0 == null
+        ? null
+        : CoinDay(collected: day0.collected + offered, left: math.max(0, day0.left - offered), ceiling: day0.ceiling);
+    HapticFeedback.mediumImpact();
+    // Immediate: not queued behind anything, not behind the network.
+    final flight = playCoins(null, offered, balanceAfter: before + offered, day: dayAfter, immediate: true);
     var gained = 0;
-    int? balance;
+    var kept = 0;
     try {
-      for (final e in List.of(items)) {
+      for (final e in todo) {
         try {
           final r = await EconomyApi.call('reportAction', {'action': e.action, if (e.key.isNotEmpty) 'key': e.key});
           gained += coinsIn(r);
-          balance = balanceIn(r) ?? balance;
-          items.remove(e);
+          items.removeWhere((x) => x.id == e.id);
         } on EconomyException catch (x) {
           // Offline / switching on: keep it waiting. Anything else (already
           // earned, limit, unknown) is settled by the server: drop it.
-          if (x.code == 'offline' || x.code == 'timeout' || x.code == 'not-configured' || x.code == 'unauthenticated') continue;
-          items.remove(e);
+          if (x.code == 'offline' || x.code == 'timeout' || x.code == 'not-configured' || x.code == 'unauthenticated') {
+            kept += e.coins;
+            continue;
+          }
+          items.removeWhere((x) => x.id == e.id);
         }
       }
       await _save();
-      try {
-        await EconomyApi.call('summary'); // today's bar reads fresh numbers
-      } catch (_) {}
-      if (gained > 0) {
-        HapticFeedback.mediumImpact();
-        await playCoins(null, gained, balanceAfter: balance);
-      }
+      // Today's numbers refresh in the background, after the animation has
+      // already started.
+      unawaited(EconomyApi.call('summary').then((_) {}, onError: (_) {}));
+      if (gained < offered) _tell(kept > 0 ? 'No connection. Your $kept coins are saved to collect later.' : 'Those coins were already collected today.');
     } finally {
       busy = false;
       notifyListeners();
     }
+    await flight;
     return gained;
+  }
+
+  void _tell(String text) {
+    final ctx = RewardOverlay.navigatorKey.currentContext;
+    final m = ctx == null ? null : ScaffoldMessenger.maybeOf(ctx);
+    m?.showSnackBar(SnackBar(content: Text(text)));
   }
 }
 
@@ -283,6 +387,7 @@ class CoinOfferCard extends StatefulWidget {
 }
 
 class _CoinOfferCardState extends State<CoinOfferCard> with SingleTickerProviderStateMixin {
+  bool _tapped = false;
   late final AnimationController _t = AnimationController(vsync: this, duration: const Duration(milliseconds: 3600))..repeat();
 
   @override
@@ -366,7 +471,11 @@ class _CoinOfferCardState extends State<CoinOfferCard> with SingleTickerProvider
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                         ),
-                        onPressed: widget.onCollect,
+                        onPressed: () {
+                          if (_tapped) return;
+                          _tapped = true;
+                          widget.onCollect();
+                        },
                         child: const Text('Collect', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Colors.black)),
                       ),
                     ),
