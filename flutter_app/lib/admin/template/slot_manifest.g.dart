@@ -458,7 +458,6 @@ const kSlotManifest = <List<String>>[
   ['subscription.SubscriptionScreen.disclaimer-confidentiality', 'text', 'Disclaimer & Confidentiality', 'screens/subscription.dart'],
   ['subscription.SubscriptionScreen.nowssb-2026-adv-sanjaykumar-gadge-shabda-5096388f', 'text', 'NowssB\n© 2026 Adv. Sanjaykumar Gadge · Shabdapathy', 'screens/subscription.dart'],
   ['subscription.SubscriptionScreen.payments-are-handled-by-google-play-mana-db4ffe7e', 'text', 'Payments are handled by Google Play. Manage or cancel in Google Play → Subscriptions.', 'screens/subscription.dart'],
-  ['subscription.SubscriptionScreen.share-nowssb-a-friend-who-subscribes-thr-a192da69', 'text', 'Share NowssB: a friend who subscribes through your link gets the friend offer on Play.', 'screens/subscription.dart'],
   ['subscription.SubscriptionScreen.subscription', 'text', 'Subscription', 'screens/subscription.dart'],
   ['subscription.SubscriptionScreen.subscription-b', 'video', 'assets/video/subscription-b.mp4', 'screens/subscription.dart'],
   ['subscription.SubscriptionScreen.subscription-bg', 'video', 'assets/video/subscription-bg.mp4', 'screens/subscription.dart'],

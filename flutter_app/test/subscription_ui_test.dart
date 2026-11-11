@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/features/programs/store_extras.dart';
 import 'package:nowssb/screens/subscription.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -60,6 +61,51 @@ void main() {
     expect(find.text('Terms & Conditions'), findsOneWidget);
     expect(find.text('Free'), findsWidgets);
     expect(find.byType(PageView), findsOneWidget);
+  });
+
+  test('subscription page source has no Copy link / Share referral block', () {
+    final src = File('lib/screens/subscription.dart').readAsStringSync();
+    for (final bad in const [
+      'ShareItemButtons',
+      'ShareChip',
+      'Copy link',
+      'Share NowssB',
+      'SharePlus',
+      'ios_share',
+    ]) {
+      expect(src, isNot(contains(bad)), reason: '$bad belongs in Profile only');
+    }
+    final manifest =
+        File('lib/admin/template/slot_manifest.g.dart').readAsStringSync();
+    expect(manifest, isNot(contains('SubscriptionScreen.share-nowssb')));
+  });
+
+  testWidgets('subscription page shows no Copy link or Share widget',
+      (tester) async {
+    tester.view.physicalSize = const Size(390 * 3, 900 * 3);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(const MaterialApp(home: SubscriptionScreen()));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+    // Scroll to the very bottom so the footer is built.
+    await tester.scrollUntilVisible(
+      find.text('Terms & Conditions'),
+      500,
+      scrollable: find
+          .byWidgetPredicate(
+              (w) => w is Scrollable && w.axisDirection == AxisDirection.down)
+          .first,
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.textContaining('Copy link'), findsNothing);
+    expect(find.textContaining('Share'), findsNothing);
+    expect(find.textContaining('your link'), findsNothing);
+    expect(find.byType(ShareItemButtons), findsNothing);
+    expect(find.byType(ShareChip), findsNothing);
+    expect(find.byIcon(Icons.link_rounded), findsNothing);
+    expect(find.byIcon(Icons.ios_share_rounded), findsNothing);
+    expect(find.text('Restore purchases'), findsOneWidget);
   });
 
   testWidgets('terms page lists the subscription conditions', (tester) async {
