@@ -35,6 +35,7 @@ import '../widgets/tv_frame.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/sound_glass.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import 'notifications_sheet.dart';
 import 'practice.dart';
@@ -386,7 +387,6 @@ class _SlmFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wide = MediaQuery.sizeOf(context).width * 0.78;
-    final mosaicW = MediaQuery.sizeOf(context).width * 0.42;
     final pool = words.isNotEmpty ? words : allWords;
     final featured = pool.isEmpty ? null : pool.first;
     final hits = () {
@@ -395,6 +395,8 @@ class _SlmFeed extends StatelessWidget {
       return use.take(10).toList();
     }();
     final trending = pool.take(12).toList();
+    // One picture per tile across the three glass sections of this page.
+    final ledger = SoundArtLedger();
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -562,31 +564,14 @@ class _SlmFeed extends StatelessWidget {
                             onTap: onPlayWord,
                           ),
                         ),
-                      _section(
-                        'Quick picks',
-                        trailing: words.isEmpty
-                            ? null
-                            : _pill('Play all', () => onPlayWord(words.first)),
-                        child: _rowPages(words.take(12).toList()),
-                      ),
+                      _glassQuickPicks(ledger),
                       _promoAt(1),
-                      if (trending.isNotEmpty)
-                        _ytmPlainSection(
-                          'Trending songs for you',
-                          trailing: _pill('Play all', () => onPlayWord(trending.first)),
-                          child: _YtmTrackList(
-                            words: trending,
-                            art: art,
-                            counts: counts,
-                            onTap: onPlayWord,
-                            onMore: onOpenWord,
-                          ),
-                        ),
+                      if (trending.isNotEmpty) _glassNowPlaying(trending, ledger),
                       _storeVideos(wide),
                       _sentencesSec(),
                       _collections(context, wide),
                       _bigCards(wide),
-                      _mosaics(mosaicW),
+                      _glassStations(ledger),
                       if (hits.length > 4)
                         _ytmPlainSection(
                           'Listen again',
@@ -1100,101 +1085,122 @@ class _SlmFeed extends StatelessWidget {
     );
   }
 
-  Widget _rowPages(List<Word> list) {
+  // ─── Glass layouts (Spotify-style) ─────────────────────────────────────────
+  //
+  // The Library feed repeated two layouts again and again: the thumbnail-row
+  // list (Quick picks, Trending, Your sentences, Meanings & origins) and the
+  // card rail (Global Hits, Collections, Not practised yet, Browse by
+  // category, Listen again). Three of them now get their own glass style:
+  //   Quick picks             → GlassQuickGrid      (2-column compact rows)
+  //   Trending songs for you  → GlassNowPlayingGrid (now playing + tile grid)
+  //   Browse by category      → GlassStationRow     (station cards)
+  // Every item still shows and still plays / opens the same page.
+
+  String _customArt(Word w) => WordArt.instance.imageFor(w.word, '');
+
+  Widget _glassQuickPicks(SoundArtLedger ledger) {
+    final list = words.take(12).toList();
     if (list.isEmpty) return const SizedBox.shrink();
-    final pages = <List<Word>>[];
-    for (var i = 0; i < list.length; i += 4) {
-      pages.add(list.sublist(i, i + 4 > list.length ? list.length : i + 4));
-    }
-    return SizedBox(
-      height: 4 * 64.0,
-      child: PageView.builder(
-        controller: PageController(viewportFraction: 0.94),
-        itemCount: pages.length,
-        itemBuilder: (_, i) => Padding(
-          padding: const EdgeInsets.only(left: 10, right: 4),
-          child: Column(
-            children: [
-              for (final w in pages[i]) _trackRow(w),
-            ],
-          ),
+    final picks = [
+      for (final w in list)
+        SlPick(
+          word: w,
+          art: ledger.pick('q:${w.word}', preferred: _customArt(w)),
+        ),
+    ];
+    return GlassSection(
+      title: 'Quick picks',
+      subline: 'Tap to play · hold to open',
+      trailing: GlassPill(
+        label: 'Play all',
+        onTap: () => onPlayWord(list.first),
+      ),
+      child: GlassQuickGrid(
+        picks: picks,
+        onPlay: onPlayWord,
+        onOpen: onOpenWord,
+        chips: const ['All', 'Practised', 'New'],
+        matches: (chip, p) => chip == 'Practised'
+            ? counts[p.word.word] != null
+            : counts[p.word.word] == null,
+        emptyLabel: 'Nothing here yet.',
+        trailingFor: (p) => DownloadButton(
+          id: WordVoice.downloadId(p.word),
+          title: p.word.word,
+          kind: 'word',
+          url: p.word.voice,
+          compact: true,
+          color: const Color(0xB3FFFFFF),
         ),
       ),
     );
   }
 
-  Widget _trackRow(Word w, {String? title, String? sub, VoidCallback? onTap}) {
-    final label = title ?? w.word;
-    final subtitle = sub ??
-        [
-          if (w.phonetic.isNotEmpty) w.phonetic,
-          if (w.organ.isNotEmpty) w.organ,
-          if (counts[w.word] != null)
-            '${counts[w.word]} session${counts[w.word] == 1 ? '' : 's'}',
-        ].join(' · ');
-    return InkWell(
-      onTap: onTap ?? () => onPlayWord(w),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 76,
-              child: FramedSlot(
-                frame: DeviceFrame.tab6Landscape,
-                child: EditableImage.asset(
-                  art(w.word),
-                  fit: BoxFit.cover,
-                  word: w.word,
-                  errorBuilder: (_, __, ___) =>
-                      const ColoredBox(color: Color(0xFF1A1A1A)),
-                      slot: 'sound_library.SlmFeed',
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  EditableLabel('sound_library.SlmFeed',
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0xFFF5F5F7),
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  EditableLabel('sound_library.SlmFeed',
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Color(0x80EBEBF5),
-                      fontSize: 12.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            DownloadButton(
-              id: WordVoice.downloadId(w),
-              title: w.word,
-              kind: 'word',
-              url: w.voice,
-              compact: true,
-              color: const Color(0x99FFFFFF),
-            ),
-            IconButton(
-              onPressed: () => onOpenWord(w),
-              icon: const Icon(Icons.more_vert, color: Color(0x99FFFFFF)),
-            ),
-          ],
+  /// The word the Now Playing card falls back to: the one practised last.
+  Word? _lastPlayedWord() {
+    for (final s in PracticeProgress.instance.sessionsSnapshot) {
+      final name = '${s['word'] ?? ''}'.trim();
+      if (name.isEmpty) continue;
+      for (final w in allWords) {
+        if (w.word == name) return w;
+      }
+    }
+    return null;
+  }
+
+  Widget _glassNowPlaying(List<Word> list, SoundArtLedger ledger) {
+    final picks = [
+      for (final w in list)
+        SlPick(
+          word: w,
+          art: ledger.pick('t:${w.word}', preferred: _customArt(w)),
         ),
+    ];
+    return GlassSection(
+      title: 'Trending songs for you',
+      subline: 'Pick up where you left off',
+      trailing: GlassPill(
+        label: 'Play all',
+        onTap: () => onPlayWord(list.first),
       ),
+      child: GlassNowPlayingGrid(
+        picks: picks,
+        onPlay: onPlayWord,
+        onOpen: onOpenWord,
+        lastPlayed: _lastPlayedWord(),
+        headerArt: (w) => ledger.pick('np:${w.word}'),
+      ),
+    );
+  }
+
+  Widget _glassStations(SoundArtLedger ledger) {
+    final cats = <String>{};
+    for (final w in allWords) {
+      cats.addAll(w.categories);
+    }
+    final list = cats.toList()..sort();
+    if (list.isEmpty) return const SizedBox.shrink();
+    final stations = <SlStation>[];
+    for (final c in list) {
+      final inCat = allWords.where((w) => w.categories.contains(c)).toList();
+      final n = inCat.length;
+      final names = inCat.take(3).map((w) => w.word).join(', ');
+      stations.add(SlStation(
+        id: c,
+        title: c,
+        subtitle: '$n word${n == 1 ? '' : 's'}${names.isEmpty ? '' : ' · $names'}',
+        avatars: [
+          for (var i = 0; i < (inCat.length < 3 ? inCat.length : 3); i++)
+            ledger.pick('c:$c:$i', avatar: true),
+        ],
+        onTap: () => onOpenCategory(c),
+        onLongPress: () => onChip(c),
+      ));
+    }
+    return GlassSection(
+      title: 'Browse by category',
+      subline: 'Pick a mood, open its sounds',
+      child: GlassStationRow(stations: stations),
     );
   }
 
@@ -1497,79 +1503,6 @@ class _SlmFeed extends StatelessWidget {
                       [w.organ, w.origin].where((s) => s.isNotEmpty).join(' · '),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Color(0x94FFFFFF),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _mosaics(double cardW) {
-    final cats = <String>{};
-    for (final w in allWords) {
-      cats.addAll(w.categories);
-    }
-    final list = cats.toList()..sort();
-    if (list.isEmpty) return const SizedBox.shrink();
-    return _section(
-      'Browse by category',
-      child: SizedBox(
-        height: 200,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          itemCount: list.length.clamp(0, 10),
-          separatorBuilder: (_, __) => const SizedBox(width: 12),
-          itemBuilder: (_, i) {
-            final c = list[i];
-            final ws = allWords.where((w) => w.categories.contains(c)).length;
-            return SizedBox(
-              width: cardW,
-              child: GestureDetector(
-                onTap: () => onOpenCategory(c),
-                onLongPress: () => onChip(c),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FramedSlot(
-                      frame: DeviceFrame.tab5Landscape,
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        physics: const NeverScrollableScrollPhysics(),
-                        children: [
-                          for (var q = 0; q < 4; q++)
-                            EditableImage.asset(
-                              _colAsset(kRmCategories[
-                                  (_hash(c) + q * 4) % kRmCategories.length]),
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  const ColoredBox(color: Color(0xFF1A1A1A)),
-                                  slot: 'sound_library.SlmFeed',
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      c,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      '$ws word${ws == 1 ? '' : 's'}',
                       style: const TextStyle(
                         color: Color(0x94FFFFFF),
                         fontSize: 12,

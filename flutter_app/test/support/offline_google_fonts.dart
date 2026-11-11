@@ -19,6 +19,9 @@ const _families = {
   'Anton': 'Anton.ttf',
   'DMSans': 'DMSans.ttf',
   'LibreBaskerville': 'LibreBaskerville.ttf',
+  // The player's own text (player_aura.dart). Stand-in file: tests only need
+  // the face to exist, not to look like Outfit.
+  'Outfit': 'DMSans.ttf',
 };
 
 Future<String> setUpOfflineGoogleFonts() async {
