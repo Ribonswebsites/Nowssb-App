@@ -262,13 +262,7 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ),
         ],
       ),
-      const Padding(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-        child: EditableLabel('store.StoreHomeContent',
-          'Disclaimer & Confidentiality\n\nWords, meanings, ebooks and verification badges shared or sold here are for educational and wellness purposes only — nothing here is medical advice. Purchases are final once unlocked. Any information you share with us is kept strictly confidential and never sold or shared with third parties.',
-          style: TextStyle(fontSize: 11, height: 1.5, color: Color(0x73FFFFFF)),
-        ),
-      ),
+      const SizedBox.shrink(),
       const Padding(
         padding: EdgeInsets.symmetric(vertical: 24),
         child: EditableLabel('store.StoreHomeContent',

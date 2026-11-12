@@ -89,7 +89,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
       _notice = null;
     });
     try {
-      if (!NwsbFirebase.ready) throw 'Firebase is not ready in this build.';
+      if (!NwsbFirebase.ready) throw 'Sign-in is unavailable. Try again later.';
       await action();
       if (FirebaseAuth.instance.currentUser != null) {
         PhoneNotifications.instance.armSession();
@@ -129,7 +129,7 @@ class _NwsbSignInPageState extends State<NwsbSignInPage> {
       case 'too-many-requests':
         return 'Too many attempts. Wait a little and try again.';
       case 'operation-not-allowed':
-        return 'This sign-in method is not enabled in Firebase yet.';
+        return 'This sign-in method is unavailable.';
       default:
         if (error is FirebaseAuthException && (error.message ?? '').isNotEmpty) {
           return error.message!;

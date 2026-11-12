@@ -51,6 +51,6 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
     await tester.pump(const Duration(milliseconds: 50));
 
-    expect(find.text('Firebase is not ready in this build.'), findsOneWidget);
+    expect(find.text('Sign-in is unavailable. Try again later.'), findsOneWidget);
   });
 }

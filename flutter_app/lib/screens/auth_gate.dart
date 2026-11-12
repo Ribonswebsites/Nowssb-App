@@ -171,7 +171,7 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _googleLogin() => _run(() async {
         if (!NwsbFirebase.ready) {
           throw const _AuthMessage(
-            'Google sign-in is not configured in this build. Use email or continue as a guest.',
+            'Google sign-in is unavailable. Use email or continue as a guest.',
           );
         }
         try {
@@ -187,7 +187,7 @@ class _AuthGateState extends State<AuthGate> {
           final credentials = await account.authentication;
           if (credentials.idToken == null && credentials.accessToken == null) {
             throw const _AuthMessage(
-              'Google did not return a credential. Check the Android app registration and signing certificate in Firebase.',
+              'Google sign-in did not finish. Try again.',
             );
           }
           await FirebaseAuth.instance.signInWithCredential(
@@ -209,7 +209,7 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _emailLogin() => _run(() async {
         if (!NwsbFirebase.ready) {
           throw const _AuthMessage(
-            'Email sign-in is unavailable until Firebase is configured in this build.',
+            'Email sign-in is unavailable. Try again later.',
           );
         }
         final email = _email.text.trim();
@@ -235,7 +235,7 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _sendPhoneCode() => _run(() async {
         if (!NwsbFirebase.ready) {
           throw const _AuthMessage(
-            'Phone sign-in is unavailable until Firebase is configured in this build.',
+            'Phone sign-in is unavailable. Try again later.',
           );
         }
         final phone = _phone.text.trim();
@@ -318,10 +318,10 @@ class _AuthGateState extends State<AuthGate> {
       case 'too-many-requests':
         return 'Too many attempts. Wait a little and try again.';
       case 'operation-not-allowed':
-        return 'This sign-in method is not enabled in Firebase yet.';
+        return 'This sign-in method is unavailable.';
       case 'app-not-authorized':
       case 'invalid-api-key':
-        return 'This build is not authorised for Firebase sign-in. Check its Android registration and SHA certificate.';
+        return 'Sign-in is unavailable. Try again later.';
       case 'captcha-check-failed':
         return 'The security check failed. Make sure Google Play services and your network are available.';
       case 'quota-exceeded':
@@ -352,7 +352,7 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _appleLogin() => _run(() async {
         if (!NwsbFirebase.ready) {
           throw const _AuthMessage(
-            'Apple sign-in is not configured in this build.',
+            'Apple sign-in is unavailable.',
           );
         }
         final provider = AppleAuthProvider()
@@ -364,7 +364,7 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _forgot() => _run(() async {
         if (!NwsbFirebase.ready) {
           throw const _AuthMessage(
-            'Password reset is unavailable until Firebase is configured in this build.',
+            'Password reset is unavailable. Try again later.',
           );
         }
         final email = _email.text.trim();
@@ -450,7 +450,7 @@ class _AuthGateState extends State<AuthGate> {
     if (authStates == null) {
       return _buildAuthScreen(
         unavailable:
-            'Firebase is not ready in this build. You can still explore without an account.',
+            'You can still explore without an account.',
       );
     }
     return StreamBuilder<User?>(

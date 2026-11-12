@@ -35,7 +35,7 @@ import 'money.dart';
 class PlayCheckout {
   PlayCheckout._();
 
-  static const playStoreOnly = 'Available in the Play Store version of NowssB.';
+  static const playStoreOnly = 'Couldn\'t start the purchase. Try again.';
   static const _productUrl = 'https://nowssb.com/api/play/product';
   static const _prefsKey = 'nwsb.play.checkouts';
   static final _prices = <String, String>{};
@@ -89,16 +89,16 @@ class PlayCheckout {
   static Future<String> priceLabel(String productId) async {
     final cached = _prices[productId];
     if (cached != null) return cached;
-    if (!await available()) return 'Play price';
+    if (!await available()) return '';
     try {
       final response = await InAppPurchase.instance.queryProductDetails({productId});
-      if (response.productDetails.isEmpty) return 'Play price';
+      if (response.productDetails.isEmpty) return '';
       final label = response.productDetails.first.price;
       _prices[productId] = label;
       FxBook.instance.notePlayCurrency(response.productDetails.first.currencyCode);
       return label;
     } catch (_) {
-      return 'Play price';
+      return '';
     }
   }
 

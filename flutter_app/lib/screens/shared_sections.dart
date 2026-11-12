@@ -299,7 +299,7 @@ class _SubscriptionTierStack extends StatelessWidget {
     if (tier == null) return 'NowssB Edition';
     final p = playPlanFor(tier, yearly: false);
     final price = p == null ? null : PlaySubscriptions.instance.priceFor(p.productId);
-    return price == null ? 'Price on Google Play' : '$price / month';
+    return price == null ? '' : '$price / month';
   }
 
   @override
@@ -393,16 +393,17 @@ class _SubscriptionTierRow extends StatelessWidget {
                             ),
                           ),
                           // Like the name: shown whole, scaled down only when
-                          // there is no room ('Price on Google Play') (B012).
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerLeft,
-                            child: EditableLabel('shared_sections.SubscriptionTierRow', detail,
-                                maxLines: 1,
-                                softWrap: false,
-                                style: const TextStyle(
-                                    color: Color(0xB3FFFFFF), fontSize: 10)),
-                          ),
+                          // there is no room (B012).
+                          if (detail.isNotEmpty)
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: EditableLabel('shared_sections.SubscriptionTierRow', detail,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  style: const TextStyle(
+                                      color: Color(0xB3FFFFFF), fontSize: 10)),
+                            ),
                         ],
                       ),
                     ),

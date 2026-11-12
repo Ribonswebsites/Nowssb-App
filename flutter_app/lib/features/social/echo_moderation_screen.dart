@@ -16,7 +16,7 @@ class EchoModerationScreen extends StatelessWidget {
       title: 'Echo reports',
       mark: NwsbMarks.verified,
       child: !NwsbFirebase.ready
-          ? const EconomyNote('Firebase is not connected.')
+          ? const EconomyNote('Can\'t load reports right now.')
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection('echoReports')

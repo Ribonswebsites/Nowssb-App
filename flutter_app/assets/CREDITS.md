@@ -228,15 +228,10 @@ Added in 301edcf1 (concept r27, 27 Oct 2026). Searched git history, commit messa
 | `home/hx/sound-feature.webp` | Self-generated for NowssB (same tool): headphones, singing bowl, lotus | Original art. Sound Library card |
 | `home/nm-sound-eq.json` | "Sound Equalizer Bars - Music" by Creator Mahesh, LottieFiles — https://lottiefiles.com/free-animation/sound-equalizer-bars-music-QF5HEZf3gR | [Lottie Simple License](https://lottiefiles.com/page/license) (free, commercial use allowed). Unzipped from the free `.lottie` download and recoloured (blue → near-black, yellow → NowssB gold); shapes and timing untouched. Plays only while the player is playing |
 
-## Subscription plan cards — `assets/subscription/` (Nov 12, 2026)
+## Subscription plan cards — `assets/subscription/` (restored 21 Sep 2026 art)
 
-Three plan pictures replaced so that every front and back on the Subscription page is a different image with no faces. The other five (`tier-blazer-front/back`, `tier-sun-back`, `tier-bag-back`, `tier-nile-front`) keep their Oct 21 art, which has no recorded third-party source.
+All eight plan pictures (`tier-blazer/sun/bag/nile` front and back) were restored byte-for-byte from commit `db31d51a` (21 Sep 2026, 21:13 IST), the last commit on that day. These are the original fashion-portrait cards: blonde woman in a purple NowssB blazer (Free), red-haired woman with headphones (Resonance), dark-haired woman in a black blazer with a NowssB bag (Frequency), and a woman in Egyptian-style jewellery (Frequency X). Each has a white-background front and a black-background back. No recorded third-party source in earlier credits.
 
-| File | Source | Licence / notes |
-|---|---|---|
-| `subscription/tier-sun-front.png` (Resonance front) | Self-generated for NowssB with the Grok Bot image tool (prompt: close-up of hands in dhyana mudra on dark linen, gold rim light, no face) | Original art made for the app; no third-party source. Resized 720×1280, PNG |
-| `subscription/tier-bag-front.png` (Frequency front) | Self-generated for NowssB (same tool): monk seen from behind in a dark temple under one shaft of gold light | Original art; no third-party source |
-| `subscription/tier-nile-back.png` (Frequency X back) | Self-generated for NowssB (same tool): black raked sand ripples round one dark stone, gold edge light, no people | Original art; no third-party source |
 ## Zen Plus reel — `assets/video/zp-*.mp4` and `zp-*-poster.webp` (Nov 12, 2026)
 
 Five people, each a still made with the Grok Bot image tool and then brought to life with its image-to-video tool (6 s, slow orbit, pulsing golden node mesh), in the style of the owner's reference clip. All are fictional, AI-generated people. Re-encoded 720x960, H.264, muted, CRF 25, faststart; the poster is each clip's first frame. Original work for NowssB; no third-party source.

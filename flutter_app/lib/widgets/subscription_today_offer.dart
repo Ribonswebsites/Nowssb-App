@@ -47,7 +47,7 @@ class _Tier {
 
 /// A bundled tier with today's real Google Play price (and Play's own
 /// offer, when this account is eligible). Nothing is invented: with no
-/// Play price yet the card says so.
+/// Play price yet the card leaves the price blank.
 _Tier _live(_Tier t) {
   final tier = tierForPlanName(t.name);
   if (tier == null) return t;
@@ -89,7 +89,7 @@ const _tiers = <_Tier>[
     name: 'Resonance',
     detail: 'A deeper daily practice.',
     badge: 'Monthly',
-    now: 'Google Play price',
+    now: '',
     was: '',
     cta: 'See the plan',
     front: 'assets/subscription/tier-sun-front.png',
@@ -105,7 +105,7 @@ const _tiers = <_Tier>[
     name: 'Frequency',
     detail: 'Every word and frequency.',
     badge: 'Monthly',
-    now: 'Google Play price',
+    now: '',
     was: '',
     cta: 'See the plan',
     front: 'assets/subscription/tier-bag-front.png',
@@ -121,7 +121,7 @@ const _tiers = <_Tier>[
     name: 'Frequency X',
     detail: 'The complete NowssB experience.',
     badge: 'Monthly',
-    now: 'Google Play price',
+    now: '',
     was: '',
     cta: 'See the plan',
     front: 'assets/subscription/tier-nile-front.png',
@@ -423,13 +423,15 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  tier.was.isEmpty ? tier.now : '${tier.now}  ·  was ${tier.was}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
-                ),
+                if (tier.now.isNotEmpty || tier.was.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    tier.was.isEmpty ? tier.now : '${tier.now}  ·  was ${tier.was}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
+                  ),
+                ],
               ],
             ),
           ),
@@ -491,17 +493,19 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
                                 ),
                             ],
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            tier.now,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
+                          if (tier.now.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Text(
+                              tier.now,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
+                          ],
                           const SizedBox(height: 8),
                           Expanded(
                             // Fits the card: no inner scroll to trap a thumb.
@@ -575,11 +579,13 @@ class _SubscriptionTodayOfferState extends State<SubscriptionTodayOffer> {
               _badge(tier),
             ],
           ),
-          const SizedBox(height: 3),
-          Text(
-            tier.was.isEmpty ? tier.now : '${tier.now}  ·  was ${tier.was}',
-            style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13),
-          ),
+          if (tier.now.isNotEmpty || tier.was.isNotEmpty) ...[
+            const SizedBox(height: 3),
+            Text(
+              tier.was.isEmpty ? tier.now : '${tier.now}  ·  was ${tier.was}',
+              style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13),
+            ),
+          ],
           const SizedBox(height: 2),
           Text(
             tier.detail,
@@ -848,21 +854,22 @@ class _OfferFlipState extends State<_OfferFlip> with SingleTickerProviderStateMi
               ),
             ),
           ),
-          Positioned(
-            left: 8,
-            right: 8,
-            bottom: 10,
-            child: Text(
-              widget.price,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w900,
+          if (widget.price.isNotEmpty)
+            Positioned(
+              left: 8,
+              right: 8,
+              bottom: 10,
+              child: Text(
+                widget.price,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

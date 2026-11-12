@@ -134,7 +134,7 @@ class PlaySubscriptions extends ChangeNotifier {
     _started = true;
     _watchEntitlement();
     if (kIsWeb || !Platform.isAndroid) {
-      _unavailable('Subscriptions are sold through Google Play on Android.');
+      _unavailable('Couldn\'t start the purchase. Try again.');
       return;
     }
     try {
@@ -144,14 +144,14 @@ class PlaySubscriptions extends ChangeNotifier {
       );
       final ok = await InAppPurchase.instance.isAvailable();
       if (!ok) {
-        _unavailable('Google Play Billing is not available on this device. Install NowssB from Google Play to subscribe.');
+        _unavailable('Couldn\'t start the purchase. Try again.');
         return;
       }
       available = true;
       notifyListeners();
       await loadProducts();
     } catch (e) {
-      _unavailable('Google Play Billing is not available on this device.');
+      _unavailable('Couldn\'t start the purchase. Try again.');
     }
   }
 
@@ -185,7 +185,7 @@ class PlaySubscriptions extends ChangeNotifier {
         }
       }
       if (_buy.isEmpty) {
-        unavailableReason = 'Subscriptions are not available in this build. Install NowssB from Google Play to subscribe.';
+        unavailableReason = null;
       } else {
         unavailableReason = null;
       }
@@ -212,12 +212,12 @@ class PlaySubscriptions extends ChangeNotifier {
     final user = _user;
     if (user == null) return const PlayResult(false, 'Sign in first — your plan is saved to your NowssB account.');
     if (available != true) {
-      return PlayResult(false, unavailableReason ?? 'Google Play Billing is not available on this device.');
+      return PlayResult(false, unavailableReason ?? 'Couldn\'t start the purchase. Try again.');
     }
     if (_buy[plan.productId] == null) await loadProducts();
     final details = _buy[plan.productId];
     if (details == null) {
-      return PlayResult(false, unavailableReason ?? '${plan.name} is not available on Google Play yet.');
+      return PlayResult(false, unavailableReason ?? 'Couldn\'t start the purchase. Try again.');
     }
     if (busy) return const PlayResult(false, 'A purchase is already in progress.');
     busy = true;
@@ -321,7 +321,7 @@ class PlaySubscriptions extends ChangeNotifier {
     final user = _user;
     if (user == null) return const PlayResult(false, 'Sign in first, then restore.');
     if (available != true) {
-      return PlayResult(false, unavailableReason ?? 'Google Play Billing is not available on this device.');
+      return PlayResult(false, unavailableReason ?? 'Couldn\'t start the purchase. Try again.');
     }
     // A second tap used to start a second restore that reset the first
     // one's counters halfway, so it could report "nothing found".
@@ -450,7 +450,7 @@ class PlaySubscriptions extends ChangeNotifier {
   String _friendlyError(IAPError? e) {
     final m = (e?.message ?? '').toLowerCase();
     if (m.contains('not configured for billing') || m.contains('developer_error') || m.contains('developererror')) {
-      return 'This copy of NowssB cannot buy through Google Play. Install NowssB from Google Play to subscribe.';
+      return 'Couldn\'t start the purchase. Try again.';
     }
     if (m.contains('already') && m.contains('own')) {
       return 'You already have this subscription. Tap Restore purchases.';

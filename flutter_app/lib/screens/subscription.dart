@@ -85,8 +85,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Resonance',
       detail: 'A deeper daily practice',
-      monthly: 'Price on Google Play',
-      yearly: 'Price on Google Play',
+      monthly: '',
+      yearly: '',
       accent: NwsbColors.mist,
       front: 'assets/subscription/tier-sun-front.png',
       back: 'assets/subscription/tier-sun-back.png',
@@ -100,8 +100,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Frequency',
       detail: 'Every word and frequency',
-      monthly: 'Price on Google Play',
-      yearly: 'Price on Google Play',
+      monthly: '',
+      yearly: '',
       accent: NwsbColors.goldLight,
       front: 'assets/subscription/tier-bag-front.png',
       back: 'assets/subscription/tier-bag-back.png',
@@ -115,8 +115,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _Plan(
       name: 'Frequency X',
       detail: 'The complete NowssB experience',
-      monthly: 'Price on Google Play',
-      yearly: 'Price on Google Play',
+      monthly: '',
+      yearly: '',
       accent: Color(0xFFF1F1F4),
       front: 'assets/subscription/tier-nile-front.png',
       back: 'assets/subscription/tier-nile-back.png',
@@ -134,7 +134,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Future<void> _subscribe(_Plan plan) async {
     final tier = tierForPlanName(plan.name);
     if (tier == null) {
-      _say('The free plan needs no purchase. Pick a paid plan to subscribe through Google Play.');
+      _say('The Free plan doesn\'t need a purchase.');
       return;
     }
     if (PlaySubscriptions.instance.isActivePlan(tier, yearly: yearly)) {
@@ -170,9 +170,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
   Widget _playFooter() {
     final billing = PlaySubscriptions.instance;
-    final note = billing.available == false || billing.unavailableReason != null
-        ? billing.unavailableReason
-        : null;
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 0),
       child: Column(
@@ -185,26 +182,12 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               FriendDiscountBadge(kind: 'subscription'),
             ]),
           ),
-          if (note != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text(
-                note,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5, height: 1.4),
-              ),
-            ),
           TextButton(
             onPressed: billing.busy ? null : _restore,
             child: Text(
               billing.busy ? 'Working…' : 'Restore purchases',
               style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
             ),
-          ),
-          const EditableLabel('subscription.SubscriptionScreen',
-            'Payments are handled by Google Play. Manage or cancel in Google Play → Subscriptions.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0x73FFFFFF), fontSize: 10.5, height: 1.4),
           ),
         ],
       ),
@@ -364,24 +347,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const EditableLabel('subscription.SubscriptionScreen',
-              'Disclaimer & Confidentiality',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: NwsbColors.gold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const EditableLabel('subscription.SubscriptionScreen',
-              'Subscriptions, trials and word access are for educational and wellness purposes only — they are not medical advice and do not replace professional care. The 30-day free trial converts to a paid plan unless you cancel before it ends. Paid plans renew automatically until cancelled. Any information you share with us is kept strictly confidential and never sold.',
-              style: TextStyle(
-                fontSize: 11,
-                height: 1.7,
-                color: Color(0x73FFFFFF),
-              ),
-            ),
-            const SizedBox(height: 14),
             GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
@@ -526,15 +491,17 @@ class _TierCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        price,
-                        style: TextStyle(
-                          color: plan.accent,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
+                      if (price.isNotEmpty) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          price,
+                          style: TextStyle(
+                            color: plan.accent,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -591,8 +558,8 @@ class _Included extends StatelessWidget {
     final cta = current
         ? 'Your current plan'
         : plan.name == 'Free'
-            ? 'Start your 30-day free trial'
-            : 'Subscribe to ${plan.name}';
+            ? 'Start free trial'
+            : 'Subscribe';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -652,17 +619,19 @@ class _Included extends StatelessWidget {
             ),
           ),
         const Spacer(),
-        Text(
-          plan.name == 'Free'
-              ? 'No card required to start · $price'
-              : '$price · cancel anytime in Google Play',
-          style: const TextStyle(
-            color: Color(0x8CFFFFFF),
-            fontSize: 10,
-            height: 1.3,
+        if (plan.name == 'Free' || price.isNotEmpty) ...[
+          Text(
+            plan.name == 'Free'
+                ? 'No card required to start'
+                : price,
+            style: const TextStyle(
+              color: Color(0x8CFFFFFF),
+              fontSize: 10,
+              height: 1.3,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
@@ -831,19 +800,20 @@ class _FlipPhotoState extends State<_FlipPhoto>
               ),
             ),
           ),
-          Positioned(
-            left: 10,
-            right: 10,
-            bottom: 12,
-            child: Text(
-              widget.price,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
+          if (widget.price.isNotEmpty)
+            Positioned(
+              left: 10,
+              right: 10,
+              bottom: 12,
+              child: Text(
+                widget.price,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

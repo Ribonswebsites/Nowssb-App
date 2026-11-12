@@ -30,7 +30,7 @@ void main() {
     await t.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: SubscriptionSection()))));
     await t.pump();
     expect(find.textContaining(r'$'), findsNothing);
-    expect(find.text('Price on Google Play'), findsNWidgets(3));
+    expect(find.text('Price on Google Play'), findsNothing);
 
     setPlayInr();
     await t.pump();
