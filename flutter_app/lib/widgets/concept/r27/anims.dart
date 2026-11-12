@@ -1,6 +1,7 @@
 /// R27 — CustomPainter animations that replace the home's videos/Lottie:
 ///  • [R27SoundOrb]   → Sound Library card video (assets/video/orb-loop.mp4)
-///  • [R27BreathFlame]→ streak card top-right video (player-aura-bg.mp4)
+///  • [R27BreathFlame]→ legacy streak disc (kept, unused on Normal home)
+///  • [R27StreakCandle]→ Normal-home streak mark: growing candle flame
 ///  • [R27Coin]       → NowssB Earn coin Lottie (nm-anim-coins.json)
 ///  • [R27PosterDrift]→ "Offers and earning" video (hero-meaning-store.mp4)
 ///  • [R27Meditator]  → replaces the Cleopatra / red-haired model cut-outs
@@ -117,6 +118,205 @@ class _FlameP extends CustomPainter {
   }
   @override
   bool shouldRepaint(_FlameP o) => o.t != t || o.streak != streak || o.light != light;
+}
+
+// ── Streak candle (Normal home) ───────────────────────────────────────────
+/// Growing candle flame for the Normal-home "YOUR STREAK" card.
+/// Height follows the live streak. Day 0 is an unlit wick with a dim ember.
+/// Painted as a tall flame and a short candle — no disc, ring, orb or particles.
+class R27StreakCandle extends StatelessWidget {
+  const R27StreakCandle({
+    super.key,
+    required this.streak,
+    this.size = const Size(72, 84),
+  });
+
+  /// Real streak days; the flame grows with this value.
+  final int streak;
+  final Size size;
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: '$streak day streak',
+    child: R27Anim(
+      period: const Duration(milliseconds: 2600),
+      builder: (_, t) => CustomPaint(size: size, painter: _CandleP(t, streak)),
+    ),
+  );
+}
+
+class _CandleP extends CustomPainter {
+  _CandleP(this.t, this.streak);
+  final double t;
+  final int streak;
+  @override
+  void paint(Canvas c, Size s) {
+    final cx = s.width / 2;
+    final h = s.height;
+    final w = s.width;
+
+    // Slim column in the lower third so the unlit state still reads as a candle.
+    final candleW = w * .28;
+    final candleH = h * .34;
+    final baseY = h - h * .05;
+    final candleTop = baseY - candleH;
+
+    final body = RRect.fromLTRBR(
+      cx - candleW / 2,
+      candleTop,
+      cx + candleW / 2,
+      baseY,
+      const Radius.circular(3.5),
+    );
+    c.drawRRect(
+      body,
+      Paint()
+        ..shader = ui.Gradient.linear(
+          Offset(cx - candleW / 2, candleTop),
+          Offset(cx + candleW / 2, baseY),
+          const [Color(0xFFFFF8EA), Color(0xFFF0D9A8), Color(0xFFE2C48A)],
+          const [0, .55, 1],
+        ),
+    );
+    // Soft left highlight, no circular shine.
+    c.drawRRect(
+      RRect.fromLTRBR(
+        cx - candleW / 2 + 1.2,
+        candleTop + 2,
+        cx - candleW * .12,
+        baseY - 2,
+        const Radius.circular(2),
+      ),
+      Paint()..color = const Color(0x66FFFFFF),
+    );
+    // Thin wax lip and a small drip — a cap, not a lid or disc.
+    final lip = RRect.fromLTRBR(
+      cx - candleW / 2 - .8,
+      candleTop - 1.4,
+      cx + candleW / 2 + .8,
+      candleTop + 1.8,
+      const Radius.circular(1.2),
+    );
+    c.drawRRect(
+      lip,
+      Paint()
+        ..shader = ui.Gradient.linear(
+          Offset(cx, candleTop - 1.4),
+          Offset(cx, candleTop + 1.8),
+          const [Color(0xFFFFE6A8), Color(0xFFD9A441), Color(0xFFB88A2E)],
+          const [0, .55, 1],
+        ),
+    );
+    final drip = Path()
+      ..moveTo(cx + candleW / 2 - .4, candleTop + 1)
+      ..cubicTo(cx + candleW / 2 + 3.2, candleTop + 4, cx + candleW / 2 + 2.4, candleTop + candleH * .42, cx + candleW / 2 + .2, candleTop + candleH * .46)
+      ..lineTo(cx + candleW / 2 - .2, candleTop + 1.6)
+      ..close();
+    c.drawPath(drip, Paint()..color = const Color(0xFFE8C57A));
+
+    final wickTop = candleTop - 8.5;
+    final wick = RRect.fromLTRBR(
+      cx - .7,
+      wickTop,
+      cx + .7,
+      candleTop + .4,
+      const Radius.circular(.8),
+    );
+    c.drawRRect(wick, Paint()..color = const Color(0xFF3A2A1C));
+
+    final lit = streak > 0;
+    // 1 day is already a clear flame; 7+ days reach full height.
+    final strength = lit ? (.42 + .58 * ((streak.clamp(1, 7) - 1) / 6)) : 0.0;
+    final flicker =
+        1 + .10 * math.sin(t * _tau) + .05 * math.sin(t * _tau * 2.65 + .4);
+    final sway =
+        math.sin(t * _tau * 1.12) * .22 + math.sin(t * _tau * 2.35 + .7) * .08;
+    final maxH = candleTop - h * .07;
+    final flameH =
+        maxH *
+        (lit ? strength : .22) *
+        (lit ? flicker : (1 + .12 * math.sin(t * _tau)));
+    final flameW = w * (lit ? (.34 + .08 * strength) : .22);
+
+    Path tongue(double k, double swayMul) {
+      final base = Offset(cx, wickTop + 1.2);
+      final tip = Offset(cx + sway * flameW * swayMul, base.dy - flameH * k);
+      final midY = base.dy - flameH * k * .38;
+      return Path()
+        ..moveTo(base.dx - flameW * .12 * k, base.dy)
+        ..cubicTo(
+          base.dx - flameW * k,
+          midY + flameH * k * .08,
+          tip.dx - flameW * .28 * k,
+          tip.dy + flameH * k * .28,
+          tip.dx,
+          tip.dy,
+        )
+        ..cubicTo(
+          tip.dx + flameW * .28 * k,
+          tip.dy + flameH * k * .28,
+          base.dx + flameW * k,
+          midY + flameH * k * .08,
+          base.dx + flameW * .12 * k,
+          base.dy,
+        )
+        ..close();
+    }
+
+    if (!lit) {
+      // Dim ember: a short, dull tongue that breathes. Shape stays a flame, not a circle.
+      final ember = tongue(.85, .35);
+      c.drawPath(
+        ember,
+        Paint()
+          ..color = const Color(0xCCC45C22)
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.5),
+      );
+      c.drawPath(
+        ember,
+        Paint()
+          ..shader = ui.Gradient.linear(
+            Offset(cx, wickTop),
+            Offset(cx, wickTop - flameH),
+            const [Color(0xFF8A3B16), Color(0xFFE07030), Color(0xFFFFC078)],
+            const [0, .5, 1],
+          ),
+      );
+      c.drawPath(tongue(.45, .2), Paint()..color = const Color(0xFFFFE0A0));
+      return;
+    }
+
+    // Soft flame-shaped glow (follows the tongue, not a circular orb).
+    c.drawPath(
+      tongue(1.18, 1.05),
+      Paint()
+        ..color = const Color(0x55D9A441)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9),
+    );
+    c.drawPath(
+      tongue(1, 1),
+      Paint()
+        ..shader = ui.Gradient.linear(
+          Offset(cx, wickTop),
+          Offset(cx + sway * flameW, wickTop - flameH),
+          const [Color(0xFFB4561E), Color(0xFFD9A441), Color(0xFFFFE6A8)],
+          const [0, .48, 1],
+        ),
+    );
+    c.drawPath(
+      tongue(.68, .7),
+      Paint()
+        ..shader = ui.Gradient.linear(
+          Offset(cx, wickTop),
+          Offset(cx + sway * flameW * .7, wickTop - flameH * .68),
+          const [Color(0xFFE8A83A), Color(0xFFFFE6A8), Color(0xFFFFF6E0)],
+          const [0, .5, 1],
+        ),
+    );
+    c.drawPath(tongue(.38, .45), Paint()..color = const Color(0xFFFFF6E0));
+  }
+
+  @override
+  bool shouldRepaint(_CandleP o) => o.t != t || o.streak != streak;
 }
 
 // ── Spinning coin ─────────────────────────────────────────────────────────

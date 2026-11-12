@@ -351,6 +351,17 @@ class PracticeProgress extends ChangeNotifier {
     return true;
   }
 
+  /// Test hook: replace in-memory sessions so a card can be rendered at a
+  /// known streak. Does not write to SharedPreferences.
+  @visibleForTesting
+  void debugSetSessionsForTest(Map<String, Map<String, dynamic>> sessions) {
+    _sessions
+      ..clear()
+      ..addAll(sessions);
+    notifyListeners();
+  }
+
+
   @override
   void dispose() {
     _authSub?.cancel();

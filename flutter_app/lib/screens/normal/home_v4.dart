@@ -11,7 +11,7 @@
 library;
 
 import 'dart:math' as math;
-import '../../widgets/concept/r27/anims.dart' show R27BreathFlame, R27Coin;
+import '../../widgets/concept/r27/anims.dart' show R27StreakCandle, R27Coin;
 import '../../data/models.dart' show Word;
 import '../../widgets/sound_glass.dart' show SlPlayer, SessionPlayer;
 import 'package:nowssb/data/day_part.dart';
@@ -697,9 +697,9 @@ class V4Streak extends StatelessWidget {
                   ]),
                 ),
                 _Well(
-                  circle: true,
-                  size: const Size.square(92),
-                  child: ClipOval(child: ColoredBox(color: const Color(0xFFF0F2F7), child: Center(child: R27BreathFlame(streak: s, size: 88, light: true)))),
+                  size: const Size(80, 92),
+                  pad: 4,
+                  child: R27StreakCandle(streak: s, size: const Size(72, 84)),
                 ),
               ]),
               const SizedBox(height: 14),
