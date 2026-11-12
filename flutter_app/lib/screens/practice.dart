@@ -16,10 +16,10 @@ import 'package:flutter/material.dart';
 
 import '../data/content.dart';
 import '../data/models.dart';
-import '../theme/tokens.dart';
 import '../theme/player_aura.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/restyle_kit.dart';
 import 'sound_library.dart';
 import 'practice_player.dart';
 import 'word_detail.dart';
@@ -72,21 +72,31 @@ class _PracticeScreenState extends State<PracticeScreen> {
     final rest = all.where((w) => !now.contains(w)).toList();
     final sessionWords = now.isEmpty ? rest : now;
 
+    void openWord(Word w) => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => WordDetail(word: w)),
+        );
+    void openLibrary() => Navigator.of(context).push(
+          MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()),
+        );
+    final ritual = SplitPromoSpec.forSurface(SplitPromoSurface.morningRitual);
+    final hold = SplitPromoExtras.at(12);
+
     return PageShell(
       eyebrow: 'Today',
       title: _slotTitle[slot] ?? 'Practice',
       film: kPlayerSharedFilm,
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(bottom: 24),
           sliver: SliverList.list(children: [
             if (all.isEmpty)
               const _Empty()
             // Server-driven order (Admin → UI Editor); bundled order by default.
             else ...layoutChildren(context, 'practice', [
               LSection('session', 'Session card', _SessionCard(
-                count: sessionWords.length,
+                words: sessionWords,
                 slot: slot,
+                onOpen: openWord,
                 onStart: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => PracticePlayerScreen(
@@ -96,45 +106,52 @@ class _PracticeScreenState extends State<PracticeScreen> {
                   ),
                 ),
               )),
-              const SizedBox(height: 18),
-              LSection('promo', 'Morning Ritual banner', ColoredSplitPromoBanner.forSurface(
-                SplitPromoSurface.morningRitual,
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => const SoundLibraryScreen(),
-                  ),
-                ),
-                margin: EdgeInsets.zero,
+              LSection('promo', 'Morning Ritual banner', KitBlackCard(
+                key: const ValueKey('practice-library-card'),
+                art: KitCutout(ritual.art),
+                eyebrow: 'Sound Library',
+                title: ritual.title.replaceAll('\n', ' '),
+                line: ritual.cta,
+                onTap: openLibrary,
               )),
-              const SizedBox(height: 22),
-              const LSection('now', 'This session words', DarkHead(
+              LSection('now', 'This session words', KitPane(
+                key: const ValueKey('practice-session-pane'),
                 eyebrow: 'Tap a word to open it',
                 title: 'This session',
-                icon: Icons.play_circle_outline,
-              )),
-              const SizedBox(height: 14),
-              for (final w in now) _row(context, w),
-              if (rest.isNotEmpty) LSection.group('also', 'Also today words', align: CrossAxisAlignment.stretch, [
-                const SizedBox(height: 22),
-                const DarkHead(
-                  eyebrow: 'Every other word you have',
-                  title: 'Also today',
-                  icon: Icons.library_music_outlined,
-                ),
-                const SizedBox(height: 14),
-                for (final w in rest) _row(context, w),
-              ]),
-              const SizedBox(height: 22),
-              LSection('promo2', 'Sound Library banner', ColoredSplitPromoBanner(
-                spec: SplitPromoExtras.at(
-                  12,
+                mark: NwsbMarks.play24,
+                trailing: GlassPill(
+                  label: 'Play all',
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
-                      builder: (_) => const SoundLibraryScreen(),
+                      builder: (_) => PracticePlayerScreen(
+                        words: sessionWords,
+                        title: _slotTitle[slot] ?? 'Practice',
+                      ),
                     ),
                   ),
                 ),
-                margin: EdgeInsets.zero,
+                child: Column(children: [
+                  for (var i = 0; i < now.length; i++)
+                    _row(now[i], openWord, highlighted: i == 0),
+                ]),
+              )),
+              if (rest.isNotEmpty)
+                LSection('also', 'Also today words', KitPane(
+                  key: const ValueKey('practice-also-pane'),
+                  eyebrow: 'Every other word you have',
+                  title: 'Also today',
+                  mark: NwsbMarks.sound,
+                  child: Column(children: [
+                    for (final w in rest) _row(w, openWord),
+                  ]),
+                )),
+              LSection('promo2', 'Sound Library banner', KitBlackCard(
+                key: const ValueKey('practice-hold-card'),
+                art: KitCutout(hold.art),
+                eyebrow: 'Practice',
+                title: hold.title.replaceAll('\n', ' '),
+                line: hold.cta,
+                onTap: openLibrary,
               )),
             ]),
           ]),
@@ -143,91 +160,62 @@ class _PracticeScreenState extends State<PracticeScreen> {
     );
   }
 
-  Widget _row(BuildContext context, Word w) => WordRow(
-        word: w.word,
-        deva: w.deva,
+  Widget _row(Word w, ValueChanged<Word> open, {bool highlighted = false}) =>
+      KitRow(
+        leading: KitWordArt(word: w.word, deva: w.deva),
+        title: w.word,
         sub: w.organ.isNotEmpty ? w.organ : w.meaning,
-        onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => WordDetail(word: w)),
-        ),
+        highlighted: highlighted,
+        onTap: () => open(w),
       );
 }
 
+/// Today's session in the Currently Playing hero layout: word-only art, the
+/// count, the line, the round white Start button, and the first few words as
+/// pills.
 class _SessionCard extends StatelessWidget {
   const _SessionCard({
-    required this.count,
+    required this.words,
     required this.slot,
     required this.onStart,
+    required this.onOpen,
   });
-  final int count;
+  final List<Word> words;
   final String slot;
   final VoidCallback onStart;
+  final ValueChanged<Word> onOpen;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0x14FFFFFF),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
-      ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                '$count',
-                style: const TextStyle(
-                  fontSize: 40,
-                  fontWeight: FontWeight.w800,
-                  color: NwsbColors.goldLight,
-                  height: 1,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                count == 1 ? 'word' : 'words',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0x8CFFFFFF),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Aligned to your $slot — say each one on the exhale, and hold '
-                  'the last sound.',
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xCCFFFFFF),
-                    height: 1.5,
+    final count = words.length;
+    final lead = words.isEmpty ? null : words.first;
+    return KitHero(
+      key: const ValueKey('practice-hero'),
+      art: KitWordArt(word: lead?.word ?? 'NowssB', deva: lead?.deva ?? ''),
+      cornerLabel: "Today's session",
+      eyebrow: 'Ready to play',
+      title: '$count ${count == 1 ? 'word' : 'words'}',
+      subline: 'Say each one on the exhale, and hold the last sound.',
+      buttonIcon: Icons.play_arrow_rounded,
+      buttonLabel: 'Start Player',
+      onButton: onStart,
+      footer: words.length < 2
+          ? null
+          : SizedBox(
+              height: 34,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: words.length.clamp(0, 8),
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (_, i) => Center(
+                  child: GlassPill(
+                    label: words[i].word,
+                    selected: i == 0,
+                    onTap: () => onOpen(words[i]),
                   ),
                 ),
-                const SizedBox(height: 14),
-                ElevatedButton.icon(
-                  onPressed: onStart,
-                  icon: const Icon(Icons.play_arrow_rounded, size: 19),
-                  label: const EditableLabel('practice.SessionCard', 'Start Player'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: NwsbColors.goldLight,
-                    foregroundColor: NwsbColors.deep,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -249,11 +237,10 @@ class _Empty extends StatelessWidget {
           ),
           SizedBox(height: 6),
           Text(
-            'Your words are still loading. Close and reopen the app if '
-            'this stays empty.',
+            'Your words are on their way.',
             textAlign: TextAlign.center,
             style:
-                TextStyle(fontSize: 12, color: Color(0x66FFFFFF), height: 1.5),
+                TextStyle(fontSize: 12, color: Color(0x8CFFFFFF), height: 1.5),
           ),
         ],
       ),
