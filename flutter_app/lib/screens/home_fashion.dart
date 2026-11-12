@@ -40,6 +40,7 @@ import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/four_banners.dart';
+import '../widgets/earn_now_section.dart';
 import '../widgets/meditation_flip_banner.dart';
 import '../widgets/enter_curve_stage.dart';
 import '../widgets/buddha_gyro_stage.dart';
@@ -558,6 +559,9 @@ class _HomeFashionState extends State<HomeFashion> {
               const NmHorizontalRoutineCards(fashion: true),
               SizedBox(height: kFashSectionGap),
               const EarthDayFilm(),
+              SizedBox(height: kFashSectionGap),
+              // NowssB Earn row (with the Zen Plus banner), mid-page (Ribon, Nov 12).
+              const EarnNowSection(),
               SizedBox(height: kFashSectionGap),
               PromoColorGrid(onOpen: _openGrid),
               SizedBox(height: kFashSectionGap),

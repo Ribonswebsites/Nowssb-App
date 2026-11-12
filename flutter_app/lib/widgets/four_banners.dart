@@ -287,7 +287,8 @@ class ProgrammesGlassSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const EarnNowSection(),
+        // The NowssB Earn row now sits mid-page on the Zen home (Ribon,
+        // Nov 12), not on top of Programmes.
         GlassWrap(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
@@ -334,7 +335,7 @@ class ProgrammesGlassSection extends StatelessWidget {
   }
 }
 
-/// The six programme cards of the glass pane. Each opens a page that exists.
+/// The four programme cards of the glass pane (no Zen Plus row, Ribon Nov 12). Each opens a page that exists.
 class _GlassCards extends StatelessWidget {
   const _GlassCards();
 
@@ -376,15 +377,6 @@ class _GlassCards extends StatelessWidget {
         line: 'Targets and rewards',
         glass: true,
         onOpen: (c) => Programmes.open(c, Programme.earn, tab: 'targets'),
-      ),
-      gap(),
-      _ProgBanner(
-        art: 'assets/banners/promo/quiet-room.webp',
-        kicker: 'Membership',
-        title: 'Zen Plus',
-        line: 'The full library',
-        glass: true,
-        onOpen: (c) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())),
       ),
       // Only while the draw is switched on, so it never opens "coming soon".
       LuckyDrawGate(

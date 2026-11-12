@@ -163,15 +163,16 @@ void main() {
     t.view.devicePixelRatio = 2;
     addTearDown(t.view.reset);
     await t.pumpWidget(MaterialApp(theme: ThemeData(fontFamily: 'DM Sans'), home: const Scaffold(body: SingleChildScrollView(child: ProgrammesGlassSection()))));
-    // The row's own card, plus the one pane that holds the programme cards.
-    expect(find.byType(GlassWrap), findsNWidgets(2));
+    // One pane that holds the programme cards (the Earn row moved mid-page).
+    expect(find.byType(GlassWrap), findsOneWidget);
     expect(find.byKey(const ValueKey('prog-glass-eyebrow')), findsOneWidget);
     expect(find.byKey(const ValueKey('prog-glass-title')), findsOneWidget);
     expect(find.text('Your path'), findsOneWidget);
     expect(find.text('Programmes'), findsOneWidget);
-    // Five cards always (the lucky draw one only while the draw is on).
+    // Exactly the four programmes; no Zen Plus membership row.
     expect(find.text('PROGRAMME'), findsNWidgets(4));
-    expect(find.text('MEMBERSHIP'), findsWidgets);
+    expect(find.text('MEMBERSHIP'), findsNothing);
+    expect(find.text('ZEN PLUS'), findsNothing);
     expect(find.text('Earned today'), findsOneWidget);
     // No stray highlight line along the top edge.
     expect(find.byWidgetPredicate((w) => w is Container && w.constraints?.maxHeight == 1.2), findsNothing);
