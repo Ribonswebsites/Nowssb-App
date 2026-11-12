@@ -1,4 +1,5 @@
 import 'profile_mind.dart';
+import '../widgets/restyle_kit.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
@@ -536,9 +537,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     )),
                     LSection('about', 'About', _about()),
-                    LSection('promo', 'Split promo banner', ColoredSplitPromoBanner.forSurface(
-                      SplitPromoSurface.profile,
-                      onTap: () => NavScope.goTo(context, 1),
+                    LSection('promo', 'Split promo banner', Padding(
+                      padding: const EdgeInsets.only(bottom: 34),
+                      child: KitBlackCard(
+                        key: const ValueKey('profile-practice-card'),
+                        margin: EdgeInsets.zero,
+                        art: KitCutout(SplitPromoSpec.forSurface(SplitPromoSurface.profile).art),
+                        eyebrow: "Today's practice",
+                        title: SplitPromoSpec.forSurface(SplitPromoSurface.profile).title.replaceAll('\n', ' '),
+                        line: SplitPromoSpec.forSurface(SplitPromoSurface.profile).cta,
+                        onTap: () => NavScope.goTo(context, 1),
+                      ),
                     )),
                     LSection('quick', 'Quick access', _quickAccess()),
                     LSection('recent', 'Recent activity', _recentActivity()),
@@ -1128,15 +1137,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final refs = EconomyMirror.instance.paidReferrals;
     final tier = live ? EconomyMirror.instance.circleTier : 'Member';
     final earned = live ? EconomyMirror.instance.lifetimeCents : 0;
-    return RoutineDeck(
-      title: 'Programs',
-      banner: 'NowssB',
-      bannerSub: 'Earn',
-      onBanner: () => Programmes.open(context, Programme.earn),
-      cards: [
-        WorkCard(category: 'Earn', title: tier, meta: '$code · $refs paid referrals', action: 'Open NowssB Earn', image: 'assets/rails/member-card.png', onTap: () => Programmes.open(context, Programme.earn)),
-        WorkCard(category: 'Earnings', title: live ? FxBook.instance.formatCents(earned) : 'Sign in', meta: 'Sales and referrals', action: 'Open earnings', image: 'assets/rails/earnings-02.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
-      ],
+    // NowssB Earn in the liked pages' look: a badge-headed glass pane with
+    // two black "NowssB Store" cards (member card, earnings).
+    return KitPane(
+      key: const ValueKey('profile-earn-pane'),
+      margin: const EdgeInsets.only(bottom: 34),
+      mark: NwsbMarks.earn,
+      eyebrow: 'Programs',
+      title: 'NowssB Earn',
+      onHead: () => Programmes.open(context, Programme.earn),
+      trailing: GlassPill(label: 'Open', onTap: () => Programmes.open(context, Programme.earn)),
+      child: Column(children: [
+        KitBlackCard(
+          margin: EdgeInsets.zero,
+          height: 120,
+          art: Image.asset('assets/rails/member-card.png', fit: BoxFit.cover),
+          eyebrow: code == '—' ? 'Earn · $refs paid referrals' : 'Earn · $code · $refs paid',
+          title: tier,
+          line: 'Open NowssB Earn',
+          onTap: () => Programmes.open(context, Programme.earn),
+        ),
+        const SizedBox(height: 10),
+        KitBlackCard(
+          margin: EdgeInsets.zero,
+          height: 120,
+          art: Image.asset('assets/rails/earnings-02.jpg', fit: BoxFit.cover),
+          eyebrow: 'Earnings',
+          title: live ? FxBook.instance.formatCents(earned) : 'Sign in',
+          line: 'Sales and referrals · Open',
+          onTap: () => Programmes.open(context, Programme.earnings),
+        ),
+      ]),
     );
       },
     );
@@ -1539,7 +1570,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Dividers go BETWEEN rows only: a divider under the last row sat on the
   // card's bottom edge and read as a cropped border.
-  Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [SectionLabel(title), GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.all(4), child: Column(children: [for (var i = 0; i < rows.length; i++) ...[if (i > 0) const Divider(height: 1, thickness: 1, color: _borderSoft, indent: 12, endIndent: 12), rows[i]]]))]);
+  Widget _sectionList(String title, List<Widget> rows) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [ProfileHead(title), GlassCard(margin: const EdgeInsets.only(bottom: 40), padding: const EdgeInsets.all(4), child: Column(children: [for (var i = 0; i < rows.length; i++) ...[if (i > 0) const Divider(height: 1, thickness: 1, color: _borderSoft, indent: 12, endIndent: 12), rows[i]]]))]);
 
   Widget _listRow(String label, {required Widget trailing, bool muted = false}) => Container(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16), child: Row(children: [Expanded(child: EditableLabel('profile.ProfileScreen', label, style: TextStyle(fontSize: 14.5, color: muted ? const Color(0xFFD9D9D6) : _text))), const SizedBox(width: 12), trailing]));
 
@@ -1721,7 +1752,29 @@ class SectionBlock extends StatelessWidget {
   const SectionBlock({super.key, required this.title, required this.child, this.trailing, this.marginBottom = 38});
   // On a narrow screen with large text the title wraps and the trailing
   // control shrinks to fit, instead of being pushed off the edge (B014).
-  @override Widget build(BuildContext context) => Container(margin: EdgeInsets.only(bottom: marginBottom), child: Column(children: [LayoutBuilder(builder: (_, box) => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Flexible(child: SectionLabel(title, bottom: 14)), if (trailing != null) ...[const SizedBox(width: 12), ConstrainedBox(constraints: BoxConstraints(maxWidth: box.maxWidth * 0.62), child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: trailing!))]])), child]));
+  // The head is the liked pages' SectionHead: round white SVG badge, grey
+  // eyebrow, bold title.
+  @override Widget build(BuildContext context) => Container(margin: EdgeInsets.only(bottom: marginBottom), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [LayoutBuilder(builder: (_, box) => Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Expanded(child: ProfileHead(title)), if (trailing != null) ...[const SizedBox(width: 12), Padding(padding: const EdgeInsets.only(bottom: 14), child: ConstrainedBox(constraints: BoxConstraints(maxWidth: box.maxWidth * 0.4), child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: trailing!)))]])), child]));
+}
+
+/// Profile section heads in the SectionHead look, with an eyebrow and an SVG
+/// mark per section.
+class ProfileHead extends StatelessWidget {
+  const ProfileHead(this.title, {super.key});
+  final String title;
+  static const _heads = <String, (String, String)>{
+    'Your Progress': ('Coins, streak and sessions', NwsbMarks.bars),
+    'Quick Access': ('Your shortcuts', NwsbMarks.compass),
+    'Recent Activity': ('What you did lately', NwsbMarks.hourglass),
+    'Preferences': ('Sound, time and reminders', NwsbMarks.sliders),
+    'Shop & Orders': ('Cart, wishlist and orders', NwsbMarks.cart),
+    'Account': ('Your plan', NwsbMarks.user),
+  };
+  @override
+  Widget build(BuildContext context) {
+    final h = _heads[title];
+    return SectionHead(eyebrow: h?.$1 ?? 'NowssB', title: title, mark: h?.$2 ?? NwsbMarks.arrow);
+  }
 }
 
 class _TeaserStat extends StatelessWidget {

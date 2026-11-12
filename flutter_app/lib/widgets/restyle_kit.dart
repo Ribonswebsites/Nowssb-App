@@ -345,7 +345,8 @@ class KitBlackCard extends StatelessWidget {
             onTap();
           },
           child: Container(
-            height: height,
+            // At least [height]; grows with large text instead of clipping.
+            constraints: BoxConstraints(minHeight: height),
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: const Color(0xF0111114),

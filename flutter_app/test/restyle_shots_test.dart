@@ -67,6 +67,17 @@ Future<void> _shot(WidgetTester t, String name) async {
   });
 }
 
+Future<void> _toFrac(WidgetTester t, double f) async {
+  for (final e in find.byType(Scrollable).hitTestable().evaluate()) {
+    final s = (e as StatefulElement).state as ScrollableState;
+    if (s.axisDirection != AxisDirection.down) continue;
+    final p = s.position;
+    if (p.maxScrollExtent > 0) p.jumpTo(p.maxScrollExtent * f);
+    break;
+  }
+  await _settle(t, 4);
+}
+
 Future<void> _toMid(WidgetTester t) async {
   for (final e in find.byType(Scrollable).hitTestable().evaluate()) {
     final s = (e as StatefulElement).state as ScrollableState;
@@ -152,7 +163,7 @@ void main() {
   for (final w in [390.0]) {
     for (final skin in ['dark']) {
       testWidgets('page shots ${w.toInt()} $skin', (t) async {
-        t.view.physicalSize = Size(w, 844);
+        t.view.physicalSize = Size(w, const int.fromEnvironment('RESTYLE_H', defaultValue: 844).toDouble());
         t.view.devicePixelRatio = 1;
         addTearDown(t.view.reset);
         await t.runAsync(() async {
@@ -190,6 +201,13 @@ void main() {
             await _settle(t, 6);
             final tag = '${w.toInt()}_${skin}_${e.key}';
             await _shot(t, '${e.key}_1top');
+            const steps = int.fromEnvironment('RESTYLE_STEPS');
+            if (steps > 1) {
+              for (var k = 1; k < steps; k++) {
+                await _toFrac(t, k / steps);
+                await _shot(t, '${e.key}_2mid$k');
+              }
+            }
             await _toMid(t);
             await _shot(t, '${e.key}_2mid');
             await _toEnd(t);
