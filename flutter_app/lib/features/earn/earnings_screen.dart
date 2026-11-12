@@ -184,6 +184,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       goodToKnow: kEarnDisclaimer,
+      goodToKnowLine: kEarnDisclaimerLine,
       title: 'Your Earnings',
       mark: NwsbMarks.bars,
       child: ListenableBuilder(

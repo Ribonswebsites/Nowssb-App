@@ -13,6 +13,8 @@ import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/theme/theme.dart';
 import 'package:nowssb/features/coins/coins_screen.dart';
+import 'package:nowssb/features/circle/circle_screen.dart';
+import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
 import 'package:nowssb/features/notifications/inbox_screen.dart';
@@ -129,6 +131,23 @@ Map<String, Widget Function()> _pages() {
     'ebooks': () => const EbooksStoreScreen(),
     'earnings': () => const EarningsScreen(),
     'daily_tasks': () => const DailyTasksPage(),
+    // Earn hub tabs, drawn as a signed-in member with an empty account so the
+    // tab content (not the sign-in card) is on screen.
+    'earn': () {
+      EconomyMirror.instance.uid = 'shot';
+      EconomyMirror.instance.summary = const {'shot': true};
+      EconomyApi.debugHandler = (_, __) async => <String, dynamic>{};
+      return const CircleScreen();
+    },
+    // Second open: the once-per-run welcome note is gone.
+    'earn_hub': () => const CircleScreen(),
+    for (final tab in ['overview', 'team', 'sales', 'targets', 'payouts', 'invite', 'academy', 'rules'])
+      'earn_$tab': () {
+        EconomyMirror.instance.uid = 'shot';
+        EconomyMirror.instance.summary = const {'shot': true};
+        EconomyApi.debugHandler = (_, __) async => <String, dynamic>{};
+        return CircleScreen(initialTab: tab);
+      },
   };
 }
 

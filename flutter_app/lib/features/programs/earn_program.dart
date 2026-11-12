@@ -22,6 +22,9 @@ const kEarnDisclaimer =
     'your own sales and are not guaranteed. Most people will earn little or nothing. Ranks cannot be bought. Refunded '
     'sales are reversed. Amounts are shown in your local currency and may be adjusted for exchange rates and taxes.';
 
+/// The Good to know bar's one short line for [kEarnDisclaimer].
+const kEarnDisclaimerLine = 'Verified sales only. Not guaranteed.';
+
 const kEarnSpec = ProgramSpec(
   pageId: 'earn.program',
   title: 'NowssB Earn',

@@ -164,11 +164,11 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
             key: _anchor,
             padding: const EdgeInsets.only(top: 6, bottom: 12),
             child: SizedBox(
-              height: 92,
+              height: 40,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: spec.tabs.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (_, i) => _tabCard(spec.tabs[i].title, i),
               ),
             ),
@@ -206,28 +206,30 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
     );
   }
 
+  /// The tab switcher in the Sound Library chip look ([GlassPill]): white
+  /// when picked, translucent otherwise.
   Widget _tabCard(String label, int i) {
     final on = i == _tab;
-    return GestureDetector(
-      onTap: () {
-        RewardHaptics.tick();
-        setState(() => _tab = i);
-      },
-      child: Container(
-        width: 168,
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-        decoration: BoxDecoration(
-          color: on ? Colors.white : Colors.black,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: on ? Colors.white : const Color(0x33FFFFFF)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${i + 1} of ${widget.spec.tabs.length}', style: TextStyle(color: on ? const Color(0xFF666666) : const Color(0x99FFFFFF), fontSize: 11, fontWeight: FontWeight.w600)),
-            const Spacer(),
-            Text(label, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: on ? Colors.black : Colors.white, fontWeight: FontWeight.w800, fontSize: 15, height: 1.1)),
-          ],
+    return Semantics(
+      button: true,
+      selected: on,
+      label: label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: () {
+          RewardHaptics.tick();
+          setState(() => _tab = i);
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: on ? Colors.white : const Color(0x24FFFFFF),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: on ? Colors.white : const Color(0x40FFFFFF)),
+          ),
+          child: Text(label, maxLines: 1, style: TextStyle(color: on ? const Color(0xFF111118) : Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
         ),
       ),
     );
@@ -297,7 +299,7 @@ class PHeading extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(2, 6, 2, 10),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        EditableLabel(slot, eyebrow.toUpperCase(), style: const TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 11, fontWeight: FontWeight.w800)),
+        EditableLabel(slot, eyebrow.toUpperCase(), style: const TextStyle(color: Color(0xB3FFFFFF), letterSpacing: 1.4, fontSize: 10.5, fontWeight: FontWeight.w700)),
         const SizedBox(height: 4),
         EditableLabel(slot, title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
       ]),
@@ -328,13 +330,13 @@ class PRow extends StatelessWidget {
             height: 32,
             margin: const EdgeInsets.only(right: 10),
             alignment: Alignment.center,
-            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: color ?? const Color(0x55E4C56A))),
-            child: NwsbIcon(mark!, size: 15, color: color ?? NwsbColors.goldLight),
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color ?? Colors.white),
+            child: NwsbIcon(mark!, size: 15, color: const Color(0xFF0B0B10)),
           ),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             EditableLabel('program_kit.PRow', title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-            if (sub != null && sub!.isNotEmpty) Text(sub!, style: const TextStyle(color: NwsbColors.mist, fontSize: 12, height: 1.3)),
+            if (sub != null && sub!.isNotEmpty) Text(sub!, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 12.5, height: 1.3)),
           ]),
         ),
         if (trailing != null) trailing!,

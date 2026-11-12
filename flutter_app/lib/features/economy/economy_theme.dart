@@ -30,8 +30,13 @@ class EconomyPage extends StatelessWidget {
     this.banner,
     this.header,
     this.goodToKnow,
+    this.goodToKnowLine,
     this.showBalance = true,
   });
+
+  /// The one short line the Good to know bar shows; the full [goodToKnow]
+  /// opens on tap. Empty: the first sentence of [goodToKnow].
+  final String? goodToKnowLine;
 
   final String title;
   final Widget child;
@@ -83,7 +88,7 @@ class EconomyPage extends StatelessWidget {
             ),
             if (banner != null) banner!,
             Expanded(child: child),
-            if (goodToKnow != null) _GoodToKnowBar(goodToKnow!),
+            if (goodToKnow != null) _GoodToKnowBar(goodToKnow!, line: goodToKnowLine),
           ],
         ),
       ),
@@ -151,8 +156,16 @@ class _CoinBalancePillState extends State<CoinBalancePill> {
 }
 
 class _GoodToKnowBar extends StatelessWidget {
-  const _GoodToKnowBar(this.text);
+  const _GoodToKnowBar(this.text, {this.line});
   final String text;
+  final String? line;
+
+  /// One short line: [line], else the first sentence of [text].
+  String get short {
+    if (line != null && line!.isNotEmpty) return line!;
+    final i = text.indexOf('. ');
+    return i < 0 ? text : text.substring(0, i + 1);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -176,9 +189,10 @@ class _GoodToKnowBar extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 9, 16, 9),
         decoration: const BoxDecoration(color: Color(0xCC05070B), border: Border(top: BorderSide(color: Color(0x22FFFFFF)))),
         child: Row(children: [
-          const Icon(Icons.info_outline_rounded, size: 15, color: Color(0xFFE4C56A)),
+          const Icon(Icons.info_outline_rounded, size: 15, color: Color(0xB3FFFFFF)),
           const SizedBox(width: 8),
-          Expanded(child: Text('Good to know · $text', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5))),
+          Expanded(child: Text('Good to know · $short', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12))),
+          const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0x8CFFFFFF)),
         ]),
       ),
     );

@@ -5,7 +5,9 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../screens/subscription.dart';
+import '../../widgets/app_backdrop.dart';
 import '../../widgets/app_thinking_loader.dart';
+import '../../widgets/restyle_kit.dart';
 import '../../widgets/flip_portrait.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/hub_rails.dart';
@@ -107,13 +109,7 @@ class _CircleScreenState extends State<CircleScreen> {
   }
 
   void _openTabs(String id) {
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => Scaffold(
-      backgroundColor: const Color(0xFF07070C),
-      body: SafeArea(child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [ProgramTabsBlock(spec: kEarnSpec, initialTab: id, scrollTo: true, showDisclaimer: false)],
-      )),
-    )));
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => EarnTabsPage(initialTab: id)));
   }
 
   void _apply(BuildContext context, bool signedIn, String referredBy) {
@@ -200,6 +196,7 @@ class _CircleScreenState extends State<CircleScreen> {
   Widget build(BuildContext context) {
     return EconomyPage(
       goodToKnow: kEarnDisclaimer,
+      goodToKnowLine: kEarnDisclaimerLine,
       title: 'NowssB Earn',
       mark: NwsbMarks.piggy,
       child: ListenableBuilder(
@@ -217,23 +214,154 @@ class _CircleScreenState extends State<CircleScreen> {
                       : units >= 100
                           ? 300
                           : 100;
+          void rank() {
+            if (!signedIn) {
+              NwsbSignInPage.open(context);
+            } else {
+              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen()));
+            }
+          }
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 40),
             children: [
-              RoutineDeck(
-                title: 'Earn',
-                banner: signedIn ? w.circleTier : 'NowssB Earn',
-                bannerSub: signedIn ? '$units units · ${w.code.isEmpty ? 'code pending' : w.code}' : 'Sign in to see your rank',
-                onBanner: () => Programmes.open(context, Programme.reference),
-                cards: [
-                  WorkCard(category: 'Rank', title: signedIn ? w.circleTier : 'Sign in', meta: signedIn ? '$units of $next to the next tier' : 'Your rank is on this account', action: signedIn ? 'See plans' : 'Sign in', image: 'assets/rails/gen-49.jpg', onTap: () { if (!signedIn) { NwsbSignInPage.open(context); } else { Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())); } }),
-                  WorkCard(category: 'Cash', title: 'Earnings', meta: 'Sales and payouts', action: 'Open earnings', image: 'assets/rails/gen-53.jpg', onTap: () => Programmes.open(context, Programme.earnings)),
-                ],
+              // Rank in the Currently Playing hero layout.
+              KitHero(
+                key: const ValueKey('earn-hero'),
+                art: Image.asset('assets/rails/gen-49.jpg', fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1A1E))),
+                cornerLabel: 'NowssB Earn',
+                eyebrow: 'Your rank',
+                title: signedIn ? w.circleTier : 'NowssB Earn',
+                subline: signedIn ? '$units of $next units to the next tier · ${w.code.isEmpty ? 'code pending' : w.code}' : 'Sign in to see your rank',
+                buttonIcon: signedIn ? Icons.workspace_premium_outlined : Icons.login_rounded,
+                buttonLabel: signedIn ? 'See plans' : 'Sign in',
+                onButton: rank,
+              ),
+              KitBlackCard(
+                key: const ValueKey('earn-earnings-card'),
+                art: Image.asset('assets/rails/gen-53.jpg', fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1A1E))),
+                eyebrow: 'Cash',
+                title: 'Earnings',
+                line: 'Sales and payouts',
+                onTap: () => Programmes.open(context, Programme.earnings),
+              ),
+              KitPane(
+                key: const ValueKey('earn-programmes-pane'),
+                mark: NwsbMarks.piggy,
+                eyebrow: 'Everything in Earn',
+                title: 'Programmes',
+                child: Column(children: [
+                  for (final t in kEarnSpec.tabs)
+                    KitRow(
+                      key: ValueKey('earn-tab-${t.id}'),
+                      leading: _TabMark(_earnTabMark[t.id] ?? NwsbMarks.arrow),
+                      title: t.title,
+                      sub: _earnTabLine[t.id],
+                      onTap: () => _openTabs(t.id),
+                    ),
+                ]),
               ),
             ],
           );
         },
       ),
+    );
+  }
+}
+
+const _earnTabMark = <String, String>{
+  'overview': NwsbMarks.compass,
+  'team': NwsbMarks.people,
+  'sales': NwsbMarks.trending,
+  'targets': NwsbMarks.rewards,
+  'payouts': NwsbMarks.earn,
+  'invite': NwsbMarks.reference,
+  'academy': NwsbMarks.book,
+  'rules': NwsbMarks.shield,
+};
+
+const _earnTabLine = <String, String>{
+  'overview': 'Your rank, units and code',
+  'team': 'People you brought in',
+  'sales': 'Every sale and commission',
+  'targets': 'Tier targets and bonuses',
+  'payouts': 'Account and payout requests',
+  'invite': 'Your link and your code',
+  'academy': 'How to earn well',
+  'rules': 'How Earn works',
+};
+
+/// Word-free row art for a programme: the tab's SVG on the dark tile.
+class _TabMark extends StatelessWidget {
+  const _TabMark(this.mark);
+  final String mark;
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1C1C22), Color(0xFF0A0A0D)]),
+        ),
+        child: Center(child: NwsbIcon(mark, size: 22, color: Colors.white)),
+      );
+}
+
+/// The Earn programme tabs (Overview … Rules) on the app film, with the
+/// liked pages' header: white round back button, eyebrow, bold title.
+class EarnTabsPage extends StatelessWidget {
+  const EarnTabsPage({super.key, required this.initialTab});
+  final String initialTab;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: Stack(fit: StackFit.expand, children: [
+        const Positioned.fill(child: AppBackdrop()),
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x66060C18), Color(0x99060C18), Color(0xB3060C18)],
+                ),
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+            children: [
+              Row(children: [
+                GestureDetector(
+                  onTap: () => Navigator.of(context).maybePop(),
+                  behavior: HitTestBehavior.opaque,
+                  child: Semantics(
+                    button: true,
+                    label: 'Back',
+                    child: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                      child: const Icon(Icons.arrow_back, size: 19, color: Color(0xFF111118)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                const Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('NOWSSB EARN', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+                    SizedBox(height: 2),
+                    Text('Programmes', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.5)),
+                  ]),
+                ),
+              ]),
+              const SizedBox(height: 8),
+              ProgramTabsBlock(spec: kEarnSpec, initialTab: initialTab, scrollTo: true, showDisclaimer: false),
+            ],
+          ),
+        ),
+      ]),
     );
   }
 }
@@ -456,6 +584,7 @@ class AgentTierPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return EconomyPage(
       goodToKnow: kEarnDisclaimer,
+      goodToKnowLine: kEarnDisclaimerLine,
       title: name,
       mark: NwsbMarks.piggy,
       child: ListView(
