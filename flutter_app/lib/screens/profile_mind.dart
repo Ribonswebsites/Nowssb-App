@@ -6,7 +6,10 @@
 ///
 /// Each time the section is opened it picks a fresh, harmonious palette so
 /// the Focus, Rhythm, This week and Practise-now tiles don't share one
-/// colour, and never repeats the palette used on the previous open.
+/// colour, and never repeats the palette used on the previous open. Each
+/// palette carries its own Focus today portrait (one distinct person per
+/// palette), so the photo changes together with the colours and crossfades
+/// in over the same 600ms easeInOutCubic.
 library;
 
 import 'dart:math' as math;
@@ -24,7 +27,12 @@ const kMindGold = Color(0xFFB8924F);
 /// SharedPreferences key for the last [kMindPalettes] index shown.
 const kMindPalettePrefKey = 'nwsb_mind_palette_index';
 
-const _mindImage = 'assets/home/ez/ez-med-focus.webp';
+/// Decode width shared by [Image.asset] and the precache so the cached
+/// frame is reused (no flash when the next portrait fades in).
+const _kMindPhotoCacheWidth = 800;
+
+ImageProvider mindPhotoProvider(String asset) =>
+    ResizeImage(AssetImage(asset), width: _kMindPhotoCacheWidth);
 
 /// One harmonious set of shades for the section. Focus, Rhythm, This week
 /// and the photo-strip tile each get a different shade, with a lighter
@@ -38,10 +46,14 @@ class MindPalette {
     required this.week,
     required this.tile,
     required this.accent,
+    required this.image,
   });
 
   final String id;
   final Color focus, rhythm, week, tile, accent;
+
+  /// The Focus today portrait paired with this palette. Unique per palette.
+  final String image;
 
   static MindPalette lerp(MindPalette a, MindPalette b, double t) =>
       MindPalette(
@@ -51,6 +63,7 @@ class MindPalette {
         week: Color.lerp(a.week, b.week, t)!,
         tile: Color.lerp(a.tile, b.tile, t)!,
         accent: Color.lerp(a.accent, b.accent, t)!,
+        image: t < 0.5 ? a.image : b.image,
       );
 }
 
@@ -63,6 +76,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF2F5644),
     tile: Color(0xFF4A7360),
     accent: Color(0xFFB7D4C4),
+    image: 'assets/home/ez/ez-med-focus.webp',
   ),
   MindPalette(
     id: 'dustyRose',
@@ -71,6 +85,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF733A47),
     tile: Color(0xFFA05F6C),
     accent: Color(0xFFE4B7BF),
+    image: 'assets/home/ez/ez-med-focus-dustyrose.webp',
   ),
   MindPalette(
     id: 'slateBlue',
@@ -79,6 +94,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF2E4664),
     tile: Color(0xFF557398),
     accent: Color(0xFFB7C8DC),
+    image: 'assets/home/ez/ez-med-focus-slateblue.webp',
   ),
   MindPalette(
     id: 'terracotta',
@@ -87,6 +103,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF8A3E2A),
     tile: Color(0xFFA8543E),
     accent: Color(0xFFE8C0B0),
+    image: 'assets/home/ez/ez-med-focus-terracotta.webp',
   ),
   MindPalette(
     id: 'lavender',
@@ -95,6 +112,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF4A3C66),
     tile: Color(0xFF7A68A0),
     accent: Color(0xFFD0C4E4),
+    image: 'assets/home/ez/ez-med-focus-lavender.webp',
   ),
   MindPalette(
     id: 'teal',
@@ -103,6 +121,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF1A5454),
     tile: Color(0xFF2A7474),
     accent: Color(0xFFA8D4D4),
+    image: 'assets/home/ez/ez-med-focus-teal.webp',
   ),
   MindPalette(
     id: 'sand',
@@ -111,6 +130,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF5A3E24),
     tile: Color(0xFF6A4C2C),
     accent: Color(0xFFE6D2B4),
+    image: 'assets/home/ez/ez-med-focus-sand.webp',
   ),
   MindPalette(
     id: 'plum',
@@ -119,6 +139,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF582A48),
     tile: Color(0xFF8A4E74),
     accent: Color(0xFFDDB4C8),
+    image: 'assets/home/ez/ez-med-focus-plum.webp',
   ),
   MindPalette(
     id: 'olive',
@@ -127,6 +148,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF4A5428),
     tile: Color(0xFF64703C),
     accent: Color(0xFFD0D8A8),
+    image: 'assets/home/ez/ez-med-focus-olive.webp',
   ),
   MindPalette(
     id: 'rust',
@@ -135,6 +157,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF743428),
     tile: Color(0xFFA85A46),
     accent: Color(0xFFE8B8A8),
+    image: 'assets/home/ez/ez-med-focus-rust.webp',
   ),
   MindPalette(
     id: 'ocean',
@@ -143,6 +166,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF254656),
     tile: Color(0xFF4A738C),
     accent: Color(0xFFB0D0DC),
+    image: 'assets/home/ez/ez-med-focus-ocean.webp',
   ),
   MindPalette(
     id: 'wine',
@@ -151,6 +175,7 @@ const kMindPalettes = <MindPalette>[
     week: Color(0xFF5A242E),
     tile: Color(0xFF8E4A56),
     accent: Color(0xFFE0B4BA),
+    image: 'assets/home/ez/ez-med-focus-wine.webp',
   ),
 ];
 
@@ -161,6 +186,7 @@ const _kMindOpenFrom = MindPalette(
   week: Color(0xFF2C2A28),
   tile: Color(0xFF2C2A28),
   accent: Color(0xFFE3BD7D),
+  image: '',
 );
 
 /// Picks a palette index that is never [last] when [last] is in range.
@@ -180,14 +206,14 @@ int pickMindPaletteIndex({
 /// Real numbers for the section, computed from session records.
 class MindStats {
   MindStats.from(PracticeProgress p)
-    : total = p.totalSessions,
-      today = p.todaySessions,
-      goal = PracticeProgress.dailyPracticeGoal,
-      streak = p.streak,
-      minutes = p.totalMinutes,
-      words = p.uniqueWords,
-      byPart = _parts(p.sessionsSnapshot),
-      week = _week(p);
+      : total = p.totalSessions,
+        today = p.todaySessions,
+        goal = PracticeProgress.dailyPracticeGoal,
+        streak = p.streak,
+        minutes = p.totalMinutes,
+        words = p.uniqueWords,
+        byPart = _parts(p.sessionsSnapshot),
+        week = _week(p);
 
   final int total, today, goal, streak, minutes, words;
 
@@ -210,10 +236,10 @@ class MindStats {
       out[h >= 5 && h < 12
           ? 0
           : h >= 12 && h < 17
-          ? 1
-          : h >= 17 && h < 21
-          ? 2
-          : 3]++;
+              ? 1
+              : h >= 17 && h < 21
+                  ? 2
+                  : 3]++;
     }
     return out;
   }
@@ -281,6 +307,12 @@ class _ProfileMindState extends State<ProfileMind>
     }
   }
 
+  /// The palette for the next open, picked (and its portrait decoded) while
+  /// this one is on screen, so the next person is already in the image
+  /// cache when the section opens again and fades in without a flash. Only
+  /// used with the production random source; tests inject their own.
+  static int? _queued;
+
   Future<void> _load() async {
     var last = -1;
     SharedPreferences? prefs;
@@ -288,15 +320,22 @@ class _ProfileMindState extends State<ProfileMind>
       prefs = await SharedPreferences.getInstance();
       last = prefs.getInt(kMindPalettePrefKey) ?? -1;
     } catch (_) {}
-    final idx = pickMindPaletteIndex(
-      last: last,
-      length: kMindPalettes.length,
-      nextInt: (widget.random ?? math.Random()).nextInt,
-    );
+    final rng = widget.random ?? math.Random();
+    final q = widget.random == null ? _queued : null;
+    final idx = (q != null && q >= 0 && q < kMindPalettes.length && q != last)
+        ? q
+        : pickMindPaletteIndex(
+            last: last,
+            length: kMindPalettes.length,
+            nextInt: rng.nextInt,
+          );
     try {
       await prefs?.setInt(kMindPalettePrefKey, idx);
     } catch (_) {}
     if (!mounted) return;
+    // Start decoding this open's portrait now (a no-op when it was queued
+    // and precached on the previous open).
+    _precache(kMindPalettes[idx].image);
     setState(() {
       _from = (last >= 0 && last < kMindPalettes.length)
           ? kMindPalettes[last]
@@ -304,6 +343,25 @@ class _ProfileMindState extends State<ProfileMind>
       _to = kMindPalettes[idx];
     });
     _anim.forward(from: 0);
+    // Queue and precache the next open's person (never this one).
+    if (widget.random == null) {
+      final next = pickMindPaletteIndex(
+        last: idx,
+        length: kMindPalettes.length,
+        nextInt: rng.nextInt,
+      );
+      _queued = next;
+      _precache(kMindPalettes[next].image);
+    }
+  }
+
+  void _precache(String asset) {
+    if (!mounted) return;
+    precacheImage(
+      mindPhotoProvider(asset),
+      context,
+      onError: (_, __) {},
+    ).catchError((_) {});
   }
 
   @override
@@ -314,54 +372,85 @@ class _ProfileMindState extends State<ProfileMind>
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-    listenable: PracticeProgress.instance,
-    builder: (context, _) {
-      final m = MindStats.from(PracticeProgress.instance);
-      return AnimatedBuilder(
-        animation: _t,
+        listenable: PracticeProgress.instance,
         builder: (context, _) {
-          final pal = MindPalette.lerp(_from, _to, _t.value);
-          return Column(
-            key: const ValueKey('profile-mind'),
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Padding(
-                padding: EdgeInsets.fromLTRB(4, 0, 4, 12),
-                child: Text(
-                  'Your practice mind',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+          final m = MindStats.from(PracticeProgress.instance);
+          return AnimatedBuilder(
+            animation: _t,
+            builder: (context, _) {
+              final pal = MindPalette.lerp(_from, _to, _t.value);
+              return Column(
+                key: const ValueKey('profile-mind'),
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(4, 0, 4, 12),
+                    child: Text(
+                      'Your practice mind',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              if (m.total == 0) _empty(pal) else ..._cards(m, pal),
-            ],
+                  if (m.total == 0) _empty(pal) else ..._cards(m, pal),
+                ],
+              );
+            },
           );
         },
       );
-    },
-  );
+
+  /// The portrait, crossfading from the previous palette's person to this
+  /// one's on the same eased 600ms timeline as the colours.
+  Widget _photo(Alignment alignment) {
+    final t = _t.value;
+    Widget img(String a, double o, String k) => Opacity(
+          key: ValueKey('mind-photo-$k'),
+          opacity: o.clamp(0.0, 1.0),
+          child: Image(
+            image: mindPhotoProvider(a),
+            fit: BoxFit.cover,
+            alignment: alignment,
+            gaplessPlayback: true,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+          ),
+        );
+    final showFrom =
+        _from.image.isNotEmpty && _from.image != _to.image && t < 1;
+    // The incoming portrait sits underneath at full strength and the
+    // outgoing one fades off on top, so there is no dip to the card colour
+    // mid-way. On the very first open there is no previous person, so the
+    // portrait simply fades in.
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        img(_to.image, _from.image.isEmpty ? t : 1, 'to'),
+        if (showFrom) img(_from.image, 1 - t, 'from'),
+      ],
+    );
+  }
 
   Widget _empty(MindPalette pal) => EzOrangeCard(
-    key: const ValueKey('mind-empty'),
-    color: pal.focus,
-    headerFade: false,
-    title: 'Practice once to see this',
-    subtitle: 'Your rhythm, focus and streak appear after a session',
-    image: _mindImage,
-    alignment: const Alignment(0, -.2),
-    height: 220,
-    icons: [
-      EzIcon(
-        Icons.play_arrow_rounded,
-        label: 'Practise now',
+        key: const ValueKey('mind-empty'),
+        color: pal.focus,
+        headerFade: false,
+        title: 'Practice once to see this',
+        subtitle: 'Your rhythm, focus and streak appear after a session',
+        image: _to.image,
+        alignment: const Alignment(0, -.2),
+        height: 220,
+        icons: [
+          EzIcon(
+            Icons.play_arrow_rounded,
+            label: 'Practise now',
+            onTap: widget.onPractice,
+          ),
+        ],
         onTap: widget.onPractice,
-      ),
-    ],
-    onTap: widget.onPractice,
-  );
+        child: _photo(const Alignment(0, -.2)),
+      );
 
   List<Widget> _cards(MindStats m, MindPalette pal) {
     const parts = ['Morning', 'Afternoon', 'Evening', 'Night'];
@@ -374,6 +463,8 @@ class _ProfileMindState extends State<ProfileMind>
         color: pal.focus,
         headerFade: false,
         title: 'Focus today',
+        // Pill sits level with the % gauge, under the portrait's face.
+        commentBottom: .06,
         subtitle: '${m.today} of ${m.goal} planned sessions',
         height: 230,
         icons: [
@@ -392,13 +483,7 @@ class _ProfileMindState extends State<ProfileMind>
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(
-              _mindImage,
-              fit: BoxFit.cover,
-              alignment: const Alignment(0, -.25),
-              cacheWidth: 800,
-              errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-            ),
+            _photo(const Alignment(0, -.25)),
             Positioned(
               right: 14,
               bottom: 14,
@@ -417,9 +502,8 @@ class _ProfileMindState extends State<ProfileMind>
               color: pal.rhythm,
               headerFade: false,
               title: 'Rhythm',
-              subtitle: bestPart == null
-                  ? 'No times recorded'
-                  : 'Mostly $bestPart',
+              subtitle:
+                  bestPart == null ? 'No times recorded' : 'Mostly $bestPart',
               height: 150,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
@@ -483,32 +567,32 @@ class _Ring extends StatelessWidget {
   final Color accent;
   @override
   Widget build(BuildContext context) => Container(
-    width: 84,
-    height: 84,
-    decoration: const BoxDecoration(color: kEzPill, shape: BoxShape.circle),
-    child: CustomPaint(
-      painter: _RingPainter(percent / 100, accent),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '$percent%',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 19,
-                fontWeight: FontWeight.w600,
-              ),
+        width: 84,
+        height: 84,
+        decoration: const BoxDecoration(color: kEzPill, shape: BoxShape.circle),
+        child: CustomPaint(
+          painter: _RingPainter(percent / 100, accent),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '$percent%',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Text(
+                  'of plan',
+                  style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9),
+                ),
+              ],
             ),
-            const Text(
-              'of plan',
-              style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 9),
-            ),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 class _RingPainter extends CustomPainter {
@@ -555,26 +639,26 @@ class _Graph extends StatelessWidget {
   final bool curve;
   @override
   Widget build(BuildContext context) => Column(
-    children: [
-      Expanded(
-        child: CustomPaint(
-          painter: _GraphPainter(values, curve),
-          size: Size.infinite,
-        ),
-      ),
-      const SizedBox(height: 4),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          for (final l in labels)
-            Text(
-              l,
-              style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 9),
+          Expanded(
+            child: CustomPaint(
+              painter: _GraphPainter(values, curve),
+              size: Size.infinite,
             ),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              for (final l in labels)
+                Text(
+                  l,
+                  style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 9),
+                ),
+            ],
+          ),
         ],
-      ),
-    ],
-  );
+      );
 }
 
 class _GraphPainter extends CustomPainter {
@@ -617,9 +701,8 @@ class _GraphPainter extends CustomPainter {
             const Radius.circular(4),
           ),
           Paint()
-            ..color = p.dy >= s.height - 4.5
-                ? const Color(0x40FFFFFF)
-                : Colors.white,
+            ..color =
+                p.dy >= s.height - 4.5 ? const Color(0x40FFFFFF) : Colors.white,
         );
       }
     }

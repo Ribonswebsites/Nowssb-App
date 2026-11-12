@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -130,9 +131,104 @@ void main() {
       );
       expect(empty.color, kMindPalettes[2].focus);
       expect(empty.headerFade, isFalse);
-      expect(empty.image, 'assets/home/ez/ez-med-focus.webp');
+      expect(empty.image, kMindPalettes[2].image);
+      expect(_shownPhoto(t), kMindPalettes[2].image);
     },
   );
+
+  test('each palette has its own existing, small, unique focus portrait', () {
+    final images = [for (final p in kMindPalettes) p.image];
+    expect(images.toSet().length, kMindPalettes.length);
+    final digests = <String, String>{};
+    for (final a in images) {
+      final f = File(a);
+      expect(f.existsSync(), isTrue, reason: '$a missing');
+      expect(a, endsWith('.webp'));
+      expect(f.lengthSync(), lessThanOrEqualTo(120 * 1024), reason: a);
+      digests[a] = base64Encode(f.readAsBytesSync());
+    }
+    expect(digests.values.toSet().length, images.length,
+        reason: 'two palettes share the same photo bytes');
+    final own = images.map((a) => File(a).absolute.path).toSet();
+    final dupes = <String>[];
+    for (final e in Directory('assets').listSync(recursive: true)) {
+      if (e is! File || own.contains(e.absolute.path)) continue;
+      final b = base64Encode(e.readAsBytesSync());
+      if (digests.containsValue(b)) dupes.add(e.path);
+    }
+    expect(dupes, isEmpty, reason: 'focus portraits reused elsewhere: $dupes');
+  });
+
+  testWidgets('the photo changes together with the palette on every open', (
+    t,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    t.view.physicalSize = const Size(390, 900);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    final rng = math.Random(11);
+    String? lastPhoto;
+    for (var i = 0; i < 12; i++) {
+      await t.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(child: ProfileMind(random: rng)),
+          ),
+        ),
+      );
+      await t.pumpAndSettle();
+      final idx = (await SharedPreferences.getInstance()).getInt(
+        kMindPalettePrefKey,
+      )!;
+      final photo = _shownPhoto(t);
+      expect(photo, kMindPalettes[idx].image);
+      expect(
+        find.byKey(const ValueKey('mind-photo-from')),
+        findsNothing,
+        reason: 'old portrait must be gone after the crossfade',
+      );
+      if (lastPhoto != null) expect(photo, isNot(lastPhoto));
+      lastPhoto = photo;
+      await t.pumpWidget(const SizedBox());
+      await t.pump();
+    }
+  });
+
+  testWidgets('portrait crossfades from the previous person over 600ms', (
+    t,
+  ) async {
+    SharedPreferences.setMockInitialValues({kMindPalettePrefKey: 0});
+    t.view.physicalSize = const Size(390, 900);
+    t.view.devicePixelRatio = 1;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: ProfileMind(random: _Fixed(4)),
+          ),
+        ),
+      ),
+    );
+    // Let prefs + precache resolve, then sit mid-way through the fade.
+    for (var i = 0;
+        i < 6 &&
+            find.byKey(const ValueKey('mind-photo-from')).evaluate().isEmpty;
+        i++) {
+      await t.pump(const Duration(milliseconds: 50));
+    }
+    await t.pump(const Duration(milliseconds: 200));
+    final from =
+        t.widget<Opacity>(find.byKey(const ValueKey('mind-photo-from')));
+    final to = t.widget<Opacity>(find.byKey(const ValueKey('mind-photo-to')));
+    expect(_assetOf(from.child! as Image), kMindPalettes[0].image);
+    expect(_assetOf(to.child! as Image), kMindPalettes[5].image);
+    expect(from.opacity, inExclusiveRange(0, 1));
+    expect(to.opacity, 1);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('mind-photo-from')), findsNothing);
+    expect(_shownPhoto(t), kMindPalettes[5].image);
+  });
 
   test('focus portrait is unique and not reused elsewhere in the app', () {
     final focus = File('assets/home/ez/ez-med-focus.webp');
@@ -158,7 +254,7 @@ void main() {
     for (final entity in Directory('lib').listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
       if (entity.path.endsWith('profile_mind.dart')) continue;
-      if (entity.readAsStringSync().contains('ez-med-focus.webp')) {
+      if (entity.readAsStringSync().contains('ez-med-focus')) {
         hits.add(entity.path);
       }
     }
@@ -168,6 +264,26 @@ void main() {
       reason: 'focus photo must only be used by the practice mind section',
     );
   });
+}
+
+/// Always returns [v] (clamped); with last=0 the picker maps 4 -> index 5.
+class _Fixed implements math.Random {
+  _Fixed(this.v);
+  final int v;
+  @override
+  int nextInt(int max) => v.clamp(0, max - 1);
+  @override
+  double nextDouble() => 0;
+  @override
+  bool nextBool() => false;
+}
+
+String _assetOf(Image img) =>
+    ((img.image as ResizeImage).imageProvider as AssetImage).assetName;
+
+String _shownPhoto(WidgetTester t) {
+  final o = t.widget<Opacity>(find.byKey(const ValueKey('mind-photo-to')));
+  return _assetOf(o.child! as Image);
 }
 
 bool _same(List<int> a, List<int> b) {

@@ -49,6 +49,7 @@ class EzOrangeCard extends StatelessWidget {
     this.radius = 26,
     this.alignment = Alignment.center,
     this.headerFade = true,
+    this.commentBottom = .26,
   });
 
   final String title;
@@ -65,6 +66,9 @@ class EzOrangeCard extends StatelessWidget {
   /// Soft colour wash from the header onto the photo. The Profile mind
   /// section turns this off so the photo has no yellow (or tinted) haze.
   final bool headerFade;
+  /// Where the comment pill sits, as a fraction of [height] from the bottom.
+  /// The Profile mind Focus card lowers it so it clears the portrait's face.
+  final double commentBottom;
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +132,7 @@ class EzOrangeCard extends StatelessWidget {
       padding: const EdgeInsets.only(left: 10),
       child: Stack(clipBehavior: Clip.none, children: [
         card,
-        Positioned(left: -10, bottom: height * .26, child: IgnorePointer(child: EzCommentPill(comment!, accent: color))),
+        Positioned(left: -10, bottom: height * commentBottom, child: IgnorePointer(child: EzCommentPill(comment!, accent: color))),
       ]),
     );
   }

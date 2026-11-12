@@ -71,6 +71,21 @@ Future<void> _shoot(WidgetTester t, Widget child, String name) async {
   await precacheAll(t);
   await t.pump(const Duration(milliseconds: 100));
   final ro = _key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+  final focus = find.byKey(const ValueKey('mind-focus'));
+  if (focus.evaluate().isNotEmpty) {
+    final box = t.renderObject<RenderBox>(focus);
+    final o = box.localToGlobal(Offset.zero, ancestor: ro);
+    File('$_out/$name.focus.json')
+      ..createSync(recursive: true)
+      ..writeAsStringSync(
+        jsonEncode({
+          'x': o.dx,
+          'y': o.dy,
+          'w': box.size.width,
+          'h': box.size.height,
+        }),
+      );
+  }
   await t.runAsync(() async {
     final img = await ro.toImage(pixelRatio: 2);
     final bytes = await img.toByteData(format: ui.ImageByteFormat.png);
@@ -128,7 +143,9 @@ void main() {
     },
   );
 
-  testWidgets('practice mind shots 390, three palettes', (t) async {
+  testWidgets('practice mind shots 390, every palette with its portrait', (
+    t,
+  ) async {
     t.view.physicalSize = const Size(390, 980);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
@@ -136,11 +153,12 @@ void main() {
       'nwsb_native_sessions': jsonEncode(_seed()),
     });
     await t.runAsync(() => PracticeProgress.instance.start());
-    const ids = ['sage', 'slateBlue', 'wine'];
-    for (final id in ids) {
-      final idx = kMindPalettes.indexWhere((p) => p.id == id);
-      expect(idx, greaterThanOrEqualTo(0));
-      await _shoot(t, ProfileMind(paletteIndex: idx), 'palette-$id');
+    for (var idx = 0; idx < kMindPalettes.length; idx++) {
+      await _shoot(
+        t,
+        ProfileMind(paletteIndex: idx),
+        'palette-${idx.toString().padLeft(2, '0')}-${kMindPalettes[idx].id}',
+      );
     }
     await t.pumpWidget(const SizedBox());
   }, skip: _out.isEmpty);
