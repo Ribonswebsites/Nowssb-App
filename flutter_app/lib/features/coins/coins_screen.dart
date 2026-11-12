@@ -8,8 +8,8 @@ library;
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
-import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
+import '../../widgets/restyle_kit.dart';
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
@@ -102,73 +102,69 @@ class CoinsBody extends StatelessWidget {
     );
   }
 
+  /// The wallet in the Currently Playing hero layout: the coin on the art
+  /// tile, the count as the title, today's progress underneath.
   Widget _hero(int earned, int cap) {
     final left = (cap - earned).clamp(0, cap);
-    return GlassWrap(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-      padding: const EdgeInsets.all(18),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const NwsbCoinDisc(size: 52),
-          const SizedBox(width: 12),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('$_coins', style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800, height: 1)),
-            const SizedBox(height: 4),
-            const Text('coins in your wallet', style: TextStyle(color: _dim, fontSize: 13)),
-          ])),
-        ]),
-        if (cap > 0) ...[
-          const SizedBox(height: 18),
-          Row(children: [
-            Flexible(child: Text('Earned today $earned', overflow: TextOverflow.ellipsis, style: const TextStyle(color: _gold, fontWeight: FontWeight.w700))),
-            const SizedBox(width: 8),
-            Flexible(child: Text(left > 0 ? '$left left to earn' : 'Today\u2019s cap reached', textAlign: TextAlign.end, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _dim, fontSize: 13))),
-          ]),
-          const SizedBox(height: 8),
-          _bar(earned / cap),
-          const SizedBox(height: 6),
-          Text('Daily cap for activity coins: $cap', style: const TextStyle(color: _dim, fontSize: 12)),
-        ],
-      ]),
+    return KitHero(
+      key: const ValueKey('coins-hero'),
+      art: const DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1C1C22), Color(0xFF0A0A0D)]),
+        ),
+        child: Center(child: NwsbCoinDisc(size: 76)),
+      ),
+      cornerLabel: 'Coins',
+      eyebrow: 'In your wallet',
+      title: '$_coins',
+      subline: 'coins in your wallet',
+      footer: cap <= 0
+          ? null
+          : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Flexible(child: Text('Earned today $earned', overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))),
+                const SizedBox(width: 8),
+                Expanded(child: Text(left > 0 ? '$left left to earn' : 'Today\u2019s cap reached', textAlign: TextAlign.end, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _dim, fontSize: 13))),
+              ]),
+              const SizedBox(height: 8),
+              _bar(earned / cap),
+              const SizedBox(height: 6),
+              Text('Daily cap for activity coins: $cap', style: const TextStyle(color: _dim, fontSize: 12)),
+            ]),
     );
   }
 
-  Widget _link(BuildContext context, IconData icon, String title, String body, VoidCallback onTap) => InkWell(
+  Widget _link(BuildContext context, IconData icon, String title, String body, VoidCallback onTap) => KitRow(
+        leading: _IconTile(icon),
+        title: title,
+        sub: body,
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Row(children: [
-            Icon(icon, size: 20, color: _gold),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 2),
-                Text(body, style: const TextStyle(color: _dim, fontSize: 13)),
-              ]),
-            ),
-            const Icon(Icons.chevron_right_rounded, color: _dim),
-          ]),
-        ),
       );
 
   static Widget _bar(double v) => ClipRRect(
         borderRadius: BorderRadius.circular(99),
-        child: LinearProgressIndicator(value: v.clamp(0.0, 1.0), minHeight: 4, color: _gold, backgroundColor: const Color(0x33FFFFFF)),
+        child: LinearProgressIndicator(value: v.clamp(0.0, 1.0), minHeight: 4, color: Colors.white, backgroundColor: const Color(0x33FFFFFF)),
       );
 
-  Widget _section(String title, List<Widget> rows) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          GlassWrap(
-            margin: EdgeInsets.zero,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            child: Column(children: rows),
-          ),
-        ]),
-      );
+  static const _heads = <String, (String, String)>{
+    'Daily lucky draw': ('Free to enter', NwsbMarks.gift),
+    'Today\u2019s activities': ('Earn coins today', NwsbMarks.features),
+    'Time in the app today': ('Minutes add up', NwsbMarks.hourglass),
+    'One-time coins still open': ('Still open', NwsbMarks.rewards),
+    'Where your coins came from': ('Your coin sources', NwsbMarks.trending),
+    'How to use coins': ('Store, streaks and cards', NwsbMarks.bag),
+  };
+
+  /// A badge-headed glass pane (the liked pages' section look).
+  Widget _section(String title, List<Widget> rows) {
+    final h = _heads[title];
+    return KitPane(
+      eyebrow: h?.$1 ?? 'Coins',
+      title: title,
+      mark: h?.$2 ?? NwsbMarks.earn,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows),
+    );
+  }
 
   Widget _activity(Map a) {
     final coins = (a['coins'] as num?)?.toInt() ?? 0;
@@ -184,7 +180,7 @@ class CoinsBody extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 9),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Icon(done >= limit ? Icons.check_circle_rounded : Icons.radio_button_unchecked, size: 18, color: done >= limit ? _gold : _dim),
+          Icon(done >= limit ? Icons.check_circle_rounded : Icons.radio_button_unchecked, size: 18, color: done >= limit ? Colors.white : _dim),
           const SizedBox(width: 8),
           Expanded(child: Text('${a['title'] ?? ''}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
           Text('+$coins', style: const TextStyle(color: _gold, fontWeight: FontWeight.w800)),
@@ -211,7 +207,7 @@ class CoinsBody extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(children: [
-        Icon(now >= mins ? Icons.check_circle_rounded : Icons.timer_outlined, size: 18, color: now >= mins ? _gold : _dim),
+        Icon(now >= mins ? Icons.check_circle_rounded : Icons.timer_outlined, size: 18, color: now >= mins ? Colors.white : _dim),
         const SizedBox(width: 8),
         Expanded(child: Text('$mins minutes', style: const TextStyle(color: Colors.white))),
         Text('+${t['coins']}', style: const TextStyle(color: _gold, fontWeight: FontWeight.w800)),
@@ -264,8 +260,13 @@ class CoinsBody extends StatelessWidget {
     Widget row(IconData i, String title, String body) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 9),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Icon(i, size: 18, color: _gold),
-            const SizedBox(width: 10),
+            Container(
+              width: 34,
+              height: 34,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: Icon(i, size: 17, color: const Color(0xFF0B0B10)),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
@@ -285,6 +286,19 @@ class CoinsBody extends StatelessWidget {
       row(Icons.info_outline_rounded, 'Coins are not money', 'They can\u2019t be cashed out or sent, and expire after a long time without opening the app.'),
     ];
   }
+}
+
+/// Row art for a link: the icon on the dark word-art tile.
+class _IconTile extends StatelessWidget {
+  const _IconTile(this.icon);
+  final IconData icon;
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1C1C22), Color(0xFF0A0A0D)]),
+        ),
+        child: Center(child: Icon(icon, size: 22, color: Colors.white)),
+      );
 }
 
 /// Keeps the [NwsbColors] import honest for themes that read it.

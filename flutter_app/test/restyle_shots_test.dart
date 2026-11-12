@@ -15,6 +15,8 @@ import 'package:nowssb/theme/theme.dart';
 import 'package:nowssb/features/coins/coins_screen.dart';
 import 'package:nowssb/features/circle/circle_screen.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
+import 'package:nowssb/features/economy/economy_theme.dart';
+import 'coins_screen_test.dart' as coins_fixture show summary;
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
 import 'package:nowssb/features/notifications/inbox_screen.dart';
@@ -139,6 +141,9 @@ Map<String, Widget Function()> _pages() {
       EconomyApi.debugHandler = (_, __) async => <String, dynamic>{};
       return const CircleScreen();
     },
+    // The Coins page exactly as CoinsScreen lays it out, on the server
+    // summary fixture from coins_screen_test.dart.
+    'coins_full': () => EconomyPage(title: 'Coins', showBalance: false, child: CoinsBody(summary: coins_fixture.summary)),
     // Second open: the once-per-run welcome note is gone.
     'earn_hub': () => const CircleScreen(),
     for (final tab in ['overview', 'team', 'sales', 'targets', 'payouts', 'invite', 'academy', 'rules'])
