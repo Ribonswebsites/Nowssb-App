@@ -23,7 +23,9 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 
 import '../../screens/nwsb_sign_in_sheet.dart';
+import '../../widgets/app_backdrop.dart';
 import '../../widgets/glass_list_card.dart';
+import '../../widgets/restyle_kit.dart';
 import '../economy/economy_api.dart';
 
 /// Max characters in one post (the server enforces the same).
@@ -336,11 +338,24 @@ class _ConnectScreenState extends State<ConnectScreen> {
     final canPop = Navigator.of(context).canPop();
     return Scaffold(
       backgroundColor: _bg,
-      body: DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: RadialGradient(center: Alignment(-.8, -1.1), radius: 1.4, colors: [Color(0xFF1C1A24), _bg]),
+      body: Stack(fit: StackFit.expand, children: [
+        // The Sound Library's backdrop: the app film under the same light
+        // scrim, so the glass panes read as one material with the liked pages.
+        const Positioned.fill(child: AppBackdrop()),
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x40060C18), Color(0x66060C18), Color(0x8C060C18)],
+                ),
+              ),
+            ),
+          ),
         ),
-        child: SafeArea(
+        SafeArea(
           bottom: false,
           child: RefreshIndicator(
             color: _white,
@@ -351,7 +366,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
               slivers: [
                 SliverToBoxAdapter(child: _header(canPop)),
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  padding: const EdgeInsets.only(top: 4),
                   sliver: SliverList.list(children: [
                     if (!_readOnly) _composer(),
                     _board(),
@@ -362,12 +377,12 @@ class _ConnectScreenState extends State<ConnectScreen> {
             ),
           ),
         ),
-      ),
+      ]),
     );
   }
 
   Widget _header(bool canPop) => Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 16, 6),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
         child: Row(children: [
           if (canPop)
             _CircleBtn(icon: Icons.arrow_back_rounded, label: 'Back', onTap: () => Navigator.of(context).maybePop())
@@ -376,9 +391,11 @@ class _ConnectScreenState extends State<ConnectScreen> {
           const SizedBox(width: 12),
           const Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('NowssB Connect', style: TextStyle(color: _white, fontSize: 24, fontWeight: FontWeight.w800)),
+              Text('COMMUNITY', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
               SizedBox(height: 2),
-              Text('Share a thought, a quote or an image.', style: TextStyle(color: kGlassMuted, fontSize: 13)),
+              Text('NowssB Connect', style: TextStyle(color: _white, fontSize: 28, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.5)),
+              SizedBox(height: 3),
+              Text('Share a thought, a quote or an image.', style: TextStyle(color: kGlassMuted, fontSize: 13.5)),
             ]),
           ),
         ]),
@@ -389,11 +406,13 @@ class _ConnectScreenState extends State<ConnectScreen> {
     final n = _outgoing.characters.length;
     final over = n > kBoardMaxText;
     final out = _left <= 0;
-    return GlassListCard(
-      icon: Icons.edit_outlined,
-      overline: 'Share · anonymous',
+    return _Pane(
+      key: const ValueKey('connect-composer'),
+      mark: NwsbMarks.thought,
+      eyebrow: 'Share · anonymous',
       title: 'Post to the board',
-      subtitle: out ? 'That’s $kBoardPerDay posts for today. Come back tomorrow.' : '$_left of $kBoardPerDay left today',
+      trailing: out ? null : _CountPill('$_left of $kBoardPerDay left today'),
+      note: out ? 'That’s $kBoardPerDay posts for today. Come back tomorrow.' : null,
       children: out
           ? const []
           : [
@@ -450,19 +469,13 @@ class _ConnectScreenState extends State<ConnectScreen> {
     final shown = [for (final p in _posts) if (_filter == null || p.kind == _filter) p];
     final isToday = _day.isEmpty || _day == _today;
     final count = _posts.length;
-    return GlassListCard(
-      icon: Icons.dashboard_outlined,
-      overline: isToday ? 'Today’s board' : 'Board · ${_label(_day)}',
+    return _Pane(
+      key: const ValueKey('connect-board'),
+      mark: NwsbMarks.feed,
+      eyebrow: isToday ? 'Today’s board' : 'Board · ${_label(_day)}',
       title: _readOnly ? 'What people shared' : 'From everyone',
-      subtitle: _loading
-          ? null
-          : _readOnly
-              ? 'This day has closed. You can read it, but not post.'
-              : count == 0
-                  ? 'Nothing here yet'
-                  : count == 1
-                      ? '1 post today'
-                      : '$count posts today',
+      trailing: _loading || _readOnly || count == 0 ? null : _CountPill(count == 1 ? '1 post today' : '$count posts today'),
+      note: _readOnly ? 'This day has closed. You can read it, but not post.' : null,
       children: [
         if (_days.isNotEmpty) _dayStrip(),
         _filters(),
@@ -719,16 +732,68 @@ class _Chip extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: selected ? const Color(0x33FFFFFF) : kGlassTile,
+              // GlassPill (Sound Library chips): white when picked.
+              color: selected ? _white : const Color(0x24FFFFFF),
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: selected ? const Color(0x66FFFFFF) : const Color(0x1AFFFFFF)),
+              border: Border.all(color: selected ? _white : const Color(0x40FFFFFF)),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              if (icon != null) ...[Icon(icon, size: 14, color: selected ? _white : kGlassMuted), const SizedBox(width: 6)],
-              Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: selected ? _white : kGlassMuted)),
+              if (icon != null) ...[Icon(icon, size: 14, color: selected ? const Color(0xFF111118) : _white), const SizedBox(width: 6)],
+              Text(label, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: selected ? const Color(0xFF111118) : _white)),
             ]),
           ),
         ),
+      );
+}
+
+/// A Connect pane: the liked pages' glass with the badge heading, and the
+/// children spaced like the Menu / Settings cards.
+class _Pane extends StatelessWidget {
+  const _Pane({super.key, required this.mark, required this.eyebrow, required this.title, this.trailing, this.note, required this.children});
+  final String mark;
+  final String eyebrow;
+  final String title;
+  final Widget? trailing;
+  final String? note;
+  final List<Widget> children;
+  @override
+  Widget build(BuildContext context) => KitPane(
+        mark: mark,
+        eyebrow: eyebrow,
+        title: title,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          // The count sits under the head, not beside it, so the title
+          // keeps one line on a 360 phone.
+          if (trailing != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(2, 0, 2, 12),
+              child: Align(alignment: Alignment.centerLeft, child: trailing!),
+            ),
+          if (note != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(2, 0, 2, 10),
+              child: Text(note!, style: const TextStyle(color: kGlassMuted, fontSize: 13, height: 1.4)),
+            ),
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0) const SizedBox(height: 10),
+            children[i],
+          ],
+        ]),
+      );
+}
+
+class _CountPill extends StatelessWidget {
+  const _CountPill(this.text);
+  final String text;
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0x24FFFFFF),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: const Color(0x40FFFFFF)),
+        ),
+        child: Text(text, style: const TextStyle(color: _white, fontSize: 12, fontWeight: FontWeight.w700)),
       );
 }
 

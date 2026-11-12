@@ -6,8 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
 import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/features/social/connect_screen.dart';
+import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/widgets/concept/normal/surface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'fake_video_platform.dart';
 
 Map<String, dynamic> _day({List<Map<String, dynamic>> posts = const [], bool readOnly = false, int left = 3, List<String> days = const []}) => {
       'day': readOnly ? '20261101' : '20261102',
@@ -33,6 +36,11 @@ Future<void> _open(WidgetTester t) async {
 }
 
 void main() {
+  // Connect now sits on the app film (AppBackdrop), like the Sound Library.
+  setUpAll(() {
+    FakeVideoPlatform();
+    VideoPool.debugDeadlines = false;
+  });
   setUp(() {
     NormalLoop.debugT = .35;
     ConnectScreen.debugImage = (_) => const ColoredBox(color: Color(0xFFCCD3E0));
