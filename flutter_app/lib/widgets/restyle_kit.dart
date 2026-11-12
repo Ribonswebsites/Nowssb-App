@@ -47,10 +47,13 @@ class KitPane extends StatelessWidget {
     required this.child,
     this.mark,
     this.trailing,
+    this.onHead,
     this.margin = const EdgeInsets.fromLTRB(16, 8, 16, 8),
     this.padding = const EdgeInsets.fromLTRB(14, 16, 14, 14),
   });
 
+  /// Tapping the heading (badge, eyebrow, title) runs this.
+  final VoidCallback? onHead;
   final String eyebrow;
   final String title;
   final String? mark;
@@ -70,8 +73,11 @@ class KitPane extends StatelessWidget {
           children: [
             Row(children: [
               Expanded(
-                  child: SectionHead(
-                      eyebrow: eyebrow, title: title, mark: mark)),
+                  child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: onHead,
+                child: SectionHead(eyebrow: eyebrow, title: title, mark: mark),
+              )),
               if (trailing != null)
                 Padding(
                     padding: const EdgeInsets.only(bottom: 14, left: 8),

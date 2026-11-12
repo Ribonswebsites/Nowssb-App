@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/widgets/sound_glass.dart' show GlassPill;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
@@ -65,7 +66,7 @@ void main() {
     await t.pump(const Duration(milliseconds: 300));
     await t.tap(chip);
     await t.pump();
-    expect(t.widget<ChoiceChip>(chip).selected, isTrue);
+    expect(t.widget<GlassPill>(chip).selected, isTrue);
 
     // Open the payout account sheet from the account card.
     await t.drag(find.byType(Scrollable).first, const Offset(0, 3000));

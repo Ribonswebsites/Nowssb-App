@@ -12,8 +12,8 @@ import '../../widgets/brand_top_banner.dart';
 import '../../widgets/colored_split_promo_banner.dart';
 import '../../widgets/hub_rails.dart';
 import '../../widgets/routine_deck.dart';
-import '../../widgets/nwsb_icon.dart';
 import '../../widgets/program_shelf.dart';
+import '../../widgets/restyle_kit.dart';
 import '../../admin/template/editable.dart';
 import '../programs/program_kit.dart';
 import '../programs/earn_program.dart';
@@ -193,36 +193,77 @@ class _EarningsScreenState extends State<EarningsScreen> {
           final unsupported = _country == 'XX';
           // The server checks the minimum, the hold and the saved account.
           final canPay = !unsupported && w.payoutRail.isNotEmpty && w.cash > 0;
+          final VoidCallback payTap = canPay
+              ? () => _requestPayout(context, w.cash)
+              : w.payoutRail.isEmpty
+                  ? () => _openAccount(context)
+                  : () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nothing is available to pay out yet. Cleared sales show up here after 30 days.')));
+          void open(String tab) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CircleScreen(initialTab: tab)));
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 40),
             children: [
-              RoutineDeck(
-                title: 'Earnings',
-                banner: 'Your earning',
-                bannerSub: 'Sales and referrals',
-                onBanner: () => _openAccount(context),
-                cards: [
-                  WorkCard(category: 'Cash', title: 'Lifetime', meta: FxBook.instance.formatCents(w.lifetimeCents), action: 'Open sales', image: 'assets/rails/gen-54.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'sales')))),
-                  WorkCard(category: 'Cash', title: 'Available', meta: FxBook.instance.formatCents(w.cash), action: 'Open payouts', image: 'assets/rails/gen-55.jpg', onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CircleScreen(initialTab: 'payouts')))),
-                  WorkCard(category: 'Account', title: 'Payout account', meta: w.payoutRail.isEmpty ? 'Wise or PayPal' : 'Saved', action: w.payoutRail.isEmpty ? 'Set account' : 'Change', image: 'assets/rails/earnings-02.jpg', onTap: () => _openAccount(context)),
-                  WorkCard(category: 'Cash', title: 'Request payout', meta: FxBook.instance.formatCents(w.cash), action: canPay ? 'Request' : w.payoutRail.isEmpty ? 'Save account first' : 'Nothing to pay yet', image: 'assets/rails/earnings-03.jpg', onTap: canPay ? () => _requestPayout(context, w.cash) : w.payoutRail.isEmpty ? () => _openAccount(context) : () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nothing is available to pay out yet. Cleared sales show up here after 30 days.')))),
-                ],
+              // The balance in the Currently Playing hero layout; its round
+              // button is the payout request (or the account, until saved).
+              KitHero(
+                key: const ValueKey('earnings-hero'),
+                art: Image.asset('assets/rails/earnings-03.jpg', fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF1A1A1E))),
+                cornerLabel: 'NowssB Earn',
+                eyebrow: 'Available',
+                title: FxBook.instance.formatCents(w.cash),
+                subline: 'Lifetime ${FxBook.instance.formatCents(w.lifetimeCents)}',
+                buttonIcon: canPay ? Icons.north_east_rounded : (w.payoutRail.isEmpty ? Icons.account_balance_outlined : Icons.hourglass_empty_rounded),
+                buttonLabel: canPay ? 'Request payout' : (w.payoutRail.isEmpty ? 'Set account' : 'Nothing yet'),
+                onButton: payTap,
               ),
-              const SizedBox(height: 16),
-              const Text('Activity', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [
-                  for (final f in const [('all', 'All'), ('sale', 'Sales'), ('circle', 'Team'), ('payout', 'Payouts')])
-                    ChoiceChip(key: Key('earnings-filter-${f.$1}'), label: Text(f.$2), selected: _filter == f.$1, onSelected: (_) => setState(() => _filter = f.$1)),
-                ],
+              KitPane(
+                key: const ValueKey('earnings-earning-pane'),
+                mark: NwsbMarks.earn,
+                eyebrow: 'Sales and referrals',
+                title: 'Your earning',
+                onHead: () => _openAccount(context),
+                trailing: GlassPill(label: 'Account', onTap: () => _openAccount(context)),
+                child: Column(children: [
+                  KitRow(
+                    leading: Image.asset('assets/rails/gen-54.jpg', fit: BoxFit.cover),
+                    title: 'Lifetime',
+                    sub: '${FxBook.instance.formatCents(w.lifetimeCents)} · Open sales',
+                    onTap: () => open('sales'),
+                  ),
+                  KitRow(
+                    leading: Image.asset('assets/rails/gen-55.jpg', fit: BoxFit.cover),
+                    title: 'Available',
+                    sub: '${FxBook.instance.formatCents(w.cash)} · Open payouts',
+                    onTap: () => open('payouts'),
+                  ),
+                  KitRow(
+                    leading: Image.asset('assets/rails/earnings-02.jpg', fit: BoxFit.cover),
+                    title: 'Payout account',
+                    sub: w.payoutRail.isEmpty ? 'Wise or PayPal · Set account' : 'Saved · Change',
+                    onTap: () => _openAccount(context),
+                  ),
+                ]),
               ),
-              const SizedBox(height: 10),
-              if ((NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null) case final user?)
-                _History(uid: user.uid, filter: _filter)
-              else
-                const EconomyMessage(title: 'Sign in to see your earnings', body: 'Sales, referral commissions and payouts show up here.'),
+              KitPane(
+                key: const ValueKey('earnings-activity-pane'),
+                mark: NwsbMarks.trending,
+                eyebrow: 'Sales, team and payouts',
+                title: 'Activity',
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final f in const [('all', 'All'), ('sale', 'Sales'), ('circle', 'Team'), ('payout', 'Payouts')])
+                        GlassPill(key: Key('earnings-filter-${f.$1}'), label: f.$2, selected: _filter == f.$1, onTap: () => setState(() => _filter = f.$1)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  if ((NwsbFirebase.ready ? FirebaseAuth.instance.currentUser : null) case final user?)
+                    _History(uid: user.uid, filter: _filter)
+                  else
+                    const EconomyMessage(title: 'Sign in to see your earnings', body: 'Sales, referral commissions and payouts show up here.'),
+                ]),
+              ),
             ],
           );
         },
@@ -293,12 +334,22 @@ class _History extends StatelessWidget {
             return Column(
               children: [
                 for (final row in shown)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                    decoration: BoxDecoration(color: const Color(0xF2050507), borderRadius: BorderRadius.circular(18)),
                     child: Row(
                       children: [
-                        Expanded(child: Text('${row.title}\n${row.status}', style: const TextStyle(color: Colors.white, height: 1.3))),
-                        Text(FxBook.instance.formatCents(row.cents), style: const TextStyle(color: NwsbColors.goldLight)),
+                        Expanded(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text(row.title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+                            if (row.status.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Text(row.status, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 12.5)),
+                            ],
+                          ]),
+                        ),
+                        Text(FxBook.instance.formatCents(row.cents), style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
                       ],
                     ),
                   ),
