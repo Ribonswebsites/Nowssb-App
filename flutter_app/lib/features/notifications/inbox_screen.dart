@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../data/firebase.dart';
 import '../../data/notifications.dart';
-import '../../theme/tokens.dart';
-import '../economy/economy_api.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
-import '../../widgets/colored_split_promo_banner.dart';
+import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
+import '../../widgets/restyle_kit.dart';
+import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../circle/circle_screen.dart';
 
@@ -19,66 +19,133 @@ class InboxScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EconomyPage(
+    return KitPage(
+      eyebrow: 'Account',
       title: 'Activity',
-      mark: NwsbMarks.bell,
-      banner: ColoredSplitPromoBanner(
-        margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        spec: SplitPromoSpec(
-          title: 'Coins and\npayouts',
-          cta: 'Open NowssB Earn',
-          leftColor: const Color(0xFF1A2438),
-          rightColor: const Color(0xFFC8A96E),
-          art: SplitPromoArts.egyptianGold,
-          onTap: () => Navigator.of(context).push(
+      trailing: const CoinBalancePill(),
+      children: [
+        KitHero(
+          art: const KitWordArt(word: 'EARN'),
+          cornerLabel: 'Earn',
+          eyebrow: 'Coins and payouts',
+          title: 'NowssB Earn',
+          subline: 'Open your coins, sales and payouts.',
+          buttonIcon: Icons.arrow_forward_rounded,
+          buttonLabel: 'Open',
+          onButton: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const CircleScreen()),
           ),
         ),
-      ),
-      child: ListenableBuilder(
-        listenable: EconomyMirror.instance,
-        builder: (context, _) {
-          final uid = EconomyMirror.instance.uid;
-          if (!NwsbFirebase.ready || uid == null) {
-            return EconomyMessage(
-              title: 'No activity yet',
-              body: 'Sign in and your messages, orders and updates will collect here.',
-              action: 'Sign in',
-              onAction: () => NwsbSignInPage.open(context),
-            );
-          }
-          // The same inbox the bell opens (NotifStore merges this
-          // account's Firestore notifications with on-phone reminders).
-          return ListenableBuilder(
-            listenable: NotifStore.instance,
-            builder: (context, _) {
-              final store = NotifStore.instance;
-              final list = store.feed;
-              if (list.isEmpty) {
-                return const EconomyMessage(
-                  title: 'You are caught up',
-                  body: 'Messages, request replies, orders and reminders land here.',
-                );
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                itemCount: list.length,
-                itemBuilder: (context, i) {
-                  final data = list[i];
-                  final unread = !data.read;
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(data.title, style: const TextStyle(color: Colors.white)),
-                    subtitle: Text(data.body, style: const TextStyle(color: NwsbColors.mist)),
-                    trailing: unread ? const NwsbIcon(NwsbMarks.bell, size: 16, color: NwsbColors.gold) : null,
-                    onTap: unread ? () => store.markRead(i) : null,
-                  );
-                },
+        ListenableBuilder(
+          listenable: EconomyMirror.instance,
+          builder: (context, _) {
+            final uid = EconomyMirror.instance.uid;
+            if (!NwsbFirebase.ready || uid == null) {
+              return _EmptyPane(
+                title: 'No activity yet',
+                body: 'Sign in and your messages, orders and updates will collect here.',
+                action: 'Sign in',
+                onAction: () => NwsbSignInPage.open(context),
               );
-            },
-          );
-        },
+            }
+            return ListenableBuilder(
+              listenable: NotifStore.instance,
+              builder: (context, _) {
+                final store = NotifStore.instance;
+                final list = store.feed;
+                if (list.isEmpty) {
+                  return const _EmptyPane(
+                    title: 'You are caught up',
+                    body: 'Messages, request replies, orders and reminders land here.',
+                  );
+                }
+                return KitPane(
+                  eyebrow: 'Inbox',
+                  title: 'Your activity',
+                  mark: NwsbMarks.bell,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (var i = 0; i < list.length; i++)
+                        KitRow(
+                          highlighted: i == 0 && !list[i].read,
+                          leading: _kindArt(list[i].type),
+                          title: list[i].title,
+                          sub: list[i].body,
+                          trailing: !list[i].read
+                              ? const NwsbIcon(NwsbMarks.bell, size: 16, color: Colors.white)
+                              : null,
+                          onTap: !list[i].read ? () => store.markRead(i) : null,
+                        ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+class _EmptyPane extends StatelessWidget {
+  const _EmptyPane({required this.title, required this.body, this.action, this.onAction});
+  final String title;
+  final String body;
+  final String? action;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return KitPane(
+      eyebrow: 'Inbox',
+      title: title,
+      mark: NwsbMarks.bell,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(body, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 13.5, height: 1.4)),
+          if (action != null) ...[
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF0B0B10),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: const StadiumBorder(),
+                ),
+                onPressed: onAction,
+                child: Text(action!, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF0B0B10))),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
+}
+
+Widget _kindArt(String type) {
+  if (type == 'coins') {
+    return const DecoratedBox(
+      decoration: BoxDecoration(color: Color(0xFF1A1A1A)),
+      child: Center(child: NwsbCoinDisc(size: 28)),
+    );
+  }
+  final mark = switch (type) {
+    'update' => NwsbMarks.word,
+    'orders' || 'delivery' || 'cart' => NwsbMarks.bag,
+    'subscription' => NwsbMarks.crown,
+    'offers' => NwsbMarks.trending,
+    'routine' => NwsbMarks.hourglass,
+    'streak' => NwsbMarks.features,
+    _ => NwsbMarks.bell,
+  };
+  return DecoratedBox(
+    decoration: const BoxDecoration(color: Color(0xFF1A1A1A)),
+    child: Center(child: NwsbIcon(mark, size: 22, color: Colors.white)),
+  );
 }

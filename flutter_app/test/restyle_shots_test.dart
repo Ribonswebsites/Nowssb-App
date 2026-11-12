@@ -20,10 +20,16 @@ import 'coins_screen_test.dart' as coins_fixture show summary;
 import 'lucky_draw_test.dart' as draw_fixture show FakeRepo;
 import 'package:nowssb/data/app_control.dart';
 import 'package:nowssb/features/draw/lucky_draw_gate.dart';
+import 'package:nowssb/features/economy/reward_fx.dart';
+import 'package:nowssb/features/economy/reward_overlay.dart';
+import 'package:nowssb/widgets/app_backdrop.dart';
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
+import 'package:nowssb/data/notifications.dart';
 import 'package:nowssb/features/notifications/inbox_screen.dart';
 import 'package:nowssb/features/notifications/notif_preferences_screen.dart';
+import 'package:nowssb/features/notifications/notif_router.dart';
+import 'package:nowssb/screens/notifications_sheet.dart';
 import 'package:nowssb/features/programs/earn_program.dart';
 import 'package:nowssb/features/programs/reference_program.dart';
 import 'package:nowssb/features/social/connect_screen.dart';
@@ -60,6 +66,40 @@ Future<void> _settle(WidgetTester t, [int n = 12]) async {
 }
 
 final _key = GlobalKey();
+
+const _rewardItems = <Map<String, dynamic>>[
+  {'type': 'coins', 'label': '40 coins'},
+  {'type': 'percentOff', 'label': '15% off coupon', 'rarity': 'rare'},
+  {'type': 'giftbox', 'label': 'Silver gift box'},
+];
+
+Widget _overBackdrop(Widget child) => Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(fit: StackFit.expand, children: [
+        const AppBackdrop(),
+        const ColoredBox(color: Color(0xCC03060C)),
+        child,
+      ]),
+    );
+
+/// Loads the bell feed so the notifications sheet is not empty in shots.
+class _LoadNotifs extends StatefulWidget {
+  const _LoadNotifs({required this.child});
+  final Widget child;
+  @override
+  State<_LoadNotifs> createState() => _LoadNotifsState();
+}
+
+class _LoadNotifsState extends State<_LoadNotifs> {
+  @override
+  void initState() {
+    super.initState();
+    NotifStore.instance.load();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
 
 const _drawStatus = <String, dynamic>{
   'drawId': 'd-shot',
@@ -156,6 +196,8 @@ Map<String, Widget Function()> _pages() {
     'recent_activity': () => const RecentActivityScreen(),
     'saved_words': () => const SavedWordsScreen(),
     'inbox_journal': () => const InboxScreen(),
+    'latest_update': () => const LatestUpdatePage(),
+    'notif_sheet': () => _overBackdrop(const _LoadNotifs(child: NotificationsSheet())),
     'quick_access': () => const QuickAccessScreen(),
     'connect': () => const ConnectScreen(),
     'practice': () => const PracticeScreen(),
@@ -177,6 +219,11 @@ Map<String, Widget Function()> _pages() {
     // The Coins page exactly as CoinsScreen lays it out, on the server
     // summary fixture from coins_screen_test.dart.
     'coins_full': () => EconomyPage(title: 'Coins', showBalance: false, child: CoinsBody(summary: coins_fixture.summary)),
+    // Reward pop-ups over the app backdrop and the dialog barrier.
+    'reward_won': () => _overBackdrop(const YouWonCard(title: 'Daily gift', items: [{'type': 'coins', 'label': '20 coins'}])),
+    'reward_won_many': () => _overBackdrop(const YouWonCard(title: 'Gift box', rarity: 'epic', items: _rewardItems)),
+    'reward_items': () => _overBackdrop(const Center(child: RewardItemsCard(title: 'Your rewards', items: _rewardItems))),
+    'reward_box': () => _overBackdrop(const GiftBoxOpening(box: 'gold', title: 'Gold gift box', items: _rewardItems)),
     // Second open: the once-per-run welcome note is gone.
     'earn_hub': () => const CircleScreen(),
     for (final tab in ['overview', 'team', 'sales', 'targets', 'payouts', 'invite', 'academy', 'rules'])
@@ -256,6 +303,8 @@ void main() {
             await _settle(t, 15);
             await t.runAsync(() => Future.delayed(const Duration(milliseconds: 600)));
             await _settle(t, 6);
+            // Gift boxes shake three times before they open.
+            if (e.key.startsWith('reward_')) await _settle(t, 45);
             final tag = '${w.toInt()}_${skin}_${e.key}';
             await _shot(t, '${e.key}_1top');
             const steps = int.fromEnvironment('RESTYLE_STEPS');
@@ -275,6 +324,9 @@ void main() {
           }
           await t.pumpWidget(const SizedBox());
           await _settle(t, 30);
+          // Flush leftover cache-manager (or similar) timers so the test
+          // does not hang after a page that starts one.
+          await t.pump(const Duration(seconds: 11));
         }
         for (final f in Directory(_out).listSync()) {
           if (f.path.contains('/_warmup_')) f.deleteSync();

@@ -25,6 +25,7 @@ import '../../screens/store/request_words.dart';
 import '../../screens/subscription.dart';
 import '../../screens/word_detail.dart';
 import '../circle/circle_screen.dart';
+import '../../widgets/restyle_kit.dart';
 import 'inbox_screen.dart';
 import 'notif_preferences_screen.dart';
 
@@ -181,39 +182,42 @@ class LatestUpdatePage extends StatelessWidget {
       ('Morning film', 'The short morning video above "Open a door" plays again.'),
       ('Coins', 'Your coins wallet shows what you have earned.'),
     ];
-    return Scaffold(
-      backgroundColor: const Color(0xFF07070C),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF07070C),
-        foregroundColor: Colors.white,
-        title: const Text('Latest update'),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-        itemCount: lines.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 10),
-        itemBuilder: (_, i) {
-          final row = lines[i];
-          return DecoratedBox(
-            decoration: BoxDecoration(
-              color: const Color(0xFF141418),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0x22FFFFFF)),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(row.$1, style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
-                  const SizedBox(height: 6),
-                  Text(row.$2, style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.35)),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+    return KitPage(
+      eyebrow: 'NowssB',
+      title: 'Latest update',
+      children: [
+        KitPane(
+          eyebrow: 'What changed',
+          title: 'In this update',
+          mark: NwsbMarks.word,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var i = 0; i < lines.length; i++) ...[
+                if (i > 0) const SizedBox(height: 8),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xF2050507),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0x1AFFFFFF)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(lines[i].$1, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 0.4)),
+                        const SizedBox(height: 6),
+                        Text(lines[i].$2, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 15, height: 1.35)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

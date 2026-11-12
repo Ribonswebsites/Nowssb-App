@@ -6,13 +6,14 @@ library;
 
 import 'dart:ui' as ui;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
 import '../features/notifications/notif_router.dart';
-import '../theme/tokens.dart';
+import '../widgets/nwsb_coin_fly.dart';
+import '../widgets/nwsb_icon.dart';
+import '../widgets/restyle_kit.dart';
 import 'notifications_settings.dart';
 import '../admin/template/editable.dart';
 
@@ -83,70 +84,51 @@ class NotificationsSheet extends StatelessWidget {
                 final store = NotifStore.instance;
                 return Material(
                   type: MaterialType.transparency,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: BackdropFilter(
-                      filter: ui.ImageFilter.blur(sigmaX: 26, sigmaY: 26),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: const Color(0x0FFFFFFF),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0x24FFFFFF)),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x8C000000),
-                              blurRadius: 60,
-                              offset: Offset(0, 26),
-                            ),
-                          ],
+                  child: GlassWrap(
+                    margin: EdgeInsets.zero,
+                    padding: EdgeInsets.zero,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _SheetHead(
+                          subtitle: store.sheetSubtitle(),
+                          onGear: () => _openSettings(context),
+                          onClose: () => Navigator.of(context).pop(),
                         ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _SheetHead(
-                              subtitle: store.sheetSubtitle(),
-                              onGear: () => _openSettings(context),
-                              onClose: () => Navigator.of(context).pop(),
-                            ),
-                            Flexible(
-                              child: store.feed.isEmpty
-                                  ? SingleChildScrollView(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          12, 12, 12, 6),
-                                      child: _EmptyState(masterOn: store.master),
-                                    )
-                                  : ListView.builder(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          12, 12, 12, 6),
-                                      shrinkWrap: true,
-                                      itemCount: store.feed.length,
-                                      itemBuilder: (context, i) {
-                                        final n = store.feed[i];
-                                        return Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 8),
-                                          child: _SheetItem(
-                                            item: n,
-                                            label: store.labelOf(n.type),
-                                            onTap: () {
-                                              Navigator.of(context).pop();
-                                              NotifRouter.instance.openItem(n);
-                                            },
-                                          ),
-                                        );
-                                      },
-                                    ),
-                            ),
-                            _SheetFoot(
-                              onClear: () {
-                                store.clearAll();
-                                HapticFeedback.mediumImpact();
-                              },
-                              onManage: () => _openSettings(context),
-                            ),
-                          ],
+                        Flexible(
+                          child: store.feed.isEmpty
+                              ? SingleChildScrollView(
+                                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+                                  child: _EmptyState(masterOn: store.master),
+                                )
+                              : ListView.builder(
+                                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+                                  shrinkWrap: true,
+                                  itemCount: store.feed.length,
+                                  itemBuilder: (context, i) {
+                                    final n = store.feed[i];
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 8),
+                                      child: _SheetItem(
+                                        item: n,
+                                        label: store.labelOf(n.type),
+                                        onTap: () {
+                                          Navigator.of(context).pop();
+                                          NotifRouter.instance.openItem(n);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
                         ),
-                      ),
+                        _SheetFoot(
+                          onClear: () {
+                            store.clearAll();
+                            HapticFeedback.mediumImpact();
+                          },
+                          onManage: () => _openSettings(context),
+                        ),
+                      ],
                     ),
                   ),
                 );
@@ -183,69 +165,36 @@ class _SheetHead extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Text('INBOX',
+                    style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 2),
                 const EditableLabel('notifications_sheet.SheetHead',
                   'Notifications',
                   style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
-                    letterSpacing: -0.2,
+                    letterSpacing: -0.3,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 4),
                 EditableLabel('notifications_sheet.SheetHead',
                   subtitle,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w300,
-                    color: Color(0x99FFFFFF),
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0x8CFFFFFF),
                   ),
                 ),
               ],
             ),
           ),
-          _HBtn(
-            color: NwsbColors.goldLight,
-            onTap: onGear,
-            child: const Icon(Icons.settings_outlined,
-                size: 16, color: NwsbColors.deep),
-          ),
+          KitRoundButton(icon: Icons.settings_outlined, size: 38, onTap: onGear, label: 'Settings'),
           const SizedBox(width: 10),
-          _HBtn(
-            color: Colors.white,
-            onTap: onClose,
-            child: const Icon(Icons.close, size: 16, color: NwsbColors.deep),
-          ),
+          KitRoundButton(icon: Icons.close, size: 38, onTap: onClose, label: 'Close'),
         ],
-      ),
-    );
-  }
-}
-
-class _HBtn extends StatelessWidget {
-  const _HBtn({
-    required this.color,
-    required this.onTap,
-    required this.child,
-  });
-
-  final Color color;
-  final VoidCallback onTap;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: 38,
-        height: 38,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        child: child,
       ),
     );
   }
@@ -259,32 +208,27 @@ class _SheetFoot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: Color(0x1AFFFFFF))),
-      ),
       child: Row(
         children: [
           Expanded(
             child: GestureDetector(
               onTap: onClear,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
+                padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0x0FFFFFFF),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0x21FFFFFF)),
+                  color: const Color(0x24FFFFFF),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: const Color(0x40FFFFFF)),
                 ),
                 child: const EditableLabel('notifications_sheet.SheetFoot',
-                  'CLEAR ALL',
+                  'Clear all',
                   style: TextStyle(
-                    fontSize: 10,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w700,
-                    letterSpacing: 2,
-                    color: Color(0x99FFFFFF),
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -295,21 +239,18 @@ class _SheetFoot extends StatelessWidget {
             child: GestureDetector(
               onTap: onManage,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
+                padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white),
+                  borderRadius: BorderRadius.circular(999),
                 ),
                 child: const EditableLabel('notifications_sheet.SheetFoot',
-                  'MANAGE',
+                  'Manage',
                   style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 2,
-                    color: NwsbColors.deep,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0B0B10),
                   ),
                 ),
               ),
@@ -327,41 +268,38 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(4, 8, 4, 12),
-      padding: const EdgeInsets.symmetric(vertical: 34, horizontal: 24),
-      decoration: BoxDecoration(
-        color: const Color(0x08FFFFFF),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
       child: Column(
         children: [
-          SizedBox(
-            width: 40,
-            height: 40,
-            child: CustomPaint(painter: _EmptyBellPainter()),
+          const DecoratedBox(
+            decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: SizedBox(
+              width: 52,
+              height: 52,
+              child: Center(child: NwsbIcon(NwsbMarks.bell, size: 22, color: Colors.black)),
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Text(
             masterOn ? 'You are all caught up' : 'Notifications are off',
             style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: Color(0x9EFFFFFF),
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             masterOn
                 ? 'New updates land here — orders, messages, offers, your routine and everything else you have switched on.'
                 : 'Turn them back on from the gear above to start receiving updates again.',
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 11.5,
-              fontWeight: FontWeight.w300,
-              color: Color(0x61FFFFFF),
-              height: 1.6,
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
+              color: Color(0x8CFFFFFF),
+              height: 1.45,
             ),
           ),
         ],
@@ -386,16 +324,16 @@ class _SheetItem extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0x52000000),
+          color: const Color(0xF2050507),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0x17FFFFFF)),
+          border: Border.all(color: const Color(0x1AFFFFFF)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _KindIcon(url: NotifIcons.urlFor(item.type)),
+            _KindIcon(type: item.type),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -405,56 +343,47 @@ class _SheetItem extends StatelessWidget {
                     children: [
                       if (!item.read) ...[
                         Container(
-                          width: 7,
-                          height: 7,
-                          margin: const EdgeInsets.only(right: 7),
-                          decoration: const BoxDecoration(
-                            color: NwsbColors.goldLight,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0x99E8D5A3),
-                                blurRadius: 8,
-                              ),
-                            ],
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(999),
                           ),
+                          child: const Text('New', style: TextStyle(color: Color(0xFF0B0B10), fontSize: 10.5, fontWeight: FontWeight.w800)),
                         ),
                       ],
                       Expanded(
                         child: Text(
                           item.title,
                           style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight:
-                                item.read ? FontWeight.w600 : FontWeight.w700,
-                            color: item.read
-                                ? const Color(0xB8FFFFFF)
-                                : Colors.white,
+                            fontSize: 15,
+                            fontWeight: item.read ? FontWeight.w600 : FontWeight.w700,
+                            color: item.read ? const Color(0xB3FFFFFF) : Colors.white,
                           ),
                         ),
                       ),
                     ],
                   ),
                   if (item.body.isNotEmpty) ...[
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 4),
                     Text(
                       item.body,
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w300,
-                        color: Color(0x80FFFFFF),
-                        height: 1.5,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0x8CFFFFFF),
+                        height: 1.45,
                       ),
                     ),
                   ],
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 6),
                   Text(
                     '$label · ${NotifStore.ago(item.at)}',
                     style: const TextStyle(
-                      fontSize: 10,
+                      fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      letterSpacing: 0.4,
-                      color: Color(0x52FFFFFF),
+                      letterSpacing: 0.2,
+                      color: Color(0x8CFFFFFF),
                     ),
                   ),
                 ],
@@ -468,56 +397,34 @@ class _SheetItem extends StatelessWidget {
 }
 
 class _KindIcon extends StatelessWidget {
-  const _KindIcon({required this.url});
-  final String url;
+  const _KindIcon({required this.type});
+  final String type;
 
   @override
   Widget build(BuildContext context) {
+    final child = type == 'coins'
+        ? const NwsbCoinDisc(size: 22)
+        : NwsbIcon(_markFor(type), size: 18, color: Colors.white);
     return Container(
       width: 38,
       height: 38,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(11),
-        border: Border.all(color: const Color(0x29FFFFFF)),
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0x1AFFFFFF)),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: CachedNetworkImage(
-        imageUrl: url,
-        fit: BoxFit.cover,
-        fadeInDuration: const Duration(milliseconds: 120),
-        errorWidget: (_, __, ___) => const ColoredBox(color: Colors.black),
-      ),
+      child: child,
     );
   }
-}
 
-/// Same SVG paths as the empty-state bell in part064.js.
-class _EmptyBellPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()
-      ..color = const Color(0x4DFFFFFF)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-    final sx = size.width / 24;
-    final sy = size.height / 24;
-    final bell = Path()
-      ..moveTo(18 * sx, 8 * sy)
-      ..cubicTo(18 * sx, 4.7 * sy, 15.3 * sx, 2 * sy, 12 * sx, 2 * sy)
-      ..cubicTo(8.7 * sx, 2 * sy, 6 * sx, 4.7 * sy, 6 * sx, 8 * sy)
-      ..cubicTo(6 * sx, 15 * sy, 3 * sx, 17 * sy, 3 * sx, 17 * sy)
-      ..lineTo(21 * sx, 17 * sy)
-      ..cubicTo(21 * sx, 17 * sy, 18 * sx, 15 * sy, 18 * sx, 8 * sy);
-    canvas.drawPath(bell, p);
-    final clapper = Path()
-      ..moveTo(13.7 * sx, 21 * sy)
-      ..cubicTo(13.2 * sx, 22.2 * sy, 10.8 * sx, 22.2 * sy, 10.3 * sx, 21 * sy);
-    canvas.drawPath(clapper, p);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  static String _markFor(String type) => switch (type) {
+        'update' => NwsbMarks.word,
+        'orders' || 'delivery' || 'cart' => NwsbMarks.bag,
+        'subscription' => NwsbMarks.crown,
+        'offers' => NwsbMarks.trending,
+        'routine' => NwsbMarks.hourglass,
+        'streak' => NwsbMarks.features,
+        _ => NwsbMarks.bell,
+      };
 }
