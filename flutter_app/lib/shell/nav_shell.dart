@@ -599,8 +599,9 @@ class _NavShellState extends State<NavShell> {
                         // (and every other tab) uses, inside one glass wrapper
                         // (HeroGlassRecipe — blur, 8% fill, hairline, no top
                         // highlight). Same 58px outside, so the nav never
-                        // changes height between tabs. Zen is untouched.
-                        final glassed = lightHome;
+                        // changes height between tabs. The Zen home gets the
+                        // same glass wrapper around its black bar.
+                        final glassed = _i == 0;
                         final inner = glassed ? 4.0 : 0.0;
                         final barRadius = radius - inner;
                         final row = Row(children: [

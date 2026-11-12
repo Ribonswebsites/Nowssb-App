@@ -1,5 +1,5 @@
 // Normal home: the bottom nav is a plain black bar inside one glass wrapper.
-// Zen home and the other tabs keep their own bar. Shots with
+// The Zen home gets the same wrapper; the other tabs keep their own bar. Shots with
 // --dart-define=NAV_SHOTS=<dir>.
 import 'dart:io';
 import 'dart:ui' as ui;
@@ -92,7 +92,7 @@ void main() {
     return d.color;
   }
 
-  testWidgets('normal home: black bar inside a glass wrapper; Zen untouched',
+  testWidgets('both homes: black bar inside a glass wrapper',
       (t) async {
     final prev = FlutterError.onError;
     FlutterError.onError = (d) {};
@@ -128,11 +128,12 @@ void main() {
       expect(find.text('Library'), findsWidgets);
       await _shot(t, 'nav-library-390');
 
-      // Zen home keeps its own bar: no glass wrapper.
+      // Zen home: the same black bar in the same glass wrapper.
       await t.runAsync(() => Settings.instance.setFashionHome(true));
       await t.tap(find.text('Connect').last);
       await _settle(t, 8);
-      expect(find.byKey(const ValueKey('nav-glass')), findsNothing);
+      expect(find.byKey(const ValueKey('nav-glass')), findsOneWidget);
+      expect(barColor(t), const Color(0xF5000000), reason: 'plain black');
       await _shot(t, 'nav-zen-home-390');
       await t.runAsync(() => Settings.instance.setFashionHome(false));
     } finally {
