@@ -26,8 +26,9 @@ Free photos under the [Pexels licence](https://www.pexels.com/license/): free to
 | ez-med-beach.webp | [Man Meditating at the Beach](https://www.pexels.com/photo/man-meditating-at-the-beach-5992566/) | Tima Miroshnichenko |
 | ez-med-lotus-white.webp | [Serene plus size female meditating in Lotus pose](https://www.pexels.com/photo/serene-plus-size-female-meditating-in-lotus-pose-6975413/) | SHVETS production |
 | ez-med-candle.webp | [Lighted Candle Beside a Tibetan Singing Bowl](https://www.pexels.com/photo/lighted-candle-beside-a-tibetan-singing-bowl-7303281/) | Cup of Couple |
+| ez-med-focus.webp | Original portrait generated for NowssB (Grok Bot image generation, Nov 12 2026); photoreal man seated in meditation, cream linen, soft white studio. Resized to 720 px WebP. | Replaces `ez-med-lotus-white.webp` on the Profile "Your practice mind" Focus today card. `ez-med-lotus-white.webp` remains in the folder for other surfaces (Sound Library glass). No third-party source; free to use. |
 
-Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are used by the Profile "Your practice mind" section.
+Used by the Editeaze-style cards (`lib/widgets/editeaze.dart`). `ez-med-*` are used by the Profile "Your practice mind" section; `ez-med-focus.webp` is used only there.
 
 ## Home hero (assets/home/hc/) — Pexels License, colour-graded, cut-outs made in-house
 - hc-a-breath — Ivan S, https://www.pexels.com/photo/6648599/

@@ -48,6 +48,7 @@ class EzOrangeCard extends StatelessWidget {
     this.height = 300,
     this.radius = 26,
     this.alignment = Alignment.center,
+    this.headerFade = true,
   });
 
   final String title;
@@ -61,6 +62,9 @@ class EzOrangeCard extends StatelessWidget {
   final double height;
   final double radius;
   final Alignment alignment;
+  /// Soft colour wash from the header onto the photo. The Profile mind
+  /// section turns this off so the photo has no yellow (or tinted) haze.
+  final bool headerFade;
 
   @override
   Widget build(BuildContext context) {
@@ -79,20 +83,21 @@ class EzOrangeCard extends StatelessWidget {
           height: height,
           child: Stack(fit: StackFit.expand, children: [
             Positioned.fill(top: 54, child: photo),
-            // Orange fades over the top of the photo so the header reads.
-            Positioned(
-              left: 0, right: 0, top: 50, height: 46,
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter, end: Alignment.bottomCenter,
-                      colors: [color, color.withValues(alpha: 0)],
+            // Colour fades over the top of the photo so the header reads.
+            if (headerFade)
+              Positioned(
+                left: 0, right: 0, top: 50, height: 46,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                        colors: [color, color.withValues(alpha: 0)],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
             Positioned(
               left: 16, right: 12, top: 14,
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
