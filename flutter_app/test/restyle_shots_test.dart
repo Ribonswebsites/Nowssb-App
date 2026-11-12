@@ -17,6 +17,9 @@ import 'package:nowssb/features/circle/circle_screen.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
 import 'package:nowssb/features/economy/economy_theme.dart';
 import 'coins_screen_test.dart' as coins_fixture show summary;
+import 'lucky_draw_test.dart' as draw_fixture show FakeRepo;
+import 'package:nowssb/data/app_control.dart';
+import 'package:nowssb/features/draw/lucky_draw_gate.dart';
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
 import 'package:nowssb/features/earn/earnings_screen.dart';
 import 'package:nowssb/features/notifications/inbox_screen.dart';
@@ -57,6 +60,27 @@ Future<void> _settle(WidgetTester t, [int n = 12]) async {
 }
 
 final _key = GlobalKey();
+
+const _drawStatus = <String, dynamic>{
+  'drawId': 'd-shot',
+  'odds': {'text': 'About 1 in 150 entries wins', 'numerator': 1, 'denominator': 150},
+  'closesAt': '2026-11-12T18:29:00Z',
+  'resultsAt': '2026-11-12T18:30:00Z',
+  'entered': false,
+  'open': true,
+  'result': null,
+  'prizes': [
+    {'id': 'g1', 'kind': 'gift', 'title': 'Headphone gift box', 'detail': 'Delivered to your address'},
+    {'id': 'c1', 'kind': 'coupon', 'title': '20% off coupon', 'detail': 'Covers part of a price'},
+  ],
+};
+
+const _drawWinners = <String, dynamic>{
+  'winners': [
+    {'displayName': 'Asha K.', 'prizeTitle': '20% off coupon', 'wonAt': '2026-11-10T18:30:00Z', 'review': {'text': 'Used it the same day.', 'stars': 5}},
+    {'displayName': 'Ravi M.', 'prizeTitle': 'Headphone gift box', 'wonAt': '2026-11-08T18:30:00Z'},
+  ],
+};
 
 Future<void> _shot(WidgetTester t, String name) async {
   await precacheAll(t);
@@ -119,6 +143,15 @@ Map<String, Widget Function()> _pages() {
     if (words.isNotEmpty) 'word_detail': () => WordDetail(word: words.first),
     'coins': () => const CoinsScreen(),
     'draw': () => const LuckyDrawScreen(),
+    // Lucky draw switched on, with the server shapes from lucky_draw_test.
+    'draw_full': () {
+      AppControl.instance.flags = const {kLuckyDrawFlag: true};
+      return LuckyDrawScreen(repository: draw_fixture.FakeRepo(statusJson: _drawStatus));
+    },
+    'draw_winners': () {
+      AppControl.instance.flags = const {kLuckyDrawFlag: true};
+      return LuckyDrawWinnersScreen(repository: draw_fixture.FakeRepo(winnersJson: _drawWinners));
+    },
     'profile': () => const ProfileScreen(),
     'recent_activity': () => const RecentActivityScreen(),
     'saved_words': () => const SavedWordsScreen(),
@@ -157,7 +190,7 @@ Map<String, Widget Function()> _pages() {
 }
 
 void main() {
-  SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
+  SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1', 'guide_seen_lucky_draw': true});
   setUpAll(() async {
     await setUpHomeRender();
     await loadRoboto();

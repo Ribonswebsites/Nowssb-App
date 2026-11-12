@@ -20,6 +20,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'app_backdrop.dart';
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
 
@@ -493,4 +494,167 @@ class KitRow extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A full restyled page: the subscription film backdrop with its navy scrim,
+/// a white round back button, a small caps eyebrow and a bold title, then
+/// a scrolling list. [onRefresh] adds pull-to-refresh.
+class KitPage extends StatelessWidget {
+  const KitPage({
+    super.key,
+    required this.eyebrow,
+    required this.title,
+    required this.children,
+    this.onRefresh,
+    this.trailing,
+    this.padding = const EdgeInsets.fromLTRB(0, 8, 0, 40),
+  });
+
+  final String eyebrow;
+  final String title;
+  final List<Widget> children;
+  final Future<void> Function()? onRefresh;
+  final Widget? trailing;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final list = ListView(
+      padding: padding,
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: children,
+    );
+    return Scaffold(
+      backgroundColor: const Color(0xFF07070C),
+      body: Stack(fit: StackFit.expand, children: [
+        const Positioned.fill(child: AppBackdrop()),
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x66060C18), Color(0x99060C18), Color(0xB3060C18)],
+                ),
+              ),
+            ),
+          ),
+        ),
+        SafeArea(
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Row(children: [
+                KitBackButton(onTap: () => Navigator.of(context).maybePop()),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(eyebrow.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 2),
+                    Text(title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.5)),
+                  ]),
+                ),
+                if (trailing != null) trailing!,
+              ]),
+            ),
+            Expanded(child: onRefresh == null ? list : RefreshIndicator(onRefresh: onRefresh!, child: list)),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+/// The white round back button used on restyled pages.
+class KitBackButton extends StatelessWidget {
+  const KitBackButton({super.key, required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: 'Back',
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Semantics(
+            button: true,
+            label: 'Back',
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(Icons.arrow_back, size: 19, color: Color(0xFF111118)),
+            ),
+          ),
+        ),
+      );
+}
+
+/// A full-width action pill: white with dark text when [primary], else the
+/// GlassPill glass fill and hairline.
+class KitActionPill extends StatelessWidget {
+  const KitActionPill(this.label, {super.key, this.onTap, this.primary = true, this.busy = false, this.icon});
+  final String label;
+  final VoidCallback? onTap;
+  final bool primary;
+  final bool busy;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = primary ? const Color(0xFF0B0B10) : Colors.white;
+    return Semantics(
+      button: true,
+      enabled: !busy && onTap != null,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: busy ? null : onTap,
+          customBorder: const StadiumBorder(),
+          child: Ink(
+            height: 46,
+            decoration: ShapeDecoration(
+              color: primary ? Colors.white : const Color(0x24FFFFFF),
+              shape: StadiumBorder(side: primary ? BorderSide.none : const BorderSide(color: Color(0x40FFFFFF))),
+            ),
+            child: Center(
+              child: busy
+                  ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: fg))
+                  : Row(mainAxisSize: MainAxisSize.min, children: [
+                      if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: 8)],
+                      Flexible(
+                        child: Text(label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: fg, fontWeight: FontWeight.w800, fontSize: 14.5)),
+                      ),
+                    ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A white circle holding a dark icon: the row badge on restyled lists.
+class KitIconBadge extends StatelessWidget {
+  const KitIconBadge(this.icon, {super.key, this.size = 34});
+  final IconData icon;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        child: Icon(icon, size: size * 0.5, color: const Color(0xFF0B0B10)),
+      );
 }

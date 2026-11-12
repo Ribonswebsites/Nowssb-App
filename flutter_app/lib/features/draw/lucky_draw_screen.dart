@@ -1,5 +1,6 @@
-/// Daily lucky draw and its winners page, in the current Rewards style
-/// (AppBackdrop video, black-glass PCards, gold eyebrows, the app coin).
+/// Daily lucky draw and its winners page, in the liked dark-glass style
+/// (subscription film backdrop, KitHero, badge-headed glass panes, white
+/// pills, the app coin).
 /// Free to enter. Odds, the draw, winners and reviews all come from the server.
 library;
 
@@ -7,8 +8,8 @@ import '../../widgets/concept/r27/how_it_works.dart';
 import 'package:flutter/material.dart';
 
 import '../../theme/tokens.dart';
-import '../../widgets/app_backdrop.dart';
 import '../../widgets/nwsb_coin_fly.dart';
+import '../../widgets/restyle_kit.dart';
 import '../../data/app_control.dart';
 import '../economy/economy_api.dart';
 import '../programs/program_kit.dart';
@@ -42,50 +43,8 @@ class _DrawPage extends StatelessWidget {
   final Future<void> Function()? onRefresh;
 
   @override
-  Widget build(BuildContext context) {
-    final list = ListView(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 40),
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: children,
-    );
-    return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const AppBackdrop(),
-          const ColoredBox(color: Color(0x99000000)),
-          SafeArea(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 56,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        tooltip: 'Back',
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigator.of(context).maybePop(),
-                      ),
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: onRefresh == null ? list : RefreshIndicator(onRefresh: onRefresh!, child: list),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      KitPage(eyebrow: 'Rewards', title: title, onRefresh: onRefresh, children: children);
 }
 
 class _Pill extends StatelessWidget {
@@ -95,30 +54,22 @@ class _Pill extends StatelessWidget {
   final bool primary;
   final bool busy;
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 48,
-    child: FilledButton(
-      style: FilledButton.styleFrom(
-        backgroundColor: primary ? NwsbColors.gold : Colors.white12,
-        foregroundColor: primary ? Colors.black : Colors.white,
-        disabledBackgroundColor: Colors.white12,
-        shape: const StadiumBorder(),
-      ),
-      onPressed: busy ? null : onTap,
-      child: busy
-          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-          : Text(label, style: const TextStyle(fontWeight: FontWeight.w800)),
-    ),
-  );
+  Widget build(BuildContext context) => KitActionPill(label, onTap: onTap, primary: primary, busy: busy);
 }
+
+/// Side padding for loose rows between panes.
+Widget _side(Widget child) => Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), child: child);
 
 class _ErrorCard extends StatelessWidget {
   const _ErrorCard(this.text, this.onRetry);
   final String text;
   final VoidCallback onRetry;
   @override
-  Widget build(BuildContext context) => PCard(
-    children: [
+  Widget build(BuildContext context) => KitPane(
+    eyebrow: 'Something went wrong',
+    title: 'Not loaded',
+    mark: NwsbMarks.shield,
+    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Row(
         children: [
           const Icon(Icons.error_outline, color: Color(0xFFFF6B6B)),
@@ -130,7 +81,7 @@ class _ErrorCard extends StatelessWidget {
       ),
       const SizedBox(height: 12),
       _Pill('Try again', onTap: onRetry, primary: false),
-    ],
+    ]),
   );
 }
 
@@ -141,24 +92,17 @@ class _ComingSoon extends StatelessWidget {
   Widget build(BuildContext context) => const _DrawPage(
     title: 'Lucky draw',
     children: [
-      PCard(
-        children: [
-          Text(
-            'DAILY LUCKY DRAW',
-            style: TextStyle(color: NwsbColors.gold, letterSpacing: 1.4, fontSize: 11, fontWeight: FontWeight.w800),
-          ),
-          SizedBox(height: 6),
-          Text(
-            'Coming soon',
-            key: Key('draw-coming-soon'),
-            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-          ),
-          SizedBox(height: 8),
+      KitPane(
+        key: Key('draw-coming-soon'),
+        eyebrow: 'Daily lucky draw',
+        title: 'Coming soon',
+        mark: NwsbMarks.gift,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
             'The free daily draw isn\'t open yet. It will show up here when it is.',
-            style: TextStyle(color: NwsbColors.mist, height: 1.4),
+            style: TextStyle(color: kKitMuted, height: 1.4),
           ),
-        ],
+        ]),
       ),
     ],
   );
@@ -286,7 +230,7 @@ class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
       children.add(
         const Padding(
           padding: EdgeInsets.only(top: 80),
-          child: Center(child: CircularProgressIndicator(color: NwsbColors.gold)),
+          child: Center(child: CircularProgressIndicator(color: Colors.white)),
         ),
       );
     } else if (_error != null && s == null) {
@@ -301,51 +245,26 @@ class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
     final result = s.result;
     final odds = s.oddsLine;
     return [
-      PCard(
-        glow: NwsbColors.gold,
-        children: [
-          const Row(
-            children: [
-              NwsbCoinDisc(size: 48),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'DAILY LUCKY DRAW',
-                      style: TextStyle(
-                        color: NwsbColors.gold,
-                        letterSpacing: 1.4,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Win a gift or a coupon',
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+      KitHero(
+        key: const ValueKey('draw-hero'),
+        art: const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1C1C22), Color(0xFF0A0A0D)]),
           ),
-          const SizedBox(height: 12),
-          const Text('Free to enter. No purchase or coins needed.', style: TextStyle(color: Colors.white, height: 1.4)),
-          if (odds.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(
-              odds,
-              key: const Key('draw-odds'),
-              style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700),
-            ),
-          ],
+          child: Center(child: NwsbCoinDisc(size: 76)),
+        ),
+        cornerLabel: 'Free',
+        eyebrow: 'Daily lucky draw',
+        title: 'Win a gift or a coupon',
+        subline: 'Free to enter. No purchase or coins needed.',
+        footer: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (odds.isNotEmpty)
+            Text(odds, key: const Key('draw-odds'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
           if (s.closesAt != null && !s.entered && s.open) ...[
-            const SizedBox(height: 6),
-            Text('Entries close ${_when(s.closesAt)}', style: const TextStyle(color: NwsbColors.mist, fontSize: 13)),
+            const SizedBox(height: 4),
+            Text('Entries close ${_when(s.closesAt)}', style: const TextStyle(color: kKitMuted, fontSize: 13)),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 12),
           if (result != null)
             _resultView(result)
           else if (s.entered)
@@ -357,52 +276,53 @@ class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
               style: const TextStyle(color: Color(0xFF6FE3C1), fontWeight: FontWeight.w700),
             )
           else if (!s.open)
-            const Text('Today\'s draw is closed. Come back tomorrow.', style: TextStyle(color: NwsbColors.mist))
+            const Text('Today\'s draw is closed. Come back tomorrow.', style: TextStyle(color: kKitMuted))
           else
             _Pill('Enter free', onTap: _enter, busy: _entering),
           if (_enterError != null) ...[
             const SizedBox(height: 8),
             Text(_enterError!, style: const TextStyle(color: Color(0xFFFF6B6B), fontSize: 13)),
           ],
-        ],
+        ]),
       ),
-      if (s.prizes.isNotEmpty) ...[
-        const PHeading('Today', 'Prizes in the draw', slot: 'draw.prizes'),
-        PCard(
-          children: [
+      if (s.prizes.isNotEmpty)
+        KitPane(
+          eyebrow: 'Today',
+          title: 'Prizes in the draw',
+          mark: NwsbMarks.gift,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             for (final p in s.prizes)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
+                padding: const EdgeInsets.symmetric(vertical: 7),
                 child: Row(
                   children: [
-                    Icon(
-                      p.kind == 'coupon' ? Icons.confirmation_number_outlined : Icons.card_giftcard,
-                      color: NwsbColors.gold,
-                    ),
+                    KitIconBadge(p.kind == 'coupon' ? Icons.confirmation_number_outlined : Icons.card_giftcard),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            p.title,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                          ),
-                          if (p.detail.isNotEmpty)
-                            Text(p.detail, style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+                          Text(p.title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                          if (p.detail.isNotEmpty) Text(p.detail, style: const TextStyle(color: kKitMuted, fontSize: 12)),
                         ],
                       ),
                     ),
-                    PPill('Prize', color: NwsbColors.goldLight),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: const ShapeDecoration(
+                        color: Color(0x24FFFFFF),
+                        shape: StadiumBorder(side: BorderSide(color: Color(0x40FFFFFF))),
+                      ),
+                      child: const Text('Prize', style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w700)),
+                    ),
                   ],
                 ),
               ),
             const SizedBox(height: 6),
-            const Text('Prizes have no cash value.', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
-          ],
+            const Text('Prizes have no cash value.', style: TextStyle(color: kKitMuted, fontSize: 12)),
+          ]),
         ),
-      ],
-      Row(
+      _side(Row(
         children: [
           Expanded(child: _Pill('Winners', onTap: _winners, primary: false)),
           const SizedBox(width: 10),
@@ -414,7 +334,7 @@ class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
             ),
           ),
         ],
-      ),
+      )),
     ];
   }
 
@@ -423,7 +343,7 @@ class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
       return const Text(
         'Not this time. A new free draw opens tomorrow.',
         key: Key('draw-lost'),
-        style: TextStyle(color: NwsbColors.mist, fontWeight: FontWeight.w700),
+        style: TextStyle(color: kKitMuted, fontWeight: FontWeight.w700),
       );
     }
     return Column(
@@ -612,50 +532,41 @@ class _LuckyDrawWinnersScreenState extends State<_LuckyDrawWinnersScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    final children = <Widget>[const PHeading('Lucky draw', 'Recent winners', slot: 'draw.winners')];
+    final rows = <Widget>[];
     if (_loading && _winners.isEmpty) {
-      children.add(
+      rows.add(
         const Padding(
-          padding: EdgeInsets.only(top: 60),
-          child: Center(child: CircularProgressIndicator(color: NwsbColors.gold)),
+          padding: EdgeInsets.symmetric(vertical: 40),
+          child: Center(child: CircularProgressIndicator(color: Colors.white)),
         ),
       );
     } else if (_error != null && _winners.isEmpty) {
-      children.add(_ErrorCard(_errText(_error!), () => _load(reset: true)));
+      return _DrawPage(title: 'Winners', onRefresh: () => _load(reset: true), children: [_ErrorCard(_errText(_error!), () => _load(reset: true))]);
     } else if (_winners.isEmpty) {
-      children.add(
-        const PCard(
-          children: [
-            PEmpty('No winners yet. The first winners show here after the next draw.', slot: 'draw.winners.empty'),
-          ],
-        ),
-      );
+      rows.add(const PEmpty('No winners yet. The first winners show here after the next draw.', slot: 'draw.winners.empty'));
     } else {
-      for (final w in _winners) {
-        children.add(
-          PCard(
+      for (var i = 0; i < _winners.length; i++) {
+        final w = _winners[i];
+        if (i > 0) rows.add(const Divider(height: 22, color: Color(0x1AFFFFFF)));
+        rows.add(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.emoji_events_outlined, color: NwsbColors.gold),
-                  const SizedBox(width: 10),
+                  const KitIconBadge(Icons.emoji_events_outlined),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          w.displayName,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-                        ),
-                        Text(w.prizeTitle, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 13)),
+                        Text(w.displayName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                        Text(w.prizeTitle, style: const TextStyle(color: kKitMuted, fontSize: 13)),
                       ],
                     ),
                   ),
                   if (w.wonAt != null)
-                    Text(
-                      shortDate(w.wonAt!.millisecondsSinceEpoch),
-                      style: const TextStyle(color: NwsbColors.mist, fontSize: 12),
-                    ),
+                    Text(shortDate(w.wonAt!.millisecondsSinceEpoch), style: const TextStyle(color: kKitMuted, fontSize: 12)),
                 ],
               ),
               if (w.review != null && w.review!.text.isNotEmpty) ...[
@@ -663,8 +574,7 @@ class _LuckyDrawWinnersScreenState extends State<_LuckyDrawWinnersScreenBody> {
                 if ((w.review!.stars ?? 0) > 0)
                   Row(
                     children: [
-                      for (var i = 0; i < w.review!.stars!.clamp(0, 5); i++)
-                        const Icon(Icons.star, size: 16, color: NwsbColors.gold),
+                      for (var i = 0; i < w.review!.stars!.clamp(0, 5); i++) const Icon(Icons.star, size: 16, color: NwsbColors.gold),
                     ],
                   ),
                 Text('“${w.review!.text}”', style: const TextStyle(color: Colors.white, height: 1.4)),
@@ -673,10 +583,16 @@ class _LuckyDrawWinnersScreenState extends State<_LuckyDrawWinnersScreenBody> {
           ),
         );
       }
-      if (_more) {
-        children.add(_Pill('Load more', primary: false, busy: _loading, onTap: () => _load()));
-      }
     }
+    final children = <Widget>[
+      KitPane(
+        eyebrow: 'Lucky draw',
+        title: 'Recent winners',
+        mark: NwsbMarks.rewards,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows),
+      ),
+      if (_more && _winners.isNotEmpty) _side(_Pill('Load more', primary: false, busy: _loading, onTap: () => _load())),
+    ];
     return _DrawPage(title: 'Winners', onRefresh: () => _load(reset: true), children: children);
   }
 }
