@@ -13,12 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../admin/template/editable.dart';
-import '../../theme/tokens.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/swipe_away.dart';
 import 'coin_collect.dart' show CoinDay;
-import 'reward_fx.dart' show ConfettiBurst;
 
 class RewardOverlay {
   RewardOverlay._();
@@ -150,7 +148,8 @@ class CoinPillAnchor {
   }
 }
 
-/// The premium glass "You won" card.
+/// The "You won" card: the NowssB Store black card look (liked pages),
+/// a white badge for the prize and a white Collect pill.
 class YouWonCard extends StatefulWidget {
   const YouWonCard({super.key, required this.title, required this.items, this.rarity});
   final String title;
@@ -161,20 +160,11 @@ class YouWonCard extends StatefulWidget {
   State<YouWonCard> createState() => _YouWonCardState();
 }
 
-class _YouWonCardState extends State<YouWonCard> with SingleTickerProviderStateMixin {
-  late final AnimationController _glow =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 2400))..repeat();
-
+class _YouWonCardState extends State<YouWonCard> {
   @override
   void initState() {
     super.initState();
     HapticFeedback.mediumImpact();
-  }
-
-  @override
-  void dispose() {
-    _glow.dispose();
-    super.dispose();
   }
 
   bool get _nothing => widget.items.every((i) => '${i['type']}' == 'none');
@@ -186,61 +176,36 @@ class _YouWonCardState extends State<YouWonCard> with SingleTickerProviderStateM
     return '${widget.items.length} prizes';
   }
 
-  Color get _tone => switch ((widget.rarity ?? '').toLowerCase()) {
-        'rare' => const Color(0xFF7FB7FF),
-        'epic' => const Color(0xFFC08BFF),
-        'legendary' => const Color(0xFFFFC857),
-        'mythic' => const Color(0xFFFF6FA8),
-        _ => NwsbColors.gold,
-      };
-
   @override
   Widget build(BuildContext context) {
-    final tone = _tone;
+    final rarity = (widget.rarity ?? '').trim();
     return Material(
       color: Colors.transparent,
-      child: Stack(children: [
-        if (!_nothing) Positioned.fill(child: ConfettiBurst(color: tone, count: 80)),
-        Center(
+      child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 360),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(22),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
-                child: AnimatedBuilder(
-                  animation: _glow,
-                  builder: (context, child) {
-                    final t = _glow.value;
-                    return Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        gradient: LinearGradient(
-                          begin: Alignment(-1 + 2 * t, -1),
-                          end: Alignment(1 + 2 * t, 1),
-                          colors: [
-                            const Color(0x33FFFFFF),
-                            tone.withValues(alpha: 0.16),
-                            const Color(0x14FFFFFF),
-                          ],
-                        ),
-                        border: Border.all(color: tone.withValues(alpha: 0.55), width: 1.2),
-                        boxShadow: [BoxShadow(color: tone.withValues(alpha: 0.28), blurRadius: 40)],
-                      ),
-                      child: child,
-                    );
-                  },
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xF0111114),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(color: const Color(0x1AFFFFFF)),
+                    boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 30, offset: Offset(0, 12))],
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(22, 24, 22, 14),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         EditableLabel('reward_overlay.YouWonCard', _nothing ? 'NO PRIZE' : 'YOU WON',
-                            style: TextStyle(color: tone, letterSpacing: 3.2, fontSize: 11, fontWeight: FontWeight.w800)),
+                            style: const TextStyle(color: Color(0xB3FFFFFF), letterSpacing: 2.4, fontSize: 10.5, fontWeight: FontWeight.w700)),
                         const SizedBox(height: 12),
-                        _Medal(tone: tone, items: widget.items),
+                        _Medal(items: widget.items),
                         const SizedBox(height: 14),
                         Text(_headline,
                             textAlign: TextAlign.center,
@@ -249,6 +214,12 @@ class _YouWonCardState extends State<YouWonCard> with SingleTickerProviderStateM
                         EditableLabel('reward_overlay.YouWonCard', widget.title,
                             textAlign: TextAlign.center,
                             style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13)),
+                        if (rarity.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          Text(rarity.toUpperCase(),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 1.6, fontWeight: FontWeight.w700)),
+                        ],
                         if (widget.items.length > 1) ...[
                           const SizedBox(height: 12),
                           for (final i in widget.items)
@@ -266,14 +237,14 @@ class _YouWonCardState extends State<YouWonCard> with SingleTickerProviderStateM
                           width: double.infinity,
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              backgroundColor: tone,
-                              foregroundColor: Colors.black,
+                              backgroundColor: Colors.white,
+                              foregroundColor: const Color(0xFF0B0B10),
                               padding: const EdgeInsets.symmetric(vertical: 13),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                             ),
                             onPressed: () => Navigator.of(context).pop(),
                             child: EditableLabel('reward_overlay.YouWonCard', _nothing ? 'Okay' : 'Collect',
-                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Colors.black)),
+                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF0B0B10))),
                           ),
                         ),
                       ],
@@ -285,14 +256,12 @@ class _YouWonCardState extends State<YouWonCard> with SingleTickerProviderStateM
           ),
         ),
       ),
-      ]),
     );
   }
 }
 
 class _Medal extends StatelessWidget {
-  const _Medal({required this.tone, required this.items});
-  final Color tone;
+  const _Medal({required this.items});
   final List<Map<String, dynamic>> items;
 
   @override
@@ -302,16 +271,7 @@ class _Medal extends StatelessWidget {
       duration: const Duration(milliseconds: 900),
       curve: Curves.elasticOut,
       builder: (context, v, child) => Transform.scale(scale: 0.4 + 0.6 * v, child: child),
-      child: Container(
-        width: 96,
-        height: 96,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(colors: [tone.withValues(alpha: 0.55), tone.withValues(alpha: 0.05)]),
-        ),
-        child: _ItemMark(item: items.first, size: 64),
-      ),
+      child: SizedBox(width: 96, height: 96, child: Center(child: _ItemMark(item: items.first, size: 72))),
     );
   }
 }

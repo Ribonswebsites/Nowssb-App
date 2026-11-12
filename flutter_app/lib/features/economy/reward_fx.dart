@@ -274,10 +274,9 @@ class RewardItemTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: const Color(0xF2050507),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: rarity.isEmpty ? const Color(0x33FFFFFF) : rarityColor(rarity), width: 1.2),
-          boxShadow: rarity.isEmpty ? null : [BoxShadow(color: rarityColor(rarity).withValues(alpha: 0.35), blurRadius: 18)],
+          border: Border.all(color: const Color(0x1AFFFFFF)),
         ),
         child: Row(
           children: [
@@ -307,42 +306,73 @@ class RewardItemTile extends StatelessWidget {
 class RewardItemsSheet {
   static Future<void> show(BuildContext context, {required String title, required List<Map<String, dynamic>> items}) {
     RewardHaptics.pop();
-    final party = items.any((i) => rarityParty('${i['rarity'] ?? ''}'));
     return RewardOverlay.enqueue((nav) => nav.push<void>(RawDialogRoute<void>(
       barrierDismissible: true,
       barrierLabel: 'close',
       barrierColor: const Color(0xC8000000),
-      pageBuilder: (context, _, __) => Stack(
-        children: [
-          if (party) const Positioned.fill(child: ConfettiBurst(color: Color(0xFFC08BFF))),
-          Center(
-            child: Material(
-              color: Colors.transparent,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 380),
-                child: GlassWrap(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      EditableLabel('reward_fx.RewardItemsSheet', title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-                      const SizedBox(height: 14),
-                      for (var i = 0; i < items.length; i++) RewardItemTile(item: items[i], delayMs: i * 140),
-                      const SizedBox(height: 6),
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child: const EditableLabel('reward_fx.RewardItemsSheet', 'Lovely', style: TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w700)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+      pageBuilder: (context, _, __) => Center(child: RewardItemsCard(title: title, items: items)),
     )));
   }
+}
+
+/// The card [RewardItemsSheet] shows: a glass pane with a title, one dark
+/// tile per item and a white "Lovely" pill that closes it.
+class RewardItemsCard extends StatelessWidget {
+  const RewardItemsCard({super.key, required this.title, required this.items});
+  final String title;
+  final List<Map<String, dynamic>> items;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Colors.transparent,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 380),
+          child: GlassWrap(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text('REWARDS',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                EditableLabel('reward_fx.RewardItemsSheet', title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 14),
+                for (var i = 0; i < items.length; i++) RewardItemTile(item: items[i], delayMs: i * 140),
+                const SizedBox(height: 6),
+                _WhitePill(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const EditableLabel('reward_fx.RewardItemsSheet', 'Lovely', style: TextStyle(color: Color(0xFF0B0B10), fontWeight: FontWeight.w800)),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+}
+
+/// The white full-width pill of the liked pages (dark label inside).
+class _WhitePill extends StatelessWidget {
+  const _WhitePill({required this.onPressed, required this.child});
+  final VoidCallback? onPressed;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        width: double.infinity,
+        child: TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Colors.white,
+            disabledBackgroundColor: const Color(0x24FFFFFF),
+            foregroundColor: const Color(0xFF0B0B10),
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            shape: const StadiumBorder(),
+          ),
+          onPressed: onPressed,
+          child: child,
+        ),
+      );
 }
 
 /* ── gift box / chest opening ── */
@@ -368,7 +398,6 @@ class GiftBoxOpening extends StatefulWidget {
 class _GiftBoxOpeningState extends State<GiftBoxOpening> with TickerProviderStateMixin {
   late final AnimationController _shake = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
   late final AnimationController _open = AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
-  late final AnimationController _rays = AnimationController(vsync: this, duration: const Duration(seconds: 8))..repeat();
   bool _opened = false;
 
   Color get _tone => switch (widget.box) {
@@ -402,7 +431,6 @@ class _GiftBoxOpeningState extends State<GiftBoxOpening> with TickerProviderStat
   void dispose() {
     _shake.dispose();
     _open.dispose();
-    _rays.dispose();
     super.dispose();
   }
 
@@ -410,18 +438,10 @@ class _GiftBoxOpeningState extends State<GiftBoxOpening> with TickerProviderStat
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          AnimatedBuilder(
-            animation: Listenable.merge([_rays, _open]),
-            builder: (context, _) => Opacity(
-              opacity: _open.value,
-              child: Transform.rotate(angle: _rays.value * 2 * math.pi, child: CustomPaint(size: const Size(520, 520), painter: _RaysPainter(_tone))),
-            ),
-          ),
-          if (_opened) Positioned.fill(child: ConfettiBurst(color: _tone, count: 70)),
-          Column(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 380),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               AnimatedBuilder(
@@ -437,7 +457,6 @@ class _GiftBoxOpeningState extends State<GiftBoxOpening> with TickerProviderStat
                       child: Stack(
                         alignment: Alignment.bottomCenter,
                         children: [
-                          // body
                           Container(
                             width: 140,
                             height: 104,
@@ -448,7 +467,6 @@ class _GiftBoxOpeningState extends State<GiftBoxOpening> with TickerProviderStat
                             ),
                             child: Center(child: Container(width: widget.chest ? 140 : 20, height: widget.chest ? 14 : 104, color: Colors.black.withValues(alpha: 0.25))),
                           ),
-                          // lid
                           Positioned(
                             bottom: 96 + 60 * lift,
                             child: Transform.rotate(
@@ -468,58 +486,36 @@ class _GiftBoxOpeningState extends State<GiftBoxOpening> with TickerProviderStat
                 },
               ),
               const SizedBox(height: 18),
-              EditableLabel('reward_fx.GiftBoxOpening', widget.title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 12),
-              AnimatedOpacity(
-                opacity: _opened ? 1 : 0,
-                duration: const Duration(milliseconds: 400),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 360),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 22),
-                    child: Column(
-                      children: [
-                        if (_opened)
-                          for (var i = 0; i < widget.items.length; i++) RewardItemTile(item: widget.items[i], delayMs: 300 + i * 160),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: _opened ? () => Navigator.of(context).pop() : null,
-                          child: const EditableLabel('reward_fx.GiftBoxOpening', 'Collect', style: TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w800, fontSize: 16)),
-                        ),
-                      ],
-                    ),
+              if (!_opened)
+                EditableLabel('reward_fx.GiftBoxOpening', widget.title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800))
+              else
+                GlassWrap(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Text('REWARDS',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 4),
+                      EditableLabel('reward_fx.GiftBoxOpening', widget.title, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 14),
+                      for (var i = 0; i < widget.items.length; i++) RewardItemTile(item: widget.items[i], delayMs: 300 + i * 160),
+                      const SizedBox(height: 8),
+                      _WhitePill(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const EditableLabel('reward_fx.GiftBoxOpening', 'Collect', style: TextStyle(color: Color(0xFF0B0B10), fontWeight: FontWeight.w800, fontSize: 16)),
+                      ),
+                    ],
                   ),
                 ),
-              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
-}
-
-class _RaysPainter extends CustomPainter {
-  _RaysPainter(this.color);
-  final Color color;
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = size.center(Offset.zero);
-    final p = Paint()
-      ..shader = RadialGradient(colors: [color.withValues(alpha: 0.35), color.withValues(alpha: 0)]).createShader(Rect.fromCircle(center: c, radius: size.width / 2));
-    for (var i = 0; i < 14; i++) {
-      final a = i * math.pi * 2 / 14;
-      final path = Path()
-        ..moveTo(c.dx, c.dy)
-        ..lineTo(c.dx + math.cos(a - 0.09) * size.width / 2, c.dy + math.sin(a - 0.09) * size.width / 2)
-        ..lineTo(c.dx + math.cos(a + 0.09) * size.width / 2, c.dy + math.sin(a + 0.09) * size.width / 2)
-        ..close();
-      canvas.drawPath(path, p);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_RaysPainter old) => false;
 }
 
 /// A calm card for when the server is not switched on yet.
@@ -536,7 +532,7 @@ class SwitchingOnCard extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 12),
           child: Row(
             children: const [
-              NwsbIcon(NwsbMarks.word, color: NwsbColors.gold, size: 22),
+              NwsbIcon(NwsbMarks.word, color: Colors.white, size: 22),
               SizedBox(width: 10),
               Expanded(
                 child: EditableLabel(
