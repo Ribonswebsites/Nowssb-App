@@ -14,6 +14,10 @@ import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import 'progress_center.dart';
+import 'progress_kit.dart' show GoalMarks;
+import 'progress_sources.dart';
+import 'today_progress_screen.dart';
+import '../../widgets/nwsb_icon.dart';
 
 /// Hero-header glass (GlassWrap tokens) with a deeper blur and a light dark
 /// tint so white text reads over any page.
@@ -436,6 +440,8 @@ class ProgressPanel extends StatelessWidget {
   final ProgressCenter? center;
 
   static Future<void> open(BuildContext context) {
+    ProgressSources.instance.sync();
+    unawaited(ProgressSources.instance.refresh());
     return showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
@@ -472,8 +478,19 @@ class ProgressPanel extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
                 child: Row(children: [
                   Text('PROGRESS', style: _ink.copyWith(fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
-                  const Spacer(),
-                  Text('$done of ${items.length} today', style: _ink.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xB3FFFFFF))),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text('$done of ${items.length} today',
+                        key: const ValueKey('progress-panel-count'),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: _ink.copyWith(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xB3FFFFFF))),
+                  ),
+                  _ViewAll(onTap: () {
+                    final nav = Navigator.of(context);
+                    if (ModalRoute.of(context) is PopupRoute) nav.pop();
+                    nav.push(MaterialPageRoute<void>(builder: (_) => const TodayProgressScreen()));
+                  }),
                 ]),
               ),
               GridView(
@@ -482,7 +499,7 @@ class ProgressPanel extends StatelessWidget {
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
-                children: [for (final e in items) _Tile(item: e)],
+                children: [for (final e in items) _Tile(item: e, onTap: () => ProgressRoutes.open(context, e.kind))],
               ),
             ]);
           },
@@ -492,24 +509,202 @@ class ProgressPanel extends StatelessWidget {
   }
 }
 
-class _Tile extends StatelessWidget {
-  const _Tile({required this.item});
+class _Tile extends StatefulWidget {
+  const _Tile({required this.item, required this.onTap});
   final ProgressItem item;
+  final VoidCallback onTap;
+  @override
+  State<_Tile> createState() => _TileState();
+}
+
+class _TileState extends State<_Tile> {
+  var _down = false;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-      decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x1FFFFFFF))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Row(children: [
-          SizedBox(width: 22, height: 22, child: ProgressDoneAnim(kind: item.kind, progress: item.complete ? 1 : 0.35)),
+    final item = widget.item;
+    final hint = item.kind == ProgressKind.checkin && !item.complete ? 'Tap to check in' : item.complete ? 'Done' : 'Open';
+    return Semantics(
+      button: true,
+      label: '${item.title} ${item.done.clamp(0, item.total)} of ${item.total}',
+      child: GestureDetector(
+        key: ValueKey('progress-tile-${item.kind.name}'),
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) => setState(() => _down = true),
+        onTapCancel: () => setState(() => _down = false),
+        onTapUp: (_) => setState(() => _down = false),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          widget.onTap();
+        },
+        child: AnimatedScale(
+          scale: _down ? 0.96 : 1,
+          duration: const Duration(milliseconds: 110),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+            decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x1FFFFFFF))),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Row(children: [
+                NwsbIcon(goalMark(item.kind), size: 20, color: item.complete ? NwsbColors.goldLight : Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: _ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700))),
+                const Icon(Icons.chevron_right_rounded, size: 16, color: Color(0x80FFFFFF)),
+              ]),
+              Row(children: [
+                Text('${item.done.clamp(0, item.total)}/${item.total}',
+                    key: ValueKey('progress-count-${item.kind.name}'),
+                    style: _ink.copyWith(fontSize: 11, fontWeight: FontWeight.w800, color: item.complete ? NwsbColors.goldLight : const Color(0xB3FFFFFF))),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(hint,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.right,
+                      style: _ink.copyWith(fontSize: 10.5, fontWeight: FontWeight.w600, color: const Color(0x80FFFFFF))),
+                ),
+              ]),
+              ProgressBarLine(value: item.value, height: 6),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ViewAll extends StatelessWidget {
+  const _ViewAll({required this.onTap});
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Material(
+        color: NwsbColors.goldLight,
+        shape: const StadiumBorder(),
+        child: InkWell(
+          key: const ValueKey('progress-view-all'),
+          customBorder: const StadiumBorder(),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            onTap();
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 6, 9, 6),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('View all', style: _ink.copyWith(color: Colors.black, fontSize: 11.5, fontWeight: FontWeight.w800)),
+              const SizedBox(width: 2),
+              const Icon(Icons.chevron_right_rounded, size: 16, color: Colors.black),
+            ]),
+          ),
+        ),
+      );
+}
+
+/// "Today 0/5" — the button that opens the Progress pop-up. [light] is the
+/// raised white neumorphic pill of the normal home; otherwise it is the
+/// Zen home's dark glass (GlassWrap tokens). Presses in on touch.
+class TodayProgressButton extends StatefulWidget {
+  const TodayProgressButton({super.key, this.light = true, this.compact = false, this.center});
+  final bool light;
+
+  /// Stacked tile (mark over "Today" over the count) for tight spots such
+  /// as the right side of the Zen home's Begin Your Healing Path banner.
+  final bool compact;
+  final ProgressCenter? center;
+  @override
+  State<TodayProgressButton> createState() => _TodayProgressButtonState();
+}
+
+class _TodayProgressButtonState extends State<TodayProgressButton> {
+  var _down = false;
+
+  ProgressCenter get _c => widget.center ?? ProgressCenter.instance;
+
+  void _set(bool v) {
+    if (_down != v) setState(() => _down = v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final light = widget.light;
+    return ListenableBuilder(
+      listenable: _c,
+      builder: (context, _) {
+        final items = _c.items;
+        final done = items.where((e) => e.complete).length;
+        final ink = light ? NwsbColors.ink : Colors.white;
+        final sub = light ? const Color(0x8C1A1A2E) : const Color(0xB3FFFFFF);
+        final mark = Container(
+          width: 26,
+          height: 26,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: light ? NwsbColors.ink : NwsbColors.goldLight,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: NwsbIcon(GoalMarks.check, size: 16, strokeWidth: 2, color: light ? Colors.white : Colors.black),
+        );
+        final count = Text('$done/${items.length} done',
+            key: const ValueKey('today-button-count'),
+            maxLines: 1,
+            style: TextStyle(color: sub, fontSize: 10.5, fontWeight: FontWeight.w700, height: 1.2, decoration: TextDecoration.none));
+        final body = widget.compact
+            ? Column(mainAxisSize: MainAxisSize.min, children: [
+                mark,
+                const SizedBox(height: 6),
+                Text('Today', style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
+                const SizedBox(height: 1),
+                count,
+              ])
+            : Row(mainAxisSize: MainAxisSize.min, children: [
+          mark,
           const SizedBox(width: 8),
-          Expanded(child: Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: _ink.copyWith(fontSize: 12.5, fontWeight: FontWeight.w700))),
-        ]),
-        Text('${item.done.clamp(0, item.total)}/${item.total}${item.complete ? ' · done' : ''}',
-            style: _ink.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xB3FFFFFF))),
-        ProgressBarLine(value: item.value, height: 6),
-      ]),
+          Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Today', style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
+            count,
+          ]),
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right_rounded, size: 18, color: sub),
+        ]);
+        final r = BorderRadius.circular(widget.compact ? 18 : 999);
+        final pill = AnimatedContainer(
+          duration: const Duration(milliseconds: 120),
+          padding: widget.compact ? const EdgeInsets.fromLTRB(10, 10, 10, 9) : const EdgeInsets.fromLTRB(6, 6, 8, 6),
+          decoration: light
+              ? BoxDecoration(
+                  color: _down ? NwsbColors.surfaceDim : NwsbColors.surface,
+                  borderRadius: r,
+                  boxShadow: _down
+                      ? const [BoxShadow(color: Color(0x1A000000), offset: Offset(1, 1), blurRadius: 3)]
+                      : NwsbShadows.raisedSm,
+                )
+              : BoxDecoration(
+                  color: _down ? const Color(0x33FFFFFF) : GlassWrap.fill,
+                  borderRadius: r,
+                  border: Border.all(color: const Color(0x33FFFFFF)),
+                ),
+          child: body,
+        );
+        final glass = light
+            ? pill
+            : ClipRRect(
+                borderRadius: r,
+                child: BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: GlassWrap.blurSigma, sigmaY: GlassWrap.blurSigma), child: pill),
+              );
+        return Semantics(
+          button: true,
+          label: 'Today\'s progress, $done of ${items.length} done',
+          child: GestureDetector(
+            key: const ValueKey('today-progress-button'),
+            behavior: HitTestBehavior.opaque,
+            onTapDown: (_) => _set(true),
+            onTapCancel: () => _set(false),
+            onTapUp: (_) => _set(false),
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              ProgressPanel.open(context);
+            },
+            child: AnimatedScale(scale: _down ? 0.94 : 1, duration: const Duration(milliseconds: 110), child: glass),
+          ),
+        );
+      },
     );
   }
 }

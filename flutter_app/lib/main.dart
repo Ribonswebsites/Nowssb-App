@@ -55,6 +55,7 @@ import 'widgets/motion.dart';
 import 'widgets/notification_popup.dart';
 import 'widgets/update_prompt.dart';
 import 'features/progress/progress_popup.dart';
+import 'features/progress/progress_sources.dart';
 import 'shell/nav_shell.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
@@ -90,6 +91,9 @@ Future<void> main() async {
   await CartBag.instance.load();
   await EarnWallet.instance.start();
   await EconomyMirror.instance.start();
+  // Today's five goals read their real counts (tasks, practice, coins,
+  // quest, check-in) from here on.
+  ProgressSources.instance.start();
   await FxBook.instance.start();
   // Google Play subscriptions: listen for purchases Play delivers at launch.
   unawaited(PlaySubscriptions.instance.start());

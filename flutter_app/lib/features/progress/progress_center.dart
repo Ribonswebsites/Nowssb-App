@@ -121,6 +121,28 @@ class ProgressCenter extends ChangeNotifier {
     return fired;
   }
 
+  /// Mirrors a counter read from its store (tasks list, practice sessions,
+  /// the server's today doc…). The first reading of a day is quiet — a goal
+  /// already done when the app opens does not pop up again; a later change
+  /// into complete pops up like [report]. No-op when nothing changed.
+  void sync(ProgressKind kind, int done, int total, {String? key, String subtitle = ''}) {
+    _rollDay();
+    final had = _items[kind];
+    final d = done < 0 ? 0 : done, t = total < 0 ? 0 : total;
+    if (had != null && had.done == d && had.total == t) return;
+    if (had == null) {
+      final item = ProgressItem(kind: kind, title: titles[kind]!, done: d, total: t, subtitle: subtitle);
+      _items[kind] = item;
+      if (item.complete) _fired.add('${kind.name}:${key ?? ''}');
+      notifyListeners();
+      return;
+    }
+    report(kind, d, t, key: key, subtitle: subtitle);
+  }
+
+  /// Goals finished today, for the "x of 5 today" lines and the buttons.
+  int get doneCount => items.where((e) => e.complete).length;
+
   void dismiss() => popup.value = null;
 
   @visibleForTesting

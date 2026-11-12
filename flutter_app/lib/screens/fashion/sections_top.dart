@@ -40,9 +40,9 @@ class FashGreeting extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Same glass as the Fashion Hero header (fashion/hero.dart GlassWrap).
-    final head = GlassWrap(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
+    const head = GlassWrap(
+      margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: EdgeInsets.fromLTRB(16, 16, 14, 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -54,25 +54,27 @@ class FashGreeting extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Flexible(
+                    Flexible(
                       child: EditableLabel('fashion_sections_top.FashGreeting',
                         'Begin Your\nHealing Path',
                         style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: Colors.white, height: 1.12),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Padding(
-                      padding: const EdgeInsets.only(top: 4),
+                      padding: EdgeInsets.only(top: 4),
                       child: NwsbIcon(NwsbMarks.sound, size: 22, color: NwsbColors.goldLight),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                const RotatingSubtitle(),
+                SizedBox(height: 8),
+                RotatingSubtitle(),
               ],
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
+          // Today's goals, same pop-up as the normal home (Ribon, Nov 12).
+          TodayProgressButton(light: false, compact: true),
         ],
       ),
     );

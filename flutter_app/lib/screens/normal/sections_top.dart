@@ -142,11 +142,8 @@ class NmGreeting extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Progress center on the light home: dark disc so the glass icon reads.
-          const DecoratedBox(
-            decoration: BoxDecoration(color: Color(0xFF111111), shape: BoxShape.circle),
-            child: ProgressIconButton(),
-          ),
+          // Today's goals: a raised white pill so it reads as a button.
+          const TodayProgressButton(compact: true),
         ],
       ),
     );
