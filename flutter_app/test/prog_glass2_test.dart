@@ -168,7 +168,7 @@ void main() {
     expect(find.byKey(const ValueKey('prog-glass-eyebrow')), findsOneWidget);
     expect(find.byKey(const ValueKey('prog-glass-title')), findsOneWidget);
     expect(find.text('Your path'), findsOneWidget);
-    expect(find.text('Programmes'), findsOneWidget);
+    expect(find.text('NowssB Earn'), findsOneWidget);
     // Exactly the four programmes; no Zen Plus membership row.
     expect(find.text('PROGRAMME'), findsNWidgets(4));
     expect(find.text('MEMBERSHIP'), findsNothing);
