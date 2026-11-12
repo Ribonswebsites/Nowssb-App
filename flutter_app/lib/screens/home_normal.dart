@@ -52,7 +52,6 @@ import '../widgets/meditation_flip_banner.dart';
 import 'normal/calm_v3.dart';
 import 'normal/home_v4.dart';
 import 'normal/home_v5.dart';
-import '../widgets/concept/normal/fashion_plus_entry_live.dart';
 import '../widgets/concept/normal/footer.dart';
 import '../features/programs/reference_program.dart';
 import 'nwsb_sign_in_sheet.dart';
@@ -435,7 +434,7 @@ class _HomeNormalState extends State<HomeNormal> {
         ('msearch', null),
         (
           'fashsw',
-          const NFashionPlusEntryLive(),
+          const SizedBox.shrink(),
         ),
         ('footer', NFooter(onLink: _footerLink)),
       ];

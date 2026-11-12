@@ -29,6 +29,7 @@ import '../media/video_pool.dart';
 import '../theme/tokens.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/app_destinations.dart';
+import '../widgets/how_it_works_card.dart';
 import '../widgets/glass_list_card.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
@@ -150,6 +151,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
       [
         GlassItemCard(icon: Icons.equalizer_rounded, overline: 'Player', title: 'Player Settings', pill: 'Equalizer, quality, sleep', pillSub: 'How words play', onTap: () => _push(const PlayerSettingsScreen())),
         GlassItemCard(icon: Icons.play_circle_outline_rounded, overline: 'Player', title: 'Player Guide', pill: 'Replay the setup', pillSub: 'A short tour of the player', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
+        GlassItemCard(icon: Icons.help_outline_rounded, overline: 'Practice', title: 'How it works', pill: 'The five steps', pillSub: 'Word, parts, hear, say, score', onTap: () => showHowItWorks(context)),
         GlassItemCard(icon: Icons.auto_awesome_outlined, overline: 'Look', title: 'Zen Plus', pill: s.fashionPlus ? 'Motion on' : 'Still backgrounds', pillSub: 'Moving or still backgrounds', onTap: () => _push(const FashionPlusScreen())),
         GlassItemCard(icon: Icons.dashboard_customize_outlined, overline: 'Navigation', title: 'Quick Access', pill: 'Bottom navigation', pillSub: 'Shape, colour and icons', onTap: () => _push(const QuickAccessScreen())),
         GlassItemCard(icon: Icons.space_bar_rounded, overline: 'Navigation', title: 'Nav Bar', pill: s.navColor == 'glass' ? 'Glass' : 'Black', pillSub: 'Tap to switch glass or black', onTap: _cycleNav),

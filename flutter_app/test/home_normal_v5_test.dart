@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/widgets/concept/normal/ebooks.dart';
 import 'package:nowssb/widgets/concept/normal/edition.dart';
-import 'package:nowssb/widgets/concept/normal/fashion_plus_entry.dart';
 import 'package:nowssb/widgets/concept/normal/footer.dart';
 import 'package:nowssb/widgets/concept/normal/own.dart';
 import 'package:nowssb/widgets/concept/normal/surface.dart';
@@ -34,7 +33,6 @@ List<Widget> _all(List<String> log) => [
       NOwn(onCart: () => log.add('cart'), onWishlist: () => log.add('wish'), onOrders: () => log.add('orders'), cartCount: 2, wishlistCount: 0, orderCount: 1),
       NEdition(onJoin: (t) => log.add('join:$t'), prices: const {}, playAvailable: null),
       NEbooks(onBrowse: () => log.add('ebooks'), books: _books),
-      NFashionPlusEntry(onEnter: () => log.add('fashion')),
       NFooter(onLink: (k) => log.add('foot:$k')),
     ];
 
@@ -51,7 +49,7 @@ void main() {
     }
 
     for (final l in ['Open Om', 'Open Shanti', 'Everything you own',
-        'Join Frequency', 'Browse eBooks', 'Enter Zen Plus']) {
+        'Join Frequency', 'Browse eBooks']) {
       if (_act(l).evaluate().isEmpty) continue;
       await tap(l);
     }
@@ -61,7 +59,7 @@ void main() {
       await tap(l.$1);
     }
     await t.pump(const Duration(seconds: 1));
-    for (final want in ['word:Om', 'word:Shanti', 'join:frequency', 'ebooks', 'fashion', 'library',
+    for (final want in ['word:Om', 'word:Shanti', 'join:frequency', 'ebooks', 'library',
       for (final l in NFooter.links) 'foot:${l.$2}']) {
       expect(log, contains(want), reason: want);
     }

@@ -18,6 +18,7 @@ import '../screens/sound_library.dart';
 import '../screens/store/request_words.dart';
 import '../screens/subscription.dart';
 import '../shell/nav_shell.dart';
+import 'how_it_works_card.dart';
 
 class AppDest {
   const AppDest({
@@ -59,6 +60,7 @@ final List<AppDest> menuDestinations = [
   const AppDest(id: 'library', icon: Icons.library_music_outlined, overline: 'Library', title: 'Everything you can hear', pill: 'Library', sub: 'Saved words, playlists, now playing', tab: 2, keywords: 'saved playlist listen'),
   AppDest(id: 'sound', icon: Icons.graphic_eq_rounded, overline: 'Sound', title: 'Sound Library', pill: 'Root frequencies', sub: 'Tones and frequencies to listen to', page: (_) => const SoundLibraryScreen(), keywords: 'tones frequency healing'),
   AppDest(id: 'science', icon: Icons.science_outlined, overline: 'Learn', title: 'Word Science', pill: 'The NowssB system', sub: 'How Prakrit words carry meaning', page: (_) => const AboutNowssbScreen(science: true), keywords: 'about prakrit learn system'),
+  AppDest(id: 'howitworks', icon: Icons.help_outline_rounded, overline: 'Learn', title: 'How it works', pill: 'The five steps', sub: 'Word, parts, hear, say, score', action: showHowItWorks, keywords: 'how it works guide practice instructions help intro'),
   const AppDest(id: 'store', icon: Icons.shopping_bag_outlined, overline: 'Store', title: 'NowssB Store', pill: 'Words, meanings, eBooks', sub: 'Word Atelier, Meanings and eBooks', tab: 3, keywords: 'buy shop meaning atelier ebooks'),
   AppDest(id: 'plans', icon: Icons.workspace_premium_outlined, overline: 'Plans', title: 'Your plan', pill: 'Resonance, Frequency, Frequency X', sub: 'Compare and change plans', page: (_) => const SubscriptionScreen(), keywords: 'subscription premium upgrade billing'),
   AppDest(id: 'connect', icon: Icons.forum_outlined, overline: 'Community', title: 'NowssB Connect', pill: 'Thoughts, quotes and images', sub: 'Post and read the board', page: (_) => const ConnectScreen(), keywords: 'community post share board'),

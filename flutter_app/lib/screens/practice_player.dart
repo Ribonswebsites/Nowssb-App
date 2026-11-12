@@ -30,6 +30,7 @@ import '../widgets/glass_wrap.dart';
 import '../widgets/nwsb_icon.dart';
 import '../widgets/black_glass_banner.dart';
 import '../widgets/colored_split_promo_banner.dart';
+import '../widgets/how_it_works_card.dart';
 import '../theme/tokens.dart';
 import '../theme/player_aura.dart';
 import 'sound_library.dart';
@@ -4952,7 +4953,54 @@ class _PlayerInfoSheet extends StatelessWidget {
                     value: word.mouthPos,
                     accent: accent,
                   ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
+                Material(
+                  color: const Color(0x28000000),
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    key: const ValueKey('player-how-it-works'),
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () {
+                      final nav = Navigator.of(context, rootNavigator: true);
+                      Navigator.of(context).pop();
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (nav.context.mounted) showHowItWorks(nav.context);
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: const Color(0x28FFFFFF)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.help_outline_rounded, color: Colors.white, size: 18),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'How it works',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            'Five steps',
+                            style: TextStyle(
+                              color: Color(0xB3FFFFFF),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 ColoredSplitPromoBanner(
                   spec: const SplitPromoSpec(
                     title: 'Shop the word\nthat heals.',
