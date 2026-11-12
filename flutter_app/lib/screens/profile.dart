@@ -542,7 +542,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: KitBlackCard(
                         key: const ValueKey('profile-practice-card'),
                         margin: EdgeInsets.zero,
-                        art: KitCutout(SplitPromoSpec.forSurface(SplitPromoSurface.profile).art),
+                        // Word-only art: the old split cut-out was the banned
+                        // red-haired yoga figure, and the ez focus man already
+                        // sits in Your practice mind on this same page.
+                        art: const KitWordArt(word: 'SESSION'),
                         eyebrow: "Today's practice",
                         title: SplitPromoSpec.forSurface(SplitPromoSurface.profile).title.replaceAll('\n', ' '),
                         line: SplitPromoSpec.forSurface(SplitPromoSurface.profile).cta,
