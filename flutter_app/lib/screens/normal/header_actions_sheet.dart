@@ -48,7 +48,6 @@ Future<void> showHeaderActionsSheet(
   required bool glassMode,
   required VoidCallback onGlassToggle,
   required VoidCallback onNotifications,
-  required VoidCallback onFashionHome,
   VoidCallback? onStore,
   VoidCallback? onPlayer,
 }) {
@@ -64,7 +63,6 @@ Future<void> showHeaderActionsSheet(
         glassMode: glassMode,
         onGlassToggle: onGlassToggle,
         onNotifications: onNotifications,
-        onFashionHome: onFashionHome,
         onStore: onStore,
         onPlayer: onPlayer,
       );
@@ -100,7 +98,6 @@ class HeaderActionsSheet extends StatefulWidget {
     required this.glassMode,
     required this.onGlassToggle,
     required this.onNotifications,
-    required this.onFashionHome,
     this.onStore,
     this.onPlayer,
   });
@@ -108,7 +105,6 @@ class HeaderActionsSheet extends StatefulWidget {
   final bool glassMode;
   final VoidCallback onGlassToggle;
   final VoidCallback onNotifications;
-  final VoidCallback onFashionHome;
   final VoidCallback? onStore;
   final VoidCallback? onPlayer;
 
@@ -265,10 +261,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
           widget.onNotifications();
         });
         break;
-      case 'fashion':
-        Navigator.of(context).pop();
-        widget.onFashionHome();
-        break;
       case 'store':
         Navigator.of(context).pop();
         widget.onStore?.call();
@@ -322,8 +314,6 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
         return _glassOn ? 'Glassmorphism on' : 'Glassmorphism off';
       case 'notifications':
         return 'Notifications';
-      case 'fashion':
-        return 'Zen home';
       case 'store':
         return 'Store';
       case 'player':
@@ -645,11 +635,6 @@ class _FlatCarousel extends StatelessWidget {
           badge: badge,
           badgeLabel: badgeLabel,
         );
-      case 'fashion':
-        return _ActionSpec(
-          label: 'Zen',
-          body: NwsbMarks.moon,
-        );
       case 'store':
         return _ActionSpec(
           label: 'Store',
@@ -830,7 +815,6 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
     'store': 'Store',
     'player': 'Player',
     'glass': 'Glassmorphism',
-    'fashion': 'Zen home',
   };
 
   @override

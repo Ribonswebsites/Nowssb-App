@@ -169,7 +169,7 @@ class HowItWorksDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      type: MaterialType.transparency,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -408,276 +408,279 @@ class _HowItWorksCardState extends State<HowItWorksCard>
   @override
   Widget build(BuildContext context) {
     final step = _step;
-    return AnimatedBuilder(
-      animation: Listenable.merge([_loop, _clock]),
-      builder: (context, _) {
-        final t = _loop.value;
-        return Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: _ink,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: const [
-              BoxShadow(
-                  color: Color(0x40000000),
-                  offset: Offset(8, 10),
-                  blurRadius: 22),
-              BoxShadow(
-                  color: Color(0x33000000),
-                  offset: Offset(0, 8),
-                  blurRadius: 24),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(30),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(
-                  key: const ValueKey('how-it-works-well'),
-                  height: 300,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    key: const ValueKey('how-it-works-reel'),
-                    children: [
-                      Listener(
-                        onPointerDown: (_) => _hold(),
-                        onPointerUp: (_) => _release(),
-                        onPointerCancel: (_) => _release(),
-                        child: PageView.builder(
-                          controller: _page,
-                          onPageChanged: (i) {
-                            setState(() => _ix = i);
-                            if (!_touching && !_still) {
-                              _clock.forward(from: 0);
-                            }
-                          },
-                          itemBuilder: (_, i) => ColoredBox(
-                            color: Colors.black,
-                            child: _video(_people[i % _people.length]),
-                          ),
-                        ),
-                      ),
-                      const IgnorePointer(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              stops: [0, .22, .6, 1],
-                              colors: [
-                                Color(0xB3000000),
-                                Color(0x00000000),
-                                Color(0x00000000),
-                                Color(0xF2050505)
-                              ],
+    return Material(
+      type: MaterialType.transparency,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_loop, _clock]),
+        builder: (context, _) {
+          final t = _loop.value;
+          return Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: _ink,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: const [
+                BoxShadow(
+                    color: Color(0x40000000),
+                    offset: Offset(8, 10),
+                    blurRadius: 22),
+                BoxShadow(
+                    color: Color(0x33000000),
+                    offset: Offset(0, 8),
+                    blurRadius: 24),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    key: const ValueKey('how-it-works-well'),
+                    height: 300,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      key: const ValueKey('how-it-works-reel'),
+                      children: [
+                        Listener(
+                          onPointerDown: (_) => _hold(),
+                          onPointerUp: (_) => _release(),
+                          onPointerCancel: (_) => _release(),
+                          child: PageView.builder(
+                            controller: _page,
+                            onPageChanged: (i) {
+                              setState(() => _ix = i);
+                              if (!_touching && !_still) {
+                                _clock.forward(from: 0);
+                              }
+                            },
+                            itemBuilder: (_, i) => ColoredBox(
+                              color: Colors.black,
+                              child: _video(_people[i % _people.length]),
                             ),
                           ),
                         ),
-                      ),
-                      IgnorePointer(
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment(-2 + 4 * t, -1),
-                              end: Alignment(-1 + 4 * t, 1),
-                              colors: const [
-                                Color(0x00FFFFFF),
-                                Color(0x18FFFFFF),
-                                Color(0x00FFFFFF)
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      const IgnorePointer(
-                          child: CustomPaint(painter: _BracketPainter())),
-                      Positioned(
-                        left: 14,
-                        right: 14,
-                        top: 14,
-                        child: Row(children: [
-                          Expanded(
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: _tag('HOW IT WORKS', '0${_who + 1}'),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 7),
+                        const IgnorePointer(
+                          child: DecoratedBox(
                             decoration: BoxDecoration(
-                                color: const Color(0xB3000000),
-                                borderRadius: BorderRadius.circular(30),
-                                border:
-                                    Border.all(color: const Color(0x33FFFFFF))),
-                            child: Text(
-                              '0${_who + 1} / 0${_people.length}',
-                              style: const TextStyle(
-                                  fontFamily: 'DM Sans',
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1.2,
-                                  color: Colors.white),
-                            ),
-                          ),
-                          if (widget.onClose != null) ...[
-                            const SizedBox(width: 8),
-                            GestureDetector(
-                              key: const ValueKey('how-it-works-close'),
-                              onTap: widget.onClose,
-                              behavior: HitTestBehavior.opaque,
-                              child: Container(
-                                width: 34,
-                                height: 34,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xB3000000),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                      color: const Color(0x33FFFFFF)),
-                                ),
-                                alignment: Alignment.center,
-                                child: const Icon(Icons.close_rounded,
-                                    size: 18, color: Colors.white),
-                              ),
-                            ),
-                          ],
-                        ]),
-                      ),
-                      Positioned(left: 14, top: 64, child: _thumbs()),
-                      Positioned(
-                        left: 60,
-                        right: 16,
-                        bottom: 14,
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 420),
-                          transitionBuilder: (c, a) => FadeTransition(
-                            opacity: a,
-                            child: SlideTransition(
-                              position: Tween(
-                                      begin: const Offset(0, .35),
-                                      end: Offset.zero)
-                                  .animate(a),
-                              child: c,
-                            ),
-                          ),
-                          child: Column(
-                            key: ValueKey('how-title-$_who'),
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'How it works',
-                                style: const TextStyle(
-                                    fontFamily: 'DM Sans',
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(0xCCFFFFFF),
-                                    height: 1.1),
-                              ),
-                              Text(
-                                step.title,
-                                style: const TextStyle(
-                                    fontFamily: 'DM Sans',
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.w900,
-                                    color: Colors.white,
-                                    height: 1.08,
-                                    letterSpacing: -.4),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                GlassWrap(
-                  margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-                  radius: 22,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 280),
-                        child: Text(
-                          step.body,
-                          key: ValueKey('how-body-$_who'),
-                          style: const TextStyle(
-                            fontFamily: 'DM Sans',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xE6FFFFFF),
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      _indicator(_clock.value),
-                      const SizedBox(height: 14),
-                      GestureDetector(
-                        key: const ValueKey('how-it-works-cta'),
-                        onTap: _runCta,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(40),
-                          child: Stack(children: [
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 18, vertical: 14),
-                              color: Colors.white,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      step.cta,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontFamily: 'DM Sans',
-                                        fontSize: 14.5,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  const Icon(Icons.arrow_forward_rounded,
-                                      size: 17, color: Colors.black),
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                stops: [0, .22, .6, 1],
+                                colors: [
+                                  Color(0xB3000000),
+                                  Color(0x00000000),
+                                  Color(0x00000000),
+                                  Color(0xF2050505)
                                 ],
                               ),
                             ),
-                            Positioned.fill(
-                              child: IgnorePointer(
-                                child: DecoratedBox(
+                          ),
+                        ),
+                        IgnorePointer(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment(-2 + 4 * t, -1),
+                                end: Alignment(-1 + 4 * t, 1),
+                                colors: const [
+                                  Color(0x00FFFFFF),
+                                  Color(0x18FFFFFF),
+                                  Color(0x00FFFFFF)
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const IgnorePointer(
+                            child: CustomPaint(painter: _BracketPainter())),
+                        Positioned(
+                          left: 14,
+                          right: 14,
+                          top: 14,
+                          child: Row(children: [
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: _tag('HOW IT WORKS', '0${_who + 1}'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 7),
+                              decoration: BoxDecoration(
+                                  color: const Color(0xB3000000),
+                                  borderRadius: BorderRadius.circular(30),
+                                  border: Border.all(
+                                      color: const Color(0x33FFFFFF))),
+                              child: Text(
+                                '0${_who + 1} / 0${_people.length}',
+                                style: const TextStyle(
+                                    fontFamily: 'DM Sans',
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.2,
+                                    color: Colors.white),
+                              ),
+                            ),
+                            if (widget.onClose != null) ...[
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                key: const ValueKey('how-it-works-close'),
+                                onTap: widget.onClose,
+                                behavior: HitTestBehavior.opaque,
+                                child: Container(
+                                  width: 34,
+                                  height: 34,
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment(-2 + 4 * t, -1),
-                                      end: Alignment(-1 + 4 * t, 1),
-                                      colors: const [
-                                        Color(0x00FFFFFF),
-                                        Color(0x66FFFFFF),
-                                        Color(0x00FFFFFF)
-                                      ],
+                                    color: const Color(0xB3000000),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: const Color(0x33FFFFFF)),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(Icons.close_rounded,
+                                      size: 18, color: Colors.white),
+                                ),
+                              ),
+                            ],
+                          ]),
+                        ),
+                        Positioned(left: 14, top: 64, child: _thumbs()),
+                        Positioned(
+                          left: 60,
+                          right: 16,
+                          bottom: 14,
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 420),
+                            transitionBuilder: (c, a) => FadeTransition(
+                              opacity: a,
+                              child: SlideTransition(
+                                position: Tween(
+                                        begin: const Offset(0, .35),
+                                        end: Offset.zero)
+                                    .animate(a),
+                                child: c,
+                              ),
+                            ),
+                            child: Column(
+                              key: ValueKey('how-title-$_who'),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'How it works',
+                                  style: TextStyle(
+                                      fontFamily: 'DM Sans',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xCCFFFFFF),
+                                      height: 1.1),
+                                ),
+                                Text(
+                                  step.title,
+                                  style: const TextStyle(
+                                      fontFamily: 'DM Sans',
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w900,
+                                      color: Colors.white,
+                                      height: 1.08,
+                                      letterSpacing: -.4),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GlassWrap(
+                    margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                    radius: 22,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 280),
+                          child: Text(
+                            step.body,
+                            key: ValueKey('how-body-$_who'),
+                            style: const TextStyle(
+                              fontFamily: 'DM Sans',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xE6FFFFFF),
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        _indicator(_clock.value),
+                        const SizedBox(height: 14),
+                        GestureDetector(
+                          key: const ValueKey('how-it-works-cta'),
+                          onTap: _runCta,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(40),
+                            child: Stack(children: [
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18, vertical: 14),
+                                color: Colors.white,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        step.cta,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontFamily: 'DM Sans',
+                                          fontSize: 14.5,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Icon(Icons.arrow_forward_rounded,
+                                        size: 17, color: Colors.black),
+                                  ],
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: IgnorePointer(
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment(-2 + 4 * t, -1),
+                                        end: Alignment(-1 + 4 * t, 1),
+                                        colors: const [
+                                          Color(0x00FFFFFF),
+                                          Color(0x66FFFFFF),
+                                          Color(0x00FFFFFF)
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ]),
+                            ]),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

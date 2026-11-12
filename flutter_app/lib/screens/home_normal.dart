@@ -565,7 +565,6 @@ class _TopRow extends StatelessWidget {
       glassMode: glassMode,
       onGlassToggle: onGlassToggle,
       onNotifications: () => showNotificationsSheet(context),
-      onFashionHome: () => Settings.instance.setFashionHome(true),
       onStore: () => NavScope.goTo(context, 3),
       onPlayer: () {
         final words = ContentStore.instance.library;

@@ -515,7 +515,6 @@ class _HomeFashionState extends State<HomeFashion> {
       glassMode: false,
       onGlassToggle: () {},
       onNotifications: () => showNotificationsSheet(context),
-      onFashionHome: () => Settings.instance.setFashionHome(false),
       onStore: () => _go(3),
       onPlayer: () => _go(1),
     );

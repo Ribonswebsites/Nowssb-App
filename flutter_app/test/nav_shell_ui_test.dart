@@ -26,9 +26,7 @@ void main() {
     );
   });
 
-  test(
-      'mini player is a black rounded rectangle inside glass, beside Zen home',
-      () {
+  test('mini player is a black rounded rectangle inside glass', () {
     final src = File('lib/widgets/mini_player_pill.dart').readAsStringSync();
     expect(src, contains('assets/store/nowssb-bag-headphones.webp'));
     expect(src, contains('_WhiteCircleBtn'));
@@ -40,8 +38,8 @@ void main() {
     expect(src, isNot(contains('BorderRadius.circular(35)')));
 
     final nav = File('lib/shell/nav_shell.dart').readAsStringSync();
-    expect(nav, contains('_fashionHomeChip'));
-    expect(nav, contains('Expanded('));
+    expect(nav, isNot(contains('_fashionHomeChip')));
+    expect(nav, isNot(contains('home-mode-pill')));
     expect(nav, contains('MiniPlayerPill'));
   });
 }

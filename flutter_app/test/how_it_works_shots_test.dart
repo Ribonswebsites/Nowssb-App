@@ -1,6 +1,7 @@
 // 390-wide shots of the normal home without the Zen Plus card, and of
 // each How it works pop-up step.
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:nowssb/screens/home_normal.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/concept/normal/fashion_plus_entry.dart';
 import 'package:nowssb/widgets/concept/normal/footer.dart';
+import 'package:nowssb/screens/normal/header_actions_sheet.dart';
 import 'package:nowssb/widgets/how_it_works_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,17 +35,41 @@ Future<ui.Image> _crop(ui.Image src, int top, int height) async {
   final canvas = ui.Canvas(rec);
   canvas.drawImageRect(
     src,
-    ui.Rect.fromLTWH(0, top.toDouble(), src.width.toDouble(), height.toDouble()),
+    ui.Rect.fromLTWH(
+        0, top.toDouble(), src.width.toDouble(), height.toDouble()),
     ui.Rect.fromLTWH(0, 0, src.width.toDouble(), height.toDouble()),
     ui.Paint(),
   );
   return rec.endRecording().toImage(src.width, height);
 }
 
-Future<void> _write(WidgetTester t, Finder f, String name) async {
+int _yellowRows(ByteData pixels, int width, int height, {int minPerRow = 40}) {
+  var rows = 0;
+  for (var y = 0; y < height; y++) {
+    var n = 0;
+    for (var x = 0; x < width; x++) {
+      final i = (y * width + x) * 4;
+      final r = pixels.getUint8(i);
+      final g = pixels.getUint8(i + 1);
+      final b = pixels.getUint8(i + 2);
+      final a = pixels.getUint8(i + 3);
+      if (a > 200 && r > 200 && g > 180 && b < 80) n++;
+    }
+    if (n >= minPerRow) rows++;
+  }
+  return rows;
+}
+
+Future<void> _write(WidgetTester t, Finder f, String name,
+    {bool checkYellow = false}) async {
   await t.runAsync(() async {
     final b = t.renderObject<RenderRepaintBoundary>(f);
     final img = await b.toImage(pixelRatio: 2);
+    if (checkYellow) {
+      final bd = await img.toByteData(format: ui.ImageByteFormat.rawRgba);
+      final rows = _yellowRows(bd!, img.width, img.height);
+      expect(rows, 0, reason: '$name has $rows rows of yellow underlines');
+    }
     await _writePng(img, name);
   });
 }
@@ -141,9 +167,44 @@ void main() {
       await precacheAll(t);
       await t.pump(const Duration(milliseconds: 200));
       expect(t.takeException(), isNull);
-      await _write(t, find.byKey(key), 'step_${i + 1}');
+      await _write(t, find.byKey(key), 'step_${i + 1}', checkYellow: true);
     });
   }
+
+  testWidgets('header actions sheet without a Zen home switch', (t) async {
+    const w = 390.0, h = 844.0;
+    t.view.physicalSize = const Size(w * 2, h * 2);
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
+    const key = ValueKey('howitworks-header-shot');
+    await t.pumpWidget(MediaQuery(
+      data: const MediaQueryData(
+          size: Size(w, h), devicePixelRatio: 2, disableAnimations: true),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(fontFamily: 'DM Sans'),
+        home: const ColoredBox(
+          color: Color(0xFF1A1A1A),
+          child: RepaintBoundary(
+            key: key,
+            child: HeaderActionsSheet(
+              glassMode: false,
+              onGlassToggle: _noop2,
+              onNotifications: _noop2,
+            ),
+          ),
+        ),
+      ),
+    ));
+    await t.pump();
+    await precacheAll(t);
+    await t.pump(const Duration(milliseconds: 200));
+    expect(t.takeException(), isNull);
+    expect(find.text('Zen home'), findsNothing);
+    expect(find.text('Zen'), findsNothing);
+    await _write(t, find.byKey(key), 'header_actions');
+  });
 }
 
 void _noop(int _) {}
+void _noop2() {}

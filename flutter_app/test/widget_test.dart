@@ -19,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/screens/home_fashion.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/widgets/home_parts.dart';
 import 'package:nowssb/widgets/concept/ritual_card.dart';
@@ -113,7 +114,8 @@ void main() {
             matching: find.byType(Scrollable));
         expect(sheet, findsOneWidget, reason: 'Store terms sheet');
         final agree = find.text('I Agree · Continue');
-        await tester.dragUntilVisible(agree, sheet.first, const Offset(0, -200));
+        await tester.dragUntilVisible(
+            agree, sheet.first, const Offset(0, -200));
         await tester.pump(const Duration(milliseconds: 50));
         await tester.tap(agree);
         await tester.pump();
@@ -165,9 +167,15 @@ void main() {
           reason: 'the home needs a reachable primary section action');
       // Begin on a fresh account has no routine yet, so the shell must send
       // the user to Practice with a hint instead of an empty player.
-      await tester.tap(find.descendant(of: today, matching: find.bySemanticsLabel("Begin today's session")).hitTestable().first);
+      await tester.tap(find
+          .descendant(
+              of: today,
+              matching: find.bySemanticsLabel("Begin today's session"))
+          .hitTestable()
+          .first);
       await tester.pump();
-      expect(find.text('Pick a few words for your routine first.'), findsOneWidget);
+      expect(find.text('Pick a few words for your routine first.'),
+          findsOneWidget);
     }
     await tester.pump(const Duration(milliseconds: 80));
     expect(tester.takeException(), isNull);
@@ -181,15 +189,17 @@ void main() {
     await tester.pumpWidget(_testShell());
     await tester.pump(const Duration(milliseconds: 50));
 
-    // The Normal home is the pale one and shows the greeting; the Fashion
-    // home is the dark one and shows its own. The switch names the home you
-    // would be going TO, so it reads as an action rather than a status.
-    expect(find.text('Zen home'), findsOneWidget);
-    await tester.tap(find.text('Zen home'));
+    // Switching homes is Settings-only. The nav chip and header shortcut
+    // are gone; Settings.fashionHome still moves the shell between homes.
+    expect(find.byKey(const ValueKey('home-mode-pill')), findsNothing);
+    expect(find.text('Zen home'), findsNothing);
+    await Settings.instance.setFashionHome(true);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 80));
 
     expect(tester.takeException(), isNull);
-    expect(find.text('Normal home'), findsOneWidget);
+    expect(find.byType(HomeFashion), findsOneWidget);
+    expect(find.byKey(const ValueKey('home-mode-pill')), findsNothing);
+    expect(find.text('Normal home'), findsNothing);
   });
 }

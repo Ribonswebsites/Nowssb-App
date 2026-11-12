@@ -2,7 +2,10 @@
 // card on the normal home.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/screens/app_settings.dart';
+import 'package:nowssb/screens/normal/header_actions_sheet.dart';
 import 'package:nowssb/widgets/app_destinations.dart';
 import 'package:nowssb/widgets/how_it_works_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,6 +36,30 @@ Future<void> _size(WidgetTester t, double w, {double h = 900}) async {
   addTearDown(t.view.reset);
 }
 
+bool _isFallbackStyle(TextStyle? s) {
+  if (s == null) return false;
+  if (s.debugLabel?.contains('fallback style') == true) return true;
+  return s.decoration == TextDecoration.underline &&
+      s.decorationStyle == TextDecorationStyle.double &&
+      s.decorationColor == const Color(0xFFFFFF00);
+}
+
+void expectCleanTypography(WidgetTester t) {
+  void walk(InlineSpan span, String where) {
+    if (span is TextSpan) {
+      expect(_isFallbackStyle(span.style), isFalse,
+          reason: 'yellow fallback underline on "$where" / "${span.text}"');
+      for (final c in span.children ?? const <InlineSpan>[]) {
+        walk(c, where);
+      }
+    }
+  }
+
+  for (final e in find.byType(RichText).evaluate()) {
+    walk((e.widget as RichText).text, 'RichText');
+  }
+}
+
 void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
@@ -55,6 +82,7 @@ void main() {
     for (var i = 0; i < 5; i++) {
       expect(find.byKey(ValueKey('how-thumb-$i')), findsOneWidget);
     }
+    expectCleanTypography(t);
     for (final banned in [
       'Zen Plus',
       'ZEN PLUS',
@@ -198,10 +226,46 @@ void main() {
     await t.pump(const Duration(milliseconds: 300));
     expect(find.byType(HowItWorksCard), findsOneWidget);
     expect(find.text('A NowssB word'), findsOneWidget);
+    expectCleanTypography(t);
     await t.tap(find.byKey(const ValueKey('how-it-works-close')));
     await t.pump();
     await t.pump(const Duration(milliseconds: 300));
     expect(find.byType(HowItWorksCard), findsNothing);
   });
-}
 
+  testWidgets('Settings Home row is the switch between homes', (t) async {
+    await Settings.instance.setFashionHome(false);
+    await _size(t, 390, h: 2000);
+    await t.pumpWidget(const MediaQuery(
+      data: MediaQueryData(size: Size(390, 2000), disableAnimations: true),
+      child: MaterialApp(home: AppSettingsScreen()),
+    ));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 200));
+    final useZen = find.text('Tap to use the Zen home');
+    await t.ensureVisible(useZen);
+    await t.tap(useZen);
+    await t.pump();
+    expect(Settings.instance.fashionHome, isTrue);
+    expect(find.text('Tap to use the Normal home'), findsOneWidget);
+    await t.tap(find.text('Tap to use the Normal home'));
+    await t.pump();
+    expect(Settings.instance.fashionHome, isFalse);
+  });
+
+  testWidgets('header actions sheet has no Zen home shortcut', (t) async {
+    await _size(t, 390, h: 844);
+    await t.pumpWidget(MaterialApp(
+      theme: ThemeData(fontFamily: 'DM Sans'),
+      home: HeaderActionsSheet(
+        glassMode: false,
+        onGlassToggle: () {},
+        onNotifications: () {},
+      ),
+    ));
+    await t.pump();
+    expect(find.text('Zen home'), findsNothing);
+    expect(find.text('Zen'), findsNothing);
+    expect(find.text('Notifications'), findsWidgets);
+  });
+}
