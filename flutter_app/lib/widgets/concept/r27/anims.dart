@@ -2,7 +2,7 @@
 ///  • [R27SoundOrb]   → Sound Library card video (assets/video/orb-loop.mp4)
 ///  • [R27BreathFlame]→ legacy streak disc (kept, unused on Normal home)
 ///  • [R27StreakCandle]→ Normal-home streak mark: growing candle flame
-///  • [R27Coin]       → NowssB Earn coin Lottie (nm-anim-coins.json)
+///  • [R27Coin]       → official NowssB coin (nwsb-coin.webp)
 ///  • [R27PosterDrift]→ "Offers and earning" video (hero-meaning-store.mp4)
 ///  • [R27Meditator]  → replaces the Cleopatra / red-haired model cut-outs
 /// Plus [R27Ribbon] (gift cards) and [R27Foil] (sealed scratch cards).
@@ -14,6 +14,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../nwsb_coin_fly.dart' show NwsbCoinDisc;
 import 'kit.dart';
 
 const _tau = math.pi * 2;
@@ -319,56 +320,14 @@ class _CandleP extends CustomPainter {
   bool shouldRepaint(_CandleP o) => o.t != t || o.streak != streak;
 }
 
-// ── Spinning coin ─────────────────────────────────────────────────────────
+// ── Official NowssB coin ─────────────────────────────────────────────────
 class R27Coin extends StatelessWidget {
   const R27Coin({super.key, this.size = 52});
   final double size;
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
-        child: R27Anim(
-          period: const Duration(milliseconds: 3200),
-          builder: (_, t) => CustomPaint(size: Size.square(size), painter: _CoinP(t)),
-        ),
+        child: NwsbCoinDisc(size: size),
       );
-}
-
-class _CoinP extends CustomPainter {
-  _CoinP(this.t);
-  final double t;
-  @override
-  void paint(Canvas c, Size s) {
-    final o = s.center(Offset.zero);
-    final R = s.shortestSide * .4;
-    final sx = math.cos(t * _tau).abs().clamp(.08, 1.0);
-    // sparkles orbit
-    for (var i = 0; i < 4; i++) {
-      final a = t * _tau + i * _tau / 4;
-      final p = o + Offset(math.cos(a) * R * 1.18, math.sin(a) * R * .5 - R * .1);
-      final k = .5 + .5 * math.sin(a * 2);
-      c.drawCircle(p, 1 + 1.6 * k, Paint()..color = const Color(0xFFFFE6A8).withValues(alpha: .4 + .5 * k));
-    }
-    c.save();
-    c.translate(o.dx, o.dy);
-    c.scale(sx, 1);
-    final rim = Rect.fromCircle(center: Offset.zero, radius: R);
-    c.drawOval(rim.shift(const Offset(2.5, 0)), Paint()..color = const Color(0xFF7A5313));
-    c.drawOval(rim, Paint()..shader = ui.Gradient.linear(rim.topLeft, rim.bottomRight, const [Color(0xFFFFE6A8), r27Gold, Color(0xFF8C6118)], [0, .5, 1]));
-    c.drawCircle(Offset.zero, R * .78, Paint()..style = PaintingStyle.stroke..strokeWidth = R * .06..color = const Color(0xFF8C6118));
-    // lotus emboss (no letters)
-    final petal = Paint()..color = const Color(0xFF8C6118);
-    for (var i = -2; i <= 2; i++) {
-      c.save();
-      c.rotate(i * .42);
-      c.drawPath(Path()
-        ..moveTo(0, R * .38)
-        ..quadraticBezierTo(R * .2, 0, 0, -R * .46)
-        ..quadraticBezierTo(-R * .2, 0, 0, R * .38), petal);
-      c.restore();
-    }
-    c.restore();
-  }
-  @override
-  bool shouldRepaint(_CoinP o) => o.t != t;
 }
 
 // ── Poster drift (Ken Burns crossfade) ────────────────────────────────────

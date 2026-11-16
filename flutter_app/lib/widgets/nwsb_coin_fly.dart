@@ -187,7 +187,8 @@ class NwsbCoinDisc extends StatelessWidget {
       NwsbCoinFly.disc,
       width: size,
       height: size,
-      fit: BoxFit.contain,
+      fit: BoxFit.cover,
+      alignment: Alignment.topCenter,
       errorBuilder: (_, __, ___) => Container(
         width: size,
         height: size,
