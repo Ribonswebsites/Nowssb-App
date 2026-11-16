@@ -64,8 +64,8 @@ class _NFashionSwitchState extends State<NFashionSwitch> with SingleTickerProvid
         ]))));
 }
 
-/// Crops the Fashion still to the model and the neon plus (the stacked
-/// FASHION letters can't read whole in a short track, so they're left out).
+/// Crops the still to the model and the neon plus (the stacked
+/// NOWSSB letters can't read whole in a short track, so they're left out).
 class _ModelCrop extends StatelessWidget {
   const _ModelCrop({required this.width, required this.height});
   final double width, height;

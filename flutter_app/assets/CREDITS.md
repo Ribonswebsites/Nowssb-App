@@ -257,3 +257,7 @@ Five people, each a still made with the Grok Bot image tool and then brought to 
 | `zp-man-latino` | Latino man, wavy hair and stubble |
 
 The small rail thumbnails `assets/home/hx/zpt-*.webp` are crops of frames from these same clips.
+
+## NowssB Plus intro — `assets/fashion/nowssb-plus-intro.webp` and `fp-intro.webp` (Nov 16, 2026)
+
+The intro poster is the existing Fashion-letter still, edited with the Grok Bot image tool so the 3D quilted letters spell NOWSSB instead of FASHION. The woman, suit, neon plus, rings and floor are the same composition. `nowssb-plus-intro.webp` is a tall 1080×2340 (9:19.5) full-bleed version for the intro page; `fp-intro.webp` is the same artwork at 941×1672 (9:16) for the start-art still and the mode switch crop. Original work for NowssB; no third-party source.

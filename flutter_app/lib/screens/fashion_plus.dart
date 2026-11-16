@@ -1,4 +1,4 @@
-/// Fashion Plus — the switch that makes the still ones move.
+/// NowssB Plus — the switch that makes still backgrounds move.
 ///
 /// Off, every page background in the app is its clip's own first frame: a
 /// picture, costing nothing, and the pool is never even asked for a decoder.
@@ -6,24 +6,24 @@
 ///
 /// It is off by default and this page says why in plain words rather than
 /// hiding it: moving pictures cost battery, and someone should be able to
-/// decide that for themselves. That is the same posture the website takes,
-/// and it is the honest one — "7 changes · Fashion home · Off by default".
+/// decide that for themselves.
 library;
 
 import '../widgets/glass_list_card.dart';
 import '../widgets/nwsb_choice_chip.dart';
+
 import 'package:flutter/material.dart';
 
 import '../data/settings.dart';
 import '../theme/tokens.dart';
-import '../widgets/intro_gate.dart';
+import '../widgets/nowssb_plus_intro.dart';
 import '../widgets/concept/r27/how_it_works.dart';
 import '../widgets/banner_mix.dart';
 import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 
-/// Which part of Fashion Plus a caller opens. [all] is the full page behind
+/// Which part of NowssB Plus a caller opens. [all] is the full page behind
 /// its intro; the other two open straight onto one chooser — the Drop Studio
 /// "Background" door (the video list) and "Start art" door (the still list,
 /// the one that writes `nwsb_fashplus_image`).
@@ -74,7 +74,7 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
       final video = widget.mode == FashionPlusMode.background;
       return PageShell(
         quietFilm: true,
-        eyebrow: 'Zen Plus',
+        eyebrow: 'NowssB Plus',
         title: video ? 'Background' : 'Start art',
         film: 'assets/video/fashion-plus-bg-6.mp4',
         fashionDim: true,
@@ -82,82 +82,87 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
         slivers: [
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: SliverList.list(children: [
-              if (video) ...[
-                _Switch(on: on, onChanged: (v) => Settings.instance.setFashionPlus(v)),
-                const SizedBox(height: 14),
+            sliver: SliverList.list(
+              children: [
+                if (video) ...[
+                  _Switch(
+                    on: on,
+                    onChanged: (v) => Settings.instance.setFashionPlus(v),
+                  ),
+                  const SizedBox(height: 14),
+                ],
+                _BackgroundChooser(videos: video),
               ],
-              _BackgroundChooser(videos: video),
-            ]),
+            ),
           ),
         ],
       );
     }
 
-    return IntroGate(
-      tag: 'Zen · Plus',
-      eyebrow: 'Experience',
-      title: 'The still ones\nstart moving.',
-      body: 'The Zen home in motion — the tiles, the practice card, and '
-          'every page that was wearing a photograph. One switch, and the '
-          'battery it costs.',
-      stats: [
-        '${_changes.length} changes',
-        'Zen home',
-        on ? 'On' : 'Off by default',
-      ],
-      art: 'assets/fashion/fp-intro.webp',
-      enterLabel: 'ENTER ZEN PLUS',
-      child: r27Guide('plus', r27PlusGuide, PageShell(
-        quietFilm: true,
-        eyebrow: 'Experience',
-        title: 'Zen Plus',
-        film: 'assets/video/fashion-plus-bg-6.mp4',
-        fashionDim: true,
-        onBack: () => Navigator.of(context).maybePop(),
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: SliverList.list(
+    return NowssbPlusIntro(
+      onBack: () => Navigator.of(context).maybePop(),
+      child: r27Guide(
+        'plus',
+        r27PlusGuide,
+        PageShell(
+          quietFilm: true,
+          eyebrow: 'NowssB Plus',
+          title: 'Motion',
+          film: 'assets/video/fashion-plus-bg-6.mp4',
+          fashionDim: true,
+          onBack: () => Navigator.of(context).maybePop(),
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverList.list(
                 // Server-driven order (Admin → UI Editor); bundled order by default.
                 children: layoutChildren(context, 'fashionplus', [
-              LSection(
-                  'switch',
-                  'Zen Plus switch',
-                  _Switch(
-                    on: on,
-                    onChanged: (v) => Settings.instance.setFashionPlus(v),
-                  )),
-              const SizedBox(height: 14),
-              const LSection('banners', 'Banner mix', BannerMix(seed: 2)),
-              const SizedBox(height: 14),
-              const LSection(
-                  'backgrounds', 'Background chooser', _BackgroundChooser()),
-              const SizedBox(height: 24),
-              LSection(
-                  'changes',
-                  'What the switch touches',
-                  GlassListCard(
-                    margin: EdgeInsets.zero,
-                    icon: Icons.auto_awesome_motion_outlined,
-                    overline: 'What the switch touches',
-                    title: 'Seven things',
-                    children: [
-                      for (final (title, sub) in _changes)
-                        GlassTile(
-                          icon: on ? Icons.play_arrow_rounded : Icons.image_outlined,
-                          title: title,
-                          sub: sub,
-                          trailing: const SizedBox.shrink(),
-                        ),
-                    ],
-                  )),
-              const SizedBox(height: 18),
-              const LSection('cost', 'Cost', _Cost()),
-            ])),
-          ),
-        ],
-      )),
+                  LSection(
+                    'switch',
+                    'NowssB Plus switch',
+                    _Switch(
+                      on: on,
+                      onChanged: (v) => Settings.instance.setFashionPlus(v),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const LSection('banners', 'Banner mix', BannerMix(seed: 2)),
+                  const SizedBox(height: 14),
+                  const LSection(
+                    'backgrounds',
+                    'Background chooser',
+                    _BackgroundChooser(),
+                  ),
+                  const SizedBox(height: 24),
+                  LSection(
+                    'changes',
+                    'What the switch touches',
+                    GlassListCard(
+                      margin: EdgeInsets.zero,
+                      icon: Icons.auto_awesome_motion_outlined,
+                      overline: 'What the switch touches',
+                      title: 'Seven things',
+                      children: [
+                        for (final (title, sub) in _changes)
+                          GlassTile(
+                            icon: on
+                                ? Icons.play_arrow_rounded
+                                : Icons.image_outlined,
+                            title: title,
+                            sub: sub,
+                            trailing: const SizedBox.shrink(),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  const LSection('cost', 'Cost', _Cost()),
+                ]),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -179,7 +184,7 @@ class _Switch extends StatelessWidget {
           child: GlassListCard(
             margin: EdgeInsets.zero,
             icon: currentOn ? Icons.play_arrow_rounded : Icons.pause_rounded,
-            overline: 'Zen Plus',
+            overline: 'NowssB Plus',
             title: currentOn ? 'Motion is on' : 'Motion is off',
             subtitle: currentOn
                 ? 'Backgrounds are playing'
@@ -223,10 +228,10 @@ class _BackgroundChooser extends StatelessWidget {
             children: [
               Text(
                 motionOn
-                    ? 'Selected Zen Plus video'
+                    ? 'Selected NowssB Plus video'
                     : pinnedStill
-                        ? 'Start art'
-                        : 'Background when motion is off',
+                    ? 'Start art'
+                    : 'Background when motion is off',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -297,10 +302,10 @@ class _BackgroundChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => NwsbChoiceChip(
-        label: EditableLabel('fashion_plus.BackgroundChoice', label),
-        selected: selected,
-        onSelected: (_) => onTap(),
-      );
+    label: EditableLabel('fashion_plus.BackgroundChoice', label),
+    selected: selected,
+    onSelected: (_) => onTap(),
+  );
 }
 
 class _Cost extends StatelessWidget {
@@ -318,8 +323,11 @@ class _Cost extends StatelessWidget {
       child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.battery_saver_outlined,
-              size: 16, color: NwsbColors.goldLight),
+          Icon(
+            Icons.battery_saver_outlined,
+            size: 16,
+            color: NwsbColors.goldLight,
+          ),
           SizedBox(width: 12),
           Expanded(
             child: Text(

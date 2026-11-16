@@ -105,9 +105,11 @@ void main() {
   Future<void> reachIn(WidgetTester t, Finder f, Type screen) async {
     final scroll = find.descendant(of: find.byType(screen), matching: find.byWidgetPredicate(
         (w) => w is Scrollable && w.axisDirection == AxisDirection.down));
-    final enter = find.text('ENTER ZEN PLUS').hitTestable();
-    if (enter.evaluate().isNotEmpty) {
-      await t.tap(enter.first);
+    final enter = find.text('Enter NowssB Plus').hitTestable();
+    final legacy = find.text('ENTER ZEN PLUS').hitTestable();
+    final gate = enter.evaluate().isNotEmpty ? enter : legacy;
+    if (gate.evaluate().isNotEmpty) {
+      await t.tap(gate.first);
       await settle(t, 10);
     }
     for (var i = 0; i < 40 && f.hitTestable().evaluate().isEmpty; i++) {

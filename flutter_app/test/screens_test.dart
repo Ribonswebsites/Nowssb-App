@@ -94,11 +94,11 @@ void main() {
     expect(find.text('OPEN LIBRARY'), findsNothing);
   });
 
-  testWidgets('Zen Plus really moves the setting', (tester) async {
+  testWidgets('NowssB Plus really moves the setting', (tester) async {
     await Settings.instance.setFashionPlus(false);
     await pump(tester, const FashionPlusScreen());
 
-    await tester.tap(find.text('ENTER ZEN PLUS'));
+    await tester.tap(find.text('Enter NowssB Plus'));
     await tester.pumpAndSettle();
 
     expect(find.text('Motion is off'), findsOneWidget);
