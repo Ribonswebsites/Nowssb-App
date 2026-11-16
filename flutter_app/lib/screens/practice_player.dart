@@ -2825,6 +2825,7 @@ class _YtmCollapsingHero extends StatelessWidget {
                 autoplay: true,
                 loop: true,
                 showPoster: true,
+                obeyMotion: false,
                 slot: 'practice_player.YtmCollapsingHero',
               )
             else if (art.startsWith('http'))
@@ -2943,6 +2944,7 @@ class _YtmCollapsingHero extends StatelessWidget {
                                       priority: ClipPriority.feature,
                                       autoplay: true,
                                       loop: true,
+                                      obeyMotion: false,
                                       slot: 'practice_player.YtmCollapsingHero',
                                     )
                                   : const ColoredBox(color: Color(0xFF111111)),
@@ -3349,6 +3351,7 @@ class _VisualStage extends StatelessWidget {
               autoplay: true,
               loop: true,
               showPoster: true,
+              obeyMotion: false,
               slot: 'practice_player.VisualStage',
             ),
             if (ritual != null)
@@ -4522,6 +4525,7 @@ class _WordActionStrip extends StatelessWidget {
       frame: DeviceFrame.wordActs,
       priority: ClipPriority.feature,
       autoplay: true,
+      obeyMotion: false,
       overlay: ColoredBox(
         color: Colors.transparent,
         child: Row(

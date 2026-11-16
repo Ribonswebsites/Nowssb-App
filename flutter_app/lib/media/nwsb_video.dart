@@ -20,6 +20,7 @@ import '../admin/admin_state.dart';
 import '../admin/template/editable.dart' show slotChrome, slotSeen, slotZoom, zoomBox;
 import '../admin/template/slot_keys.dart';
 import '../admin/template/ui_overrides.dart';
+import '../data/settings.dart';
 import '../data/word_art.dart';
 import 'video_pool.dart';
 
@@ -34,6 +35,7 @@ class NwsbVideo extends StatefulWidget {
     this.autoplay = true,
     this.alignment = Alignment.center,
     this.showPoster = true,
+    this.obeyMotion = true,
     this.slot,
     this.id,
     this.word,
@@ -69,6 +71,11 @@ class NwsbVideo extends StatefulWidget {
   /// TV-frame clips deliberately show only the moving video through the
   /// bezel. Other app surfaces can retain their loading poster.
   final bool showPoster;
+
+  /// When true (the default), this clip follows [Settings.fashionPlus]:
+  /// Still holds the poster and never takes a decoder; Moving plays.
+  /// Set false for user-started media such as a word film in the player.
+  final bool obeyMotion;
 
   /// True when [asset] is a URL rather than a bundled file.
   bool get isRemote =>
@@ -130,7 +137,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     if (next == _src) return;
     _src = next;
     _drop();
-    _take();
+    _syncLease();
     if (mounted) setState(() {});
   }
 
@@ -141,10 +148,32 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     if (widget.word != null && widget.word!.isNotEmpty) {
       WordArt.instance.addListener(_onArt);
     }
-    // Every mounted video is live in the normal home. Keep the legacy flag
-    // accepted for compatibility, but do not let it disable playback.
-    _take();
+    Settings.instance.addListener(_onMotion);
+    _syncLease();
     _pump();
+  }
+
+  /// Decorative / autoplay clips play only while Zen Plus motion is Moving.
+  /// User-started media ([obeyMotion] false) is left alone.
+  bool get _wantsDecoder =>
+      widget.autoplay && (!widget.obeyMotion || Settings.instance.fashionPlus);
+
+  void _onMotion() {
+    final had = _lease != null;
+    _syncLease();
+    if (mounted && had != (_lease != null)) setState(() {});
+  }
+
+  void _syncLease() {
+    if (_wantsDecoder) {
+      if (_lease == null) {
+        _take();
+      } else if (widget.autoplay) {
+        _lease?.play();
+      }
+    } else if (_lease != null) {
+      _drop();
+    }
   }
 
   @override
@@ -218,7 +247,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     // A decoder that arrives mid-scroll must start moving immediately —
     // waiting for the pool heartbeat left feature films (player bg, orb)
     // on their poster for a visible beat.
-    if (ready && widget.autoplay) {
+    if (ready && _wantsDecoder) {
       _lease?.play();
     }
     if (ready == _wasReady && sized == _wasSized) return;
@@ -242,9 +271,13 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
         old.word != widget.word) {
       _src = _resolve();
       _drop();
-      _take();
+      _syncLease();
       if (mounted) setState(() {});
-    } else if (widget.autoplay) {
+    } else if (old.autoplay != widget.autoplay ||
+        old.obeyMotion != widget.obeyMotion) {
+      _syncLease();
+      if (mounted) setState(() {});
+    } else if (_wantsDecoder) {
       _lease?.play();
     }
   }
@@ -262,6 +295,7 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
   @override
   void dispose() {
     if ((widget.word ?? '').isNotEmpty) WordArt.instance.removeListener(_onArt);
+    Settings.instance.removeListener(_onMotion);
     WidgetsBinding.instance.removeObserver(this);
     _drop();
     super.dispose();

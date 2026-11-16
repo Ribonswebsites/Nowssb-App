@@ -10,6 +10,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:video_player/video_player.dart';
 
 import '../admin/template/editable.dart';
+import '../data/settings.dart';
 
 class LoginStage extends StatelessWidget {
   const LoginStage({
@@ -477,36 +478,74 @@ class _LoginFilm extends StatefulWidget {
 }
 
 class _LoginFilmState extends State<_LoginFilm> {
-  late final VideoPlayerController _film;
+  VideoPlayerController? _film;
   var _ready = false;
+  int _gen = 0;
+
+  bool get _motionOn => Settings.instance.fashionPlus;
 
   @override
   void initState() {
     super.initState();
-    _film = VideoPlayerController.asset('assets/video/login-phone.mp4')
+    Settings.instance.addListener(_onMotion);
+    if (_motionOn) _open();
+  }
+
+  void _onMotion() {
+    if (!mounted) return;
+    if (_motionOn) {
+      if (_film == null) {
+        _open();
+      } else {
+        _film!.play();
+      }
+    } else {
+      _close();
+    }
+  }
+
+  void _open() {
+    final gen = ++_gen;
+    final film = VideoPlayerController.asset('assets/video/login-phone.mp4')
       ..setLooping(true)
       ..setVolume(0);
+    _film = film;
     // A film that cannot load (no decoder, missing platform) must never
     // take the login screen down; the still backdrop stays instead.
     try {
-      _film.initialize().then((_) {
-        if (!mounted) return;
-        _film.play();
+      film.initialize().then((_) {
+        if (!mounted || gen != _gen || !_motionOn) return;
+        film.play();
         setState(() => _ready = true);
       }).catchError((Object _) {});
     } catch (_) {}
   }
 
+  void _close() {
+    _gen++;
+    final film = _film;
+    _film = null;
+    _ready = false;
+    try {
+      film?.pause();
+      film?.dispose();
+    } catch (_) {}
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    Settings.instance.removeListener(_onMotion);
+    _gen++;
     try {
-      _film.dispose();
+      _film?.dispose();
     } catch (_) {}
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final film = _film;
     return Stack(
       fit: StackFit.expand,
       children: [
@@ -515,14 +554,14 @@ class _LoginFilmState extends State<_LoginFilm> {
           fit: BoxFit.cover,
           alignment: const Alignment(0, -0.05),
         ),
-        if (_ready && _film.value.size.width > 0)
+        if (_ready && film != null && film.value.size.width > 0)
           FittedBox(
             fit: BoxFit.cover,
             alignment: const Alignment(0, -0.05),
             child: SizedBox(
-              width: _film.value.size.width,
-              height: _film.value.size.height,
-              child: VideoPlayer(_film),
+              width: film.value.size.width,
+              height: film.value.size.height,
+              child: VideoPlayer(film),
             ),
           ),
       ],

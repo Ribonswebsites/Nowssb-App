@@ -260,6 +260,7 @@ class TvFrame extends StatelessWidget {
     this.overlay,
     this.showVideo = true,
     this.showPoster = false,
+    this.obeyMotion = true,
   });
 
   /// The clip on the screen.
@@ -288,6 +289,9 @@ class TvFrame extends StatelessWidget {
   /// When true, soft-fail to the clip poster instead of an empty aperture
   /// (needed when healing-path-bg.mp4 hits PlatformException).
   final bool showPoster;
+
+  /// Follows [Settings.fashionPlus] unless this is user-started player media.
+  final bool obeyMotion;
 
   @override
   Widget build(BuildContext context) {
@@ -330,6 +334,7 @@ class TvFrame extends StatelessWidget {
                                 priority: priority,
                                 autoplay: autoplay,
                                 showPoster: showPoster,
+                                obeyMotion: obeyMotion,
                                 fit: BoxFit.cover,
                                 slot: 'tv_frame.TvFrame',
                               ),

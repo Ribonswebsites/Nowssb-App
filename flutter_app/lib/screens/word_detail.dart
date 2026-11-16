@@ -568,7 +568,7 @@ class _WordVideo extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: AspectRatio(
           aspectRatio: 16 / 9,
-          child: NwsbVideo(asset: url, fit: BoxFit.cover, showPoster: false, slot: 'word_detail.WordVideo', id: 'video'),
+          child: NwsbVideo(asset: url, fit: BoxFit.cover, showPoster: false, obeyMotion: false, slot: 'word_detail.WordVideo', id: 'video'),
         ),
       );
 }
@@ -660,7 +660,7 @@ class _StageState extends State<_Stage> {
             borderRadius: BorderRadius.circular(14),
             child: AspectRatio(
               aspectRatio: 16 / 9,
-              child: NwsbVideo(asset: st.video, fit: BoxFit.cover, showPoster: false, slot: 'word_detail.Stage', id: 'stage${widget.n}'),
+              child: NwsbVideo(asset: st.video, fit: BoxFit.cover, showPoster: false, obeyMotion: false, slot: 'word_detail.Stage', id: 'stage${widget.n}'),
             ),
           ),
         ],
