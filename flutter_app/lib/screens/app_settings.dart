@@ -34,7 +34,7 @@ import '../widgets/glass_list_card.dart';
 import '../widgets/routine_deck.dart';
 import '../widgets/page_shell.dart';
 import '../widgets/colored_split_promo_banner.dart';
-import 'fashion_plus.dart';
+import '../widgets/settings_choice_sheet.dart';
 import 'notifications_settings.dart';
 import 'player_settings.dart';
 import 'player_guide.dart';
@@ -126,52 +126,279 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => page));
   }
 
-  void _cycleNav() {
+  String _homeLabel(bool zen) => zen ? 'NowssB home' : 'Simple home';
+
+  String _motionLabel(bool moving) => moving ? 'Moving' : 'Still';
+
+  String _navLabel(String color) => color == 'glass' ? 'Glass' : 'Black';
+
+  String _wakeLabel(bool on) => on ? 'Stays on' : 'Can sleep';
+
+  String _discoverLabel(bool visible) =>
+      visible ? 'Others can find you' : 'Hidden';
+
+  Future<void> _pickHome() async {
     final s = Settings.instance;
-    final next = s.navColor == 'glass' ? 'black' : 'glass';
-    s.setNavConfig(color: next);
-    HapticFeedback.selectionClick();
+    final chosen = await showSettingsChoiceSheet<bool>(
+      context: context,
+      icon: Icons.home_outlined,
+      overline: 'Look',
+      title: 'Home',
+      current: s.fashionHome,
+      choices: const [
+        SettingsChoice(
+            value: false, label: 'Simple home', icon: Icons.home_outlined),
+        SettingsChoice(
+            value: true,
+            label: 'NowssB home',
+            icon: Icons.auto_awesome_outlined),
+      ],
+    );
+    if (chosen == null || !mounted) return;
+    await Settings.instance.setFashionHome(chosen);
+    if (mounted) _toast('Home set to ${_homeLabel(chosen)}');
   }
 
-  Widget _toggle(bool v, VoidCallback onTap) => Switch.adaptive(
-        value: v,
-        onChanged: (_) => onTap(),
-        activeThumbColor: Colors.white,
-      );
+  Future<void> _pickMotion() async {
+    final s = Settings.instance;
+    final chosen = await showSettingsChoiceSheet<bool>(
+      context: context,
+      icon: Icons.auto_awesome_outlined,
+      overline: 'Look',
+      title: 'Zen Plus',
+      current: s.fashionPlus,
+      choices: const [
+        SettingsChoice(
+            value: true, label: 'Moving', icon: Icons.auto_awesome_outlined),
+        SettingsChoice(
+            value: false, label: 'Still', icon: Icons.pause_outlined),
+      ],
+    );
+    if (chosen == null || !mounted) return;
+    await Settings.instance.setFashionPlus(chosen);
+    if (mounted) _toast('Zen Plus set to ${_motionLabel(chosen)}');
+  }
+
+  Future<void> _pickNav() async {
+    final s = Settings.instance;
+    final chosen = await showSettingsChoiceSheet<String>(
+      context: context,
+      icon: Icons.space_bar_rounded,
+      overline: 'Navigation',
+      title: 'Nav Bar',
+      current: s.navColor,
+      choices: const [
+        SettingsChoice(
+            value: 'black', label: 'Black', icon: Icons.space_bar_rounded),
+        SettingsChoice(
+            value: 'glass', label: 'Glass', icon: Icons.blur_on_rounded),
+      ],
+    );
+    if (chosen == null || !mounted) return;
+    await Settings.instance.setNavConfig(color: chosen);
+    if (mounted) _toast('Nav Bar set to ${_navLabel(chosen)}');
+  }
+
+  Future<void> _pickWake() async {
+    final chosen = await showSettingsChoiceSheet<bool>(
+      context: context,
+      icon: Icons.light_mode_outlined,
+      overline: 'Screen',
+      title: 'Keep Screen Awake',
+      current: _screenWake,
+      choices: const [
+        SettingsChoice(
+            value: true, label: 'Stays on', icon: Icons.light_mode_outlined),
+        SettingsChoice(
+            value: false, label: 'Can sleep', icon: Icons.bedtime_outlined),
+      ],
+    );
+    if (chosen == null || !mounted) return;
+    setState(() => _screenWake = chosen);
+    await _saveBool('ss_screen_wake', chosen);
+    DeviceFlags.keepAwake(chosen).catchError((_) {});
+    if (mounted) _toast('Keep Screen Awake set to ${_wakeLabel(chosen)}');
+  }
+
+  Future<void> _pickDiscover() async {
+    final chosen = await showSettingsChoiceSheet<bool>(
+      context: context,
+      icon: Icons.travel_explore_rounded,
+      overline: 'Privacy',
+      title: 'Appear in Discover',
+      current: _appearDiscover,
+      choices: const [
+        SettingsChoice(
+            value: true,
+            label: 'Others can find you',
+            icon: Icons.travel_explore_rounded),
+        SettingsChoice(
+            value: false, label: 'Hidden', icon: Icons.visibility_off_outlined),
+      ],
+    );
+    if (chosen == null || !mounted) return;
+    if (chosen == _appearDiscover) {
+      _toast('Appear in Discover set to ${_discoverLabel(chosen)}');
+      return;
+    }
+    await _setDiscover(chosen);
+    if (!mounted) return;
+    if (_appearDiscover == chosen) {
+      _toast('Appear in Discover set to ${_discoverLabel(chosen)}');
+    }
+  }
 
   List<List<GlassItemCard>> _groups(Settings s) {
-    void wake() {
-      final v = !_screenWake;
-      setState(() => _screenWake = v);
-      _saveBool('ss_screen_wake', v);
-      DeviceFlags.keepAwake(v);
-    }
-
     return [
       [
-        GlassItemCard(icon: Icons.equalizer_rounded, overline: 'Player', title: 'Player Settings', pill: 'Equalizer, quality, sleep', pillSub: 'How words play', onTap: () => _push(const PlayerSettingsScreen())),
-        GlassItemCard(icon: Icons.play_circle_outline_rounded, overline: 'Player', title: 'Player Guide', pill: 'Replay the setup', pillSub: 'A short tour of the player', onTap: () { OnboardingWarmup.playerGuide(context, firstOnly: true); _push(PlayerGuideScreen(onDone: () => Navigator.of(context).maybePop())); }),
-        GlassItemCard(icon: Icons.help_outline_rounded, overline: 'Practice', title: 'How it works', pill: 'The five steps', pillSub: 'Word, parts, hear, say, score', onTap: () => showHowItWorks(context)),
-        GlassItemCard(icon: Icons.auto_awesome_outlined, overline: 'Look', title: 'Zen Plus', pill: s.fashionPlus ? 'Motion on' : 'Still backgrounds', pillSub: 'Moving or still backgrounds', onTap: () => _push(const FashionPlusScreen())),
-        GlassItemCard(icon: Icons.home_outlined, overline: 'Look', title: 'Home', pill: s.fashionHome ? 'Zen home' : 'Normal home', pillSub: s.fashionHome ? 'Tap to use the Normal home' : 'Tap to use the Zen home', onTap: () => Settings.instance.setFashionHome(!s.fashionHome)),
-        GlassItemCard(icon: Icons.dashboard_customize_outlined, overline: 'Navigation', title: 'Quick Access', pill: 'Bottom navigation', pillSub: 'Shape, colour and icons', onTap: () => _push(const QuickAccessScreen())),
-        GlassItemCard(icon: Icons.space_bar_rounded, overline: 'Navigation', title: 'Nav Bar', pill: s.navColor == 'glass' ? 'Glass' : 'Black', pillSub: 'Tap to switch glass or black', onTap: _cycleNav),
+        GlassItemCard(
+            icon: Icons.equalizer_rounded,
+            overline: 'Player',
+            title: 'Player Settings',
+            pill: 'Equalizer, quality, sleep',
+            pillSub: 'How words play',
+            onTap: () => _push(const PlayerSettingsScreen())),
+        GlassItemCard(
+            icon: Icons.play_circle_outline_rounded,
+            overline: 'Player',
+            title: 'Player Guide',
+            pill: 'Replay the setup',
+            pillSub: 'A short tour of the player',
+            onTap: () {
+              OnboardingWarmup.playerGuide(context, firstOnly: true);
+              _push(PlayerGuideScreen(
+                  onDone: () => Navigator.of(context).maybePop()));
+            }),
+        GlassItemCard(
+            icon: Icons.help_outline_rounded,
+            overline: 'Practice',
+            title: 'How it works',
+            pill: 'The five steps',
+            pillSub: 'Word, parts, hear, say, score',
+            onTap: () => showHowItWorks(context)),
+        GlassItemCard(
+            icon: Icons.auto_awesome_outlined,
+            overline: 'Look',
+            title: 'Zen Plus',
+            pill: _motionLabel(s.fashionPlus),
+            pillSub: _motionLabel(s.fashionPlus),
+            onTap: _pickMotion),
+        GlassItemCard(
+            icon: Icons.home_outlined,
+            overline: 'Look',
+            title: 'Home',
+            pill: _homeLabel(s.fashionHome),
+            pillSub: _homeLabel(s.fashionHome),
+            onTap: _pickHome),
+        GlassItemCard(
+            icon: Icons.dashboard_customize_outlined,
+            overline: 'Navigation',
+            title: 'Quick Access',
+            pill: 'Bottom navigation',
+            pillSub: 'Shape, colour and icons',
+            onTap: () => _push(const QuickAccessScreen())),
+        GlassItemCard(
+            icon: Icons.space_bar_rounded,
+            overline: 'Navigation',
+            title: 'Nav Bar',
+            pill: _navLabel(s.navColor),
+            pillSub: _navLabel(s.navColor),
+            onTap: _pickNav),
       ],
       [
-        GlassItemCard(icon: Icons.notifications_none_rounded, overline: 'Alerts', title: 'Notifications', pill: 'Daily words and reminders', pillSub: 'What this phone tells you', onTap: () => _push(const NotificationsSettingsPage())),
-        GlassItemCard(icon: Icons.light_mode_outlined, overline: 'Screen', title: 'Keep Screen Awake', pill: _screenWake ? 'Stays on' : 'Can sleep', pillSub: 'While a word is playing', onTap: wake, trailing: _toggle(_screenWake, wake)),
-        GlassItemCard(icon: Icons.cleaning_services_outlined, overline: 'Storage', title: 'Cached Data', pill: 'Clear cache', pillSub: 'Temporary images and video', onTap: () { _clearCache(); }),
-        GlassItemCard(icon: Icons.history_rounded, overline: 'History', title: 'Clear Practice History', pill: 'Clear history', pillSub: 'Session logs on this account', onTap: () { _confirmClearHistory(); }),
+        GlassItemCard(
+            icon: Icons.notifications_none_rounded,
+            overline: 'Alerts',
+            title: 'Notifications',
+            pill: 'Daily words and reminders',
+            pillSub: 'What this phone tells you',
+            onTap: () => _push(const NotificationsSettingsPage())),
+        GlassItemCard(
+            icon: Icons.light_mode_outlined,
+            overline: 'Screen',
+            title: 'Keep Screen Awake',
+            pill: _wakeLabel(_screenWake),
+            pillSub: _wakeLabel(_screenWake),
+            onTap: _pickWake),
+        GlassItemCard(
+            icon: Icons.cleaning_services_outlined,
+            overline: 'Storage',
+            title: 'Cached Data',
+            pill: 'Clear cache',
+            pillSub: 'Temporary images and video',
+            onTap: () {
+              _clearCache();
+            }),
+        GlassItemCard(
+            icon: Icons.history_rounded,
+            overline: 'History',
+            title: 'Clear Practice History',
+            pill: 'Clear history',
+            pillSub: 'Session logs on this account',
+            onTap: () {
+              _confirmClearHistory();
+            }),
       ],
       [
-        GlassItemCard(icon: Icons.travel_explore_rounded, overline: 'Privacy', title: 'Appear in Discover', pill: _appearDiscover ? 'Others can find you' : 'Hidden', pillSub: 'Your Word Print in Discover', onTap: () => _setDiscover(!_appearDiscover), trailing: _toggle(_appearDiscover, () => _setDiscover(!_appearDiscover))),
-        GlassItemCard(icon: Icons.edit_note_rounded, overline: 'Words', title: 'Request Words', pill: 'Ask the atelier', pillSub: 'Request a word to be made', onTap: () => openRequestWords(context)),
-        if (AdminState.instance.isAdmin) GlassItemCard(icon: Icons.admin_panel_settings_outlined, overline: 'Admin', title: 'Admin', pill: 'Words, quotes, editor', onTap: () => openAdminHome(context)),
-        GlassItemCard(icon: Icons.info_outline_rounded, overline: 'About', title: 'About NowssB', pill: 'Version 9.5.0', pillSub: 'nowssb.com', onTap: () { _openAbout(); }),
-        GlassItemCard(icon: Icons.privacy_tip_outlined, overline: 'Legal', title: 'Privacy Policy', pill: 'What NowssB keeps', pillSub: 'nowssb.com/privacy', onTap: () => _openUrl('https://nowssb.com/privacy')),
-        GlassItemCard(icon: Icons.description_outlined, overline: 'Legal', title: 'Terms of Service', pill: 'Read terms', pillSub: 'nowssb.com/terms', onTap: () => _openUrl('https://nowssb.com/terms')),
-        GlassItemCard(icon: Icons.logout_rounded, overline: 'Session', title: 'Sign Out', pill: 'End this session', danger: true, onTap: _signOut),
-        GlassItemCard(icon: Icons.delete_outline_rounded, overline: 'Account', title: 'Delete Account', pill: 'Erase this account', pillSub: 'Cannot be undone', danger: true, onTap: _deleteAccount),
+        GlassItemCard(
+            icon: Icons.travel_explore_rounded,
+            overline: 'Privacy',
+            title: 'Appear in Discover',
+            pill: _discoverLabel(_appearDiscover),
+            pillSub: _discoverLabel(_appearDiscover),
+            onTap: _pickDiscover),
+        GlassItemCard(
+            icon: Icons.edit_note_rounded,
+            overline: 'Words',
+            title: 'Request Words',
+            pill: 'Ask the atelier',
+            pillSub: 'Request a word to be made',
+            onTap: () => openRequestWords(context)),
+        if (AdminState.instance.isAdmin)
+          GlassItemCard(
+              icon: Icons.admin_panel_settings_outlined,
+              overline: 'Admin',
+              title: 'Admin',
+              pill: 'Words, quotes, editor',
+              onTap: () => openAdminHome(context)),
+        GlassItemCard(
+            icon: Icons.info_outline_rounded,
+            overline: 'About',
+            title: 'About NowssB',
+            pill: 'Version 9.5.0',
+            pillSub: 'nowssb.com',
+            onTap: () {
+              _openAbout();
+            }),
+        GlassItemCard(
+            icon: Icons.privacy_tip_outlined,
+            overline: 'Legal',
+            title: 'Privacy Policy',
+            pill: 'What NowssB keeps',
+            pillSub: 'nowssb.com/privacy',
+            onTap: () => _openUrl('https://nowssb.com/privacy')),
+        GlassItemCard(
+            icon: Icons.description_outlined,
+            overline: 'Legal',
+            title: 'Terms of Service',
+            pill: 'Read terms',
+            pillSub: 'nowssb.com/terms',
+            onTap: () => _openUrl('https://nowssb.com/terms')),
+        GlassItemCard(
+            icon: Icons.logout_rounded,
+            overline: 'Session',
+            title: 'Sign Out',
+            pill: 'End this session',
+            danger: true,
+            onTap: _signOut),
+        GlassItemCard(
+            icon: Icons.delete_outline_rounded,
+            overline: 'Account',
+            title: 'Delete Account',
+            pill: 'Erase this account',
+            pillSub: 'Cannot be undone',
+            danger: true,
+            onTap: _deleteAccount),
       ],
     ];
   }
@@ -181,18 +408,29 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     const names = ['Look and sound', 'This phone', 'Account'];
     final searching = _q.isNotEmpty;
     final cards = searching
-        ? [for (final g in groups) ...g.where((c) => _match('${c.overline} ${c.title}', '${c.pill} ${c.pillSub ?? ''}'))]
+        ? [
+            for (final g in groups)
+              ...g.where((c) => _match(
+                  '${c.overline} ${c.title}', '${c.pill} ${c.pillSub ?? ''}'))
+          ]
         : groups[_set.clamp(0, 2)];
-    final settingIds = {for (final g in groups) for (final c in g) c.title.toLowerCase()};
+    final settingIds = {
+      for (final g in groups)
+        for (final c in g) c.title.toLowerCase()
+    };
     final pages = searching
         ? [...menuDestinations, ...settingsDestinations]
-            .where((d) => d.id != 'settings' && !settingIds.contains(d.title.toLowerCase()) && d.matches(_q))
+            .where((d) =>
+                d.id != 'settings' &&
+                !settingIds.contains(d.title.toLowerCase()) &&
+                d.matches(_q))
             .toList()
         : const <AppDest>[];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        GlassSearchField(controller: _search, hint: 'Search settings and pages'),
+        GlassSearchField(
+            controller: _search, hint: 'Search settings and pages'),
         const SizedBox(height: 14),
         if (!searching) ...[
           Container(
@@ -220,9 +458,12 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                            color: i == _set ? const Color(0xFF0B0B10) : Colors.white,
+                            color: i == _set
+                                ? const Color(0xFF0B0B10)
+                                : Colors.white,
                             fontSize: 13,
-                            fontWeight: i == _set ? FontWeight.w800 : FontWeight.w500,
+                            fontWeight:
+                                i == _set ? FontWeight.w800 : FontWeight.w500,
                           ),
                         ),
                       ),
@@ -236,7 +477,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         if (searching && cards.isEmpty && pages.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Text('Nothing called "${_search.text.trim()}" in NowssB.', textAlign: TextAlign.center, style: const TextStyle(color: Color(0x99FFFFFF))),
+            child: Text('Nothing called "${_search.text.trim()}" in NowssB.',
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Color(0x99FFFFFF))),
           ),
         ...cards,
         for (final d in pages)
@@ -327,7 +570,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   Future<void> _openUrl(String url) async {
     var opened = false;
     try {
-      opened = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      opened =
+          await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
     } catch (_) {}
     if (!opened && mounted) _toast('Could not open $url');
   }
@@ -402,7 +646,9 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   }
 
   void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
       SnackBar(content: Text(msg), behavior: SnackBarBehavior.floating),
     );
   }

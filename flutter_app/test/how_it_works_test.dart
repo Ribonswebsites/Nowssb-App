@@ -242,15 +242,26 @@ void main() {
     ));
     await t.pump();
     await t.pump(const Duration(milliseconds: 200));
-    final useZen = find.text('Tap to use the Zen home');
-    await t.ensureVisible(useZen);
-    await t.tap(useZen);
+    final homeRow = find.text('Home');
+    await t.ensureVisible(homeRow);
+    await t.tap(homeRow);
     await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('settings-choice-sheet')), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('settings-choice-NowssB home')));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
     expect(Settings.instance.fashionHome, isTrue);
-    expect(find.text('Tap to use the Normal home'), findsOneWidget);
-    await t.tap(find.text('Tap to use the Normal home'));
+    expect(find.text('Home set to NowssB home'), findsOneWidget);
+    expect(find.byKey(const ValueKey('settings-choice-sheet')), findsNothing);
+    await t.tap(find.text('Home'));
     await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
+    await t.tap(find.byKey(const ValueKey('settings-choice-Simple home')));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
     expect(Settings.instance.fashionHome, isFalse);
+    expect(find.text('Home set to Simple home'), findsOneWidget);
   });
 
   testWidgets('header actions sheet has no Zen home shortcut', (t) async {
