@@ -49,6 +49,11 @@ void main() {
     expect(find.text('Enter NowssB Plus'), findsOneWidget);
     expect(find.text('Motion on the Zen home'), findsOneWidget);
     expect(find.text(NowssbPlusIntro.copy), findsOneWidget);
+    expect(
+      NowssbPlusIntro.copy.contains('Switch it off anytime in Settings.'),
+      isTrue,
+    );
+    expect(NowssbPlusIntro.copy.contains('Settings > Zen Plus'), isFalse);
     expect(find.textContaining('Fashion'), findsNothing);
     expect(find.text('ENTER ZEN PLUS'), findsNothing);
     expect(find.textContaining('The still ones'), findsNothing);

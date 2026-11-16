@@ -1,5 +1,5 @@
-// 390-wide shots of the reinvented NowssB Plus intro, and the page
-// underneath after Enter.
+// 390- and 360-wide shots of the reinvented NowssB Plus intro, and the
+// page underneath after Enter.
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -45,9 +45,12 @@ void main() {
   setUp(VideoPool.instance.debugDropAll);
   tearDown(VideoPool.instance.debugDropAll);
 
-  testWidgets('NowssB Plus intro and the page after Enter', (t) async {
-    const w = 390.0, h = 844.0;
-    t.view.physicalSize = const Size(w * 2, h * 2);
+  Future<void> pumpIntro(
+    WidgetTester t, {
+    required double w,
+    required double h,
+  }) async {
+    t.view.physicalSize = Size(w * 2, h * 2);
     t.view.devicePixelRatio = 2;
     addTearDown(t.view.reset);
 
@@ -59,11 +62,11 @@ void main() {
     const key = ValueKey('nowssbplus-shot');
     await t.pumpWidget(
       MediaQuery(
-        data: const MediaQueryData(
+        data: MediaQueryData(
           size: Size(w, h),
           devicePixelRatio: 2,
           disableAnimations: true,
-          padding: EdgeInsets.only(top: 47, bottom: 34),
+          padding: const EdgeInsets.only(top: 47, bottom: 34),
         ),
         child: RepaintBoundary(
           key: key,
@@ -90,15 +93,36 @@ void main() {
       );
     });
     await t.pump();
-    await _write(t, find.byKey(key), 'intro');
+  }
+
+  testWidgets('NowssB Plus intro and the page after Enter', (t) async {
+    await pumpIntro(t, w: 390, h: 844);
+    await _write(t, find.byKey(const ValueKey('nowssbplus-shot')), 'intro');
 
     expect(find.text('Enter NowssB Plus'), findsOneWidget);
     expect(find.textContaining('Fashion'), findsNothing);
+    expect(
+      find.textContaining('Switch it off anytime in Settings.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Settings > Zen Plus'), findsNothing);
 
     await t.tap(find.text('Enter NowssB Plus'));
     for (var i = 0; i < 30; i++) {
       await t.pump(const Duration(milliseconds: 50));
     }
-    await _write(t, find.byKey(key), 'inside');
+    await _write(t, find.byKey(const ValueKey('nowssbplus-shot')), 'inside');
+  });
+
+  testWidgets('NowssB Plus intro at 360 width keeps NOWSSB clear of the pane', (
+    t,
+  ) async {
+    await pumpIntro(t, w: 360, h: 844);
+    await _write(t, find.byKey(const ValueKey('nowssbplus-shot')), 'intro-360');
+    expect(find.text('Enter NowssB Plus'), findsOneWidget);
+    expect(
+      find.textContaining('Switch it off anytime in Settings.'),
+      findsOneWidget,
+    );
   });
 }
