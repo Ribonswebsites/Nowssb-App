@@ -23,6 +23,7 @@ import '../widgets/restyle_kit.dart';
 import 'sound_library.dart';
 import 'practice_player.dart';
 import 'word_detail.dart';
+import '../data/word_art.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 
@@ -48,11 +49,13 @@ class _PracticeScreenState extends State<PracticeScreen> {
   void initState() {
     super.initState();
     ContentStore.instance.addListener(_onContent);
+    WordArt.instance.addListener(_onContent);
   }
 
   @override
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
+    WordArt.instance.removeListener(_onContent);
     super.dispose();
   }
 
@@ -96,7 +99,6 @@ class _PracticeScreenState extends State<PracticeScreen> {
               LSection('session', 'Session card', _SessionCard(
                 words: sessionWords,
                 slot: slot,
-                onOpen: openWord,
                 onStart: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => PracticePlayerScreen(
@@ -132,7 +134,7 @@ class _PracticeScreenState extends State<PracticeScreen> {
                 ),
                 child: Column(children: [
                   for (var i = 0; i < now.length; i++)
-                    _row(now[i], openWord, highlighted: i == 0),
+                    _row(now[i], openWord, index: i, highlighted: i == 0),
                 ]),
               )),
               if (rest.isNotEmpty)
@@ -142,7 +144,8 @@ class _PracticeScreenState extends State<PracticeScreen> {
                   title: 'Also today',
                   mark: NwsbMarks.sound,
                   child: Column(children: [
-                    for (final w in rest) _row(w, openWord),
+                    for (var i = 0; i < rest.length; i++)
+                      _row(rest[i], openWord, index: now.length + i),
                   ]),
                 )),
               LSection('promo2', 'Sound Library banner', KitBlackCard(
@@ -160,9 +163,13 @@ class _PracticeScreenState extends State<PracticeScreen> {
     );
   }
 
-  Widget _row(Word w, ValueChanged<Word> open, {bool highlighted = false}) =>
+  Widget _row(Word w, ValueChanged<Word> open,
+          {required int index, bool highlighted = false}) =>
       KitRow(
-        leading: KitWordArt(word: w.word, deva: w.deva),
+        leading: _PlayerCover(
+          path: playerCoverArtFor(w, index),
+          word: w.word,
+        ),
         title: w.word,
         sub: w.organ.isNotEmpty ? w.organ : w.meaning,
         highlighted: highlighted,
@@ -170,48 +177,113 @@ class _PracticeScreenState extends State<PracticeScreen> {
       );
 }
 
-/// Today's session in the Currently Playing hero layout: word-only art, the
-/// count, the line, the round white Start button, and the first few words as
-/// pills.
-class _SessionCard extends StatelessWidget {
+/// The same still the practice player shows for a word, clipped by the
+/// parent tile (128×128 / 16 on the hero, 52×52 / 8 on a row).
+class _PlayerCover extends StatelessWidget {
+  const _PlayerCover({super.key, required this.path, this.word});
+  final String path;
+  final String? word;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget err(BuildContext _, Object __, StackTrace? ___) =>
+        const ColoredBox(color: Color(0xFF111111));
+    if (path.startsWith('http')) {
+      return EditableImage.network(
+        path,
+        fit: BoxFit.cover,
+        word: word,
+        errorBuilder: err,
+        slot: 'practice.PlayerCover',
+      );
+    }
+    return EditableImage.asset(
+      path,
+      fit: BoxFit.cover,
+      word: word,
+      errorBuilder: err,
+      slot: 'practice.PlayerCover',
+    );
+  }
+}
+
+/// Today's session in the Currently Playing hero layout: the player's
+/// cover for the selected word, the count, the line, the round white
+/// Start button, and the first few words as pills. Tapping a pill
+/// crossfades the cover to that word's player art.
+class _SessionCard extends StatefulWidget {
   const _SessionCard({
     required this.words,
     required this.slot,
     required this.onStart,
-    required this.onOpen,
   });
   final List<Word> words;
   final String slot;
   final VoidCallback onStart;
-  final ValueChanged<Word> onOpen;
+
+  @override
+  State<_SessionCard> createState() => _SessionCardState();
+}
+
+class _SessionCardState extends State<_SessionCard> {
+  var _selected = 0;
+
+  @override
+  void didUpdateWidget(covariant _SessionCard old) {
+    super.didUpdateWidget(old);
+    if (widget.words.isEmpty) {
+      _selected = 0;
+    } else if (_selected >= widget.words.length) {
+      _selected = widget.words.length - 1;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final words = widget.words;
     final count = words.length;
-    final lead = words.isEmpty ? null : words.first;
+    final i = words.isEmpty ? 0 : _selected.clamp(0, words.length - 1);
+    final lead = words.isEmpty ? null : words[i];
+    final path = playerCoverArtFor(lead, i);
     return KitHero(
       key: const ValueKey('practice-hero'),
-      art: KitWordArt(word: lead?.word ?? 'NowssB', deva: lead?.deva ?? ''),
+      art: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 280),
+        switchInCurve: Curves.easeInOutCubic,
+        switchOutCurve: Curves.easeInOutCubic,
+        layoutBuilder: (current, previous) => Stack(
+          fit: StackFit.expand,
+          children: [...previous, if (current != null) current],
+        ),
+        child: _PlayerCover(
+          key: ValueKey(path),
+          path: path,
+          word: lead?.word,
+        ),
+      ),
       cornerLabel: "Today's session",
       eyebrow: 'Ready to play',
       title: '$count ${count == 1 ? 'word' : 'words'}',
       subline: 'Say each one on the exhale, and hold the last sound.',
       buttonIcon: Icons.play_arrow_rounded,
       buttonLabel: 'Start Player',
-      onButton: onStart,
+      onButton: widget.onStart,
       footer: words.length < 2
           ? null
           : SizedBox(
               height: 34,
               child: ListView.separated(
+                key: const ValueKey('practice-chips'),
                 scrollDirection: Axis.horizontal,
+                cacheExtent: 800,
                 itemCount: words.length.clamp(0, 8),
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (_, i) => Center(
                   child: GlassPill(
+                    key: ValueKey('practice-chip-${words[i].word}'),
                     label: words[i].word,
-                    selected: i == 0,
-                    onTap: () => onOpen(words[i]),
+                    selected: i == _selected,
+                    onTap: () => setState(() => _selected = i),
                   ),
                 ),
               ),

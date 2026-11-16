@@ -1912,12 +1912,7 @@ class _NextUpCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final nextIndex = words.isEmpty ? 0 : (index + 1) % words.length;
     final next = words.isEmpty ? null : words[nextIndex];
-    final art = next == null
-        ? null
-        : WordArt.instance.imageFor(
-            next.word,
-            next.img.isNotEmpty ? next.img : themes[nextIndex % themes.length].image,
-          );
+    final art = next == null ? null : playerCoverArtFor(next, nextIndex);
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -2279,10 +2274,7 @@ class _QueueSheetState extends State<_QueueSheet> {
     final filtered = _filtered;
     final word = _currentWord;
     final theme = _currentTheme;
-    final art = WordArt.instance.imageFor(
-      word?.word ?? '',
-      (word?.img.isNotEmpty == true) ? word!.img : theme.image,
-    );
+    final art = playerCoverArtFor(word, widget.index);
 
     final heroVideo = kPlayerBoxFilms[widget.index % kPlayerBoxFilms.length];
 
@@ -2521,12 +2513,7 @@ class _QueueSheetState extends State<_QueueSheet> {
                                 itemBuilder: (context, i) {
                                   final orig = filtered[i];
                                   final w = widget.words[orig];
-                                  final rowArt = WordArt.instance.imageFor(
-                                    w.word,
-                                    w.img.isNotEmpty
-                                        ? w.img
-                                        : widget.themes[orig % widget.themes.length].image,
-                                  );
+                                  final rowArt = playerCoverArtFor(w, orig);
                                   final isCurrent = orig == widget.index;
                                   return ReorderableDelayedDragStartListener(
                                     key: ValueKey('q-$orig-${w.word}'),
@@ -5201,6 +5188,25 @@ const _playerThemes = <_PlayerTheme>[
     accent: Color(0xFF8FE6FF),
   ),
 ];
+
+/// Default cover stills the practice player uses when a word has no
+/// WordArt upload and no word image of its own, in queue order.
+List<String> get kPlayerThemeImages =>
+    [for (final t in _playerThemes) t.image];
+
+/// The cover the practice player shows for [word] at queue [index].
+///
+/// Same resolution the player itself uses: a shared WordArt upload, else
+/// the word's own image, else the player's default theme art for that
+/// slot. Never a letter tile.
+String playerCoverArtFor(Word? word, int index) {
+  final theme = _playerThemes[index % _playerThemes.length];
+  if (word == null) return theme.image;
+  return WordArt.instance.imageFor(
+    word.word,
+    word.img.isNotEmpty ? word.img : theme.image,
+  );
+}
 
 class _PracticeNotesSheet extends StatelessWidget {
   const _PracticeNotesSheet({
