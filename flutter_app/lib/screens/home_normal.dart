@@ -51,6 +51,7 @@ import '../widgets/four_banners.dart';
 import '../widgets/meditation_flip_banner.dart';
 import 'normal/calm_v3.dart';
 import 'normal/home_v4.dart';
+import 'normal/new_releases.dart';
 import 'normal/home_v5.dart';
 import '../widgets/concept/normal/footer.dart';
 import '../features/programs/reference_program.dart';
@@ -362,7 +363,27 @@ class _HomeNormalState extends State<HomeNormal> {
             ],
           )
         ),
-        ('herovid', V4Streak(onPractice: () => _go(1), onOffers: () => _go(3))),
+        (
+          'herovid',
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              V4Streak(onPractice: () => _go(1), onOffers: () => _go(3)),
+              // After the streak card, before the Store row (and the
+              // sections in between). Black New releases carousel.
+              NewReleasesCard(
+                onSeeAll: () => _go(2),
+                onWord: (w) {
+                  final items = newReleaseWords(ContentStore.instance.library);
+                  _push(PracticePlayerScreen(
+                    words: newReleaseQueue(items, w),
+                    title: w.word,
+                  ));
+                },
+              ),
+            ],
+          ),
+        ),
         ('streak', const SizedBox.shrink()),
         ('practice', const SizedBox.shrink()),
         (
