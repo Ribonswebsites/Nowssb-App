@@ -673,6 +673,10 @@ class V4Streak extends StatelessWidget {
   const V4Streak({super.key, required this.onPractice, required this.onOffers});
   final VoidCallback onPractice;
   final VoidCallback onOffers;
+
+  /// Shot tests only: swap the right-hand streak mark to preview candidates.
+  @visibleForTesting
+  static Widget Function(int streak, Size size)? debugMark;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: PracticeProgress.instance,
@@ -699,7 +703,8 @@ class V4Streak extends StatelessWidget {
                 _Well(
                   size: const Size(80, 92),
                   pad: 4,
-                  child: R27StreakCandle(streak: s, size: const Size(72, 84)),
+                  child: debugMark?.call(s, const Size(72, 84)) ??
+                      R27StreakCandle(streak: s, size: const Size(72, 84)),
                 ),
               ]),
               const SizedBox(height: 14),
