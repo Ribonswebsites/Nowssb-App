@@ -6,6 +6,8 @@
 /// * [AutoMarquee] — slow continuous sideways drift for a row.
 library;
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -180,20 +182,33 @@ class StoreNowCard extends StatelessWidget {
             ),
             const SizedBox(width: 14),
             Expanded(
-              child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(label, maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: _ink.copyWith(fontSize: 10.5, letterSpacing: 1.6, color: const Color(0xB3FFFFFF), fontWeight: FontWeight.w600)),
-                const SizedBox(height: 6),
-                FittedBox(
+              child: LayoutBuilder(builder: (context, c) {
+                final labelStyle = _ink.copyWith(fontSize: 10.5, letterSpacing: 1.6, color: const Color(0xB3FFFFFF), fontWeight: FontWeight.w600);
+                final wordStyle = _ink.copyWith(fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: .5);
+                final lineStyle = _ink.copyWith(fontSize: 13, color: const Color(0x99FFFFFF));
+                final line = item.line ?? '${item.category} · ${item.price}';
+                // Scale the block down only when two-line copy would overflow
+                // the fixed 136-tall card (large text scale); at the usual
+                // size the look is unchanged aside from wrapping to 2 lines.
+                return FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
-                  child: Text(item.word.toUpperCase(), maxLines: 1,
-                      style: _ink.copyWith(fontSize: 26, fontWeight: FontWeight.w900, letterSpacing: .5)),
-                ),
-                const SizedBox(height: 6),
-                Text(item.line ?? '${item.category} · ${item.price}', maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: _ink.copyWith(fontSize: 13, color: const Color(0x99FFFFFF))),
-              ]),
+                  child: SizedBox(
+                    width: c.maxWidth,
+                    child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      _HomeFitText(label, style: labelStyle, maxLines: 2),
+                      const SizedBox(height: 6),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(item.word.toUpperCase(), maxLines: 1, style: wordStyle),
+                      ),
+                      const SizedBox(height: 6),
+                      _HomeFitText(line, style: lineStyle, maxLines: 2),
+                    ]),
+                  ),
+                );
+              }),
             ),
             const SizedBox(width: 8),
             Container(
@@ -278,15 +293,23 @@ class _StoreNowCarouselState extends State<StoreNowCarousel> with SingleTickerPr
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(14)),
-                  child: Text(widget.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: _ink.copyWith(fontSize: 15, fontWeight: FontWeight.w600)),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(widget.title, maxLines: 1, style: _ink.copyWith(fontSize: 15, fontWeight: FontWeight.w600)),
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
               Flexible(
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text(widget.kicker, maxLines: 1, overflow: TextOverflow.ellipsis,
-                      style: _ink.copyWith(fontSize: 12, color: const Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(widget.kicker, maxLines: 1,
+                        style: _ink.copyWith(fontSize: 12, color: const Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+                  ),
                 ),
               ),
             ]),
@@ -475,5 +498,66 @@ class NowProgressRail extends StatelessWidget {
         ),
       ]),
     );
+  }
+}
+
+
+/// Fits a home-row label: wrap up to [maxLines], then scale down slightly
+/// so the whole string (deal % or price) stays visible. No style change
+/// when the text already fits on one line.
+class _HomeFitText extends StatelessWidget {
+  const _HomeFitText(this.text, {required this.style, this.maxLines = 2});
+  final String text;
+  final TextStyle style;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, c) {
+      final painted = DefaultTextStyle.of(context).style.merge(style);
+      if (!c.hasBoundedWidth || c.maxWidth <= 0) {
+        return Text(text, maxLines: maxLines, style: painted);
+      }
+      final scaler = MediaQuery.textScalerOf(context);
+      final dir = Directionality.of(context);
+      bool exceeds(double width) {
+        final tp = TextPainter(
+          text: TextSpan(text: text, style: painted),
+          textDirection: dir,
+          textScaler: scaler,
+          maxLines: maxLines,
+        )..layout(maxWidth: width);
+        return tp.didExceedMaxLines;
+      }
+
+      if (!exceeds(c.maxWidth)) {
+        return Text(text, style: painted);
+      }
+      // Tightest width that still fits in [maxLines], then scale to the slot.
+      final one = TextPainter(
+        text: TextSpan(text: text, style: painted),
+        textDirection: dir,
+        textScaler: scaler,
+        maxLines: 1,
+      )..layout(maxWidth: double.infinity);
+      var lo = c.maxWidth;
+      var hi = math.max(c.maxWidth, one.width) + 8;
+      for (var i = 0; i < 14; i++) {
+        final mid = (lo + hi) / 2;
+        if (exceeds(mid)) {
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+          width: hi,
+          child: Text(text, style: painted, maxLines: maxLines),
+        ),
+      );
+    });
   }
 }

@@ -178,21 +178,42 @@ class _PracticeBannerCarouselState extends State<PracticeBannerCarousel>
   @override
   Widget build(BuildContext context) {
     final b = widget.banners;
-    return Column(children: [
-      SizedBox(
-        height: 96,
-        child: PageView.builder(
-          controller: _pager,
-          itemCount: b.length,
-          onPageChanged: (i) => setState(() => _page = i),
-          itemBuilder: (_, i) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: RoutineStyleBlackBanner(title: b[i].title, subtitle: b[i].subtitle, onTap: b[i].onTap, heavy: true),
+    return LayoutBuilder(builder: (context, constraints) {
+      final width = constraints.maxWidth.isFinite && constraints.maxWidth > 0
+          ? constraints.maxWidth
+          : MediaQuery.sizeOf(context).width;
+      final scaler = MediaQuery.textScalerOf(context);
+      final base = DefaultTextStyle.of(context).style;
+      var height = RoutineStyleBlackBanner.minHeight;
+      for (final e in b) {
+        height = math.max(
+          height,
+          RoutineStyleBlackBanner.heightFor(
+            title: e.title,
+            subtitle: e.subtitle,
+            maxWidth: (width - 32).clamp(1.0, double.infinity),
+            scaler: scaler,
+            base: base,
+            heavy: true,
+          ),
+        );
+      }
+      return Column(children: [
+        SizedBox(
+          height: height,
+          child: PageView.builder(
+            controller: _pager,
+            itemCount: b.length,
+            onPageChanged: (i) => setState(() => _page = i),
+            itemBuilder: (_, i) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: RoutineStyleBlackBanner(title: b[i].title, subtitle: b[i].subtitle, onTap: b[i].onTap, heavy: true),
+            ),
           ),
         ),
-      ),
-      const SizedBox.shrink(),
-    ]);
+        const SizedBox.shrink(),
+      ]);
+    });
   }
 }
 

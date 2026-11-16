@@ -6,6 +6,8 @@
 /// is needed. No emoji — SVG only.
 library;
 
+import 'dart:math' as math;
+
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -403,14 +405,53 @@ class RoutineStyleBlackBanner extends StatelessWidget {
   /// default w700.
   final bool heavy;
 
+  /// Default height for a two-line banner. Taller copy (or a larger text
+  /// scale) grows the plate so the last line is not clipped; short copy
+  /// stays this size, so the look does not change.
+  static const double minHeight = 96;
+
+  static const double _padL = 22;
+  static const double _padR = 18;
+  static const double _padV = 18;
+  static const double _arrow = 44;
+
+  static TextStyle copyStyle({required bool heavy, TextStyle? base}) {
+    return (base ?? const TextStyle()).copyWith(
+      color: Colors.white,
+      fontSize: 22,
+      height: 1.08,
+      fontWeight: heavy ? FontWeight.w800 : FontWeight.w700,
+      letterSpacing: heavy ? -.5 : -.3,
+    );
+  }
+
+  /// Height needed for [title] / [subtitle] at [maxWidth] (the plate's
+  /// outer width, before padding and the arrow).
+  static double heightFor({
+    required String title,
+    required String subtitle,
+    required double maxWidth,
+    required TextScaler scaler,
+    TextStyle? base,
+    bool heavy = false,
+  }) {
+    final textWidth = (maxWidth - _padL - _padR - _arrow).clamp(1.0, double.infinity);
+    final tp = TextPainter(
+      text: TextSpan(text: '$title\n$subtitle', style: copyStyle(heavy: heavy, base: base)),
+      textDirection: TextDirection.ltr,
+      textScaler: scaler,
+    )..layout(maxWidth: textWidth);
+    return math.max(minHeight, tp.height + _padV * 2 + 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        height: 96,
-        padding: const EdgeInsets.fromLTRB(22, 18, 18, 18),
+        constraints: const BoxConstraints(minHeight: minHeight),
+        padding: const EdgeInsets.fromLTRB(_padL, _padV, _padR, _padV),
         decoration: BoxDecoration(
           color: Colors.black,
           borderRadius: BorderRadius.circular(18),
@@ -423,18 +464,12 @@ class RoutineStyleBlackBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 '$title\n$subtitle',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  height: 1.08,
-                  fontWeight: heavy ? FontWeight.w800 : FontWeight.w700,
-                  letterSpacing: heavy ? -.5 : -.3,
-                ),
+                style: copyStyle(heavy: heavy),
               ),
             ),
             Container(
-              width: 44,
-              height: 44,
+              width: _arrow,
+              height: _arrow,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
