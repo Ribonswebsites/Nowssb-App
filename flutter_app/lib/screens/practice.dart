@@ -177,8 +177,9 @@ class _PracticeScreenState extends State<PracticeScreen> {
       );
 }
 
-/// The same still the practice player shows for a word, clipped by the
-/// parent tile (128×128 / 16 on the hero, 52×52 / 8 on a row).
+/// The word's own poster (the same cover the player shows), clipped by the
+/// parent tile (128×128 / 16 on the hero, 52×52 / 8 on a row). Posters are
+/// square; a taller picture keeps its top, where the word and face sit.
 class _PlayerCover extends StatelessWidget {
   const _PlayerCover({super.key, required this.path, this.word});
   final String path;
@@ -192,6 +193,7 @@ class _PlayerCover extends StatelessWidget {
       return EditableImage.network(
         path,
         fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
         word: word,
         errorBuilder: err,
         slot: 'practice.PlayerCover',
@@ -200,6 +202,7 @@ class _PlayerCover extends StatelessWidget {
     return EditableImage.asset(
       path,
       fit: BoxFit.cover,
+      alignment: Alignment.topCenter,
       word: word,
       errorBuilder: err,
       slot: 'practice.PlayerCover',

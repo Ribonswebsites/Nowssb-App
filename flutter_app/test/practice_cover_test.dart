@@ -1,5 +1,8 @@
-// Practice tab: every letter tile is replaced by the word's player cover,
-// and the Today's session art follows the selected word chip.
+// Practice tab: every tile shows that word's own poster (the player's
+// cover), the Today's session art follows the selected word chip, and no
+// word ever falls back to a generic theme still.
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +10,7 @@ import 'package:nowssb/admin/template/editable.dart';
 import 'package:nowssb/data/content.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/data/models.dart';
+import 'package:nowssb/data/word_posters.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/practice.dart';
 import 'package:nowssb/screens/practice_player.dart';
@@ -40,20 +44,47 @@ void main() {
     DayClock.clock = null;
   });
 
-  test('playerCoverArtFor uses the word image, else the player theme still', () {
-    expect(playerCoverArtFor(null, 0), kPlayerThemeImages[0]);
-    expect(playerCoverArtFor(null, 1), kPlayerThemeImages[1]);
-    expect(playerCoverArtFor(null, kPlayerThemeImages.length),
-        kPlayerThemeImages[0]);
+  test('playerCoverArtFor uses the word poster, never a theme still', () {
+    const library = [
+      'AAROGYA', 'PRANA', 'SHAKTI', 'ANANDA', 'SOMA', 'TEJAS', //
+      'OJAS', 'VATA', 'PITTA', 'KAPHA', 'SURYA', 'CHANDRA',
+    ];
+    for (var i = 0; i < library.length; i++) {
+      final w = Word.from({'word': library[i]})!;
+      final art = playerCoverArtFor(w, i);
+      expect(art, 'assets/word_posters/${library[i].toLowerCase()}.webp',
+          reason: library[i]);
+      expect(kPlayerThemeImages, isNot(contains(art)), reason: library[i]);
+      expect(File(art).existsSync(), isTrue, reason: art);
+    }
+    // Case and spacing do not matter.
+    expect(playerCoverArtFor(Word.from({'word': 'Soma'})!, 3),
+        kWordPosters['soma']);
 
+    // Even with a theme still as its image, a poster word keeps its poster.
+    final themed = Word.from({
+      'word': 'SURYA',
+      'img': kPlayerThemeImages.first,
+    })!;
+    expect(playerCoverArtFor(themed, 0), kWordPosters['surya']);
+
+    // A word with no poster uses its own picture...
     final withImg = Word.from({
       'word': 'ZZZCOVERTEST',
       'img': 'assets/player/t-wave.jpg',
     })!;
     expect(playerCoverArtFor(withImg, 0), 'assets/player/t-wave.jpg');
 
+    // ...but never a generic theme still; then it gets the NowssB poster.
+    final stillImg = Word.from({
+      'word': 'ZZZSTILL',
+      'img': kPlayerThemeImages[2],
+    })!;
+    expect(playerCoverArtFor(stillImg, 2), kNowssbPoster);
     final bare = Word.from({'word': 'ZZZBARECOVER'})!;
-    expect(playerCoverArtFor(bare, 2), kPlayerThemeImages[2]);
+    expect(playerCoverArtFor(bare, 2), kNowssbPoster);
+    expect(playerCoverArtFor(null, 0), kNowssbPoster);
+    expect(File(kNowssbPoster).existsSync(), isTrue);
   });
 
   testWidgets('Practice tiles use player covers, not letter art', (t) async {
@@ -93,7 +124,7 @@ void main() {
       expect(find.text(w), findsWidgets, reason: w);
     }
 
-    expect(_heroCover(t), kPlayerThemeImages[0],
+    expect(_heroCover(t), kWordPosters['soma'],
         reason: 'SOMA is first in the night session, same as the player');
 
     // Each This session row shows that word's player cover.
@@ -105,7 +136,8 @@ void main() {
         .map((e) => (e.widget as EditableImage).source)
         .toList();
     expect(rowImgs.length, greaterThanOrEqualTo(4));
-    expect(rowImgs.take(4).toList(), kPlayerThemeImages.take(4).toList());
+    expect(rowImgs.take(4).toList(),
+        [for (final w in session) kWordPosters[w.toLowerCase()]]);
 
     // Also today rows, if present, must also be covers not letter tiles.
     final also = find.byKey(const ValueKey('practice-also-pane'));
@@ -114,23 +146,27 @@ void main() {
           .descendant(of: also, matching: find.byType(EditableImage))
           .evaluate();
       expect(alsoImgs, isNotEmpty);
+      for (final e in alsoImgs) {
+        final src = (e.widget as EditableImage).source;
+        expect(src, startsWith('assets/word_posters/'), reason: src);
+      }
     }
 
     // Selecting a chip crossfades the hero to that word's player cover.
-    Future<void> select(String word, int index) async {
+    Future<void> select(String word) async {
       final f = _pill(word);
       await t.ensureVisible(f);
       await t.pump();
       await t.tap(f);
       await t.pump();
       await t.pump(const Duration(milliseconds: 300));
-      expect(_heroCover(t), kPlayerThemeImages[index], reason: word);
+      expect(_heroCover(t), kWordPosters[word.toLowerCase()], reason: word);
     }
 
-    await select('PITTA', 1);
-    await select('KAPHA', 2);
-    await select('CHANDRA', 3);
-    await select('SOMA', 0);
+    await select('PITTA');
+    await select('KAPHA');
+    await select('CHANDRA');
+    await select('SOMA');
 
     expect(find.byType(KitWordArt), findsNothing);
     expect(t.takeException(), isNull);

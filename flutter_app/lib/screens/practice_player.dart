@@ -20,6 +20,7 @@ import '../data/earn_wallet.dart';
 import '../features/economy/economy_api.dart';
 import '../data/models.dart';
 import '../data/word_art.dart';
+import '../data/word_posters.dart';
 import '../data/practice_progress.dart';
 import '../media/nwsb_video.dart';
 import '../media/onboarding_warmup.dart';
@@ -5200,16 +5201,18 @@ List<String> get kPlayerThemeImages =>
 
 /// The cover the practice player shows for [word] at queue [index].
 ///
-/// Same resolution the player itself uses: a shared WordArt upload, else
-/// the word's own image, else the player's default theme art for that
-/// slot. Never a letter tile.
+/// The word's own poster first (black, the word three times, a model in
+/// NowssB headphones, a ribbon in the word's colour). A word without a
+/// bundled poster uses its WordArt upload or own image; anything else gets
+/// the NowssB poster. Never a generic theme still and never a letter tile.
+/// [index] is kept so callers stay in queue order.
 String playerCoverArtFor(Word? word, int index) {
-  final theme = _playerThemes[index % _playerThemes.length];
-  if (word == null) return theme.image;
-  return WordArt.instance.imageFor(
-    word.word,
-    word.img.isNotEmpty ? word.img : theme.image,
-  );
+  if (word == null) return kNowssbPoster;
+  final poster = wordPosterFor(word.word);
+  if (poster != null) return poster;
+  final own = WordArt.instance.imageFor(word.word, word.img).trim();
+  if (own.isNotEmpty && !kPlayerThemeImages.contains(own)) return own;
+  return kNowssbPoster;
 }
 
 class _PracticeNotesSheet extends StatelessWidget {

@@ -253,6 +253,8 @@ flutter:
     - assets/progress/
     - assets/store/
     - assets/store/words/
+    # One poster per practice word (black, word x3, NowssB headphones, ribbon).
+    - assets/word_posters/
     - assets/store/waves/
     - assets/store/meaning-flips/
     - assets/store/ebook-flips/
