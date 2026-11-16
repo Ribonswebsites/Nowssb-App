@@ -1,10 +1,11 @@
-// B023: the seven week dots fit a 320dp screen at text x1.3 without overflowing.
+// The seven week-day tiles fit a 320dp screen at text x1.3 without overflowing.
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/data/practice_progress.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +21,21 @@ const _faces = {
   '$_g/Roboto Mono/RobotoMono-VariableFont_wght.ttf': ['Roboto Mono'],
 };
 
+String _day(DateTime d) =>
+    '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+void _seedToday() {
+  final key = _day(DateTime.now());
+  PracticeProgress.instance.debugSetSessionsForTest({
+    '${key}_SOMA': {
+      'date': key,
+      'word': 'SOMA',
+      'completedAt': '${key}T12:00:00.000',
+      'source': 'test',
+    },
+  });
+}
+
 void main() {
   final haveFonts = _faces.keys.every((f) => File(f).existsSync());
   SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
@@ -32,10 +48,13 @@ void main() {
         await (FontLoader(f)..addFont(Future.value(b))).load();
       }
     }
+    await PracticeProgress.instance.start();
   });
 
+  setUp(_seedToday);
+
   for (final (w, scale) in [(390.0, 1.0), (320.0, 1.3)]) {
-    testWidgets('week dots fit at ${w.toInt()} x$scale', (t) async {
+    testWidgets('week tiles fit at ${w.toInt()} x$scale', (t) async {
       if (!haveFonts) return markTestSkipped('Profile fonts not installed');
       FakeVideoPlatform();
       VideoPool.debugDeadlines = false;
@@ -47,22 +66,35 @@ void main() {
       FlutterError.onError = (d) => errors.add(d.exceptionAsString());
       await t.pumpWidget(MaterialApp(
         home: MediaQuery(
-          data: MediaQueryData(size: Size(w, 3600), textScaler: TextScaler.linear(scale)),
+          data: MediaQueryData(
+              size: Size(w, 3600), textScaler: TextScaler.linear(scale)),
           child: const ProfileScreen(),
         ),
       ));
       await t.pump(const Duration(milliseconds: 500));
       FlutterError.onError = prev;
-      final dots = find.ancestor(
-          of: find.byWidgetPredicate((x) => x is Text && x.data != null && x.data!.length == 1 && 'MTWFS'.contains(x.data!)),
-          matching: find.byType(AnimatedContainer));
-      expect(dots, findsNWidgets(7));
+      expect(
+          find.byKey(const ValueKey('profile-week-tracker')), findsOneWidget);
+      final tiles = find.byWidgetPredicate(
+        (x) =>
+            x.key is ValueKey<String> &&
+            (x.key as ValueKey<String>).value.startsWith('profile-week-day-'),
+      );
+      expect(tiles, findsNWidgets(7));
       expect(errors.where((e) => e.contains('overflowed')), isEmpty);
-      for (final r in dots.evaluate().map((e) => t.getRect(find.byWidget(e.widget)))) {
+      for (final e in tiles.evaluate()) {
+        final r = t.getRect(find.byWidget(e.widget));
         expect(r.left, greaterThanOrEqualTo(0));
         expect(r.right, lessThanOrEqualTo(w));
-        expect((r.width - r.height).abs(), lessThan(0.5), reason: 'dots stay round');
+        expect((r.width - r.height).abs(), lessThan(1.0),
+            reason: 'day tiles stay square');
+        final box = e.widget as AnimatedContainer;
+        expect(box.decoration, isA<BoxDecoration>());
+        expect((box.decoration as BoxDecoration).shape, BoxShape.rectangle);
+        expect((box.decoration as BoxDecoration).borderRadius, isNotNull);
       }
+      // Today's practiced day carries a gold check.
+      expect(find.byIcon(Icons.check_rounded), findsWidgets);
       await t.pumpWidget(const SizedBox());
       await t.pump(const Duration(minutes: 1));
     });

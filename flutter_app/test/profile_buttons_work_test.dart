@@ -1,9 +1,8 @@
-// Profile: motto tiles act, progress card says Back (not Skip).
+// Profile: week tiles and Sign Out work; removed motto / about / quote banners.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/profile.dart';
-import 'package:nowssb/screens/subscription.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_video_platform.dart';
@@ -28,16 +27,28 @@ void main() {
   SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
   setUpAll(setUpHomeRender);
 
-  testWidgets('Practice tile changes the time; Plan tile opens plans', (t) async {
+  testWidgets('removed Profile banners are gone; week and sign out remain',
+      (t) async {
     await _open(t);
-    final before = find.text('No limit').evaluate().length;
-    await t.tap(find.text('PRACTICE'));
-    await t.pump(const Duration(milliseconds: 300));
-    expect(find.text('No limit').evaluate().length, isNot(before));
-    await t.tap(find.text('PLAN'));
+    expect(find.text('MY MOTTO'), findsNothing);
+    expect(find.text('About NowssB'), findsNothing);
+    expect(find.text('Long before there was language, there was only sound.'),
+        findsNothing);
+    expect(find.text("Start today's practice now."), findsNothing);
+    expect(find.text('PRACTICE'), findsNothing);
+    expect(find.byKey(const ValueKey('profile-practice-card')), findsNothing);
+    expect(find.byKey(const ValueKey('profile-week-tracker')), findsOneWidget);
+    expect(find.text('Practice Duration'), findsOneWidget);
+    expect(find.text('Daily Reminder'), findsOneWidget);
+    expect(find.text('Sign Out'), findsOneWidget);
+    await t.tap(find.text('Sign Out'));
     await t.pump();
-    await t.pump(const Duration(milliseconds: 600));
-    expect(find.byType(SubscriptionScreen), findsOneWidget);
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.text('Sign out?'), findsOneWidget);
+    await t.tap(find.text('Stay signed in'));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.text('Sign out?'), findsNothing);
     await _close(t);
   });
 

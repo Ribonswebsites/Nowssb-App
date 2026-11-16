@@ -47,7 +47,6 @@ import '../features/notifications/notif_scheduler.dart';
 import 'quick_access.dart';
 import 'store.dart';
 import 'subscription.dart';
-import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import '../features/programs/program_router.dart';
@@ -499,7 +498,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
-    final int today = (DateTime.now().weekday - 1).clamp(0, 6);
     return PopScope(
       canPop: !_recentOpen,
       onPopInvokedWithResult: (didPop, _) {
@@ -536,30 +534,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onPractice: () => NavScope.goTo(context, 1),
                       ),
                     )),
-                    LSection('about', 'About', _about()),
-                    LSection('promo', 'Split promo banner', Padding(
-                      padding: const EdgeInsets.only(bottom: 34),
-                      child: KitBlackCard(
-                        key: const ValueKey('profile-practice-card'),
-                        margin: EdgeInsets.zero,
-                        // Word-only art: the old split cut-out was the banned
-                        // red-haired yoga figure, and the ez focus man already
-                        // sits in Your practice mind on this same page.
-                        art: const KitWordArt(word: 'SESSION'),
-                        eyebrow: "Today's practice",
-                        title: SplitPromoSpec.forSurface(SplitPromoSurface.profile).title.replaceAll('\n', ' '),
-                        line: SplitPromoSpec.forSurface(SplitPromoSurface.profile).cta,
-                        onTap: () => NavScope.goTo(context, 1),
-                      ),
-                    )),
                     LSection('quick', 'Quick access', _quickAccess()),
                     LSection('recent', 'Recent activity', _recentActivity()),
-                    LSection('motto', 'Motto', _motto()),
-                    LSection('week', 'Week tracker', _weekTracker(today)),
+                    LSection('week', 'Week tracker', _weekTracker()),
                     LSection('prefs', 'Preferences', _preferences()),
                     LSection('shop', 'Shop', _shop()),
                     LSection('account', 'Account', _account()),
-                    LSection('quote', 'Quote', _quote()),
                     LSection('signout', 'Sign out', _signOut()),
                   ]),
                 ),
@@ -1268,18 +1248,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _about() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 40),
-        padding: const EdgeInsets.all(22),
-        image: 'assets/profile_source/img-about.jpeg',
-        overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xB8000000), Color(0x61000000), Color(0xBF000000)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [EditableSvg.asset('assets/icons/icon_04.svg', width: 15, height: 15, colorFilter: const ColorFilter.mode(_dim, BlendMode.srcIn), slot: 'profile.ProfileScreen'), const SizedBox(width: 9), const Flexible(child: EditableLabel('profile.ProfileScreen', 'About NowssB', style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600)))]), // Flexible: the 3.6px overflow at 320dp x1.3 (B015 trace)
-          const SizedBox(height: 14),
-          const FractionallySizedBox(widthFactor: .78, child: EditableLabel('profile.ProfileScreen', 'Before a word had a spelling, it had a sound. NowssB works backward from the dictionary — past the meaning, past the letters — to the breath and vibration a word first came from, so you practice the origin, not just the definition.', style: TextStyle(fontSize: 14, height: 1.65, color: _dim))),
-        ]),
-      );
-
   Widget _quickAccess() => SectionBlock(
         marginBottom: 38,
         title: 'Quick Access',
@@ -1409,44 +1377,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _motto() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 40),
-        minHeight: 210,
-        padding: const EdgeInsets.fromLTRB(18, 24, 18, 18),
-        image: 'assets/profile_source/img-motto.jpeg',
-        overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x8C000000), Color(0x40000000), Color(0x99000000)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 26, color: _accent)), const SizedBox(width: 8), const EditableLabel('profile.ProfileScreen', 'MY MOTTO', style: TextStyle(fontSize: 11, letterSpacing: 2, color: _dim, fontWeight: FontWeight.w600))]),
-          const SizedBox(height: 16),
-          const FractionallySizedBox(widthFactor: .66, child: Text.rich(TextSpan(children: [TextSpan(text: 'My Focus.\nBreathe.\nLet go.\n'), TextSpan(text: 'Grow.', style: TextStyle(color: _accent))]), style: TextStyle(fontSize: 25, height: 1.22, fontWeight: FontWeight.w300))),
-          const SizedBox(height: 14),
-          Row(children: [Expanded(child: InkWell(onTap: () => _stepDuration(_duration >= 60 ? -60 : 15), borderRadius: BorderRadius.circular(16), child: _compactQuick('Practice', _durationText, 15))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(16), child: _compactQuick('Reminder', _reminderText, 17))), const SizedBox(width: 5), Expanded(child: InkWell(onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SubscriptionScreen())), borderRadius: BorderRadius.circular(16), child: ListenableBuilder(listenable: EconomyMirror.instance, builder: (context, _) => _compactQuick('Plan', _planName, 21))))]),
-        ]),
-      );
-
-  Widget _compactQuick(String label, String value, int icon) => Container(
-        padding: const EdgeInsets.fromLTRB(7, 8, 7, 9),
-        decoration: BoxDecoration(color: const Color(0x85040405), border: const Border.fromBorderSide(BorderSide(color: _borderSoft)), borderRadius: BorderRadius.circular(16)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Container(width: 30, height: 30, decoration: BoxDecoration(color: const Color(0x29E3BD7D), border: Border.all(color: const Color(0x59E3BD7D)), borderRadius: BorderRadius.circular(10)), child: Center(child: EditableSvg.asset('assets/icons/icon_${icon.toString().padLeft(2, '0')}.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(_accent, BlendMode.srcIn), slot: 'profile.ProfileScreen'))), EditableSvg.asset('assets/icons/icon_${(icon + 1).toString().padLeft(2, '0')}.svg', width: 12, height: 12, colorFilter: const ColorFilter.mode(_faint, BlendMode.srcIn), slot: 'profile.ProfileScreen')]), const SizedBox(height: 9), Text(label.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 7, letterSpacing: .7, color: _dim)), const SizedBox(height: 3), Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600))]),
-      );
-
-  Widget _weekTracker(int today) {
-    final week = PracticeProgress.instance.thisWeekDays;
-    return Container(
-        margin: const EdgeInsets.only(bottom: 44),
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: List.generate(7, (i) {
-          // Days this account actually practiced (PracticeProgress), read-only.
-          final done = week[i].done;
-          final future = i > today;
-          // Seven 42dp dots need 294dp; a 320dp screen leaves less, so
-          // each dot may shrink (staying round) instead of overflowing (B023).
-          return Flexible(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 42), child: AspectRatio(aspectRatio: 1, child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              decoration: BoxDecoration(shape: BoxShape.circle, color: done ? const Color(0xFFF2F2F0) : Colors.transparent, border: Border.all(color: future ? _borderSoft : (i == today ? const Color(0xD9FFFFFF) : _borderSoft), width: i == today ? 1.5 : 1)),
-              child: Center(child: Text(const ['M','T','W','T','F','S','S'][i], style: TextStyle(fontFamily: _mono, fontSize: 13, fontWeight: i == today ? FontWeight.w600 : FontWeight.w400, color: done ? Colors.black : (future ? _dim.withOpacity(.32) : _dim)))),
-          ))));
-        })),
-      );
+  Widget _weekTracker() {
+    const letters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+    return ListenableBuilder(
+      listenable: PracticeProgress.instance,
+      builder: (context, _) {
+        final week = PracticeProgress.instance.thisWeekDays;
+        return GlassCard(
+          key: const ValueKey('profile-week-tracker'),
+          margin: const EdgeInsets.only(bottom: 40),
+          padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+          child: Row(
+            children: List.generate(7, (i) {
+              final done = week[i].done;
+              final future = week[i].isFuture;
+              final isToday = week[i].isToday;
+              final bg = isToday ? const Color(0xFFF2F2F0) : const Color(0xFF0A0A0C);
+              final letterColor = isToday
+                  ? Colors.black
+                  : (future ? _dim.withOpacity(.32) : _text);
+              return Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(right: i == 6 ? 0 : 6),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: AnimatedContainer(
+                      key: ValueKey('profile-week-day-$i'),
+                      duration: const Duration(milliseconds: 150),
+                      decoration: BoxDecoration(
+                        color: bg,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isToday ? const Color(0xFFF2F2F0) : _borderSoft),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Center(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                letters[i],
+                                style: TextStyle(
+                                  fontFamily: _mono,
+                                  fontSize: 13,
+                                  fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
+                                  color: letterColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (done)
+                            Positioned(
+                              top: 3,
+                              right: 3,
+                              child: MediaQuery.withNoTextScaling(
+                                child: const Icon(Icons.check_rounded, size: 10, color: _accent),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
+        );
+      },
+    );
   }
 
   Widget _preferences() => _sectionList('Preferences', [
@@ -1510,15 +1508,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ]),
       );
 
-  Widget _quote() => GlassCard(
-        margin: const EdgeInsets.only(bottom: 34),
-        minHeight: 170,
-        padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
-        image: 'assets/profile_source/img-quote.jpeg',
-        overlay: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xB3000000), Color(0x52000000), Color(0xC7000000)]),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const EditableLabel('profile.ProfileScreen', '“', style: TextStyle(fontFamily: 'Georgia', fontSize: 38, color: _faint, height: 1)), const SizedBox(height: 8), const FractionallySizedBox(widthFactor: .70, child: EditableLabel('profile.ProfileScreen', 'Long before there was language, there was only sound.', style: TextStyle(fontSize: 17, height: 1.5))), const SizedBox(height: 16), const EditableLabel('profile.ProfileScreen', '— THE IDEA BEHIND NOWSSB', style: TextStyle(fontSize: 11, letterSpacing: 1.3, color: _dim))]),
-      );
-
   Future<void> _doSignOut() async {
     final ok = await showDialog<bool>(
       context: context,
@@ -1565,10 +1554,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.of(context, rootNavigator: true).popUntil((route) => route.isFirst);
   }
 
-  Widget _signOut() => InkWell(
-        onTap: _doSignOut,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(margin: const EdgeInsets.only(bottom: 30), padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(22)), alignment: Alignment.center, child: const EditableLabel('profile.ProfileScreen', 'Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500))),
+  Widget _signOut() => GlassCard(
+        key: const ValueKey('profile-sign-out'),
+        margin: const EdgeInsets.only(bottom: 30),
+        padding: EdgeInsets.zero,
+        child: InkWell(
+          onTap: _doSignOut,
+          borderRadius: BorderRadius.circular(22),
+          child: const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(
+              child: EditableLabel('profile.ProfileScreen', 'Sign Out', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+            ),
+          ),
+        ),
       );
 
   // Dividers go BETWEEN rows only: a divider under the last row sat on the
@@ -1646,10 +1645,13 @@ class _Background extends StatelessWidget {
             ),
           const DecoratedBox(
             decoration: BoxDecoration(
+              // Dimmer than the other pages so Profile copy stays readable
+              // over the motion clip; Profile only.
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color(0x66060C18), Color(0x44060C18), Color(0x99060C18)],
+                colors: [Color(0xC4060C18), Color(0xBA060C18), Color(0xE8060C18)],
+                stops: [0, 0.45, 1],
               ),
             ),
           ),
