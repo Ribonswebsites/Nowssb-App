@@ -42,7 +42,9 @@ Future<void> _pumpSection(WidgetTester t) async {
   t.view.devicePixelRatio = 3;
   addTearDown(t.view.reset);
   await t.runAsync(() async {
-    await ContentStore.instance.start().timeout(const Duration(seconds: 5), onTimeout: () {});
+    await ContentStore.instance
+        .start()
+        .timeout(const Duration(seconds: 5), onTimeout: () {});
     await Settings.instance.load();
   });
   await t.pumpWidget(MaterialApp(
@@ -60,7 +62,11 @@ Future<void> _pumpSection(WidgetTester t) async {
                 gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0xFF1B2430), Color(0xFF0A0C10), Color(0xFF231A12)]),
+                    colors: [
+                      Color(0xFF1B2430),
+                      Color(0xFF0A0C10),
+                      Color(0xFF231A12)
+                    ]),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: const NmHorizontalRoutineCards(fashion: true),
@@ -70,7 +76,8 @@ Future<void> _pumpSection(WidgetTester t) async {
       ),
     ),
   ));
-  await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
+  await t
+      .runAsync(() => Future<void>.delayed(const Duration(milliseconds: 200)));
   await _pumps(t, 6);
 }
 
@@ -78,7 +85,8 @@ Future<void> _shot(WidgetTester t, String name) async {
   if (_shots.isEmpty) return;
   await t.pump(const Duration(milliseconds: 50));
   await t.runAsync(() async {
-    final b = _boundary.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+    final b =
+        _boundary.currentContext!.findRenderObject()! as RenderRepaintBoundary;
     final img = await b.toImage(pixelRatio: 3);
     final png = await img.toByteData(format: ui.ImageByteFormat.png);
     Directory(_shots).createSync(recursive: true);
@@ -95,19 +103,24 @@ Future<void> _show(WidgetTester t, String id) async {
 Future<void> _tapCta(WidgetTester t, String id) async {
   await _show(t, id);
   await t.tap(find.byKey(ValueKey('getstarted-cta-$id')));
-  await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+  await t
+      .runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
   await _pumps(t, 12);
 }
 
 Future<void> _back(WidgetTester t) async {
   final nav = t.state<NavigatorState>(find.byType(Navigator).first);
   nav.popUntil((r) => r.isFirst);
-  await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+  await t
+      .runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
   await _pumps(t, 8);
 }
 
-bool _dotDone(String id) =>
-    find.byKey(ValueKey('routine-step-${GetStartedProgress.steps.indexOf(id)}-done')).evaluate().isNotEmpty;
+bool _dotDone(String id) => find
+    .byKey(
+        ValueKey('routine-step-${GetStartedProgress.steps.indexOf(id)}-done'))
+    .evaluate()
+    .isNotEmpty;
 
 void main() {
   setUpAll(() async {
@@ -121,11 +134,13 @@ void main() {
       '/usr/share/fonts/truetype/sand-box/google/Noto Sans Devanagari/NotoSansDevanagari-VariableFont_wdth,wght.ttf',
     ]);
     final m = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
-    m.setMockMethodCallHandler(const MethodChannel('flutter_tts'), (c) async => 1);
+    m.setMockMethodCallHandler(
+        const MethodChannel('flutter_tts'), (c) async => 1);
   });
 
   setUp(() {
-    SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1', kPlayerGuideSeenKey: true});
+    SharedPreferences.setMockInitialValues(
+        {'nwsb_terms_hub': '1', kPlayerGuideSeenKey: true});
     GetStartedProgress.instance.debugReset();
     _tabs.clear();
   });
@@ -137,10 +152,17 @@ void main() {
     for (var i = 0; i < 7; i++) {
       expect(find.byKey(ValueKey('routine-step-$i')), findsOneWidget);
     }
-    for (final bad in ['Positive Self-Talk & Power', 'Life Coaching', 'Story', 'What Your Body Knows', 'A Softer Inner Voice']) {
+    for (final bad in [
+      'Positive Self-Talk & Power',
+      'Life Coaching',
+      'Story',
+      'What Your Body Knows',
+      'A Softer Inner Voice'
+    ]) {
       expect(find.textContaining(bad), findsNothing);
     }
-    expect(find.byType(Image), findsNothing, reason: 'word-only art, no posters or bag badges');
+    expect(find.byType(Image), findsWidgets,
+        reason: 'original poster images and store badges');
     expect(find.text('0 of 7 done'), findsOneWidget);
     for (final id in GetStartedProgress.steps) {
       await _show(t, id);
@@ -149,13 +171,16 @@ void main() {
     }
   });
 
-  testWidgets('every CTA opens its page and the dots follow what was done', (t) async {
+  testWidgets('every CTA opens its page and the dots follow what was done',
+      (t) async {
     final prev = FlutterError.onError;
     // Full pages (player, Sound Library) log transient overflows/asset misses
     // in the test harness; this test is about where each card goes.
     FlutterError.onError = (d) {
       final s = d.toString();
-      if (!s.contains('overflowed') && !s.contains('Unable to load asset') && !s.contains('HTTP')) prev!(d);
+      if (!s.contains('overflowed') &&
+          !s.contains('Unable to load asset') &&
+          !s.contains('HTTP')) prev!(d);
     };
     addTearDown(() => FlutterError.onError = prev);
     await _pumpSection(t);
@@ -170,8 +195,10 @@ void main() {
     await _tapCta(t, 'practise');
     expect(find.byType(PracticePlayerScreen), findsOneWidget);
     await _back(t);
-    expect(_dotDone('practise'), isFalse, reason: 'opening the player is not a finished session');
-    await t.runAsync(() => PracticeProgress.instance.recordCompletedWord(word.first));
+    expect(_dotDone('practise'), isFalse,
+        reason: 'opening the player is not a finished session');
+    await t.runAsync(
+        () => PracticeProgress.instance.recordCompletedWord(word.first));
     await _pumps(t, 4);
     expect(_dotDone('practise'), isTrue);
 
@@ -209,12 +236,14 @@ void main() {
 
     // Kept on the phone.
     final kept = await t.runAsync(() async =>
-        (await SharedPreferences.getInstance()).getStringList(GetStartedProgress.prefsKey));
+        (await SharedPreferences.getInstance())
+            .getStringList(GetStartedProgress.prefsKey));
     expect(kept!.toSet(), GetStartedProgress.steps.toSet());
     await t.runAsync(() => PracticeProgress.instance.clearAll());
   });
 
-  testWidgets('stepper with some steps done (shot) and stored steps reload', (t) async {
+  testWidgets('stepper with some steps done (shot) and stored steps reload',
+      (t) async {
     SharedPreferences.setMockInitialValues({
       'nwsb_terms_hub': '1',
       GetStartedProgress.prefsKey: ['word', 'guide', 'sounds'],
@@ -231,12 +260,17 @@ void main() {
     await _shot(t, 'stepper-3-done');
   });
 
-  testWidgets('auto-advance: 5 s per card, holds on touch, resumes 5 s later', (t) async {
+  testWidgets('auto-advance: 5 s per card, holds on touch, resumes 5 s later',
+      (t) async {
     NmHorizontalRoutineCards.autoAdvance = true;
     addTearDown(() => NmHorizontalRoutineCards.autoAdvance = false);
     await _pumpSection(t);
     final row = find.byKey(const ValueKey('getstarted-row'));
-    double offset() => t.state<ScrollableState>(find.descendant(of: row, matching: find.byType(Scrollable))).position.pixels;
+    double offset() => t
+        .state<ScrollableState>(
+            find.descendant(of: row, matching: find.byType(Scrollable)))
+        .position
+        .pixels;
     expect(offset(), 0);
     await t.pump(const Duration(seconds: 5));
     await t.pump(const Duration(milliseconds: 650));
