@@ -944,6 +944,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     );
   }
 
+  void _openHowItWorks() {
+    showHowItWorks(context);
+  }
+
   void _openNotes() {
     showModalBottomSheet<void>(
       context: context,
@@ -1326,6 +1330,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               onBack: _minimizeToPill,
                               onSettings: _openSettings,
                               onMore: _openAuraClock,
+                              onHowItWorks: _openHowItWorks,
                             ),
                             const SizedBox(height: 12),
                             Center(
@@ -1538,10 +1543,12 @@ class _PlayerHeader extends StatelessWidget {
     required this.onBack,
     required this.onSettings,
     required this.onMore,
+    required this.onHowItWorks,
   });
   final VoidCallback onBack;
   final VoidCallback onSettings;
   final VoidCallback onMore;
+  final VoidCallback onHowItWorks;
 
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -1579,7 +1586,21 @@ class _PlayerHeader extends StatelessWidget {
         ),
         Align(
           alignment: Alignment.centerRight,
-          child: _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onMore),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                button: true,
+                label: 'How it works',
+                child: _BareIconButton(
+                  key: const ValueKey('player-how-it-works-btn'),
+                  icon: Icons.info_outline_rounded,
+                  onTap: onHowItWorks,
+                ),
+              ),
+              _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onMore),
+            ],
+          ),
         ),
       ],
     ),
@@ -4610,7 +4631,7 @@ class _RoundIconButton extends StatelessWidget {
 }
 
 class _BareIconButton extends StatelessWidget {
-  const _BareIconButton({required this.icon, required this.onTap});
+  const _BareIconButton({super.key, required this.icon, required this.onTap});
   final IconData icon;
   final VoidCallback onTap;
 
