@@ -49,7 +49,7 @@ void main() {
     await t.pump();
     expect(find.text('Unlock this word'), findsOneWidget);
     expect(find.text('The first sound'), findsNothing, reason: 'meaning stays hidden');
-    expect(find.byIcon(Icons.play_circle_outline), findsNothing, reason: 'no free play button');
+    expect(find.byIcon(Icons.play_arrow_rounded), findsNothing, reason: 'no free play button');
     expect(find.byIcon(Icons.lock_outline), findsWidgets);
     await t.pumpWidget(const SizedBox());
     await t.pump(const Duration(seconds: 5));
@@ -60,7 +60,7 @@ void main() {
     await t.pump();
     expect(find.text('Unlock this word'), findsNothing);
     expect(find.text('The first sound'), findsOneWidget);
-    expect(find.byIcon(Icons.play_circle_outline), findsOneWidget);
+    expect(find.byIcon(Icons.play_arrow_rounded), findsOneWidget);
     await t.pumpWidget(const SizedBox());
     await t.pump(const Duration(seconds: 5));
   });

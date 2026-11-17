@@ -24,15 +24,15 @@ import '../features/downloads/download_button.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../admin/template/editable.dart';
 import '../data/entitlements.dart';
 import '../data/models.dart';
 import '../data/word_private.dart';
-import 'daily_tasks.dart' show DailyTasks;
-import '../theme/tokens.dart';
-import '../widgets/app_backdrop.dart';
-import '../widgets/content_lock.dart';
-import '../admin/template/editable.dart';
 import '../media/nwsb_video.dart';
+import '../widgets/content_lock.dart';
+import '../widgets/restyle_kit.dart';
+import 'daily_tasks.dart' show DailyTasks;
+import 'practice_player.dart' show playerCoverArtFor;
 
 class WordDetail extends StatefulWidget {
   const WordDetail({super.key, required this.word});
@@ -90,270 +90,184 @@ class _WordDetailState extends State<WordDetail> {
     // /api/content/word once entitled — never assume public docs still carry them.
     return ListenableBuilder(
       listenable: Entitlements.instance,
-      builder: (context, _) => _page(context, Entitlements.instance.canOpenWord(widget.word)),
+      builder: (context, _) =>
+          _page(context, Entitlements.instance.canOpenWord(widget.word)),
     );
   }
 
   Widget _page(BuildContext context, bool open) {
     final word = _word;
-    return Scaffold(
-      backgroundColor: NwsbColors.deep,
-      body: Stack(
-        children: [
-          const Positioned.fill(child: AppBackdrop()),
-          const Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xB3060C18), Color(0xFA060C18)],
-                ),
+    final facts = <Widget>[
+      if (open && word.meaning.isNotEmpty)
+        _Fact(label: 'MEANING', value: word.meaning, icon: Icons.translate),
+      if (word.benefit.isNotEmpty)
+        _Fact(
+            label: 'WHAT IT DOES',
+            value: word.benefit,
+            icon: Icons.favorite_border),
+      if (word.organ.isNotEmpty)
+        _Fact(
+            label: 'WHERE IT WORKS',
+            value: word.organ,
+            icon: Icons.my_location),
+      if (word.mouthPos.isNotEmpty)
+        _Fact(
+            label: 'YOUR MOUTH',
+            value: word.mouthPos,
+            icon: Icons.record_voice_over_outlined),
+      if (word.resonance.isNotEmpty)
+        _Fact(
+            label: 'WHERE YOU FEEL IT',
+            value: word.resonance,
+            icon: Icons.graphic_eq),
+      if (word.mistake.isNotEmpty)
+        _Fact(
+            label: 'THE COMMON MISTAKE',
+            value: word.mistake,
+            icon: Icons.error_outline,
+            warn: true),
+      if (word.tip.isNotEmpty)
+        _Fact(label: 'A TIP', value: word.tip, icon: Icons.lightbulb_outline),
+      if (word.notes.isNotEmpty)
+        _Fact(
+            label: 'NOTES',
+            value: word.notes,
+            icon: Icons.sticky_note_2_outlined),
+    ];
+    final sub = [
+      if (word.deva.isNotEmpty) word.word,
+      if (word.phonetic.isNotEmpty) word.phonetic,
+    ].where((e) => e.trim().isNotEmpty).join('  ·  ');
+    return KitPage(
+      eyebrow: word.origin.isNotEmpty ? word.origin : 'Word',
+      title: word.word,
+      children: [
+        KitHero(
+          art: _WordPoster(word: word),
+          eyebrow: word.origin.isNotEmpty ? word.origin : 'Word',
+          title: word.deva.isNotEmpty ? word.deva : word.word,
+          subline: sub.isEmpty ? null : sub,
+          cornerLabel: open ? null : 'Locked',
+        ),
+        if (open && WordVoice.hasVoice(word))
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: DownloadButton(
+                id: WordVoice.downloadId(word),
+                title: word.word,
+                kind: 'word',
+                url: word.voice,
               ),
             ),
           ),
-          SafeArea(
+        if (!open) _LockedCard(word: word),
+        if (open && word.video.startsWith('http'))
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: _WordVideo(url: word.video),
+          ),
+        if (word.description.isNotEmpty)
+          KitPane(
+            eyebrow: 'About this word',
+            title: word.word,
+            mark: NwsbMarks.word,
+            child: Text(word.description,
+                style: const TextStyle(
+                    color: Color(0xE6FFFFFF), fontSize: 15, height: 1.5)),
+          ),
+        if (word.parts.isNotEmpty)
+          KitPane(
+            eyebrow: 'How to say it',
+            title: 'Sound parts',
+            mark: NwsbMarks.sound,
+            child: _Parts(parts: word.parts),
+          ),
+        if (facts.isNotEmpty)
+          KitPane(
+            eyebrow: 'The word',
+            title: 'Meaning and use',
+            mark: NwsbMarks.meaning,
             child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: facts),
+          ),
+        if (word.stages.isNotEmpty)
+          KitPane(
+            eyebrow: 'Practice',
+            title: 'Stages',
+            mark: NwsbMarks.stages,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _TopBar(title: word.word),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
-                    children: [
-                      _Headline(word: word),
-                      // Offline copy of this word's real recording (paid
-                      // words only once open). Hidden when there is none.
-                      if (open && WordVoice.hasVoice(word))
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: DownloadButton(
-                            id: WordVoice.downloadId(word),
-                            title: word.word,
-                            kind: 'word',
-                            url: word.voice,
-                          ),
-                        ),
-                      const SizedBox(height: 26),
-                      if (!open) ...[
-                        _LockedCard(word: word),
-                        const SizedBox(height: 22),
-                      ],
-                      if (open && word.video.startsWith('http')) ...[
-                        _WordVideo(url: word.video),
-                        const SizedBox(height: 22),
-                      ],
-                      if (word.description.isNotEmpty) ...[
-                        const _SectionLabel('ABOUT THIS WORD'),
-                        const SizedBox(height: 10),
-                        Text(word.description, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 15, height: 1.5)),
-                        const SizedBox(height: 24),
-                      ],
-                      if (word.parts.isNotEmpty) ...[
-                        const _SectionLabel('HOW TO SAY IT'),
-                        const SizedBox(height: 12),
-                        _Parts(parts: word.parts),
-                        const SizedBox(height: 26),
-                      ],
-                      if (open && word.meaning.isNotEmpty)
-                        _Fact(
-                          label: 'MEANING',
-                          value: word.meaning,
-                          icon: Icons.translate,
-                        ),
-                      if (word.benefit.isNotEmpty)
-                        _Fact(
-                          label: 'WHAT IT DOES',
-                          value: word.benefit,
-                          icon: Icons.favorite_border,
-                        ),
-                      if (word.organ.isNotEmpty)
-                        _Fact(
-                          label: 'WHERE IT WORKS',
-                          value: word.organ,
-                          icon: Icons.my_location,
-                        ),
-                      if (word.mouthPos.isNotEmpty)
-                        _Fact(
-                          label: 'YOUR MOUTH',
-                          value: word.mouthPos,
-                          icon: Icons.record_voice_over_outlined,
-                        ),
-                      if (word.resonance.isNotEmpty)
-                        _Fact(
-                          label: 'WHERE YOU FEEL IT',
-                          value: word.resonance,
-                          icon: Icons.graphic_eq,
-                        ),
-                      if (word.mistake.isNotEmpty)
-                        _Fact(
-                          label: 'THE COMMON MISTAKE',
-                          value: word.mistake,
-                          icon: Icons.error_outline,
-                          warn: true,
-                        ),
-                      if (word.tip.isNotEmpty)
-                        _Fact(
-                          label: 'A TIP',
-                          value: word.tip,
-                          icon: Icons.lightbulb_outline,
-                        ),
-                      if (word.stages.isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        const _SectionLabel('STAGES'),
-                        const SizedBox(height: 12),
-                        for (var i = 0; i < word.stages.length; i++) _Stage(n: i + 1, stage: word.stages[i], word: word, open: open),
-                      ],
-                      if (word.images.any((u) => u.startsWith('http'))) ...[
-                        const SizedBox(height: 14),
-                        _Images(urls: [for (final u in word.images) if (u.startsWith('http')) u]),
-                      ],
-                      if (word.notes.isNotEmpty) ...[
-                        const SizedBox(height: 10),
-                        _Fact(label: 'NOTES', value: word.notes, icon: Icons.sticky_note_2_outlined),
-                      ],
-                      const SizedBox(height: 18),
-                      if (word.categories.isNotEmpty) _Chips(word.categories),
-                    ],
-                  ),
-                ),
+                for (var i = 0; i < word.stages.length; i++)
+                  _Stage(
+                      n: i + 1, stage: word.stages[i], word: word, open: open),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar({required this.title});
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 16, 4),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).maybePop(),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child:
-                  const Icon(Icons.arrow_back, size: 20, color: NwsbColors.ink),
-            ),
+        if (word.images.any((u) => u.startsWith('http')))
+          KitPane(
+            eyebrow: 'Gallery',
+            title: 'Images',
+            mark: NwsbMarks.feed,
+            child: _Images(urls: [
+              for (final u in word.images)
+                if (u.startsWith('http')) u
+            ]),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: EditableLabel('word_detail.TopBar',
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.w800,
-                color: Colors.white,
-              ),
-            ),
+        if (word.categories.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: _Chips(word.categories),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Headline extends StatelessWidget {
-  const _Headline({required this.word});
-  final Word word;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          word.origin,
-          style: const TextStyle(
-            fontSize: 10,
-            letterSpacing: 3,
-            fontWeight: FontWeight.w700,
-            color: NwsbColors.gold,
-          ),
-        ),
-        const SizedBox(height: 14),
-        // The Devanagari first and largest when it exists — it is the word.
-        // The roman spelling under it is a reading aid, not the thing itself.
-        if (word.deva.isNotEmpty)
-          Text(
-            word.deva,
-            style: const TextStyle(
-              fontSize: 46,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-              height: 1.25,
-            ),
-          ),
-        Text(
-          word.word,
-          style: TextStyle(
-            fontSize: word.deva.isEmpty ? 42 : 26,
-            fontWeight: FontWeight.w800,
-            color: word.deva.isEmpty ? Colors.white : NwsbColors.goldLight,
-            height: 1.1,
-            letterSpacing: word.deva.isEmpty ? -0.5 : 1,
-          ),
-        ),
-        if (word.phonetic.isNotEmpty) ...[
-          const SizedBox(height: 8),
-          Text(
-            word.phonetic,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0x99FFFFFF),
-              letterSpacing: 1.5,
-            ),
-          ),
-        ],
       ],
     );
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  const _SectionLabel(this.text);
-  final String text;
+/// The word's own poster in the hero tile: bundled word art first, then
+/// a WordArt upload, then the NowssB poster. Same path the player uses.
+class _WordPoster extends StatelessWidget {
+  const _WordPoster({required this.word});
+  final Word word;
 
   @override
   Widget build(BuildContext context) {
-    return EditableLabel('word_detail.SectionLabel',
-      text,
-      style: const TextStyle(
-        fontSize: 10,
-        letterSpacing: 2.5,
-        fontWeight: FontWeight.w700,
-        color: Color(0x8CFFFFFF),
-      ),
+    final path = playerCoverArtFor(word, 0);
+    Widget err(BuildContext _, Object __, StackTrace? ___) =>
+        KitWordArt(word: word.word, deva: word.deva);
+    if (path.startsWith('http')) {
+      return EditableImage.network(
+        path,
+        fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
+        word: word.word,
+        errorBuilder: err,
+        slot: 'word_detail.Poster',
+      );
+    }
+    return EditableImage.asset(
+      path,
+      fit: BoxFit.cover,
+      alignment: Alignment.topCenter,
+      word: word.word,
+      errorBuilder: err,
+      slot: 'word_detail.Poster',
     );
   }
 }
 
-/// The pronunciation boxes. Three to five, side by side and scrollable —
-/// they are read left to right as one word, so they must not wrap into a
-/// grid where the reading order stops being obvious.
 class _Parts extends StatelessWidget {
   const _Parts({required this.parts});
   final List<WordPart> parts;
 
   @override
   Widget build(BuildContext context) {
+    final scale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.6);
     return SizedBox(
-      height: 132,
+      height: 132 * scale,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: parts.length,
@@ -364,20 +278,16 @@ class _Parts extends StatelessWidget {
             width: 116,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0x14FFFFFF),
+              color: const Color(0xF0111114),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0x1FFFFFFF)),
+              border: Border.all(color: const Color(0x33FFFFFF)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   '${i + 1}',
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: NwsbColors.gold,
-                  ),
+                  style: kKitEyebrow,
                 ),
                 const Spacer(),
                 if (p.deva.isNotEmpty)
@@ -407,8 +317,9 @@ class _Parts extends StatelessWidget {
                   'hold ${p.hold.toStringAsFixed(p.hold % 1 == 0 ? 0 : 1)}s',
                   style: const TextStyle(
                     fontSize: 10,
-                    color: NwsbColors.goldLight,
+                    color: kKitMuted,
                     letterSpacing: 0.5,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -435,36 +346,29 @@ class _Fact extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: warn ? const Color(0x1AE0342B) : const Color(0x0FFFFFFF),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: warn ? const Color(0x33E0342B) : const Color(0x14FFFFFF),
-        ),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon,
-              size: 17,
-              color: warn ? const Color(0xFFFF8A80) : NwsbColors.goldLight),
+          KitIconBadge(icon, size: 34),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                EditableLabel('word_detail.Fact',
+                EditableLabel(
+                  'word_detail.Fact',
                   label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: 9,
-                    letterSpacing: 1.8,
+                    fontSize: 10.5,
+                    letterSpacing: 1.4,
                     fontWeight: FontWeight.w700,
                     color: warn
                         ? const Color(0xCCFF8A80)
-                        : const Color(0x8CFFFFFF),
+                        : const Color(0xB3FFFFFF),
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -497,18 +401,18 @@ class _Chips extends StatelessWidget {
       children: [
         for (final c in items)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
             decoration: BoxDecoration(
-              color: const Color(0x14FFFFFF),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0x1FFFFFFF)),
+              color: const Color(0x24FFFFFF),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0x40FFFFFF)),
             ),
             child: Text(
               c,
               style: const TextStyle(
-                fontSize: 11,
-                color: Color(0xCCFFFFFF),
-                letterSpacing: 0.3,
+                fontSize: 12,
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -516,7 +420,6 @@ class _Chips extends StatelessWidget {
     );
   }
 }
-
 
 /// Shown instead of the paid parts (recordings, videos, meaning) of a word
 /// this account hasn't unlocked. Tapping opens the same lock sheet as the
@@ -537,27 +440,37 @@ class _LockedCard extends StatelessWidget {
         }
       },
       behavior: HitTestBehavior.opaque,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0x1AE8C77E),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: const Color(0x55E8C77E)),
-        ),
-        child: const Row(children: [
-          Icon(Icons.lock_outline, color: Color(0xFFE8C77E), size: 22),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              EditableLabel('word_detail.LockedCard', 'Unlock this word',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15)),
-              SizedBox(height: 4),
-              EditableLabel('word_detail.LockedCard', 'Recordings, video and meaning open when you own the word or have a plan.',
-                  style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 12.5, height: 1.4)),
-            ]),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xF0111114),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: const Color(0x33FFFFFF)),
           ),
-          Icon(Icons.chevron_right, color: Color(0xFFE8C77E)),
-        ]),
+          child: const Row(children: [
+            KitIconBadge(Icons.lock_outline, size: 46),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    EditableLabel('word_detail.LockedCard', 'Unlock this word',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 16)),
+                    SizedBox(height: 4),
+                    EditableLabel('word_detail.LockedCard',
+                        'Recordings, video and meaning open when you own the word or have a plan.',
+                        style: TextStyle(
+                            color: kKitMuted, fontSize: 12.5, height: 1.4)),
+                  ]),
+            ),
+            KitRoundButton(icon: Icons.arrow_forward_rounded),
+          ]),
+        ),
       ),
     );
   }
@@ -573,14 +486,24 @@ class _WordVideo extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: AspectRatio(
           aspectRatio: 16 / 9,
-          child: NwsbVideo(asset: url, fit: BoxFit.cover, showPoster: false, obeyMotion: false, slot: 'word_detail.WordVideo', id: 'video'),
+          child: NwsbVideo(
+              asset: url,
+              fit: BoxFit.cover,
+              showPoster: false,
+              obeyMotion: false,
+              slot: 'word_detail.WordVideo',
+              id: 'video'),
         ),
       );
 }
 
 /// One stage of the practice, with its own recording or clip if it has one.
 class _Stage extends StatefulWidget {
-  const _Stage({required this.n, required this.stage, required this.word, required this.open});
+  const _Stage(
+      {required this.n,
+      required this.stage,
+      required this.word,
+      required this.open});
   final int n;
   final WordStage stage;
   final Word word;
@@ -627,37 +550,52 @@ class _StageState extends State<_Stage> {
   @override
   Widget build(BuildContext context) {
     final st = widget.stage;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0x0FFFFFFF),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0x1FFFFFFF)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Container(
-            width: 26,
-            height: 26,
+            width: 34,
+            height: 34,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(color: Color(0x33E8C77E), shape: BoxShape.circle),
-            child: Text('${widget.n}', style: const TextStyle(color: Color(0xFFE8C77E), fontWeight: FontWeight.w800, fontSize: 12)),
+            decoration: const BoxDecoration(
+                color: Colors.white, shape: BoxShape.circle),
+            child: Text('${widget.n}',
+                style: const TextStyle(
+                    color: Color(0xFF0B0B10),
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13)),
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(st.title.isEmpty ? '' : st.title,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('STAGE ${widget.n}', style: kKitEyebrow),
+              if (st.title.isNotEmpty)
+                Text(st.title,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15)),
+            ]),
           ),
           if (st.audio.startsWith('http'))
-            IconButton(
-              onPressed: _toggle,
-              icon: Icon(_playing ? Icons.stop_circle_outlined : (widget.open ? Icons.play_circle_outline : Icons.lock_outline), color: const Color(0xFFE8C77E)),
+            KitRoundButton(
+              icon: _playing
+                  ? Icons.stop_rounded
+                  : (widget.open
+                      ? Icons.play_arrow_rounded
+                      : Icons.lock_outline),
+              size: 46,
+              onTap: _toggle,
+              label: _playing ? 'Stop' : (widget.open ? 'Play' : 'Unlock'),
             ),
         ]),
         if (st.text.isNotEmpty) ...[
           const SizedBox(height: 8),
-          Text(st.text, style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 14, height: 1.45)),
+          Text(st.text,
+              style: const TextStyle(
+                  color: Color(0xD9FFFFFF), fontSize: 14, height: 1.45)),
         ],
         if (widget.open && st.video.startsWith('http')) ...[
           const SizedBox(height: 10),
@@ -665,7 +603,13 @@ class _StageState extends State<_Stage> {
             borderRadius: BorderRadius.circular(14),
             child: AspectRatio(
               aspectRatio: 16 / 9,
-              child: NwsbVideo(asset: st.video, fit: BoxFit.cover, showPoster: false, obeyMotion: false, slot: 'word_detail.Stage', id: 'stage${widget.n}'),
+              child: NwsbVideo(
+                  asset: st.video,
+                  fit: BoxFit.cover,
+                  showPoster: false,
+                  obeyMotion: false,
+                  slot: 'word_detail.Stage',
+                  id: 'stage${widget.n}'),
             ),
           ),
         ],
@@ -689,7 +633,10 @@ class _Images extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             child: AspectRatio(
               aspectRatio: 1,
-              child: Image.network(urls[i], fit: BoxFit.cover, errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0x14FFFFFF))),
+              child: Image.network(urls[i],
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      const ColoredBox(color: Color(0x14FFFFFF))),
             ),
           ),
         ),
