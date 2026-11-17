@@ -28,6 +28,7 @@ class FaintFilm extends StatelessWidget {
                   priority: ClipPriority.feature,
                   autoplay: true,
                   loop: true,
+                  obeyMotion: true,
                   slot: 'faint_film.FaintFilm',
                 ),
         ),

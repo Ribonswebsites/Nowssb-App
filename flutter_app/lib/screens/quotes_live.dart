@@ -1,6 +1,7 @@
 /// "Today quotes to live by" tab, the week page, and the admin editor.
 library;
 
+import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
@@ -8,13 +9,11 @@ import '../data/app_control.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/firebase.dart';
 import '../data/settings.dart';
-import '../media/nwsb_video.dart';
-import '../media/video_pool.dart';
+import '../media/quote_film.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/glass_wrap.dart';
@@ -1375,31 +1374,89 @@ class _SharedLine {
   final String text;
 }
 
-/// Once a day, after the splash, the line opens as its own card.
-/// Quotes or Close. It does not sit on the home page.
-Future<void> showDailyQuoteIfNeeded(BuildContext context) async {
+/// Older builds wrote this (device-wide) key — only AFTER the pop-up was
+/// dismissed, so a pop-up that was still open when the app was swiped away,
+/// or two shells opening at once, meant it came back on every launch.
+const _kDailyQuoteShownLegacy = _kDailyQuoteShown;
+
+/// One mark per account (or per device when signed out), per local day.
+String dailyQuoteShownKey([String? uid]) =>
+    (uid == null || uid.isEmpty) ? 'nwsb_daily_quote_seen_v5' : 'nwsb_daily_quote_seen_v5_$uid';
+
+String? _quoteUid() {
+  try {
+    return NwsbFirebase.ready ? FirebaseAuth.instance.currentUser?.uid : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/// True while a daily check is running — a second shell (auth swap, home
+/// switch) arriving at the same moment must not open a second pop-up.
+bool _dailyQuoteBusy = false;
+
+/// Whether today's pop-up has not been shown yet on this account.
+Future<bool> dailyQuoteDue({DateTime? now, String? uid}) async {
   final prefs = await SharedPreferences.getInstance();
-  final today = _dayKey(DateTime.now());
-  if (prefs.getString(_kDailyQuoteShown) == today) {
+  final today = _dayKey(now ?? DateTime.now());
+  final key = dailyQuoteShownKey(uid ?? _quoteUid());
+  if (prefs.getString(key) == today) return false;
+  if (prefs.getString(_kDailyQuoteShownLegacy) == today) return false;
+  return true;
+}
+
+/// Called when the home loads: on a day the pop-up is still due, decode its
+/// poster and open its film now so it plays the instant it appears.
+Future<void> warmDailyQuote(BuildContext context) async {
+  try {
+    if (!await dailyQuoteDue()) return;
+    if (!context.mounted) return;
+    unawaited(QuoteFilm.precachePoster(context));
+    unawaited(QuoteFilm.prepare());
+  } catch (_) {}
+}
+
+/// At most once per calendar day (local date), after the splash. The day is
+/// claimed BEFORE the card opens, so closing the app with it open, or two
+/// shells asking at once, can never bring it back the same day.
+Future<void> showDailyQuoteIfNeeded(BuildContext context, {DateTime? now, String? uid}) async {
+  if (_dailyQuoteBusy) return;
+  _dailyQuoteBusy = true;
+  try {
+    final id = uid ?? _quoteUid();
+    if (!await dailyQuoteDue(now: now, uid: id)) {
+      unawaited(QuoteFilm.release());
+      return;
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(dailyQuoteShownKey(id), _dayKey(now ?? DateTime.now()));
+    if (!context.mounted) {
+      unawaited(QuoteFilm.release());
+      return;
+    }
+    await showTodayQuote(context, now: now);
+  } finally {
+    _dailyQuoteBusy = false;
     DailyQuoteGate.done.value = true;
-    return;
   }
-  if (!context.mounted) {
-    DailyQuoteGate.done.value = true;
-    return;
-  }
+}
+
+/// Today's quote card, any time (the daily open, or by hand from Quotes).
+Future<void> showTodayQuote(BuildContext context, {DateTime? now}) async {
   final live = Settings.instance.liveQuote.trim();
   final line = live.isNotEmpty ? live : _kBuddhaQuote;
+  unawaited(QuoteFilm.prepare());
   try {
     await showGeneralDialog<void>(
       context: context,
       barrierDismissible: true,
-      barrierLabel: 'Today quote',
-      barrierColor: const Color(0xC0000000),
-      transitionDuration: const Duration(milliseconds: 280),
+      barrierLabel: "Today's quote",
+      barrierColor: const Color(0xC8000000),
+      transitionDuration: const Duration(milliseconds: 320),
       pageBuilder: (dialogContext, _, __) {
         return _DailyQuotePopup(
           quote: line,
+          day: now ?? DateTime.now(),
           onClose: () => Navigator.of(dialogContext).pop(),
           onQuotes: () {
             Navigator.of(dialogContext).pop();
@@ -1413,20 +1470,50 @@ Future<void> showDailyQuoteIfNeeded(BuildContext context) async {
         );
       },
       transitionBuilder: (context, anim, _, child) {
-        return FadeTransition(opacity: anim, child: child);
+        final a = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
+        return FadeTransition(
+          opacity: a,
+          child: ScaleTransition(
+            scale: Tween<double>(begin: 0.96, end: 1).animate(a),
+            child: child,
+          ),
+        );
       },
     );
-    final again = await SharedPreferences.getInstance();
-    await again.setString(_kDailyQuoteShown, today);
   } finally {
-    DailyQuoteGate.done.value = true;
+    unawaited(QuoteFilm.release());
   }
 }
 
+const _kMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+TextStyle _dm({
+  required double size,
+  FontWeight weight = FontWeight.w400,
+  Color color = Colors.white,
+  double? height,
+  double? spacing,
+}) =>
+    TextStyle(
+      fontFamily: 'DM Sans',
+      fontSize: size,
+      fontWeight: weight,
+      color: color,
+      height: height,
+      letterSpacing: spacing,
+      fontStyle: FontStyle.normal,
+      decoration: TextDecoration.none,
+    );
 
 class _DailyQuotePopup extends StatefulWidget {
-  const _DailyQuotePopup({required this.quote, required this.onClose, required this.onQuotes});
+  const _DailyQuotePopup({
+    required this.quote,
+    required this.day,
+    required this.onClose,
+    required this.onQuotes,
+  });
   final String quote;
+  final DateTime day;
   final VoidCallback onClose;
   final VoidCallback onQuotes;
 
@@ -1434,98 +1521,269 @@ class _DailyQuotePopup extends StatefulWidget {
   State<_DailyQuotePopup> createState() => _DailyQuotePopupState();
 }
 
-class _DailyQuotePopupState extends State<_DailyQuotePopup> with SingleTickerProviderStateMixin {
-  late final AnimationController _rise = AnimationController(vsync: this, duration: const Duration(milliseconds: 700))..forward();
+class _DailyQuotePopupState extends State<_DailyQuotePopup> {
+  Set<String> _likes = {};
+  Set<String> _saves = {};
+
+  String get _id => _dayKey(widget.day);
 
   @override
-  void dispose() {
-    _rise.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final m = await _readMarks();
+      if (!mounted) return;
+      setState(() {
+        _likes = m.likes;
+        _saves = m.saves;
+      });
+    } catch (_) {}
+  }
+
+  /// The same Save the Quotes page keeps for today.
+  Future<void> _toggleSave() async {
+    final on = !_saves.contains(_id);
+    setState(() => on ? _saves.add(_id) : _saves.remove(_id));
+    await _writeMarks(_likes, _saves);
+  }
+
+  double _quoteSize(String q) {
+    final n = q.length;
+    if (n <= 70) return 24;
+    if (n <= 130) return 21;
+    if (n <= 200) return 18.5;
+    return 16.5;
   }
 
   @override
   Widget build(BuildContext context) {
-    final rise = CurvedAnimation(parent: _rise, curve: Curves.easeOutCubic);
-    return SafeArea(
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 22),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: const Color(0x33FFFFFF),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: const Color(0x66FFFFFF)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: ColoredBox(
-                      color: const Color(0xFF07070C),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const AspectRatio(
-                            aspectRatio: 16 / 9,
-                            child: const NwsbVideo(
-                              asset: 'assets/video/todays-quote.mp4',
-                              priority: ClipPriority.feature,
-                              fit: BoxFit.cover,
+    final mq = MediaQuery.of(context);
+    final w = (mq.size.width - 32).clamp(0.0, 400.0);
+    final d = widget.day;
+    final dateLine = '${_days[d.weekday - 1].substring(0, 3)}, ${d.day} ${_kMonths[d.month - 1]}';
+    final saved = _saves.contains(_id);
+    return Material(
+      type: MaterialType.transparency,
+      child: SafeArea(
+        child: Center(
+          child: SizedBox(
+            key: const ValueKey('daily-quote-popup'),
+            width: w,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x8C000000), blurRadius: 48, offset: Offset(0, 22)),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: const Color(0xE60A0A0F),
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(color: GlassWrap.line),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: AspectRatio(
+                              aspectRatio: 1.62,
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  const QuoteFilmBand(),
+                                  const DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        stops: [0, 0.45, 1],
+                                        colors: [Color(0x33000000), Color(0x00000000), Color(0xB3000000)],
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 10,
+                                    right: 10,
+                                    child: _GlassRound(
+                                      key: const ValueKey('daily-quote-x'),
+                                      icon: Icons.close_rounded,
+                                      label: 'Close',
+                                      onTap: widget.onClose,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 10,
+                                    left: 10,
+                                    child: _GlassRound(
+                                      key: const ValueKey('daily-quote-save'),
+                                      icon: saved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                                      label: saved ? 'Saved' : 'Save',
+                                      onTap: _toggleSave,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    left: 12,
+                                    bottom: 10,
+                                    child: Image.asset(
+                                      'assets/icons/quote-headphones.webp',
+                                      width: 58,
+                                      height: 52,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(18, 4, 18, 16),
-                            child: FadeTransition(
-                              opacity: rise,
-                              child: SlideTransition(
-                                position: Tween<Offset>(begin: const Offset(0, 0.12), end: Offset.zero).animate(rise),
-                                child: Text(
-                                  widget.quote,
-                                  style: GoogleFonts.libreBaskerville(
-                                    color: Colors.white,
-                                    fontSize: 22,
-                                    height: 1.35,
-                                    decoration: TextDecoration.none,
-                                  ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                          child: Row(
+                            children: [
+                              Text("TODAY'S QUOTE",
+                                  style: _dm(size: 11.5, weight: FontWeight.w800, color: const Color(0xFFE8D5A3), spacing: 1.6)),
+                              const Spacer(),
+                              Flexible(
+                                child: Text(dateLine,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: _dm(size: 12, weight: FontWeight.w500, color: const Color(0x8CFFFFFF))),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxHeight: mq.size.height * 0.34),
+                            child: SingleChildScrollView(
+                              child: Text(
+                                widget.quote,
+                                style: _dm(
+                                  size: _quoteSize(widget.quote),
+                                  weight: FontWeight.w600,
+                                  height: 1.32,
+                                  spacing: -0.2,
                                 ),
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: TextButton(
-                                    onPressed: widget.onClose,
-                                    child: const Text('Close', style: TextStyle(color: Colors.white, fontSize: 15, decoration: TextDecoration.none)),
-                                  ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 20, 14, 14),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: _PopPill(
+                                  key: const ValueKey('daily-quote-close'),
+                                  label: 'Close',
+                                  onTap: widget.onClose,
                                 ),
-                                Expanded(
-                                  child: FilledButton(
-                                    onPressed: widget.onQuotes,
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: const Color(0xFF07070C),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                    ),
-                                    child: const Text('Quotes', style: TextStyle(fontWeight: FontWeight.w800, decoration: TextDecoration.none)),
-                                  ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: _PopPill(
+                                  key: const ValueKey('daily-quote-open'),
+                                  label: 'Open Quotes',
+                                  white: true,
+                                  onTap: widget.onQuotes,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A round glass button on the film: close, save.
+class _GlassRound extends StatelessWidget {
+  const _GlassRound({super.key, required this.icon, required this.label, required this.onTap});
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0x52000000),
+                border: Border.all(color: const Color(0x38FFFFFF)),
+              ),
+              child: Icon(icon, size: 19, color: Colors.white),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// White pill (primary) or glass pill, as on Subscription and Settings.
+class _PopPill extends StatelessWidget {
+  const _PopPill({super.key, required this.label, required this.onTap, this.white = false});
+  final String label;
+  final VoidCallback onTap;
+  final bool white;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: 50,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: white ? Colors.white : const Color(0x14FFFFFF),
+            borderRadius: BorderRadius.circular(25),
+            border: white ? null : Border.all(color: const Color(0x29FFFFFF)),
+          ),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: _dm(
+              size: 15,
+              weight: white ? FontWeight.w800 : FontWeight.w600,
+              color: white ? const Color(0xFF07070C) : Colors.white,
             ),
           ),
         ),

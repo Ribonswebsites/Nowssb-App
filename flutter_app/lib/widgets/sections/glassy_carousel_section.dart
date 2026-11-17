@@ -18,7 +18,6 @@ import 'package:video_player/video_player.dart';
 
 import '../../admin/layout/app_pages.dart';
 import '../../shell/nwsb_links.dart';
-import '../../data/settings.dart';
 import '../../theme/tokens.dart';
 import 'section_config.dart';
 
@@ -688,58 +687,30 @@ class _NetLoopVideo extends StatefulWidget {
 
 class _NetLoopVideoState extends State<_NetLoopVideo> {
   VideoPlayerController? _c;
-  int _gen = 0;
-
-  bool get _motionOn => Settings.instance.fashionPlus;
 
   @override
   void initState() {
     super.initState();
-    Settings.instance.addListener(_onMotion);
-    if (_motionOn) _open();
-  }
-
-  void _onMotion() {
-    if (!mounted) return;
-    if (_motionOn) {
-      if (_c == null) {
-        _open();
-      } else {
-        _c!.play();
-      }
-    } else {
-      _close();
-    }
+    _open();
   }
 
   @override
   void didUpdateWidget(_NetLoopVideo old) {
     super.didUpdateWidget(old);
     if (old.url != widget.url) {
-      _close(rebuild: false);
-      if (_motionOn) _open();
+      _c?.dispose();
+      _c = null;
+      _open();
     }
   }
 
-  void _close({bool rebuild = true}) {
-    _gen++;
-    final c = _c;
-    _c = null;
-    try {
-      c?.pause();
-      c?.dispose();
-    } catch (_) {}
-    if (rebuild && mounted) setState(() {});
-  }
-
   Future<void> _open() async {
-    final gen = ++_gen;
     try {
       final url = widget.url;
       final VideoPlayerController c;
       if (url.startsWith('http://') || url.startsWith('https://')) {
         final f = await DefaultCacheManager().getSingleFile(url);
-        if (!mounted || gen != _gen || !_motionOn) return;
+        if (!mounted) return;
         c = VideoPlayerController.file(
           File(f.path),
           videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
@@ -753,25 +724,19 @@ class _NetLoopVideoState extends State<_NetLoopVideo> {
       await c.initialize();
       await c.setVolume(0);
       await c.setLooping(true);
-      if (!mounted || gen != _gen || !_motionOn) {
-        await c.dispose();
-        return;
-      }
       await c.play();
-      if (!mounted || gen != _gen || !_motionOn) {
+      if (!mounted) {
         await c.dispose();
         return;
       }
       setState(() => _c = c);
     } catch (_) {
-      if (mounted && gen == _gen) setState(() => _c = null);
+      if (mounted) setState(() => _c = null);
     }
   }
 
   @override
   void dispose() {
-    Settings.instance.removeListener(_onMotion);
-    _gen++;
     _c?.dispose();
     super.dispose();
   }

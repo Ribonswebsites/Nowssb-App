@@ -106,6 +106,7 @@ class _PageShellState extends State<PageShell> {
                     priority: ClipPriority.decoration,
                     autoplay: true,
                     loop: true,
+                    obeyMotion: true,
                     slot: 'page_shell.PageShell',
                   )
                 : (widget.background ?? const AppBackdrop()),

@@ -260,7 +260,7 @@ class TvFrame extends StatelessWidget {
     this.overlay,
     this.showVideo = true,
     this.showPoster = false,
-    this.obeyMotion = true,
+    this.obeyMotion = false,
   });
 
   /// The clip on the screen.
@@ -290,7 +290,7 @@ class TvFrame extends StatelessWidget {
   /// (needed when healing-path-bg.mp4 hits PlatformException).
   final bool showPoster;
 
-  /// Follows [Settings.fashionPlus] unless this is user-started player media.
+  /// True only when this frame is a page background; see [NwsbVideo.obeyMotion].
   final bool obeyMotion;
 
   @override

@@ -21,6 +21,7 @@ class AppBackdrop extends StatelessWidget {
           priority: ClipPriority.feature,
           autoplay: true,
           loop: true,
+          obeyMotion: true,
           slot: 'app_backdrop.AppBackdrop',
         ),
       ],

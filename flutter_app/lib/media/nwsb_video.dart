@@ -35,7 +35,7 @@ class NwsbVideo extends StatefulWidget {
     this.autoplay = true,
     this.alignment = Alignment.center,
     this.showPoster = true,
-    this.obeyMotion = true,
+    this.obeyMotion = false,
     this.slot,
     this.id,
     this.word,
@@ -72,9 +72,11 @@ class NwsbVideo extends StatefulWidget {
   /// bezel. Other app surfaces can retain their loading poster.
   final bool showPoster;
 
-  /// When true (the default), this clip follows [Settings.fashionPlus]:
-  /// Still holds the poster and never takes a decoder; Moving plays.
-  /// Set false for user-started media such as a word film in the player.
+  /// True only for full-screen / page BACKGROUND films (AppBackdrop,
+  /// FaintFilm, PageShell, the Profile and normal-home backdrops). Those
+  /// follow [Settings.fashionPlus]: Still holds the poster and never takes
+  /// a decoder; Moving plays. Every other clip (pop-ups, banners, cards,
+  /// tiles, carousels, the player, word art) keeps playing in Still.
   final bool obeyMotion;
 
   /// True when [asset] is a URL rather than a bundled file.
@@ -153,8 +155,8 @@ class _NwsbVideoState extends State<NwsbVideo> with WidgetsBindingObserver {
     _pump();
   }
 
-  /// Decorative / autoplay clips play only while Zen Plus motion is Moving.
-  /// User-started media ([obeyMotion] false) is left alone.
+  /// Background films ([obeyMotion]) play only while motion is Moving.
+  /// Everything else is left alone.
   bool get _wantsDecoder =>
       widget.autoplay && (!widget.obeyMotion || Settings.instance.fashionPlus);
 

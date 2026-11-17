@@ -1648,6 +1648,7 @@ class _Background extends StatelessWidget {
               autoplay: true,
               loop: true,
               fit: BoxFit.cover,
+              obeyMotion: true,
               slot: 'profile.Background',
             )
           else

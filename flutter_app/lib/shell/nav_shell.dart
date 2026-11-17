@@ -138,6 +138,11 @@ class _NavShellState extends State<NavShell> {
     // Coins left uncollected earlier today come back to collect.
     unawaited(PendingCoins.instance.show());
     NotifRouter.instance.attach(context, goTab: _goToTab, popToRoot: _popShellOverlays);
+    // Open today's quote film while the splash is still up, so the pop-up
+    // plays the moment it appears.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(warmDailyQuote(context));
+    });
     if (SplashGate.done.value) {
       WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_openDay()));
     } else {
