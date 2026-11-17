@@ -85,13 +85,9 @@ class _NEbooksState extends State<NEbooks> with SingleTickerProviderStateMixin, 
             Positioned(left: 11, top: 9, child: Text('NOWSSB', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1.6,
                 color: Colors.white.withValues(alpha: .92)))),
             Positioned(right: 7, top: 6, child: Icon(c.icon, size: 15, color: nGold)),
-            Positioned(left: 11, right: 7, bottom: 9, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(width: 18, height: 2, color: nGold),
-              const SizedBox(height: 5),
-              for (final l in c.lines)
-                SizedBox(width: double.infinity, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft,
-                    child: Text(l, maxLines: 1, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2)))),
-            ])),
+            // The title is baked into each jacket (Nov 17 art), so it is not
+            // set again here; Semantics keeps it readable.
+            Semantics(label: c.title, child: const SizedBox.expand()),
             if (glint < 1)
               DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
                 begin: Alignment(-2 + 4 * glint, -1), end: Alignment(-1 + 4 * glint, 1),
