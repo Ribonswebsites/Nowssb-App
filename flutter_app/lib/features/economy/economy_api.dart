@@ -153,6 +153,10 @@ class EconomyMirror extends ChangeNotifier {
   String sellerTier = 'Seller';
   int wordsSold = 0;
   int nextSellerTarget = 100;
+
+  /// People appointed under you (sellerStats/main.teamCount, server-written
+  /// when an appointment is accepted).
+  int teamCount = 0;
   int subUntil = 0;
   int lifetimeCents = 0;
   bool subscriptionActive = false;
@@ -212,6 +216,7 @@ class EconomyMirror extends ChangeNotifier {
     sellerTier = 'Seller';
     wordsSold = 0;
     nextSellerTarget = 100;
+    teamCount = 0;
     subUntil = 0;
     lifetimeCents = 0;
     subscriptionActive = false;
@@ -309,6 +314,7 @@ class EconomyMirror extends ChangeNotifier {
       sellerTier = (data['tier'] as String?) ?? 'Seller';
       wordsSold = (data['wordsSoldTotal'] as num?)?.toInt() ?? 0;
       nextSellerTarget = (data['nextTierTarget'] as num?)?.toInt() ?? 100;
+      teamCount = (data['teamCount'] as num?)?.toInt() ?? 0;
     });
     _watch('users/$id/prefs/earn', (data) {
       hasSeenEarn = data['hasSeenEarnCard'] == true;

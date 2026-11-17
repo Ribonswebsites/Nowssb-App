@@ -51,6 +51,7 @@ import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/drop_studio.dart';
 import 'fashion/header.dart';
+import 'fashion/today_earn_section.dart';
 import 'fashion/hero_quick_row.dart';
 import 'fashion/home_cards.dart';
 import 'store/product_detail.dart' show openAtelierWord;
@@ -758,7 +759,9 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              HeroGreeting(name: widget.name, onQuickAccess: _openQuickActions),
+              // Quick moved into the Your day card below (Ribon, Nov 17).
+              HeroGreeting(name: widget.name),
+              TodayEarnSection(onQuick: _openQuickActions),
               HeroQuickRow(pool: _quickPool()),
               FashionHero(
                 onExplore: () => _go(2),

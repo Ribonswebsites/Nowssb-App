@@ -601,8 +601,12 @@ class _ViewAll extends StatelessWidget {
 /// raised white neumorphic pill of the normal home; otherwise it is the
 /// Zen home's dark glass (GlassWrap tokens). Presses in on touch.
 class TodayProgressButton extends StatefulWidget {
-  const TodayProgressButton({super.key, this.light = true, this.compact = false, this.center});
+  const TodayProgressButton({super.key, this.light = true, this.compact = false, this.stretch = false, this.center});
   final bool light;
+
+  /// Fills the width it is given, chevron at the far end (the Zen home's
+  /// Quick + Today row).
+  final bool stretch;
 
   /// Stacked tile (mark over "Today" over the count) for tight spots such
   /// as the right side of the Zen home's Begin Your Healing Path banner.
@@ -644,6 +648,7 @@ class _TodayProgressButtonState extends State<TodayProgressButton> {
         final count = Text('$done/${items.length} done',
             key: const ValueKey('today-button-count'),
             maxLines: 1,
+            overflow: widget.stretch ? TextOverflow.ellipsis : null,
             style: TextStyle(color: sub, fontSize: 10.5, fontWeight: FontWeight.w700, height: 1.2, decoration: TextDecoration.none));
         final body = widget.compact
             ? Column(mainAxisSize: MainAxisSize.min, children: [
@@ -653,14 +658,23 @@ class _TodayProgressButtonState extends State<TodayProgressButton> {
                 const SizedBox(height: 1),
                 count,
               ])
-            : Row(mainAxisSize: MainAxisSize.min, children: [
+            : Row(mainAxisSize: widget.stretch ? MainAxisSize.max : MainAxisSize.min, children: [
           mark,
           const SizedBox(width: 8),
-          Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Today', style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
-            count,
-          ]),
-          const SizedBox(width: 4),
+          if (widget.stretch)
+            Expanded(
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Today', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
+                count,
+              ]),
+            )
+          else ...[
+            Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Today', style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
+              count,
+            ]),
+            const SizedBox(width: 4),
+          ],
           Icon(Icons.chevron_right_rounded, size: 18, color: sub),
         ]);
         final r = BorderRadius.circular(widget.compact ? 18 : 999);

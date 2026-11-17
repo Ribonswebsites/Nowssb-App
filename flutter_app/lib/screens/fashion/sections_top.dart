@@ -72,9 +72,8 @@ class FashGreeting extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: 10),
-          // Today's goals, same pop-up as the normal home (Ribon, Nov 12).
-          TodayProgressButton(light: false, compact: true),
+          // Today x/5 now lives in the Your day card under the greeting
+          // (Ribon, Nov 17), so it is not repeated here.
         ],
       ),
     );
