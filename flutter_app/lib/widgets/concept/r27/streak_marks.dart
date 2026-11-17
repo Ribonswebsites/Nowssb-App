@@ -34,17 +34,18 @@ class StreakMarkFrame {
   static (double, double)? debug;
 }
 
-/// One-shot intro + repeating loop, both frozen when motion is off.
-class _MarkAnim extends StatefulWidget {
-  const _MarkAnim({required this.intro, required this.period, required this.builder});
+/// One-shot intro + repeating loop, both frozen when motion is off (shared by
+/// every streak mark, including streak_marks2.dart).
+class StreakMarkAnim extends StatefulWidget {
+  const StreakMarkAnim({super.key, required this.intro, required this.period, required this.builder});
   final Duration intro;
   final Duration period;
   final Widget Function(BuildContext, double intro, double t) builder;
   @override
-  State<_MarkAnim> createState() => _MarkAnimState();
+  State<StreakMarkAnim> createState() => _StreakMarkAnimState();
 }
 
-class _MarkAnimState extends State<_MarkAnim> with TickerProviderStateMixin {
+class _StreakMarkAnimState extends State<StreakMarkAnim> with TickerProviderStateMixin {
   late final AnimationController _in = AnimationController(vsync: this, duration: widget.intro);
   late final AnimationController _loop = AnimationController(vsync: this, duration: widget.period);
 
@@ -111,7 +112,7 @@ class StreakVoiceStair extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         label: '$streak day streak',
-        child: _MarkAnim(
+        child: StreakMarkAnim(
           intro: const Duration(milliseconds: 1100),
           period: const Duration(milliseconds: 2400),
           builder: (_, i, t) => CustomPaint(size: size, painter: _StairP(streak, i, t)),
@@ -195,7 +196,7 @@ class StreakLetterSha extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         label: '$streak day streak',
-        child: _MarkAnim(
+        child: StreakMarkAnim(
           intro: const Duration(milliseconds: 1900),
           period: const Duration(milliseconds: 3200),
           builder: (_, i, t) => CustomPaint(size: size, painter: _ShaP(streak, i, t)),
@@ -432,7 +433,7 @@ class StreakDiyaLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         label: '$streak day streak',
-        child: _MarkAnim(
+        child: StreakMarkAnim(
           intro: const Duration(milliseconds: 1500),
           period: const Duration(milliseconds: 2800),
           builder: (_, i, t) => CustomPaint(size: size, painter: _DiyaP(streak, i, t)),

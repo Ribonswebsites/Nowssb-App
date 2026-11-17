@@ -675,6 +675,11 @@ class V4Streak extends StatelessWidget {
   final VoidCallback onPractice;
   final VoidCallback onOffers;
 
+  /// Preview hook for streak-mark candidates (streak_marks2.dart). Null keeps
+  /// the shipped mark, [StreakLetterSha].
+  @visibleForTesting
+  static Widget Function(int streak, Size size)? debugMark;
+
   @override
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: PracticeProgress.instance,
@@ -701,7 +706,7 @@ class V4Streak extends StatelessWidget {
                 _Well(
                   size: const Size(80, 92),
                   pad: 4,
-                  child: StreakLetterSha(streak: s, size: const Size(72, 84)),
+                  child: debugMark?.call(s, const Size(72, 84)) ?? StreakLetterSha(streak: s, size: const Size(72, 84)),
                 ),
               ]),
               const SizedBox(height: 14),
