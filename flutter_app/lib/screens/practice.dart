@@ -18,9 +18,7 @@ import '../data/content.dart';
 import '../data/models.dart';
 import '../theme/player_aura.dart';
 import '../widgets/page_shell.dart';
-import '../widgets/colored_split_promo_banner.dart';
 import '../widgets/restyle_kit.dart';
-import 'sound_library.dart';
 import 'practice_player.dart';
 import 'word_detail.dart';
 import '../data/word_art.dart';
@@ -78,11 +76,6 @@ class _PracticeScreenState extends State<PracticeScreen> {
     void openWord(Word w) => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => WordDetail(word: w)),
         );
-    void openLibrary() => Navigator.of(context).push(
-          MaterialPageRoute<void>(builder: (_) => const SoundLibraryScreen()),
-        );
-    final ritual = SplitPromoSpec.forSurface(SplitPromoSurface.morningRitual);
-    final hold = SplitPromoExtras.at(12);
 
     return PageShell(
       eyebrow: 'Today',
@@ -107,14 +100,6 @@ class _PracticeScreenState extends State<PracticeScreen> {
                     ),
                   ),
                 ),
-              )),
-              LSection('promo', 'Morning Ritual banner', KitBlackCard(
-                key: const ValueKey('practice-library-card'),
-                art: KitCutout(ritual.art),
-                eyebrow: 'Sound Library',
-                title: ritual.title.replaceAll('\n', ' '),
-                line: ritual.cta,
-                onTap: openLibrary,
               )),
               LSection('now', 'This session words', KitPane(
                 key: const ValueKey('practice-session-pane'),
@@ -148,14 +133,6 @@ class _PracticeScreenState extends State<PracticeScreen> {
                       _row(rest[i], openWord, index: now.length + i),
                   ]),
                 )),
-              LSection('promo2', 'Sound Library banner', KitBlackCard(
-                key: const ValueKey('practice-hold-card'),
-                art: KitCutout(hold.art),
-                eyebrow: 'Practice',
-                title: hold.title.replaceAll('\n', ' '),
-                line: hold.cta,
-                onTap: openLibrary,
-              )),
             ]),
           ]),
         ),
