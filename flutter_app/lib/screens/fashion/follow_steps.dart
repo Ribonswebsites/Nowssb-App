@@ -243,8 +243,14 @@ const kFstSteps = <FstStep>[
     lead: 'A quiet board: post a thought, a quote or an image, and read what '
         'others shared.',
     points: [
-      ('Thoughts, quotes, images', 'Three simple ways to share. Up to 3 a day.'),
-      ('Calm and anonymous', 'No profiles, follows or counts. Hide or report anything.'),
+      (
+        'Thoughts, quotes, images',
+        'Three simple ways to share. Up to 3 a day.'
+      ),
+      (
+        'Calm and anonymous',
+        'No profiles, follows or counts. Hide or report anything.'
+      ),
     ],
   ),
   FstStep(
@@ -300,6 +306,50 @@ class FstNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final n = kFstSteps.length;
+    // Close + the two labels + the bar + back + forward. The labels keep
+    // their natural size when they fit; at a large text scale they scale
+    // down together so the row never overflows the foot or clips a word.
+    const barMin = 24.0;
+    final count = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          index < 1 ? 'Start' : '$index',
+          maxLines: 1,
+          softWrap: false,
+          style: const TextStyle(
+            fontWeight: FontWeight.w800,
+            color: Colors.white,
+            fontSize: 13,
+          ),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          index < 1 ? '$n steps' : 'of $n',
+          maxLines: 1,
+          softWrap: false,
+          style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11),
+        ),
+      ],
+    );
+    final bar = ClipRRect(
+      borderRadius: BorderRadius.circular(999),
+      child: SizedBox(
+        height: 3,
+        child: Stack(
+          children: [
+            const ColoredBox(
+              color: Color(0x1FFFFFFF),
+              child: SizedBox.expand(),
+            ),
+            FractionallySizedBox(
+              widthFactor: (index / n).clamp(0.0, 1.0),
+              child: const ColoredBox(color: NwsbColors.goldLight),
+            ),
+          ],
+        ),
+      ),
+    );
     return SizedBox(
       height: 34,
       child: Row(
@@ -311,42 +361,25 @@ class FstNav extends StatelessWidget {
             label: 'Close the steps',
           ),
           const SizedBox(width: 10),
-          // `.fst-count` is a `<b>` and a `<span>`, and they stay two
-          // elements here — one rich string reads the same on screen and
-          // cannot be found by either half.
-          Text(
-            index < 1 ? 'Start' : '$index',
-            style: const TextStyle(
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(width: 5),
-          Text(
-            index < 1 ? '$n steps' : 'of $n',
-            style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11),
-          ),
-          const SizedBox(width: 12),
           Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: SizedBox(
-                height: 3,
-                child: Stack(
-                  children: [
-                    const ColoredBox(
-                      color: Color(0x1FFFFFFF),
-                      child: SizedBox.expand(),
+            child: LayoutBuilder(builder: (context, c) {
+              final maxLabel =
+                  (c.maxWidth - 12 - barMin).clamp(16.0, c.maxWidth);
+              return Row(
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: maxLabel),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: count,
                     ),
-                    FractionallySizedBox(
-                      widthFactor: (index / n).clamp(0.0, 1.0),
-                      child: const ColoredBox(color: NwsbColors.goldLight),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: bar),
+                ],
+              );
+            }),
           ),
           const SizedBox(width: 12),
           _Disc(
@@ -517,88 +550,98 @@ class FstCard extends StatelessWidget {
             // No inner scroll (it trapped the thumb): the body scales down
             // to fit the card instead.
             Expanded(
-              child: LayoutBuilder(builder: (context, box) => FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.topLeft,
-                child: SizedBox(
-                width: box.maxWidth - 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      step.lead,
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        height: 1.45,
-                        color: Color(0xCCFFFFFF),
-                      ),
-                    ),
-                    const SizedBox(height: 9),
-                    for (final p in step.points)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text.rich(
-                          TextSpan(
+              child: LayoutBuilder(
+                  builder: (context, box) => FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.topLeft,
+                        child: SizedBox(
+                          width: box.maxWidth - 2,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              TextSpan(
-                                text: '${p.$1} — ',
+                              Text(
+                                step.lead,
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white,
+                                  fontSize: 12.5,
+                                  height: 1.45,
+                                  color: Color(0xCCFFFFFF),
                                 ),
                               ),
-                              TextSpan(
-                                text: p.$2,
-                                style: const TextStyle(
-                                  color: Color(0x99FFFFFF),
-                                ),
-                              ),
-                            ],
-                          ),
-                          style: const TextStyle(fontSize: 11.5, height: 1.4),
-                        ),
-                      ),
-                    if (step.goLabel != null && step.goTab != null) ...[
-                      const SizedBox(height: 4),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: GestureDetector(
-                          onTap: () => onGo?.call(step.goTab!),
-                          behavior: HitTestBehavior.opaque,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 9),
-                            decoration: BoxDecoration(
-                              color: const Color(0x1FFFFFFF),
-                              borderRadius: BorderRadius.circular(20),
-                              border:
-                                  Border.all(color: const Color(0x40FFFFFF)),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  step.goLabel!,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                              const SizedBox(height: 9),
+                              for (final p in step.points)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        TextSpan(
+                                          text: '${p.$1} — ',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: p.$2,
+                                          style: const TextStyle(
+                                            color: Color(0x99FFFFFF),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    style: const TextStyle(
+                                        fontSize: 11.5, height: 1.4),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                const NwsbIcon(FstMarks.forward,
-                                    size: 14, strokeWidth: 1.9),
+                              if (step.goLabel != null &&
+                                  step.goTab != null) ...[
+                                const SizedBox(height: 4),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: GestureDetector(
+                                      onTap: () => onGo?.call(step.goTab!),
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 14, vertical: 9),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0x1FFFFFFF),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          border: Border.all(
+                                              color: const Color(0x40FFFFFF)),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              step.goLabel!,
+                                              maxLines: 1,
+                                              softWrap: false,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            const NwsbIcon(FstMarks.forward,
+                                                size: 14, strokeWidth: 1.9),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
-                            ),
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ],
-                ),
-                ),
-              )),
+                      )),
             ),
             const SizedBox(height: 8),
             FstNav(index: index, onClose: onClose, onStep: onStep),
@@ -609,50 +652,90 @@ class FstCard extends StatelessWidget {
   }
 }
 
-/// `.fst-title` — part084.js:403. What the television's screen becomes when
-/// the disc is tapped: the wordmark, and "Follow the steps" under it. The
-/// tagline, the big word and the picture rail go.
+/// `.fst-title` — part084.js:403 / steps.css:285. What the television's
+/// screen becomes when the disc is tapped: the wordmark, and "Follow the
+/// steps" under it. The tagline, the big word and the picture rail go.
+///
+/// The film behind keeps a hard edge at mid-screen — black on the left,
+/// the wave on the right — so the two lines sit on the LEFT of the
+/// aperture, left-aligned and vertically centred, and never cross that
+/// edge. If a large text scale would overflow the left half, both lines
+/// scale down together rather than clip or run into the wave.
 class FstTitle extends StatelessWidget {
   const FstTitle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text.rich(
-            TextSpan(
-              style: TextStyle(
-                fontSize: 34,
-                color: NwsbColors.goldLight,
-                height: 1.05,
-                letterSpacing: -0.5,
-              ),
-              children: [
-                TextSpan(
-                  text: 'Nowss',
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
-                TextSpan(
-                  text: 'B',
-                  style: TextStyle(fontWeight: FontWeight.w200),
-                ),
-              ],
+    return LayoutBuilder(
+      builder: (context, c) {
+        final padL = (c.maxWidth * 0.06).clamp(14.0, 26.0);
+        final padY = (c.maxHeight * 0.06).clamp(8.0, 16.0);
+        // The wave starts at ~50%. Keep a little air before it.
+        final maxW = ((c.maxWidth * 0.48) - padL).clamp(48.0, c.maxWidth);
+        return Padding(
+          padding:
+              EdgeInsets.fromLTRB(padL, padY, c.maxWidth - padL - maxW, padY),
+          child: const Align(
+            alignment: Alignment.centerLeft,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: _FstTitleCopy(),
             ),
           ),
-          SizedBox(height: 8),
-          EditableLabel('follow_steps.FstTitle',
-            'Follow the steps',
+        );
+      },
+    );
+  }
+}
+
+class _FstTitleCopy extends StatelessWidget {
+  const _FstTitleCopy();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      key: ValueKey('fst-title-copy'),
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(
+          TextSpan(
             style: TextStyle(
-              fontSize: 11,
-              letterSpacing: 2.2,
-              fontWeight: FontWeight.w600,
-              color: Color(0xB3FFFFFF),
+              fontSize: 34,
+              color: NwsbColors.goldLight,
+              height: 1.05,
+              letterSpacing: -0.5,
             ),
+            children: [
+              TextSpan(
+                text: 'Nowss',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+              TextSpan(
+                text: 'B',
+                style: TextStyle(fontWeight: FontWeight.w200),
+              ),
+            ],
           ),
-        ],
-      ),
+          maxLines: 1,
+          softWrap: false,
+        ),
+        SizedBox(height: 8),
+        EditableLabel(
+          'follow_steps.FstTitle',
+          'Follow the steps',
+          textAlign: TextAlign.left,
+          maxLines: 1,
+          softWrap: false,
+          style: TextStyle(
+            fontSize: 11,
+            letterSpacing: 2.2,
+            fontWeight: FontWeight.w600,
+            color: Color(0xB3FFFFFF),
+          ),
+        ),
+      ],
     );
   }
 }
