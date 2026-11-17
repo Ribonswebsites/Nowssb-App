@@ -26,7 +26,9 @@ void main() {
     );
   });
 
-  test('mini player is a black rounded rectangle inside glass', () {
+  test(
+      'mini player is a black rounded rectangle inside glass, beside the Normal/NowssB switch',
+      () {
     final src = File('lib/widgets/mini_player_pill.dart').readAsStringSync();
     expect(src, contains('assets/store/nowssb-bag-headphones.webp'));
     expect(src, contains('_WhiteCircleBtn'));
@@ -38,8 +40,14 @@ void main() {
     expect(src, isNot(contains('BorderRadius.circular(35)')));
 
     final nav = File('lib/shell/nav_shell.dart').readAsStringSync();
-    expect(nav, isNot(contains('_fashionHomeChip')));
-    expect(nav, isNot(contains('home-mode-pill')));
+    expect(nav, contains('_fashionHomeChip'));
+    expect(nav, contains('home-mode-pill'));
+    expect(nav, contains("'NowssB'"));
+    expect(nav, contains("'Normal'"));
+    expect(nav, contains("setFashionHome(!_fashion)"));
+    expect(nav, isNot(contains("'Fashion home'")));
+    expect(nav, isNot(contains("'Fashion'")));
     expect(nav, contains('MiniPlayerPill'));
+    expect(nav, contains('showLoader: _i != 0'));
   });
 }

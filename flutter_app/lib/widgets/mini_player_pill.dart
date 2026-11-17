@@ -20,11 +20,16 @@ class MiniPlayerPill extends StatelessWidget {
     required this.onOpen,
     this.onPlayPause,
     this.onDismiss,
+    this.showLoader = true,
   });
 
   final VoidCallback onOpen;
   final VoidCallback? onPlayPause;
   final VoidCallback? onDismiss;
+
+  /// The composing orb. Hidden when the Normal/NowssB switch shares the
+  /// row, so the word and "Paused · NowssB" are not clipped.
+  final bool showLoader;
 
   @override
   Widget build(BuildContext context) {
@@ -122,13 +127,15 @@ class MiniPlayerPill extends StatelessWidget {
                           height: 24,
                           color: const Color(0x55FFFFFF),
                         ),
-                        const SizedBox(width: 8),
-                        const AppThinkingLoader(
-                          size: 28,
-                          state: OrbState.composing,
-                          circlePad: 6,
-                        ),
-                        const SizedBox(width: 8),
+                        if (showLoader) ...[
+                          const SizedBox(width: 8),
+                          const AppThinkingLoader(
+                            size: 28,
+                            state: OrbState.composing,
+                            circlePad: 6,
+                          ),
+                          const SizedBox(width: 8),
+                        ],
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,

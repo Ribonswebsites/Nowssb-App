@@ -16,6 +16,8 @@ import '../data/content.dart';
 import '../data/home_widget_sync.dart';
 import '../data/models.dart';
 import '../screens/home_fashion.dart';
+import '../theme/white_neu.dart';
+import '../data/app_haptics.dart';
 import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
 import '../screens/practice.dart';
@@ -90,7 +92,7 @@ class NavClearance extends InheritedWidget {
   /// Nav bar: 14 from the bottom + 58 tall, plus 12 breathing room.
   static const double navOnly = 14 + 58 + 12;
 
-  /// Nav bar plus the Normal/Fashion pill or mini-player row (bottom 88, ~40 tall).
+  /// Nav bar plus the Normal/NowssB pill or mini-player row (bottom 88, ~40 tall).
   static const double navAndPill = 88 + 40 + 8;
 
   static double of(BuildContext context) =>
@@ -250,6 +252,55 @@ class _NavShellState extends State<NavShell> {
           title: session.title.isEmpty ? 'NowssB' : session.title,
           showIntro: false,
         ),
+      ),
+    );
+  }
+
+  Widget _fashionHomeChip() {
+    // Same glass as the hero header (HeroGlass). Ink on the light Normal
+    // home, white over the NowssB film.
+    final ink = _fashion ? Colors.white : NwsbColors.ink;
+    return Material(
+      color: Colors.transparent,
+      child: GestureDetector(
+        key: const ValueKey('home-mode-pill'),
+        onTap: () {
+          AppHaptics.selection();
+          Settings.instance.setFashionHome(!_fashion);
+        },
+        child: !_fashion
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: wnBox(radius: 16),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.dark_mode, size: 14, color: ink),
+                  const SizedBox(width: 6),
+                  Text('NowssB', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: ink)),
+                ]),
+              )
+            : HeroGlass(
+                radius: 16,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _fashion ? Icons.light_mode : Icons.dark_mode,
+                      size: 14,
+                      color: ink,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      _fashion ? 'Normal' : 'NowssB',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: ink,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
     );
   }
@@ -493,15 +544,37 @@ class _NavShellState extends State<NavShell> {
                 _tabAlive(4, const ProfileScreen()),
               ],
             ),
-            // Mini player sits above the nav when a session is running.
-            if (PlaybackSession.instance.showPill)
+            // Normal/NowssB switch + mini player share one row above the nav.
+            if (_i == 0 || PlaybackSession.instance.showPill)
               Positioned(
+                // Inset mode pill from screen/card edge (Normal/NowssB toggle).
                 left: 20,
                 right: 20,
                 bottom: 88,
                 child: SafeArea(
                   top: false,
-                  child: MiniPlayerPill(onOpen: _openMiniPlayer),
+                  child: Row(
+                    children: [
+                      if (_i == 0) _fashionHomeChip(),
+                      if (_i == 0 && PlaybackSession.instance.showPill) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 1,
+                          height: 22,
+                          color: const Color(0x66FFFFFF),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      if (PlaybackSession.instance.showPill)
+                        Expanded(
+                          child: MiniPlayerPill(
+                            onOpen: _openMiniPlayer,
+                            // Home already has the mode chip on the left.
+                            showLoader: _i != 0,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
 
