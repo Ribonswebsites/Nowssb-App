@@ -16,7 +16,6 @@ import '../data/content.dart';
 import '../data/home_widget_sync.dart';
 import '../data/models.dart';
 import '../screens/home_fashion.dart';
-import '../theme/white_neu.dart';
 import '../data/app_haptics.dart';
 import '../screens/home_normal.dart';
 import '../screens/sound_library.dart';
@@ -257,8 +256,8 @@ class _NavShellState extends State<NavShell> {
   }
 
   Widget _fashionHomeChip() {
-    // Same glass as the hero header (HeroGlass). Ink on the light Normal
-    // home, white over the NowssB film.
+    // Same glass as the hero header (HeroGlass), on both homes. Ink on the
+    // light Normal home, white over the NowssB film.
     final ink = _fashion ? Colors.white : NwsbColors.ink;
     return Material(
       color: Colors.transparent,
@@ -268,39 +267,29 @@ class _NavShellState extends State<NavShell> {
           AppHaptics.selection();
           Settings.instance.setFashionHome(!_fashion);
         },
-        child: !_fashion
-            ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: wnBox(radius: 16),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Icon(Icons.dark_mode, size: 14, color: ink),
-                  const SizedBox(width: 6),
-                  Text('NowssB', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: ink)),
-                ]),
-              )
-            : HeroGlass(
-                radius: 16,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _fashion ? Icons.light_mode : Icons.dark_mode,
-                      size: 14,
-                      color: ink,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _fashion ? 'Normal' : 'NowssB',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: ink,
-                      ),
-                    ),
-                  ],
+        child: HeroGlass(
+          radius: 16,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _fashion ? Icons.light_mode : Icons.dark_mode,
+                size: 14,
+                color: ink,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                _fashion ? 'Normal' : 'NowssB',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: ink,
                 ),
               ),
+            ],
+          ),
+        ),
       ),
     );
   }

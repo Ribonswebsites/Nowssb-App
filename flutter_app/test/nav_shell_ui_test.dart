@@ -49,5 +49,10 @@ void main() {
     expect(nav, isNot(contains("'Fashion'")));
     expect(nav, contains('MiniPlayerPill'));
     expect(nav, contains('showLoader: _i != 0'));
+    expect(nav, contains('AppHaptics.selection()'));
+    // Switch chip is HeroGlass on both homes (blur, hairline, radius 16).
+    expect(nav, contains('HeroGlass('));
+    expect(nav, contains('radius: 16'));
+    expect(nav, isNot(contains('wnBox')));
   });
 }
