@@ -266,6 +266,7 @@ flutter:
     - assets/store/collections/
     - assets/store/store-rotator/
     - assets/fashion/
+    - assets/drop_studio/
     - assets/player/
     - assets/player/guide/
     - assets/player/intro/

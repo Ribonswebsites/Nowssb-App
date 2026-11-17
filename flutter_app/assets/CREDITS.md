@@ -272,3 +272,14 @@ The small rail thumbnails `assets/home/hx/zpt-*.webp` are crops of frames from t
 ## NowssB Plus intro — `assets/fashion/nowssb-plus-intro.webp` and `fp-intro.webp` (Nov 16, 2026)
 
 The intro poster is the existing Fashion-letter still, edited with the Grok Bot image tool so the 3D quilted letters spell NOWSSB instead of FASHION. The woman, suit, neon plus, rings and floor are the same composition. `nowssb-plus-intro.webp` is a tall 1080×2340 (9:19.5) full-bleed version for the intro page; `fp-intro.webp` is the same artwork at 941×1672 (9:16) for the start-art still and the mode switch crop. Original work for NowssB; no third-party source.
+
+
+## Drop Studio door previews — `assets/drop_studio/` (Nov 17, 2026)
+
+Prism face art for the three "Make this home yours" doors on Drop Studio. Original stills generated with the Grok Bot image tool. Black backgrounds, subtle gold accent, no text. These are preview art only; they do not replace the user-selectable Fashion Plus backgrounds or start-art stills.
+
+| File | Subject |
+|---|---|
+| `door-background.webp` | Phone with a dark home-screen backdrop being swapped (gold-lit panel sliding over a darker one) |
+| `door-start-art.webp` | Phone showing the app opening art: white over-ear headphones with a gold accent |
+| `door-access.webp` | Antique gold key beside a folded black pass |

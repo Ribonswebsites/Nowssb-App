@@ -17,7 +17,7 @@ import '../../data/day_part.dart';
 import '../../data/models.dart';
 import '../../data/settings.dart';
 import '../../widgets/concept/stillwater.dart';
-import 'drop_v4_concepts.dart' show DoorHooks, DoorKind, SettingPreview, doorState, doorTitle, hourWord;
+import 'drop_v4_concepts.dart' show DoorHooks, DoorKind, doorState, doorTitle, hourWord;
 import 'drop_v4_type.dart';
 import '../store/store_art.dart' show kNowssbStoreMark, meaningFlipArt, storeSubjectArt;
 import 'package:nowssb/data/app_haptics.dart';
@@ -102,7 +102,7 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
         final w = math.min(c.maxWidth - 96, 250.0);
         return AnimatedBuilder(
           animation: _c,
-          builder: (context, _) => Breath(builder: (context, t) {
+          builder: (context, _) {
             // a resting quarter-turn bias so the next side face always peeks
             final step = 2 * math.pi / _n;
             final depth = w / (2 * math.tan(math.pi / _n));
@@ -128,14 +128,6 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                   height: 300,
                   width: double.infinity,
                   child: Stack(alignment: Alignment.center, children: [
-                    Positioned.fill(
-                      child: DecoratedBox(
-                          decoration: BoxDecoration(
-                              gradient: RadialGradient(radius: .7, colors: [
-                        _violet.withValues(alpha: .30 + .18 * Stillwater.lungs(t)),
-                        Colors.transparent
-                      ]))),
-                    ),
                     for (final f in faces)
                       if (math.cos(f.$2) > .02)
                         Transform(
@@ -145,13 +137,13 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                             ..translateByDouble(0, 0, depth, 1)
                             ..rotateY(f.$2)
                             ..translateByDouble(0, 0, -depth, 1),
-                          child: _Face(kind: DoorKind.values[f.$1], w: w, t: t, isFront: f.$1 == fr, shade: 1 - math.cos(f.$2)),
+                          child: _Face(kind: DoorKind.values[f.$1], w: w, isFront: f.$1 == fr, shade: 1 - math.cos(f.$2)),
                         ),
                   ]),
                 ),
               ),
             );
-          }),
+          },
         );
       }),
       const SizedBox(height: 10),
@@ -213,16 +205,22 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
 
 
 class _Face extends StatelessWidget {
-  const _Face({required this.kind, required this.w, required this.t, required this.isFront, required this.shade});
+  const _Face({required this.kind, required this.w, required this.isFront, required this.shade});
   final DoorKind kind;
-  final double w, t, shade;
+  final double w, shade;
   final bool isFront;
   @override
   Widget build(BuildContext context) {
-    final Widget preview = switch (kind) {
-      DoorKind.startArt => const _StillPreview(),
-      _ => SettingPreview(kind: kind, t: t),
-    };
+    // Fixed door art, not the live selected background / start still.
+    // "Live now:" below still names the current setting.
+    final Widget preview = Image.asset(
+      doorPreviewArt(kind),
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      alignment: Alignment.center,
+      filterQuality: FilterQuality.high,
+    );
     return Container(
       width: w,
       height: 280,
@@ -249,26 +247,14 @@ class _Face extends StatelessWidget {
   }
 }
 
-/// Start art face: the saved still shown WHOLE (contain), so any word in
-/// the artwork reads in full, over a darkened fill of the same still.
-class _StillPreview extends StatelessWidget {
-  const _StillPreview();
-  @override
-  Widget build(BuildContext context) {
-    final still = Settings.instance.fashionImageAsset ?? Settings.fashionImages.first;
-    return Stack(fit: StackFit.expand, children: [
-      // ONE still, full-bleed, cropped to the model (bottom-left) so no
-      // part of the FASHION lettering is cut.
-      ClipRect(
-        child: Transform.scale(
-          scale: 1.9,
-          alignment: Alignment.bottomLeft,
-          child: Image.asset(still, fit: BoxFit.cover, alignment: Alignment.bottomLeft),
-        ),
-      ),
-    ]);
-  }
-}
+/// Dedicated preview art for each prism door. These are not the
+/// user-selectable backgrounds / start-art stills (those stay in Settings).
+String doorPreviewArt(DoorKind k) => switch (k) {
+      DoorKind.background => 'assets/drop_studio/door-background.webp',
+      DoorKind.startArt => 'assets/drop_studio/door-start-art.webp',
+      DoorKind.access => 'assets/drop_studio/door-access.webp',
+    };
+
 
 // ─── ENTRY · peeling poster ─────────────────────────────────────────────
 

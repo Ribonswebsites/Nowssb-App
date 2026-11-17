@@ -38,11 +38,13 @@ import 'package:nowssb/data/app_haptics.dart';
 
 /// The real Drop Studio page: every hook wired.
 class DropStudioScreen extends StatefulWidget {
-  const DropStudioScreen({super.key, this.controller, this.debugTilt, this.debugPage, this.clock});
+  const DropStudioScreen({super.key, this.controller, this.debugTilt, this.debugPage, this.debugFront, this.clock});
 
   final ScrollController? controller;
   final Offset? debugTilt;
   final double? debugPage;
+  /// Shots: freeze the doors prism on this face (0..2).
+  final int? debugFront;
 
   /// Wall clock for the hourly word rotation; tests inject one.
   final DateTime Function()? clock;
@@ -98,6 +100,7 @@ class _DropStudioScreenState extends State<DropStudioScreen> {
       controller: widget.controller,
       debugTilt: widget.debugTilt,
       debugPage: widget.debugPage,
+      debugFront: widget.debugFront,
       clock: widget.clock,
     );
   }
@@ -151,6 +154,7 @@ class FashionDropStudio extends StatefulWidget {
     this.controller,
     this.debugTilt,
     this.debugPage,
+    this.debugFront,
     this.clock,
   });
 
@@ -175,6 +179,7 @@ class FashionDropStudio extends StatefulWidget {
   final ScrollController? controller;
   final Offset? debugTilt;
   final double? debugPage;
+  final int? debugFront;
 
   @override
   State<FashionDropStudio> createState() => _FashionDropStudioState();
@@ -256,6 +261,8 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
                       onOpenStartArt: widget.onOpenStartArt,
                       onOpenAccess: widget.onOpenAccess,
                     ),
+                    debugFront: widget.debugFront,
+                    debugAngle: widget.debugFront?.toDouble(),
                   ),
                   const SizedBox(height: 30),
                   const _HowItFlows(),
@@ -310,30 +317,7 @@ class _FashionDropStudioState extends State<FashionDropStudio> {
 class _LiquidBackdrop extends StatelessWidget {
   const _LiquidBackdrop();
   @override
-  Widget build(BuildContext context) => Breath(
-        builder: (context, t) => CustomPaint(painter: _LiquidPainter(t)),
-      );
-}
-
-class _LiquidPainter extends CustomPainter {
-  _LiquidPainter(this.t);
-  final double t;
-  @override
-  void paint(Canvas c, Size s) {
-    c.drawRect(Offset.zero & s, Paint()..color = _deep);
-    final a = 2 * math.pi * t;
-    void blob(Offset o, double r, Color col) => c.drawCircle(
-        o,
-        r,
-        Paint()
-          ..shader = RadialGradient(colors: [col, col.withValues(alpha: 0)])
-              .createShader(Rect.fromCircle(center: o, radius: r)));
-    blob(Offset(s.width * (.15 + .06 * math.sin(a)), s.height * .12), s.width * .7, const Color(0x14C8A96E));
-    blob(Offset(s.width * .8, s.height * .95), s.width * .5, const Color(0x33C8A96E));
-  }
-
-  @override
-  bool shouldRepaint(_LiquidPainter o) => o.t != t;
+  Widget build(BuildContext context) => const ColoredBox(color: _deep);
 }
 
 // ─── chrome ──────────────────────────────────────────────────────────────
@@ -532,8 +516,6 @@ class _DropHero extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // gold ripple rings breathing behind the figure
-                    Positioned.fill(child: CustomPaint(painter: _RingsPainter(t))),
                     // far plane: word posters set in type only
                     Positioned(
                       left: -18,
@@ -630,35 +612,6 @@ class _DropHero extends StatelessWidget {
   }
 
   static String _hourLabel([DateTime? at]) => dayPartFor(at ?? DayClock.now()).label.toUpperCase();
-}
-
-class _RingsPainter extends CustomPainter {
-  _RingsPainter(this.t);
-  final double t;
-  @override
-  void paint(Canvas c, Size s) {
-    final o = Offset(s.width * .5, s.height * .42);
-    final l = Stillwater.lungs(t);
-    for (var i = 0; i < 4; i++) {
-      final r = 70.0 + i * 46 + l * 14;
-      c.drawCircle(
-          o,
-          r,
-          Paint()
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1
-            ..color = _gold.withValues(alpha: (.34 - i * .07).clamp(0, 1)));
-    }
-    c.drawCircle(
-        o,
-        120 + l * 20,
-        Paint()
-          ..shader = RadialGradient(colors: [_violet.withValues(alpha: .45), _violet.withValues(alpha: 0)])
-              .createShader(Rect.fromCircle(center: o, radius: 140 + l * 20)));
-  }
-
-  @override
-  bool shouldRepaint(_RingsPainter o) => o.t != t;
 }
 
 class _Kicker extends StatelessWidget {
