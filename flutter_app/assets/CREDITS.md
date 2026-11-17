@@ -235,9 +235,9 @@ Added in 301edcf1 (concept r27, 27 Oct 2026). Searched git history, commit messa
 
 | Asset | Source | Licence / notes |
 |---|---|---|
-| `home/hx/cover-shabdapathy.webp`, `cover-phonetic.webp`, `cover-atlas.webp` | Self-generated for NowssB (same tool): palm-leaf manuscript, sound-wave landscape, singing-bowl still life | Original art; no text in the images, titles are set in Flutter. eBooks covers |
-| `home/hx/offers-bowl.webp` | Self-generated for NowssB (same tool): brass bowl, coins, mala, incense | Original art. Meaning Store offers card |
-| `home/hx/sound-feature.webp` | Self-generated for NowssB (same tool): headphones, singing bowl, lotus | Original art. Sound Library card |
+| `home/hx/cover-shabdapathy.webp`, `cover-phonetic.webp`, `cover-atlas.webp` | Self-generated for NowssB (Grok Bot image generation, Nov 17, 2026, replacing the Nov 11 art): black jackets with the title baked in, crimson sound-letter glyph chart, electric-blue voice-anatomy profile with waveform, emerald body map with sound points | Original art. eBooks covers |
+| `home/hx/offers-bowl.webp` | Self-generated for NowssB (Grok Bot image generation, Nov 17, 2026, replacing the Nov 11 art): white NowssB headphone box and NowssB coins on black, gold sound ribbon; the upright coin is the bundled `icons/nwsb-coin.webp` composited in | Original art. Meaning Store offers card |
+| `home/hx/sound-feature.webp` | Self-generated for NowssB (Grok Bot image generation, Nov 17, 2026, replacing the Nov 11 art): white NowssB headphones on the NowssB box with a violet sound-wave ribbon on black | Original art. Sound Library card |
 | `home/nm-sound-eq.json` | "Sound Equalizer Bars - Music" by Creator Mahesh, LottieFiles — https://lottiefiles.com/free-animation/sound-equalizer-bars-music-QF5HEZf3gR | [Lottie Simple License](https://lottiefiles.com/page/license) (free, commercial use allowed). Unzipped from the free `.lottie` download and recoloured (blue → near-black, yellow → NowssB gold); shapes and timing untouched. Plays only while the player is playing |
 
 ## Subscription plan cards — `assets/subscription/` (restored 21 Sep 2026 art)
