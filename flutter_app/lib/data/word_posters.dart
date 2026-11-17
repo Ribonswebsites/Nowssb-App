@@ -1,6 +1,7 @@
-/// Each practice word's own poster: a black background, the word three
-/// times in big white letters, a model in white NowssB headphones and
-/// sunglasses, and a glowing ribbon in that word's colour.
+/// Each practice word's own poster: the word three times in big white
+/// letters, a model in white NowssB headphones and sunglasses, and a glowing
+/// ribbon. Every word has its own model and its own background colour
+/// (PRANA is Ribon's original on black).
 ///
 /// Every place that shows a word as a picture (the Practice tab tiles, the
 /// player's Next up card and queue) reads this first, so a word never shows

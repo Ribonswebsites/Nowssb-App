@@ -52,6 +52,7 @@ import '../widgets/meditation_flip_banner.dart';
 import 'normal/calm_v3.dart';
 import 'normal/home_v4.dart';
 import 'normal/new_releases.dart';
+import 'normal/picked_for_you.dart';
 import 'normal/home_v5.dart';
 import '../widgets/concept/normal/footer.dart';
 import '../features/programs/reference_program.dart';
@@ -393,6 +394,18 @@ class _HomeNormalState extends State<HomeNormal> {
             children: [
               MeditationFlipBanner(onTap: () => _go(1), leadingIcons: true),
               MainOptionsSection(onGo: _go, onAction: _openMainOption),
+              // Under Where to Begin: the second black row, by body area.
+              PickedForYouCard(
+                onSeeAll: () => _go(2),
+                onWord: (w) {
+                  final items =
+                      pickedForYouWords(ContentStore.instance.library);
+                  _push(PracticePlayerScreen(
+                    words: newReleaseQueue(items, w),
+                    title: w.word,
+                  ));
+                },
+              ),
             ],
           )
         ),

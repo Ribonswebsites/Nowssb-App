@@ -4,7 +4,13 @@
 /// (organ, else meaning, else benefit). Edge fades match the reference
 /// mask: a left-to-right gradient that is transparent at the edges and
 /// opaque between 15% and 85%.
+///
+/// The row changes once a day: the order is a shuffle seeded by the local
+/// calendar day, so it is stable all day and moves on at local midnight.
 library;
+
+import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -12,14 +18,89 @@ import '../../data/content.dart';
 import '../../data/models.dart';
 import '../practice_player.dart' show playerCoverArtFor;
 
-/// Newest library words first. Brand-new published words are appended
-/// to [ContentStore.library], so the end of that list is the latest.
-List<Word> newReleaseWords(List<Word> library) {
+/// The local calendar day as a whole number (days since 1970-01-01).
+/// Built from the local y/m/d so DST shifts never move it.
+int homeDayNumber(DateTime local) =>
+    DateTime.utc(local.year, local.month, local.day).millisecondsSinceEpoch ~/
+    Duration.millisecondsPerDay;
+
+/// [words] in a shuffle seeded by [seed] (Fisher–Yates, so every word is
+/// kept exactly once). Same seed, same order.
+List<Word> seededOrder(List<Word> words, int seed) {
+  final out = [...words];
+  final rnd = math.Random(seed);
+  for (var i = out.length - 1; i > 0; i--) {
+    final j = rnd.nextInt(i + 1);
+    final t = out[i];
+    out[i] = out[j];
+    out[j] = t;
+  }
+  return out;
+}
+
+/// Library words for the New releases row on [on] (default: today).
+/// Every word is listed once; the order changes each local day.
+List<Word> newReleaseWords(List<Word> library, {DateTime? on}) {
   final usable = [
     for (final w in library)
       if (w.word.trim().isNotEmpty) w,
   ];
-  return usable.reversed.toList();
+  // Newest first as the base, so the shuffle is stable for a given list.
+  final base = usable.reversed.toList();
+  final day = homeDayNumber(on ?? DateTime.now());
+  return seededOrder(base, day * 7919 + 17);
+}
+
+/// Rebuilds [builder] at the next local midnight, so a daily row moves on
+/// while the app stays open. With a fixed [today] (tests, shots) it never
+/// schedules anything.
+class DailyRebuild extends StatefulWidget {
+  const DailyRebuild({super.key, this.today, required this.builder});
+
+  final DateTime? today;
+  final Widget Function(BuildContext context, DateTime today) builder;
+
+  @override
+  State<DailyRebuild> createState() => _DailyRebuildState();
+}
+
+class _DailyRebuildState extends State<DailyRebuild> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _arm();
+  }
+
+  @override
+  void didUpdateWidget(DailyRebuild old) {
+    super.didUpdateWidget(old);
+    if (old.today != widget.today) _arm();
+  }
+
+  void _arm() {
+    _timer?.cancel();
+    _timer = null;
+    if (widget.today != null) return;
+    final now = DateTime.now();
+    final next = DateTime(now.year, now.month, now.day + 1);
+    _timer = Timer(next.difference(now) + const Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() {});
+      _arm();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) =>
+      widget.builder(context, widget.today ?? DateTime.now());
 }
 
 /// A short real line for the tile: organ, else meaning, else benefit.
@@ -45,10 +126,14 @@ class NewReleasesCard extends StatelessWidget {
     required this.onWord,
     required this.onSeeAll,
     this.words,
+    this.today,
   });
 
   /// Library to show (tests). Defaults to the live [ContentStore].
   final List<Word>? words;
+
+  /// Fixed day (tests, shots). Defaults to the local date, live.
+  final DateTime? today;
 
   final void Function(Word word) onWord;
   final VoidCallback onSeeAll;
@@ -60,122 +145,128 @@ class NewReleasesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: ContentStore.instance,
-      builder: (context, _) {
-        final items = newReleaseWords(words ?? ContentStore.instance.library);
-        if (items.isEmpty) return const SizedBox.shrink();
-        return Padding(
-          key: const ValueKey('new-releases'),
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(_radius),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x24000000),
-                  offset: Offset(7, 7),
-                  blurRadius: 18,
-                ),
-                BoxShadow(
-                  color: Color(0xFFFFFFFF),
-                  offset: Offset(-7, -7),
-                  blurRadius: 18,
-                ),
-              ],
-            ),
-            child: Material(
-              type: MaterialType.transparency,
-              borderRadius: BorderRadius.circular(_radius),
-              clipBehavior: Clip.antiAlias,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        const Expanded(
-                          child: Text(
-                            'New releases',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2,
-                              letterSpacing: -0.2,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          key: const ValueKey('newrel-see-all'),
-                          onTap: onSeeAll,
-                          behavior: HitTestBehavior.opaque,
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 6,
-                              horizontal: 2,
-                            ),
+    return DailyRebuild(
+      today: today,
+      builder: (context, day) => ListenableBuilder(
+        listenable: ContentStore.instance,
+        builder: (context, _) {
+          final items = newReleaseWords(
+            words ?? ContentStore.instance.library,
+            on: day,
+          );
+          if (items.isEmpty) return const SizedBox.shrink();
+          return Padding(
+            key: const ValueKey('new-releases'),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(_radius),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x24000000),
+                    offset: Offset(7, 7),
+                    blurRadius: 18,
+                  ),
+                  BoxShadow(
+                    color: Color(0xFFFFFFFF),
+                    offset: Offset(-7, -7),
+                    blurRadius: 18,
+                  ),
+                ],
+              ),
+              child: Material(
+                type: MaterialType.transparency,
+                borderRadius: BorderRadius.circular(_radius),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          const Expanded(
                             child: Text(
-                              'See all',
+                              'New releases',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                color: Color(0xFFB3B3B3),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
                                 height: 1.2,
+                                letterSpacing: -0.2,
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    ShaderMask(
-                      blendMode: BlendMode.dstIn,
-                      shaderCallback: (rect) => const LinearGradient(
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                        colors: [
-                          Color(0x00000000),
-                          Color(0xFF000000),
-                          Color(0xFF000000),
-                          Color(0x00000000),
-                        ],
-                        stops: [0.0, 0.15, 0.85, 1.0],
-                      ).createShader(rect),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        clipBehavior: Clip.none,
-                        child: Row(
-                          children: [
-                            for (var i = 0; i < items.length; i++) ...[
-                              if (i > 0) const SizedBox(width: _gap),
-                              _Tile(
-                                word: items[i],
-                                index: i,
-                                size: _tile,
-                                radius: _tileRadius,
-                                onTap: () => onWord(items[i]),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            key: const ValueKey('newrel-see-all'),
+                            onTap: onSeeAll,
+                            behavior: HitTestBehavior.opaque,
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 6,
+                                horizontal: 2,
                               ),
-                            ],
+                              child: Text(
+                                'See all',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Color(0xFFB3B3B3),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ShaderMask(
+                        blendMode: BlendMode.dstIn,
+                        shaderCallback: (rect) => const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0x00000000),
+                            Color(0xFF000000),
+                            Color(0xFF000000),
+                            Color(0x00000000),
                           ],
+                          stops: [0.0, 0.15, 0.85, 1.0],
+                        ).createShader(rect),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          clipBehavior: Clip.none,
+                          child: Row(
+                            children: [
+                              for (var i = 0; i < items.length; i++) ...[
+                                if (i > 0) const SizedBox(width: _gap),
+                                _Tile(
+                                  word: items[i],
+                                  index: i,
+                                  size: _tile,
+                                  radius: _tileRadius,
+                                  onTap: () => onWord(items[i]),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

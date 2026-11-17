@@ -25,11 +25,17 @@ Word _word({
       'img': img,
     })!;
 
+final _day1 = DateTime(2026, 11, 17, 9);
+
 final _sample = [
   _word(key: 'aarogya', word: 'AAROGYA', organ: 'Immune System'),
   _word(key: 'prana', word: 'PRANA', organ: 'Lungs · Heart'),
   _word(key: 'shakti', word: 'SHAKTI', organ: 'Solar Plexus'),
-  _word(key: 'soma', word: 'SOMA', organ: 'Brain', meaning: 'Nectar of consciousness'),
+  _word(
+      key: 'soma',
+      word: 'SOMA',
+      organ: 'Brain',
+      meaning: 'Nectar of consciousness'),
   _word(key: 'pitta', word: 'PITTA', organ: 'Liver · Digestion'),
   _word(key: 'kapha', word: 'KAPHA', organ: 'Lungs · Joints'),
   _word(key: 'chandra', word: 'CHANDRA', organ: 'Mind · Emotions'),
@@ -64,28 +70,59 @@ void main() {
     await loadMaterialIcons();
   });
 
-  test('newReleaseWords lists the newest library entries first', () {
-    final newestFirst = newReleaseWords(_sample);
-    expect(newestFirst.first.word, 'CHANDRA');
-    expect(newestFirst.last.word, 'AAROGYA');
+  test('newReleaseWords lists every word once, in a daily order', () {
+    final a = newReleaseWords(_sample, on: _day1);
+    expect(a.length, _sample.length);
+    expect(a.map((w) => w.key).toSet(), _sample.map((w) => w.key).toSet());
+    // Stable within a day, from early morning to just before midnight.
+    expect(
+      newReleaseWords(_sample, on: DateTime(2026, 11, 17, 0, 1))
+          .map((w) => w.key),
+      newReleaseWords(_sample, on: DateTime(2026, 11, 17, 23, 59))
+          .map((w) => w.key),
+    );
+    // Over a week the row does not keep the same order every day.
+    final orders = {
+      for (var d = 0; d < 7; d++)
+        newReleaseWords(_sample, on: DateTime(2026, 11, 17 + d))
+            .map((w) => w.key)
+            .join(','),
+    };
+    expect(orders.length, greaterThan(4));
+    final leads = {
+      for (var d = 0; d < 7; d++)
+        newReleaseWords(_sample, on: DateTime(2026, 11, 17 + d)).first.key,
+    };
+    expect(leads.length, greaterThan(2));
     expect(newReleaseWords(const []), isEmpty);
+  });
+
+  test('homeDayNumber moves at local midnight only', () {
+    expect(homeDayNumber(DateTime(2026, 11, 17, 0, 0)),
+        homeDayNumber(DateTime(2026, 11, 17, 23, 59, 59)));
+    expect(
+        homeDayNumber(DateTime(2026, 11, 18)) -
+            homeDayNumber(DateTime(2026, 11, 17, 23, 59)),
+        1);
   });
 
   test('newReleaseSubtitle prefers organ, then meaning, then benefit', () {
     expect(newReleaseSubtitle(_sample.first), 'Immune System');
     expect(
-      newReleaseSubtitle(_word(key: 'x', word: 'X', meaning: 'A short meaning')),
+      newReleaseSubtitle(
+          _word(key: 'x', word: 'X', meaning: 'A short meaning')),
       'A short meaning',
     );
     expect(
-      newReleaseSubtitle(_word(key: 'y', word: 'Y', benefit: 'Builds immunity')),
+      newReleaseSubtitle(
+          _word(key: 'y', word: 'Y', benefit: 'Builds immunity')),
       'Builds immunity',
     );
     expect(newReleaseSubtitle(_word(key: 'z', word: 'Z')), isEmpty);
   });
 
   test('newReleaseQueue starts at the tapped word', () {
-    final items = newReleaseWords(_sample);
+    final items = newReleaseWords(_sample, on: _day1);
     final q = newReleaseQueue(items, items[2]);
     expect(q.first.word, items[2].word);
     expect(q.length, items.length);
@@ -100,6 +137,7 @@ void main() {
     await t.pumpWidget(_app(
       child: NewReleasesCard(
         words: _sample,
+        today: _day1,
         onWord: (_) {},
         onSeeAll: () {},
       ),
@@ -110,9 +148,10 @@ void main() {
     expect(find.text('See all'), findsOneWidget);
     expect(find.byKey(const ValueKey('new-releases')), findsOneWidget);
 
-    // Newest first: CHANDRA is the first tile.
-    expect(find.text('CHANDRA'), findsOneWidget);
-    expect(find.text('Mind · Emotions'), findsOneWidget);
+    // Today's lead word is the first tile, with its real subtitle.
+    final lead = newReleaseWords(_sample, on: _day1).first;
+    expect(find.text(lead.word), findsOneWidget);
+    expect(find.text(newReleaseSubtitle(lead)), findsWidgets);
 
     final mask = t.widget<ShaderMask>(find.byType(ShaderMask));
     expect(mask.blendMode, BlendMode.dstIn);
@@ -120,16 +159,19 @@ void main() {
     // Tiles use the same cover resolver the player uses.
     final imgs = t.widgetList<Image>(find.byType(Image)).toList();
     expect(imgs, isNotEmpty);
-    final items = newReleaseWords(_sample);
+    final items = newReleaseWords(_sample, on: _day1);
     for (var i = 0; i < imgs.length && i < items.length; i++) {
-      expect((imgs[i].image as AssetImage).assetName, playerCoverArtFor(items[i], i));
+      expect((imgs[i].image as AssetImage).assetName,
+          playerCoverArtFor(items[i], i));
     }
 
     // The container itself is black.
-    final box = t.widget<DecoratedBox>(find.descendant(
-      of: find.byKey(const ValueKey('new-releases')),
-      matching: find.byType(DecoratedBox),
-    ).first);
+    final box = t.widget<DecoratedBox>(find
+        .descendant(
+          of: find.byKey(const ValueKey('new-releases')),
+          matching: find.byType(DecoratedBox),
+        )
+        .first);
     final deco = box.decoration as BoxDecoration;
     expect(deco.color, Colors.black);
   });
@@ -144,6 +186,7 @@ void main() {
     await t.pumpWidget(_app(
       child: NewReleasesCard(
         words: _sample,
+        today: _day1,
         onWord: (w) => tapped.add(w.word),
         onSeeAll: () => seeAll++,
       ),
@@ -153,8 +196,9 @@ void main() {
     await t.tap(find.byKey(const ValueKey('newrel-see-all')));
     expect(seeAll, 1);
 
-    await t.tap(find.byKey(const ValueKey('newrel-tile-chandra')));
-    expect(tapped, ['CHANDRA']);
+    final lead = newReleaseWords(_sample, on: _day1).first;
+    await t.tap(find.byKey(ValueKey('newrel-tile-${lead.key}')));
+    expect(tapped, [lead.word]);
   });
 
   testWidgets('an empty library hides the card', (t) async {
