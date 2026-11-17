@@ -54,6 +54,7 @@ import '../admin/template/editable.dart';
 import '../player/frequency_ritual.dart';
 import '../widgets/content_lock.dart';
 import '../data/word_private.dart';
+import 'daily_tasks.dart' show DailyTasks;
 
 String _fmtClock(num sec) {
   final s = sec.round().clamp(0, 24 * 3600);
@@ -130,6 +131,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _introDone = false;
   var _flagsReady = false;
   Timer? _sleepTimer;
+  Timer? _listenTimer;
+  var _listenedSec = 0;
   DateTime? _startedAt;
   String? _error;
   var _playGen = 0;
@@ -157,6 +160,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     WordArt.instance.addListener(_onProgress);
     Settings.instance.addListener(_onSettings);
     _armSleep();
+    // Your essentials: opening the player is the "Open the player" step, and
+    // a set time of real listening here counts as "Sit with one word".
+    unawaited(DailyTasks.markEvent('player'));
+    _listenTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!_playing) return;
+      if (++_listenedSec >= DailyTasks.sitListenSeconds) {
+        t.cancel();
+        unawaited(DailyTasks.markEvent('word'));
+      }
+    });
     unawaited(PracticeProgress.instance.start());
     unawaited(_loadLiked());
     unawaited(_loadShuffle());
@@ -245,6 +258,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   void dispose() {
     _bottomAutoTimer?.cancel();
     _sleepTimer?.cancel();
+    _listenTimer?.cancel();
     _bottomPageController.dispose();
     _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);

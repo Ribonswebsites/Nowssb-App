@@ -2,9 +2,13 @@
 /// moves the bar. The editor is where that account sets its own tasks.
 library;
 
+import 'dart:async';
+
 import '../widgets/app_thinking_loader.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../data/firebase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../features/progress/progress_center.dart';
@@ -65,7 +69,26 @@ class DailyTasks {
     return pool[title.hashCode.abs() % pool.length];
   }
 
+  /// Tests: stands in for the signed-in account id.
+  @visibleForTesting
+  static String? debugUid;
+
+  /// The phone's clock (the day rolls at local midnight). Tests swap it.
+  static DateTime Function() clock = DateTime.now;
+
+  /// Steps that tick themselves from a real action in the app.
+  /// word: a practice session for a word finishes in the player, or
+  ///       [sitListenSeconds] of listening in the player.
+  /// player: the player opens.
+  /// read: a word's meaning page (WordDetail) opens and can be read.
+  static const eventSteps = {'word', 'player', 'read'};
+  static const sitListenSeconds = 120;
+
+  static String get who => _who;
+
   static String get _who {
+    if (debugUid != null) return debugUid!;
+    if (!NwsbFirebase.ready) return 'local';
     try {
       return FirebaseAuth.instance.currentUser?.uid ?? 'local';
     } catch (_) {
@@ -73,8 +96,31 @@ class DailyTasks {
     }
   }
 
+  static StreamSubscription<User?>? _authSub;
+
+  /// Re-reads the list when a different account signs in on this phone.
+  static void watchAccount() {
+    if (_authSub != null || !NwsbFirebase.ready) return;
+    try {
+      _authSub = FirebaseAuth.instance.authStateChanges().listen((_) => unawaited(publish()));
+    } catch (_) {}
+  }
+
+  /// A real action happened ([eventSteps]). Ticks that step for this
+  /// account today if it is in the account's routine. [setDone] reads and
+  /// writes the day's list with no gap in between, so two quick actions
+  /// cannot overwrite each other.
+  static Future<void> markEvent(String id) async {
+    try {
+      if ((await done()).contains(id)) return;
+      final tasks = await template();
+      if (!tasks.any((t) => t.id == id)) return;
+      await setDone(id, true);
+    } catch (_) {}
+  }
+
   static String _day() {
-    final n = DateTime.now();
+    final n = clock();
     return '${n.year}${n.month.toString().padLeft(2, '0')}${n.day.toString().padLeft(2, '0')}';
   }
 
@@ -109,7 +155,7 @@ class DailyTasks {
   static Future<void> _pruneOld() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final n = DateTime.now().subtract(const Duration(days: 7));
+      final n = clock().subtract(const Duration(days: 7));
       final cutoff = '${n.year}${n.month.toString().padLeft(2, '0')}${n.day.toString().padLeft(2, '0')}';
       final day = RegExp(r'^nwsb_task_done_.+_(\d{8})$');
       for (final key in prefs.getKeys().toList()) {

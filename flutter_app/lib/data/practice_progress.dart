@@ -24,6 +24,7 @@ import 'models.dart';
 import '../features/economy/economy_api.dart';
 import '../features/economy/reward_fx.dart';
 import '../features/progress/progress_center.dart';
+import '../screens/daily_tasks.dart' show DailyTasks;
 
 class PracticeProgress extends ChangeNotifier {
   PracticeProgress._();
@@ -308,6 +309,8 @@ class PracticeProgress extends ChangeNotifier {
     await _save(); // the in-memory session stays even if storage fails
     notifyListeners();
     ProgressCenter.instance.report(ProgressKind.routine, todaySessions, dailyPracticeGoal);
+    // Your essentials · "Sit with one word": a session really finished.
+    unawaited(DailyTasks.markEvent('word'));
     // Profile > Sound Feedback: a short click when a word is completed.
     try {
       if (AppHaptics.soundOn) unawaited(SystemSound.play(SystemSoundType.click));

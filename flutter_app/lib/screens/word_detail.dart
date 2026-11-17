@@ -17,6 +17,8 @@
 /// something to read, and something to hear.
 library;
 
+import 'dart:async';
+
 import '../data/word_voice.dart';
 import '../features/downloads/download_button.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,7 @@ import 'package:just_audio/just_audio.dart';
 import '../data/entitlements.dart';
 import '../data/models.dart';
 import '../data/word_private.dart';
+import 'daily_tasks.dart' show DailyTasks;
 import '../theme/tokens.dart';
 import '../widgets/app_backdrop.dart';
 import '../widgets/content_lock.dart';
@@ -74,6 +77,8 @@ class _WordDetailState extends State<WordDetail> {
       if (mounted) setState(() => _word = widget.word);
       return;
     }
+    // Your essentials · "Read one meaning": this word's meaning is on screen.
+    unawaited(DailyTasks.markEvent('read'));
     final next = await WordPrivateStore.instance.resolve(widget.word);
     if (!mounted) return;
     setState(() => _word = next);
