@@ -128,5 +128,6 @@ class V5Ebooks extends StatelessWidget {
         key: const ValueKey('v5-ebooks'),
         onBrowse: onBrowse,
         books: [for (final b in kEbBooks) (b.key, b.title)],
+        chapters: {for (final b in kEbBooks) b.key: (sub: b.sub, chapters: b.contents.length)},
       );
 }

@@ -21,7 +21,7 @@ import 'support/home_render.dart';
 import 'support/offline_google_fonts.dart';
 
 final _tag = Platform.environment['SHOT_TAG'] ?? 'after';
-final _shots = Directory('/workspace/team-plan/shots/homeimgs')..createSync(recursive: true);
+final _shots = Directory(Platform.environment['SHOT_DIR'] ?? '/workspace/team-plan/shots/homeimgs')..createSync(recursive: true);
 
 Future<void> _png(WidgetTester t, Finder finder, String name) async {
   await precacheAll(t);

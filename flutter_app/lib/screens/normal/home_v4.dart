@@ -803,8 +803,9 @@ class V4StoreEarn extends StatelessWidget {
         key: const ValueKey('v4-offers'),
         onTap: onStore,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          // Ribon 11-11: a sharp, new still (assets/home/hx/offers-bowl.webp,
-          // self-generated) with a black pill + gold tag and the home marquee.
+          // Ribon 17-11: a real photo (assets/home/hx/offers-bowl.webp, a white
+          // NowssB Meaning Store bag on black; Pexels, see CREDITS.md) with a
+          // black pill + gold tag and the home marquee.
           AspectRatio(
             aspectRatio: 1.8,
             child: _Well(

@@ -49,7 +49,7 @@ void main() {
     }
 
     for (final l in ['Open Om', 'Open Shanti', 'Everything you own',
-        'Join Frequency', 'Browse eBooks']) {
+        'Join Frequency', 'Open eBook']) {
       if (_act(l).evaluate().isEmpty) continue;
       await tap(l);
     }
@@ -90,6 +90,16 @@ void main() {
       NEdition(onJoin: (_) {}, prices: const {'resonance': '₹99', 'frequency': '₹99', 'frequencyX': '₹99'}, playAvailable: true),
     ]));
     expect(find.textContaining('₹99'), findsOneWidget);
+  });
+
+  testWidgets('ebooks card shows only the one real book and its chapters', (t) async {
+    await _pump(t, NEbooks(onBrowse: _no, books: _books,
+        chapters: {for (final b in kEbBooks) b.key: (sub: b.sub, chapters: b.contents.length)}));
+    expect(find.text('The Shabdapathy Codex'), findsOneWidget);
+    expect(find.textContaining('Phonetic'), findsNothing);
+    expect(find.textContaining('Atlas'), findsNothing);
+    expect(find.text('5 chapters'), findsOneWidget);
+    expect(find.textContaining('titles'), findsNothing);
   });
 
   testWidgets('ebooks hide when no catalogue book has bundled art', (t) async {

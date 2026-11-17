@@ -246,9 +246,9 @@ Added in 301edcf1 (concept r27, 27 Oct 2026). Searched git history, commit messa
 
 | Asset | Source | Licence / notes |
 |---|---|---|
-| `home/hx/cover-shabdapathy.webp`, `cover-phonetic.webp`, `cover-atlas.webp` | Self-generated for NowssB (Grok Bot image generation, Nov 17, 2026, replacing the Nov 11 art): black jackets with the title baked in, crimson sound-letter glyph chart, electric-blue voice-anatomy profile with waveform, emerald body map with sound points | Original art. eBooks covers |
-| `home/hx/offers-bowl.webp` | Self-generated for NowssB (Grok Bot image generation, Nov 17, 2026, replacing the Nov 11 art): white NowssB headphone box and NowssB coins on black, gold sound ribbon; the upright coin is the bundled `icons/nwsb-coin.webp` composited in | Original art. Meaning Store offers card |
-| `home/hx/sound-feature.webp` | Self-generated for NowssB (Grok Bot image generation, Nov 17, 2026, replacing the Nov 11 art): white NowssB headphones on the NowssB box with a violet sound-wave ribbon on black | Original art. Sound Library card |
+| `ebooks/ebooks-headphones.jpg` (reused) | Existing NowssB eBook art, already bundled for the Ebooks store | NowssB's own art. Normal-home eBooks card jacket for The Shabdapathy Codex (Nov 17, 2026; the three stand-in jackets were removed) |
+| `home/hx/offers-bowl.webp` | Photo: [White shopping bag with striped tissue paper on a black background](https://www.pexels.com/photo/5556278/) by Leeloo The First, [Pexels License](https://www.pexels.com/license/) (free to use and modify; credited anyway). Mirrored, cropped to 1.8:1, with the NowssB / MEANING STORE wordmark printed flat on the bag in-house (Anton, OFL) | Meaning Store offers card (Nov 17, 2026) |
+| `home/hx/sound-feature.webp` | Photo: [Man in sunglasses putting on headphones, black and white](https://www.pexels.com/photo/6090887/) by Tima Miroshnichenko, [Pexels License](https://www.pexels.com/license/) (free to use and modify; credited anyway). Cropped to 1.9:1, light contrast lift | Sound Library card (Nov 17, 2026) |
 | `home/nm-sound-eq.json` | "Sound Equalizer Bars - Music" by Creator Mahesh, LottieFiles — https://lottiefiles.com/free-animation/sound-equalizer-bars-music-QF5HEZf3gR | [Lottie Simple License](https://lottiefiles.com/page/license) (free, commercial use allowed). Unzipped from the free `.lottie` download and recoloured (blue → near-black, yellow → NowssB gold); shapes and timing untouched. Plays only while the player is playing |
 
 ## Subscription plan cards — `assets/subscription/` (restored 21 Sep 2026 art)
