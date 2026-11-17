@@ -10,13 +10,13 @@ import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../admin/template/editable.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../widgets/swipe_away.dart';
 import 'coin_collect.dart' show CoinDay;
+import 'package:nowssb/data/app_haptics.dart';
 
 class RewardOverlay {
   RewardOverlay._();
@@ -164,7 +164,7 @@ class _YouWonCardState extends State<YouWonCard> {
   @override
   void initState() {
     super.initState();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
   }
 
   bool get _nothing => widget.items.every((i) => '${i['type']}' == 'none');

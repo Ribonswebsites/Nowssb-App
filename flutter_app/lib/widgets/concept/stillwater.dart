@@ -17,10 +17,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 
 import '../../theme/tokens.dart';
 import '../../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// One breath. In 2.75 s, out 2.75 s.
 const kBreath = Duration(milliseconds: 5500);
@@ -159,7 +159,7 @@ class _RipplePoolState extends State<RipplePool> with SingleTickerProviderStateM
   }
 
   void _drop(Offset p) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     if (Stillwater.still(context)) return;
     if (!_ticker.isActive) {
       _now = Duration.zero;
@@ -288,7 +288,7 @@ class _DepthTiltState extends State<DepthTilt> with SingleTickerProviderStateMix
           );
         }),
         onPanEnd: (_) {
-          HapticFeedback.lightImpact();
+          AppHaptics.light();
           _from = _tilt;
           _spring.value = 1;
           _spring.animateWith(SpringSimulation(
@@ -416,7 +416,7 @@ class StillGo extends StatelessWidget {
       child: InkWell(
         customBorder: const StadiumBorder(),
         onTap: () {
-          HapticFeedback.lightImpact();
+          AppHaptics.light();
           onTap?.call();
         },
         child: Padding(

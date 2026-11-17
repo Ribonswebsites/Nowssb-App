@@ -18,13 +18,13 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../data/settings.dart';
 import '../../widgets/concept/stillwater.dart';
 import 'drop_v4_type.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _gold = Color(0xFFC8A96E);
 const _goldSoft = Color(0xFFE8D5A3);
@@ -186,7 +186,7 @@ mixin _Pick<T extends StatefulWidget> on State<T> {
   int get initial;
   late int open = initial;
   void pick(int i, DoorHooks h) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     if (open == i) {
       h.of(DoorKind.values[i])?.call();
     } else {
@@ -249,7 +249,7 @@ abstract class _EntryBase extends StatelessWidget {
         label: 'Open Drop Studio',
         child: GestureDetector(
           onTap: () {
-            HapticFeedback.lightImpact();
+            AppHaptics.light();
             onOpen?.call();
           },
           child: Padding(

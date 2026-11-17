@@ -12,12 +12,12 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../data/store_prices.dart';
 import '../../features/economy/money.dart';
 import '../../widgets/hero_glass.dart';
 import 'daily_deals.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _quietArts = <String>[
   'assets/banners/promo/quiet-water.webp',
@@ -69,7 +69,7 @@ class StoreDriftBanner extends StatelessWidget {
                   deal: d,
                   price: _priceOf(d),
                   onTap: () {
-                    HapticFeedback.selectionClick();
+                    AppHaptics.selection();
                     onDeal(d);
                   },
                 );
@@ -164,7 +164,7 @@ class StoreSlashBanner extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           onDeal(deal);
         },
         child: ClipRRect(

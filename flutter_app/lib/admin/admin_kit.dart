@@ -12,6 +12,7 @@ import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import 'admin_api.dart';
 import 'editor/glass.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 export 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart' show ThinkingOrb, OrbState, OrbTheme;
 export 'editor/glass.dart' show Glass, Pill, Eyebrow, PillSwitch, LabeledSlider, Hint, kGold, kMint, kInk, kDim, kFaint, kGlassEdge, kGlassFill, tapFeel, actFeel, bigFeel, AdminBackdrop, confirmAction;
@@ -559,9 +560,9 @@ class GoldButton extends StatelessWidget {
 
 void adminSnack(BuildContext context, String msg, {bool error = false}) {
   if (error) {
-    HapticFeedback.heavyImpact();
+    AppHaptics.heavy();
   } else {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
   }
   ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
     behavior: SnackBarBehavior.floating,

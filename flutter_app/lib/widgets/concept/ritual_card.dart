@@ -10,7 +10,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 enum RitualTime { morning, afternoon, evening, night }
 
@@ -146,7 +146,7 @@ class _RitualCardState extends State<RitualCard> with TickerProviderStateMixin {
   }
 
   void _tap(VoidCallback cb) {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     cb();
   }
 

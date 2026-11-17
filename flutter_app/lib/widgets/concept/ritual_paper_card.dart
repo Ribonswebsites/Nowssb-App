@@ -8,10 +8,10 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../home_text.dart';
 import 'ritual_card.dart' show RitualTime, ritualTimeFor;
+import 'package:nowssb/data/app_haptics.dart';
 
 class PaperRitualPalette {
   final String word, title;
@@ -113,7 +113,7 @@ class _PaperRitualCardState extends State<PaperRitualCard> with TickerProviderSt
   }
 
   void _tap(VoidCallback cb) {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     cb();
   }
 

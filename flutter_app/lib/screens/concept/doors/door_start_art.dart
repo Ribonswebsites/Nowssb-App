@@ -9,10 +9,10 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../data/day_part.dart';
 import 'door_kit.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _slot = 'concept.Doors.StartArt';
 
@@ -67,9 +67,9 @@ class _S extends State<DoorStartArtPicker> with TickerProviderStateMixin, DoorPh
   DoorStill get _f => widget.stills.firstWhere((s) => s.id == _focus, orElse: () => widget.stills.first);
 
   void _tap(DoorStill s) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     if (s.id == _focus) {
-      HapticFeedback.mediumImpact();
+      AppHaptics.medium();
       widget.onPickImage?.call(s.id);
       return;
     }
@@ -116,7 +116,7 @@ class _S extends State<DoorStartArtPicker> with TickerProviderStateMixin, DoorPh
                   line: f.name,
                   action: chosen ? 'Pinned' : 'Pin it',
                   onTap: () {
-                    HapticFeedback.mediumImpact();
+                    AppHaptics.medium();
                     widget.onPickImage?.call(f.id);
                   },
                 ),

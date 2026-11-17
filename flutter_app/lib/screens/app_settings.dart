@@ -8,7 +8,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -43,6 +42,7 @@ import 'quick_access.dart';
 import 'quotes_live.dart';
 import 'store/request_words.dart';
 import '../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
@@ -953,7 +953,7 @@ class _ToggleRow extends StatelessWidget {
     return NestedDarkWrap(
       margin: EdgeInsets.only(bottom: last ? 0 : 8),
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         onChanged(!value);
       },
       child: Row(
@@ -988,7 +988,7 @@ class _ToggleRow extends StatelessWidget {
           Switch.adaptive(
             value: value,
             onChanged: (v) {
-              HapticFeedback.selectionClick();
+              AppHaptics.selection();
               onChanged(v);
             },
             activeColor: NwsbColors.goldLight,

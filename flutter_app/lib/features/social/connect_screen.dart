@@ -27,6 +27,7 @@ import '../../widgets/app_backdrop.dart';
 import '../../widgets/glass_list_card.dart';
 import '../../widgets/restyle_kit.dart';
 import '../economy/economy_api.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Max characters in one post (the server enforces the same).
 const kBoardMaxText = 280;
@@ -268,7 +269,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
       final r = await EconomyApi.call('boardPost', {'text': _outgoing, 'image': _kind == PostKind.image ? (_image ?? '') : ''});
       final p = r['post'];
       if (!mounted) return;
-      HapticFeedback.lightImpact();
+      AppHaptics.light();
       setState(() {
         if (p is Map) _posts = [BoardPost.from(p), ..._posts];
         _left = (r['postsLeft'] as num?)?.toInt() ?? math.max(0, _left - 1);

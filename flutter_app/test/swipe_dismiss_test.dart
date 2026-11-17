@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/data/app_haptics.dart';
 import 'package:nowssb/data/notifications.dart';
 import 'package:nowssb/features/progress/progress_center.dart';
 import 'package:nowssb/widgets/notification_popup.dart';
@@ -102,6 +103,7 @@ void main() {
       await (FontLoader('Roboto')..addFont(Future.value(ByteData.sublistView(f.readAsBytesSync())))).load();
     }
   });
+  setUp(AppHaptics.debugReset);
 
   testWidgets('swipe up on one card removes only that card, with haptic', (t) async {
     final h = _haptics(t);

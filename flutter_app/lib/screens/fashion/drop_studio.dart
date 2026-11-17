@@ -17,7 +17,6 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../admin/template/editable.dart';
 import '../../data/cart_bag.dart';
@@ -35,6 +34,7 @@ import 'door_screens.dart';
 import '../concept/drop_v4_concepts.dart' show DoorHooks;
 import '../concept/drop_v5.dart';
 import '../word_detail.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// The real Drop Studio page: every hook wired.
 class DropStudioScreen extends StatefulWidget {
@@ -493,7 +493,7 @@ class _DropHero extends StatelessWidget {
     final p = (scroll * .18).clamp(-80.0, 80.0); // scroll parallax
     return GestureDetector(
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         onTap?.call();
       },
       child: Padding(
@@ -750,7 +750,7 @@ class _WordsDeckState extends State<_WordsDeck> {
     final v = d.primaryVelocity ?? 0;
     setState(() {
       if (_dx.abs() > 70 || v.abs() > 600) {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         _top = (_dx + v * .1) < 0 ? (_top + 1) % n : (_top - 1 + n) % n;
       }
       _dx = 0;
@@ -996,7 +996,7 @@ class _WordPoster extends StatelessWidget {
               bottom: 14,
               child: GestureDetector(
                 onTap: () {
-                  HapticFeedback.lightImpact();
+                  AppHaptics.light();
                   onBuy?.call();
                 },
                 child: Transform.rotate(
@@ -1184,7 +1184,7 @@ class _BuyDock extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              HapticFeedback.mediumImpact();
+              AppHaptics.medium();
               onBuy?.call();
             },
             child: Container(

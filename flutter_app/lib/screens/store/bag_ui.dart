@@ -5,7 +5,6 @@ import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../data/cart_bag.dart';
 import '../../theme/tokens.dart';
@@ -13,6 +12,7 @@ import '../../widgets/nwsb_icon.dart';
 import 'cart_pages.dart';
 import 'store_cards.dart';
 import '../../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 enum BagKind { cart, wishlist }
 
@@ -147,7 +147,7 @@ class _BagCircle extends StatelessWidget {
 }
 
 Future<void> showBagSheet(BuildContext context, BagKind kind) {
-  HapticFeedback.lightImpact();
+  AppHaptics.light();
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
@@ -187,7 +187,7 @@ class _BagSheet extends StatelessWidget {
   void _openAll(BuildContext context) {
     final nav = Navigator.of(context);
     nav.pop();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     Future<void>.delayed(const Duration(milliseconds: 280), () {
       nav.push(
         MaterialPageRoute<void>(
@@ -284,7 +284,7 @@ class _BagSheet extends StatelessWidget {
                                     bag.removeWishlist(e.id);
                                   }
                                 }
-                                HapticFeedback.mediumImpact();
+                                AppHaptics.medium();
                               },
                               primary: 'VIEW ALL',
                               onPrimary: () => _openAll(context),

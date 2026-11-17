@@ -7,9 +7,9 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'door_kit.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _slot = 'concept.Doors.Background';
 
@@ -94,7 +94,7 @@ class _S extends State<DoorBackgroundPicker> with TickerProviderStateMixin, Door
                     ),
                     const DoorKicker('$_slot.k1', 'Motion'),
                     _MotionSwitch(on: on, t: t, poster: v.poster, onChanged: (b) {
-                      HapticFeedback.mediumImpact();
+                      AppHaptics.medium();
                       widget.onToggleMotion?.call(b);
                     }),
                     const DoorKicker('$_slot.k2', 'Flip the reel'),
@@ -104,7 +104,7 @@ class _S extends State<DoorBackgroundPicker> with TickerProviderStateMixin, Door
                         controller: _deck,
                         itemCount: widget.videos.length,
                         onPageChanged: (i) {
-                          HapticFeedback.selectionClick();
+                          AppHaptics.selection();
                           setState(() => _focus = i);
                         },
                         itemBuilder: (context, i) => AnimatedBuilder(
@@ -129,7 +129,7 @@ class _S extends State<DoorBackgroundPicker> with TickerProviderStateMixin, Door
                               if (i != _focus) {
                                 _deck.animateToPage(i, duration: const Duration(milliseconds: 380), curve: Curves.easeOutCubic);
                               } else {
-                                HapticFeedback.mediumImpact();
+                                AppHaptics.medium();
                                 widget.onPickVideo?.call(widget.videos[i].id);
                               }
                             },
@@ -157,7 +157,7 @@ class _S extends State<DoorBackgroundPicker> with TickerProviderStateMixin, Door
                   line: v.name,
                   action: widget.selectedId == v.id ? 'Playing' : 'Set film',
                   onTap: () {
-                    HapticFeedback.mediumImpact();
+                    AppHaptics.medium();
                     widget.onPickVideo?.call(v.id);
                   },
                 ),

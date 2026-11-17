@@ -13,7 +13,7 @@ library;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const kEzOrange = Color(0xFFF47A3C);
 const kEzTeal = Color(0xFF2CE0C4);
@@ -234,6 +234,7 @@ class EzOrangeCarouselState extends State<EzOrangeCarousel> {
   late final PageController _page = PageController(initialPage: _loop * widget.slides.length);
   Timer? _tick;
   Timer? _resume;
+  final _pageHaptic = UserPageHapticGate();
   bool _held = false;
 
   /// Test hooks.
@@ -290,11 +291,13 @@ class EzOrangeCarouselState extends State<EzOrangeCarousel> {
       onPointerCancel: _up,
       child: SizedBox(
         height: widget.height,
-        child: PageView.builder(
+        child: NotificationListener<ScrollNotification>(
+          onNotification: _pageHaptic.onScroll,
+          child: PageView.builder(
           key: const ValueKey('ez-carousel'),
           controller: _page,
           clipBehavior: Clip.none,
-          onPageChanged: (_) => HapticFeedback.selectionClick(),
+          onPageChanged: (_) => _pageHaptic.onPageChanged(),
           itemBuilder: (context, i) {
             final s = widget.slides[i % n];
             final card = EzOrangeCard(
@@ -309,6 +312,7 @@ class EzOrangeCarouselState extends State<EzOrangeCarousel> {
             );
             return hasPill && s.comment == null ? Padding(padding: const EdgeInsets.only(left: 10), child: card) : card;
           },
+        ),
         ),
       ),
     );

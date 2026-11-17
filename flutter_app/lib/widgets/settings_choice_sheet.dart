@@ -4,9 +4,9 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'glass_list_card.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class SettingsChoice<T> {
   const SettingsChoice({
@@ -56,7 +56,7 @@ Future<T?> showSettingsChoiceSheet<T>({
                     title: choice.label,
                     sub: choice.sub,
                     onTap: () {
-                      HapticFeedback.selectionClick();
+                      AppHaptics.selection();
                       Navigator.of(ctx).pop(choice.value);
                     },
                     trailing: choice.value == current

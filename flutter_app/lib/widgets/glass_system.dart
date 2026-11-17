@@ -5,10 +5,10 @@ library;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../theme/tokens.dart';
 import 'app_thinking_loader.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 bool nwsbReduce(BuildContext context) => MediaQuery.maybeOf(context)?.disableAnimations ?? false;
 
@@ -67,7 +67,7 @@ class GlassWrapper extends StatelessWidget {
     if (onTap == null) return pane;
     return GestureDetector(
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         onTap!();
       },
       child: pane,

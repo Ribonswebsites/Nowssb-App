@@ -10,7 +10,6 @@ import 'dart:async';
 import 'package:flutter/gestures.dart' show Drag;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../theme/theme.dart';
 import '../layout/app_pages.dart';
@@ -21,6 +20,7 @@ import '../template/slot_keys.dart';
 import 'editor_controller.dart';
 import 'glass.dart';
 import 'tab_layout.dart' show SectionDrop;
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Kept for callers that ask for "the page as a whole".
 const kProbe = '__probe__';
@@ -384,7 +384,7 @@ class AnimDrop {
 }
 
 /// Something thrown away (the trash, a flick, off the screen).
-void trashFeel() => HapticFeedback.heavyImpact();
+void trashFeel() => AppHaptics.heavy();
 
 /// Deletes the element [key] for real (not hidden: gone from the page for
 /// everyone), with Undo.

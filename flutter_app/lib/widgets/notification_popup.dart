@@ -7,7 +7,6 @@ import 'dart:ui' show ImageFilter;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'swipe_away.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../data/notifications.dart';
@@ -20,6 +19,7 @@ import '../screens/notifications_sheet.dart';
 import '../screens/quotes_live.dart';
 import '../screens/splash.dart';
 import '../theme/liquid_glass_theme.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class NotificationPopupHost extends StatefulWidget {
   const NotificationPopupHost(
@@ -126,7 +126,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   }
 
   void _clearAll(List<NotifItem> items) {
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     _hide?.cancel();
     setState(() {
       _gone.addAll(items.map(_id));
@@ -322,7 +322,7 @@ class _NotificationRowState extends State<NotificationRow> {
                             GestureDetector(
                               behavior: HitTestBehavior.opaque,
                               onTap: () {
-                                HapticFeedback.selectionClick();
+                                AppHaptics.selection();
                                 widget.onTouch?.call();
                                 setState(() => _page = (page + 1) % n);
                               },
@@ -372,7 +372,7 @@ class _NotificationRowState extends State<NotificationRow> {
   Widget _action(String label, VoidCallback onTap) => GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           onTap();
         },
         child: Padding(
@@ -419,7 +419,7 @@ class _BlackPill extends StatelessWidget {
     const ink = TextStyle(decoration: TextDecoration.none, color: Colors.white);
     return GestureDetector(
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         onTap();
       },
       behavior: HitTestBehavior.opaque,

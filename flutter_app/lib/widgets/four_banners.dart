@@ -3,7 +3,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../features/draw/lucky_draw_gate.dart';
 import '../features/draw/lucky_draw_screen.dart';
@@ -15,6 +14,7 @@ import 'colored_split_promo_banner.dart';
 import 'nwsb_icon.dart';
 import 'glass_wrap.dart';
 import 'earn_now_section.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class FourBanners extends StatelessWidget {
   const FourBanners({
@@ -147,7 +147,7 @@ class _DeckCard extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         face.open(context);
       },
       child: SizedBox(width: 246, child: child),
@@ -459,7 +459,7 @@ class _ProgBanner extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         if (onOpen != null) {
           onOpen!(context);
         } else {

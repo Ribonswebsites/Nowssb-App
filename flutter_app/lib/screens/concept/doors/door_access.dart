@@ -9,9 +9,9 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'door_kit.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _slot = 'concept.Doors.Access';
 
@@ -98,7 +98,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
                         active: _socket,
                         t: t,
                         onTap: (i) {
-                          HapticFeedback.selectionClick();
+                          AppHaptics.selection();
                           setState(() => _socket = i);
                         },
                       ),
@@ -120,7 +120,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
                         diameterRatio: 1.9,
                         perspective: .004,
                         physics: const FixedExtentScrollPhysics(),
-                        onSelectedItemChanged: (_) => HapticFeedback.selectionClick(),
+                        onSelectedItemChanged: (_) => AppHaptics.selection(),
                         childDelegate: ListWheelChildBuilderDelegate(
                           childCount: widget.features.length,
                           builder: (context, i) {
@@ -128,7 +128,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
                             final inBar = widget.slots.indexOf(f.id);
                             return GestureDetector(
                               onTap: () {
-                                HapticFeedback.mediumImpact();
+                                AppHaptics.medium();
                                 widget.onSetSlot?.call(_socket, f.id);
                               },
                               child: Padding(
@@ -185,7 +185,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
       label: 'Put ${f.label} in socket ${_socket + 1}',
       child: GestureDetector(
         onTap: () {
-          HapticFeedback.mediumImpact();
+          AppHaptics.medium();
           widget.onSetSlot?.call(_socket, f.id);
         },
         child: DoorTornTile(

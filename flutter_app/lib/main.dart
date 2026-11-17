@@ -28,6 +28,7 @@ import 'admin/layout/ui_layouts.dart';
 import 'admin/template/ui_overrides.dart';
 import 'app_update.dart';
 import 'data/app_control.dart';
+import 'data/app_haptics.dart';
 import 'data/content.dart';
 import 'data/word_art.dart';
 import 'data/earn_wallet.dart';
@@ -87,6 +88,7 @@ Future<void> main() async {
   // whether or not the network ever answers. This sets those up and leaves
   // the Firestore watch running behind them when there is one.
   await Settings.instance.load();
+  await AppHaptics.preload();
   await NotifStore.instance.load();
   await CartBag.instance.load();
   await EarnWallet.instance.start();

@@ -18,7 +18,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../screens/quotes_live.dart' show DailyQuoteGate;
@@ -28,6 +27,7 @@ import '../../widgets/swipe_away.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart' show coinsIn, playCoins;
 import 'reward_overlay.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// One activity's coins waiting for a Collect tap.
 class PendingEarn {
@@ -392,7 +392,7 @@ class PendingCoins extends ChangeNotifier {
   /// with an optimistic amount, and never when the coins were only saved.
   Future<void> _playConfirmed(int gained) async {
     if (gained <= 0) return;
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     final before = _balanceBefore ?? 0;
     final day0 = _dayBefore;
     final dayAfter = day0 == null

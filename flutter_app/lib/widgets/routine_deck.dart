@@ -9,10 +9,10 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'hero_glass.dart';
-import 'package:flutter/services.dart';
 
 import '../admin/template/editable.dart';
 import 'nwsb_icon.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const kRoutineArts = <String>[
   'assets/routine/trusting-the-breath.png',
@@ -122,7 +122,7 @@ class _Banner extends StatelessWidget {
         onTap: onTap == null
             ? null
             : () {
-                HapticFeedback.selectionClick();
+                AppHaptics.selection();
                 onTap!();
               },
         child: Padding(
@@ -193,7 +193,7 @@ class _RoutineCard extends StatelessWidget {
       width: width,
       child: GestureDetector(
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           card.onTap();
         },
         child: shop ? _shopFace(radius) : _plainFace(radius),
@@ -420,7 +420,7 @@ class _OctButtons extends StatelessWidget {
           onTap: onCart == null
               ? null
               : () {
-                  HapticFeedback.selectionClick();
+                  AppHaptics.selection();
                   onCart!();
                 },
           child: Container(
@@ -442,7 +442,7 @@ class _OctButtons extends StatelessWidget {
           onTap: onBuy == null
               ? null
               : () {
-                  HapticFeedback.selectionClick();
+                  AppHaptics.selection();
                   onBuy!();
                 },
           child: Container(

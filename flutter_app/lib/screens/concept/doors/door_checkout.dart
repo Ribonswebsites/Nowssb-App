@@ -10,10 +10,10 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../admin/template/editable.dart';
 import 'door_kit.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _slot = 'concept.Doors.Checkout';
 
@@ -154,7 +154,7 @@ class _S extends State<DoorCheckout> with TickerProviderStateMixin, DoorPhase {
                   onTap: items.isEmpty
                       ? null
                       : () {
-                          HapticFeedback.mediumImpact();
+                          AppHaptics.medium();
                           widget.allInPlan ? widget.onAddToLibrary?.call() : widget.onPlaceOrder?.call();
                         },
                 ),
@@ -200,7 +200,7 @@ class _S extends State<DoorCheckout> with TickerProviderStateMixin, DoorPhase {
                 angle: depth == 0 ? math.sin(t * math.pi * 2) * .008 : (depth.isEven ? .035 : -.04),
                 child: GestureDetector(
                   onTap: () {
-                    HapticFeedback.selectionClick();
+                    AppHaptics.selection();
                     if (depth == 0) {
                       widget.onOpenItem?.call(items[k].id);
                     } else {

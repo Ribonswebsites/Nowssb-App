@@ -10,7 +10,6 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../data/content.dart';
 import '../data/entitlements.dart';
@@ -26,6 +25,7 @@ import 'store.dart';
 import 'store/word_atelier.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Subconscious tier → max words selectable when combining.
 /// Starts at 2 (free); highest tier caps at 6.
@@ -154,14 +154,14 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   }
 
   void _toggle(String w) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     setState(() {
       if (_selected.contains(w)) {
         _selected.remove(w);
       } else if (_selected.length < _max) {
         _selected.add(w);
       } else {
-        HapticFeedback.heavyImpact();
+        AppHaptics.heavy();
       }
       _sentence = null;
       _reveal.value = 0;
@@ -171,7 +171,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   Future<void> _combine() async {
     if (_selected.length < 2 || _building) return;
     setState(() => _building = true);
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     await Future<void>.delayed(const Duration(milliseconds: 520));
     final words = _selected.toList();
     final woven = _composeLocal(words);
@@ -198,7 +198,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   }
 
   void _listen() {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: EditableLabel('sentence_builder.SentenceBuilderScreen', 'Listen opens from your owned words in Practice.'),
@@ -221,7 +221,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
   }
 
   void _openRequest() {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -552,8 +552,7 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
                                                   locked: _wordTab == 1,
                                                   onTap: () {
                                                     if (_wordTab == 1) {
-                                                      HapticFeedback
-                                                          .selectionClick();
+                                                      AppHaptics.selection();
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
@@ -992,7 +991,7 @@ class _RequestCustomSheetState extends State<_RequestCustomSheet> {
             const SizedBox(height: 4),
             GestureDetector(
               onTap: () {
-                HapticFeedback.mediumImpact();
+                AppHaptics.medium();
                 widget.onSubmitted(_ctrl.text);
               },
               child: Container(

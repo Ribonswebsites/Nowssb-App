@@ -12,10 +12,10 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter/services.dart';
 
 import '../../data/models.dart';
 import 'poster_kit.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// One orbiting poster: real hero-curve art.
 class OrbitPoster {
@@ -105,7 +105,7 @@ class _PosterOrbitStageState extends State<PosterOrbitStage> with TickerProvider
             _tilt = Offset((_tilt.dx + d.delta.dx / (W / 2)).clamp(-1.0, 1.0), (_tilt.dy + d.delta.dy / 160).clamp(-1.0, 1.0));
           }),
           onPanEnd: (_) {
-            HapticFeedback.lightImpact();
+            AppHaptics.light();
             _from = _tilt;
             _spring.value = 1;
             _spring.animateWith(SpringSimulation(const SpringDescription(mass: 1, stiffness: 110, damping: 10), 1, 0, 0));

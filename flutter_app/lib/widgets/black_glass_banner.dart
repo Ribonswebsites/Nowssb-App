@@ -11,11 +11,11 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'home_parts.dart';
 import 'nwsb_icon.dart';
 import '../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Notifications-sheet blur (CSS blur(26px) → sigma ≈ 13).
 const double kNotifGlassSigma = 13;
@@ -136,7 +136,7 @@ class BlackGlassBanner extends StatelessWidget {
       child: InkWell(
         borderRadius: r,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           onTap!();
         },
         child: body,
@@ -280,7 +280,7 @@ class NestedDarkWrap extends StatelessWidget {
       child: InkWell(
         borderRadius: r,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           onTap!();
         },
         child: body,
@@ -377,7 +377,7 @@ class CustomizeBlackBanner extends StatelessWidget {
       child: InkWell(
         borderRadius: r,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           onTap!();
         },
         child: body,

@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../template/editable.dart' show EditableLabel;
+import 'package:nowssb/data/app_haptics.dart';
 
 const kCouponInk = 0xFF111111;
 const kCouponRed = 0xFFD71920;
@@ -131,7 +132,7 @@ Color _readableOn(Color bg) =>
 void _copyCode(BuildContext context, String code) {
   if (code.trim().isEmpty) return;
   Clipboard.setData(ClipboardData(text: code.trim()));
-  HapticFeedback.selectionClick();
+  AppHaptics.selection();
   ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
     behavior: SnackBarBehavior.floating,
     duration: const Duration(seconds: 2),

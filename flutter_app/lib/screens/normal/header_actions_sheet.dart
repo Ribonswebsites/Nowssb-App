@@ -9,13 +9,13 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter/services.dart';
 
 import '../../data/notifications.dart';
 import '../../data/settings.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Blur / glass mark — not in [NwsbMarks]; drawn to match stroke style.
 const _kBlurMark =
@@ -51,7 +51,7 @@ Future<void> showHeaderActionsSheet(
   VoidCallback? onStore,
   VoidCallback? onPlayer,
 }) {
-  HapticFeedback.lightImpact();
+  AppHaptics.light();
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
@@ -249,7 +249,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
 
   void _activateCenter() {
     final id = _ids[_centerIndex];
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     switch (id) {
       case 'glass':
         setState(() => _glassOn = !_glassOn);
@@ -276,7 +276,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
   }
 
   Future<void> _openCustomize() async {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     final chosen = await showModalBottomSheet<List<String>>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -303,7 +303,7 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
     if (centered) {
       _activateCenter();
     } else {
-      HapticFeedback.selectionClick();
+      AppHaptics.selection();
       _animateTo(index.toDouble());
     }
   }

@@ -18,11 +18,11 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'app_backdrop.dart';
 import 'glass_wrap.dart';
 import 'nwsb_icon.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 export 'glass_wrap.dart' show GlassWrap, SectionHead;
 export 'nwsb_icon.dart' show NwsbMarks;
@@ -122,7 +122,7 @@ class KitRoundButton extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           onTap!();
         },
         child: b,
@@ -342,7 +342,7 @@ class KitBlackCard extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
-            HapticFeedback.selectionClick();
+            AppHaptics.selection();
             onTap();
           },
           child: Container(

@@ -7,7 +7,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import '../../widgets/swipe_away.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../theme/tokens.dart';
@@ -18,6 +17,7 @@ import 'progress_kit.dart' show GoalMarks;
 import 'progress_sources.dart';
 import 'today_progress_screen.dart';
 import '../../widgets/nwsb_icon.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Hero-header glass (GlassWrap tokens) with a deeper blur and a light dark
 /// tint so white text reads over any page.
@@ -110,7 +110,7 @@ class _ProgressPopupHostState extends State<ProgressPopupHost> with SingleTicker
       _close();
       return;
     }
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() {
       _shown = item;
     });
@@ -343,7 +343,7 @@ class ProgressIconButton extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           ProgressPanel.open(context);
         },
         child: Container(
@@ -392,7 +392,7 @@ class _ProgressPillButtonState extends State<ProgressPillButton> with SingleTick
         splashColor: const Color(0x55FFFFFF),
         onHighlightChanged: (v) => setState(() => _down = v),
         onTap: () {
-          HapticFeedback.mediumImpact();
+          AppHaptics.medium();
           ProgressPanel.open(context);
         },
         child: Padding(
@@ -533,7 +533,7 @@ class _TileState extends State<_Tile> {
         onTapCancel: () => setState(() => _down = false),
         onTapUp: (_) => setState(() => _down = false),
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           widget.onTap();
         },
         child: AnimatedScale(
@@ -582,7 +582,7 @@ class _ViewAll extends StatelessWidget {
           key: const ValueKey('progress-view-all'),
           customBorder: const StadiumBorder(),
           onTap: () {
-            HapticFeedback.selectionClick();
+            AppHaptics.selection();
             onTap();
           },
           child: Padding(
@@ -698,7 +698,7 @@ class _TodayProgressButtonState extends State<TodayProgressButton> {
             onTapCancel: () => _set(false),
             onTapUp: (_) => _set(false),
             onTap: () {
-              HapticFeedback.mediumImpact();
+              AppHaptics.medium();
               ProgressPanel.open(context);
             },
             child: AnimatedScale(scale: _down ? 0.94 : 1, duration: const Duration(milliseconds: 110), child: glass),

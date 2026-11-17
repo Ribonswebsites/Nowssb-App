@@ -8,7 +8,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
@@ -16,13 +15,14 @@ import '../theme/tokens.dart';
 import 'app_destinations.dart';
 import 'glass_list_card.dart';
 import '../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Opens the website hamburger (`#menuDrawer`) over the current route.
 Future<void> showHomeMenuDrawer(
   BuildContext context, {
   required void Function(int tab) goTab,
 }) {
-  HapticFeedback.lightImpact();
+  AppHaptics.light();
   // Both homes open the same dark menu. The pale drawer was a different page.
   return showGeneralDialog<void>(
     context: context,
@@ -101,7 +101,7 @@ class _HomeMenuDrawerState extends State<HomeMenuDrawer> {
   void _close(BuildContext context) => Navigator.of(context).maybePop();
 
   void _open(AppDest d) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     // Pages replace the drawer route so the home never flashes underneath.
     openDest(context, d, goTab: widget.goTab, replace: d.action == null);
   }

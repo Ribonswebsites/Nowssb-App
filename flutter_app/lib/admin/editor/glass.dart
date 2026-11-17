@@ -6,7 +6,7 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 
 const kGold = Color(0xFFE8D5A3);
@@ -17,9 +17,9 @@ const kGlassEdge = Color(0x24FFFFFF);
 const kDim = Color(0x99FFFFFF);
 const kFaint = Color(0x55FFFFFF);
 
-void tapFeel() => HapticFeedback.selectionClick();
-void actFeel() => HapticFeedback.lightImpact();
-void bigFeel() => HapticFeedback.mediumImpact();
+void tapFeel() => AppHaptics.selection();
+void actFeel() => AppHaptics.light();
+void bigFeel() => AppHaptics.medium();
 
 /// The Admin app's own backdrop — deep night blue with a gold and a violet
 /// glow, nothing from the member app's film — and its veil, behind every
@@ -361,7 +361,7 @@ class LabeledSlider extends StatelessWidget {
             max: max,
             divisions: divisions,
             onChanged: (v) {
-              HapticFeedback.selectionClick();
+              AppHaptics.selection();
               onChanged(v);
             },
           ),

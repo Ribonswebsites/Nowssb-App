@@ -7,7 +7,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../admin/template/editable.dart';
 import '../../data/notifications.dart';
@@ -18,6 +17,7 @@ import '../../widgets/nwsb_icon.dart';
 import 'economy_api.dart';
 import 'reward_overlay.dart';
 import 'coin_collect.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Rarity palette (Common → Mythic).
 Color rarityColor(String? rarity) => switch ((rarity ?? '').toLowerCase()) {
@@ -36,22 +36,22 @@ String rarityTitle(String? r) {
 bool rarityParty(String? r) => ['epic', 'legendary', 'mythic'].contains((r ?? '').toLowerCase());
 
 class RewardHaptics {
-  static void tick() => HapticFeedback.selectionClick();
-  static void pop() => HapticFeedback.mediumImpact();
-  static void big() => HapticFeedback.heavyImpact();
+  static void tick() => AppHaptics.selection();
+  static void pop() => AppHaptics.medium();
+  static void big() => AppHaptics.heavy();
   static Future<void> rarity(String? r) async {
     switch ((r ?? '').toLowerCase()) {
       case 'mythic':
       case 'legendary':
-        HapticFeedback.heavyImpact();
+        AppHaptics.heavy();
         await Future<void>.delayed(const Duration(milliseconds: 90));
-        HapticFeedback.heavyImpact();
+        AppHaptics.heavy();
       case 'epic':
-        HapticFeedback.heavyImpact();
+        AppHaptics.heavy();
       case 'rare':
-        HapticFeedback.mediumImpact();
+        AppHaptics.medium();
       default:
-        HapticFeedback.lightImpact();
+        AppHaptics.light();
     }
   }
 }

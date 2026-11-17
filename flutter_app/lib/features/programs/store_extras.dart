@@ -17,6 +17,7 @@ import '../economy/money.dart';
 import '../economy/play_billing.dart';
 import '../economy/reward_fx.dart';
 import '../../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Gets (or mints) my link for one item from the server.
 Future<String?> myLinkFor(BuildContext context, {required String kind, String id = '', String title = ''}) async {
@@ -43,7 +44,7 @@ class ShareItemButtons extends StatelessWidget {
     final url = await myLinkFor(context, kind: kind, id: id, title: title);
     if (url == null) return;
     await Clipboard.setData(ClipboardData(text: url));
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: EditableLabel('store_extras.ShareItemButtons', 'Your link is copied. Friends get a discount; you earn when they buy.')));
   }
 

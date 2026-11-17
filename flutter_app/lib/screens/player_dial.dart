@@ -14,6 +14,7 @@ import '../widgets/colored_split_promo_banner.dart';
 import 'player_settings.dart';
 import 'sound_settings_sheet.dart';
 import '../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class PlayerDial extends StatefulWidget {
   const PlayerDial({
@@ -89,7 +90,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
   }
 
   void _openFullSettings() {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     if (widget.onSettings != null) {
       widget.onSettings!();
       return;
@@ -343,7 +344,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
                       onTap: () {
-                        HapticFeedback.selectionClick();
+                        AppHaptics.selection();
                         setState(() => _quickExpanded = !_quickExpanded);
                       },
                       child: Row(
@@ -460,7 +461,7 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
   Widget _row(IconData icon, String label, String value, VoidCallback onTap) {
     return InkWell(
       onTap: () {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         onTap();
       },
       child: Container(

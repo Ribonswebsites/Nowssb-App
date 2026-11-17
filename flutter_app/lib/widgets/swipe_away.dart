@@ -6,7 +6,7 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class SwipeAway extends StatefulWidget {
   const SwipeAway({
@@ -77,7 +77,7 @@ class _SwipeAwayState extends State<SwipeAway>
     _to = horizontal
         ? Offset(dir.dx.sign * (size.width + 40), _drag.dy)
         : Offset(_drag.dx, -(size.height + 80));
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     await _out.forward(from: 0);
     if (mounted) widget.onDismissed();
   }

@@ -27,6 +27,7 @@ import '../../widgets/app_thinking_loader.dart';
 import 'reader_epub.dart';
 import 'reader_lookup.dart';
 import '../../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _flutterTest = bool.fromEnvironment('FLUTTER_TEST');
 
@@ -126,9 +127,9 @@ class _ReaderBookScreenState extends State<ReaderBookScreen> {
 
   void _haptic([int ms = 15]) {
     if (ms >= 24) {
-      HapticFeedback.mediumImpact();
+      AppHaptics.medium();
     } else {
-      HapticFeedback.selectionClick();
+      AppHaptics.selection();
     }
   }
 

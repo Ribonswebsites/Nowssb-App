@@ -6,11 +6,11 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../widgets/glass_wrap.dart';
 import 'home_cards.dart' show AutoMarquee;
 import '../normal/home_v4.dart' show V4Lottie;
+import 'package:nowssb/data/app_haptics.dart';
 
 enum QuickStyle { banner, button, colour }
 
@@ -121,7 +121,7 @@ class HeroQuickRow extends StatelessWidget {
           key: ValueKey('quick-${c.id}'),
           behavior: HitTestBehavior.opaque,
           onTap: () {
-            HapticFeedback.selectionClick();
+            AppHaptics.selection();
             c.onTap();
           },
           child: child,

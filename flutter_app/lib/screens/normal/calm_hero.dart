@@ -12,7 +12,6 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart' show SpringDescription, SpringSimulation;
-import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/models.dart';
@@ -20,6 +19,7 @@ import '../../media/golden_breath.dart';
 import '../../media/nwsb_video.dart';
 import '../../widgets/concept/ritual_card.dart';
 import '../../widgets/concept/ritual_paper_card.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class HeroData {
   const HeroData({
@@ -114,6 +114,7 @@ class HeroCarouselState extends State<_Carousel> {
   static const _loop = 10000;
   late final PageController _page = PageController(initialPage: _loop * widget.count, viewportFraction: widget.peek);
   Timer? _tick, _resume;
+  final _pageHaptic = UserPageHapticGate();
   bool held = false;
   int get index => _page.hasClients ? (_page.page ?? 0).round() % widget.count : 0;
 
@@ -156,12 +157,14 @@ class HeroCarouselState extends State<_Carousel> {
         }),
         child: SizedBox(
           height: widget.height,
-          child: PageView.builder(
+          child: NotificationListener<ScrollNotification>(
+            onNotification: _pageHaptic.onScroll,
+            child: PageView.builder(
             key: const ValueKey('hero-concept-pages'),
             controller: _page,
             padEnds: true,
             physics: const PageScrollPhysics(parent: BouncingScrollPhysics()),
-            onPageChanged: (_) => HapticFeedback.selectionClick(),
+            onPageChanged: (_) => _pageHaptic.onPageChanged(),
             itemBuilder: (context, i) => AnimatedBuilder(
               animation: _page,
               builder: (context, _) {
@@ -177,6 +180,7 @@ class HeroCarouselState extends State<_Carousel> {
                 );
               },
             ),
+          ),
           ),
         ),
       );
@@ -620,7 +624,7 @@ class _DepthCardState extends State<_DepthCard> with SingleTickerProviderStateMi
   }
 
   void _step(int d) {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     _settle(_start + d, 0);
   }
 
@@ -649,7 +653,7 @@ class _DepthCardState extends State<_DepthCard> with SingleTickerProviderStateMi
       onVerticalDragEnd: (e) {
         final v = e.primaryVelocity ?? 0;
         final d = (_drag < -24 || v < -250) ? 1 : (_drag > 24 || v > 250) ? -1 : 0;
-        if (d != 0) HapticFeedback.selectionClick();
+        if (d != 0) AppHaptics.selection();
         _pos.animateWith(SpringSimulation(_spring, _pos.value, _start + d, -v / 140));
       },
       child: ClipRRect(

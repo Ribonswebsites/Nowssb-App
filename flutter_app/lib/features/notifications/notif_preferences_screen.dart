@@ -4,7 +4,6 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../admin/layout/layout_sections.dart';
 import '../../admin/template/editable.dart';
@@ -14,6 +13,7 @@ import '../../widgets/page_shell.dart';
 import 'notif_categories.dart';
 import 'notif_prefs.dart';
 import 'notif_scheduler.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _gold = Color(0xFFE8D5A3);
 const _muted = Color(0x99FFFFFF);
@@ -185,7 +185,7 @@ class _TimingCard extends StatelessWidget {
                   value: prefs.quietOn,
                   activeThumbColor: _gold,
                   onChanged: (v) {
-                    HapticFeedback.lightImpact();
+                    AppHaptics.light();
                     prefs.setQuiet(on: v);
                   },
                 ),
@@ -243,7 +243,7 @@ class _GroupCard extends StatelessWidget {
                     value: prefs.isOn(c),
                     activeThumbColor: _gold,
                     onChanged: (v) {
-                      HapticFeedback.lightImpact();
+                      AppHaptics.light();
                       prefs.setOn(c, v);
                     },
                   ),

@@ -9,13 +9,13 @@ import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../admin/template/editable.dart';
 import '../app_update.dart';
 import '../data/app_control.dart';
 import 'update_prompt.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const _gold = Color(0xFFE8D5A3);
 const _ink = Color(0xFF060C18);
@@ -127,7 +127,7 @@ class AnnouncementBanner extends StatelessWidget {
               IconButton(
                 visualDensity: VisualDensity.compact,
                 onPressed: () {
-                  HapticFeedback.selectionClick();
+                  AppHaptics.selection();
                   onClose!();
                 },
                 icon: const Icon(Icons.close_rounded, color: Color(0x99FFFFFF), size: 18),

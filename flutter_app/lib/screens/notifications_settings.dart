@@ -4,7 +4,6 @@ library;
 import '../widgets/glass_list_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
 import '../features/notifications/notif_preferences_screen.dart';
@@ -15,6 +14,7 @@ import '../widgets/page_shell.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
 import 'notifications_sheet.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class NotificationsSettingsPage extends StatelessWidget {
   const NotificationsSettingsPage({super.key});
@@ -43,7 +43,7 @@ class NotificationsSettingsPage extends StatelessWidget {
                       on: store.master,
                       onToggle: () {
                         store.toggleMaster();
-                        HapticFeedback.lightImpact();
+                        AppHaptics.light();
                       },
                     )),
                     const LSection('preferences', 'Preferences', NotifPreferencesEntry()),
@@ -55,7 +55,7 @@ class NotificationsSettingsPage extends StatelessWidget {
                           : GestureDetector(
                               onTap: () {
                                 store.clearAll();
-                                HapticFeedback.mediumImpact();
+                                AppHaptics.medium();
                               },
                               child: Container(
                                 height: 26,
@@ -101,13 +101,13 @@ class NotificationsSettingsPage extends StatelessWidget {
                                 pillSub: k.sub,
                                 onTap: () {
                                   store.toggleKind(k.k);
-                                  HapticFeedback.lightImpact();
+                                  AppHaptics.light();
                                 },
                                 trailing: _NtSwitch(
                                   on: store.master && !store.offSet.contains(k.k),
                                   onTap: () {
                                     store.toggleKind(k.k);
-                                    HapticFeedback.lightImpact();
+                                    AppHaptics.light();
                                   },
                                 ),
                               ),

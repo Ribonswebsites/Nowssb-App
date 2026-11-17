@@ -8,11 +8,11 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../admin/template/editable.dart';
 import '../features/economy/economy_api.dart' show EconomyMirror;
 import '../features/economy/reward_overlay.dart' show CoinPillAnchor;
 import '../features/economy/coin_collect.dart' show CoinDay;
+import 'package:nowssb/data/app_haptics.dart';
 
 class NwsbCoinFly {
   NwsbCoinFly._();
@@ -69,7 +69,7 @@ class _FlyStageState extends State<_FlyStage> with SingleTickerProviderStateMixi
         return;
       }
       _move.forward().whenComplete(() {
-        HapticFeedback.selectionClick();
+        AppHaptics.selection();
         if (mounted) Navigator.of(context).pop();
       });
     });

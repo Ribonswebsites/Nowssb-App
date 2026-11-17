@@ -7,7 +7,6 @@ library;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../data/notifications.dart';
 import '../features/notifications/notif_router.dart';
@@ -16,9 +15,10 @@ import '../widgets/nwsb_icon.dart';
 import '../widgets/restyle_kit.dart';
 import 'notifications_settings.dart';
 import '../admin/template/editable.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 Future<void> showNotificationsSheet(BuildContext context) {
-  HapticFeedback.lightImpact();
+  AppHaptics.light();
   return showGeneralDialog<void>(
     context: context,
     barrierDismissible: true,
@@ -59,7 +59,7 @@ class NotificationsSheet extends StatelessWidget {
   void _openSettings(BuildContext context) {
     final nav = Navigator.of(context);
     nav.pop();
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     Future<void>.delayed(const Duration(milliseconds: 280), () {
       nav.push(
         MaterialPageRoute<void>(
@@ -124,7 +124,7 @@ class NotificationsSheet extends StatelessWidget {
                         _SheetFoot(
                           onClear: () {
                             store.clearAll();
-                            HapticFeedback.mediumImpact();
+                            AppHaptics.medium();
                           },
                           onManage: () => _openSettings(context),
                         ),

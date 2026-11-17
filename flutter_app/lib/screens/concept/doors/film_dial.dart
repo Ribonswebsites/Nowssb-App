@@ -7,9 +7,9 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'film_dial_kit.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 class FilmDial extends StatefulWidget {
   const FilmDial({super.key, required this.value, this.onChanged, this.onChangeEnd, this.size = 250, this.debugPhase});
@@ -52,7 +52,7 @@ class _FilmDialState extends State<FilmDial> with SingleTickerProviderStateMixin
 
   void _set(double v) {
     v = v.clamp(0.0, 1.0);
-    if ((v * 20).round() != (_v * 20).round()) HapticFeedback.selectionClick();
+    if ((v * 20).round() != (_v * 20).round()) AppHaptics.selection();
     setState(() => _v = v);
     widget.onChanged?.call(v);
   }

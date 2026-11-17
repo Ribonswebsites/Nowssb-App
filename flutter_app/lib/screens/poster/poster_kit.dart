@@ -10,7 +10,6 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../admin/template/editable.dart';
 import '../../widgets/concept/stillwater.dart';
@@ -18,6 +17,7 @@ import '../../data/store_prices.dart';
 import '../../data/entitlements.dart';
 import '../../features/economy/money.dart';
 import '../../features/economy/play_billing.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// The live store price for a word (admin default / Deal of the Day applied).
 num wordPrice(String word) => StorePrices.instance.priceFor('word:${word.toLowerCase()}');
@@ -290,7 +290,7 @@ class _TapState extends State<Tap> {
         onTap: widget.onTap == null
             ? null
             : () {
-                HapticFeedback.selectionClick();
+                AppHaptics.selection();
                 widget.onTap!();
               },
         child: AnimatedScale(scale: _down ? .96 : 1, duration: const Duration(milliseconds: 120), child: widget.child),

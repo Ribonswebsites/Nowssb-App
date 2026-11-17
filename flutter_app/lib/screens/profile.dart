@@ -19,6 +19,7 @@ import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../data/firebase.dart';
 import '../data/settings.dart';
+import '../data/app_haptics.dart';
 
 import '../data/cart_bag.dart';
 import '../data/content.dart';
@@ -1448,7 +1449,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _preferences() => _sectionList('Preferences', [
-        _listRow('Sound Feedback', trailing: ToggleSwitch(value: _soundOn, onChanged: (v) async { setState(() => _soundOn = v); await _prefs.setString('nowssb_sound', v ? 'on' : 'off'); })),
+        _listRow('Sound Feedback', trailing: ToggleSwitch(value: _soundOn, onChanged: (v) async { setState(() => _soundOn = v); await _prefs.setString('nowssb_sound', v ? 'on' : 'off'); AppHaptics.syncFromPrefs(_prefs); })),
         _listRow('Practice Duration', trailing: Row(mainAxisSize: MainAxisSize.min, children: [_roundAction('assets/icons/icon_24.svg', () => _stepDuration(-15)), const SizedBox(width: 14), SizedBox(width: 64, child: Text(_durationText, textAlign: TextAlign.center, style: const TextStyle(fontFamily: _mono, fontSize: 14))), const SizedBox(width: 14), _roundAction('assets/icons/icon_25.svg', () => _stepDuration(15))])),
         _listRow('Daily Reminder', trailing: InkWell(onTap: _pickReminder, borderRadius: BorderRadius.circular(999), child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), decoration: BoxDecoration(color: const Color(0x08FFFFFF), border: const Border.fromBorderSide(BorderSide(color: _border)), borderRadius: BorderRadius.circular(999)), child: Text(_reminderText, style: const TextStyle(fontFamily: _mono, fontSize: 13.5))))),
         _listRow('App Version', muted: true, trailing: const EditableLabel('profile.ProfileScreen', 'Build ${NwsbAppUpdate.currentBuild}', style: TextStyle(fontSize: 13, color: _dim))),

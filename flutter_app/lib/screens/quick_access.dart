@@ -8,7 +8,6 @@ import '../widgets/glass_list_card.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
 import '../data/settings.dart';
@@ -22,6 +21,7 @@ import '../widgets/banner_mix.dart';
 import '../widgets/tv_frame.dart';
 import '../admin/template/editable.dart';
 import '../admin/layout/layout_sections.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// Every feature that can sit in the bottom nav (id, label, img).
 const quickAccessFeatures = <Map<String, String>>[
@@ -177,7 +177,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
   }
 
   void _openPicker() {
-    HapticFeedback.selectionClick();
+    AppHaptics.selection();
     setState(() => _picking = true);
   }
 
@@ -194,7 +194,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
   }
 
   Future<void> _apply() async {
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium();
     await Settings.instance.setNavConfig(
       shape: shape,
       color: color,

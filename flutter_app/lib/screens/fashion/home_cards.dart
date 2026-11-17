@@ -9,10 +9,10 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../widgets/auto_cycle.dart';
 import '../../widgets/glass_wrap.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 const kHomeStoreArt = 'assets/home/nowssb-store.webp';
 
@@ -163,7 +163,7 @@ class StoreNowCard extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           item.onTap();
         },
         child: Container(
@@ -387,7 +387,7 @@ class NowProgressCard extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
-          HapticFeedback.selectionClick();
+          AppHaptics.selection();
           item.onTap();
         },
         child: Container(

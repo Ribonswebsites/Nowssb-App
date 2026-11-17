@@ -4,11 +4,11 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_icon.dart';
+import 'package:nowssb/data/app_haptics.dart';
 
 /// SVG bodies for the goal marks (NwsbIcon draws them).
 abstract final class GoalMarks {
@@ -107,7 +107,7 @@ class _GoalCardState extends State<GoalCard> {
               onTapCancel: () => setState(() => _down = false),
               onTapUp: (_) => setState(() => _down = false),
               onTap: () {
-                HapticFeedback.selectionClick();
+                AppHaptics.selection();
                 widget.onTap!();
               },
               child: card,
@@ -129,7 +129,7 @@ class GoalAction extends StatelessWidget {
     return TextButton(
       onPressed: on
           ? () {
-              HapticFeedback.selectionClick();
+              AppHaptics.selection();
               onTap!();
             }
           : null,

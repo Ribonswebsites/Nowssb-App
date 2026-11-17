@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show SystemSound, SystemSoundType;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'app_haptics.dart';
 import 'content.dart';
 import 'firebase.dart';
 import 'models.dart';
@@ -309,8 +310,7 @@ class PracticeProgress extends ChangeNotifier {
     ProgressCenter.instance.report(ProgressKind.routine, todaySessions, dailyPracticeGoal);
     // Profile > Sound Feedback: a short click when a word is completed.
     try {
-      final preferences = await SharedPreferences.getInstance();
-      if (preferences.getString('nowssb_sound') != 'off') unawaited(SystemSound.play(SystemSoundType.click));
+      if (AppHaptics.soundOn) unawaited(SystemSound.play(SystemSoundType.click));
     } catch (_) {}
     // Server: practice counters, starter quest and mastery practice days.
     unawaited(EconomyApi.call('reportPractice', {'practiced': true, 'wordId': word.word})

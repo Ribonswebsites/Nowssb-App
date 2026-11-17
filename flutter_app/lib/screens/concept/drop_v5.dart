@@ -11,7 +11,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter/services.dart';
 
 import '../../data/content.dart';
 import '../../data/day_part.dart';
@@ -21,6 +20,7 @@ import '../../widgets/concept/stillwater.dart';
 import 'drop_v4_concepts.dart' show DoorHooks, DoorKind, SettingPreview, doorState, doorTitle, hourWord;
 import 'drop_v4_type.dart';
 import '../store/store_art.dart' show kNowssbStoreMark, meaningFlipArt, storeSubjectArt;
+import 'package:nowssb/data/app_haptics.dart';
 
 const _gold = Color(0xFFC8A96E);
 const _violet = Color(0xFF7C4DDB);
@@ -71,7 +71,7 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
     _c
         .animateTo(target, duration: still ? Duration.zero : const Duration(milliseconds: 320), curve: Curves.easeOutCubic)
         .whenComplete(() {
-      if (mounted) HapticFeedback.selectionClick();
+      if (mounted) AppHaptics.selection();
     });
   }
 
@@ -120,7 +120,7 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                   _turnTo((_c.value + v.clamp(-1.0, 1.0) * .35).roundToDouble());
                 },
                 onTap: () {
-                  HapticFeedback.lightImpact();
+                  AppHaptics.light();
                   widget.hooks.of(DoorKind.values[fr])?.call();
                 },
                 child: SizedBox(
@@ -309,7 +309,7 @@ class _EntryPeelV5State extends State<EntryPeelV5> with SingleTickerProviderStat
   }
 
   void _open() {
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     widget.onOpenDrop?.call();
   }
 
@@ -371,7 +371,7 @@ class _EntryPeelV5State extends State<EntryPeelV5> with SingleTickerProviderStat
                           height: math.max(d + 24, 72),
                           child: GestureDetector(
                             behavior: HitTestBehavior.opaque,
-                            onPanStart: (_) => HapticFeedback.selectionClick(),
+                            onPanStart: (_) => AppHaptics.selection(),
                             onPanUpdate: (g) =>
                                 _p.value = (_p.value - (g.delta.dx + g.delta.dy) / (2 * (maxD - rest))).clamp(0.0, 1.0),
                             onPanEnd: (g) => _release(-(g.velocity.pixelsPerSecond.dx + g.velocity.pixelsPerSecond.dy) / (2 * (maxD - rest))),
@@ -720,7 +720,7 @@ class CornerPeelState extends State<CornerPeel> with TickerProviderStateMixin {
   Future<void> open() async {
     if (_opening) return;
     _opening = true;
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     _loop.stop();
     await _full.forward(from: 0);
     if (!mounted) return;
