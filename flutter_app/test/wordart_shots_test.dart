@@ -170,7 +170,7 @@ void main() {
         await _settle(t, 3);
         expect(t.getRect(find.text(title)).top, lessThan(80));
         expect(find.text('Start Player'), findsOneWidget);
-        expect(heroSrc(), soundLibraryArtFor(word), reason: word);
+        expect(heroSrc(), kWordPosters[word.toLowerCase()], reason: word);
         await _shot(t, 'practice-${word.toLowerCase()}');
       }
     }
