@@ -81,6 +81,16 @@ void main() {
     expect(find.text('0 of 5 today'), findsOneWidget);
   });
 
+  testWidgets('Progress pop-up closes when the dimmed area is tapped', (t) async {
+    await _mount(t, home);
+    await _openPanel(t);
+    final panel = t.getRect(find.byType(ProgressPanel));
+    await t.tapAt(Offset(195, (panel.bottom + 40).clamp(0, 890)));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.byType(ProgressPanel), findsNothing);
+  });
+
   testWidgets('Zen Begin Your Healing Path banner has the button on the right, clear of the speaker', (t) async {
     await _mount(t, const Scaffold(backgroundColor: Colors.black, body: FashGreeting()));
     final btn = find.byType(TodayProgressButton);

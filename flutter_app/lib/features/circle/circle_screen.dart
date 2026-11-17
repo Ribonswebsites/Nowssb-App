@@ -120,6 +120,8 @@ class _CircleScreenState extends State<CircleScreen> {
     if (referredBy.isNotEmpty) return;
     showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xFF10141C),
       builder: (ctx) => Padding(
         padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + MediaQuery.viewInsetsOf(ctx).bottom),

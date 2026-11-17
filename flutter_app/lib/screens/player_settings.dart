@@ -83,6 +83,8 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
       ValueChanged<String> onPick) async {
     await showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xFF14171E),
       showDragHandle: true,
       shape: const RoundedRectangleBorder(

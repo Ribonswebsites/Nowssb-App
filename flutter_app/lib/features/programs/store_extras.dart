@@ -271,6 +271,8 @@ class ShareChip extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () => showModalBottomSheet<void>(
         context: context,
+        isDismissible: true,
+        enableDrag: true,
         backgroundColor: const Color(0xFF0B0F16),
         builder: (context) => SafeArea(
           child: Padding(

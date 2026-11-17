@@ -168,13 +168,15 @@ class HowItWorksDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      type: MaterialType.transparency,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: Align(
-            alignment: Alignment.center,
+    // Material must wrap only the card. A full-screen Material swallows
+    // taps meant for the dimmed barrier.
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: Align(
+          alignment: Alignment.center,
+          child: Material(
+            type: MaterialType.transparency,
             child: HowItWorksCard(
               startAt: startAt,
               onClose: () =>

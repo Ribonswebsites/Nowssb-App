@@ -35,40 +35,41 @@ Future<T?> showSettingsChoiceSheet<T>({
     backgroundColor: Colors.transparent,
     barrierColor: const Color(0x99000000),
     isScrollControlled: true,
+    isDismissible: true,
+    enableDrag: true,
     builder: (ctx) {
       final bottom = MediaQuery.paddingOf(ctx).bottom;
+      // Shrink-wrap the card so the dimmed barrier above it can receive
+      // taps. Align expands to the full sheet height and swallows them.
       return Padding(
         padding: EdgeInsets.fromLTRB(16, 0, 16, 12 + bottom),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: IntrinsicHeight(
-            child: GlassListCard(
-              key: const ValueKey('settings-choice-sheet'),
-              margin: EdgeInsets.zero,
-              icon: icon,
-              overline: overline,
-              title: title,
-              children: [
-                for (final choice in choices)
-                  GlassTile(
-                    key: ValueKey('settings-choice-${choice.label}'),
-                    icon: choice.icon ?? icon,
-                    title: choice.label,
-                    sub: choice.sub,
-                    onTap: () {
-                      AppHaptics.selection();
-                      Navigator.of(ctx).pop(choice.value);
-                    },
-                    trailing: choice.value == current
-                        ? const _CurrentPill()
-                        : const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            size: 14,
-                            color: kGlassMuted,
-                          ),
-                  ),
-              ],
-            ),
+        child: IntrinsicHeight(
+          child: GlassListCard(
+            key: const ValueKey('settings-choice-sheet'),
+            margin: EdgeInsets.zero,
+            icon: icon,
+            overline: overline,
+            title: title,
+            children: [
+              for (final choice in choices)
+                GlassTile(
+                  key: ValueKey('settings-choice-${choice.label}'),
+                  icon: choice.icon ?? icon,
+                  title: choice.label,
+                  sub: choice.sub,
+                  onTap: () {
+                    AppHaptics.selection();
+                    Navigator.of(ctx).pop(choice.value);
+                  },
+                  trailing: choice.value == current
+                      ? const _CurrentPill()
+                      : const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 14,
+                          color: kGlassMuted,
+                        ),
+                ),
+            ],
           ),
         ),
       );

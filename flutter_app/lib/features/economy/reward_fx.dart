@@ -385,7 +385,8 @@ class GiftBoxOpening extends StatefulWidget {
 
   static Future<void> show(BuildContext context, {required String box, required String title, required List<Map<String, dynamic>> items, bool chest = false}) {
     return RewardOverlay.enqueue((nav) => nav.push<void>(RawDialogRoute<void>(
-      barrierDismissible: false,
+      barrierDismissible: true,
+      barrierLabel: 'close',
       barrierColor: const Color(0xE0000000),
       pageBuilder: (context, _, __) => GiftBoxOpening(box: box, title: title, items: items, chest: chest),
     )));
@@ -436,9 +437,9 @@ class _GiftBoxOpeningState extends State<GiftBoxOpening> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
+    return Center(
+      child: Material(
+        color: Colors.transparent,
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 380),
           child: Column(

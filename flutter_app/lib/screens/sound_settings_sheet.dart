@@ -10,6 +10,8 @@ import '../admin/template/editable.dart';
 Future<void> showSoundSettingsSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
+    isDismissible: true,
+    enableDrag: true,
     backgroundColor: const Color(0xFF0C0C10),
     isScrollControlled: true,
     shape: const RoundedRectangleBorder(

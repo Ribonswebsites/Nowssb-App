@@ -345,6 +345,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _pickPhoto() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => SafeArea(
@@ -789,6 +791,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }) async {
     final choice = await showModalBottomSheet<String>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xF0101014),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) => SafeArea(
@@ -836,6 +840,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _pickBannerPhoto() async {
     final source = await showModalBottomSheet<ImageSource>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => SafeArea(
@@ -859,6 +865,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _openPrebuiltBanners() async {
     final url = await showModalBottomSheet<String>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xF0101014),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) => SafeArea(
@@ -892,6 +900,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _openPrebuiltAvatars() async {
     final url = await showModalBottomSheet<String>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xF2161024),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) => SafeArea(
@@ -948,6 +958,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _pickBanner() async {
     final chosen = await showModalBottomSheet<String>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xF00A0A0C),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => SafeArea(

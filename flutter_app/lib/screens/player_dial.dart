@@ -147,6 +147,8 @@ class _PlayerDialState extends State<PlayerDial> with SingleTickerProviderStateM
   ) async {
     await showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: const Color(0xFF14171E),
       showDragHandle: true,
       shape: const RoundedRectangleBorder(

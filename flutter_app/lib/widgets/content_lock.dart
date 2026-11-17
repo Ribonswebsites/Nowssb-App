@@ -120,6 +120,8 @@ Future<void> showContentLock(
 }) {
   return showModalBottomSheet<void>(
     context: context,
+    isDismissible: true,
+    enableDrag: true,
     backgroundColor: Colors.transparent,
     barrierColor: const Color(0xB8060C18),
     isScrollControlled: true,

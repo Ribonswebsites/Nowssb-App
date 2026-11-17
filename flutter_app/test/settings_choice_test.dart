@@ -43,6 +43,12 @@ Future<void> _pick(WidgetTester t, String label) async {
   await t.pump(const Duration(milliseconds: 300));
 }
 
+Future<void> _tapBarrier(WidgetTester t) async {
+  await t.tapAt(const Offset(195, 20));
+  await t.pump();
+  await t.pump(const Duration(milliseconds: 300));
+}
+
 void main() {
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
@@ -130,5 +136,60 @@ void main() {
     await _pick(t, 'Simple home');
     expect(Settings.instance.fashionHome, isFalse);
     expect(find.text('Home set to Simple home'), findsOneWidget);
+  });
+
+
+  testWidgets('each Settings picker closes on a barrier tap without changing the setting', (t) async {
+    await _pumpSettings(t);
+
+    Future<void> openAndDismiss(String row) async {
+      await _openRow(t, row);
+      expect(find.byKey(const ValueKey('settings-choice-sheet')), findsOneWidget);
+      await _tapBarrier(t);
+      expect(find.byKey(const ValueKey('settings-choice-sheet')), findsNothing);
+    }
+
+    await openAndDismiss('Home');
+    expect(Settings.instance.fashionHome, isFalse);
+
+    await openAndDismiss('Zen Plus');
+    expect(Settings.instance.fashionPlus, isTrue);
+
+    await openAndDismiss('Nav Bar');
+    expect(Settings.instance.navColor, 'black');
+
+    await t.tap(find.text('This phone'));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 200));
+    await openAndDismiss('Keep Screen Awake');
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool('ss_screen_wake'), isNull);
+
+    await t.tap(find.text('Account'));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 200));
+    await openAndDismiss('Appear in Discover');
+    expect(prefs.getBool('ss_appear_discover'), isNull);
+  });
+
+  testWidgets('Nav Bar picker closes on the Android back button without changing the setting', (t) async {
+    await _pumpSettings(t);
+    await _openRow(t, 'Nav Bar');
+    expect(find.byKey(const ValueKey('settings-choice-sheet')), findsOneWidget);
+    await t.binding.handlePopRoute();
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('settings-choice-sheet')), findsNothing);
+    expect(Settings.instance.navColor, 'black');
+  });
+
+  testWidgets('Nav Bar picker closes on a downward swipe without changing the setting', (t) async {
+    await _pumpSettings(t);
+    await _openRow(t, 'Nav Bar');
+    expect(find.byKey(const ValueKey('settings-choice-sheet')), findsOneWidget);
+    await t.fling(find.byKey(const ValueKey('settings-choice-sheet')), const Offset(0, 400), 2000);
+    await t.pumpAndSettle();
+    expect(find.byKey(const ValueKey('settings-choice-sheet')), findsNothing);
+    expect(Settings.instance.navColor, 'black');
   });
 }

@@ -84,6 +84,8 @@ notes = '''  void _openNotes() {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
       barrierColor: Colors.transparent,
       builder: (sheetContext) => _PracticeNotesSheet(
         word: _word,

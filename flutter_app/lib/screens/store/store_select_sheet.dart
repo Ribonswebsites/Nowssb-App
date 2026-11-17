@@ -58,6 +58,8 @@ Future<void> showStoreSelectSheet(
   }
   return showModalBottomSheet<void>(
     context: context,
+    isDismissible: true,
+    enableDrag: true,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     barrierColor: const Color(0xCC000000),

@@ -103,9 +103,11 @@ class RewardOverlay {
             ),
           ),
           // Swipe the card away (any direction) as well as tap-outside/back.
-          pageBuilder: (context, _, __) => SwipeAway(
-            onDismissed: () => Navigator.of(context).maybePop(),
-            child: YouWonCard(title: title, items: items, rarity: rarity),
+          pageBuilder: (context, _, __) => Center(
+            child: SwipeAway(
+              onDismissed: () => Navigator.of(context).maybePop(),
+              child: YouWonCard(title: title, items: items, rarity: rarity),
+            ),
           ),
         )));
   }
@@ -181,8 +183,7 @@ class _YouWonCardState extends State<YouWonCard> {
     final rarity = (widget.rarity ?? '').trim();
     return Material(
       color: Colors.transparent,
-      child: Center(
-        child: ConstrainedBox(
+      child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 360),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -255,7 +256,6 @@ class _YouWonCardState extends State<YouWonCard> {
             ),
           ),
         ),
-      ),
     );
   }
 }

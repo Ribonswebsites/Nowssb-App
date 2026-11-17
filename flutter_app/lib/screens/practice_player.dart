@@ -230,6 +230,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   void _openSoundLibrary(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => const FractionallySizedBox(
@@ -470,6 +472,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!mounted) return false;
     final answer = await showModalBottomSheet<bool>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: Colors.transparent,
       barrierColor: const Color(0x99000000),
       builder: (ctx) {
@@ -913,6 +917,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   void _openLevel() {
     showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withOpacity(.62),
@@ -935,6 +941,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   void _openInfo() {
     showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       barrierColor: Colors.transparent,
@@ -954,6 +962,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
       barrierColor: Colors.transparent,
       builder: (sheetContext) => _PracticeNotesSheet(
         word: _word,
@@ -1184,6 +1194,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                   Navigator.of(dialogContext).pop();
                   showModalBottomSheet<void>(
                     context: this.context,
+                    isDismissible: true,
+                    enableDrag: true,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (_) => const FractionallySizedBox(

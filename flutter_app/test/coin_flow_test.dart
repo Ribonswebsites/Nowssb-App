@@ -167,10 +167,20 @@ void main() {
     await t.pump(const Duration(seconds: 20));
     expect(_card, findsOneWidget, reason: 'it waits for the user');
     expect(calls, isEmpty);
-    // A tap on the dim area is not a Collect and does not close it.
-    await t.tapAt(const Offset(8, 8));
+    expect(PendingCoins.instance.total, 5);
+  });
+
+  testWidgets('a tap on the dim area closes it like Later and credits nothing', (t) async {
+    await _app(t);
+    await _offer(t, 'open');
+    await t.pump(const Duration(milliseconds: 900));
     await t.pump(const Duration(milliseconds: 600));
     expect(_card, findsOneWidget);
+    final card = t.getRect(find.byType(CoinOfferCard));
+    await t.tapAt(Offset(20, (card.top - 40).clamp(8, 200)));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 600));
+    expect(_card, findsNothing);
     expect(calls, isEmpty);
     expect(PendingCoins.instance.total, 5);
   });

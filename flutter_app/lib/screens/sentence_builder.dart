@@ -224,6 +224,8 @@ class _SentenceBuilderScreenState extends State<SentenceBuilderScreen>
     AppHaptics.selection();
     showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => _RequestCustomSheet(

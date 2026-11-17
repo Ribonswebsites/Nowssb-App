@@ -273,9 +273,9 @@ class PendingCoins extends ChangeNotifier {
         played = true;
         _shownIds.addAll(shown.map((e) => e.id));
         await nav.push<bool>(RawDialogRoute<bool>(
-          // Only Collect, Later or a swipe closes it: a stray tap on the
-          // dim area must not make the reward vanish.
-          barrierDismissible: false,
+          // A tap on the dim area is the same as Later: the coins stay
+          // pending and nothing is collected.
+          barrierDismissible: true,
           barrierLabel: 'coins',
           barrierColor: const Color(0xCC03060C),
           transitionDuration: const Duration(milliseconds: 420),
@@ -287,9 +287,9 @@ class PendingCoins extends ChangeNotifier {
               child: child,
             ),
           ),
-          pageBuilder: (context, _, __) => SwipeAway(
-            onDismissed: () => Navigator.of(context).maybePop(false),
-            child: Center(
+          pageBuilder: (context, _, __) => Center(
+            child: SwipeAway(
+              onDismissed: () => Navigator.of(context).maybePop(false),
               child: CoinOfferCard(
                 items: shown,
                 day: CoinDay.fromSummary(EconomyMirror.instance.summary, pending: shown.fold(0, (s, e) => s + e.coins)),

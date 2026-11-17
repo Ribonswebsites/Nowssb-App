@@ -122,6 +122,8 @@ class _Gated extends StatelessWidget {
 void showDrawRules(BuildContext context, {String serverText = ''}) {
   showModalBottomSheet<void>(
     context: context,
+    isDismissible: true,
+    enableDrag: true,
     isScrollControlled: true,
     backgroundColor: const Color(0xFF0B0B12),
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
@@ -376,6 +378,8 @@ class _LuckyDrawScreenState extends State<_LuckyDrawScreenBody> {
 Future<void> showDrawReviewSheet(BuildContext context, DrawRepository repo, String claimId) {
   return showModalBottomSheet<void>(
     context: context,
+    isDismissible: true,
+    enableDrag: true,
     isScrollControlled: true,
     backgroundColor: const Color(0xFF0B0B12),
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),

@@ -17,6 +17,8 @@ Future<bool> showPronunciationSurveyIfNeeded(BuildContext context) async {
   if (!context.mounted) return false;
   await showModalBottomSheet<bool>(
     context: context,
+    isDismissible: true,
+    enableDrag: true,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     barrierColor: const Color(0x99000000),

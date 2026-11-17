@@ -79,6 +79,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
     String? problem;
     showModalBottomSheet<void>(
       context: context,
+      isDismissible: true,
+      enableDrag: true,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF10141C),
       builder: (ctx) => StatefulBuilder(

@@ -233,6 +233,30 @@ void main() {
     expect(find.byType(HowItWorksCard), findsNothing);
   });
 
+  testWidgets('showHowItWorks closes when the dimmed barrier is tapped', (t) async {
+    await _size(t, 390, h: 844);
+    await t.pumpWidget(MaterialApp(
+      theme: ThemeData(fontFamily: 'DM Sans'),
+      home: Scaffold(
+        body: Builder(
+          builder: (c) => TextButton(
+            onPressed: () => showHowItWorks(c),
+            child: const Text('Open'),
+          ),
+        ),
+      ),
+    ));
+    await t.tap(find.text('Open'));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.byType(HowItWorksCard), findsOneWidget);
+    expectCleanTypography(t);
+    await t.tapAt(const Offset(20, 20));
+    await t.pump();
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.byType(HowItWorksCard), findsNothing);
+  });
+
   testWidgets('Settings Home row is the switch between homes', (t) async {
     await Settings.instance.setFashionHome(false);
     await _size(t, 390, h: 2000);

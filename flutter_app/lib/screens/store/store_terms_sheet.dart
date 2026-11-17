@@ -21,7 +21,7 @@ Future<void> askStoreTerms(
   if (!context.mounted) return;
   final agreed = await showGeneralDialog<bool>(
     context: context,
-    barrierDismissible: false,
+    barrierDismissible: true,
     barrierLabel: 'Store terms',
     barrierColor: const Color(0xF008080A),
     transitionDuration: const Duration(milliseconds: 260),
