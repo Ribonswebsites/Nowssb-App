@@ -1,7 +1,7 @@
 /// R27 — CustomPainter animations that replace the home's videos/Lottie:
 ///  • [R27SoundOrb]   → Sound Library card video (assets/video/orb-loop.mp4)
 ///  • [R27BreathFlame]→ legacy streak disc (kept, unused on Normal home)
-///  • [R27StreakCandle]→ Normal-home streak mark: growing candle flame
+///  • [R27StreakCandle]→ unused candle mark (home now uses StreakLetterSha)
 ///  • [R27Coin]       → official NowssB coin (nwsb-coin.webp)
 ///  • [R27PosterDrift]→ "Offers and earning" video (hero-meaning-store.mp4)
 ///  • [R27Meditator]  → replaces the Cleopatra / red-haired model cut-outs

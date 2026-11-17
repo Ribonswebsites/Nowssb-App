@@ -3,7 +3,8 @@
 /// rings, orbiting dots, aurora or particles.
 ///  • [StreakVoiceStair] (A) — seven voice-meter bars rising as a stair.
 ///  • [StreakLetterSha]  (B) — the Devanagari श (shabda, "word") written
-///    stroke by stroke, then a soft ink sheen.
+///    stroke by stroke in gold, then a soft gold shimmer. The fill deepens
+///    with the streak; 0 days is still a clear pale-gold letter.
 ///  • [StreakDiyaLine]   (C) — a line-art diya whose flame grows with the streak.
 /// Each plays a one-time intro on open, then a calm loop. Still under
 /// reduced motion and in tests ([StreakMarkFrame.debug] picks a frame).
@@ -14,6 +15,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
+import '../../../data/settings.dart';
 import '../normal/surface.dart' show NormalLoop;
 import 'kit.dart';
 
@@ -45,10 +47,25 @@ class _MarkAnim extends StatefulWidget {
 class _MarkAnimState extends State<_MarkAnim> with TickerProviderStateMixin {
   late final AnimationController _in = AnimationController(vsync: this, duration: widget.intro);
   late final AnimationController _loop = AnimationController(vsync: this, duration: widget.period);
+
+  /// Reduced motion, shot/test freeze, or the Settings "Still" motion switch.
+  bool get _still => r27Still(context) || !Settings.instance.fashionPlus;
+
+  @override
+  void initState() {
+    super.initState();
+    Settings.instance.addListener(_sync);
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (r27Still(context)) {
+    _sync();
+  }
+
+  void _sync() {
+    if (!mounted) return;
+    if (_still) {
       _in
         ..stop()
         ..value = 1;
@@ -63,6 +80,7 @@ class _MarkAnimState extends State<_MarkAnim> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    Settings.instance.removeListener(_sync);
     _in.dispose();
     _loop.dispose();
     super.dispose();
@@ -165,9 +183,11 @@ class _StairP extends CustomPainter {
 
 // ───────────────────────── B · letter श written ─────────────────────────
 
-/// The Devanagari श (shabda — "word") written stroke by stroke: bowl, tail,
-/// stem, then the headline in gold. 0 days leaves an embossed, unwritten
-/// letter. Glyph outline from Noto Sans Devanagari (SIL OFL 1.1).
+/// The Devanagari श (shabda — "word") written stroke by stroke in gold:
+/// bowl, tail, stem, then the headline. After the last stroke it holds with
+/// a soft gold shimmer. Fill and intensity deepen with the streak; at 0 days
+/// the letter is still a clear pale gold. Glyph outline from Noto Sans
+/// Devanagari (SIL OFL 1.1).
 class StreakLetterSha extends StatelessWidget {
   const StreakLetterSha({super.key, required this.streak, this.size = const Size(72, 84)});
   final int streak;
@@ -265,6 +285,9 @@ class _ShaP extends CustomPainter {
 
   static const _box = Rect.fromLTRB(25, 68, 743, 714);
 
+  /// 0 at no streak, 1 at a week or more. The letter stays gold at 0.
+  double get _fill => streak <= 0 ? 0.0 : (streak / 7).clamp(0.0, 1.0);
+
   @override
   void paint(Canvas c, Size s) {
     final k = math.min(s.width * .86 / _box.width, s.height * .8 / _box.height);
@@ -274,38 +297,60 @@ class _ShaP extends CustomPainter {
     c.translate(-_box.center.dx, -_box.center.dy);
     final px = 1 / k; // one logical pixel in glyph units
 
-    // Embossed, unwritten letter (pressed into the well).
+    // Soft pressed ghost so the well never looks empty mid-stroke.
     c.drawPath(_shaGlyph.shift(Offset(-px, -px)), Paint()..color = const Color(0xFFFFFFFF));
-    c.drawPath(_shaGlyph.shift(Offset(px * .8, px * .8)), Paint()..color = const Color(0x22000000));
-    c.drawPath(_shaGlyph, Paint()..color = _ghost);
+    c.drawPath(_shaGlyph.shift(Offset(px * .8, px * .8)), Paint()..color = const Color(0x1A000000));
+    c.drawPath(_shaGlyph, Paint()..color = const Color(0xFFE6E8EF));
 
-    final lit = streakLitInWeek(streak);
-    if (lit == 0) {
-      _sheen(c, t, .5);
-      c.restore();
-      return;
-    }
+    final f = _fill;
+    final top = Color.lerp(const Color(0xFFEEDBA8), const Color(0xFFFFF1C2), f)!;
+    final mid = Color.lerp(const Color(0xFFD4B56C), _gold, f)!;
+    final deep = Color.lerp(const Color(0xFFB89248), const Color(0xFF8A5E14), f)!;
+    final alpha = 0.66 + 0.34 * f;
 
-    // Ink: the full letter, then cut back to the strokes written so far.
     final bounds = _box.inflate(40);
     c.saveLayer(bounds, Paint());
-    // Ink colour deepens with the week: lavender → full indigo.
-    final depth = .55 + .45 * (lit / 7);
     c.drawPath(
       _shaGlyph,
       Paint()
         ..shader = ui.Gradient.linear(
-          const Offset(0, 120),
+          const Offset(0, 100),
           const Offset(0, 714),
-          [Color.lerp(const Color(0xFFB3AEF2), const Color(0xFF8E86EC), depth)!, Color.lerp(_accent, _indigo, depth)!],
+          [
+            top.withValues(alpha: alpha),
+            mid.withValues(alpha: alpha),
+            deep.withValues(alpha: alpha),
+          ],
+          const [0, .45, 1],
         ),
     );
-    // Headline (shirorekha) in gold, written last.
+    // Slightly brighter gold on the headline, written last.
     c.drawRect(
       const Rect.fromLTRB(440, 70, 750, 176),
       Paint()
         ..blendMode = BlendMode.srcATop
-        ..shader = ui.Gradient.linear(const Offset(0, 78), const Offset(0, 176), const [Color(0xFFFFE3A0), _gold]),
+        ..shader = ui.Gradient.linear(
+          const Offset(0, 78),
+          const Offset(0, 176),
+          [
+            const Color(0xFFFFF6D0).withValues(alpha: alpha),
+            Color.lerp(const Color(0xFFE8C36A), _gold, f)!.withValues(alpha: alpha),
+          ],
+        ),
+    );
+    // Linear highlight along the letter — not a circular shine.
+    c.drawPath(
+      _shaGlyph,
+      Paint()
+        ..blendMode = BlendMode.srcATop
+        ..shader = ui.Gradient.linear(
+          const Offset(80, 120),
+          const Offset(420, 520),
+          [
+            const Color(0xFFFFFFFF).withValues(alpha: 0.20 + 0.10 * f),
+            const Color(0x00FFFFFF),
+          ],
+        ),
     );
     if (intro < 1) {
       c.saveLayer(bounds, Paint()..blendMode = BlendMode.dstIn);
@@ -332,25 +377,38 @@ class _ShaP extends CustomPainter {
       c.restore();
     }
     c.restore();
-    if (intro >= 1) _sheen(c, t, 1);
+
+    // Crisp gold edge once the letter is written, so a pale 0-day mark stays sharp.
+    if (intro >= 1) {
+      c.drawPath(
+        _shaGlyph,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 14
+          ..strokeJoin = StrokeJoin.round
+          ..color = deep.withValues(alpha: 0.55 + 0.35 * f),
+      );
+      _sheen(c, t, 0.7 + 0.3 * f);
+    }
     c.restore();
   }
 
-  /// A diagonal band of light that sweeps across the letter once per loop.
+  /// A diagonal band of gold light that sweeps across the letter once per loop.
   void _sheen(Canvas c, double t, double strength) {
-    final x = -300 + 1500 * _ease(_seg(t, .1, .7));
+    final x = -300 + 1500 * _ease(_seg(t, .12, .82));
+    final gleam = (0.18 + 0.14 * _fill) * strength;
     c.save();
     c.clipPath(_shaGlyph);
     c.drawRect(
       _box.inflate(60),
       Paint()
         ..shader = ui.Gradient.linear(
-          Offset(x - 140, 100),
-          Offset(x + 140, 700),
+          Offset(x - 160, 80),
+          Offset(x + 160, 680),
           [
-            const Color(0x00FFFFFF),
-            Colors.white.withValues(alpha: .55 * strength),
-            const Color(0x00FFFFFF),
+            const Color(0x00FFF6D8),
+            const Color(0xFFFFF6D8).withValues(alpha: gleam),
+            const Color(0x00FFF6D8),
           ],
           const [0, .5, 1],
         ),

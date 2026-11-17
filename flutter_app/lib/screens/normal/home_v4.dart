@@ -11,7 +11,8 @@
 library;
 
 import 'dart:math' as math;
-import '../../widgets/concept/r27/anims.dart' show R27StreakCandle, R27Coin;
+import '../../widgets/concept/r27/anims.dart' show R27Coin;
+import '../../widgets/concept/r27/streak_marks.dart' show StreakLetterSha;
 import '../../data/models.dart' show Word;
 import '../../widgets/sound_glass.dart' show SlPlayer, SessionPlayer;
 import 'package:nowssb/data/day_part.dart';
@@ -674,9 +675,6 @@ class V4Streak extends StatelessWidget {
   final VoidCallback onPractice;
   final VoidCallback onOffers;
 
-  /// Shot tests only: swap the right-hand streak mark to preview candidates.
-  @visibleForTesting
-  static Widget Function(int streak, Size size)? debugMark;
   @override
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: PracticeProgress.instance,
@@ -703,8 +701,7 @@ class V4Streak extends StatelessWidget {
                 _Well(
                   size: const Size(80, 92),
                   pad: 4,
-                  child: debugMark?.call(s, const Size(72, 84)) ??
-                      R27StreakCandle(streak: s, size: const Size(72, 84)),
+                  child: StreakLetterSha(streak: s, size: const Size(72, 84)),
                 ),
               ]),
               const SizedBox(height: 14),
