@@ -5227,17 +5227,24 @@ List<String> get kPlayerThemeImages =>
 
 /// The cover the practice player shows for [word] at queue [index].
 ///
-/// The word's own poster first (black, the word three times, a model in
-/// NowssB headphones, a ribbon in the word's colour). A word without a
-/// bundled poster uses its WordArt upload or own image; anything else gets
-/// the NowssB poster. Never a generic theme still and never a letter tile.
+/// Same picture Sound Library shows for the word (WordArt / published
+/// image, else the Atelier collection banner). A word with no library
+/// picture uses its bundled typography poster; anything else gets the
+/// NowssB poster. Never a generic theme still and never a letter tile.
 /// [index] is kept so callers stay in queue order.
 String playerCoverArtFor(Word? word, int index) {
   if (word == null) return kNowssbPoster;
-  final poster = wordPosterFor(word.word);
-  if (poster != null) return poster;
   final own = WordArt.instance.imageFor(word.word, word.img).trim();
   if (own.isNotEmpty && !kPlayerThemeImages.contains(own)) return own;
+  // Same fallback Sound Library uses when the word has no picture of its own.
+  final library = soundLibraryArtFor(word.word);
+  if (library != null &&
+      library.isNotEmpty &&
+      !kPlayerThemeImages.contains(library)) {
+    return library;
+  }
+  final poster = kWordPosters[WordArt.keyOf(word.word)];
+  if (poster != null) return poster;
   return kNowssbPoster;
 }
 

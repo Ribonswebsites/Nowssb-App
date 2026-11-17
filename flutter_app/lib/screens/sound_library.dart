@@ -20,6 +20,7 @@ import '../shell/nav_shell.dart';
 import '../data/content.dart';
 import '../data/models.dart';
 import '../data/word_art.dart';
+import '../data/word_posters.dart';
 import '../data/playback_session.dart';
 import '../data/practice_progress.dart';
 import '../data/store_catalog.dart';
@@ -48,29 +49,7 @@ import 'word_detail.dart';
 import '../admin/layout/layout_sections.dart';
 import '../admin/template/editable.dart';
 
-/// Collection banner file for each Atelier id — same table as part080 COLS.
-const Map<String, String> _kColFiles = {
-  'off50': 'sale',
-  'elements': 'elements',
-  'sacred': 'sacred',
-  'identity': 'identity',
-  'cosmos': 'cosmos',
-  'nature': 'nature',
-  'family': 'family',
-  'elite': 'elite',
-  'premium': 'premium',
-  'mythical': 'mythical',
-  'warriors': 'warriors',
-  'ancient': 'ancient',
-  'peace': 'peace',
-  'white': 'white',
-  'black': 'black',
-};
-
-String _colAsset(RmCategory c) {
-  final file = _kColFiles[c.id] ?? c.id;
-  return 'assets/store/collections/$file.webp';
-}
+String _colAsset(RmCategory c) => soundLibraryCollectionAsset(c);
 
 int _hash(String s) {
   var h = 0;
@@ -80,26 +59,11 @@ int _hash(String s) {
   return h;
 }
 
-String _artForWord(String name, Map<String, RmCategory> byWord) {
-  final custom = WordArt.instance.imageFor(name, '');
-  if (custom.isNotEmpty) return custom;
-  final key = name.toLowerCase();
-  final hit = byWord[key];
-  if (hit != null) return _colAsset(hit);
-  final cs = kRmCategories;
-  return _colAsset(cs[_hash(key) % cs.length]);
-}
+/// Same picture New releases, Practice and the player use.
+String _artForWord(String name, [Map<String, RmCategory>? byWord]) =>
+    soundLibraryArtFor(name) ?? '';
 
-Map<String, RmCategory> _wordToCol() {
-  final out = <String, RmCategory>{};
-  for (final c in kRmCategories) {
-    for (final w in c.words) {
-      final k = w.word.toLowerCase();
-      out.putIfAbsent(k, () => c);
-    }
-  }
-  return out;
-}
+Map<String, RmCategory> _wordToCol() => soundLibraryWordToCollection();
 
 
 /// Filter chips that stay on Sound Library (do not open Category page).

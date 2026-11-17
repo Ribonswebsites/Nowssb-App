@@ -1,6 +1,6 @@
-// Practice tab: every tile shows that word's own poster (the player's
-// cover), the Today's session art follows the selected word chip, and no
-// word ever falls back to a generic theme still.
+// Practice tab: every tile shows the same picture Sound Library uses for
+// that word (the player's cover), the Today's session art follows the
+// selected word chip, and no word ever falls back to a generic theme still.
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -44,7 +44,7 @@ void main() {
     DayClock.clock = null;
   });
 
-  test('playerCoverArtFor uses the word poster, never a theme still', () {
+  test('playerCoverArtFor uses the Sound Library image, never a theme still', () {
     const library = [
       'AAROGYA', 'PRANA', 'SHAKTI', 'ANANDA', 'SOMA', 'TEJAS', //
       'OJAS', 'VATA', 'PITTA', 'KAPHA', 'SURYA', 'CHANDRA',
@@ -52,39 +52,44 @@ void main() {
     for (var i = 0; i < library.length; i++) {
       final w = Word.from({'word': library[i]})!;
       final art = playerCoverArtFor(w, i);
-      expect(art, 'assets/word_posters/${library[i].toLowerCase()}.webp',
-          reason: library[i]);
+      expect(art, soundLibraryArtFor(library[i]), reason: library[i]);
+      expect(art, isNot(startsWith('assets/word_posters/')), reason: library[i]);
       expect(kPlayerThemeImages, isNot(contains(art)), reason: library[i]);
       expect(File(art).existsSync(), isTrue, reason: art);
     }
     // Case and spacing do not matter.
     expect(playerCoverArtFor(Word.from({'word': 'Soma'})!, 3),
-        kWordPosters['soma']);
+        soundLibraryArtFor('Soma'));
 
-    // Even with a theme still as its image, a poster word keeps its poster.
+    // A theme still is ignored; the word still gets its library picture.
     final themed = Word.from({
       'word': 'SURYA',
       'img': kPlayerThemeImages.first,
     })!;
-    expect(playerCoverArtFor(themed, 0), kWordPosters['surya']);
+    expect(playerCoverArtFor(themed, 0), soundLibraryArtFor('SURYA'));
 
-    // A word with no poster uses its own picture...
+    // A word with its own picture keeps that picture.
     final withImg = Word.from({
       'word': 'ZZZCOVERTEST',
       'img': 'assets/player/t-wave.jpg',
     })!;
     expect(playerCoverArtFor(withImg, 0), 'assets/player/t-wave.jpg');
 
-    // ...but never a generic theme still; then it gets the NowssB poster.
+    // A theme still is not used; a nameless-to-the-library word still gets
+    // the same hashed collection banner Sound Library would show.
     final stillImg = Word.from({
       'word': 'ZZZSTILL',
       'img': kPlayerThemeImages[2],
     })!;
-    expect(playerCoverArtFor(stillImg, 2), kNowssbPoster);
+    expect(playerCoverArtFor(stillImg, 2), soundLibraryArtFor('ZZZSTILL'));
     final bare = Word.from({'word': 'ZZZBARECOVER'})!;
-    expect(playerCoverArtFor(bare, 2), kNowssbPoster);
+    expect(playerCoverArtFor(bare, 2), soundLibraryArtFor('ZZZBARECOVER'));
     expect(playerCoverArtFor(null, 0), kNowssbPoster);
     expect(File(kNowssbPoster).existsSync(), isTrue);
+
+    // Typography posters are only a fallback when there is no library image.
+    expect(soundLibraryArtFor(''), isNull);
+    expect(wordPosterFor(''), isNull);
   });
 
   testWidgets('Practice tiles use player covers, not letter art', (t) async {
@@ -124,8 +129,8 @@ void main() {
       expect(find.text(w), findsWidgets, reason: w);
     }
 
-    expect(_heroCover(t), kWordPosters['soma'],
-        reason: 'SOMA is first in the night session, same as the player');
+    expect(_heroCover(t), soundLibraryArtFor('SOMA'),
+        reason: 'SOMA is first in the night session, same as the library');
 
     // Each This session row shows that word's player cover.
     final pane = find.byKey(const ValueKey('practice-session-pane'));
@@ -137,7 +142,7 @@ void main() {
         .toList();
     expect(rowImgs.length, greaterThanOrEqualTo(4));
     expect(rowImgs.take(4).toList(),
-        [for (final w in session) kWordPosters[w.toLowerCase()]]);
+        [for (final w in session) soundLibraryArtFor(w)]);
 
     // Also today rows, if present, must also be covers not letter tiles.
     final also = find.byKey(const ValueKey('practice-also-pane'));
@@ -148,7 +153,12 @@ void main() {
       expect(alsoImgs, isNotEmpty);
       for (final e in alsoImgs) {
         final src = (e.widget as EditableImage).source;
-        expect(src, startsWith('assets/word_posters/'), reason: src);
+        expect(
+          src.startsWith('assets/store/collections/') ||
+              src.startsWith('assets/word_posters/'),
+          isTrue,
+          reason: src,
+        );
       }
     }
 
@@ -160,7 +170,7 @@ void main() {
       await t.tap(f);
       await t.pump();
       await t.pump(const Duration(milliseconds: 300));
-      expect(_heroCover(t), kWordPosters[word.toLowerCase()], reason: word);
+      expect(_heroCover(t), soundLibraryArtFor(word), reason: word);
     }
 
     await select('PITTA');
