@@ -204,6 +204,17 @@ Committed as "new stills" in 4a1523ef (drift-*, slash-*), cc8d6acc (quiet-*), d3
 | `banners/promo/rail-stones.webp` | source unverified | Your programmes rail card (962d3e25) |
 | `banners/promo/rail-well.webp` | source unverified | Your programmes rail card (962d3e25) |
 
+## Your path / NowssB Earn card thumbs (Nov 17, banners/promo/earn-*)
+
+Four new 1024px square stills for the Reference, Earning, Coins and Bonuses rows on the Zen home "Your path / NowssB Earn" card (and the same three programme banners used off the normal home). Layout, text and styling of the card were not changed. The previous letter / window-sill / bowl / stone-circle pictures stay in the folder because other rails still use some of them.
+
+| File | Source | Notes |
+|---|---|---|
+| `banners/promo/earn-reference.webp` | Original still generated for NowssB (Grok Bot image generation, Nov 17 2026); black-background phone sharing a link, no typography. Saved as 1024px WebP. | Reference row ("Your links"). No third-party source; free to use. |
+| `banners/promo/earn-earning.webp` | Original still generated for NowssB (Grok Bot image generation, Nov 17 2026); open black leather wallet with a gold card, no typography. Saved as 1024px WebP. | Earning row ("What you have earned"). No third-party source; free to use. |
+| `banners/promo/earn-coins.webp` | Composite of the official NowssB coin (`icons/nwsb-coin.webp`) on a black plate; the real coin was not redrawn. Saved as 1024px WebP, Nov 17 2026. | Coins row ("Earned today"). Official NowssB coin asset already used on the Coins page. |
+| `banners/promo/earn-bonuses.webp` | Original still generated for NowssB (Grok Bot image generation, Nov 17 2026); black gift box slightly open with a gold ribbon and gold key, no typography. Saved as 1024px WebP. | Bonuses row ("Targets and rewards"). No third-party source; free to use. |
+
 ## NowssB Earn row (Nov 11, rails/subj-*)
 
 Four stills that were already bundled in `assets/rails/` (in the repo since the Oct 19 flutter_app baseline, 1dcf1918) and were not used anywhere in the app until now. Their source is not recorded in the repo, so none is invented here. They carry no people.

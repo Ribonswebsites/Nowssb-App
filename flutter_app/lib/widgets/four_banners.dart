@@ -344,7 +344,7 @@ class _GlassCards extends StatelessWidget {
     Widget gap() => const SizedBox(height: 10);
     return Column(children: [
       _ProgBanner(
-        art: 'assets/banners/promo/prog-letter.webp',
+        art: 'assets/banners/promo/earn-reference.webp',
         kicker: 'Programme',
         title: 'Reference',
         line: 'Your links',
@@ -353,7 +353,7 @@ class _GlassCards extends StatelessWidget {
       ),
       gap(),
       _ProgBanner(
-        art: 'assets/banners/promo/prog-sill.webp',
+        art: 'assets/banners/promo/earn-earning.webp',
         kicker: 'Programme',
         title: 'Earning',
         line: 'What you have earned',
@@ -362,7 +362,7 @@ class _GlassCards extends StatelessWidget {
       ),
       gap(),
       _ProgBanner(
-        art: 'assets/banners/promo/prog-bowl.webp',
+        art: 'assets/banners/promo/earn-coins.webp',
         kicker: 'Programme',
         title: 'Coins',
         line: 'Earned today',
@@ -371,7 +371,7 @@ class _GlassCards extends StatelessWidget {
       ),
       gap(),
       _ProgBanner(
-        art: 'assets/banners/promo/rail-stones.webp',
+        art: 'assets/banners/promo/earn-bonuses.webp',
         kicker: 'Programme',
         title: 'Bonuses',
         line: 'Targets and rewards',
@@ -407,7 +407,7 @@ class _ProgrammeBanners extends StatelessWidget {
     return Column(
       children: [
         _ProgBanner(
-          art: 'assets/banners/promo/prog-letter.webp',
+          art: 'assets/banners/promo/earn-reference.webp',
           kicker: 'Programme',
           title: 'Reference',
           line: 'Your links',
@@ -415,7 +415,7 @@ class _ProgrammeBanners extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         _ProgBanner(
-          art: 'assets/banners/promo/prog-sill.webp',
+          art: 'assets/banners/promo/earn-earning.webp',
           kicker: 'Programme',
           title: 'Earning',
           line: 'What you have earned',
@@ -423,7 +423,7 @@ class _ProgrammeBanners extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         _ProgBanner(
-          art: 'assets/banners/promo/prog-bowl.webp',
+          art: 'assets/banners/promo/earn-coins.webp',
           kicker: 'Programme',
           title: 'Coins',
           line: 'Earned today',
