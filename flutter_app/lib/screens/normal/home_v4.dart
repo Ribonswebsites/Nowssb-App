@@ -12,7 +12,7 @@ library;
 
 import 'dart:math' as math;
 import '../../widgets/concept/r27/anims.dart' show R27Coin;
-import '../../widgets/concept/r27/streak_marks.dart' show StreakLetterSha;
+import '../../widgets/concept/r27/streak_marks2.dart' show StreakSilkRibbons;
 import '../../data/models.dart' show Word;
 import '../../widgets/sound_glass.dart' show SlPlayer, SessionPlayer;
 import 'package:nowssb/data/day_part.dart';
@@ -676,7 +676,7 @@ class V4Streak extends StatelessWidget {
   final VoidCallback onOffers;
 
   /// Preview hook for streak-mark candidates (streak_marks2.dart). Null keeps
-  /// the shipped mark, [StreakLetterSha].
+  /// the shipped mark, [StreakSilkRibbons].
   @visibleForTesting
   static Widget Function(int streak, Size size)? debugMark;
 
@@ -706,7 +706,7 @@ class V4Streak extends StatelessWidget {
                 _Well(
                   size: const Size(80, 92),
                   pad: 4,
-                  child: debugMark?.call(s, const Size(72, 84)) ?? StreakLetterSha(streak: s, size: const Size(72, 84)),
+                  child: debugMark?.call(s, const Size(72, 84)) ?? StreakSilkRibbons(streak: s, size: const Size(72, 84)),
                 ),
               ]),
               const SizedBox(height: 14),

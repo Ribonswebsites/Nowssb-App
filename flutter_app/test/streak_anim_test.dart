@@ -8,6 +8,7 @@ import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/screens/normal/home_v4.dart';
 import 'package:nowssb/widgets/concept/r27/anims.dart';
 import 'package:nowssb/widgets/concept/r27/streak_marks.dart';
+import 'package:nowssb/widgets/concept/r27/streak_marks2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'support/home_render.dart';
@@ -84,7 +85,7 @@ void main() {
       expect(find.text('0 today · 0 sessions in all'), findsOneWidget);
       expect(find.text('Practice now'), findsOneWidget);
       expect(find.text('Exclusive offers'), findsOneWidget);
-      expect(find.byType(StreakLetterSha), findsOneWidget);
+      expect(find.byType(StreakSilkRibbons), findsOneWidget);
       expect(find.byType(R27StreakCandle), findsNothing);
       expect(find.byType(R27BreathFlame), findsNothing);
       expect(t.takeException(), isNull);
@@ -97,7 +98,7 @@ void main() {
     await t.pumpWidget(_app(V4Streak(onPractice: () {}, onOffers: () {})));
     await t.pump();
     expect(
-      find.byWidgetPredicate((w) => w is StreakLetterSha && w.streak == 0),
+      find.byWidgetPredicate((w) => w is StreakSilkRibbons && w.streak == 0),
       findsOneWidget,
     );
 
@@ -107,7 +108,7 @@ void main() {
     expect(find.text('days in a row'), findsOneWidget);
     expect(find.text('1 today · 5 sessions in all'), findsOneWidget);
     expect(
-      find.byWidgetPredicate((w) => w is StreakLetterSha && w.streak == 5),
+      find.byWidgetPredicate((w) => w is StreakSilkRibbons && w.streak == 5),
       findsOneWidget,
     );
     expect(find.byType(R27StreakCandle), findsNothing);
@@ -127,7 +128,7 @@ void main() {
     await t.pump();
     await t.pump(const Duration(milliseconds: 2400));
     expect(
-      find.byWidgetPredicate((w) => w is StreakLetterSha && w.streak == 5),
+      find.byWidgetPredicate((w) => w is StreakSilkRibbons && w.streak == 5),
       findsOneWidget,
     );
     expect(find.byType(R27StreakCandle), findsNothing);
@@ -145,7 +146,7 @@ void main() {
     );
     await t.pump();
     await t.pump(const Duration(milliseconds: 2400));
-    expect(find.byType(StreakLetterSha), findsOneWidget);
+    expect(find.byType(StreakSilkRibbons), findsOneWidget);
     expect(h, isEmpty);
     expect(t.takeException(), isNull);
   });
