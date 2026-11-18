@@ -131,29 +131,7 @@ void main() {
       }
     });
 
-    testWidgets('Zen Plus subline wraps whole at $tag', (t) async {
-      final errs = await boot(t, const FashPlusMini(), w, s);
-      expect(errs, isEmpty);
-      final sub = find.textContaining(Settings.instance.fashionPlus ? 'On —' : 'Off —');
-      expect(sub, findsOneWidget);
-      final p = t.renderObject<RenderParagraph>(find.descendant(of: sub, matching: find.byType(RichText)));
-      expect(p.overflow, isNot(TextOverflow.ellipsis));
-      expect(p.didExceedMaxLines, isFalse);
-      // No mid-word break: every line ends at a space or the text end.
-      final text = p.text.toPlainText();
-      final lines = (TextPainter(text: p.text, textDirection: TextDirection.ltr, textScaler: p.textScaler)
-            ..layout(maxWidth: p.size.width))
-          .computeLineMetrics();
-      var off = 0;
-      for (final lm in lines.take(lines.length - 1)) {
-        final pos = p.getPositionForOffset(Offset(p.size.width, lm.baseline - lm.ascent / 2)).offset;
-        off = pos;
-        expect(off >= text.length || text[off - 1] == ' ' || text[off] == ' ', isTrue,
-            reason: 'mid-word break at $off in "$text"');
-      }
-      noEllipsis(t);
-      await shot(t, 'fashplus-$tag');
-      await t.pumpWidget(const SizedBox());
-    });
+    // 'Zen Plus subline' case removed: the EXPERIENCE · Zen Plus banner
+    // is no longer on the home (Ribon, Nov 18).
   }
 }
