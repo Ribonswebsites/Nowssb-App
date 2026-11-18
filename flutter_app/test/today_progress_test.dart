@@ -13,8 +13,8 @@ import 'package:nowssb/features/progress/today_progress_screen.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/daily_tasks.dart';
 import 'package:nowssb/screens/fashion/sections_top.dart';
-import 'package:nowssb/screens/fashion/today_earn_section.dart';
 import 'package:nowssb/screens/normal/sections_top.dart';
+import 'package:nowssb/widgets/nwsb_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_video_platform.dart';
@@ -91,11 +91,15 @@ void main() {
     expect(find.byType(ProgressPanel), findsNothing);
   });
 
-  testWidgets('Zen: Today lives in the Your day card, not the Begin Your Healing Path banner', (t) async {
+  testWidgets('Zen Begin Your Healing Path banner has the button on the right, clear of the speaker', (t) async {
     await _mount(t, const Scaffold(backgroundColor: Colors.black, body: FashGreeting()));
-    expect(find.byType(TodayProgressButton), findsNothing, reason: 'moved to the Your day card (Ribon, Nov 17)');
-    await _mount(t, Scaffold(backgroundColor: Colors.black, body: TodayEarnSection(onQuick: () {})));
-    expect(find.byType(TodayProgressButton), findsOneWidget);
+    final btn = find.byType(TodayProgressButton);
+    expect(btn, findsOneWidget);
+    final speaker = find.byType(NwsbIcon).first;
+    final b = t.getRect(btn), s = t.getRect(speaker);
+    expect(b.overlaps(s), isFalse);
+    expect(b.left, greaterThan(s.right));
+    expect(b.right, lessThanOrEqualTo(390 - 16));
     expect(t.takeException(), isNull);
     await _openPanel(t);
   });
@@ -106,7 +110,7 @@ void main() {
     addTearDown(t.view.reset);
     await t.pumpWidget(MaterialApp(
       theme: ThemeData(fontFamily: 'DM Sans'),
-      home: Scaffold(backgroundColor: Colors.black, body: SingleChildScrollView(child: Column(children: [const NmGreeting(name: 'Healer'), const FashGreeting(), TodayEarnSection(onQuick: () {})]))),
+      home: const Scaffold(backgroundColor: Colors.black, body: Column(children: [NmGreeting(name: 'Healer'), FashGreeting()])),
     ));
     await t.pump();
     expect(t.takeException(), isNull);

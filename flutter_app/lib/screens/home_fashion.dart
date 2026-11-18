@@ -51,7 +51,7 @@ import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/drop_studio.dart';
 import 'fashion/header.dart';
-import 'fashion/today_earn_section.dart';
+import '../features/your_day/your_day.dart';
 import 'fashion/hero_quick_row.dart';
 import 'fashion/home_cards.dart';
 import 'store/product_detail.dart' show openAtelierWord;
@@ -759,9 +759,17 @@ class _HomeFashionState extends State<HomeFashion> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Quick moved into the Your day card below (Ribon, Nov 17).
-              HeroGreeting(name: widget.name),
-              TodayEarnSection(onQuick: _openQuickActions),
+              HeroGreeting(name: widget.name, onQuickAccess: _openQuickActions),
+              // Your day: Quick · Today · Your Earnings, each opening its own
+              // tab of one sheet (Ribon, Nov 18). Additive: the greeting's
+              // Quick and the banner's Today stay where they are.
+              YourDaySection(
+                actions: YourDayActions(
+                  onNotifications: () => showNotificationsSheet(context),
+                  onStore: () => _go(3),
+                  onPlayer: () => _go(1),
+                ),
+              ),
               HeroQuickRow(pool: _quickPool()),
               FashionHero(
                 onExplore: () => _go(2),

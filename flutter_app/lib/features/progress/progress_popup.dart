@@ -436,8 +436,12 @@ class _ProgressPillButtonState extends State<ProgressPillButton> with SingleTick
 /// Glass sheet: notification-glance header + Quick Access style grid of
 /// black tiles, each with its own bar.
 class ProgressPanel extends StatelessWidget {
-  const ProgressPanel({super.key, this.center});
+  const ProgressPanel({super.key, this.center, this.bare = false});
   final ProgressCenter? center;
+
+  /// Without its own glass, for hosts that already are glass (the Your day
+  /// sheet's Today tab).
+  final bool bare;
 
   static Future<void> open(BuildContext context) {
     ProgressSources.instance.sync();
@@ -464,11 +468,7 @@ class ProgressPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = center ?? ProgressCenter.instance;
-    return Material(
-      type: MaterialType.transparency,
-      child: ProgressGlass(
-        padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
-        child: ListenableBuilder(
+    final body = ListenableBuilder(
           listenable: c,
           builder: (context, _) {
             final items = c.items;
@@ -503,8 +503,10 @@ class ProgressPanel extends StatelessWidget {
               ),
             ]);
           },
-        ),
-      ),
+        );
+    return Material(
+      type: MaterialType.transparency,
+      child: bare ? body : ProgressGlass(padding: const EdgeInsets.fromLTRB(8, 12, 8, 8), child: body),
     );
   }
 }
@@ -601,12 +603,8 @@ class _ViewAll extends StatelessWidget {
 /// raised white neumorphic pill of the normal home; otherwise it is the
 /// Zen home's dark glass (GlassWrap tokens). Presses in on touch.
 class TodayProgressButton extends StatefulWidget {
-  const TodayProgressButton({super.key, this.light = true, this.compact = false, this.stretch = false, this.center});
+  const TodayProgressButton({super.key, this.light = true, this.compact = false, this.center});
   final bool light;
-
-  /// Fills the width it is given, chevron at the far end (the Zen home's
-  /// Quick + Today row).
-  final bool stretch;
 
   /// Stacked tile (mark over "Today" over the count) for tight spots such
   /// as the right side of the Zen home's Begin Your Healing Path banner.
@@ -648,7 +646,6 @@ class _TodayProgressButtonState extends State<TodayProgressButton> {
         final count = Text('$done/${items.length} done',
             key: const ValueKey('today-button-count'),
             maxLines: 1,
-            overflow: widget.stretch ? TextOverflow.ellipsis : null,
             style: TextStyle(color: sub, fontSize: 10.5, fontWeight: FontWeight.w700, height: 1.2, decoration: TextDecoration.none));
         final body = widget.compact
             ? Column(mainAxisSize: MainAxisSize.min, children: [
@@ -658,23 +655,14 @@ class _TodayProgressButtonState extends State<TodayProgressButton> {
                 const SizedBox(height: 1),
                 count,
               ])
-            : Row(mainAxisSize: widget.stretch ? MainAxisSize.max : MainAxisSize.min, children: [
+            : Row(mainAxisSize: MainAxisSize.min, children: [
           mark,
           const SizedBox(width: 8),
-          if (widget.stretch)
-            Expanded(
-              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('Today', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
-                count,
-              ]),
-            )
-          else ...[
-            Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Today', style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
-              count,
-            ]),
-            const SizedBox(width: 4),
-          ],
+          Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Today', style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.1, decoration: TextDecoration.none)),
+            count,
+          ]),
+          const SizedBox(width: 4),
           Icon(Icons.chevron_right_rounded, size: 18, color: sub),
         ]);
         final r = BorderRadius.circular(widget.compact ? 18 : 999);
