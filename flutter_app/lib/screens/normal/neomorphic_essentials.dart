@@ -8,6 +8,7 @@
 /// (see [DailyTasks]).
 library;
 
+import 'dart:math' as math;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -475,13 +476,23 @@ class EssentialsCarouselState extends State<EssentialsCarousel> {
     // Room for the card's text at large type. Indicators sit under
     // this box, so they are not included here. Grows with the text
     // scale so nothing is cut off at 360 / 1.3.
-    final height = (narrow ? 216.0 : 200.0) * scale;
+    final room = (narrow ? 216.0 : 200.0) * scale;
     final page = _page;
     if (page == null || _length == 0) return const SizedBox.shrink();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Listener(
+        // The day's word changes the card text ('The meaning of ...'), so
+        // the page box also grows to the tallest card's real text height.
+        LayoutBuilder(builder: (context, box) {
+        final height = math.max(
+            room,
+            _HeroEssential.heightFor(context, box.maxWidth, [
+                  for (final t in widget.tasks)
+                    (t.title, widget.infoFor(t.id), t.done),
+                ]) +
+                4);
+        return Listener(
           onPointerDown: (_) => _hold(),
           onPointerUp: (_) => _release(),
           onPointerCancel: (_) => _release(),
@@ -519,7 +530,8 @@ class EssentialsCarouselState extends State<EssentialsCarousel> {
               ),
             ),
           ),
-        ),
+        );
+        }),
         if (_length > 1)
           _DashIndicators(
             count: _length,
@@ -724,6 +736,57 @@ class _HeroEssential extends StatelessWidget {
 
   static const _ink = Color(0xFF1E2233);
   static const _inkSoft = Color(0xFF4A4E63);
+
+  /// Height [build] needs at [width] for the tallest of [cards]
+  /// (title, info, done), measured with the same styles, so the carousel's
+  /// fixed page box never cuts a card off at any word, width or text size.
+  static double heightFor(BuildContext context, double width,
+      List<(String, String, bool)> cards) {
+    final scaler = MediaQuery.textScalerOf(context);
+    final dir = Directionality.maybeOf(context) ?? TextDirection.ltr;
+    final base = DefaultTextStyle.of(context).style;
+    final narrow = _narrow(context);
+    double h(String text, TextStyle style, double maxW, {int? lines}) {
+      final tp = TextPainter(
+        text: TextSpan(text: text, style: base.merge(style)),
+        textDirection: dir,
+        textScaler: scaler,
+        maxLines: lines,
+      )..layout(maxWidth: math.max(0.0, maxW));
+      final out = tp.height;
+      tp.dispose();
+      return out;
+    }
+
+    // Padding 20 plus the 1px border on each side.
+    final inner = width - 42 - (narrow ? 0 : 84);
+    final pill = h('Step 9 of 9',
+            const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+            inner) +
+        10;
+    var tallest = 0.0;
+    for (final (title, info, done) in cards) {
+      final t = h(title,
+          const TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+          inner - 50,
+          lines: 3);
+      final i = h(info,
+          const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
+          inner - 22);
+      final d = h(done ? 'Done' : 'To do',
+          const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800),
+          inner);
+      final col = math.max(pill, narrow ? 48.0 : 0.0) +
+          14 +
+          math.max(38.0, t) +
+          12 +
+          math.max(16.0, i) +
+          6 +
+          math.max(16.0, d);
+      tallest = math.max(tallest, math.max(148.0, col + 42));
+    }
+    return tallest;
+  }
 
   @override
   Widget build(BuildContext context) => Container(
