@@ -35,7 +35,7 @@
 /// [HomeSkinScope] is what tells them which home they are on.
 library;
 
-import '../features/your_day/your_day.dart';
+import '../features/earn/your_earnings_section.dart';
 import 'package:nowssb/data/content.dart' show ContentStore;
 import 'dart:async';
 
@@ -312,38 +312,11 @@ class _HomeNormalState extends State<HomeNormal> {
     }
   }
 
-  /// The Quick tab's shortcuts here — the same ones the top-row carousel runs.
-  YourDayActions _yourDayActions() => YourDayActions(
-        onNotifications: () => showNotificationsSheet(context),
-        onStore: () => _go(3),
-        onPlayer: () {
-          final words = ContentStore.instance.library;
-          if (words.isEmpty) {
-            _go(1);
-            return;
-          }
-          _push(PracticePlayerScreen(words: words, title: 'Practice'));
-        },
-        onGlassToggle: () => setState(() {
-          _glassMode = !_glassMode;
-          VideoPool.instance.setGlassHomeMode(_glassMode);
-        }),
-        glassOn: () => _glassMode,
-      );
-
   /// The twenty-nine, in `REG.norm.items` order. A null widget is a row with
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
   List<(String, Widget?)> _sections() => [
-        (
-          'greet',
-          Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            NmGreeting(name: widget.name),
-            // Your day: Quick · Today · Your Earnings, each opening its own
-            // tab of one sheet (Ribon, Nov 18). The greeting keeps its Today.
-            YourDaySection(light: true, actions: _yourDayActions()),
-          ])
-        ),
+        ('greet', NmGreeting(name: widget.name)),
         ('search', NmSearch(onSearch: (_) => _go(2))),
         ('promoRail', const SizedBox.shrink()),
         (
@@ -434,6 +407,9 @@ class _HomeNormalState extends State<HomeNormal> {
                   ));
                 },
               ),
+              // Your Earnings: the third black banner, below Where to Begin
+              // (Ribon, Nov 17).
+              const YourEarningsSection(),
             ],
           )
         ),

@@ -51,7 +51,7 @@ import 'quotes_live.dart';
 import 'player_settings.dart';
 import 'fashion/drop_studio.dart';
 import 'fashion/header.dart';
-import '../features/your_day/your_day.dart';
+import '../features/earn/your_earnings_section.dart';
 import 'fashion/hero_quick_row.dart';
 import 'fashion/home_cards.dart';
 import 'store/product_detail.dart' show openAtelierWord;
@@ -535,6 +535,8 @@ class _HomeFashionState extends State<HomeFashion> {
               below: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Your Earnings, right under Begin Your Healing Path (Ribon, Nov 17).
+              const YourEarningsSection(light: false, padding: EdgeInsets.fromLTRB(16, 16, 16, 4)),
               FashPractice(
                 banners: dailyPracticeBanners(_practicePool()),
                 // Today's Practice opens the Practice tab (Ribon, Oct 24).
@@ -760,16 +762,6 @@ class _HomeFashionState extends State<HomeFashion> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               HeroGreeting(name: widget.name, onQuickAccess: _openQuickActions),
-              // Your day: Quick · Today · Your Earnings, each opening its own
-              // tab of one sheet (Ribon, Nov 18). Additive: the greeting's
-              // Quick and the banner's Today stay where they are.
-              YourDaySection(
-                actions: YourDayActions(
-                  onNotifications: () => showNotificationsSheet(context),
-                  onStore: () => _go(3),
-                  onPlayer: () => _go(1),
-                ),
-              ),
               HeroQuickRow(pool: _quickPool()),
               FashionHero(
                 onExplore: () => _go(2),

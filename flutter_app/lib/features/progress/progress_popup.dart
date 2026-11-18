@@ -436,12 +436,8 @@ class _ProgressPillButtonState extends State<ProgressPillButton> with SingleTick
 /// Glass sheet: notification-glance header + Quick Access style grid of
 /// black tiles, each with its own bar.
 class ProgressPanel extends StatelessWidget {
-  const ProgressPanel({super.key, this.center, this.bare = false});
+  const ProgressPanel({super.key, this.center});
   final ProgressCenter? center;
-
-  /// Without its own glass, for hosts that already are glass (the Your day
-  /// sheet's Today tab).
-  final bool bare;
 
   static Future<void> open(BuildContext context) {
     ProgressSources.instance.sync();
@@ -468,7 +464,11 @@ class ProgressPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = center ?? ProgressCenter.instance;
-    final body = ListenableBuilder(
+    return Material(
+      type: MaterialType.transparency,
+      child: ProgressGlass(
+        padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
+        child: ListenableBuilder(
           listenable: c,
           builder: (context, _) {
             final items = c.items;
@@ -503,10 +503,8 @@ class ProgressPanel extends StatelessWidget {
               ),
             ]);
           },
-        );
-    return Material(
-      type: MaterialType.transparency,
-      child: bare ? body : ProgressGlass(padding: const EdgeInsets.fromLTRB(8, 12, 8, 8), child: body),
+        ),
+      ),
     );
   }
 }

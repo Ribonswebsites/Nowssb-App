@@ -92,20 +92,6 @@ Future<void> showHeaderActionsSheet(
   );
 }
 
-/// The same "Customize shortcuts" sheet the Add tile opens; saves the pick
-/// to [Settings.quickActions]. Used by the Your day sheet's Quick tab.
-Future<void> showCustomizeQuickActions(BuildContext context) async {
-  AppHaptics.selection();
-  final chosen = await showModalBottomSheet<List<String>>(
-    context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
-    builder: (ctx) => _CustomizeShortcutsSheet(initial: Settings.instance.quickActions),
-  );
-  if (chosen == null) return;
-  await Settings.instance.setQuickActions(chosen);
-}
-
 class HeaderActionsSheet extends StatefulWidget {
   const HeaderActionsSheet({
     super.key,
