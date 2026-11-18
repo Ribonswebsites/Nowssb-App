@@ -530,7 +530,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 120 + MediaQuery.paddingOf(context).bottom),
                   // Server-driven order (Admin → UI Editor); bundled order by default.
       children: layoutChildren(context, 'profile', [
-                    LSection('face', 'Profile', _courseFace()),
+                    // Clear air under the tab card so it never touches the
+                    // NowssB Earn wrapper below.
+                    LSection('face', 'Profile', Padding(padding: const EdgeInsets.only(bottom: 24), child: _courseFace())),
                     LSection('earn', 'Earn hub', _earnHub()),
                     LSection('progress', 'Progress', _progress()),
                     LSection('mind', 'Practice mind', Padding(
@@ -605,6 +607,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           rowCircle: true,
           onRowImage: _openPhotoChoices,
           onRow: openers[_chip.clamp(0, rows.length - 1)],
+          rowCard: _ProfileTabCard(
+            index: _chip.clamp(0, rows.length - 1),
+            spec: _kProfileTabs[_chip.clamp(0, rows.length - 1)],
+            count: counts[_chip.clamp(0, rows.length - 1)],
+            onTap: openers[_chip.clamp(0, rows.length - 1)],
+          ),
           instead: _face == 1 ? _progressCard(streak: streak, score: score, words: words, coins: coins, photo: photo) : null,
         );
       },
@@ -1860,3 +1868,123 @@ class _AnimatedSheetState extends State<_AnimatedSheet> with SingleTickerProvide
 class _SheetTab extends StatelessWidget { final String label; final bool active; final VoidCallback onTap; const _SheetTab({required this.label, required this.active, required this.onTap}); @override Widget build(BuildContext context)=>InkWell(onTap:onTap,borderRadius:BorderRadius.circular(999),child:AnimatedContainer(duration:const Duration(milliseconds:160),padding:const EdgeInsets.symmetric(horizontal:12,vertical:8),decoration:BoxDecoration(color:active?const Color(0x26E3BD7D):const Color(0x08FFFFFF),border:Border.all(color:active?const Color(0x59E3BD7D):_borderSoft),borderRadius:BorderRadius.circular(999)),child:EditableLabel('profile.SheetTab', label,style:TextStyle(fontSize:12,color:active?_accent:_dim)))); }
 
 class _MoreCard extends StatelessWidget { final String title,sub,image; const _MoreCard(this.title,this.sub,this.image); @override Widget build(BuildContext context)=>Container(padding:const EdgeInsets.all(8),decoration:BoxDecoration(color:const Color(0x06FFFFFF),border:Border.all(color:_borderSoft),borderRadius:BorderRadius.circular(18)),child:Row(children:[ClipRRect(borderRadius:BorderRadius.circular(13),child:EditableImage.asset(image,width:54,height:54,fit:BoxFit.cover, slot: 'profile.MoreCard')),const SizedBox(width:10),Expanded(child:Column(mainAxisAlignment:MainAxisAlignment.center,crossAxisAlignment:CrossAxisAlignment.start,children:[EditableLabel('profile.MoreCard', title,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:12.5,fontWeight:FontWeight.w600)),const SizedBox(height:4),EditableLabel('profile.MoreCard', sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:10.5,color:_faint))])),Container(width:24,height:24,decoration:BoxDecoration(shape:BoxShape.circle,border:Border.all(color:_borderSoft)),alignment:Alignment.center,child:const EditableLabel('profile.MoreCard', '↗',style:TextStyle(fontSize:12,color:_dim)))])); }
+
+
+/// One Profile tab: its own render, the words around its count, and where
+/// it leads. Each art file belongs to one tab only.
+typedef _ProfileTabSpec = ({String art, String eyebrow, String title, String unit, String line});
+
+const List<_ProfileTabSpec> _kProfileTabs = [
+  (art: 'assets/profile/tabs/coins.webp', eyebrow: 'Wallet', title: 'NowssB coins', unit: 'coins', line: 'Open your coin wallet'),
+  (art: 'assets/profile/tabs/cart.webp', eyebrow: 'Your bag', title: 'Cart', unit: 'in cart', line: 'Review and check out'),
+  (art: 'assets/profile/tabs/wishlist.webp', eyebrow: 'Saved', title: 'Wishlist', unit: 'saved', line: 'Words you saved for later'),
+  (art: 'assets/profile/tabs/orders.webp', eyebrow: 'Purchases', title: 'Order history', unit: 'owned', line: 'Everything you bought'),
+];
+
+/// The black NowssB card under the Profile tabs: product render on the
+/// left, gold eyebrow, the live count, and a gold-ringed arrow. Swaps with a
+/// soft fade when the tab changes.
+class _ProfileTabCard extends StatelessWidget {
+  const _ProfileTabCard({required this.index, required this.spec, required this.count, required this.onTap});
+
+  final int index;
+  final _ProfileTabSpec spec;
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 260),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, a) => FadeTransition(
+        opacity: a,
+        child: SlideTransition(position: Tween(begin: const Offset(.04, 0), end: Offset.zero).animate(a), child: child),
+      ),
+      layoutBuilder: (current, previous) => Stack(alignment: Alignment.topCenter, children: [...previous, if (current != null) current]),
+      child: Semantics(
+        key: ValueKey('profile-tab-card-$index'),
+        button: true,
+        label: '${spec.title}, $count ${spec.unit}',
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            AppHaptics.selection();
+            onTap();
+          },
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 140),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(26),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xF5141417), Color(0xF50A0A0C)],
+              ),
+              border: Border.all(color: const Color(0x38E3BD7D)),
+              boxShadow: const [BoxShadow(color: Color(0x22E3BD7D), blurRadius: 28, spreadRadius: -8, offset: Offset(0, 10))],
+            ),
+            child: Row(children: [
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: const Color(0x30E3BD7D)),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset(spec.art, key: ValueKey('profile-tab-art-$index'), fit: BoxFit.cover),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(spec.eyebrow.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: _accent, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 1.8)),
+                    const SizedBox(height: 8),
+                    Text.rich(
+                      TextSpan(children: [
+                        TextSpan(text: '$count', style: const TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w900, height: 1)),
+                        TextSpan(text: '  ${spec.unit}', style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 13, fontWeight: FontWeight.w600)),
+                      ]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(spec.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: _text, fontSize: 16, fontWeight: FontWeight.w700, height: 1.15)),
+                    const SizedBox(height: 4),
+                    Text(spec.line,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 12)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0x14E3BD7D),
+                  border: Border.all(color: const Color(0x80E3BD7D)),
+                ),
+                child: const Icon(Icons.arrow_forward_rounded, color: _accent, size: 20),
+              ),
+              const SizedBox(width: 4),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}

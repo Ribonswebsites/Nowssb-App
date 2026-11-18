@@ -42,6 +42,7 @@ class CourseFace extends StatelessWidget {
     this.extra,
     this.instead,
     this.rowCircle = false,
+    this.rowCard,
   });
 
   final Widget avatar;
@@ -68,6 +69,10 @@ class CourseFace extends StatelessWidget {
   final Widget? extra;
   final Widget? instead;
   final bool rowCircle;
+
+  /// Replaces the plain row under the tabs with a custom card (the Profile
+  /// gives each tab its own art and count).
+  final Widget? rowCard;
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +215,7 @@ class CourseFace extends StatelessWidget {
           ),
         ),
         if (chips.isNotEmpty) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: 22),
           // The tabs scroll sideways; the right edge fades out so a cut-off
           // tab reads as "more this way", not as a clipped word (B027).
           ShaderMask(
@@ -248,7 +253,10 @@ class CourseFace extends StatelessWidget {
           ),
           ),
         ],
-        if (rowTitle != null) ...[
+        if (rowCard != null) ...[
+          const SizedBox(height: 16),
+          rowCard!,
+        ] else if (rowTitle != null) ...[
           const SizedBox(height: 12),
           GestureDetector(
             onTap: onRow,

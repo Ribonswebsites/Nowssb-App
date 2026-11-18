@@ -264,6 +264,8 @@ flutter:
     - assets/ebooks/
     - assets/profile_source/
     - assets/profile/rails/
+    # One render per Profile tab (coins, cart, wishlist, orders); never shared.
+    - assets/profile/tabs/
     - assets/routine/
     - assets/store/collections/
     - assets/store/store-rotator/
