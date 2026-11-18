@@ -131,10 +131,12 @@ void main() {
     // Terms for the hub are pre-accepted via SharedPreferences mock above.
     await pump(tester, const StoreScreen());
     final scrollable = find.byType(Scrollable).first;
+    // MEANING STORE (Today carousel) and SHABDAPATHY · LIBRARY (single
+    // picture card) were removed from the Store (Ribon, Nov 18).
     for (final label in [
       'WORD ATELIER',
-      'MEANING STORE',
-      'SHABDAPATHY · LIBRARY',
+      'NOWSSB CONNECT',
+      'SUBSCRIPTION PLANS',
     ]) {
       await tester.scrollUntilVisible(find.text(label), 260,
           scrollable: scrollable);

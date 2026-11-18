@@ -66,6 +66,7 @@ final List<AppDest> menuDestinations = [
   AppDest(id: 'connect', icon: Icons.forum_outlined, overline: 'Community', title: 'NowssB Connect', pill: 'Thoughts, quotes and images', sub: 'Post and read the board', page: (_) => const ConnectScreen(), keywords: 'community post share board'),
   AppDest(id: 'wordprint', icon: Icons.fingerprint_rounded, overline: 'You', title: 'Word Print', pill: 'Your public profile', sub: 'What others see of your practice', page: (_) => const WordPrintScreen(), keywords: 'public profile'),
   const AppDest(id: 'profile', icon: Icons.person_outline_rounded, overline: 'You', title: 'Profile', pill: 'Account and plan', sub: 'Your name, photo and account', tab: 4, keywords: 'account me edit'),
+  AppDest(id: 'zenplus', icon: Icons.auto_awesome_outlined, overline: 'Settings · Look', title: 'Zen Plus', pill: 'Moving backgrounds', sub: 'Motion on or still', page: (_) => const FashionPlusScreen(), keywords: 'motion video background animation experience'),
   AppDest(id: 'settings', icon: Icons.settings_outlined, overline: 'Settings', title: 'Settings', pill: 'Player, look, alerts, account', sub: 'Everything you can change', page: (_) => const AppSettingsScreen(), keywords: 'preferences options'),
 ];
 
@@ -73,7 +74,6 @@ final List<AppDest> menuDestinations = [
 final List<AppDest> settingsDestinations = [
   AppDest(id: 'notifications', icon: Icons.notifications_none_rounded, overline: 'Settings · Alerts', title: 'Notifications', pill: 'Daily words and reminders', sub: 'What this phone tells you', page: (_) => const NotificationsSettingsPage(), keywords: 'alerts push reminders'),
   AppDest(id: 'player', icon: Icons.equalizer_rounded, overline: 'Settings · Player', title: 'Player Settings', pill: 'Equalizer, quality, sleep', sub: 'How words play', page: (_) => const PlayerSettingsScreen(), keywords: 'equalizer bass crossfade sleep timer audio quality download'),
-  AppDest(id: 'zenplus', icon: Icons.auto_awesome_outlined, overline: 'Settings · Look', title: 'Zen Plus', pill: 'Moving backgrounds', sub: 'Motion on or still', page: (_) => const FashionPlusScreen(), keywords: 'motion video background animation'),
   AppDest(id: 'quickaccess', icon: Icons.dashboard_customize_outlined, overline: 'Settings · Nav', title: 'Quick Access', pill: 'Bottom navigation', sub: 'Shape, colour and icons', page: (_) => const QuickAccessScreen(), keywords: 'nav bar bottom tabs customize'),
   AppDest(id: 'request', icon: Icons.edit_note_rounded, overline: 'Words', title: 'Request Words', pill: 'Ask the atelier', sub: 'Request a word to be made', action: openRequestWords, keywords: 'request word atelier'),
 ];

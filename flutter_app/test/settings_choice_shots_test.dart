@@ -54,7 +54,9 @@ Future<void> _pumpSettings(WidgetTester t) async {
 
 Future<void> _openRow(WidgetTester t, String title) async {
   final row = find.text(title);
-  await t.ensureVisible(row);
+  // Centre it: the top edge sits under the page header.
+  await Scrollable.ensureVisible(t.element(row), alignment: .5);
+  await t.pump();
   await t.tap(row);
   await t.pump();
   await t.pump(const Duration(milliseconds: 400));

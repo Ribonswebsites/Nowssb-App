@@ -142,12 +142,14 @@ class Settings extends ChangeNotifier {
     'store',
     'player',
     'glass',
+    'zenplus',
   ];
   static const availableQuickActions = <String>[
     'notifications',
     'store',
     'player',
     'glass',
+    'zenplus',
   ];
   List<String> _quickActions = List<String>.from(defaultQuickActions);
   List<String> _sharedThoughts = const [];

@@ -23,7 +23,6 @@ import '../data/store_prices.dart';
 import 'store/daily_deals.dart';
 import 'store/product_detail.dart';
 import 'store/store_art.dart';
-import 'store/store_drift_banners.dart';
 import 'store/bag_ui.dart';
 import 'store/store_home_sections.dart';
 
@@ -81,13 +80,6 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
     if (mounted) setState(() {});
   }
 
-  void _openDeal(DailyDeal d) => openAtelierWord(
-        context,
-        word: d.word,
-        root: d.root,
-        img: kNowssbStoreMark,
-        price: StorePrices.instance.priceFor('word:${d.word.toLowerCase()}'),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +170,9 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ),
         ],
       ),
-      const _StoreDepartmentLabel('MEANING STORE'),
+      // MEANING STORE label removed with the Today carousel under it
+      // (Ribon, Nov 18). Kept as an empty slot so the indices hold.
+      const SizedBox.shrink(),
       _StoreGlassSection(
         children: [
           const HomeKeepAlive(
@@ -224,7 +218,9 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           ),
         ],
       ),
-      const _StoreDepartmentLabel('SHABDAPATHY · LIBRARY'),
+      // SHABDAPATHY · LIBRARY label removed with its single picture card
+      // (Ribon, Nov 18). Kept as an empty slot so the indices hold.
+      const SizedBox.shrink(),
       _StoreGlassSection(
         children: [
           const HomeKeepAlive(
@@ -271,8 +267,12 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
           style: TextStyle(fontSize: 11, height: 1.6, color: Color(0x73FFFFFF)),
         ),
       ),
-      StoreDriftBanner(margin: const EdgeInsets.symmetric(horizontal: 12), onDeal: _openDeal),
-      StoreSlashBanner(margin: const EdgeInsets.symmetric(horizontal: 12), onDeal: _openDeal),
+      // Today carousel and the single picture card: removed from the Store
+      // (Ribon, Nov 18). Empty slots keep the indices; their sections are
+      // gone from the layout below, so a saved editor layout can't bring
+      // them back.
+      const SizedBox.shrink(),
+      const SizedBox.shrink(),
     ];
     final shown = _resell && AppControl.instance.flag('resale', fallback: false)
         ? <Widget>[items[0], items[1], const BazaarScreen(embedded: true)]
@@ -285,11 +285,9 @@ class _StoreHomeContentState extends State<_StoreHomeContent> {
             items[4],
             LSection.group('atelier', 'Word Atelier', [items[5], items[6]]),
             LSection.group('meaning', 'Meaning Store', [items[7], items[8]]),
-            LSection('today', 'Today', items[19]),
             LSection('promo', 'Split promo banner', items[9]),
             LSection.group('connect', 'NowssB Connect', [items[10], items[11]]),
             LSection.group('ebooks', 'eBooks', [items[12], items[13]]),
-            LSection('sit', 'Sit with it', items[20]),
             LSection.group('plans', 'Subscription plans', [items[14], items[15]]),
             LSection('disclaimer', 'Disclaimer', items[16]),
             LSection('credits', 'Credits', items[17]),

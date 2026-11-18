@@ -12,6 +12,7 @@ import 'package:flutter/physics.dart';
 
 import '../../data/notifications.dart';
 import '../../data/settings.dart';
+import '../fashion_plus.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_icon.dart';
 import '../../admin/template/editable.dart';
@@ -25,6 +26,9 @@ const _kBlurMark =
     '<circle cx="12" cy="12" r="7.2" stroke-dasharray="2.2 2.4"/>';
 
 const _kPlusMark = '<path d="M12 5v14M5 12h14"/>';
+
+/// Zen Plus droplet.
+const _kZenMark = '<path d="M12 3.6c3.3 4.1 5.6 7.2 5.6 10.1a5.6 5.6 0 0 1-11.2 0c0-2.9 2.3-6 5.6-10.1z"/>';
 
 const _kAddId = 'add';
 
@@ -269,6 +273,11 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
         Navigator.of(context).pop();
         widget.onPlayer?.call();
         break;
+      case 'zenplus':
+        final nav = Navigator.of(context);
+        nav.pop();
+        nav.push(MaterialPageRoute<void>(builder: (_) => const FashionPlusScreen()));
+        break;
       case _kAddId:
         _openCustomize();
         break;
@@ -318,6 +327,8 @@ class _HeaderActionsSheetState extends State<HeaderActionsSheet>
         return 'Store';
       case 'player':
         return 'Player';
+      case 'zenplus':
+        return 'Zen Plus';
       case _kAddId:
         return 'Add shortcut';
       default:
@@ -645,6 +656,11 @@ class _FlatCarousel extends StatelessWidget {
           label: 'Player',
           body: NwsbMarks.play,
         );
+      case 'zenplus':
+        return const _ActionSpec(
+          label: 'Zen Plus',
+          body: _kZenMark,
+        );
       case _kAddId:
         return const _ActionSpec(
           label: 'Add',
@@ -815,6 +831,7 @@ class _CustomizeShortcutsSheetState extends State<_CustomizeShortcutsSheet> {
     'store': 'Store',
     'player': 'Player',
     'glass': 'Glassmorphism',
+    'zenplus': 'Zen Plus',
   };
 
   @override

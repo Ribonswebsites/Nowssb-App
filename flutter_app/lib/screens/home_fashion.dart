@@ -663,10 +663,9 @@ class _HomeFashionState extends State<HomeFashion> {
           'custom',
           DropStudioEntry(onTap: () => _push(const DropStudioScreen()))
         ),
-        (
-          'fashplus',
-          FashPlusMini(onTap: () => _push(const FashionPlusScreen()))
-        ),
+        // EXPERIENCE · Zen Plus banner removed from the home (Ribon, Nov 18).
+        // The page stays: Settings, the menu and the Quick shortcuts open it.
+        ('fashplus', const SizedBox.shrink()),
         ('enterCurve', const SizedBox.shrink()),
         // Cleanup (Nov 2): one Practice card, one Store promo.
         ('rx', const SizedBox.shrink()),

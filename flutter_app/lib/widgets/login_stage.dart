@@ -2,7 +2,6 @@
 /// Every pill is glass — no fill colour, no gradient.
 library;
 
-import 'app_thinking_loader.dart';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -185,16 +184,15 @@ class LoginStage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _GlassButton(
-                height: busy ? 88 : 54,
+                height: 54,
                 onTap: busy ? null : onSubmit,
+                // Busy: the words only, centred — no orb (Ribon, Nov 18).
                 child: busy
-                    ? const AppThinkingLoader(
-                        size: 52,
-                        blackCircle: true,
-                        circlePad: 8,
-                        axis: Axis.horizontal,
-                        label: 'Loading please wait',
-                        labelStyle: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                    ? const Text(
+                        'Loading please wait',
+                        key: ValueKey('login-busy-label'),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
                       )
                     : EditableLabel(
                         'login_stage.LoginStage',

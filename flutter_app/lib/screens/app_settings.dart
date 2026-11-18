@@ -4,6 +4,7 @@
 /// Settings row. Persists toggles via SharedPreferences. No emoji.
 library;
 
+import 'fashion_plus.dart';
 import 'dart:ui' show ImageFilter;
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -283,6 +284,13 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
             pill: _motionLabel(s.fashionPlus),
             pillSub: _motionLabel(s.fashionPlus),
             onTap: _pickMotion),
+        GlassItemCard(
+            icon: Icons.water_drop_outlined,
+            overline: 'Look',
+            title: 'Open Zen Plus',
+            pill: 'Backgrounds and start art',
+            pillSub: 'The Zen Plus page',
+            onTap: () => _push(const FashionPlusScreen())),
         GlassItemCard(
             icon: Icons.home_outlined,
             overline: 'Look',
