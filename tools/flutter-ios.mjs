@@ -68,6 +68,15 @@ if (!infoText.includes('<key>NSSpeechRecognitionUsageDescription</key>')) {
     '<dict>\n\t<key>NSSpeechRecognitionUsageDescription</key>\n\t<string>NowssB uses speech recognition to compare your spoken word with the practice sound.</string>',
   );
 }
+// NowssB Reference: nowssb://ref?r=CODE opens the app (app_links reads it);
+// Flutter's deep-link router stays off so links never push unknown routes.
+if (!infoText.includes('com.nowssb.app.ref')) {
+  const refType = `\n\t\t<dict>\n\t\t\t<key>CFBundleURLName</key>\n\t\t\t<string>com.nowssb.app.ref</string>\n\t\t\t<key>CFBundleURLSchemes</key>\n\t\t\t<array><string>nowssb</string></array>\n\t\t</dict>`;
+  infoText = infoText.replace(/(<key>CFBundleURLTypes<\/key>\s*<array>)/, `$1${refType}`);
+}
+if (!infoText.includes('<key>FlutterDeepLinkingEnabled</key>')) {
+  infoText = infoText.replace('<dict>', '<dict>\n\t<key>FlutterDeepLinkingEnabled</key>\n\t<false/>');
+}
 writeFileSync(info, infoText);
 
 const fileRef = 'F10A55B0C0DE000000000001';

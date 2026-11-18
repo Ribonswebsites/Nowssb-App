@@ -100,6 +100,9 @@ class PendingCoins extends ChangeNotifier {
     'explore': (2, 'Visit a program page'),
     'first_share': (15, 'First share of a word'),
     'echo_first_post': (10, 'First Echo Wall post'),
+    'profile_complete': (50, 'Complete your profile'),
+    'referral_welcome': (100, 'Welcome gift from a friend’s link'),
+    'referral_friend': (50, 'A friend joined with your link'),
   };
 
   final List<PendingEarn> items = [];

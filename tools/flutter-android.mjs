@@ -397,6 +397,35 @@ if (!m.includes('.UpdateDownloadService')) {
     `</application>`,
   );
 }
+// NowssB Reference links open the app (lib/features/account/referral_capture.dart
+// reads them with app_links): https://nowssb.com/w/<item>?r=CODE (App Link —
+// .well-known/assetlinks.json is served from nowssb.com) and nowssb://ref?r=CODE.
+// Flutter's own deep-link router is switched off so a link never pushes an
+// unknown route; app_links hands the URI to Dart instead.
+if (!m.includes('android:pathPrefix="/w/"')) {
+  const before = m;
+  m = m.replace(
+    /(<activity[\s\S]*?android:name="\.MainActivity"[\s\S]*?)(\n\s*<\/activity>)/,
+    `$1\n            <meta-data android:name="flutter_deeplinking_enabled" android:value="false" />` +
+    `\n            <intent-filter android:autoVerify="true">` +
+    `\n                <action android:name="android.intent.action.VIEW" />` +
+    `\n                <category android:name="android.intent.category.DEFAULT" />` +
+    `\n                <category android:name="android.intent.category.BROWSABLE" />` +
+    `\n                <data android:scheme="https" android:host="nowssb.com" android:pathPrefix="/w/" />` +
+    `\n                <data android:scheme="https" android:host="www.nowssb.com" android:pathPrefix="/w/" />` +
+    `\n            </intent-filter>` +
+    `\n            <intent-filter>` +
+    `\n                <action android:name="android.intent.action.VIEW" />` +
+    `\n                <category android:name="android.intent.category.DEFAULT" />` +
+    `\n                <category android:name="android.intent.category.BROWSABLE" />` +
+    `\n                <data android:scheme="nowssb" android:host="ref" />` +
+    `\n            </intent-filter>$2`,
+  );
+  if (m === before) throw new Error('AndroidManifest.xml: MainActivity not found for the referral link filters');
+  done.push('referral links (nowssb.com/w/ App Link + nowssb://ref)');
+} else {
+  already.push('referral links');
+}
 writeFileSync(manifest, m);
 
 const drawableDir = join(android, 'app', 'src', 'main', 'res', 'drawable');

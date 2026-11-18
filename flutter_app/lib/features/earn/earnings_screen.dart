@@ -19,6 +19,7 @@ import '../programs/program_kit.dart';
 import '../programs/earn_program.dart';
 import '../programs/program_router.dart';
 import '../circle/circle_screen.dart';
+import '../account/payout_details_page.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -244,6 +245,13 @@ class _EarningsScreenState extends State<EarningsScreen> {
                     sub: w.payoutRail.isEmpty ? 'Wise or PayPal · Set account' : 'Saved · Change',
                     onTap: () => _openAccount(context),
                   ),
+                  KitRow(
+                    key: const Key('earnings-bank-details'),
+                    leading: const _BankMark(),
+                    title: 'Bank / payout details',
+                    sub: 'Bank account, UPI, IBAN, PayPal or Wise',
+                    onTap: () => PayoutDetailsPage.open(context),
+                  ),
                 ]),
               ),
               KitPane(
@@ -382,4 +390,17 @@ class EarningsRow {
   final int cents;
   final String status;
   final int at;
+}
+
+
+/// Leading mark for the Bank / payout details row (drawn, not a photo).
+class _BankMark extends StatelessWidget {
+  const _BankMark();
+  @override
+  Widget build(BuildContext context) {
+    return const DecoratedBox(
+      decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF3B2585), Color(0xFF120C26)])),
+      child: Center(child: Icon(Icons.account_balance_rounded, color: NwsbColors.goldLight, size: 22)),
+    );
+  }
 }

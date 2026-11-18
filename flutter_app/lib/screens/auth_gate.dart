@@ -15,6 +15,7 @@ import '../data/auth_errors.dart';
 import '../data/firebase.dart';
 import '../data/remember_me.dart';
 import '../data/phone_notifications.dart';
+import '../features/account/complete_profile_page.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 import '../widgets/app_thinking_loader.dart';
 import '../widgets/login_stage.dart';
@@ -478,6 +479,11 @@ class _AuthGateState extends State<AuthGate> {
                 EarnWallet.instance.onSignedIn();
               }
             });
+          }
+          // New accounts (and older ones missing their details) add name,
+          // phone, country and a friend's code before the app opens.
+          if (uid != null && widget.authStates == null) {
+            return ProfileSetupGate(uid: uid, child: widget.child);
           }
           return widget.child;
         }

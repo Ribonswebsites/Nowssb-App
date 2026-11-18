@@ -6,6 +6,8 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import '../features/account/complete_profile_page.dart';
+import '../features/account/payout_details_page.dart';
 import '../widgets/hero_glass.dart';
 import '../widgets/swipe_away.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1163,6 +1165,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           line: 'Sales and referrals · Open',
           onTap: () => Programmes.open(context, Programme.earnings),
         ),
+        if (live && NwsbFirebase.ready && FirebaseAuth.instance.currentUser != null) ...[
+          const SizedBox(height: 10),
+          Row(children: [
+            Expanded(child: _earnLink('Your details', YourDetailsPage(uid: FirebaseAuth.instance.currentUser!.uid))),
+            const SizedBox(width: 10),
+            Expanded(child: _earnLink('Bank / payout details', const PayoutDetailsPage())),
+          ]),
+        ],
       ]),
     );
       },
@@ -1297,7 +1307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       'pronounce80': 'Pronunciation score 80+', 'quote': 'Read the daily quote', 'read_meaning': 'Read a meaning to the end',
       'explore': 'Visited a program page', 'first_share': 'Shared a word', 'close_stage': 'Closed a stage',
       'profile_complete': 'Completed your profile', 'reminders_on': 'Turned on reminders', 'echo_first_post': 'First Echo Wall post',
-      'feedback': 'Sent feedback',
+      'feedback': 'Sent feedback', 'referral_welcome': 'Welcome gift (friend’s link)', 'referral_friend': 'A friend joined with your link',
     };
     if (r.startsWith('act:')) {
       final a = r.substring(4).split(':').first;

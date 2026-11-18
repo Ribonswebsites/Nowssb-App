@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import '../progress/progress_center.dart';
+import 'coin_collect.dart' show PendingCoins;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -309,6 +310,15 @@ class EconomyMirror extends ChangeNotifier {
       paidReferrals = (data['paidReferralCount'] as num?)?.toInt() ?? 0;
       unitsSold = (data['unitsSold'] as num?)?.toInt() ?? paidReferrals;
       subscriptionActive = data['subscriptionActive'] == true;
+      // A friend joined with this account's link: the server lists them
+      // here until the referrer collects the bonus (never auto-credited).
+      final friends = data['friendBonusPending'];
+      if (friends is List) {
+        for (final f in friends.take(10)) {
+          final key = '$f'.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '');
+          if (key.isNotEmpty) unawaited(PendingCoins.instance.offer('referral_friend', key: key));
+        }
+      }
     });
     _watch('users/$id/sellerStats/main', (data) {
       sellerTier = (data['tier'] as String?) ?? 'Seller';

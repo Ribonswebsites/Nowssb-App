@@ -4,6 +4,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import '../account/payout_details_page.dart';
 
 import '../../admin/layout/layout_sections.dart';
 import '../../theme/tokens.dart';
@@ -291,6 +292,17 @@ List<Widget> _payouts(BuildContext context, Map<String, dynamic> s) => [
               const PEmpty('Add your payout details below to request a payout.', slot: 'earn_program.payouts')
             else if (!enough)
               PEmpty(min > 0 ? 'You can request a payout once ${FxBook.instance.formatPrice(min)} is available.' : 'Nothing is available to pay out yet.', slot: 'earn_program.payouts'),
+          ]),
+          PCard(children: [
+            PRow(
+              key: const ValueKey('earn.payout.bank'),
+              title: 'Bank / payout details',
+              sub: 'Bank account, IBAN, PayPal or Wise · shown back masked',
+              trailing: TextButton(
+                onPressed: () => PayoutDetailsPage.open(context).then((_) => reload()),
+                child: const Text('Open', style: TextStyle(color: NwsbColors.gold, fontWeight: FontWeight.w700)),
+              ),
+            ),
           ]),
           _PayoutForm(account: acct, onSaved: reload),
         ]);

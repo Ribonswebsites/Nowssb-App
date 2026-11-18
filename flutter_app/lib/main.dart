@@ -48,6 +48,7 @@ import 'data/cart_bag.dart';
 import 'data/home_widget_sync.dart';
 import 'data/play_subscriptions.dart';
 import 'data/settings.dart';
+import 'features/account/referral_capture.dart';
 import 'media/video_pool.dart';
 import 'screens/auth_gate.dart';
 import 'screens/splash.dart';
@@ -93,6 +94,9 @@ Future<void> main() async {
   await CartBag.instance.load();
   await EarnWallet.instance.start();
   await EconomyMirror.instance.start();
+  // A friend's code from the Play install referrer or a tapped link waits
+  // on the phone until sign-up, then attaches once (features/account).
+  unawaited(ReferralCapture.instance.start());
   // Today's five goals read their real counts (tasks, practice, coins,
   // quest, check-in) from here on.
   ProgressSources.instance.start();
