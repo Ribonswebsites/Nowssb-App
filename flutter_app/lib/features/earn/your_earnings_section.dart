@@ -1,12 +1,15 @@
-/// Your Earnings on both homes (Ribon, Nov 17).
+/// Your day on both homes (Ribon, Nov 18): one black banner in the language
+/// of the Normal home's New releases / Picked for you rows holding three
+/// glass buttons — Quick, Today and Your Earnings. Quick and Today open the
+/// very same sheets as the greeting's Quick and the Begin banner's Today
+/// (the host passes its own Quick opener; Today is ProgressPanel.open).
 ///
-/// One black banner in the language of the Normal home's New releases and
-/// Picked for you rows — white bold title, grey subtitle, "See all" — with
-/// a featured hero tile (Cash earned: a big count-up figure over a slowly
-/// drifting gold glow) and, under it, a row of square tiles in the New
-/// releases style: Coins, Sold, Target (progress ring), Your position,
-/// Under you and This month. "See all" opens the Your Earnings sheet, built
-/// from the same black surfaces.
+/// Your Earnings opens the Your Earnings tab: a deep-blur glass sheet with
+/// a black featured hero (Cash earned: a big count-up over a slowly drifting
+/// gold glow), a row of square tiles in the New releases style (Coins, Sold,
+/// Target ring, Your position, Under you, This month), Your position and
+/// Target cards and links, all on glass. It opens part way and expands to
+/// full screen (button, or drag the handle up) and collapses back.
 ///
 /// Every number is the server's: EconomyMirror (users/{uid}/wallet/main,
 /// payout/main, sellerStats/main incl. teamCount, the summary's rank ladder)
@@ -15,6 +18,7 @@
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:cloud_firestore/cloud_firestore.dart' show DocumentSnapshot, FirebaseFirestore;
 import 'package:flutter/material.dart';
@@ -29,6 +33,8 @@ import '../coins/coins_screen.dart';
 import '../economy/economy_api.dart';
 import '../economy/money.dart';
 import '../programs/reference_program.dart' show monthKeyIst;
+import '../progress/progress_center.dart';
+import '../progress/progress_popup.dart' show ProgressPanel;
 import 'earnings_screen.dart';
 
 // Same tokens as NewReleasesCard / PickedForYouCard.
@@ -131,10 +137,14 @@ class _Go {
 
 String _cents(int v) => FxBook.instance.formatCents(v);
 
-// ─── the home section ───────────────────────────────────────────────────────
+// ─── the home section: Quick · Today · Your Earnings ────────────────────────
 
-class YourEarningsSection extends StatelessWidget {
-  const YourEarningsSection({super.key, this.light = true, this.padding = const EdgeInsets.fromLTRB(20, 10, 20, 14)});
+class HomeTrioSection extends StatelessWidget {
+  const HomeTrioSection({super.key, required this.onQuick, this.light = true, this.padding = const EdgeInsets.fromLTRB(20, 10, 20, 14), this.center});
+
+  /// The host home's own Quick opener — the same sheet its greeting Quick
+  /// (Zen) or header Quick (Normal) opens.
+  final VoidCallback onQuick;
 
   /// Outer air; the Zen home's panes sit 16 from the edge.
   final EdgeInsets padding;
@@ -143,36 +153,171 @@ class YourEarningsSection extends StatelessWidget {
   /// home the white highlight would glow, so it gets a hairline instead.
   final bool light;
 
+  /// Tests: Today's source (defaults to ProgressCenter.instance).
+  final ProgressCenter? center;
+
   @override
   Widget build(BuildContext context) {
-    return EarnBuilder(
-      builder: (context, s) => Padding(
-        key: const ValueKey('your-earnings-section'),
-        padding: padding,
-        child: _BlackBanner(
-          light: light,
-          title: 'Your Earnings',
-          subtitle: s.subtitle,
-          trailing: _SeeAll(key: const ValueKey('earn-see-all'), onTap: () => showYourEarningsSheet(context)),
-          onHead: () => showYourEarningsSheet(context),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
-            _CashHero(s: s, onTap: () => _Go.cash(context)),
-            const SizedBox(height: 14),
-            _TileRow(s: s),
-          ]),
+    final c = center ?? ProgressCenter.instance;
+    return Padding(
+      key: const ValueKey('home-trio-section'),
+      padding: padding,
+      child: _BlackBanner(
+        light: light,
+        title: 'Your day',
+        subtitle: 'Shortcuts, today\u2019s goals and your earnings',
+        child: ListenableBuilder(
+          listenable: Listenable.merge([c, EconomyMirror.instance, FxBook.instance]),
+          builder: (context, _) {
+            final items = c.items;
+            final done = items.where((e) => e.complete).length;
+            final m = EconomyMirror.instance;
+            final live = m.live && m.uid != null;
+            return IntrinsicHeight(
+              child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Expanded(
+                  child: _TrioButton(
+                    key: const ValueKey('trio-quick'),
+                    label: 'Quick',
+                    sub: 'Your shortcuts',
+                    glow: const Color(0xFF8B6CF0),
+                    icon: const NwsbIcon(NwsbMarks.features, size: 18, color: Colors.black, strokeWidth: 1.8),
+                    onTap: onQuick,
+                  ),
+                ),
+                const SizedBox(width: _gap),
+                Expanded(
+                  child: _TrioButton(
+                    key: const ValueKey('trio-today'),
+                    label: 'Today',
+                    sub: '$done/${items.length} done',
+                    glow: const Color(0xFF4FD1B5),
+                    progress: items.isEmpty ? null : done / items.length,
+                    icon: const Icon(Icons.check_rounded, size: 19, color: Colors.black),
+                    onTap: () => ProgressPanel.open(context),
+                  ),
+                ),
+                const SizedBox(width: _gap),
+                Expanded(
+                  child: _TrioButton(
+                    key: const ValueKey('trio-earnings'),
+                    label: 'Your Earnings',
+                    sub: live ? '${_cents(m.lifetimeCents)} earned' : 'Sign in to earn',
+                    glow: const Color(0xFFE8C46A),
+                    icon: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.black, strokeWidth: 1.9),
+                    onTap: () => showYourEarningsSheet(context),
+                  ),
+                ),
+              ]),
+            );
+          },
         ),
       ),
     );
   }
 }
 
+/// One glass button on the black banner: frosted face, hairline, a soft
+/// coloured glow in its corner, a white disc mark, label and live line.
+class _TrioButton extends StatelessWidget {
+  const _TrioButton({super.key, required this.label, required this.sub, required this.glow, required this.icon, required this.onTap, this.progress});
+  final String label;
+  final String sub;
+  final Color glow;
+  final Widget icon;
+  final VoidCallback onTap;
+  final double? progress;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: '$label, $sub',
+        child: _Press(
+          onTap: () {
+            AppHaptics.medium();
+            onTap();
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 112),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x2EFFFFFF), Color(0x0DFFFFFF)]),
+                border: Border.all(color: const Color(0x33FFFFFF)),
+              ),
+              child: Stack(children: [
+                Positioned(
+                  right: -26,
+                  top: -26,
+                  child: IgnorePointer(
+                    child: Container(
+                      width: 92,
+                      height: 92,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(colors: [glow.withValues(alpha: .55), glow.withValues(alpha: 0)]),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(11, 11, 10, 11),
+                  child: ExcludeSemantics(
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Container(
+                        width: 34,
+                        height: 34,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [BoxShadow(color: glow.withValues(alpha: .45), blurRadius: 14)],
+                        ),
+                        child: icon,
+                      ),
+                      const Spacer(),
+                      const SizedBox(height: 10),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(label, maxLines: 1, softWrap: false, style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.15, letterSpacing: -0.2)),
+                      ),
+                      const SizedBox(height: 2),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(sub, maxLines: 1, softWrap: false, style: const TextStyle(color: _grey, fontSize: 10.5, fontWeight: FontWeight.w600, height: 1.15)),
+                      ),
+                      if (progress != null) ...[
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(9),
+                          child: LinearProgressIndicator(
+                            value: progress!.clamp(0, 1).toDouble(),
+                            minHeight: 3,
+                            backgroundColor: const Color(0x26FFFFFF),
+                            valueColor: AlwaysStoppedAnimation(glow),
+                          ),
+                        ),
+                      ],
+                    ]),
+                  ),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      );
+}
+
 /// The black card of New releases / Picked for you, header included.
 class _BlackBanner extends StatelessWidget {
-  const _BlackBanner({required this.light, required this.title, required this.subtitle, required this.trailing, required this.child, this.onHead});
+  const _BlackBanner({required this.light, required this.title, required this.subtitle, required this.child, this.trailing, this.onHead});
   final bool light;
   final String title;
   final String subtitle;
-  final Widget trailing;
+  final Widget? trailing;
   final Widget child;
   final VoidCallback? onHead;
 
@@ -209,15 +354,13 @@ class _BlackBanner extends StatelessWidget {
                         style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.2)),
                     const SizedBox(height: 3),
                     Text(subtitle,
-                        key: const ValueKey('earn-subtitle'),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: _grey, fontSize: 11.5, fontWeight: FontWeight.w500, height: 1.2)),
                   ]),
                 ),
               ),
-              const SizedBox(width: 8),
-              trailing,
+              if (trailing != null) ...[const SizedBox(width: 8), trailing!],
             ]),
             const SizedBox(height: 12),
             child,
@@ -226,27 +369,6 @@ class _BlackBanner extends StatelessWidget {
       ),
     );
   }
-}
-
-class _SeeAll extends StatelessWidget {
-  const _SeeAll({super.key, required this.onTap});
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: 'See all earnings',
-        child: GestureDetector(
-          onTap: () {
-            AppHaptics.medium();
-            onTap();
-          },
-          behavior: HitTestBehavior.opaque,
-          child: const Padding(
-            padding: EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-            child: Text('See all', maxLines: 1, style: TextStyle(color: _seeAll, fontSize: 13, fontWeight: FontWeight.w500, height: 1.2)),
-          ),
-        ),
-      );
 }
 
 // ─── featured hero: Cash earned ─────────────────────────────────────────────
@@ -360,7 +482,7 @@ class _GlowState extends State<_Glow> with SingleTickerProviderStateMixin {
           final t = _c.value * 2 * math.pi;
           return DecoratedBox(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF17121F), Color(0xFF0A0A0C)]),
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF0E0B14), Color(0xFF000000)]),
             ),
             child: Stack(fit: StackFit.expand, children: [
               DecoratedBox(
@@ -669,7 +791,8 @@ Future<void> showYourEarningsSheet(BuildContext context) {
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Your Earnings',
-    barrierColor: const Color(0xA6000000),
+    // Light scrim: the glass does the frosting, so the home shows through.
+    barrierColor: const Color(0x59000000),
     transitionDuration: const Duration(milliseconds: 520),
     pageBuilder: (ctx, _, __) => const YourEarningsSheet(),
     transitionBuilder: (ctx, a, _, child) {
@@ -684,6 +807,9 @@ Future<void> showYourEarningsSheet(BuildContext context) {
   );
 }
 
+/// The Your Earnings tab: deep-blur glass, black hero, glass tiles inside.
+/// Opens part way; the expand button or dragging the handle up takes it
+/// full screen, and the same (or dragging down) brings it back.
 class YourEarningsSheet extends StatefulWidget {
   const YourEarningsSheet({super.key});
   @override
@@ -691,117 +817,65 @@ class YourEarningsSheet extends StatefulWidget {
 }
 
 class _YourEarningsSheetState extends State<YourEarningsSheet> {
-  double _drag = 0;
+  bool _expanded = false;
+  bool _dragging = false;
+
+  /// Live height change while the handle is dragged (+ = taller).
+  double _pull = 0;
 
   void _close() => Navigator.of(context).maybePop();
+
+  void _setExpanded(bool v) {
+    if (v == _expanded) return;
+    AppHaptics.selection();
+    setState(() => _expanded = v);
+  }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final height = math.min(size.height * 0.84, 700.0);
+    final pad = MediaQuery.paddingOf(context);
+    final full = size.height - pad.top - pad.bottom - 12;
+    final part = math.min(full, math.min(size.height * 0.74, 640.0));
+    final base = _expanded ? full : part;
+    final height = (base + _pull).clamp(part * .55, full).toDouble();
+    final still = _still(context);
+    final r = BorderRadius.circular(_expanded ? 30 : _radius);
     return SafeArea(
       child: Align(
         alignment: Alignment.bottomCenter,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+          padding: EdgeInsets.fromLTRB(_expanded ? 6 : 10, 0, _expanded ? 6 : 10, _expanded ? 6 : 10),
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 520, maxHeight: height),
-            child: Transform.translate(
-              offset: Offset(0, _drag),
-              child: Material(
-                type: MaterialType.transparency,
-                child: Container(
-                  key: const ValueKey('your-earnings-sheet'),
-                  height: height,
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(_radius),
-                    border: Border.all(color: const Color(0x24FFFFFF)),
-                    boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 50, offset: Offset(0, 20))],
-                  ),
-                  child: EarnBuilder(
-                    builder: (context, s) => Column(children: [
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onVerticalDragUpdate: (d) => setState(() => _drag = math.max(0, _drag + d.delta.dy)),
-                        onVerticalDragEnd: (d) {
-                          if (_drag > 90 || (d.primaryVelocity ?? 0) > 700) {
-                            _close();
-                          } else {
-                            setState(() => _drag = 0);
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(18, 10, 12, 10),
-                          child: Column(children: [
-                            Container(width: 38, height: 4, decoration: BoxDecoration(color: const Color(0x40FFFFFF), borderRadius: BorderRadius.circular(9))),
-                            const SizedBox(height: 12),
-                            Row(children: [
-                              Expanded(
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  const Text('Your Earnings',
-                                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.3)),
-                                  const SizedBox(height: 3),
-                                  Text(s.subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _grey, fontSize: 12, fontWeight: FontWeight.w500)),
-                                ]),
-                              ),
-                              Semantics(
-                                button: true,
-                                label: 'Close',
-                                child: GestureDetector(
-                                  key: const ValueKey('earn-sheet-close'),
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: () {
-                                    AppHaptics.light();
-                                    _close();
-                                  },
-                                  child: Container(
-                                    width: 36,
-                                    height: 36,
-                                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF1C1C1F)),
-                                    child: const Icon(Icons.close_rounded, size: 18, color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ]),
-                          ]),
-                        ),
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: AnimatedContainer(
+              key: const ValueKey('your-earnings-sheet'),
+              duration: _dragging || still ? Duration.zero : const Duration(milliseconds: 420),
+              curve: Curves.easeOutCubic,
+              height: height,
+              decoration: BoxDecoration(
+                borderRadius: r,
+                boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 50, offset: Offset(0, 20))],
+              ),
+              child: ClipRRect(
+                borderRadius: r,
+                child: BackdropFilter(
+                  // Deep blur: the home behind turns to soft colour.
+                  filter: ImageFilter.blur(sigmaX: 36, sigmaY: 36),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: r,
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [Color(0x4D3A3550), Color(0x33201C2C), Color(0x40302A44)],
                       ),
-                      Expanded(
-                        child: ListView(
-                          padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
-                          children: [
-                            _CashHero(s: s, tall: true, onTap: () => _Go.cash(context)),
-                            const SizedBox(height: 16),
-                            const _RowHead('At a glance'),
-                            _TileRow(s: s),
-                            const SizedBox(height: 18),
-                            const _RowHead('Your position'),
-                            _PositionCard(s: s),
-                            const SizedBox(height: 18),
-                            const _RowHead('Target'),
-                            _TargetCard(s: s),
-                            const SizedBox(height: 18),
-                            _Wide(
-                              key: const ValueKey('earn-open-earnings'),
-                              mark: NwsbMarks.bars,
-                              title: 'Earnings and payouts',
-                              sub: 'Balance, payout account and activity',
-                              onTap: () => _Go.cash(context),
-                            ),
-                            const SizedBox(height: 10),
-                            _Wide(
-                              key: const ValueKey('earn-open-sales'),
-                              mark: NwsbMarks.trending,
-                              title: 'Sales and leaderboard',
-                              sub: 'Every cleared sale and this month\u2019s board',
-                              onTap: () => _Go.sales(context),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ]),
+                      border: Border.all(color: const Color(0x40FFFFFF)),
+                    ),
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: EarnBuilder(builder: (context, s) => Column(children: [_head(s), Expanded(child: _body(s))])),
+                    ),
                   ),
                 ),
               ),
@@ -811,6 +885,121 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
       ),
     );
   }
+
+  Widget _head(EarnSnapshot s) => GestureDetector(
+        key: const ValueKey('earn-sheet-handle'),
+        behavior: HitTestBehavior.opaque,
+        onVerticalDragStart: (_) => setState(() => _dragging = true),
+        onVerticalDragUpdate: (d) => setState(() => _pull -= d.delta.dy),
+        onVerticalDragEnd: (d) {
+          final v = d.primaryVelocity ?? 0;
+          final pull = _pull;
+          setState(() {
+            _dragging = false;
+            _pull = 0;
+          });
+          if (pull > 60 || v < -600) {
+            _setExpanded(true);
+          } else if (pull < -60 || v > 600) {
+            if (_expanded) {
+              _setExpanded(false);
+            } else {
+              _close();
+            }
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 10, 12, 10),
+          child: Column(children: [
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0x80FFFFFF), borderRadius: BorderRadius.circular(9))),
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('Your Earnings', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.3)),
+                  const SizedBox(height: 3),
+                  Text(s.subtitle,
+                      key: const ValueKey('earn-subtitle'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, fontWeight: FontWeight.w500)),
+                ]),
+              ),
+              const SizedBox(width: 8),
+              _HeadButton(
+                key: const ValueKey('earn-sheet-expand'),
+                label: _expanded ? 'Collapse' : 'Expand',
+                icon: _expanded ? Icons.close_fullscreen_rounded : Icons.open_in_full_rounded,
+                onTap: () => _setExpanded(!_expanded),
+              ),
+              const SizedBox(width: 8),
+              _HeadButton(
+                key: const ValueKey('earn-sheet-close'),
+                label: 'Close',
+                icon: Icons.close_rounded,
+                onTap: () {
+                  AppHaptics.light();
+                  _close();
+                },
+              ),
+            ]),
+          ]),
+        ),
+      );
+
+  Widget _body(EarnSnapshot s) => ListView(
+        padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
+        children: [
+          _CashHero(s: s, tall: true, onTap: () => _Go.cash(context)),
+          const SizedBox(height: 16),
+          const _RowHead('At a glance'),
+          _TileRow(s: s),
+          const SizedBox(height: 18),
+          const _RowHead('Your position'),
+          _PositionCard(s: s),
+          const SizedBox(height: 18),
+          const _RowHead('Target'),
+          _TargetCard(s: s),
+          const SizedBox(height: 18),
+          _Wide(
+            key: const ValueKey('earn-open-earnings'),
+            mark: NwsbMarks.bars,
+            title: 'Earnings and payouts',
+            sub: 'Balance, payout account and activity',
+            onTap: () => _Go.cash(context),
+          ),
+          const SizedBox(height: 10),
+          _Wide(
+            key: const ValueKey('earn-open-sales'),
+            mark: NwsbMarks.trending,
+            title: 'Sales and leaderboard',
+            sub: 'Every cleared sale and this month\u2019s board',
+            onTap: () => _Go.sales(context),
+          ),
+        ],
+      );
+}
+
+class _HeadButton extends StatelessWidget {
+  const _HeadButton({super.key, required this.label, required this.icon, required this.onTap});
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: label,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0x26FFFFFF), border: Border.all(color: const Color(0x33FFFFFF))),
+            child: Icon(icon, size: 17, color: Colors.white),
+          ),
+        ),
+      );
 }
 
 class _RowHead extends StatelessWidget {
@@ -823,11 +1012,11 @@ class _RowHead extends StatelessWidget {
       );
 }
 
-/// Dark rounded surface used by the sheet's cards.
+/// Glass surface used by the sheet's cards.
 BoxDecoration _surface({bool gold = false}) => BoxDecoration(
-      color: const Color(0xFF111114),
+      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x26FFFFFF), Color(0x0FFFFFFF)]),
       borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: gold ? const Color(0x55E8D5A3) : const Color(0x1FFFFFFF)),
+      border: Border.all(color: gold ? const Color(0x77E8D5A3) : const Color(0x33FFFFFF)),
     );
 
 class _PositionCard extends StatelessWidget {
@@ -838,7 +1027,7 @@ class _PositionCard extends StatelessWidget {
     Widget stat(String k, String v) => Expanded(
           child: Container(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-            decoration: BoxDecoration(color: const Color(0xFF1C1C21), borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0x1FFFFFFF))),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(k, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _grey, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: .6)),
               const SizedBox(height: 3),
@@ -908,7 +1097,7 @@ class _TargetCard extends StatelessWidget {
             : '${math.max(0, s.target - s.sold)} more words to ${s.nextRank ?? 'the next rank'}';
     Widget bar(double v) => LayoutBuilder(
           builder: (context, c) => Stack(children: [
-            Container(height: 8, decoration: BoxDecoration(color: const Color(0xFF26262B), borderRadius: BorderRadius.circular(9))),
+            Container(height: 8, decoration: BoxDecoration(color: const Color(0x26FFFFFF), borderRadius: BorderRadius.circular(9))),
             Container(
               height: 8,
               width: c.maxWidth * v,

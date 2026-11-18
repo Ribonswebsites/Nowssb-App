@@ -535,8 +535,10 @@ class _HomeFashionState extends State<HomeFashion> {
               below: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Your Earnings, right under Begin Your Healing Path (Ribon, Nov 17).
-              const YourEarningsSection(light: false, padding: EdgeInsets.fromLTRB(16, 16, 16, 4)),
+              // Your day: Quick · Today · Your Earnings, right under Begin
+              // Your Healing Path (Ribon, Nov 18). Quick and Today open the
+              // same sheets as the greeting's Quick and the banner's Today.
+              HomeTrioSection(light: false, padding: const EdgeInsets.fromLTRB(16, 16, 16, 4), onQuick: _openQuickActions),
               FashPractice(
                 banners: dailyPracticeBanners(_practicePool()),
                 // Today's Practice opens the Practice tab (Ribon, Oct 24).

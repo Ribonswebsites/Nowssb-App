@@ -312,6 +312,30 @@ class _HomeNormalState extends State<HomeNormal> {
     }
   }
 
+  /// The header Quick's sheet (_TopRow._openActions), same arguments.
+  void _openQuickActions() {
+    showHeaderActionsSheet(
+      context,
+      glassMode: _glassMode,
+      onGlassToggle: () => setState(() {
+        _glassMode = !_glassMode;
+        VideoPool.instance.setGlassHomeMode(_glassMode);
+      }),
+      onNotifications: () => showNotificationsSheet(context),
+      onStore: () => NavScope.goTo(context, 3),
+      onPlayer: () {
+        final words = ContentStore.instance.library;
+        if (words.isEmpty) {
+          NavScope.goTo(context, 1);
+          return;
+        }
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (_) => PracticePlayerScreen(words: words, title: 'Practice'),
+        ));
+      },
+    );
+  }
+
   /// The twenty-nine, in `REG.norm.items` order. A null widget is a row with
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
@@ -407,9 +431,10 @@ class _HomeNormalState extends State<HomeNormal> {
                   ));
                 },
               ),
-              // Your Earnings: the third black banner, below Where to Begin
-              // (Ribon, Nov 17).
-              const YourEarningsSection(),
+              // Your day: Quick · Today · Your Earnings, the third black
+              // banner below Where to Begin (Ribon, Nov 18). Quick opens the
+              // header's Quick sheet, Today the greeting's Today panel.
+              HomeTrioSection(onQuick: _openQuickActions),
             ],
           )
         ),
