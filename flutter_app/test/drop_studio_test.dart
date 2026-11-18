@@ -215,11 +215,11 @@ void main() {
       expect(tabs, contains(3));
     });
 
-    testWidgets('Own the drop → real word item in cart → Checkout', (t) async {
+    testWidgets('Get this word → real word item in cart → Checkout', (t) async {
       await boot(t, DropStudioScreen(clock: () => fixed));
       final first = dropWordsFor(ContentStore.instance.library, fixed).first;
       await t.runAsync(() async {
-        await t.tap(find.text('Own the drop'));
+        await t.tap(find.text('Get this word'));
         await Future<void>.delayed(const Duration(milliseconds: 1400));
       });
       await settle(t, 30);
@@ -323,8 +323,8 @@ void main() {
       await clearCart(t);
       final first = dropWordsFor(ContentStore.instance.library, fixed).first;
       await t.runAsync(() async {
-        await t.tap(find.text('Own the drop'));
-        await t.tap(find.text('Own the drop'), warnIfMissed: false);
+        await t.tap(find.text('Get this word'));
+        await t.tap(find.text('Get this word'), warnIfMissed: false);
         await Future<void>.delayed(const Duration(milliseconds: 1400));
       });
       await settle(t, 30);
@@ -347,7 +347,7 @@ void main() {
       final price = t.widget<Text>(find.byKey(const ValueKey('drop-dock-price'))).data;
       expect(price, isNotEmpty);
       await t.runAsync(() async {
-        await t.tap(find.text('Own the drop'));
+        await t.tap(find.text('Get this word'));
         await Future<void>.delayed(const Duration(milliseconds: 1400));
       });
       await settle(t, 30);
@@ -402,13 +402,13 @@ void main() {
       String word() => t.widget<Text>(find.byKey(const ValueKey('drop-studio-entry-word'))).data!;
       String chip() => t.widget<Text>(find.byKey(const ValueKey('drop-entry-when'))).data!;
       expect(word(), dropWordsFor(all, now).first.word.toUpperCase());
-      expect(chip(), startsWith('This morning'));
+      expect(chip(), "Today's word · 11 AM");
       expect(DayClock.running, isTrue);
       now = DateTime(2026, 10, 26, 12, 0, 1);
       await t.pump(const Duration(minutes: 2, seconds: 1));
       await t.pump();
       expect(word(), dropWordsFor(all, now).first.word.toUpperCase());
-      expect(chip(), startsWith('This afternoon'));
+      expect(chip(), "Today's word · 12 PM");
       await t.pumpWidget(const SizedBox());
       expect(DayClock.running, isFalse, reason: 'last listener gone: the timer is cancelled');
     });
@@ -419,7 +419,7 @@ void main() {
       for (final now in [DateTime(2026, 10, 27, 1), DateTime(2026, 10, 27, 1, 17)]) {
         DayClock.clock = () => now;
         await boot(t, Scaffold(body: ListView(children: [DropStudioEntry(onTap: () {})])));
-        expect(t.widget<Text>(find.byKey(const ValueKey('drop-entry-when'))).data, 'Tonight, 1 AM');
+        expect(t.widget<Text>(find.byKey(const ValueKey('drop-entry-when'))).data, "Tonight's word · 1 AM");
         expect(dayPartFor(now), DayPart.night);
         await t.pumpWidget(const SizedBox());
       }
@@ -558,7 +558,7 @@ void main() {
       var sawOld = false;
       for (var i = 0; i < 60; i++) {
         if (find.byWidgetPredicate((w) => w is EnterCurveStage && !w.embedded).evaluate().isNotEmpty ||
-            find.text('A featured drop for this hour').evaluate().isNotEmpty) {
+            find.text("This hour's featured word").evaluate().isNotEmpty) {
           sawOld = true;
         }
         if (find.byKey(const ValueKey('drop-studio-entry')).hitTestable().evaluate().isNotEmpty) break;

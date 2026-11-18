@@ -788,10 +788,17 @@ class _HomeFashionState extends State<HomeFashion> {
             LSection(
               k,
               kFashionSectionTitles[k] ?? k,
-              Padding(
-                padding: EdgeInsets.only(
-                    bottom: air.contains(k) ? 26 : kFashSectionGap),
-                child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
+              // The footer's gap below it is solid black like the footer
+              // itself, so the backdrop film never shows under its box.
+              ColoredBox(
+                color: k == 'footer'
+                    ? const Color(0xFF000000)
+                    : const Color(0x00000000),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      bottom: air.contains(k) ? 26 : kFashSectionGap),
+                  child: KeyedSubtree(key: ValueKey('fash-$k'), child: w),
+                ),
               ),
               carousel: kFashionCarousels.contains(k),
             ),
@@ -887,8 +894,7 @@ class _HomeFashionState extends State<HomeFashion> {
                   itemCount: shown.length + 1,
                   itemBuilder: (context, i) => i == shown.length
                       // Last item: room to scroll the footer clear of the nav bar.
-                      ? const ColoredBox(
-                          color: Colors.black, child: NavClearanceSpacer())
+                      ? const FooterBlackTail(child: NavClearanceSpacer())
                       : HomeKeepAlive(child: shown[i]),
                 ),
               ),
@@ -898,4 +904,37 @@ class _HomeFashionState extends State<HomeFashion> {
       ),
     );
   }
+}
+
+/// The black run-out under the footer: the nav clearance, painted black, and
+/// black on past its own bottom so an overscroll bounce at the end of the
+/// home shows black, not the backdrop film behind the list.
+class FooterBlackTail extends StatelessWidget {
+  const FooterBlackTail({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => CustomPaint(
+        key: const ValueKey('footer-black-tail'),
+        painter: const _BlackTailPainter(),
+        child: child,
+      );
+}
+
+class _BlackTailPainter extends CustomPainter {
+  const _BlackTailPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Two screens' worth below the spacer covers any bounce; the viewport
+    // clips the rest.
+    canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height + 2000),
+      Paint()..color = const Color(0xFF000000),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_BlackTailPainter oldDelegate) => false;
 }

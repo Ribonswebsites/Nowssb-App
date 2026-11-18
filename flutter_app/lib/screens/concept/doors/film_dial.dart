@@ -84,7 +84,7 @@ class _FilmDialState extends State<FilmDial> with SingleTickerProviderStateMixin
     return Semantics(
       slider: true,
       value: '$pct%',
-      label: 'Film visibility',
+      label: 'Video brightness',
       increasedValue: '${math.min(100, pct + 10)}%',
       decreasedValue: '${math.max(0, pct - 10)}%',
       onIncrease: () => _step(.1),
@@ -109,7 +109,7 @@ class _FilmDialState extends State<FilmDial> with SingleTickerProviderStateMixin
                   child: Center(
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                       Text('$pct', textScaler: TextScaler.noScaling, style: doorDisplay(64, ls: 0)),
-                      Text('PERCENT FILM',
+                      Text('PERCENT VIDEO',
                           textScaler: TextScaler.noScaling, style: doorBody(10, color: doorGoldSoft, w: FontWeight.w800, ls: 2)),
                       const SizedBox(height: 6),
                       Container(

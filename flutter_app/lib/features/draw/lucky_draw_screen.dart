@@ -20,8 +20,8 @@ import 'lucky_draw_gate.dart';
 const kDrawRules = <String>[
   'Free to enter. No purchase and no coins are needed, and entering never costs anything.',
   'One free entry per person per day.',
-  'Odds of winning are about 1 in 150 per entry (the exact odds shown come from the server).',
-  'Winners are picked at random by NowssB\'s server. The odds shown come from the server.',
+  'Odds of winning are about 1 in 150 per entry (the exact odds are shown on this page).',
+  'Winners are picked at random by NowssB.',
   'Prizes are gifts or coupons. They have no cash value and cannot be exchanged for money.',
   'Coins are never cashable and a coupon covers only part of a price.',
   'Only winners who agree are listed, as first name and last initial (for example "Asha R."). Reviews are written by winners.',

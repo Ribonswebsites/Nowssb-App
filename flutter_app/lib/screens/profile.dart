@@ -423,7 +423,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         data = Map<String, dynamic>.from(jsonDecode(res.body) as Map);
       } catch (_) {}
       if (res.statusCode != 200 || data['uploadUrl'] is! String || data['publicUrl'] is! String) {
-        throw Exception(data['error'] ?? 'Upload server said ${res.statusCode}.');
+        throw Exception(data['error'] ?? 'Please try again in a moment.');
       }
       // Content-Type (and Content-Length from the body) were signed into uploadUrl.
       final put = await http

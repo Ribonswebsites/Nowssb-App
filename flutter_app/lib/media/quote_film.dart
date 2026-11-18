@@ -17,7 +17,10 @@ import 'package:video_player/video_player.dart';
 class QuoteFilm {
   QuoteFilm._();
 
-  /// 636×420 H.264, 15 s, ~2 MB, no audio, faststart.
+  /// 1272×840 H.264 High, 15 s, ~4.6 MB, no audio, faststart. The wave is
+  /// 636×420 in the source film, so it is upscaled 2× with Real-ESRGAN
+  /// (general-x4v3) from the 6.5 Mbps original rather than stretched on the
+  /// phone.
   static const asset = 'assets/video/quote-wave.mp4';
 
   /// The clip's own first frame.

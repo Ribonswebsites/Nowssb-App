@@ -80,7 +80,7 @@ class _S extends State<DoorBackgroundPicker> with TickerProviderStateMixin, Door
             DoorBackdrop(asset: v.poster, slot: '$_slot.backdrop', t: on ? t : 0, dim: .6),
             SafeArea(
               child: Column(children: [
-                DoorTopBar(slot: _slot, sub: 'Background film', onBack: widget.onBack),
+                DoorTopBar(slot: _slot, sub: 'Background video', onBack: widget.onBack),
                 Expanded(
                   // Bottom padding = dock height, so the last reel tile scrolls fully clear.
                   child: ListView(padding: EdgeInsets.only(bottom: MediaQuery.textScalerOf(context).scale(doorDockHeight)), children: [

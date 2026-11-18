@@ -354,7 +354,7 @@ class _TopBar extends StatelessWidget {
                             letterSpacing: -.4,
                             height: 1)),
                     SizedBox(height: 3),
-                    EditableLabel(_slot, 'DROP STUDIO',
+                    EditableLabel(_slot, 'WORD OF THE HOUR',
                         style:
                             TextStyle(color: _goldSoft, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 2.6)),
                   ]),
@@ -485,7 +485,7 @@ class _DropHero extends StatelessWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const _Kicker("Today's offers"),
           const SizedBox(height: 8),
-          const EditableLabel(_slot, 'A featured drop\nfor this hour',
+          const EditableLabel(_slot, 'This hour\'s\nfeatured word',
               style: HomeText.heading),
           const SizedBox(height: 16),
           DepthTilt(
@@ -586,7 +586,7 @@ class _DropHero extends StatelessWidget {
                     Positioned(
                       left: 14,
                       top: 14,
-                      child: _Chip(text: 'DROP · ${_hourLabel(now)}'),
+                      child: _Chip(text: 'WORD · ${_hourLabel(now)}'),
                     ),
                     Positioned(
                       right: 14,
@@ -726,7 +726,7 @@ class _WordsDeckState extends State<_WordsDeck> {
                     const TextStyle(color: _goldSoft, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
         ]),
         const SizedBox(height: 4),
-        const EditableLabel(_slot, 'Swipe the deck. Own one.',
+        const EditableLabel(_slot, 'Swipe to see more words.',
             style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 13)),
         const SizedBox(height: 10),
         if (n == 0)
@@ -1058,7 +1058,7 @@ class _HowItFlows extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const _Kicker('How the drop flows'),
+        const _Kicker('How it works'),
         const SizedBox(height: 10),
         SizedBox(
           height: 470,
@@ -1117,7 +1117,7 @@ class _BuyDock extends StatelessWidget {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              const EditableLabel('drop_studio.BuyDock', "THIS HOUR'S DROP",
+              const EditableLabel('drop_studio.BuyDock', "THIS HOUR'S WORD",
                   style: TextStyle(color: _goldSoft, fontSize: 9.5, fontWeight: FontWeight.w700, letterSpacing: 1.8)),
               const SizedBox(height: 2),
               Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
@@ -1144,7 +1144,7 @@ class _BuyDock extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
               decoration: BoxDecoration(color: _gold, borderRadius: BorderRadius.circular(30)),
               child: const Row(children: [
-                EditableLabel('drop_studio.BuyDock', 'Own the drop',
+                EditableLabel('drop_studio.BuyDock', 'Get this word',
                     style: TextStyle(color: Color(0xFF14100A), fontSize: 14, fontWeight: FontWeight.w800)),
                 SizedBox(width: 6),
                 Icon(Icons.arrow_forward_rounded, color: Color(0xFF14100A), size: 18),
@@ -1195,7 +1195,7 @@ class _EmptyPoster extends StatelessWidget {
               border: Border.all(color: Colors.white, width: 4),
               boxShadow: const [BoxShadow(color: Color(0xCC000000), blurRadius: 30, offset: Offset(0, 18))],
             ),
-            child: EditableLabel(_slot, 'Words land\non the hour',
+            child: EditableLabel(_slot, 'A new word\nevery hour',
                 textAlign: TextAlign.center,
                 style: HomeText.heading.copyWith(color: const Color(0xFF14100A))),
           ),

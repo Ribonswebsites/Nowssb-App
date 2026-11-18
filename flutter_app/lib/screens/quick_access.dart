@@ -247,7 +247,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                         icon: Icons.dashboard_customize_outlined,
                         overline: 'Customize your navigation',
                         title: 'Quick access',
-                        subtitle: 'Reshape your bottom navigation — shape, colour, and the icons it shows. Live preview updates as you pick tiles.',
+                        subtitle: 'Change your bottom bar — its shape, colour and icons.',
                       )),
                       const SizedBox(height: 14),
                       LSection('nav', 'Nav preview', _GlassCard(
@@ -362,7 +362,7 @@ class _QuickAccessScreenState extends State<QuickAccessScreen> {
                               ),
                               const SizedBox(height: 6),
                               const EditableLabel('quick_access.QuickAccessScreen',
-                                'Pick a feature to fill the + slot.',
+                                'Pick a shortcut to add here.',
                                 style: TextStyle(
                                   color: Colors.white54,
                                   fontSize: 11,

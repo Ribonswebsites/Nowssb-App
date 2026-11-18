@@ -78,7 +78,7 @@ void main() {
   testWidgets('featured drop card', (t) async {
     await bootPage(t);
     await _png(t, find.byKey(const ValueKey('shot')), 'featured');
-    expect(find.textContaining('A featured drop'), findsOneWidget);
+    expect(find.textContaining('featured word'), findsOneWidget);
     expect(t.takeException(), isNull);
   });
 
@@ -110,7 +110,7 @@ void main() {
 
   testWidgets('how the drop flows', (t) async {
     await bootPage(t);
-    final flows = find.text('HOW THE DROP FLOWS');
+    final flows = find.text('HOW IT WORKS');
     for (var i = 0; i < 40 && flows.hitTestable().evaluate().isEmpty; i++) {
       await t.drag(find.byType(Scrollable).first, const Offset(0, -240));
       await t.pump(const Duration(milliseconds: 80));

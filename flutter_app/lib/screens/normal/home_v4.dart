@@ -631,7 +631,7 @@ class V4Doors extends StatelessWidget {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('EIGHT DOORS', style: _eyebrow),
                 SizedBox(height: 6),
-                Text('Open a door', style: _h),
+                Text('Where to go', style: _h),
               ]),
             ),
             V4Lottie(_infinity, size: 48),

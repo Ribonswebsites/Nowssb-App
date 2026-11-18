@@ -97,7 +97,7 @@ const _pages = <_EnterPageSpec>[
   _EnterPageSpec(
     subject: EnterCurveAssets.candle,
     kicker: "Today's offers",
-    title: 'A featured drop for this hour',
+    title: 'This hour\'s featured word',
     sub: 'Swipe for the words and what they mean.',
   ),
   // Card 2 — words and meanings, same height, own glass wrapper.
@@ -303,7 +303,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
                     ),
                     SizedBox(height: 4),
                     EditableLabel('enter_curve_stage.EnterCurveStage',
-                      'Featured healing word — limited shop drop for mind & organ.',
+                      'A featured healing word for mind and body.',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -334,7 +334,7 @@ class _EnterCurveStageState extends State<EnterCurveStage> {
           child: words.isEmpty
               ? const Center(
                   child: EditableLabel('enter_curve_stage.EnterCurveStage',
-                    'Words land here as the library loads.',
+                    'Words will appear here in a moment.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 13),
                   ),

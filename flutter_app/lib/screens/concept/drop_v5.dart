@@ -15,7 +15,6 @@ import 'package:flutter/physics.dart';
 import '../../data/content.dart';
 import '../../data/day_part.dart';
 import '../../data/models.dart';
-import '../../data/settings.dart';
 import '../../widgets/concept/stillwater.dart';
 import 'drop_v4_concepts.dart' show DoorHooks, DoorKind, doorState, doorTitle, hourWord;
 import 'drop_v4_type.dart';
@@ -28,7 +27,9 @@ const _deep = Color(0xFF060C18);
 const _ink = Color(0xFF0B0B10);
 const _paper = Color(0xFFF3EADB);
 
-String _poster(String mp4) => mp4.replaceAll('.mp4', '-poster.webp');
+/// The word-of-the-hour card's own photo (Pexels, Eren Li — see CREDITS).
+const kWordHourPhoto = 'assets/home/word-hour-listen.webp';
+
 
 // ─── DOORS · prism ──────────────────────────────────────────────────────
 
@@ -93,9 +94,9 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
           FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
-              child: Text('Three doors. One tap.', key: const ValueKey('drop-prism-heading'), maxLines: 1, style: V4Type.title())),
+              child: Text('Three settings. One tap each.', key: const ValueKey('drop-prism-heading'), maxLines: 1, style: V4Type.title())),
           const SizedBox(height: 3),
-          Text('Turn the prism. Tap the front to change it.', style: V4Type.sub()),
+          Text('Pick your background, start picture and bottom bar.', style: V4Type.sub()),
         ]),
       ),
       LayoutBuilder(builder: (context, c) {
@@ -191,7 +192,7 @@ class _PrismV5State extends State<DoorsPrismV5> with SingleTickerProviderStateMi
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('Live now: ', style: V4Type.sub()),
+                  Text('Now: ', style: V4Type.sub()),
                   Text(doorState(DoorKind.values[fr]), maxLines: 1, style: V4Type.sub().copyWith(color: Colors.white)),
                 ]),
               ),
@@ -332,7 +333,7 @@ class _EntryPeelV5State extends State<EntryPeelV5> with SingleTickerProviderStat
                 final d = rest + 6 * Stillwater.lungs(t) * (1 - peel) + (maxD - rest) * peel;
                 return Semantics(
                   button: true,
-                  label: 'Open Drop Studio. This hour: ${w?.word ?? 'NowssB'}',
+                  label: 'See this hour\'s word: ${w?.word ?? 'NowssB'}',
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: _open,
@@ -388,7 +389,6 @@ class _Face2 extends StatelessWidget {
   final double band;
   @override
   Widget build(BuildContext context) {
-    final s = Settings.instance;
     final night = part == DayPart.night;
     final tint = switch (part) {
       DayPart.night => const Color(0xE6040814),
@@ -397,15 +397,15 @@ class _Face2 extends StatelessWidget {
       DayPart.evening => const Color(0xA62A0E3A),
     };
     final when = switch (part) {
-      DayPart.night => 'Tonight, ${_hh(at)}',
-      DayPart.morning => 'This morning, ${_hh(at)}',
-      DayPart.afternoon => 'This afternoon, ${_hh(at)}',
-      DayPart.evening => 'This evening, ${_hh(at)}',
+      DayPart.night => 'Tonight\'s word · ${_hh(at)}',
+      DayPart.morning => 'Today\'s word · ${_hh(at)}',
+      DayPart.afternoon => 'Today\'s word · ${_hh(at)}',
+      DayPart.evening => 'Today\'s word · ${_hh(at)}',
     };
     return Stack(children: [
       Positioned.fill(
-          child: Image.asset(_poster(Settings.fashionVideos[s.fashionVideoIndex]),
-              fit: BoxFit.cover, color: night ? const Color(0xFF8E9BD6) : null, colorBlendMode: night ? BlendMode.multiply : null)),
+          child: Image.asset(kWordHourPhoto,
+              fit: BoxFit.cover, alignment: const Alignment(.35, -.2), color: night ? const Color(0xFF8E9BD6) : null, colorBlendMode: night ? BlendMode.multiply : null)),
       Positioned.fill(
           child: DecoratedBox(
               decoration: BoxDecoration(
@@ -432,7 +432,7 @@ class _Face2 extends StatelessWidget {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(when, key: const ValueKey('drop-entry-when'), maxLines: 1, softWrap: false, style: V4Type.greet())),
-          Text('Drop Studio', style: V4Type.title()),
+          Text('Word of the hour', style: V4Type.title()),
           const SizedBox(height: 14),
           // giant word: Anton poster sans, always whole
           // the word grows to the full width; its right edge is kept clear of
@@ -468,7 +468,7 @@ class _Face2 extends StatelessWidget {
                   constraints: const BoxConstraints(minHeight: 48),
                   child: Align(
                       alignment: Alignment.centerLeft,
-                      child: FittedBox(fit: BoxFit.scaleDown, child: Text('Peel into the studio', maxLines: 1, style: V4Type.action()))),
+                      child: FittedBox(fit: BoxFit.scaleDown, child: Text('See this word', maxLines: 1, style: V4Type.action()))),
                 ),
               ]),
             ),
@@ -519,7 +519,7 @@ class _Under extends StatelessWidget {
             fit: BoxFit.contain,
             alignment: Alignment.bottomRight,
             child: Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
-              Text('Next, ${_hh(at.add(const Duration(hours: 1)))}',
+              Text('Next word at ${_hh(at.add(const Duration(hours: 1)))}',
                   textScaler: TextScaler.noScaling,
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, height: 1.1, shadows: [Shadow(blurRadius: 4)])),
               Text((next?.word ?? '').toUpperCase(),

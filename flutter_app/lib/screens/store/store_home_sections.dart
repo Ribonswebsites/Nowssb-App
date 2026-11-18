@@ -1519,7 +1519,7 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     pillLabel: '50% OFF',
   ),
   StoreMidRailBannerData(
-    heading: 'FEATURED DROP',
+    heading: 'FEATURED WORD',
     artAsset: kStoreProductArt,
     accent: Color(0xFFFFB74D),
     svgBody: NwsbMarks.word,

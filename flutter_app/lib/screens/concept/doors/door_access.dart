@@ -88,7 +88,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('YOUR BAR', style: doorDisplay(44, ls: 0)),
                           const SizedBox(height: 2),
-                          Text('Five doors on your bottom bar · tap a socket to change it', style: doorSub()),
+                          Text('Choose the five shortcuts on your bottom bar', style: doorSub()),
                         ]),
                       ),
                       const SizedBox(height: 12),
@@ -182,7 +182,7 @@ class _S extends State<DoorAccessPicker> with TickerProviderStateMixin, DoorPhas
     return Semantics(
       button: true,
       selected: inBar == _socket,
-      label: 'Put ${f.label} in socket ${_socket + 1}',
+      label: 'Put ${f.label} in place ${_socket + 1}',
       child: GestureDetector(
         onTap: () {
           AppHaptics.medium();
@@ -241,7 +241,7 @@ class _SocketBar extends StatelessWidget {
                 child: Semantics(
                   button: true,
                   selected: i == active,
-                  label: 'Socket ${i + 1}: ${slots[i].label}',
+                  label: 'Place ${i + 1}: ${slots[i].label}',
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () => onTap(i),

@@ -82,7 +82,7 @@ class FashionBgDimControl extends StatelessWidget {
           builder: (context, v, _) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Background film',
+              const Text('Background video',
                   style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
               const Text('How much of the video shows behind the cards',
                   style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12)),
@@ -114,7 +114,7 @@ class FashionBgDimSlider extends StatelessWidget {
           children: [
             Row(children: [
               const Expanded(
-                child: Text('Background film',
+                child: Text('Background video',
                     style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
               ),
               Text('${((1 - v) * 100).round()}%',

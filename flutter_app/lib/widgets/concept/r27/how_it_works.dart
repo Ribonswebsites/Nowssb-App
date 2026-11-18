@@ -48,7 +48,7 @@ const r27DrawGuide = <StoreGuideStep>[
   StoreGuideStep(Icons.casino_rounded, 'How the lucky draw works',
       'Free to enter, one entry per person per day. No purchase and no coins are needed.'),
   StoreGuideStep(Icons.emoji_events_rounded, 'Winners',
-      'Winners are picked at random by the server. Prizes are gifts or coupons with no cash value.'),
+      'Winners are picked at random. Prizes are gifts or coupons with no cash value.'),
   StoreGuideStep(Icons.gavel_rounded, 'Rules',
       'The full official rules and the odds are on this page.'),
 ];

@@ -85,7 +85,7 @@ class CoinsBody extends StatelessWidget {
       children: [
         _hero(earned, cap),
         LuckyDrawGate(child:         _section('Daily lucky draw', [
-          _link(context, Icons.card_giftcard_rounded, 'Enter today\u2019s draw', 'Free to enter. Winners are picked on the server.',
+          _link(context, Icons.card_giftcard_rounded, 'Enter today\u2019s draw', 'Free to enter. Winners are picked at random.',
               () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LuckyDrawScreen()))),
           _link(context, Icons.emoji_events_rounded, 'Winners and reviews', 'See who won what and what they said.',
               () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LuckyDrawWinnersScreen()))),

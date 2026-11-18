@@ -168,7 +168,6 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with TickerProvid
   /// readout chip on the black collar. [slot] 0..2 is the chip's column.
   Widget _callout(BoxConstraints k, String label, int count, Offset anchor, int slot, double t) {
     final w = k.maxWidth, h = k.maxHeight;
-    final live = count + (math.sin(t * 2 * math.pi * 2 + label.length) * 14).round();
     final cw = (w - 28 - 16) / 3;
     final left = 14 + slot * (cw + 8);
     final top = h * _chipY;
@@ -188,13 +187,19 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with TickerProvid
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(label, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: Color(0xCCFFFFFF), height: 1.1)),
-              Text(_fmt(live), style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: _gold, height: 1.15)),
+              Text(_cue(label), style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: _gold, height: 1.15)),
             ]),
           ),
         ),
       ]),
     );
   }
+
+  static String _cue(String label) => switch (label) {
+        'EAR' => 'listen',
+        'NECK' => 'soften',
+        _ => 'release',
+      };
 
   static const _chipY = .655;
 
@@ -432,15 +437,15 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with TickerProvid
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            const Text('MESH PULSE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5, color: Color(0xB3FFFFFF))),
+                            const Text('BREATH', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5, color: Color(0xB3FFFFFF))),
                             const SizedBox(height: 6),
                             _meter(t),
                           ]),
                         ),
                         const SizedBox(width: 12),
                         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                          const Text('NODES LIVE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5, color: Color(0xB3FFFFFF))),
-                          Text(_fmt(p.nodes + (math.sin(t * 2 * math.pi * 3) * 22).round()),
+                          const Text('SESSIONS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.5, color: Color(0xB3FFFFFF))),
+                          Text(_people.length.toString().padLeft(2, '0'),
                               style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _gold, height: 1.15)),
                         ]),
                       ]),
@@ -449,7 +454,7 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with TickerProvid
                       const SizedBox(height: 14),
                       Row(children: [
                         const Expanded(
-                          child: Text('Golden Breath, Drop Studio and poster pages, in one dark home.',
+                          child: Text('Moving backgrounds, Golden Breath and a new word every hour.',
                               style: TextStyle(fontSize: 12.5, color: Color(0xCCFFFFFF), height: 1.3)),
                         ),
                         const SizedBox(width: 12),
@@ -490,7 +495,7 @@ class _NFashionPlusEntryState extends State<NFashionPlusEntry> with TickerProvid
                     alignment: Alignment.centerLeft,
                     decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0x26E0B04C)))),
                     child: const GentleMarqueeText(
-                      'LIVE MESH  ·  5 SESSIONS  ·  GOLDEN BREATH  ·  DROP STUDIO  ·  POSTER PAGES  ·  DIMMABLE LOOK  ·  ',
+                      'MOVING BACKGROUNDS  ·  5 SESSIONS  ·  GOLDEN BREATH  ·  WORD OF THE HOUR  ·  DIMMABLE LOOK  ·  ',
                       style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.4, color: _gold, height: 1.2),
                     ),
                   ),

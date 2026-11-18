@@ -246,7 +246,7 @@ class CouponsHero extends StatelessWidget {
           accent: ProgramAccent.coupons,
           eyebrow: 'NOWSSB COUPONS',
           title: cards.isEmpty ? 'Your scratch deck' : '${cards.length} card${cards.length == 1 ? '' : 's'} to scratch',
-          line: t['scratch'] == true ? 'Today\u2019s free card is scratched. A new one comes at midnight.' : 'One free card every day. The server draws it; scratching shows it.',
+          line: t['scratch'] == true ? 'Today\u2019s free card is scratched. A new one comes at midnight.' : 'One free card every day. Scratch it to see what you got.',
           art: CustomPaint(painter: _DeckPainter(count: cards.length)),
           stats: [(_n(cards.length), 'sealed'), (_n(coupons.length), 'discounts'), (t['scratch'] == true ? 'Done' : 'Ready', 'free card')],
         );

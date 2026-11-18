@@ -283,3 +283,21 @@ Prism face art for the three "Make this home yours" doors on Drop Studio. Origin
 | `door-background.webp` | Phone with a dark home-screen backdrop being swapped (gold-lit panel sliding over a darker one) |
 | `door-start-art.webp` | Phone showing the app opening art: white over-ear headphones with a gold accent |
 | `door-access.webp` | Antique gold key beside a folded black pass |
+
+## Footer posters (assets/footer/tab-*.png/.webp) and the word-of-the-hour card — real photographs (Nov 18)
+
+These replace the earlier generated footer posters and the card's diamond still. Every photo is under the [Pexels licence](https://www.pexels.com/license/) (free to use, modification allowed, no attribution required; credited anyway). The people were cut out in-house (BiRefNet) and set on a solid colour with Anton type. Each photo is used once in the app.
+
+| File | Photo | Photographer |
+|---|---|---|
+| `footer/tab-sound-of-stillness` | [Woman in yellow turtleneck with white headphones](https://www.pexels.com/photo/3769019/) | Andrea Piacquadio |
+| `footer/tab-breathe-new-noise` | [Man wearing white wireless headphones](https://www.pexels.com/photo/3394667/) | Sound On |
+| `footer/tab-calm-new-loud` | [Woman in grey sweatshirt wearing headphones](https://www.pexels.com/photo/3756961/) | Sound On |
+| `footer/tab-find-your-frequency` | [Woman in lotus position meditating](https://www.pexels.com/photo/7596969/) | Pavel Danilyuk |
+| `footer/tab-still-mind-still-style` | [Elderly man in a prayer pose](https://www.pexels.com/photo/7500651/) | Mikhail Nilov |
+| `footer/tab-ancient-calm-new-sound` | [Man wearing white clothes in a yoga pose](https://www.pexels.com/photo/9271208/) | Ajan Yogi |
+| `home/word-hour-listen.webp` (word-of-the-hour card) | [Man listening to music in wireless headphones](https://www.pexels.com/photo/7241365/) | Eren Li |
+
+Banner cut-outs `banners/promo/split-robot-lookback.png` and `banners/promo/pose-02.png` were re-cut from the same figures with a soft alpha edge (BiRefNet matte, black fringe removed); the figures are unchanged.
+
+`video/quote-wave.mp4` (Today's Quote pop-up): re-made from the 1280×720, 6.5 Mbps original film. The wave is only 636×420 inside that film, so it is now upscaled 2× with Real-ESRGAN (realesr-general-x4v3, BSD-3-Clause) to 1272×840 and encoded H.264 High at 2.4 Mbps, instead of the 1.1 Mbps 636×420 copy that phones had to stretch ~1.7×.

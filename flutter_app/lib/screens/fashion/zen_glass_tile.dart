@@ -151,7 +151,7 @@ class _ZenGlassTileState extends State<ZenGlassTile> with SingleTickerProviderSt
           const SizedBox(height: 2),
           const Text('Zen Plus', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: Colors.white, height: 1.2)),
           const SizedBox(height: 3),
-          Text(widget.on ? 'On — the tiles, the practice card and every photo background are playing' : 'Off — pages keep their photographs',
+          Text(widget.on ? 'On — backgrounds move' : 'Off — backgrounds stay still',
               softWrap: true, style: const TextStyle(fontSize: 11.5, color: Color(0xB3FFFFFF), height: 1.35)),
         ])),
         if (enter) const SizedBox(width: 10),

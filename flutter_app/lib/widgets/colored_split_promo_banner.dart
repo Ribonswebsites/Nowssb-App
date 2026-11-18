@@ -497,7 +497,7 @@ abstract final class SplitPromoExtras {
       SplitPromoArts.pose08,
     ),
     (
-      'A rare drop,\nonce only.',
+      'A rare word,\nonce only.',
       'View signatures',
       0xFF2C1810,
       0xFFC9A227,

@@ -59,12 +59,12 @@ class _FashionPlusScreenState extends State<FashionPlusScreen> {
   /// "7 changes" tells nobody anything.
   static const _changes = [
     ('Page backgrounds', 'Every store, library and intro page'),
-    ('The homes', 'The hero and the section films'),
-    ('The televisions', 'The tablet screens on both homes'),
-    ('The banners', 'The wide films between sections'),
-    ('The word page', 'The film behind a word'),
-    ('The Sound Library', 'Its archive backdrop'),
-    ('This page', 'The one you are looking at'),
+    ('The homes', 'The top of the home and its videos'),
+    ('The screens', 'The video screens on both homes'),
+    ('The banners', 'The wide videos on the home'),
+    ('The word page', 'The video behind a word'),
+    ('The Sound Library', 'Its background'),
+    ('This page', 'Zen Plus itself'),
   ];
 
   @override
@@ -187,8 +187,8 @@ class _Switch extends StatelessWidget {
             overline: 'NowssB Plus',
             title: currentOn ? 'Motion is on' : 'Motion is off',
             subtitle: currentOn
-                ? 'Backgrounds are playing'
-                : 'Backgrounds are holding their first frame',
+                ? 'Backgrounds move'
+                : 'Backgrounds stay still',
             trailing: Switch(
               value: currentOn,
               onChanged: onChanged,
@@ -331,10 +331,9 @@ class _Cost extends StatelessWidget {
           SizedBox(width: 12),
           Expanded(
             child: Text(
-              'A still costs nothing at all — with motion off the app never '
-              'even asks the phone for a decoder. With it on, at most four '
-              'clips decode at once, which is what keeps this from being '
-              'the thing that drains the battery.',
+              'With motion off, backgrounds stay still and use almost no '
+              'battery. With it on, only a few videos play at once, so your '
+              'battery lasts.',
               style: TextStyle(
                 fontSize: 12,
                 color: Color(0x99FFFFFF),
