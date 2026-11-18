@@ -301,3 +301,14 @@ These replace the earlier generated footer posters and the card's diamond still.
 Banner cut-outs `banners/promo/split-robot-lookback.png` and `banners/promo/pose-02.png` were re-cut from the same figures with a soft alpha edge (BiRefNet matte, black fringe removed); the figures are unchanged.
 
 `video/quote-wave.mp4` (Today's Quote pop-up): re-made from the 1280×720, 6.5 Mbps original film. The wave is only 636×420 inside that film, so it is now upscaled 2× with Real-ESRGAN (realesr-general-x4v3, BSD-3-Clause) to 1272×840 and encoded H.264 High at 2.4 Mbps, instead of the 1.1 Mbps 636×420 copy that phones had to stretch ~1.7×.
+
+## Profile tab card renders — `assets/profile/tabs/` (Nov 18, 2026)
+
+Four 720px square stills for the Profile tab card (Coins, Cart, Wishlist, Order history), first added in `763b854b`. The coins render was rebuilt in this commit so it uses only the official NowssB coin, the same way `banners/promo/earn-coins.webp` does.
+
+| File | Source | Notes |
+|---|---|---|
+| `profile/tabs/coins.webp` | Composite of the official NowssB coin (`icons/nwsb-coin.webp`) on a black plate, built with Python PIL (LANCZOS resize, 720×720 WebP, quality 82). The real coin was not redrawn or AI-generated. Rebuilt Nov 18 2026 after review of `763b854b`, matching the method recorded for `banners/promo/earn-coins.webp` (`e62ae9cc`, Nov 17 2026). | Coins tab ("NowssB coins"). Official NowssB coin asset already used on the Coins page. |
+| `profile/tabs/cart.webp` | First added in `763b854b` (Nov 18 2026) as a 720px square still for the Profile Cart tab card. No generation script, prompt, or third-party source is recorded in the repo or in git history. | Cart tab ("Your bag"). Source unverified; no outside licence is claimed. |
+| `profile/tabs/wishlist.webp` | First added in `763b854b` (Nov 18 2026) as a 720px square still for the Profile Wishlist tab card. No generation script, prompt, or third-party source is recorded in the repo or in git history. | Wishlist tab ("Saved"). Source unverified; no outside licence is claimed. |
+| `profile/tabs/orders.webp` | First added in `763b854b` (Nov 18 2026) as a 720px square still for the Profile Order history tab card. No generation script, prompt, or third-party source is recorded in the repo or in git history. | Orders tab ("Purchases"). Source unverified; no outside licence is claimed. |
