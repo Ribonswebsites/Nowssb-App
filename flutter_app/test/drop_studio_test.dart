@@ -463,6 +463,67 @@ void main() {
     }
   });
 
+  group('Word of the hour card: meaning and Listen now', () {
+    Word withAudio(Word w) => Word.from({...w.toMap(), 'audio': 'https://cdn.example/${w.key}.mp3'})!;
+    final at = DateTime(2026, 11, 19, 8, 10);
+
+    testWidgets('shows the real one-line meaning and the real next word', (t) async {
+      final sem = t.ensureSemantics();
+      await boot(t, Scaffold(body: Align(alignment: Alignment.topCenter,
+          child: EntryPeelV5(now: () => at, wordFor: hourWord, onOpenDrop: () {}))));
+      final w = hourWord(at)!, next = hourWord(at.add(const Duration(hours: 1)))!;
+      final m = t.widget<Text>(find.byKey(const ValueKey('drop-entry-meaning')));
+      expect(m.data, wordHourMeaning(w));
+      expect(m.data, isNotEmpty);
+      expect(w.meaning, startsWith(m.data!));
+      expect(m.maxLines, 1);
+      expect(find.text("Today's word · 8 AM"), findsOneWidget);
+      expect(find.text('Next word at 9 AM:'), findsOneWidget);
+      expect(find.text(next.word.toUpperCase()), findsWidgets);
+      expect(find.bySemanticsLabel(RegExp('Next word at 9 AM: ${next.word}')), findsWidgets);
+      expect(find.bySemanticsLabel('See this word: ${w.word}'), findsOneWidget);
+      sem.dispose();
+    });
+
+    testWidgets('Listen now plays the client recording; no recording -> See this word', (t) async {
+      Word? played, seen;
+      var studio = 0;
+      Future<void> card(bool rec) => boot(t, Scaffold(body: Align(alignment: Alignment.topCenter,
+          child: EntryPeelV5(
+              now: () => at,
+              wordFor: (d) => rec ? withAudio(hourWord(d)!) : hourWord(d),
+              onOpenDrop: () => studio++,
+              onListen: (w) => played = w,
+              onSeeWord: (w) => seen = w))));
+      await card(true);
+      expect(find.text('Listen now'), findsOneWidget);
+      expect(find.text('See this word'), findsNothing);
+      await t.tap(find.byKey(const ValueKey('drop-entry-cta')));
+      await t.pump();
+      expect(played?.key, hourWord(at)!.key);
+      expect(wordHasRecording(played!), isTrue);
+      expect(studio, 0);
+      await t.pumpWidget(const SizedBox());
+      await card(false);
+      expect(find.text('See this word'), findsOneWidget);
+      expect(find.text('Listen now'), findsNothing);
+      await t.tap(find.byKey(const ValueKey('drop-entry-cta')));
+      await t.pump();
+      expect(seen?.key, hourWord(at)!.key);
+      expect(studio, 0);
+    });
+
+    testWidgets('See this word opens the real word page', (t) async {
+      await boot(t, Scaffold(body: Align(alignment: Alignment.topCenter,
+          child: EntryPeelV5(now: () => at, wordFor: hourWord, onOpenDrop: () {}))));
+      await t.tap(find.byKey(const ValueKey('drop-entry-cta')));
+      await t.pump();
+      await t.pump(const Duration(milliseconds: 400));
+      expect(find.byType(WordDetail), findsOneWidget);
+      expect(t.widget<WordDetail>(find.byType(WordDetail)).word.key, hourWord(at)!.key);
+    });
+  });
+
   group('Drop entry v4 peel caption', () {
     double lin(double c) => c <= .04045 ? c / 12.92 : math.pow((c + .055) / 1.055, 2.4).toDouble();
     for (final w in [320.0, 390.0]) {

@@ -2,9 +2,12 @@
 ///   [DoorsPrismV5]  "Make this home yours": a turning 4-face prism, one real
 ///                   setting per face. Swipe OR tap a tab to turn; haptic on
 ///                   every face snap; tap the front face to open its hook.
-///   [EntryPeelV5]   Fashion-home entry card: this hour's film poster whose
-///                   corner is a real drag-to-peel revealing the next hour's
-///                   word; release springs back; tap anywhere enters.
+///   [EntryPeelV5]   Fashion-home "Word of the hour" card: this hour's word,
+///                   its real meaning and 'Listen now' (the client recording
+///                   in the Player; 'See this word' opens the word when there
+///                   is no recording yet). The corner peels to the next hour's
+///                   word; release springs back; tapping the card opens the
+///                   word-of-the-hour page.
 library;
 
 import 'dart:math' as math;
@@ -20,6 +23,9 @@ import 'drop_v4_concepts.dart' show DoorHooks, DoorKind, doorState, doorTitle, h
 import 'drop_v4_type.dart';
 import '../store/store_art.dart' show kNowssbStoreMark, meaningFlipArt, storeSubjectArt;
 import 'package:nowssb/data/app_haptics.dart';
+import '../../pronunciation/reference.dart' show referenceUrls;
+import '../practice_player.dart';
+import '../word_detail.dart';
 
 const _gold = Color(0xFFC8A96E);
 const _violet = Color(0xFF7C4DDB);
@@ -29,6 +35,21 @@ const _paper = Color(0xFFF3EADB);
 
 /// The word-of-the-hour card's own photo (Pexels, Eren Li — see CREDITS).
 const kWordHourPhoto = 'assets/home/word-hour-listen.webp';
+
+/// True when the client uploaded a recording of [w] (main, male or female).
+bool wordHasRecording(Word w) => referenceUrls(w).isNotEmpty;
+
+/// One short line of [w]'s real meaning for the card: the shortest of its
+/// short meanings, else its meaning up to the first full stop or semicolon.
+String wordHourMeaning(Word w) {
+  final short = [for (final m in w.meanings) m.trim()]..removeWhere((m) => m.isEmpty);
+  short.sort((a, b) => a.length.compareTo(b.length));
+  final base = w.meaning.trim();
+  var line = short.isNotEmpty && (base.isEmpty || short.first.length < base.length) ? short.first : base;
+  final cut = line.indexOf(RegExp(r'[.;]\s'));
+  if (cut > 0) line = line.substring(0, cut);
+  return line.endsWith('.') ? line.substring(0, line.length - 1) : line;
+}
 
 
 // ─── DOORS · prism ──────────────────────────────────────────────────────
@@ -265,8 +286,12 @@ String _hh(DateTime d) {
 }
 
 class EntryPeelV5 extends StatefulWidget {
-  const EntryPeelV5({super.key, this.onOpenDrop, this.now, this.debugPeel, this.wordFor});
+  const EntryPeelV5({super.key, this.onOpenDrop, this.now, this.debugPeel, this.wordFor, this.onListen, this.onSeeWord});
   final VoidCallback? onOpenDrop;
+  /// 'Listen now': play [Word]'s client recording. Null = open the Player.
+  final void Function(Word w)? onListen;
+  /// 'See this word' (no recording yet). Null = open the word's page.
+  final void Function(Word w)? onSeeWord;
   /// Clock override (tests). Null = the shared [DayClock] (local time,
   /// refreshes on the hour and on resume).
   final DateTime Function()? now;
@@ -298,6 +323,19 @@ class _EntryPeelV5State extends State<EntryPeelV5> with SingleTickerProviderStat
   void _open() {
     AppHaptics.light();
     widget.onOpenDrop?.call();
+  }
+
+  void _cta(Word w) {
+    AppHaptics.light();
+    if (wordHasRecording(w)) {
+      final go = widget.onListen;
+      if (go != null) return go(w);
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => PracticePlayerScreen(words: [w], title: w.word)));
+    } else {
+      final go = widget.onSeeWord;
+      if (go != null) return go(w);
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => WordDetail(word: w)));
+    }
   }
 
   void _release(double v) {
@@ -346,7 +384,7 @@ class _EntryPeelV5State extends State<EntryPeelV5> with SingleTickerProviderStat
                         Positioned(right: 0, bottom: 0, width: d, height: d, child: CustomPaint(painter: _FoldShadow())),
                         ClipPath(
                           clipper: _CornerCut(d),
-                          child: _Face2(word: w, at: at, part: part, band: band),
+                          child: _Face2(word: w, at: at, part: part, band: band, onCta: w == null ? null : () => _cta(w)),
                         ),
                         // the curled-back flap
                         Positioned(right: 0, bottom: 0, width: d, height: d, child: CustomPaint(painter: _FlapPainter(part))),
@@ -382,8 +420,9 @@ class _EntryPeelV5State extends State<EntryPeelV5> with SingleTickerProviderStat
 const double _strip = 118;
 
 class _Face2 extends StatelessWidget {
-  const _Face2({required this.word, required this.at, required this.part, required this.band});
+  const _Face2({required this.word, required this.at, required this.part, required this.band, this.onCta});
   final Word? word;
+  final VoidCallback? onCta;
   final DateTime at;
   final DayPart part;
   final double band;
@@ -462,14 +501,42 @@ class _Face2 extends StatelessWidget {
               padding: EdgeInsets.only(right: band - 4),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                 if (word != null)
-                  Text(word!.meaning, style: V4Type.sub().copyWith(color: Colors.white)),
-                const SizedBox(height: 2),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 48),
-                  child: Align(
+                  // the word's real meaning, always one line
+                  FittedBox(
+                      fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
-                      child: FittedBox(fit: BoxFit.scaleDown, child: Text('See this word', maxLines: 1, style: V4Type.action()))),
-                ),
+                      child: Text(wordHourMeaning(word!),
+                          key: const ValueKey('drop-entry-meaning'),
+                          maxLines: 1,
+                          softWrap: false,
+                          style: V4Type.sub().copyWith(color: Colors.white))),
+                const SizedBox(height: 2),
+                if (word != null)
+                  Semantics(
+                    container: true,
+                    button: true,
+                    label: wordHasRecording(word!) ? 'Listen now: ${word!.word}' : 'See this word: ${word!.word}',
+                    excludeSemantics: true,
+                    child: GestureDetector(
+                      key: const ValueKey('drop-entry-cta'),
+                      behavior: HitTestBehavior.opaque,
+                      onTap: onCta,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 48),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                  if (wordHasRecording(word!)) ...[
+                                    Icon(Icons.play_circle_fill_rounded, size: 22, color: V4Type.action().color ?? Colors.white),
+                                    const SizedBox(width: 6),
+                                  ],
+                                  Text(wordHasRecording(word!) ? 'Listen now' : 'See this word', maxLines: 1, style: V4Type.action()),
+                                ]))),
+                      ),
+                    ),
+                  ),
               ]),
             ),
           ),
@@ -514,19 +581,22 @@ class _Under extends StatelessWidget {
           bottom: 6,
           width: d * .5,
           height: d * .28,
-          child: FittedBox(
+          child: Semantics(
+           label: next == null ? null : 'Next word at ${_hh(at.add(const Duration(hours: 1)))}: ${next!.word}',
+           excludeSemantics: next != null,
+           child: FittedBox(
             key: const ValueKey('drop-entry-next'),
             fit: BoxFit.contain,
             alignment: Alignment.bottomRight,
             child: Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
-              Text('Next word at ${_hh(at.add(const Duration(hours: 1)))}',
+              Text(next == null ? 'Next word at ${_hh(at.add(const Duration(hours: 1)))}' : 'Next word at ${_hh(at.add(const Duration(hours: 1)))}:',
                   textScaler: TextScaler.noScaling,
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, height: 1.1, shadows: [Shadow(blurRadius: 4)])),
               Text((next?.word ?? '').toUpperCase(),
                   textScaler: TextScaler.noScaling,
                   style: const TextStyle(fontFamily: 'Anton', fontSize: 18, color: Colors.white, height: 1.15, shadows: [Shadow(blurRadius: 4)])),
             ]),
-          ),
+          )),
         ),
       ]);
 }
