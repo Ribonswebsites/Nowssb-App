@@ -2,6 +2,7 @@
 /// Mirrors website rmd-* / ms-detail / ebd layouts without inventing copy.
 library;
 
+import '../../features/stage_practice/stage_pack.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/content.dart';
@@ -39,6 +40,15 @@ void openAtelierWord(
       .toList();
   // A library word opens straight in Word Detail only when this account can
   // already open it; otherwise the product page with its Buy button.
+  // Words that ship with the client's recorded stages always open their
+  // own page: it shows the stages and practice, and its lock card sells
+  // the word when this account does not own it yet.
+  if (!signature && found.isNotEmpty && StagePack.forWord(found.first) != null) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => WordDetail(word: found.first)),
+    );
+    return;
+  }
   final open = found.isNotEmpty &&
       (signature
           ? Entitlements.instance.canOpenStoreWord(word, signature: true, price: price > 0 ? price : StorePrices.instance.priceFor('signature:$key', kind: 'signature'))

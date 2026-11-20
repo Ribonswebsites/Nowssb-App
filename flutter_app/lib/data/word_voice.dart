@@ -31,14 +31,21 @@ class WordVoice {
     ),
   );
 
-  static bool hasVoice(Word w) => w.voice.startsWith('http');
+  /// A recording that can be played: uploaded (http) or shipped inside the
+  /// app (`asset:assets/…`, the client-recorded words in
+  /// assets/content/client_words.json).
+  static bool hasVoice(Word w) => isRemote(w) || isBundled(w);
+
+  static bool isRemote(Word w) => w.voice.startsWith('http');
+  static bool isBundled(Word w) => w.voice.startsWith('asset:');
+  static String assetPath(Word w) => w.voice.substring('asset:'.length);
 
   /// The id a word's recording is downloaded under.
   static String downloadId(Word w) => 'word:${w.key}';
 
   /// Download ahead of time so the first play is instant. Never throws.
   static Future<void> prefetch(Word w) async {
-    if (!hasVoice(w)) return;
+    if (!isRemote(w)) return;
     try {
       await cache.getSingleFile(w.voice);
     } catch (_) {}
@@ -50,6 +57,19 @@ class WordVoice {
     if (!hasVoice(w)) return false;
     final token = ++_token;
     try {
+      if (isBundled(w)) {
+        final p = _player ??= AudioPlayer();
+        await p.stop();
+        await p.setAsset(assetPath(w));
+        if (token != _token) return true;
+        await p.setVolume(volume.clamp(0.0, 1.0));
+        await p.setSpeed(speed.clamp(0.5, 2.0));
+        final done = p.playerStateStream
+            .firstWhere((s) => s.processingState == ProcessingState.completed || token != _token);
+        unawaited(p.play());
+        await done.timeout(const Duration(minutes: 2), onTimeout: () => p.playerState);
+        return true;
+      }
       // A downloaded word plays from its encrypted copy, decrypted in memory.
       final offline = await SecureDownloads.instance.audioSource(downloadId(w));
       final file = offline == null ? await cache.getSingleFile(w.voice).timeout(const Duration(seconds: 15)) : null;

@@ -16,6 +16,17 @@ celebrations) are original procedural Flutter code written for this app
 | The 6 thinking orbs (Composing, Listening, Solving, Working, Searching, Shaping) | [`flutter_thinking_orbs`](https://pub.dev/packages/flutter_thinking_orbs) 0.1.0 by Bright Sunu, a port of [thinking-orbs](https://github.com/Jakubantalik/thinking-orbs) | MIT |
 | Entrance and loop effects | [`flutter_animate`](https://pub.dev/packages/flutter_animate) by Grant Skinner | BSD-3-Clause |
 
+## Practice stage music (`assets/words/america/*_music.m4a`)
+
+The "With music" version of each America stage plays the client's own
+recording over a soft drone, ducked under the voice. The voice is the
+client's recording only; nothing synthetic.
+
+| What | Source | Licence |
+|---|---|---|
+| Background drone | “meditationdrone1.wav” by Jim-Bretherick, [freesound.org/s/674255](https://freesound.org/s/674255/) | CC0 1.0 |
+| Voice noise reduction (build time only, not shipped) | ffmpeg `arnndn` with `std.rnnn` from [richardpl/arnndn-models](https://github.com/richardpl/arnndn-models) | BSD-3-Clause |
+
 ## Not yet traced
 
 `assets/anim/thinking/` and `assets/anim/loaders/` (the admin orb picker's

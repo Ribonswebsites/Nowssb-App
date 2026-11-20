@@ -288,6 +288,9 @@ flutter:
     - assets/login/
     - assets/media/
     - assets/content/
+    # Client-recorded practice stages (America): playback m4a, music
+    # versions, and the 16 kHz WAV references the scorer compares against.
+    - assets/words/america/
     - assets/subscription/
     - assets/hero-curve/
     - assets/meditation/

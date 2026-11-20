@@ -12,6 +12,7 @@ library;
 import '../features/downloads/downloads_screen.dart';
 import '../data/word_voice.dart';
 import '../features/downloads/download_button.dart';
+import '../features/stage_practice/staged_words_card.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -456,6 +457,7 @@ class _SlmFeed extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _libraryLead(pool),
+                          StagedWordsCard(words: allWords, onOpenWord: onOpenWord),
                           const DownloadsEntry(onlyWhenAny: true),
                         ],
                       ),

@@ -215,7 +215,7 @@ class CurrentlyPlayingAlbum extends StatelessWidget {
   /// so the session plays without a connection.
   Future<void> _saveOffline(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
-    final withVoice = words.where(WordVoice.hasVoice).toList();
+    final withVoice = words.where(WordVoice.isRemote).toList();
     if (withVoice.isEmpty) {
       messenger.showSnackBar(const SnackBar(
         content: EditableLabel('currently_playing_album.CurrentlyPlayingAlbum', 'These words use the built-in voice, which already works offline.'),

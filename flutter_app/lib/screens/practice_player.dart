@@ -5,6 +5,8 @@
 /// text-to-speech and completed words are recorded locally.
 library;
 
+import '../features/stage_practice/stage_pack.dart';
+import '../features/stage_practice/stage_practice_screen.dart';
 import '../features/downloads/download_button.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -1007,6 +1009,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   void _openPracticeLab() {
     if (!mounted || _practiceOpen) return;
+    // Words with the client's recorded stages practise stage by stage.
+    if (StagePack.forWord(_word) != null) {
+      _practiceOpen = true;
+      unawaited(openStagePractice(context, _word).whenComplete(() => _practiceOpen = false));
+      return;
+    }
     _practiceOpen = true;
     showGeneralDialog<void>(
       context: context,

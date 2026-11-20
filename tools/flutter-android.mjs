@@ -315,6 +315,15 @@ if (!m.includes('android.permission.REQUEST_INSTALL_PACKAGES')) {
     '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>',
   );
 }
+// Stage practice records the learner's voice (record plugin). The plugin's
+// own manifest merges this in too; stating it here keeps it explicit.
+if (!m.includes('android.permission.RECORD_AUDIO')) {
+  m = m.replace(
+    '<uses-permission android:name="android.permission.INTERNET"/>',
+    '<uses-permission android:name="android.permission.INTERNET"/>\n' +
+    '    <uses-permission android:name="android.permission.RECORD_AUDIO"/>',
+  );
+}
 if (!m.includes('android.permission.POST_NOTIFICATIONS')) {
   m = m.replace(
     '<uses-permission android:name="android.permission.INTERNET"/>',

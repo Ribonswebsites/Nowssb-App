@@ -45,6 +45,15 @@ class ContentStore extends ChangeNotifier {
   /// (or adds) the word with that key.
   Map<String, Map<String, dynamic>> _published = const {};
 
+  /// Words that ship inside the app with their own client recordings
+  /// (assets/content/client_words.json). Kept apart from library.json
+  /// because tools/export-content.mjs rewrites that file on every build,
+  /// and apart from `_base` because a Firestore content/library publish
+  /// replaces `_base` wholesale. Each one is added to the library unless a
+  /// word with the same key is already there (or archived in admin mode).
+  List<Word> _client = const [];
+  Map<String, Map<String, dynamic>> _clientRaw = const {};
+
   List<Word> _library = const [];
   List<Book> _books = const [];
   List<Shelf> _shelves = const [];
@@ -80,7 +89,47 @@ class ContentStore extends ChangeNotifier {
     _books = await _bundle('assets/content/books.json', Book.from);
     _shelves = await _bundle('assets/content/words.json', Shelf.from);
     _meanings = await _bundle('assets/content/meanings.json', Meaning.from);
+    await _loadClientWords();
   }
+
+  Future<void> _loadClientWords() async {
+    try {
+      final raw = jsonDecode(
+          await rootBundle.loadString('assets/content/client_words.json'));
+      final items = raw is Map ? raw['items'] : raw;
+      if (items is! List) return;
+      _setClientWords(items);
+    } catch (e) {
+      debugPrint('NowssB content: no client words ($e)');
+    }
+  }
+
+  /// Test hook: load client words (raw maps) and rebuild the library.
+  @visibleForTesting
+  void debugSetClientWords(List<dynamic> items) {
+    _setClientWords(items);
+    _recompute();
+    notifyListeners();
+  }
+
+  void _setClientWords(List<dynamic> items) {
+    final words = <Word>[];
+    final byKey = <String, Map<String, dynamic>>{};
+    for (final it in items) {
+      if (it is! Map) continue;
+      final m = Map<String, dynamic>.from(it);
+      final w = Word.from(m);
+      if (w == null) continue;
+      words.add(w);
+      byKey[w.key] = m;
+    }
+    _client = words;
+    _clientRaw = byKey;
+  }
+
+  /// The raw shipped entry for a client-recorded word (with its `practice`
+  /// block), or null when [key] is not one.
+  Map<String, dynamic>? clientWordRaw(String key) => _clientRaw[key];
 
   Future<List<T>> _bundle<T>(String path, T? Function(dynamic) parse) async {
     try {
@@ -223,10 +272,21 @@ class ContentStore extends ChangeNotifier {
   /// Base library with admin-mode edits laid over it, in the base order;
   /// brand-new words go at the end.
   void _recompute() {
-    if (_published.isEmpty) {
-      _library = _base;
-      return;
-    }
+    _library = _withClientWords(_overlayPublished());
+  }
+
+  List<Word> _withClientWords(List<Word> lib) {
+    if (_client.isEmpty) return lib;
+    final have = {for (final w in lib) w.key};
+    final extra = [
+      for (final w in _client)
+        if (!have.contains(w.key) && _published[w.key]?['status'] != 'archived') w
+    ];
+    return extra.isEmpty ? lib : [...lib, ...extra];
+  }
+
+  List<Word> _overlayPublished() {
+    if (_published.isEmpty) return _base;
     final out = <Word>[];
     final seen = <String>{};
     for (final w in _base) {
@@ -244,7 +304,7 @@ class ContentStore extends ChangeNotifier {
       final w = Word.from(e.value);
       if (w != null) out.add(w);
     }
-    _library = out;
+    return out;
   }
 
   /// The admin-mode doc for [key], raw, if there is one.

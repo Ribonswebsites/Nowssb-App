@@ -4,7 +4,10 @@ library;
 
 import 'package:flutter/material.dart';
 
+import '../../data/content.dart';
+import '../../data/models.dart';
 import '../../data/store_catalog.dart';
+import '../../features/stage_practice/stage_pack.dart';
 import '../../data/store_prices.dart';
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
@@ -128,10 +131,27 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         add(name, w.root, storeGroup(w.word), kRmWordImg, () => openAtelierWord(context, word: w.word, root: w.root, img: kRmWordImg, price: price));
       }
     }
+    for (final w in _stageWords()) {
+      final name = _cap(w.word);
+      add(name, _stageLine(w), 'Recorded stages', kRmWordImg, () => openAtelierWord(context, word: w.key, root: _stageLine(w), img: kRmWordImg, price: w.price));
+    }
     for (final row in kPlaceRows) {
       add(row.$1, row.$2, row.$3, kRmWordImg, () => openAtelierWord(context, word: row.$1, root: row.$2, img: kRmWordImg));
     }
     return out;
+  }
+
+  /// Library words that ship with the client's recorded practice stages.
+  List<Word> _stageWords() => [
+        for (final w in ContentStore.instance.library)
+          if (StagePack.forWord(w) != null) w,
+      ];
+
+  static String _cap(String w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}';
+
+  static String _stageLine(Word w) {
+    final n = StagePack.forWord(w)?.stages.length ?? 0;
+    return '$n recorded stages · practice with a score';
   }
 
   void _openDeal(DailyDeal d) => openAtelierWord(
@@ -144,7 +164,31 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
 
   @override
   Widget build(BuildContext context) {
+    final staged = [
+      for (final w in _stageWords())
+        if (_match(w.word, _stageLine(w))) w
+    ];
     final decks = <Widget>[
+        if (staged.isNotEmpty)
+          RoutineDeck(
+            title: 'Recorded stages',
+            banner: 'Recorded stages',
+            bannerSub: 'Teacher-recorded words you practise stage by stage',
+            cards: [
+              for (final w in staged)
+                WorkCard(
+                  category: 'Recorded stages',
+                  title: _cap(w.word),
+                  meta: _stageLine(w),
+                  action: 'Open',
+                  image: kNowssbStoreMark,
+                  flip: storeWaveFor(w.word),
+                  onTap: () => openAtelierWord(context, word: w.key, root: _stageLine(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}')),
+                  onCart: () => storeAddToCart(context, wordBagItem(name: _cap(w.word), root: _stageLine(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}'))),
+                  onBuy: () => storeBuyNow(context, wordBagItem(name: _cap(w.word), root: _stageLine(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}'))),
+                ),
+            ],
+          ),
         for (final cat in kRmCategories)
           if (cat.words.any((w) => _match(w.word, w.root)))
             RoutineDeck(

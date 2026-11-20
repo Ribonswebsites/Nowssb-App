@@ -1,0 +1,370 @@
+{
+ "raw": {
+  "1-1": {
+   "overall": 100.0,
+   "sounds": 100.0,
+   "rhythm": 100.0,
+   "pitch": 100.0,
+   "vowel": 100.0,
+   "completeness": 99.6
+  },
+  "1-2": {
+   "overall": 31.7,
+   "sounds": 20.8,
+   "rhythm": 32.9,
+   "pitch": 1.9,
+   "vowel": 40.5,
+   "completeness": 100.0
+  },
+  "1-3": {
+   "overall": 29.1,
+   "sounds": 38.3,
+   "rhythm": 2.1,
+   "pitch": 0.2,
+   "vowel": 25.5,
+   "completeness": 100.0
+  },
+  "2-1": {
+   "overall": 25.9,
+   "sounds": 28.5,
+   "rhythm": 2.2,
+   "pitch": 1.6,
+   "vowel": 24.6,
+   "completeness": 100.0
+  },
+  "2-2": {
+   "overall": 100.0,
+   "sounds": 100.0,
+   "rhythm": 100.0,
+   "pitch": 100.0,
+   "vowel": 100.0,
+   "completeness": 100.0
+  },
+  "2-3": {
+   "overall": 40.3,
+   "sounds": 44.9,
+   "rhythm": 17.6,
+   "pitch": 3.7,
+   "vowel": 62.4,
+   "completeness": 100.0
+  },
+  "3-1": {
+   "overall": 23.8,
+   "sounds": 32.0,
+   "rhythm": 0.1,
+   "pitch": 0.1,
+   "vowel": 5.9,
+   "completeness": 100.0
+  },
+  "3-2": {
+   "overall": 44.6,
+   "sounds": 43.8,
+   "rhythm": 52.4,
+   "pitch": 3.6,
+   "vowel": 46.1,
+   "completeness": 100.0
+  },
+  "3-3": {
+   "overall": 100.0,
+   "sounds": 100.0,
+   "rhythm": 100.0,
+   "pitch": 100.0,
+   "vowel": 100.0,
+   "completeness": 100.0
+  }
+ },
+ "ref": {
+  "1-1": {
+   "overall": 100.0,
+   "sounds": 100.0,
+   "rhythm": 100.0,
+   "pitch": 100.0,
+   "vowel": 100.0,
+   "completeness": 99.8
+  },
+  "1-2": {
+   "overall": 31.8,
+   "sounds": 20.7,
+   "rhythm": 33.8,
+   "pitch": 1.9,
+   "vowel": 40.1,
+   "completeness": 100.0
+  },
+  "1-3": {
+   "overall": 29.5,
+   "sounds": 38.8,
+   "rhythm": 1.8,
+   "pitch": 0.2,
+   "vowel": 27.6,
+   "completeness": 100.0
+  },
+  "2-1": {
+   "overall": 26.2,
+   "sounds": 29.8,
+   "rhythm": 2.1,
+   "pitch": 1.6,
+   "vowel": 23.9,
+   "completeness": 100.0
+  },
+  "2-2": {
+   "overall": 100.0,
+   "sounds": 100.0,
+   "rhythm": 100.0,
+   "pitch": 100.0,
+   "vowel": 100.0,
+   "completeness": 100.0
+  },
+  "2-3": {
+   "overall": 39.9,
+   "sounds": 44.9,
+   "rhythm": 15.8,
+   "pitch": 3.5,
+   "vowel": 62.4,
+   "completeness": 100.0
+  },
+  "3-1": {
+   "overall": 23.7,
+   "sounds": 32.0,
+   "rhythm": 0.1,
+   "pitch": 0.1,
+   "vowel": 5.6,
+   "completeness": 100.0
+  },
+  "3-2": {
+   "overall": 43.6,
+   "sounds": 43.7,
+   "rhythm": 49.0,
+   "pitch": 3.5,
+   "vowel": 44.5,
+   "completeness": 100.0
+  },
+  "3-3": {
+   "overall": 100.0,
+   "sounds": 100.0,
+   "rhythm": 100.0,
+   "pitch": 100.0,
+   "vowel": 100.0,
+   "completeness": 100.0
+  }
+ },
+ "degraded": {
+  "1-tempo0.8": {
+   "overall": 69.9,
+   "sounds": 84.4,
+   "rhythm": 35.8,
+   "pitch": 82.2,
+   "vowel": 44.0,
+   "completeness": 95.2
+  },
+  "1-tempo1.25": {
+   "overall": 65.3,
+   "sounds": 79.6,
+   "rhythm": 28.9,
+   "pitch": 74.4,
+   "vowel": 45.1,
+   "completeness": 94.0
+  },
+  "1-pitchn3": {
+   "overall": 65.1,
+   "sounds": 56.7,
+   "rhythm": 76.4,
+   "pitch": 26.9,
+   "vowel": 97.1,
+   "completeness": 96.4
+  },
+  "1-pitchp3": {
+   "overall": 70.7,
+   "sounds": 63.5,
+   "rhythm": 88.1,
+   "pitch": 29.3,
+   "vowel": 97.1,
+   "completeness": 100.0
+  },
+  "1-midcut": {
+   "overall": 64.0,
+   "sounds": 93.8,
+   "rhythm": 25.0,
+   "pitch": 90.8,
+   "vowel": 14.6,
+   "completeness": 58.1
+  },
+  "1-trunc": {
+   "overall": 50.7,
+   "sounds": 81.8,
+   "rhythm": 0.6,
+   "pitch": 14.6,
+   "vowel": 56.0,
+   "completeness": 100.0
+  },
+  "2-tempo0.8": {
+   "overall": 49.4,
+   "sounds": 72.8,
+   "rhythm": 7.7,
+   "pitch": 25.8,
+   "vowel": 42.8,
+   "completeness": 100.0
+  },
+  "2-tempo1.25": {
+   "overall": 58.0,
+   "sounds": 84.3,
+   "rhythm": 27.0,
+   "pitch": 26.5,
+   "vowel": 47.1,
+   "completeness": 100.0
+  },
+  "2-pitchn3": {
+   "overall": 68.3,
+   "sounds": 54.9,
+   "rhythm": 100.0,
+   "pitch": 19.2,
+   "vowel": 98.6,
+   "completeness": 100.0
+  },
+  "2-pitchp3": {
+   "overall": 70.2,
+   "sounds": 64.2,
+   "rhythm": 100.0,
+   "pitch": 19.2,
+   "vowel": 90.1,
+   "completeness": 99.7
+  },
+  "2-midcut": {
+   "overall": 65.3,
+   "sounds": 95.0,
+   "rhythm": 28.1,
+   "pitch": 78.9,
+   "vowel": 29.8,
+   "completeness": 61.7
+  },
+  "2-trunc": {
+   "overall": 40.7,
+   "sounds": 59.5,
+   "rhythm": 0.2,
+   "pitch": 37.9,
+   "vowel": 6.2,
+   "completeness": 100.0
+  },
+  "3-tempo0.8": {
+   "overall": 62.3,
+   "sounds": 84.2,
+   "rhythm": 35.2,
+   "pitch": 49.0,
+   "vowel": 34.9,
+   "completeness": 100.0
+  },
+  "3-tempo1.25": {
+   "overall": 55.5,
+   "sounds": 76.9,
+   "rhythm": 33.3,
+   "pitch": 20.4,
+   "vowel": 47.2,
+   "completeness": 100.0
+  },
+  "3-pitchn3": {
+   "overall": 64.0,
+   "sounds": 49.6,
+   "rhythm": 100.0,
+   "pitch": 5.6,
+   "vowel": 100.0,
+   "completeness": 100.0
+  },
+  "3-pitchp3": {
+   "overall": 66.7,
+   "sounds": 60.5,
+   "rhythm": 100.0,
+   "pitch": 1.7,
+   "vowel": 98.7,
+   "completeness": 100.0
+  },
+  "3-midcut": {
+   "overall": 58.7,
+   "sounds": 91.8,
+   "rhythm": 9.7,
+   "pitch": 60.2,
+   "vowel": 43.1,
+   "completeness": 62.5
+  },
+  "3-trunc": {
+   "overall": 35.0,
+   "sounds": 62.5,
+   "rhythm": 0.3,
+   "pitch": 7.1,
+   "vowel": 1.8,
+   "completeness": 100.0
+  }
+ },
+ "features": {
+  "1": {
+   "frames": 768,
+   "intervals": [
+    [
+     2.2575000000000003,
+     3.7975
+    ]
+   ],
+   "f0_median": 233.18327278634172,
+   "n_vowels": 1,
+   "snr": 28.44774870192265
+  },
+  "2": {
+   "frames": 988,
+   "intervals": [
+    [
+     4.4375,
+     6.4275
+    ]
+   ],
+   "f0_median": 183.24193404126981,
+   "n_vowels": 3,
+   "snr": 19.43015571272428
+  },
+  "3": {
+   "frames": 964,
+   "intervals": [
+    [
+     3.9175,
+     5.7875
+    ]
+   ],
+   "f0_median": 162.36387470295966,
+   "n_vowels": 2,
+   "snr": 17.68510811467842
+  },
+  "c1": {
+   "frames": 237,
+   "intervals": [
+    [
+     0.3475,
+     1.8875
+    ]
+   ],
+   "f0_median": 231.93831042137106,
+   "n_vowels": 1,
+   "snr": 28.40318048021993
+  },
+  "c2": {
+   "frames": 282,
+   "intervals": [
+    [
+     0.3575,
+     2.3375
+    ]
+   ],
+   "f0_median": 182.4670627657502,
+   "n_vowels": 3,
+   "snr": 19.216381627175195
+  },
+  "c3": {
+   "frames": 270,
+   "intervals": [
+    [
+     0.3575,
+     2.2175
+    ]
+   ],
+   "f0_median": 162.54834558455244,
+   "n_vowels": 2,
+   "snr": 17.064841408940566
+  }
+ }
+}
