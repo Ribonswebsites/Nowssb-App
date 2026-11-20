@@ -199,20 +199,16 @@ void main() {
     expect(Settings.defaultQuickActions, contains('zenplus'));
     expect(Settings.availableQuickActions, contains('zenplus'));
     await _app(t, Builder(builder: (c) => Scaffold(body: Center(child: TextButton(
-        onPressed: () => showHeaderActionsSheet(c, glassMode: false, onGlassToggle: () {}, onNotifications: () {}),
+        onPressed: () => showHeaderActionsSheet(c, onNotifications: () {}),
         child: const Text('quick'))))));
     await t.tap(find.text('quick'));
     for (var i = 0; i < 8; i++) {
       await t.pump(const Duration(milliseconds: 100));
     }
-    // Tap once to centre the Zen Plus tile, again to open it.
+    // One tap on the Zen Plus tile opens it.
     final tile = find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.endsWith('-Zen Plus'));
     expect(tile, findsOneWidget);
-    await t.tap(tile, warnIfMissed: false);
-    for (var i = 0; i < 10; i++) {
-      await t.pump(const Duration(milliseconds: 100));
-    }
-    await t.tap(find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.endsWith('-Zen Plus')), warnIfMissed: false);
+    await t.tap(tile);
     for (var i = 0; i < 10; i++) {
       await t.pump(const Duration(milliseconds: 100));
     }

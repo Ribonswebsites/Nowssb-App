@@ -1,20 +1,18 @@
-/// Your day on both homes (Ribon, Nov 18): one black banner in the language
-/// of the Normal home's New releases / Picked for you rows holding three
-/// glass buttons — Quick, Today and Your Earnings. Quick and Today open the
-/// very same sheets as the greeting's Quick and the Begin banner's Today
-/// (the host passes its own Quick opener; Today is ProgressPanel.open).
+/// Your day on both homes: one black banner holding three glass buttons —
+/// Quick, Today and Your Earnings. Quick and Today open the very same sheets
+/// as the greeting's Quick and the Begin banner's Today (the host passes its
+/// own Quick opener; Today is ProgressPanel.open).
 ///
-/// Your Earnings opens the Your Earnings tab: a deep-blur glass sheet with
-/// a black featured hero (Cash earned: a big count-up over a slowly drifting
-/// gold glow), a row of square tiles in the New releases style (Coins, Sold,
-/// Target ring, Your position, Under you, This month), Your position and
-/// Target cards and links, all on glass. It opens part way and expands to
-/// full screen (button, or drag the handle up) and collapses back.
+/// Your Earnings opens the Your Earnings tab: a deep-blur glass sheet with a
+/// black Cash earned hero, Coins and Sold, then the Your position and Target
+/// cards. Each figure is shown once and each card opens its own page. It
+/// opens part way and expands to full screen (button, or drag the handle up)
+/// and collapses back.
 ///
 /// Every number is the server's: EconomyMirror (users/{uid}/wallet/main,
 /// payout/main, sellerStats/main incl. teamCount, the summary's rank ladder)
 /// and the monthly sellers board (leaderboards/sellers_{month}). Coins are
-/// only shown here, never collected. Every tile opens its real page.
+/// only shown here, never collected.
 library;
 
 import 'dart:math' as math;
@@ -83,9 +81,6 @@ class EarnSnapshot {
     return null;
   }
 
-  String get subtitle => !live
-      ? 'Sign in to start earning'
-      : '$rank · ${place == null ? 'not on this month\u2019s board' : '#${place!.$1} this month'}';
 }
 
 final _boards = <String, Stream<DocumentSnapshot<Map<String, dynamic>>>>{};
@@ -165,7 +160,6 @@ class HomeTrioSection extends StatelessWidget {
       child: _BlackBanner(
         light: light,
         title: 'Your day',
-        subtitle: 'Shortcuts, today\u2019s goals and your earnings',
         child: ListenableBuilder(
           listenable: Listenable.merge([c, EconomyMirror.instance, FxBook.instance]),
           builder: (context, _) {
@@ -313,10 +307,10 @@ class _TrioButton extends StatelessWidget {
 
 /// The black card of New releases / Picked for you, header included.
 class _BlackBanner extends StatelessWidget {
-  const _BlackBanner({required this.light, required this.title, required this.subtitle, required this.child, this.trailing, this.onHead});
+  const _BlackBanner({required this.light, required this.title, this.subtitle, required this.child, this.trailing, this.onHead});
   final bool light;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final Widget? trailing;
   final Widget child;
   final VoidCallback? onHead;
@@ -352,11 +346,13 @@ class _BlackBanner extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.2)),
-                    const SizedBox(height: 3),
-                    Text(subtitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: _grey, fontSize: 11.5, fontWeight: FontWeight.w500, height: 1.2)),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 3),
+                      Text(subtitle!,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: _grey, fontSize: 11.5, fontWeight: FontWeight.w500, height: 1.2)),
+                    ],
                   ]),
                 ),
               ),
@@ -381,7 +377,7 @@ class _CashHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sub = !s.live
+    final sub = !s.live || (s.lifetimeCents == 0 && s.availableCents == 0)
         ? 'Sales through your links show up here'
         : '${_cents(s.availableCents)} available${s.availableCents > 0 ? ' · tap to request' : ''}';
     return Semantics(
@@ -532,204 +528,84 @@ class _DotWave extends CustomPainter {
   bool shouldRepaint(_DotWave old) => false;
 }
 
-// ─── square tiles (New releases style) ──────────────────────────────────────
-
-class _TileSpec {
-  const _TileSpec(this.id, this.label, this.sub, this.art, this.onTap);
-  final String id;
-  final String label;
-  final String sub;
-  final Widget art;
-  final void Function(BuildContext) onTap;
-}
-
-List<_TileSpec> _tiles(EarnSnapshot s) => [
-      _TileSpec('coins', 'Coins', s.live ? 'In your wallet' : 'Sign in', _Art(
-        colors: const [Color(0xFFF3E6BF), Color(0xFF8A6A28)],
-        icon: const Icon(Icons.toll_rounded, size: 18, color: Colors.black),
-        value: EarnCount(s.coins, format: (v) => '$v', style: _Art.big(dark: true)),
-        dark: true,
-      ), _Go.coins),
-      _TileSpec('sold', 'Sold', s.sold == 0 ? 'No sales yet' : 'Words & meanings', _Art(
-        colors: const [Color(0xFFB9A2FF), Color(0xFF3B2490)],
-        icon: const NwsbIcon(NwsbMarks.wordBag, size: 17, color: Colors.white, strokeWidth: 1.9),
-        value: EarnCount(s.sold, format: (v) => '$v', style: _Art.big()),
-      ), _Go.sales),
-      _TileSpec('target', 'Target', !s.live ? 'Sign in' : s.topRank ? 'Top rank' : 'to ${s.nextRank ?? 'next rank'}', _RingArt(s: s), _Go.targets),
-      _TileSpec('position', 'Your position', s.live ? s.rank : 'Not ranked', _Art(
-        colors: const [Color(0xFF2B2B33), Color(0xFF0E0E12)],
-        icon: const NwsbIcon(NwsbMarks.crown, size: 17, color: _gold, strokeWidth: 1.9),
-        value: Text(s.live ? _initials(s.rank) : '\u2014', maxLines: 1, style: _Art.big().copyWith(color: _gold)),
-        border: true,
-      ), _Go.team),
-      _TileSpec('under', 'Under you', s.under == 1 ? '1 person' : '${s.under} people', _Art(
-        colors: const [Color(0xFF8EC5FF), Color(0xFF1F4E8C)],
-        icon: const NwsbIcon(NwsbMarks.people, size: 17, color: Colors.white, strokeWidth: 1.9),
-        value: EarnCount(s.under, format: (v) => '$v', style: _Art.big()),
-      ), _Go.team),
-      _TileSpec('month', 'This month', s.place == null ? 'Not on board' : 'of ${s.place!.$2} sellers', _Art(
-        colors: const [Color(0xFFFFB3C7), Color(0xFF8C2E4E)],
-        icon: const NwsbIcon(NwsbMarks.trending, size: 17, color: Colors.white, strokeWidth: 1.9),
-        value: Text(s.place == null ? '\u2014' : '#${s.place!.$1}', maxLines: 1, style: _Art.big()),
-      ), _Go.sales),
-    ];
-
-String _initials(String rank) {
-  final parts = rank.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
-  if (parts.isEmpty) return '\u2014';
-  return parts.take(2).map((e) => e[0].toUpperCase()).join();
-}
+// ─── Coins and Sold: the two figures no other card shows ───────────────────
 
 class _TileRow extends StatelessWidget {
   const _TileRow({required this.s});
   final EarnSnapshot s;
   @override
-  Widget build(BuildContext context) {
-    final items = _tiles(s);
-    return ShaderMask(
-      blendMode: BlendMode.dstIn,
-      shaderCallback: (rect) => const LinearGradient(
-        colors: [Color(0xFF000000), Color(0xFF000000), Color(0x00000000)],
-        stops: [0.0, 0.85, 1.0],
-      ).createShader(rect),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        clipBehavior: Clip.none,
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          for (var i = 0; i < items.length; i++) ...[
-            if (i > 0) const SizedBox(width: _gap),
-            _SquareTile(spec: items[i]),
-          ],
-          const SizedBox(width: 24),
+  Widget build(BuildContext context) => IntrinsicHeight(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Expanded(
+            child: _StatCard(
+              id: 'coins',
+              label: 'Coins',
+              sub: s.live ? 'In your wallet' : 'Sign in to see',
+              value: s.coins,
+              icon: const Icon(Icons.toll_rounded, size: 19, color: Colors.black),
+              onTap: () => _Go.coins(context),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _StatCard(
+              id: 'sold',
+              label: 'Sold',
+              sub: !s.live ? 'Sign in to see' : s.sold == 0 ? 'No sales yet' : 'Words and meanings',
+              value: s.sold,
+              icon: const NwsbIcon(NwsbMarks.wordBag, size: 18, color: Colors.black, strokeWidth: 1.9),
+              onTap: () => _Go.sales(context),
+            ),
+          ),
         ]),
-      ),
-    );
-  }
+      );
 }
 
-class _SquareTile extends StatelessWidget {
-  const _SquareTile({required this.spec});
-  final _TileSpec spec;
+class _StatCard extends StatelessWidget {
+  const _StatCard({required this.id, required this.label, required this.sub, required this.value, required this.icon, required this.onTap});
+  final String id;
+  final String label;
+  final String sub;
+  final int value;
+  final Widget icon;
+  final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => Semantics(
         button: true,
-        label: '${spec.label}, ${spec.sub}',
+        label: '$label, $value, $sub',
         child: _Press(
-          key: ValueKey('earn-tile-${spec.id}'),
-          onTap: () => spec.onTap(context),
-          child: SizedBox(
-            width: _tile,
+          key: ValueKey('earn-tile-$id'),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+            decoration: _surface(),
             child: ExcludeSemantics(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                SizedBox(width: _tile, height: _tile, child: ClipRRect(borderRadius: BorderRadius.circular(_tileRadius), child: spec.art)),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: _tile,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(spec.label, maxLines: 1, softWrap: false, style: const TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w600, height: 1.15)),
-                  ),
+              child: Row(children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  child: icon,
                 ),
-                SizedBox(
-                  width: _tile,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(spec.sub, maxLines: 1, softWrap: false, style: const TextStyle(color: _grey, fontSize: 10, fontWeight: FontWeight.w500, height: 1.15)),
-                  ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: EarnCount(value, format: (v) => '$v', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.05, letterSpacing: -0.5)),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                    Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _grey, fontSize: 10.5, fontWeight: FontWeight.w500)),
+                  ]),
                 ),
               ]),
             ),
           ),
         ),
       );
-}
-
-/// A tile's "cover art": a gradient square with an icon and the figure.
-class _Art extends StatelessWidget {
-  const _Art({required this.colors, required this.icon, required this.value, this.dark = false, this.border = false});
-  final List<Color> colors;
-  final Widget icon;
-  final Widget value;
-  final bool dark;
-  final bool border;
-
-  static TextStyle big({bool dark = false}) =>
-      TextStyle(color: dark ? Colors.black : Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.0, letterSpacing: -0.5);
-
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(9, 9, 9, 8),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: colors),
-          borderRadius: BorderRadius.circular(_tileRadius),
-          border: border ? Border.all(color: const Color(0x55E8D5A3)) : null,
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          icon,
-          const Spacer(),
-          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.bottomLeft, child: value),
-        ]),
-      );
-}
-
-/// Target tile: a progress ring around words sold / target.
-class _RingArt extends StatelessWidget {
-  const _RingArt({required this.s});
-  final EarnSnapshot s;
-  @override
-  Widget build(BuildContext context) {
-    Widget ring(double v) => CustomPaint(
-          painter: _Ring(v),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(s.live ? '${s.sold}' : '0', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, height: 1)),
-                  Text(s.live ? '/ ${s.target}' : 'words', style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10, fontWeight: FontWeight.w700, height: 1.2)),
-                ]),
-              ),
-            ),
-          ),
-        );
-    return DecoratedBox(
-      decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF7FE0D0), Color(0xFF14524A)])),
-      child: _still(context)
-          ? ring(s.progress)
-          : TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: s.progress),
-              duration: const Duration(milliseconds: 1100),
-              curve: Curves.easeOutCubic,
-              builder: (context, v, _) => ring(v),
-            ),
-    );
-  }
-}
-
-class _Ring extends CustomPainter {
-  _Ring(this.v);
-  final double v;
-  @override
-  void paint(Canvas canvas, Size size) {
-    final c = size.center(Offset.zero);
-    final r = size.shortestSide / 2 - 9;
-    final base = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5
-      ..color = const Color(0x33FFFFFF);
-    canvas.drawCircle(c, r, base);
-    if (v <= 0) return;
-    final arc = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5
-      ..strokeCap = StrokeCap.round
-      ..color = Colors.white;
-    canvas.drawArc(Rect.fromCircle(center: c, radius: r), -math.pi / 2, 2 * math.pi * v, false, arc);
-  }
-
-  @override
-  bool shouldRepaint(_Ring old) => old.v != v;
 }
 
 /// Counts up to [value] (from its last value on change); still under
@@ -914,16 +790,8 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
             Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0x80FFFFFF), borderRadius: BorderRadius.circular(9))),
             const SizedBox(height: 12),
             Row(children: [
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('Your Earnings', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.3)),
-                  const SizedBox(height: 3),
-                  Text(s.subtitle,
-                      key: const ValueKey('earn-subtitle'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, fontWeight: FontWeight.w500)),
-                ]),
+              const Expanded(
+                child: Text('Your Earnings', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.3)),
               ),
               const SizedBox(width: 8),
               _HeadButton(
@@ -951,8 +819,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
         padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
         children: [
           _CashHero(s: s, tall: true, onTap: () => _Go.cash(context)),
-          const SizedBox(height: 16),
-          const _RowHead('At a glance'),
+          const SizedBox(height: 12),
           _TileRow(s: s),
           const SizedBox(height: 18),
           const _RowHead('Your position'),
@@ -960,22 +827,6 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
           const SizedBox(height: 18),
           const _RowHead('Target'),
           _TargetCard(s: s),
-          const SizedBox(height: 18),
-          _Wide(
-            key: const ValueKey('earn-open-earnings'),
-            mark: NwsbMarks.bars,
-            title: 'Earnings and payouts',
-            sub: 'Balance, payout account and activity',
-            onTap: () => _Go.cash(context),
-          ),
-          const SizedBox(height: 10),
-          _Wide(
-            key: const ValueKey('earn-open-sales'),
-            mark: NwsbMarks.trending,
-            title: 'Sales and leaderboard',
-            sub: 'Every cleared sale and this month\u2019s board',
-            onTap: () => _Go.sales(context),
-          ),
         ],
       );
 }
@@ -1148,44 +999,3 @@ class _TargetCard extends StatelessWidget {
     );
   }
 }
-
-class _Wide extends StatelessWidget {
-  const _Wide({super.key, required this.mark, required this.title, required this.sub, required this.onTap});
-  final String mark;
-  final String title;
-  final String sub;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: '$title, $sub',
-        child: _Press(
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
-            decoration: _surface(),
-            child: ExcludeSemantics(
-              child: Row(children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                  child: NwsbIcon(mark, size: 19, color: Colors.black, strokeWidth: 1.9),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 2),
-                    Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _grey, fontSize: 11.5, fontWeight: FontWeight.w500)),
-                  ]),
-                ),
-                const Icon(Icons.chevron_right_rounded, color: _seeAll),
-              ]),
-            ),
-          ),
-        ),
-      );
-}
-

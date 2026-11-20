@@ -36,8 +36,7 @@ const _out = String.fromEnvironment('TRIO_SHOTS');
 final _shotKey = GlobalKey();
 
 /// The hosts' Quick: the header actions sheet, exactly as the homes call it.
-void _quick(BuildContext c) => showHeaderActionsSheet(c,
-    glassMode: false, onGlassToggle: () {}, onNotifications: () {}, onStore: () {}, onPlayer: () {});
+void _quick(BuildContext c) => showHeaderActionsSheet(c, onNotifications: () {}, onStore: () {}, onPlayer: () {});
 
 Future<void> _mount(WidgetTester t, Widget Function(BuildContext) body,
     {double w = 412, double h = 915, bool light = false, double scale = 1, bool still = false, List<NavigatorObserver> obs = const []}) async {
@@ -104,6 +103,15 @@ void _signedIn() {
   m.nextSellerTarget = 25;
   m.sellerTier = 'Senior Officer';
   m.teamCount = 3;
+}
+
+/// A brand-new signed-in account exactly as the server starts it: no coins,
+/// no sales, first rank. The shots use this, not made-up figures.
+void _newAccount() {
+  _signedOut();
+  final m = EconomyMirror.instance;
+  m.live = true;
+  m.uid = 'new-user';
 }
 
 void _signedOut() {
@@ -269,8 +277,8 @@ void main() {
     expect(find.byType(TabBar), findsNothing);
     await t.pump(const Duration(seconds: 2));
     expect(find.text('140'), findsOneWidget);
-    expect(find.text('/ 25'), findsOneWidget);
-    expect(find.text('SO'), findsOneWidget);
+    expect(find.text('/ 25 words'), findsOneWidget);
+    expect(find.text('Senior Officer'), findsOneWidget);
     final part = t.getSize(_sheet).height;
     await t.tap(find.byKey(const ValueKey('earn-sheet-expand')));
     await _settle(t);
@@ -290,6 +298,48 @@ void main() {
     await t.drag(find.byKey(const ValueKey('earn-sheet-handle')), const Offset(0, 200));
     await _settle(t);
     expect(_sheet, findsNothing);
+    await _done(t);
+  });
+
+  testWidgets('earnings tab: every figure once, no repeated rows', (t) async {
+    _signedIn();
+    await _mount(t, _zen);
+    await _openEarnings(t);
+    await t.tap(find.byKey(const ValueKey('earn-sheet-expand')));
+    await _settle(t);
+    await t.pump(const Duration(seconds: 2));
+    // Rank, place and team live only in the Your position card.
+    expect(find.text('Senior Officer'), findsOneWidget);
+    expect(find.textContaining('this month\u2019s board'), findsNothing);
+    expect(find.text('3 people'), findsOneWidget);
+    expect(find.text('At a glance'), findsNothing);
+    for (final k in ['earn-tile-target', 'earn-tile-position', 'earn-tile-under', 'earn-tile-month', 'earn-open-earnings', 'earn-open-sales']) {
+      expect(find.byKey(ValueKey(k)), findsNothing, reason: k);
+    }
+    expect(find.text('Earnings and payouts'), findsNothing);
+    expect(find.text('Sales and leaderboard'), findsNothing);
+    await _done(t);
+  });
+
+  testWidgets('Your day: no filler line under the title', (t) async {
+    await _mount(t, _zen);
+    expect(find.text('Your day'), findsOneWidget);
+    expect(find.textContaining('Shortcuts, today'), findsNothing);
+    await _done(t);
+  });
+
+  testWidgets('Quick sheet: four shortcuts, no glass toggle, no add tile, one tap opens', (t) async {
+    await _mount(t, _zen);
+    await t.tap(find.byKey(const ValueKey('trio-quick')));
+    await _settle(t);
+    final sheet = find.byType(HeaderActionsSheet);
+    expect(sheet, findsOneWidget);
+    for (final l in ['Notifications', 'Store', 'Player', 'Zen Plus']) {
+      expect(find.descendant(of: sheet, matching: find.text(l)), findsOneWidget, reason: l);
+    }
+    for (final l in ['Glassmorphism on', 'Glassmorphism off', 'Glass on', 'Glass off', 'Add shortcut', 'Add', 'Swipe \u00b7 centre to open', 'Customize shortcuts']) {
+      expect(find.text(l), findsNothing, reason: l);
+    }
     await _done(t);
   });
 
@@ -319,14 +369,8 @@ void main() {
     ('earn-hero-cash', EarningsScreen, ''),
     ('earn-tile-coins', CoinsScreen, ''),
     ('earn-tile-sold', EarnTabsPage, 'sales'),
-    ('earn-tile-target', EarnTabsPage, 'targets'),
-    ('earn-tile-position', EarnTabsPage, 'team'),
-    ('earn-tile-under', EarnTabsPage, 'team'),
-    ('earn-tile-month', EarnTabsPage, 'sales'),
     ('earn-position-card', EarnTabsPage, 'team'),
     ('earn-target-card', EarnTabsPage, 'targets'),
-    ('earn-open-earnings', EarningsScreen, ''),
-    ('earn-open-sales', EarnTabsPage, 'sales'),
   ]) {
     testWidgets('tab: ${c.$1} opens ${c.$2} ${c.$3}', (t) async {
       final routes = <Route<dynamic>>[];
@@ -378,7 +422,7 @@ void main() {
     await _mount(t, _zen);
     await _shot(t, '00_warm');
     FlutterError.onError = warm;
-    _signedIn();
+    _newAccount();
     final shots = <(String, Widget Function(BuildContext), bool, String?)>[
       ('01_zen_home_three_buttons', _zen, false, null),
       ('02_normal_home_three_buttons', _normal, true, null),

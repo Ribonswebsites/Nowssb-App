@@ -136,19 +136,17 @@ class Settings extends ChangeNotifier {
   /// Website `heroStyle()` / `nwsb_hero_style`: `plain` | `full` | `tv`.
   String _heroStyle = 'plain';
 
-  /// Normal-home Quick actions carousel ids (Add tile is always appended in UI).
+  /// Quick actions sheet shortcut ids (both homes).
   static const defaultQuickActions = <String>[
     'notifications',
     'store',
     'player',
-    'glass',
     'zenplus',
   ];
   static const availableQuickActions = <String>[
     'notifications',
     'store',
     'player',
-    'glass',
     'zenplus',
   ];
   List<String> _quickActions = List<String>.from(defaultQuickActions);

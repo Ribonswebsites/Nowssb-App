@@ -513,8 +513,6 @@ class _HomeFashionState extends State<HomeFashion> {
   void _openQuickActions() {
     showHeaderActionsSheet(
       context,
-      glassMode: false,
-      onGlassToggle: () {},
       onNotifications: () => showNotificationsSheet(context),
       onStore: () => _go(3),
       onPlayer: () => _go(1),

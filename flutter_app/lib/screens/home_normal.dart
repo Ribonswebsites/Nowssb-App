@@ -199,7 +199,6 @@ class HomeNormal extends StatefulWidget {
 }
 
 class _HomeNormalState extends State<HomeNormal> {
-  bool _glassMode = false;
 
   @override
   void initState() {
@@ -215,7 +214,6 @@ class _HomeNormalState extends State<HomeNormal> {
   void dispose() {
     ContentStore.instance.removeListener(_onContent);
     Settings.instance.removeListener(_onSettings);
-    VideoPool.instance.setGlassHomeMode(false);
     super.dispose();
   }
 
@@ -316,11 +314,6 @@ class _HomeNormalState extends State<HomeNormal> {
   void _openQuickActions() {
     showHeaderActionsSheet(
       context,
-      glassMode: _glassMode,
-      onGlassToggle: () => setState(() {
-        _glassMode = !_glassMode;
-        VideoPool.instance.setGlassHomeMode(_glassMode);
-      }),
       onNotifications: () => showNotificationsSheet(context),
       onStore: () => NavScope.goTo(context, 3),
       onPlayer: () {
@@ -567,12 +560,6 @@ class _HomeNormalState extends State<HomeNormal> {
             child: _TopRow(
               onMenu: () => _openHomeMenu(context),
               onNotifications: () => showNotificationsSheet(context),
-              glassMode: _glassMode,
-              onGlassToggle: () => setState(() {
-                _glassMode = !_glassMode;
-                // Keep on-screen clips decoding while glass film is up.
-                VideoPool.instance.setGlassHomeMode(_glassMode);
-              }),
             ),
           ),
           Expanded(
@@ -593,40 +580,30 @@ class _HomeNormalState extends State<HomeNormal> {
       ),
     );
 
-    return NormalGlassMode(
-      enabled: _glassMode,
-      child: HomeSkinScope(
-        skin: HomeSkin.normal,
-        child: Scaffold(
-          backgroundColor:
-              _glassMode ? const Color(0xFFF7FAFF) : NwsbColors.surface,
-          body: _glassMode ? NormalGlassBackground(child: page) : page,
-        ),
+    return HomeSkinScope(
+      skin: HomeSkin.normal,
+      child: Scaffold(
+        backgroundColor: NwsbColors.surface,
+        body: page,
       ),
     );
   }
 }
 
 /// .nmh-toprow — logo + title on the left; Settings | Quick | Menu on the
-/// right. The expanding SVG control opens the glass 3D actions carousel.
+/// right. The Quick control opens the Quick actions sheet.
 class _TopRow extends StatelessWidget {
   const _TopRow({
     required this.onMenu,
     required this.onNotifications,
-    required this.glassMode,
-    required this.onGlassToggle,
   });
 
   final VoidCallback onMenu;
   final VoidCallback onNotifications;
-  final bool glassMode;
-  final VoidCallback onGlassToggle;
 
   void _openActions(BuildContext context) {
     showHeaderActionsSheet(
       context,
-      glassMode: glassMode,
-      onGlassToggle: onGlassToggle,
       onNotifications: () => showNotificationsSheet(context),
       onStore: () => NavScope.goTo(context, 3),
       onPlayer: () {

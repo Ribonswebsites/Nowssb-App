@@ -293,8 +293,6 @@ void main() {
     await t.pumpWidget(MaterialApp(
       theme: ThemeData(fontFamily: 'DM Sans'),
       home: HeaderActionsSheet(
-        glassMode: false,
-        onGlassToggle: () {},
         onNotifications: () {},
       ),
     ));

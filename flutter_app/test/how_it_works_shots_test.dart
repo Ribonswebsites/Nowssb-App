@@ -188,8 +188,6 @@ void main() {
           child: RepaintBoundary(
             key: key,
             child: HeaderActionsSheet(
-              glassMode: false,
-              onGlassToggle: _noop2,
               onNotifications: _noop2,
             ),
           ),
