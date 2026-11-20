@@ -10,6 +10,7 @@ import 'package:nowssb/features/account/profile_details.dart';
 import 'package:nowssb/features/account/referral_capture.dart';
 import 'package:nowssb/features/economy/coin_collect.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
+import 'package:nowssb/media/video_pool.dart';
 
 void main() {
   group('validation', () {
@@ -58,6 +59,7 @@ void main() {
     late List<Map<String, dynamic>> saved;
 
     setUp(() async {
+      VideoPool.debugDeadlines = false; // the page's film backdrop
       SharedPreferences.setMockInitialValues({});
       await ReferralCapture.instance.debugReset();
       await PendingCoins.instance.debugReset();

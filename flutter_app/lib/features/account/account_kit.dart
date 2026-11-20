@@ -1,97 +1,147 @@
-/// The look shared by Complete your profile and Bank / payout details: the
-/// dark NowssB surface with the violet glow, frosted glass cards with a
-/// hairline, gold for the one action that matters, white type.
+/// The look shared by Complete your profile and Bank / payout details. It
+/// is the Menu / Settings / Store / Sound Library language, built from the
+/// same widgets:
+///
+///  * the purple film behind ([AppBackdrop]) under the Menu's
+///    [QuietFilmVeil];
+///  * the Menu's top bar: white circle back button, `NOWSSB` in gold and
+///    the page name;
+///  * the Store's big white heading and grey subline;
+///  * cards are [GlassListCard] (white badge, small grey overline, big white
+///    title) and every row inside is the black [GlassTile] row: circle icon,
+///    hairline divider, text, arrow. Input rows are that same black row with
+///    a text field in place of the title;
+///  * the main action is the Sound Library / intro white bar with the ink
+///    label and an arrow;
+///  * pickers are the Settings choice sheet (dark glass, [GlassSearchField],
+///    black rows, a white pill on the current one).
 library;
 
-import 'dart:ui' show ImageFilter;
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../theme/tokens.dart';
+import '../../widgets/app_backdrop.dart';
+import '../../widgets/glass_list_card.dart';
 import 'countries.dart';
+
+export '../../widgets/glass_list_card.dart' show GlassListCard, GlassTile, kGlassMuted, kGlassTile;
 
 class AccountColors {
   AccountColors._();
-  static const bg = Color(0xFF07060F);
-  static const violet = Color(0xFF6B4BD8);
-  static const violetDeep = Color(0xFF2A1A5E);
-  static const glass = Color(0x1AFFFFFF);
-  static const glassStrong = Color(0x26FFFFFF);
-  static const hairline = Color(0x2EFFFFFF);
+  static const bg = NwsbColors.deep;
+  static const muted = kGlassMuted;
   static const soft = Color(0xB3FFFFFF);
-  static const faint = Color(0x80FFFFFF);
-  static const error = Color(0xFFFF8A80);
-  static const ok = Color(0xFF7CE0B4);
+  static const faint = Color(0x73FFFFFF);
+  static const hairline = Color(0x26FFFFFF);
+
+  /// The login screen's error ink.
+  static const error = Color(0xFFFFB4AB);
+  static const errorEdge = Color(0x99FFB4AB);
 }
 
-/// Full-screen page: violet glow behind, a round glass back button, title
-/// and kicker, then [children] in a scroll view.
+/// Full-screen page: film + veil, the Menu bar, a Store heading, then
+/// [children]; [bottom] is pinned under the list (the main action).
 class AccountPage extends StatelessWidget {
   const AccountPage({
     super.key,
     required this.kicker,
     required this.title,
     required this.children,
+    this.subtitle,
     this.onBack,
     this.trailing,
     this.bottom,
   });
 
+  /// Second word in the bar after NOWSSB ("Your account", "Earn").
   final String kicker;
   final String title;
+  final String? subtitle;
   final List<Widget> children;
   final VoidCallback? onBack;
   final Widget? trailing;
-
-  /// Pinned under the scroll view (the main action).
   final Widget? bottom;
 
   @override
   Widget build(BuildContext context) {
+    final top = MediaQuery.paddingOf(context).top;
+    final pad = MediaQuery.paddingOf(context).bottom;
     return Scaffold(
       backgroundColor: AccountColors.bg,
       resizeToAvoidBottomInset: true,
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          const Positioned.fill(child: _Glow()),
-          SafeArea(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-                  child: Row(
-                    children: [
-                      if (onBack != null)
-                        GlassIconButton(icon: Icons.arrow_back_ios_new_rounded, onTap: onBack!, semantic: 'Back')
-                      else
-                        const SizedBox(width: 4),
-                      const Spacer(),
-                      if (trailing != null) trailing!,
-                    ],
-                  ),
+          const Positioned.fill(child: AppBackdrop()),
+          const Positioned.fill(child: QuietFilmVeil()),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                padding: EdgeInsets.fromLTRB(onBack == null ? 18 : 12, top + 10, 16, 14),
+                decoration: const BoxDecoration(
+                  color: Color(0x66060C18),
+                  border: Border(bottom: BorderSide(color: Color(0x12FFFFFF))),
                 ),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                    children: [
-                      Text(kicker.toUpperCase(),
-                          style: const TextStyle(color: NwsbColors.gold, fontSize: 11.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
-                      const SizedBox(height: 6),
-                      Text(title,
-                          style: const TextStyle(color: Colors.white, fontSize: 30, height: 1.1, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
-                      const SizedBox(height: 18),
-                      ...children,
+                child: Row(children: [
+                  if (onBack != null) ...[
+                    AccountBackButton(onTap: onBack!),
+                    const SizedBox(width: 12),
+                  ],
+                  Expanded(
+                    child: Text.rich(
+                      TextSpan(children: [
+                        const TextSpan(
+                          text: 'NOWSSB',
+                          style: TextStyle(fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w700, color: NwsbColors.goldLight),
+                        ),
+                        const TextSpan(text: '  '),
+                        TextSpan(
+                          text: kicker,
+                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white),
+                        ),
+                      ]),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (trailing != null) trailing!,
+                ]),
+              ),
+              Expanded(
+                child: ListView(
+                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Text(title,
+                          style: const TextStyle(color: Colors.white, fontSize: 34, height: 1.0, fontWeight: FontWeight.w800, letterSpacing: -1.0)),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Text(subtitle!, style: const TextStyle(color: Color(0xAFFFFFFF), fontSize: 13, height: 1.3)),
+                      ),
                     ],
-                  ),
+                    const SizedBox(height: 18),
+                    ...children,
+                  ],
                 ),
-                if (bottom != null)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 6, 20, 14),
-                    child: bottom!,
+              ),
+              if (bottom != null)
+                Container(
+                  padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + pad),
+                  decoration: const BoxDecoration(
+                    color: Color(0x66060C18),
+                    border: Border(top: BorderSide(color: Color(0x12FFFFFF))),
                   ),
-              ],
-            ),
+                  child: bottom!,
+                ),
+            ],
           ),
         ],
       ),
@@ -99,139 +149,245 @@ class AccountPage extends StatelessWidget {
   }
 }
 
-class _Glow extends StatelessWidget {
-  const _Glow();
-  @override
-  Widget build(BuildContext context) {
-    return const DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment(0.7, -1.05),
-          radius: 1.25,
-          colors: [Color(0xFF3B2585), Color(0xFF160F33), AccountColors.bg],
-          stops: [0, 0.42, 1],
-        ),
-      ),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: Alignment(-1.1, 0.9),
-            radius: 0.9,
-            colors: [Color(0x40C8A96E), Color(0x00000000)],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Frosted glass card with a hairline.
-class GlassCard extends StatelessWidget {
-  const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.radius = 24, this.glow});
-  final Widget child;
-  final EdgeInsets padding;
-  final double radius;
-  final Color? glow;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(radius),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                (glow ?? Colors.white).withValues(alpha: glow == null ? 0.11 : 0.20),
-                Colors.white.withValues(alpha: 0.035),
-              ],
-            ),
-            border: Border.all(color: AccountColors.hairline),
-          ),
-          child: child,
-        ),
-      ),
-    );
-  }
-}
-
-class GlassIconButton extends StatelessWidget {
-  const GlassIconButton({super.key, required this.icon, required this.onTap, required this.semantic});
-  final IconData icon;
+/// The Menu's back button: a white circle with an ink arrow.
+class AccountBackButton extends StatelessWidget {
+  const AccountBackButton({super.key, required this.onTap});
   final VoidCallback onTap;
-  final String semantic;
 
   @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: semantic,
+      label: 'Back',
       child: GestureDetector(
         onTap: onTap,
+        behavior: HitTestBehavior.opaque,
         child: Container(
           width: 42,
           height: 42,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AccountColors.glassStrong,
-            border: Border.all(color: AccountColors.hairline),
-          ),
-          child: Icon(icon, size: 17, color: Colors.white),
+          decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+          child: const Icon(Icons.arrow_back, size: 19, color: NwsbColors.ink),
         ),
       ),
     );
   }
 }
 
-/// Small section label above a group of fields.
-class FieldLabel extends StatelessWidget {
-  const FieldLabel(this.text, {super.key, this.optional = false});
-  final String text;
+/// The plain surface of a [GlassListCard] for content that is not a header
+/// plus rows (a loading block, an error).
+class GlassCard extends StatelessWidget {
+  const GlassCard({super.key, required this.child, this.padding = const EdgeInsets.fromLTRB(14, 16, 14, 14)});
+  final Widget child;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          color: const Color(0x8C14141C),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: AccountColors.hairline),
+        ),
+        child: child,
+      ),
+    );
+  }
+}
+
+/// The circle a [GlassTile] opens with.
+class TileBadge extends StatelessWidget {
+  const TileBadge({super.key, this.icon, this.child, this.color = Colors.white});
+  final IconData? icon;
+  final Widget? child;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: const Color(0x1AFFFFFF),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0x1FFFFFFF)),
+      ),
+      child: child ?? Icon(icon, size: 18, color: color),
+    );
+  }
+}
+
+const _divider = SizedBox(
+  width: 25,
+  child: Center(child: SizedBox(width: 1, height: 28, child: ColoredBox(color: Color(0x26FFFFFF)))),
+);
+
+/// One black [GlassTile]-shaped row. [label] is the small grey line, [body]
+/// takes the title's place (a text field, a value). An [error] draws the
+/// login screen's error ink under the row and on its edge.
+class TileRow extends StatelessWidget {
+  const TileRow({
+    super.key,
+    required this.leading,
+    required this.label,
+    required this.body,
+    this.trailing,
+    this.onTap,
+    this.error,
+    this.optional = false,
+  });
+
+  final Widget leading;
+  final String label;
+  final Widget body;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final String? error;
   final bool optional;
+
+  @override
+  Widget build(BuildContext context) {
+    final bad = error != null;
+    final row = Material(
+      color: kGlassTile,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: bad ? AccountColors.errorEdge : Colors.transparent),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+          child: Row(children: [
+            leading,
+            _divider,
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                Text.rich(
+                  TextSpan(children: [
+                    TextSpan(text: label),
+                    if (optional) const TextSpan(text: '  ·  optional', style: TextStyle(color: AccountColors.faint, fontWeight: FontWeight.w500)),
+                  ]),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: kGlassMuted, fontSize: 11.5, fontWeight: FontWeight.w600, letterSpacing: 0.2),
+                ),
+                const SizedBox(height: 2),
+                body,
+              ]),
+            ),
+            if (trailing != null) ...[const SizedBox(width: 8), trailing!],
+          ]),
+        ),
+      ),
+    );
+    if (!bad) return row;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+      row,
+      FieldError(error!),
+    ]);
+  }
+}
+
+/// Validation line in the login screen's error ink.
+class FieldError extends StatelessWidget {
+  const FieldError(this.text, {super.key});
+  final String text;
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 7, top: 14),
-      child: Row(children: [
-        Text(text, style: const TextStyle(color: AccountColors.soft, fontSize: 13, fontWeight: FontWeight.w600)),
-        if (optional) const Text('  · optional', style: TextStyle(color: AccountColors.faint, fontSize: 12)),
+      padding: const EdgeInsets.fromLTRB(14, 7, 8, 0),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Padding(
+          padding: EdgeInsets.only(top: 1),
+          child: Icon(Icons.error_outline_rounded, size: 14, color: AccountColors.error),
+        ),
+        const SizedBox(width: 6),
+        Expanded(child: Text(text, style: const TextStyle(color: AccountColors.error, fontSize: 12, height: 1.35))),
       ]),
     );
   }
 }
 
-InputDecoration accountInput({String? hint, String? error, Widget? prefix, Widget? suffix}) {
-  OutlineInputBorder b(Color c, [double w = 1]) =>
-      OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: c, width: w));
-  return InputDecoration(
-    hintText: hint,
-    hintStyle: const TextStyle(color: Color(0x66FFFFFF)),
-    errorText: error,
-    errorStyle: const TextStyle(color: AccountColors.error, fontSize: 12),
-    errorMaxLines: 2,
-    filled: true,
-    fillColor: const Color(0x14FFFFFF),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-    prefixIcon: prefix,
-    suffixIcon: suffix,
-    enabledBorder: b(AccountColors.hairline),
-    focusedBorder: b(NwsbColors.gold, 1.4),
-    errorBorder: b(AccountColors.error),
-    focusedErrorBorder: b(AccountColors.error, 1.4),
-    disabledBorder: b(const Color(0x14FFFFFF)),
-  );
+/// The white text the Menu's search field types in, on a black row.
+const accountFieldStyle = TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700);
+
+/// A text field inside a [TileRow]: no box, no outline, white type.
+class TileInput extends StatelessWidget {
+  const TileInput({
+    super.key,
+    required this.controller,
+    required this.hint,
+    this.keyboard,
+    this.caps = TextCapitalization.none,
+    this.formatters,
+    this.onChanged,
+    this.autofill,
+    this.action,
+    this.spacing = 0,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final TextInputType? keyboard;
+  final TextCapitalization caps;
+  final List<TextInputFormatter>? formatters;
+  final ValueChanged<String>? onChanged;
+  final Iterable<String>? autofill;
+  final TextInputAction? action;
+  final double spacing;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      style: accountFieldStyle.copyWith(letterSpacing: spacing),
+      cursorColor: Colors.white,
+      keyboardType: keyboard,
+      textCapitalization: caps,
+      textInputAction: action ?? TextInputAction.next,
+      autocorrect: false,
+      enableSuggestions: false,
+      autofillHints: autofill,
+      inputFormatters: formatters,
+      onChanged: onChanged,
+      onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
+      decoration: InputDecoration(
+        isDense: true,
+        isCollapsed: true,
+        border: InputBorder.none,
+        contentPadding: const EdgeInsets.symmetric(vertical: 1),
+        hintText: hint,
+        hintStyle: const TextStyle(color: Color(0x59FFFFFF), fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0),
+      ),
+    );
+  }
 }
 
-const accountFieldStyle = TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500);
+/// The arrow a tappable [GlassTile] ends with.
+const tileArrow = Icon(Icons.arrow_forward_ios_rounded, size: 14, color: kGlassMuted);
 
-/// The gold primary action; a spinner while [busy].
-class GoldCta extends StatelessWidget {
-  const GoldCta({super.key, required this.label, required this.onTap, this.busy = false});
+/// The white pill that marks the current choice in a Settings sheet.
+class CurrentPill extends StatelessWidget {
+  const CurrentPill({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+      child: const Icon(Icons.check_rounded, size: 16, color: Color(0xFF0B0B10)),
+    );
+  }
+}
+
+/// The Sound Library / intro main action: a white bar, ink label in caps,
+/// an arrow. "Please wait" while [busy] (the login screen's busy state).
+class PrimaryBar extends StatelessWidget {
+  const PrimaryBar({super.key, required this.label, required this.onTap, this.busy = false});
   final String label;
   final VoidCallback? onTap;
   final bool busy;
@@ -239,29 +395,57 @@ class GoldCta extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null && !busy;
-    return AnimatedOpacity(
-      duration: const Duration(milliseconds: 200),
-      opacity: enabled || busy ? 1 : 0.45,
-      child: GestureDetector(
-        onTap: enabled ? onTap : null,
-        child: Container(
-          height: 56,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            gradient: const LinearGradient(colors: [Color(0xFFF3D58A), Color(0xFFC8A96E), Color(0xFFA9843C)]),
-            boxShadow: const [BoxShadow(color: Color(0x40C8A96E), blurRadius: 28, spreadRadius: -6, offset: Offset(0, 10))],
+    return Opacity(
+      opacity: enabled || busy ? 1 : 0.5,
+      child: Material(
+        color: Colors.white,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          child: SizedBox(
+            height: 54,
+            width: double.infinity,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Flexible(
+                child: Text(
+                  busy ? 'PLEASE WAIT' : label.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: NwsbColors.ink),
+                ),
+              ),
+              if (!busy) ...[
+                const SizedBox(width: 14),
+                const Icon(Icons.arrow_forward, size: 17, color: NwsbColors.ink),
+              ],
+            ]),
           ),
-          child: busy
-              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Color(0xFF1A1408)))
-              : Text(label, style: const TextStyle(color: Color(0xFF1A1408), fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: 0.2)),
         ),
       ),
     );
   }
 }
 
-/// A pill that selects one option.
+/// Quiet text action under the main bar ("Not now", "Cancel"), as the
+/// login screen's "Explore without account".
+class QuietAction extends StatelessWidget {
+  const QuietAction({super.key, required this.label, required this.onTap});
+  final String label;
+  final VoidCallback? onTap;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Text(label, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13, fontWeight: FontWeight.w600)),
+      ),
+    );
+  }
+}
+
+/// A choice pill: the Settings sheet's white pill when on, a glass circle
+/// row's fill when off.
 class GlassChoice extends StatelessWidget {
   const GlassChoice({super.key, required this.label, required this.selected, required this.onTap, this.icon});
   final String label;
@@ -271,62 +455,93 @@ class GlassChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = selected ? const Color(0xFF0B0B10) : Colors.white;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
-          color: selected ? NwsbColors.gold.withValues(alpha: 0.22) : const Color(0x12FFFFFF),
-          border: Border.all(color: selected ? NwsbColors.gold : AccountColors.hairline, width: selected ? 1.3 : 1),
+          borderRadius: BorderRadius.circular(20),
+          color: selected ? Colors.white : const Color(0x1AFFFFFF),
+          border: Border.all(color: selected ? Colors.white : const Color(0x1FFFFFFF)),
         ),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[Icon(icon, size: 16, color: selected ? NwsbColors.goldLight : AccountColors.soft), const SizedBox(width: 6)],
-          Text(label, style: TextStyle(color: selected ? NwsbColors.goldLight : AccountColors.soft, fontWeight: FontWeight.w700, fontSize: 13.5)),
+          if (icon != null) ...[Icon(icon, size: 16, color: ink), const SizedBox(width: 6)],
+          Text(label, style: TextStyle(color: ink, fontWeight: FontWeight.w700, fontSize: 13.5)),
         ]),
       ),
     );
   }
 }
 
-/// Tappable field that shows the chosen country and opens [pickCountry].
+/// Flag in the tile circle.
+class FlagBadge extends StatelessWidget {
+  const FlagBadge(this.country, {super.key});
+  final NwsbCountry? country;
+  @override
+  Widget build(BuildContext context) {
+    return TileBadge(
+      child: country == null
+          ? const Icon(Icons.public_rounded, size: 18, color: Colors.white)
+          : Text(country!.flag, style: const TextStyle(fontSize: 18)),
+    );
+  }
+}
+
+/// A black row that shows the chosen country and opens [pickCountry].
 class CountryField extends StatelessWidget {
-  const CountryField({super.key, required this.country, required this.onPicked, this.showDial = false, this.error, this.fieldKey});
+  const CountryField({super.key, required this.country, required this.onPicked, this.label = 'Country', this.error, this.fieldKey});
   final NwsbCountry? country;
   final ValueChanged<NwsbCountry> onPicked;
-  final bool showDial;
+  final String label;
   final String? error;
   final Key? fieldKey;
 
   @override
   Widget build(BuildContext context) {
     final c = country;
-    return GestureDetector(
+    return TileRow(
       key: fieldKey,
+      leading: FlagBadge(c),
+      label: label,
+      error: error,
       onTap: () async {
         final picked = await pickCountry(context, selected: c?.code);
         if (picked != null) onPicked(picked);
       },
-      child: InputDecorator(
-        isEmpty: c == null,
-        decoration: accountInput(hint: 'Choose your country', error: error, suffix: const Icon(Icons.expand_more_rounded, color: AccountColors.soft)),
-        child: c == null
-            ? null
-            : Text('${c.flag}  ${c.name}${showDial ? '  +${c.dial}' : ''}', style: accountFieldStyle, overflow: TextOverflow.ellipsis),
-      ),
+      body: Text(c?.name ?? 'Choose your country',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: c == null ? const TextStyle(color: Color(0x59FFFFFF), fontSize: 15, fontWeight: FontWeight.w500) : accountFieldStyle),
+      trailing: tileArrow,
     );
   }
 }
 
+/// The Settings choice sheet frame: a [GlassListCard] pane above the
+/// dimmed page.
+Future<T?> showAccountSheet<T>(BuildContext context, {required WidgetBuilder builder, bool tall = false}) {
+  return showModalBottomSheet<T>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    barrierColor: const Color(0x99000000),
+    isScrollControlled: true,
+    builder: (ctx) {
+      final bottom = MediaQuery.paddingOf(ctx).bottom;
+      final kb = MediaQuery.viewInsetsOf(ctx).bottom;
+      final body = Padding(
+        padding: EdgeInsets.fromLTRB(16, 0, 16, 12 + bottom + kb),
+        child: builder(ctx),
+      );
+      return tall ? SizedBox(height: MediaQuery.sizeOf(ctx).height * 0.86, child: body) : body;
+    },
+  );
+}
+
 /// Searchable country sheet (all ISO countries with calling codes).
 Future<NwsbCountry?> pickCountry(BuildContext context, {String? selected}) {
-  return showModalBottomSheet<NwsbCountry>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (ctx) => _CountrySheet(selected: selected),
-  );
+  return showAccountSheet<NwsbCountry>(context, tall: true, builder: (_) => _CountrySheet(selected: selected));
 }
 
 class _CountrySheet extends StatefulWidget {
@@ -337,52 +552,154 @@ class _CountrySheet extends StatefulWidget {
 }
 
 class _CountrySheetState extends State<_CountrySheet> {
-  String _q = '';
+  final _search = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _search.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final q = _q.trim().toLowerCase();
+    final q = _search.text.trim().toLowerCase();
     final list = kNwsbCountries
         .where((c) => q.isEmpty || c.name.toLowerCase().contains(q) || c.code.toLowerCase() == q || '+${c.dial}'.startsWith(q.startsWith('+') ? q : '+$q'))
         .toList();
-    return Container(
-      height: MediaQuery.sizeOf(context).height * 0.82,
-      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
-      decoration: const BoxDecoration(
-        color: Color(0xFF110D22),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        border: Border(top: BorderSide(color: AccountColors.hairline)),
+    return ClipRRect(
+      key: const Key('country-sheet'),
+      borderRadius: BorderRadius.circular(28),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 16, 14, 0),
+        decoration: BoxDecoration(
+          color: const Color(0xF014141C),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: AccountColors.hairline),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Row(children: [
+            Container(
+              width: 46,
+              height: 46,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(Icons.public_rounded, size: 22, color: Color(0xFF0B0B10)),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('CHOOSE', style: TextStyle(color: kGlassMuted, fontSize: 10.5, fontWeight: FontWeight.w700, letterSpacing: 1.4)),
+                SizedBox(height: 2),
+                Text('Country', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.15)),
+              ]),
+            ),
+          ]),
+          const SizedBox(height: 14),
+          KeyedSubtree(key: const Key('country-search'), child: GlassSearchField(controller: _search, hint: 'Search country or +code')),
+          const SizedBox(height: 10),
+          Expanded(
+            child: list.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 28),
+                    child: Text('No country called "${_search.text.trim()}".', textAlign: TextAlign.center, style: const TextStyle(color: kGlassMuted, fontSize: 13)),
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.only(bottom: 14),
+                    itemCount: list.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (_, i) {
+                      final c = list[i];
+                      final on = c.code == widget.selected;
+                      return TileRow(
+                        key: Key('country-${c.code}'),
+                        leading: FlagBadge(c),
+                        label: '+${c.dial}',
+                        onTap: () => Navigator.pop(context, c),
+                        body: Text(c.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: accountFieldStyle),
+                        trailing: on ? const CurrentPill() : tileArrow,
+                      );
+                    },
+                  ),
+          ),
+        ]),
       ),
-      child: Column(children: [
-        const SizedBox(height: 10),
-        Container(width: 42, height: 4, decoration: BoxDecoration(color: const Color(0x40FFFFFF), borderRadius: BorderRadius.circular(4))),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 8),
-          child: TextField(
-            key: const Key('country-search'),
-            autofocus: false,
-            style: accountFieldStyle,
-            onChanged: (v) => setState(() => _q = v),
-            decoration: accountInput(hint: 'Search country or +code', prefix: const Icon(Icons.search_rounded, color: AccountColors.soft)),
+    );
+  }
+}
+
+/// Date of birth in the Settings sheet frame: a dark wheel and the white
+/// bar. Returns the picked day.
+Future<DateTime?> pickBirthday(BuildContext context, {DateTime? initial}) {
+  final now = DateTime.now();
+  var value = initial ?? DateTime(now.year - 25, now.month, now.day);
+  return showAccountSheet<DateTime>(
+    context,
+    builder: (ctx) => GlassListCard(
+      key: const Key('dob-sheet'),
+      margin: EdgeInsets.zero,
+      icon: Icons.cake_outlined,
+      overline: 'Optional',
+      title: 'Date of birth',
+      subtitle: 'Only used to check you are 13 or older.',
+      children: [
+        Container(
+          height: 190,
+          decoration: BoxDecoration(color: kGlassTile, borderRadius: BorderRadius.circular(20)),
+          child: CupertinoTheme(
+            data: const CupertinoThemeData(
+              brightness: Brightness.dark,
+              textTheme: CupertinoTextThemeData(dateTimePickerTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600)),
+            ),
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              initialDateTime: value,
+              minimumDate: DateTime(now.year - 110),
+              maximumDate: now,
+              onDateTimeChanged: (d) => value = d,
+            ),
           ),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: list.length,
-            itemBuilder: (_, i) {
-              final c = list[i];
-              final on = c.code == widget.selected;
-              return ListTile(
-                key: Key('country-${c.code}'),
-                onTap: () => Navigator.pop(context, c),
-                leading: Text(c.flag, style: const TextStyle(fontSize: 22)),
-                title: Text(c.name, style: TextStyle(color: on ? NwsbColors.goldLight : Colors.white, fontWeight: on ? FontWeight.w700 : FontWeight.w500)),
-                trailing: Text('+${c.dial}', style: const TextStyle(color: AccountColors.faint)),
-              );
-            },
-          ),
-        ),
-      ]),
+        const SizedBox(height: 4),
+        PrimaryBar(key: const Key('dob-done'), label: 'Done', onTap: () => Navigator.pop(ctx, value)),
+      ],
+    ),
+  );
+}
+
+/// A short black message strip floating over the page (the app's toast).
+void showAccountToast(BuildContext context, String text) {
+  ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: kGlassTile,
+    elevation: 0,
+    margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: AccountColors.hairline)),
+    content: Row(children: [
+      const Icon(Icons.check_rounded, size: 18, color: Colors.white),
+      const SizedBox(width: 10),
+      Expanded(child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w600))),
+    ]),
+  ));
+}
+
+/// Placeholder block while a page loads.
+class LoadingBlock extends StatelessWidget {
+  const LoadingBlock({super.key, required this.height});
+  final double height;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        color: const Color(0x8C14141C),
+        border: Border.all(color: AccountColors.hairline),
+      ),
     );
   }
 }

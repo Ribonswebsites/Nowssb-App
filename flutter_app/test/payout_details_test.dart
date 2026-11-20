@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:nowssb/features/account/payout_details_page.dart';
 import 'package:nowssb/features/account/payout_methods.dart';
 import 'package:nowssb/features/economy/economy_api.dart';
+import 'package:nowssb/media/video_pool.dart';
 
 const _all = ['upi', 'bank_in', 'us_ach', 'gb_bank', 'iban', 'paypal', 'wise'];
 
@@ -65,6 +66,7 @@ void main() {
     Map<String, dynamic> account = {};
 
     setUp(() {
+      VideoPool.debugDeadlines = false; // the page's film backdrop
       SharedPreferences.setMockInitialValues({});
       calls = [];
       account = {'methods': _all};

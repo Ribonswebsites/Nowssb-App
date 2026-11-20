@@ -104,21 +104,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   }
 
   Future<void> _pickDob() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _dob ?? DateTime(now.year - 25, now.month, now.day),
-      firstDate: DateTime(now.year - 110),
-      lastDate: now,
-      helpText: 'Date of birth',
-      builder: (ctx, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(primary: NwsbColors.gold, onPrimary: Color(0xFF1A1408), surface: Color(0xFF16112B)),
-        ),
-        child: child!,
-      ),
-    );
-    if (picked != null) setState(() => _dob = picked);
+    FocusScope.of(context).unfocus();
+    final picked = await pickBirthday(context, initial: _dob);
+    if (picked != null && mounted) setState(() => _dob = picked);
   }
 
   bool _serverPaysProfileCoins() {
@@ -186,191 +174,208 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   Widget build(BuildContext context) {
     final name = _name.text.trim();
     return AccountPage(
-      kicker: widget.editing ? 'Your account' : 'Welcome to NowssB',
+      kicker: widget.editing ? 'Your account' : 'Welcome',
       title: widget.editing ? 'Your details' : 'Complete your profile',
+      subtitle: 'So rewards, referrals and payouts reach the right person.',
       onBack: widget.editing ? () => Navigator.maybePop(context) : null,
-      bottom: Column(mainAxisSize: MainAxisSize.min, children: [
-        if (_saveError != null)
-          Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(_saveError!, style: const TextStyle(color: AccountColors.error, fontSize: 13))),
-        GoldCta(key: const Key('profile-save'), label: widget.editing ? 'Save details' : 'Save and continue', busy: _busy, onTap: _save),
-        if (widget.onSkip != null)
-          TextButton(
-            key: const Key('profile-skip'),
-            onPressed: _busy ? null : widget.onSkip,
-            child: const Text('Not now', style: TextStyle(color: AccountColors.soft, fontWeight: FontWeight.w600)),
-          ),
+      bottom: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        if (_saveError != null) Padding(padding: const EdgeInsets.only(bottom: 10), child: FieldError(_saveError!)),
+        PrimaryBar(key: const Key('profile-save'), label: widget.editing ? 'Save details' : 'Save and continue', busy: _busy, onTap: _save),
+        if (widget.onSkip != null) QuietAction(key: const Key('profile-skip'), label: 'Not now', onTap: _busy ? null : widget.onSkip),
       ]),
       children: [
-        GlassCard(
-          glow: AccountColors.violet,
-          child: Row(children: [
-            Container(
-              width: 58,
-              height: 58,
-              alignment: Alignment.center,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(colors: [Color(0xFFF3D58A), Color(0xFFA9843C)]),
-                boxShadow: [BoxShadow(color: Color(0x66C8A96E), blurRadius: 18)],
+        // The Menu card: white badge (the initial), overline, the name.
+        _ProfileHead(name: name, filled: _filled),
+        GlassListCard(
+          icon: Icons.badge_outlined,
+          overline: 'About you',
+          title: 'Your details',
+          children: [
+            TileRow(
+              key: const Key('profile-name'),
+              leading: const TileBadge(icon: Icons.person_outline_rounded),
+              label: 'Full name',
+              error: _nameError,
+              body: TileInput(
+                controller: _name,
+                hint: 'As you want it on NowssB',
+                caps: TextCapitalization.words,
+                autofill: const [AutofillHints.name],
+                onChanged: (_) => setState(() {}),
               ),
-              child: name.isEmpty
-                  ? const Icon(Icons.person_rounded, color: Color(0xFF1A1408), size: 28)
-                  : Text(name.characters.first.toUpperCase(),
-                      style: const TextStyle(color: Color(0xFF1A1408), fontSize: 24, fontWeight: FontWeight.w800)),
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(name.isEmpty ? 'Your name here' : name,
-                    maxLines: 1, overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 4),
-                const Text('So rewards, referrals and payouts reach the right person.',
-                    style: TextStyle(color: AccountColors.soft, fontSize: 12.5, height: 1.3)),
-                const SizedBox(height: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: _filled / 4,
-                    minHeight: 6,
-                    backgroundColor: const Color(0x1FFFFFFF),
-                    valueColor: const AlwaysStoppedAnimation(NwsbColors.gold),
-                  ),
-                ),
-              ]),
+            CountryField(
+              fieldKey: const Key('profile-country'),
+              country: _country,
+              error: _countryError,
+              onPicked: (c) => setState(() {
+                _country = c;
+                if (_phone.text.trim().isEmpty) _dial = c;
+              }),
             ),
-          ]),
-        ),
-        const FieldLabel('Full name'),
-        TextField(
-          key: const Key('profile-name'),
-          controller: _name,
-          style: accountFieldStyle,
-          textCapitalization: TextCapitalization.words,
-          textInputAction: TextInputAction.next,
-          autofillHints: const [AutofillHints.name],
-          onChanged: (_) => setState(() {}),
-          decoration: accountInput(hint: 'As you want it on NowssB', error: _nameError),
-        ),
-        const FieldLabel('Country'),
-        CountryField(
-          fieldKey: const Key('profile-country'),
-          country: _country,
-          error: _countryError,
-          onPicked: (c) => setState(() {
-            _country = c;
-            if (_phone.text.trim().isEmpty) _dial = c;
-          }),
-        ),
-        const FieldLabel('Phone number'),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          GestureDetector(
-            key: const Key('profile-dial'),
-            onTap: () async {
-              final c = await pickCountry(context, selected: _dial?.code);
-              if (c != null) setState(() => _dial = c);
-            },
-            child: Container(
-              height: 54,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: const Color(0x14FFFFFF),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AccountColors.hairline),
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text(_dial?.flag ?? '🌐', style: const TextStyle(fontSize: 18)),
-                const SizedBox(width: 6),
-                Text(_dial == null ? '+ code' : '+${_dial!.dial}', style: accountFieldStyle),
-                const Icon(Icons.expand_more_rounded, size: 18, color: AccountColors.soft),
-              ]),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: TextField(
+            TileRow(
               key: const Key('profile-phone'),
-              controller: _phone,
-              style: accountFieldStyle,
-              keyboardType: TextInputType.phone,
-              autofillHints: const [AutofillHints.telephoneNumberNational],
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9 ]')), LengthLimitingTextInputFormatter(17)],
-              onChanged: (_) => setState(() {}),
-              decoration: accountInput(hint: 'Mobile number', error: _phoneError),
+              leading: _DialPill(
+                key: const Key('profile-dial'),
+                country: _dial,
+                onTap: () async {
+                  final c = await pickCountry(context, selected: _dial?.code);
+                  if (c != null) setState(() => _dial = c);
+                },
+              ),
+              label: 'Phone number',
+              error: _phoneError,
+              body: TileInput(
+                controller: _phone,
+                hint: 'Mobile number',
+                keyboard: TextInputType.phone,
+                autofill: const [AutofillHints.telephoneNumberNational],
+                formatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9 ]')), LengthLimitingTextInputFormatter(17)],
+                onChanged: (_) => setState(() {}),
+              ),
             ),
-          ),
-        ]),
-        const FieldLabel('Date of birth', optional: true),
-        GestureDetector(
-          key: const Key('profile-dob'),
-          onTap: _pickDob,
-          child: InputDecorator(
-            isEmpty: _dob == null,
-            decoration: accountInput(
-              hint: 'Add your birthday',
+            TileRow(
+              key: const Key('profile-dob'),
+              leading: const TileBadge(icon: Icons.cake_outlined),
+              label: 'Date of birth',
+              optional: true,
               error: _dobError,
-              suffix: _dob == null
-                  ? const Icon(Icons.cake_outlined, color: AccountColors.soft)
-                  : IconButton(
-                      tooltip: 'Clear',
-                      icon: const Icon(Icons.close_rounded, color: AccountColors.soft),
-                      onPressed: () => setState(() => _dob = null),
+              onTap: _pickDob,
+              body: Text(_dob == null ? 'Add your birthday' : _prettyDate(_dob!),
+                  style: _dob == null ? const TextStyle(color: Color(0x59FFFFFF), fontSize: 15, fontWeight: FontWeight.w500) : accountFieldStyle),
+              trailing: _dob == null
+                  ? tileArrow
+                  : GestureDetector(
+                      key: const Key('profile-dob-clear'),
+                      onTap: () => setState(() => _dob = null),
+                      child: const Icon(Icons.close_rounded, size: 18, color: kGlassMuted),
                     ),
             ),
-            child: _dob == null ? null : Text(_prettyDate(_dob!), style: accountFieldStyle),
-          ),
+          ],
         ),
-        const FieldLabel('Friend’s code', optional: true),
-        if (_attachedCode.isNotEmpty)
-          GlassCard(
-            key: const Key('profile-ref-locked'),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(children: [
-              const Icon(Icons.verified_rounded, color: AccountColors.ok),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  _codeOk ?? (_attachedCode == '•' ? 'You joined with a friend’s link. It stays with your account.' : 'Joined with code $_attachedCode. It stays with your account.'),
-                  style: const TextStyle(color: Colors.white, fontSize: 13.5, height: 1.35),
+        GlassListCard(
+          icon: Icons.card_giftcard_rounded,
+          overline: 'Invited by a friend?',
+          title: 'Friend’s code',
+          subtitle: _attachedCode.isNotEmpty ? null : 'Optional. It is attached once and can’t be changed later.',
+          children: [
+            if (_attachedCode.isNotEmpty)
+              TileRow(
+                key: const Key('profile-ref-locked'),
+                leading: const TileBadge(icon: Icons.verified_rounded),
+                label: _attachedCode == '•' ? 'Joined with a friend’s link' : 'Code applied · $_attachedCode',
+                body: Text(
+                  _codeOk ?? 'It stays with your account.',
+                  style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600, height: 1.3),
+                ),
+                trailing: const CurrentPill(),
+              )
+            else ...[
+              TileRow(
+                key: const Key('profile-ref'),
+                leading: const TileBadge(icon: Icons.redeem_rounded),
+                label: 'Code',
+                optional: true,
+                error: _codeError,
+                body: TileInput(
+                  controller: _code,
+                  hint: 'Have a code? Enter it here',
+                  caps: TextCapitalization.characters,
+                  spacing: 1.6,
+                  action: TextInputAction.done,
+                  formatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')), LengthLimitingTextInputFormatter(20)],
+                  onChanged: (_) => setState(() => _codeError = null),
                 ),
               ),
-            ]),
-          )
-        else ...[
-          TextField(
-            key: const Key('profile-ref'),
-            controller: _code,
-            style: accountFieldStyle.copyWith(letterSpacing: 1.6),
-            textCapitalization: TextCapitalization.characters,
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9]')), LengthLimitingTextInputFormatter(20)],
-            onChanged: (_) => setState(() => _codeError = null),
-            decoration: accountInput(
-              hint: 'Have a code? Enter it here',
-              error: _codeError,
-              prefix: const Icon(Icons.card_giftcard_rounded, color: NwsbColors.gold),
-            ),
-          ),
-          if (_fromLink)
-            const Padding(
-              key: Key('profile-ref-from-link'),
-              padding: EdgeInsets.only(left: 6, top: 8),
-              child: Row(children: [
-                Icon(Icons.link_rounded, size: 16, color: NwsbColors.goldLight),
-                SizedBox(width: 6),
-                Expanded(child: Text('Added from your friend’s link. It is attached once and can’t be changed later.', style: TextStyle(color: NwsbColors.goldLight, fontSize: 12.5))),
-              ]),
-            ),
-        ],
-        const SizedBox(height: 18),
-        const Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(Icons.lock_outline_rounded, size: 16, color: AccountColors.faint),
-          SizedBox(width: 8),
-          Expanded(
-            child: Text('Your phone and birthday stay private to your account. They are never shown on your public profile.',
-                style: TextStyle(color: AccountColors.faint, fontSize: 12, height: 1.4)),
-          ),
-        ]),
+              if (_fromLink)
+                const Padding(
+                  key: Key('profile-ref-from-link'),
+                  padding: EdgeInsets.fromLTRB(8, 2, 8, 0),
+                  child: Row(children: [
+                    Icon(Icons.link_rounded, size: 16, color: NwsbColors.goldLight),
+                    SizedBox(width: 8),
+                    Expanded(child: Text('Added from your friend’s link.', style: TextStyle(color: NwsbColors.goldLight, fontSize: 12.5, fontWeight: FontWeight.w600))),
+                  ]),
+                ),
+            ],
+          ],
+        ),
+        const _PrivacyNote('Your phone and birthday stay private to your account. They are never shown on your public profile.'),
       ],
+    );
+  }
+}
+
+/// The page's head card: the Menu card with the initial in the white badge
+/// and a white progress line (the Player's bar) for how much is filled in.
+class _ProfileHead extends StatelessWidget {
+  const _ProfileHead({required this.name, required this.filled});
+  final String name;
+  final int filled;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassListCard(
+      key: const Key('profile-head'),
+      icon: Icons.person_rounded,
+      overline: 'Your profile · $filled of 4',
+      title: name.isEmpty ? 'Your name here' : name,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(99),
+          child: Stack(children: [
+            Container(height: 4, color: const Color(0x33FFFFFF)),
+            FractionallySizedBox(widthFactor: (filled / 4).clamp(0.0, 1.0), child: Container(height: 4, color: Colors.white)),
+          ]),
+        ),
+      ],
+    );
+  }
+}
+
+/// Flag + calling code in a white pill, where the phone row's circle is.
+class _DialPill extends StatelessWidget {
+  const _DialPill({super.key, required this.country, required this.onTap});
+  final NwsbCountry? country;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Calling code',
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: 38,
+          padding: const EdgeInsets.only(left: 10, right: 6),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(country?.flag ?? '🌐', style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 6),
+            Text(country == null ? '+ code' : '+${country!.dial}',
+                style: const TextStyle(color: Color(0xFF0B0B10), fontSize: 14, fontWeight: FontWeight.w800)),
+            const Icon(Icons.expand_more_rounded, size: 18, color: Color(0xFF0B0B10)),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+class _PrivacyNote extends StatelessWidget {
+  const _PrivacyNote(this.text);
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Icon(Icons.lock_outline_rounded, size: 15, color: kGlassMuted),
+        const SizedBox(width: 8),
+        Expanded(child: Text(text, style: const TextStyle(color: kGlassMuted, fontSize: 12, height: 1.4))),
+      ]),
     );
   }
 }
@@ -474,9 +479,11 @@ class _YourDetailsPageState extends State<YourDetailsPage> {
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
-      return const Scaffold(
-        backgroundColor: AccountColors.bg,
-        body: Center(child: CircularProgressIndicator(color: NwsbColors.gold, strokeWidth: 2.4)),
+      return AccountPage(
+        kicker: 'Your account',
+        title: 'Your details',
+        onBack: () => Navigator.maybePop(context),
+        children: const [LoadingBlock(height: 120), SizedBox(height: 16), LoadingBlock(height: 300)],
       );
     }
     return CompleteProfilePage(
@@ -484,7 +491,7 @@ class _YourDetailsPageState extends State<YourDetailsPage> {
       initial: _d,
       editing: true,
       onDone: () {
-        ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text('Your details are saved.')));
+        showAccountToast(context, 'Your details are saved.');
         Navigator.maybePop(context);
       },
     );
