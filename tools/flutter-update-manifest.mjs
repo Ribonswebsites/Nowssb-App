@@ -48,6 +48,10 @@ const sha256 = (path) => new Promise((resolve, reject) => {
     .on('end', () => resolve(hash.digest('hex')));
 });
 const url = (name) => `https://github.com/${repo}/releases/download/${tag}/${name}`;
+// Phones download this, not the GitHub release URL. GitHub answers with a
+// redirect whose headers some installed builds cannot read, so the download
+// dies at 0 bytes. nowssb.com streams the same universal APK directly.
+const CDN = 'https://nowssb.com/download/flutter.apk';
 const describe = async (name, path) => {
   if (!existsSync(path)) throw new Error(`missing ${path}`);
   return { url: url(name), size: statSync(path).size, sha256: await sha256(path) };
@@ -62,12 +66,14 @@ else if (Number.isInteger(policy.minBuild) && policy.minBuild > 0) minBuild = Ma
 const [uName, uPath] = (opt('universal') ?? '').split('=');
 if (!uName || !uPath) throw new Error('--universal NAME=PATH is required');
 const universal = await describe(uName, uPath);
+universal.url = CDN;
 
 const apks = {};
 for (const spec of many('apk')) {
   const [abi, name, path] = spec.split('=');
   if (!abi || !name || !path) throw new Error(`bad --apk ${spec}`);
-  apks[abi] = await describe(name, path);
+  if (!existsSync(path)) throw new Error(`missing ${path}`);
+  apks[abi] = { url: CDN, size: universal.size, sha256: universal.sha256 };
 }
 
 const manifest = {

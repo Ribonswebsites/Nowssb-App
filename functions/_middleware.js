@@ -35,10 +35,16 @@ export async function onRequest(context) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'GET, HEAD' } });
     }
+    const upstreamHeaders = new Headers();
+    const range = request.headers.get('Range');
+    if (range) upstreamHeaders.set('Range', range);
+    upstreamHeaders.set('Accept-Encoding', 'identity');
     const upstream = await fetch(FLUTTER_APK_UPSTREAM, {
-      cf: { cacheTtl: 300, cacheEverything: true },
+      headers: upstreamHeaders,
+      redirect: 'follow',
+      cf: range ? undefined : { cacheTtl: 300, cacheEverything: true },
     });
-    if (!upstream.ok) {
+    if (!upstream.ok && upstream.status !== 206) {
       return new Response('Flutter APK is temporarily unavailable', {
         status: 502,
         headers: { 'Cache-Control': 'no-store' },
@@ -47,10 +53,11 @@ export async function onRequest(context) {
     const headers = new Headers(upstream.headers);
     headers.set('Content-Type', 'application/vnd.android.package-archive');
     headers.set('Content-Disposition', 'attachment; filename="NowssB-Flutter-Android.apk"');
-    headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
+    headers.set('Accept-Ranges', 'bytes');
+    headers.set('Cache-Control', range ? 'no-store' : 'public, max-age=300, s-maxage=300');
     headers.delete('content-encoding');
     return new Response(request.method === 'HEAD' ? null : upstream.body, {
-      status: 200,
+      status: upstream.status,
       headers,
     });
   }

@@ -164,8 +164,8 @@ class NwsbUpdater extends ChangeNotifier {
 
   /// Returning to the app re-reads the manifest at most this often.
   static const _recheckEvery = Duration(minutes: 10);
-  static const _stallTimeout = Duration(seconds: 30);
-  static const _maxFailuresWithoutProgress = 8;
+  static const _stallTimeout = Duration(seconds: 60);
+  static const _maxFailuresWithoutProgress = 12;
   static const _resumePref = 'nwsb_update_resume_build';
 
   /// Google Play builds (`flutter build appbundle
@@ -344,9 +344,14 @@ class NwsbUpdater extends ChangeNotifier {
       final tag = 'nowssb-${update.build}-${apk.abi}';
       final part = File('${dir.path}/$tag.apk.part');
       final done = File('${dir.path}/$tag.apk');
-      await for (final entity in dir.list()) {
-        if (entity.path != part.path && entity.path != done.path) await entity.delete(recursive: true);
-      }
+      try {
+        await for (final entity in dir.list()) {
+          if (entity.path == part.path || entity.path == done.path) continue;
+          try {
+            await entity.delete(recursive: true);
+          } catch (_) {}
+        }
+      } catch (_) {}
       if (await done.exists() && (apk.size <= 0 || await done.length() == apk.size)) {
         _markReady(update, done);
         return;
@@ -652,16 +657,17 @@ class NwsbApkFetch {
     }
     if (size > 0 && offset == size) return;
     final client = HttpClient()
-      ..connectionTimeout = const Duration(seconds: 20)
-      ..idleTimeout = const Duration(seconds: 15)
+      ..connectionTimeout = const Duration(seconds: 45)
+      ..idleTimeout = const Duration(minutes: 3)
       ..autoUncompress = false;
     _client = client;
     try {
       // GitHub answers with a redirect to a short-lived signed URL, so every
       // attempt starts from the stable URL; dart:io carries Range across it.
-      final request = await client.getUrl(url).timeout(const Duration(seconds: 30));
+      final request = await client.getUrl(url).timeout(const Duration(seconds: 45));
       request.followRedirects = true;
       request.maxRedirects = 8;
+      request.headers.set(HttpHeaders.userAgentHeader, 'NowssB-Android');
       request.headers.set(HttpHeaders.acceptEncodingHeader, 'identity');
       if (offset > 0) request.headers.set(HttpHeaders.rangeHeader, 'bytes=$offset-');
       final response = await request.close().timeout(const Duration(seconds: 45));
