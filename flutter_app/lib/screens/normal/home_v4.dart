@@ -10,6 +10,7 @@
 /// Media sources and licences: /workspace/team-plan/research/home-normal/MEDIA-LICENSES.md
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:math' as math;
 import '../../widgets/concept/r27/anims.dart' show R27Coin;
 import '../../widgets/concept/r27/streak_marks2.dart' show StreakSilkRibbons;
@@ -440,7 +441,7 @@ class _V4SoundLibraryState extends State<V4SoundLibrary> {
                 ),
               ]),
               const SizedBox(height: 14),
-              AspectRatio(
+              TabletAspectRatio(
                 aspectRatio: 1.9,
                 child: _Well(
                   pad: 5,
@@ -806,7 +807,7 @@ class V4StoreEarn extends StatelessWidget {
           // Ribon 17-11: a real photo (assets/home/hx/offers-bowl.webp, a white
           // NowssB Meaning Store bag on black; Pexels, see CREDITS.md) with a
           // black pill + gold tag and the home marquee.
-          AspectRatio(
+          TabletAspectRatio(
             aspectRatio: 1.8,
             child: _Well(
               pad: 5,
@@ -947,7 +948,7 @@ class V4Community extends StatelessWidget {
         key: const ValueKey('v4-community'),
         onTap: onTap,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const AspectRatio(
+          const TabletAspectRatio(
             aspectRatio: 2.4,
             child: _Well(child: V4Film('assets/video/connect-banner.mp4', slot: 'connect', radius: 18)),
           ),

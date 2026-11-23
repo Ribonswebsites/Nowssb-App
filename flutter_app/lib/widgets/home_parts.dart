@@ -19,6 +19,7 @@
 ///              "Enter" and an arrow in a disc.
 library;
 
+import '../shell/tablet.dart';
 import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie;
 import 'dart:async';
 
@@ -634,7 +635,7 @@ class PhotoCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: aspect,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(18),

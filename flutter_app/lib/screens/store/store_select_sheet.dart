@@ -4,6 +4,7 @@
 /// Top film: assets/video/choose-store.mp4 — this sheet only.
 library;
 
+import '../../shell/tablet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
 
@@ -110,7 +111,7 @@ class StoreSelectSheet extends StatelessWidget {
                 const SizedBox(height: 12),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
-                  child: const AspectRatio(
+                  child: const TabletAspectRatio(
                     aspectRatio: 16 / 9,
                     child: NwsbVideo(
                       asset: kChooseStoreVideo,

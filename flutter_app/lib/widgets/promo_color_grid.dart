@@ -5,6 +5,7 @@
 /// rule between the cells. Scrolling the home tilts the grid.
 library;
 
+import '../shell/tablet.dart';
 import 'package:flutter/material.dart';
 
 import 'glass_wrap.dart';
@@ -133,7 +134,7 @@ class _PromoColorGridState extends State<PromoColorGrid> {
       ..translateByDouble(0, _shift * (8 + row * 6), 0, 1);
     return GestureDetector(
       onTap: () => widget.onOpen(cell.id),
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: 1,
         child: Transform(
           alignment: Alignment.center,

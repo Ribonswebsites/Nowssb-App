@@ -17,6 +17,7 @@
 ///        ink (ARGB, optional), height (optional, scales the section)
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -348,7 +349,7 @@ class CouponTicket extends StatelessWidget {
     );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: _w / _h,
         child: FittedBox(fit: BoxFit.contain, child: ticket),
       ),
@@ -472,7 +473,7 @@ class CouponCard extends StatelessWidget {
     );
     return Padding(
       padding: const EdgeInsets.only(top: 10, bottom: 4),
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: _w / _h,
         child: FittedBox(fit: BoxFit.contain, child: card),
       ),

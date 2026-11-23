@@ -12,6 +12,7 @@
 /// on each class say where.
 library;
 
+import '../../shell/tablet.dart';
 import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie;
 import 'package:flutter/material.dart';
 
@@ -43,7 +44,7 @@ class FashOffer extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRect(
                 child: Stack(
@@ -163,7 +164,7 @@ class FashWordSearch extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const AspectRatio(
+          const TabletAspectRatio(
             aspectRatio: 16 / 9,
             child: ClipRect(
               child: NwsbImage(
@@ -202,7 +203,7 @@ class FashMeaningSearch extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const AspectRatio(
+          const TabletAspectRatio(
             aspectRatio: 16 / 9,
             child: ClipRect(
               child: NwsbImage(
@@ -263,7 +264,7 @@ class _SearchPanelState extends State<_SearchPanel> {
     return GestureDetector(
       onTap: () => widget.onOpen?.call(''),
       behavior: HitTestBehavior.opaque,
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: 3 / 4,
         child: ClipRect(
           child: Stack(

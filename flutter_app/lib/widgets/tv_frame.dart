@@ -15,6 +15,7 @@
 /// the repository the whole time.
 library;
 
+import '../shell/tablet.dart';
 import 'package:flutter/material.dart';
 
 import '../media/nwsb_video.dart';
@@ -298,7 +299,7 @@ class TvFrame extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: aspect ?? frame.aspect,
         child: LayoutBuilder(
           builder: (context, c) {
@@ -496,7 +497,7 @@ class FramedSlot extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: aspect ?? frame.aspect,
         child: LayoutBuilder(
           builder: (context, c) {

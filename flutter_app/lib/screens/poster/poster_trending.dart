@@ -4,6 +4,7 @@
 /// front), then a ladder of torn paper chart strips 02–07.
 library;
 
+import '../../shell/tablet.dart';
 import 'package:flutter/material.dart';
 
 import '../../admin/template/editable.dart';
@@ -113,7 +114,7 @@ class _ChartTopper extends StatelessWidget {
               boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 30, offset: Offset(0, 16))],
             ),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              AspectRatio(
+              TabletAspectRatio(
                 aspectRatio: .9,
                 child: ClipRect(
                   child: LayoutBuilder(builder: (context, box) {

@@ -17,6 +17,7 @@
 /// something to read, and something to hear.
 library;
 
+import '../shell/tablet.dart';
 import 'dart:async';
 
 import '../data/word_voice.dart';
@@ -595,7 +596,7 @@ class _WordVideo extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: AspectRatio(
+        child: TabletAspectRatio(
           aspectRatio: 16 / 9,
           child: NwsbVideo(
               asset: url,
@@ -712,7 +713,7 @@ class _StageState extends State<_Stage> {
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 16 / 9,
               child: NwsbVideo(
                   asset: st.video,
@@ -742,7 +743,7 @@ class _Images extends StatelessWidget {
           separatorBuilder: (_, __) => const SizedBox(width: 10),
           itemBuilder: (_, i) => ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 1,
               child: Image.network(urls[i],
                   fit: BoxFit.cover,

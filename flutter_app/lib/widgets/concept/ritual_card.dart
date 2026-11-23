@@ -6,6 +6,7 @@
 /// into the ground plate.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -191,7 +192,7 @@ class _RitualCardState extends State<RitualCard> with TickerProviderStateMixin {
                 button: true,
                 label: '${widget.title ?? p.title}. $done of $total sessions done today. ${widget.streak} day streak. Begin',
                 child: ExcludeSemantics(
-                  child: AspectRatio(
+                  child: TabletAspectRatio(
                     aspectRatio: 1.02,
                     child: AnimatedBuilder(
                       animation: Listenable.merge([_breath, _push, _press, _ignite]),

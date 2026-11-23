@@ -5,6 +5,7 @@
 /// header. No shelf of stand-in books.
 library;
 
+import '../../../shell/tablet.dart';
 import 'package:flutter/material.dart';
 import 'surface.dart';
 
@@ -47,7 +48,7 @@ class _NEbooksState extends State<NEbooks> with SingleTickerProviderStateMixin, 
   Widget _cover(int i, double t) {
     final glint = (t * 2) % 2;
     final c = kNEbookArt[_shown[i].$1]!;
-    return AspectRatio(
+    return TabletAspectRatio(
       aspectRatio: .70,
       child: Container(
         decoration: BoxDecoration(

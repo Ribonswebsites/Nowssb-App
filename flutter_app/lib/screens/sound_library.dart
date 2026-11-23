@@ -9,6 +9,7 @@
 /// Artwork is Word Atelier collection renders in `assets/store/collections/`.
 library;
 
+import '../shell/tablet.dart' show TabletAspectRatio, TabletScope;
 import '../features/downloads/downloads_screen.dart';
 import '../data/word_voice.dart';
 import '../features/downloads/download_button.dart';
@@ -313,7 +314,8 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
       // Bottom inset clears the floating nav pill when this is the Library
       // tab root; pushed sheets still get SafeArea bottom from the modal.
       // Match home_normal: safe-area + 112 so Buy Request clears the pill.
-      final bottom = Navigator.of(context).canPop()
+      // Tablet frame: no floating nav to clear.
+      final bottom = Navigator.of(context).canPop() || TabletScope.framedOf(context)
           ? 0.0
           : MediaQuery.paddingOf(context).bottom + 112;
       return Material(
@@ -1690,7 +1692,7 @@ class _StoreFilmReelState extends State<_StoreFilmReel> {
                       children: [
                         ClipRRect(
                           borderRadius: BorderRadius.circular(14),
-                          child: AspectRatio(
+                          child: TabletAspectRatio(
                             aspectRatio: 16 / 9,
                             child: NwsbVideo(
                               asset: x.asset,
@@ -2971,7 +2973,7 @@ class _SoundCategoryScreenState extends State<SoundCategoryScreen> {
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: AspectRatio(
+                      child: TabletAspectRatio(
                         aspectRatio: 16 / 9,
                         child: NwsbVideo(
                           asset: _bannerFor(widget.category),

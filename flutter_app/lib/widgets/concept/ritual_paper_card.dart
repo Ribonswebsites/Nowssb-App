@@ -5,6 +5,7 @@
 /// neumorphic page (raised frame, inset window).
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -155,7 +156,7 @@ class _PaperRitualCardState extends State<PaperRitualCard> with TickerProviderSt
                   final s = 1 - .02 * _press.value;
                   return Transform.scale(
                     scale: s,
-                    child: AspectRatio(
+                    child: TabletAspectRatio(
                       aspectRatio: 1.32,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(22),

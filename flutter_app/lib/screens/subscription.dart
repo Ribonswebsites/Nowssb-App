@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../shell/tablet.dart';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
@@ -259,7 +260,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
-          child: const AspectRatio(
+          child: const TabletAspectRatio(
             aspectRatio: 16 / 9,
             child: NwsbVideo(
               asset: 'assets/video/subscription-b.mp4',

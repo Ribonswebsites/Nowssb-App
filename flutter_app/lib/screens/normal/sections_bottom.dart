@@ -12,6 +12,7 @@
 /// on each class say where.
 library;
 
+import '../../shell/tablet.dart';
 import 'package:flutter/material.dart';
 
 import '../../widgets/nwsb_icon.dart';
@@ -193,7 +194,7 @@ class NmTrendShop extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: const AspectRatio(
+            child: const TabletAspectRatio(
               aspectRatio: 16 / 9,
               child: NwsbVideo(
                 asset: 'assets/video/store-banner-fash.mp4',

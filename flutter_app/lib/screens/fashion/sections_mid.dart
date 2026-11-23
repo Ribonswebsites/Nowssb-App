@@ -4,6 +4,7 @@
 /// storeban
 library;
 
+import '../../shell/tablet.dart';
 import '../../media/golden_breath.dart';
 import 'zen_glass_tile.dart';
 import 'package:nowssb/widgets/home_text.dart';
@@ -331,7 +332,7 @@ class FashStore extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 3 / 4,
               child: ClipRect(
                 child: Stack(
@@ -459,7 +460,7 @@ class FashTrending extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRect(
                 child: Stack(
@@ -545,7 +546,7 @@ class FashPrescription extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
-            child: const AspectRatio(
+            child: const TabletAspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRect(
                 child: NwsbVideo(asset: 'assets/video/rx-banner.mp4', slot: 'sections_mid.FashPrescription'),
@@ -707,7 +708,7 @@ class FashConnect extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 768 / 1168,
               child: ClipRect(
                 child: Stack(

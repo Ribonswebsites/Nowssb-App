@@ -4,6 +4,7 @@
 /// the four meditating portraits. Fashion wraps it in glass; Normal in neu.
 library;
 
+import '../shell/tablet.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -61,7 +62,7 @@ class StoriesFindYouBanner extends StatelessWidget {
     final inner = GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: 16 / 9,
         child: ClipRect(
           child: Container(

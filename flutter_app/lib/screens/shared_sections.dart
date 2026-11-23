@@ -15,6 +15,7 @@
 /// Normal home's twin of it is listed beside it where they differ.
 library;
 
+import '../shell/tablet.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -735,7 +736,7 @@ class StoreBannerSection extends StatelessWidget {
             GestureDetector(
               onTap: onTap,
               behavior: HitTestBehavior.opaque,
-              child: const AspectRatio(
+              child: const TabletAspectRatio(
                 aspectRatio: 1136 / 800,
                 child: ClipRect(child: NwsbVideo(asset: _clip, slot: 'shared_sections.StoreBannerSection')),
               ),
@@ -907,7 +908,7 @@ class EbooksSection extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             behavior: HitTestBehavior.opaque,
-            child: const AspectRatio(
+            child: const TabletAspectRatio(
               aspectRatio: 16 / 9,
               child: ClipRect(
                 child: NwsbVideo(

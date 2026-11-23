@@ -15,6 +15,7 @@
 /// only giant poster words use the poster serif.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -360,7 +361,7 @@ class EntryPeelPoster extends _EntryBase {
     final word = w?.word ?? 'NowssB';
     final next = hourWord(at.add(const Duration(hours: 1)));
     final peel = .26 + .14 * Stillwater.lungs(t);
-    return LayoutBuilder(builder: (context, outer) => AspectRatio(
+    return LayoutBuilder(builder: (context, outer) => TabletAspectRatio(
       aspectRatio: outer.maxWidth < 320 ? .78 : 1.1,
       child: LayoutBuilder(builder: (context, c) {
         final s = c.biggest;

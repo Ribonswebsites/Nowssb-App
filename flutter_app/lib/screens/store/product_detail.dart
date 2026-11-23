@@ -2,6 +2,7 @@
 /// Mirrors website rmd-* / ms-detail / ebd layouts without inventing copy.
 library;
 
+import '../../shell/tablet.dart';
 import '../../features/stage_practice/stage_pack.dart';
 import 'package:flutter/material.dart';
 
@@ -253,7 +254,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
             delegate: SliverChildListDelegate(
                 [
                   if (heroVideo != null) ...[
-                    AspectRatio(
+                    TabletAspectRatio(
                       aspectRatio: 16 / 9,
                       child: NwsbVideo(
                         asset: heroVideo!,
@@ -263,7 +264,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
                     ),
                     const SizedBox(height: 0),
                   ],
-                  AspectRatio(
+                  TabletAspectRatio(
                     aspectRatio: 1,
                     child: StoreNetImage(url: img, word: title),
                   ),

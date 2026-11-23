@@ -5,6 +5,7 @@
 /// Ebooks (part017).
 library;
 
+import '../shell/tablet.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -442,8 +443,9 @@ class _StoreImageRotatorState extends State<_StoreImageRotator>
   @override
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(18),
-        child: AspectRatio(
+        child: TabletAspectRatio(
           aspectRatio: 1.55,
+          maxHeight: 330,
           child: AnimatedBuilder(
             animation: _turn,
             builder: (context, _) {
@@ -724,7 +726,7 @@ class _StoreCompactVideoBanner extends StatelessWidget {
         padding: const EdgeInsets.all(5),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(15),
-          child: AspectRatio(
+          child: TabletAspectRatio(
             aspectRatio: 16 / 6.4,
             child: NwsbVideo(
               asset: asset,
@@ -759,7 +761,7 @@ class _StoreVideoBanner extends StatelessWidget {
       padding: const EdgeInsets.all(5),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
-        child: AspectRatio(
+        child: TabletAspectRatio(
           // Subscription film is 720×406, so a 16:9 box shows the whole frame.
           aspectRatio: tall ? 16 / 9 : 16 / 6.4,
           child: EditMedia(

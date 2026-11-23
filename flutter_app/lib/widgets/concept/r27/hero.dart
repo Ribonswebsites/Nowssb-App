@@ -3,6 +3,7 @@
 /// banner-sit art).
 library;
 
+import '../../../shell/tablet.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class R27SoundHero extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 18, 0, 22),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          AspectRatio(
+          TabletAspectRatio(
             aspectRatio: .92,
             child: LayoutBuilder(builder: (c, box) {
               final w = box.maxWidth, h = box.maxHeight;
