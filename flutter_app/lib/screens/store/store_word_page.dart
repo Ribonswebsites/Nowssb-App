@@ -22,7 +22,7 @@
 library;
 
 import 'dart:math' as math;
-import 'dart:ui' show ImageFilter;
+import 'dart:ui' show ImageFilter, MaskFilter;
 
 import 'package:flutter/material.dart';
 
@@ -577,28 +577,17 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
                   colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
                 ).createShader(r);
               }
-              // Radius stays inside the shortest side so left/right edges
-              // never stay opaque (a larger radius left a rectangle).
-              final side = r.shortestSide;
-              // Inscribe a slightly wide oval inside the widget so the
-              // fade reaches transparency before any rectangle edge.
-              final box = Rect.fromCenter(
-                center: r.center.translate(0, -r.height * .03),
-                width: side * 0.96,
-                height: side * 1.02,
-              );
               return const RadialGradient(
-                center: Alignment(0, -0.04),
-                radius: 1.0,
+                center: Alignment(0, -0.06),
+                radius: 0.46,
                 colors: [
                   Color(0xFFFFFFFF),
-                  Color(0xFFFFFFFF),
-                  Color(0xD9FFFFFF),
-                  Color(0x66FFFFFF),
+                  Color(0xF2FFFFFF),
+                  Color(0x99FFFFFF),
                   Color(0x00FFFFFF),
                 ],
-                stops: [0.0, 0.52, 0.72, 0.88, 1.0],
-              ).createShader(box);
+                stops: [0.0, 0.58, 0.8, 1.0],
+              ).createShader(r);
             },
             child: Stack(fit: StackFit.expand, children: [
               photo,
@@ -608,13 +597,17 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      stops: [0, .42, 1],
-                      colors: [Color(0x00000000), Color(0x29000000), Color(0xA6000000)],
+                      stops: [0, .45, 1],
+                      colors: [Color(0x00000000), Color(0x24000000), Color(0x8C000000)],
                     ),
                   ),
                 ),
             ]),
           ),
+          if (own)
+            const Positioned.fill(
+              child: IgnorePointer(child: CustomPaint(painter: _MistyVignettePainter())),
+            ),
           Positioned(
             left: 14,
             right: 14,
@@ -667,7 +660,9 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: const Color(0x33FFFFFF), width: .6),
         ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        child: Stack(
+          children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           SizedBox(
             height: 228,
             child: Stack(fit: StackFit.expand, children: [
@@ -686,8 +681,7 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 12, 14),
-            child: Stack(clipBehavior: Clip.none, children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Padding(
           padding: const EdgeInsets.only(right: 72),
           child: _OriginLabel(_origin.isEmpty ? _collection : _origin),
@@ -727,14 +721,16 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
         const SizedBox(height: 6),
         _buyCard(),
             ]),
+          ),
+            ]),
+            // Large overlapping star badge, fully inside this stack so it stays tappable.
             Positioned(
-              right: 4,
-              top: -36,
+              right: 16,
+              top: 228 - 36,
               child: StoreWordStar(item: widget.item, size: 64, badge: true),
             ),
-            ]),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -1180,9 +1176,9 @@ class _OutlinePill extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0x33FFFFFF),
+                color: const Color(0x14FFFFFF),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: const Color(0xF2FFFFFF), width: 1.6),
+                border: Border.all(color: const Color(0xF2FFFFFF), width: 1.8),
               ),
               child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
             ),
@@ -1476,4 +1472,35 @@ class StoreWordStar extends StatelessWidget {
       },
     );
   }
+}
+
+
+/// Soft-edged oval hole in the page colour, so the hero photo reads as a
+/// misty circular cut-out even when a shader mask cannot punch through
+/// the picture widget.
+class _MistyVignettePainter extends CustomPainter {
+  const _MistyVignettePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    canvas.saveLayer(rect, Paint());
+    canvas.drawRect(rect, Paint()..color = const Color(0xF207090F));
+    final oval = Rect.fromCenter(
+      center: Offset(size.width / 2, size.height * 0.46),
+      width: size.shortestSide * 0.92,
+      height: size.shortestSide * 0.98,
+    );
+    canvas.drawOval(
+      oval,
+      Paint()
+        ..blendMode = BlendMode.dstOut
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 36)
+        ..color = const Color(0xFFFFFFFF),
+    );
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
