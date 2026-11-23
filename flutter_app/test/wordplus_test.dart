@@ -13,6 +13,7 @@ import 'package:nowssb/features/progress/progress_center.dart';
 import 'package:nowssb/features/progress/progress_popup.dart';
 import 'package:nowssb/features/progress/progress_sources.dart';
 import 'package:nowssb/features/progress/today_progress_screen.dart';
+import 'package:nowssb/data/word_backgrounds.dart';
 import 'package:nowssb/data/word_photos.dart';
 import 'package:nowssb/media/nwsb_video.dart';
 import 'package:nowssb/media/video_pool.dart';
@@ -180,15 +181,25 @@ void main() {
   test('word page backgrounds use own photos, never the five rejected ones, and fall back to default art', () {
     final ocean = wordPageBackgrounds('Ocean');
     expect(ocean, isNotEmpty);
-    expect(ocean, isNot(contains(kNowssbWordFallback)), reason: 'Ocean has its own photo');
+    expect(ocean.first, equals(wordBackgroundFor('Ocean')));
+    expect(ocean, isNot(contains(kNowssbWordFallback)), reason: 'Ocean has its own picture');
     expect(wordPhotoFor('ocean'), isNotNull);
     for (final w in kBannedWordPhotos) {
       final urls = wordPageBackgrounds(w);
       expect(urls, isNotEmpty);
-      expect(urls.every((u) => !u.toLowerCase().contains('/$w.')), isTrue, reason: w);
+      expect(
+        urls.every((u) => !u.toLowerCase().contains('word_photos/$w.')),
+        isTrue,
+        reason: w,
+      );
       expect(wordPhotoFor(w), isNull);
     }
-    expect(wordPageBackgrounds('shield'), equals([kNowssbWordFallback]));
+    expect(wordPageBackgrounds('shield').first, equals(wordBackgroundFor('shield')));
+    expect(wordPageBackgrounds('clan').first, equals(wordBackgroundFor('clan')));
+    // Concept art not bundled yet for these banned words: default art only.
+    expect(wordPageBackgrounds('honor'), equals([kNowssbWordFallback]));
+    expect(wordPageBackgrounds('sovereign'), equals([kNowssbWordFallback]));
+    expect(wordPageBackgrounds('space'), equals([kNowssbWordFallback]));
   });
 }
 

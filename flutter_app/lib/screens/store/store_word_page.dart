@@ -38,6 +38,7 @@ import '../../data/settings.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import '../../data/word_art.dart';
+import '../../data/word_backgrounds.dart';
 import '../../data/word_photos.dart';
 import '../../data/word_posters.dart';
 import '../../features/earn/earn_kit.dart' show earnFirstName;
@@ -196,19 +197,25 @@ const kNowssbWordFallback = 'assets/store/nowssb-store-mark.png';
 const kBannedWordPhotos = {'shield', 'honor', 'clan', 'sovereign', 'space'};
 
 /// This word's own pictures for the page background, unique and in order:
-/// admin art, practice poster, then photograph. The five rejected photos
-/// and any flag or country picture are skipped. Default art is the fallback
-/// when the word has no picture of its own.
+/// concept-art still first (when bundled), then admin art, practice poster,
+/// then photograph. The five rejected photos and any flag or country picture
+/// are skipped. Default art is the fallback when the word has no picture.
 List<String> wordPageBackgrounds(String word, [String fallback = kNowssbWordFallback]) {
   final key = WordArt.keyOf(word);
   final out = <String>[];
   void add(String? p) {
     if (p == null || p.isEmpty) return;
     final low = p.toLowerCase();
-    if (kBannedWordPhotos.any((w) => low.contains('/$w.') || low.contains('/$w-'))) return;
+    // Concept-art in word_backgrounds/ is original and allowed, including
+    // for words whose older photographs were rejected.
+    if (!low.contains('word_backgrounds/') &&
+        kBannedWordPhotos.any((w) => low.contains('/$w.') || low.contains('/$w-'))) {
+      return;
+    }
     if (low.contains('flag') || low.contains('/country')) return;
     if (!out.contains(p)) out.add(p);
   }
+  add(wordBackgroundFor(word));
   if (!kBannedWordPhotos.contains(key)) {
     add(WordArt.instance.imageOf(word));
     add(wordPosterFor(word));

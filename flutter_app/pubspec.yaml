@@ -258,6 +258,7 @@ flutter:
     # One poster per practice word (black, word x3, NowssB headphones, ribbon).
     - assets/word_posters/
     - assets/word_photos/
+    - assets/word_backgrounds/
     - assets/store/waves/
     - assets/store/meaning-flips/
     - assets/store/ebook-flips/
