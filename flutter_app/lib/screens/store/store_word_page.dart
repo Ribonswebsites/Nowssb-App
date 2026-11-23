@@ -13,17 +13,24 @@
 ///  * The word's own photo as a soft cut-out with its headline, a two-line
 ///    meaning, three stat items and an outlined Add to Cart / Yours pill.
 ///  * A glass detail card with the price pills and a nested buy card.
+///  * A small NowssB Store thumbnail on the origin line, opening the Store.
+///  * A stacked practice card of this word and its collection, swipeable,
+///    with Begin opening the player on the front word.
 ///  * "More in <collection>": the dark avatar card and tall photo cards.
 ///
 /// Every action works as before: wishlist, cart, buy or Yours, other words.
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
 import '../../data/app_haptics.dart';
 import '../../data/cart_bag.dart';
+import '../../data/content.dart';
+import '../../data/models.dart';
+import '../../data/practice_progress.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import '../../data/word_art.dart';
@@ -35,8 +42,11 @@ import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
 import '../../shell/tablet.dart' show isTablet;
 import '../../theme/tokens.dart';
+import '../../shell/nav_shell.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
+import '../../widgets/word_practice_stack.dart';
+import '../practice_player.dart';
 import '../poster/poster_kit.dart' show inr;
 import 'bag_ui.dart';
 import 'store_actions.dart';
@@ -241,11 +251,22 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
 
   String get _priceLabel => widget.open ? 'Yours' : inr(widget.price, sku: widget.itemId);
 
+  String get _heroBody {
+    final about = widget.about.trim();
+    if (about.isEmpty) {
+      final line = _f.line.trim();
+      return line;
+    }
+    final stop = about.indexOf(RegExp(r'[.!?]'));
+    if (stop > 24) return about.substring(0, stop + 1).trim();
+    return about;
+  }
+
   (String, String) get _panel {
     switch (_mode) {
       case StoreWordMode.meaning:
         final head = _f.categorySub.isNotEmpty ? _f.categorySub : 'What $_title means';
-        return (head, widget.about);
+        return (head, _heroBody);
       case StoreWordMode.listen:
         return ('Hear $_title said right', 'Native pronunciation of $_title, made for you when you open it. Listen first, then say it back.');
       case StoreWordMode.practice:
@@ -293,7 +314,7 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
                 children: [
                   _topRow(context),
                   const SizedBox(height: 22),
-                  _OriginLabel(_origin),
+                  _originRow(context),
                   const SizedBox(height: 6),
                   _titleRow(),
                   const SizedBox(height: 18),
@@ -302,6 +323,10 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
                   _hero(),
                   const SizedBox(height: 18),
                   _detailCard(),
+                  if (_stackEntries().isNotEmpty) ...[
+                    const SizedBox(height: 18),
+                    _practiceStack(),
+                  ],
                   if (_f.related.isNotEmpty) ..._more(),
                 ],
               ),
@@ -345,6 +370,118 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
     ]);
   }
 
+  String get _picture {
+    final p = widget.picture.trim();
+    return p.isEmpty ? kNowssbWordFallback : p;
+  }
+
+  void _openStore(BuildContext context) {
+    AppHaptics.selection();
+    NavScope.goTo(context, 3);
+    // When the shell is not above this route, still leave the word page
+    // and land back on the Store.
+    if (context.mounted && (ModalRoute.of(context)?.isCurrent ?? false)) {
+      Navigator.of(context).maybePop();
+    }
+  }
+
+  Widget _originRow(BuildContext context) {
+    return Row(children: [
+      Expanded(child: _OriginLabel(_origin)),
+      const SizedBox(width: 10),
+      _StoreThumb(onTap: () => _openStore(context)),
+    ]);
+  }
+
+  List<WordStackEntry> _stackEntries() {
+    final seen = <String>{};
+    final out = <WordStackEntry>[];
+    void add(String word, String photo, String title) {
+      final key = word.trim().toLowerCase();
+      if (key.isEmpty || !seen.add(key)) return;
+      if (out.length >= 5) return;
+      out.add(WordStackEntry(
+        word: word,
+        photo: photo,
+        title: title,
+        progress: _stackProgress(word),
+        onBegin: () => _beginWord(word),
+      ));
+    }
+
+    final serif = _f.categorySub.isNotEmpty
+        ? _f.categorySub
+        : (_collection.isNotEmpty ? _collection : _title);
+    add(_title, _picture, serif);
+    for (final l in _f.related) {
+      add(l.title, storeWordPicture(l.word, kNowssbWordFallback), serif);
+    }
+    return out;
+  }
+
+  String _stackProgress(String word) {
+    final key = word.trim().toLowerCase();
+    final today = DateTime.now();
+    final ymd =
+        '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    var done = 0;
+    for (final s in PracticeProgress.instance.sessionsSnapshot) {
+      if ('${s['date'] ?? ''}' != ymd) continue;
+      if ('${s['word'] ?? ''}'.trim().toLowerCase() == key) done++;
+    }
+    return '$done of ${PracticeProgress.dailyPracticeGoal} done';
+  }
+
+  void _beginWord(String title) {
+    final key = title.trim().toLowerCase();
+    Word? found;
+    for (final w in ContentStore.instance.library) {
+      if (w.key.toLowerCase() == key || w.word.toLowerCase() == key) {
+        found = w;
+        break;
+      }
+    }
+    final word = found ??
+        Word(
+          key: key,
+          word: title,
+          deva: '',
+          translit: '',
+          phonetic: '',
+          parts: const [],
+          audioMale: '',
+          audioFemale: '',
+          organ: '',
+          origin: _origin,
+          benefit: '',
+          meaning: widget.about,
+          mouthPos: '',
+          resonance: '',
+          mistake: '',
+          tip: '',
+          categories: _collection.isEmpty ? const [] : [_collection],
+          gender: 'both',
+          time: 'any',
+          price: widget.price,
+          img: _picture,
+        );
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => PracticePlayerScreen(words: [word], title: word.word, showIntro: false),
+      ),
+    );
+  }
+
+  Widget _practiceStack() {
+    final items = _stackEntries();
+    final label = _collection.isEmpty ? 'PRACTICES' : 'PRACTICES · ${_collection.toUpperCase()}';
+    return WordPracticeStack(
+      eyebrow: label,
+      entries: items,
+      height: 400,
+    );
+  }
+
   Widget _titleRow() {
     final big = '$_title\n$_collection';
     return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -359,10 +496,10 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
               key: const ValueKey('word-title'),
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 46,
+                fontSize: 54,
                 fontWeight: FontWeight.w800,
-                height: 1.02,
-                letterSpacing: -1.6,
+                height: 0.96,
+                letterSpacing: -1.8,
               ),
             ),
           ),
@@ -403,6 +540,7 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
 
   Widget _hero() {
     final (head, body) = _panel;
+    final own = storeWordHasOwnPicture(widget.title);
     return LayoutBuilder(builder: (context, c) {
       final w = c.maxWidth;
       var h = (w * 1.14).clamp(360.0, 560.0);
@@ -411,49 +549,71 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
       if (isTablet(context)) {
         h = math.min(h, math.max(320.0, MediaQuery.sizeOf(context).height * .52));
       }
+      final Widget photo;
+      if (!own) {
+        // A word without a picture of its own shows the default Store
+        // art whole in the upper part, clear of the text below it.
+        photo = Padding(
+          padding: EdgeInsets.only(top: h * .06, bottom: h * .4),
+          child: StoreNetImage(url: _picture, fit: BoxFit.contain),
+        );
+      } else {
+        photo = StoreNetImage(url: _picture);
+      }
       return SizedBox(
         height: h,
         child: Stack(fit: StackFit.expand, children: [
-          // The cut-out: the photo fades into the page on every side, with
-          // no card edge, like the reference's misty forest.
+          // Soft misty circular/organic cut-out, like the reference's
+          // forest medallion — the photo fades into the page on every
+          // side, with no rectangle edge. Default art stays whole.
           ShaderMask(
             blendMode: BlendMode.dstIn,
-            shaderCallback: (r) => const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [0, .16, .62, 1],
-              colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
-            ).createShader(r),
-            child: ShaderMask(
-              blendMode: BlendMode.dstIn,
-              shaderCallback: (r) => const LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                stops: [0, .14, .86, 1],
-                colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
-              ).createShader(r),
-              child: Stack(fit: StackFit.expand, children: [
-                // A word without a picture of its own shows the default Store
-                // art whole in the upper part, clear of the text below it.
-                if (!storeWordHasOwnPicture(widget.title))
-                  Padding(
-                    padding: EdgeInsets.only(top: h * .06, bottom: h * .4),
-                    child: StoreNetImage(url: widget.picture, fit: BoxFit.contain),
-                  )
-                else
-                  StoreNetImage(url: widget.picture),
+            shaderCallback: (r) {
+              if (!own) {
+                return const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0, .08, .55, 1],
+                  colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
+                ).createShader(r);
+              }
+              // Radius stays inside the shortest side so left/right edges
+              // never stay opaque (a larger radius left a rectangle).
+              final side = r.shortestSide;
+              // Inscribe a slightly wide oval inside the widget so the
+              // fade reaches transparency before any rectangle edge.
+              final box = Rect.fromCenter(
+                center: r.center.translate(0, -r.height * .03),
+                width: side * 0.96,
+                height: side * 1.02,
+              );
+              return const RadialGradient(
+                center: Alignment(0, -0.04),
+                radius: 1.0,
+                colors: [
+                  Color(0xFFFFFFFF),
+                  Color(0xFFFFFFFF),
+                  Color(0xD9FFFFFF),
+                  Color(0x66FFFFFF),
+                  Color(0x00FFFFFF),
+                ],
+                stops: [0.0, 0.52, 0.72, 0.88, 1.0],
+              ).createShader(box);
+            },
+            child: Stack(fit: StackFit.expand, children: [
+              photo,
+              if (own)
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      stops: [0, .45, 1],
-                      colors: [Color(0x00000000), Color(0x26000000), Color(0xCC000000)],
+                      stops: [0, .42, 1],
+                      colors: [Color(0x00000000), Color(0x29000000), Color(0xA6000000)],
                     ),
                   ),
                 ),
-              ]),
-            ),
+            ]),
           ),
           Positioned(
             left: 14,
@@ -495,21 +655,49 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
   // ── phone 3: the detail card with the nested buy card ────────────────────
 
   Widget _detailCard() {
-    return GlassWrap(
-      margin: EdgeInsets.zero,
-      radius: 26,
-      padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
-          Expanded(child: _OriginLabel(_origin.isEmpty ? _collection : _origin)),
-          StoreWordStar(item: widget.item, size: 36, onDark: false),
-        ]),
+    // Phone 3: photo hero, flag + origin, a large overlapping star badge
+    // on the photo, the bold two-line title, chips and the nested card.
+    // The coin circle lives only in the page's top row, not here.
+    return ClipRRect(
+      key: const ValueKey('word-detail-card'),
+      borderRadius: BorderRadius.circular(28),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xCC14161E),
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: const Color(0x33FFFFFF), width: .6),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          SizedBox(
+            height: 228,
+            child: Stack(fit: StackFit.expand, children: [
+              StoreNetImage(url: _picture),
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: [0, .55, 1],
+                    colors: [Color(0x33000000), Color(0x00000000), Color(0xCC14161E)],
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 12, 14),
+            child: Stack(clipBehavior: Clip.none, children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Padding(
+          padding: const EdgeInsets.only(right: 72),
+          child: _OriginLabel(_origin.isEmpty ? _collection : _origin),
+        ),
         const SizedBox(height: 6),
         Padding(
-          padding: const EdgeInsets.only(right: 4),
+          padding: const EdgeInsets.only(right: 72),
           child: Text(
             widget.meaning ? 'Discover what $_title really means' : 'Discover the sound of $_title',
-            style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -0.3),
+            style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.5),
           ),
         ),
         const SizedBox(height: 12),
@@ -538,7 +726,16 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
           ),
         const SizedBox(height: 6),
         _buyCard(),
-      ]),
+            ]),
+            Positioned(
+              right: 4,
+              top: -36,
+              child: StoreWordStar(item: widget.item, size: 64, badge: true),
+            ),
+            ]),
+          ),
+        ]),
+      ),
     );
   }
 
@@ -556,7 +753,7 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
         Row(children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(14),
-            child: SizedBox(width: 56, height: 56, child: StoreNetImage(url: widget.picture)),
+            child: SizedBox(width: 56, height: 56, child: StoreNetImage(url: _picture)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -605,8 +802,26 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
     final all = _f.related;
     return [
       const SizedBox(height: 30),
+      Row(children: [
+        StoreWordCircle(
+          key: const ValueKey('word-more-back'),
+          icon: Icons.arrow_back_rounded,
+          label: 'Back',
+          onTap: () => Navigator.of(context).maybePop(),
+        ),
+        const Spacer(),
+        StoreWordCircle(
+          icon: Icons.tune_rounded,
+          label: 'All stores',
+          onTap: widget.onStorePicker,
+        ),
+        const SizedBox(width: 8),
+        StoreWordStar(item: widget.item, size: 40, onDark: false),
+      ]),
+      const SizedBox(height: 10),
       Text('More in\n$_collection',
-          style: const TextStyle(color: Colors.white, fontSize: 38, fontWeight: FontWeight.w800, height: 1.04, letterSpacing: -1.2)),
+          key: const ValueKey('word-more-title'),
+          style: const TextStyle(color: Colors.white, fontSize: 48, fontWeight: FontWeight.w800, height: 0.96, letterSpacing: -1.6)),
       const SizedBox(height: 16),
       Container(
         key: const ValueKey('word-more-card'),
@@ -639,15 +854,22 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
               onTap: () => widget.onOpenLink(links.first),
             ),
           ]),
-          const SizedBox(height: 12),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            _SmallPill(icon: Icons.sell_outlined, label: 'From ${inr(widget.price <= 0 ? 49 : widget.price, sku: widget.itemId)}'),
-            const _SmallPill(icon: Icons.all_inclusive_rounded, label: 'Owned forever'),
-          ]),
         ]),
       ),
+      if (links.isNotEmpty) ...[
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 36,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: links.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (_, i) => _SmallPill(icon: Icons.menu_book_outlined, label: links[i].title),
+          ),
+        ),
+      ],
       const SizedBox(height: 16),
-      for (final l in links) _PhotoCard(link: l, onOpen: () => widget.onOpenLink(l)),
+      _MoreCarousel(links: links, onOpen: widget.onOpenLink),
     ];
   }
 
@@ -702,7 +924,48 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
   }
 }
 
-/// The small caps line over a title (the reference's flag and country).
+/// Small NowssB Store box on the origin line. Tapping it opens the Store.
+class _StoreThumb extends StatelessWidget {
+  const _StoreThumb({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Open the Store',
+      child: GestureDetector(
+        key: const ValueKey('word-store-mark'),
+        onTap: onTap,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0x66FFFFFF), width: 1),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(11),
+            child: Image.asset(
+              'assets/home/nowssb-store.webp',
+              width: 44,
+              height: 44,
+              fit: BoxFit.cover,
+              semanticLabel: 'NowssB Store',
+              errorBuilder: (_, __, ___) => Image.asset(
+                kNowssbWordFallback,
+                width: 44,
+                height: 44,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _OriginLabel extends StatelessWidget {
   const _OriginLabel(this.text);
   final String text;
@@ -742,20 +1005,17 @@ class _CoinBadge extends StatelessWidget {
         final c = EconomyMirror.instance.coins;
         return Semantics(
           label: '$c NowssB coins',
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              width: 38,
-              height: 38,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: const Color(0xF2FFFFFF), borderRadius: BorderRadius.circular(19)),
-              child: const NwsbCoinDisc(size: 26),
-            ),
-            const SizedBox(width: 8),
-            Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              const Text('Coins', style: TextStyle(color: _kMuted, fontSize: 11, fontWeight: FontWeight.w500)),
-              Text('$c', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800, height: 1.15)),
+          child: Container(
+            width: 64,
+            height: 64,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: Color(0xF2FFFFFF), shape: BoxShape.circle),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const NwsbCoinDisc(size: 22),
+              const Text('Coins', style: TextStyle(color: Color(0xB316141C), fontSize: 8, fontWeight: FontWeight.w600, height: 1.1)),
+              Text('$c', style: const TextStyle(color: NwsbColors.ink, fontSize: 13, fontWeight: FontWeight.w800, height: 1.05)),
             ]),
-          ]),
+          ),
         );
       },
     );
@@ -829,15 +1089,15 @@ class _WishPill extends StatelessWidget {
               }
             },
             child: Container(
-              width: 52,
-              height: 70,
+              width: 54,
+              height: 96,
               decoration: BoxDecoration(
                 color: on ? Colors.white : _kGlass,
-                borderRadius: BorderRadius.circular(26),
-                border: Border.all(color: on ? Colors.white : _kLine),
+                borderRadius: BorderRadius.circular(27),
+                border: Border.all(color: on ? Colors.white : _kLine, width: 1.2),
               ),
               child: Icon(on ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                  size: 22, color: on ? NwsbColors.ink : Colors.white),
+                  size: 24, color: on ? NwsbColors.ink : Colors.white),
             ),
           ),
         );
@@ -913,14 +1173,20 @@ class _OutlinePill extends StatelessWidget {
           AppHaptics.selection();
           onTap();
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 11),
-          decoration: BoxDecoration(
-            color: const Color(0x1FFFFFFF),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: Colors.white, width: 1.2),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(999),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0x33FFFFFF),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: const Color(0xF2FFFFFF), width: 1.6),
+              ),
+              child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+            ),
           ),
-          child: Text(label, style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w700)),
         ),
       ),
     );
@@ -1024,8 +1290,72 @@ BagItem storeWordLinkItem(StoreWordLink l) {
   return wordBagItem(name: l.title, root: l.root, img: pic, price: StorePrices.instance.priceFor(l.id));
 }
 
+/// Sideways overlapping carousel of tall photo cards, like the reference's
+/// Popular list — the next card peeks from the right.
+class _MoreCarousel extends StatefulWidget {
+  const _MoreCarousel({required this.links, required this.onOpen});
+  final List<StoreWordLink> links;
+  final ValueChanged<StoreWordLink> onOpen;
+
+  @override
+  State<_MoreCarousel> createState() => _MoreCarouselState();
+}
+
+class _MoreCarouselState extends State<_MoreCarousel> {
+  late final PageController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = PageController(viewportFraction: 0.78);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final links = widget.links;
+    if (links.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      key: const ValueKey('word-more-carousel'),
+      height: 340,
+      child: PageView.builder(
+        controller: _ctrl,
+        padEnds: false,
+        itemCount: links.length,
+        itemBuilder: (context, i) {
+          return AnimatedBuilder(
+            animation: _ctrl,
+            builder: (context, child) {
+              var page = 0.0;
+              if (_ctrl.hasClients && _ctrl.position.haveDimensions) {
+                page = _ctrl.page ?? _ctrl.initialPage.toDouble();
+              }
+              final dist = (i - page).abs();
+              final scale = 1 - (dist * 0.06).clamp(0.0, 0.1);
+              return Transform.scale(
+                scale: scale,
+                alignment: Alignment.centerLeft,
+                child: child,
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.only(right: i == links.length - 1 ? 0 : 12),
+              child: _PhotoCard(link: links[i], onOpen: () => widget.onOpen(links[i])),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 /// A tall photo card in "More in …" (the reference's forest card): the
-/// photo with the word over it, a star in the corner and chips under it.
+/// photo with the word over it, a star in the corner and chips on the photo.
 class _PhotoCard extends StatelessWidget {
   const _PhotoCard({required this.link, required this.onOpen});
   final StoreWordLink link;
@@ -1036,64 +1366,56 @@ class _PhotoCard extends StatelessWidget {
     final l = link;
     final origin = plainOrigin(l.root.split('·').first.trim());
     final letters = l.word.replaceAll(RegExp(r'[^A-Za-z]'), '').length;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 18),
-      child: Semantics(
-        button: true,
-        label: 'Open ${l.title}',
-        child: GestureDetector(
-          key: ValueKey('word-more-${l.id}'),
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            AppHaptics.selection();
-            onOpen();
-          },
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(26),
-              child: SizedBox(
-                height: 236,
-                child: Stack(fit: StackFit.expand, children: [
-                  StoreNetImage(url: storeWordPicture(l.word, kNowssbWordFallback)),
-                  const DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        stops: [0, .45, 1],
-                        colors: [Color(0x33000000), Color(0x00000000), Color(0xD9000000)],
-                      ),
-                    ),
-                  ),
-                  Positioned(right: 12, top: 12, child: StoreWordStar(item: () => storeWordLinkItem(l), size: 38)),
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 14,
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                      _OriginLabel(origin),
-                      const SizedBox(height: 4),
-                      Text(l.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.4)),
-                    ]),
-                  ),
-                ]),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              ListenableBuilder(
-                listenable: StorePrices.instance,
-                builder: (_, __) => _SmallPill(
-                  icon: Icons.sell_outlined,
-                  label: inr(l.meaning != null ? StorePrices.instance.priceFor(l.id, shown: l.meaning!.price) : StorePrices.instance.priceFor(l.id), sku: l.id),
+    return Semantics(
+      button: true,
+      label: 'Open ${l.title}',
+      child: GestureDetector(
+        key: ValueKey('word-more-${l.id}'),
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          AppHaptics.selection();
+          onOpen();
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(26),
+          child: Stack(fit: StackFit.expand, children: [
+            StoreNetImage(url: storeWordPicture(l.word, kNowssbWordFallback)),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0, .4, 1],
+                  colors: [Color(0x33000000), Color(0x00000000), Color(0xE0000000)],
                 ),
               ),
-              if (letters > 0) _SmallPill(icon: Icons.text_fields_rounded, label: '$letters letters'),
-              const _SmallPill(icon: Icons.all_inclusive_rounded, label: 'Owned forever'),
-            ]),
+            ),
+            Positioned(right: 12, top: 12, child: StoreWordStar(item: () => storeWordLinkItem(l), size: 38)),
+            Positioned(
+              left: 14,
+              right: 14,
+              bottom: 14,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                _OriginLabel(origin),
+                const SizedBox(height: 4),
+                Text(l.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800, height: 1.1, letterSpacing: -0.4)),
+                const SizedBox(height: 8),
+                Wrap(spacing: 6, runSpacing: 6, children: [
+                  ListenableBuilder(
+                    listenable: StorePrices.instance,
+                    builder: (_, __) => _SmallPill(
+                      icon: Icons.sell_outlined,
+                      label: inr(l.meaning != null ? StorePrices.instance.priceFor(l.id, shown: l.meaning!.price) : StorePrices.instance.priceFor(l.id), sku: l.id),
+                    ),
+                  ),
+                  if (letters > 0) _SmallPill(icon: Icons.text_fields_rounded, label: '$letters letters'),
+                  const _SmallPill(icon: Icons.all_inclusive_rounded, label: 'Owned forever'),
+                ]),
+              ]),
+            ),
           ]),
         ),
       ),
@@ -1104,10 +1426,12 @@ class _PhotoCard extends StatelessWidget {
 /// The favourite star: on when the item is on the wishlist. Tapping it adds
 /// or removes it (one selection haptic, on the tap only).
 class StoreWordStar extends StatelessWidget {
-  const StoreWordStar({super.key, required this.item, this.size = 40, this.onDark = true});
+  const StoreWordStar({super.key, required this.item, this.size = 40, this.onDark = true, this.badge = false});
   final BagItem Function() item;
   final double size;
   final bool onDark;
+  /// Large overlapping white star badge (phone 3), never gold.
+  final bool badge;
 
   @override
   Widget build(BuildContext context) {
@@ -1134,12 +1458,18 @@ class StoreWordStar extends StatelessWidget {
               width: size,
               height: size,
               decoration: BoxDecoration(
-                color: on ? Colors.white : (onDark ? const Color(0x59000000) : const Color(0x24FFFFFF)),
+                color: badge ? const Color(0xF2FFFFFF) : (on ? Colors.white : (onDark ? const Color(0x59000000) : const Color(0x24FFFFFF))),
                 borderRadius: BorderRadius.circular(size / 2),
-                border: Border.all(color: on ? Colors.white : const Color(0x40FFFFFF)),
+                border: Border.all(color: badge || on ? Colors.white : const Color(0x40FFFFFF), width: badge ? 1.5 : 1),
+                boxShadow: badge
+                    ? const [BoxShadow(color: Color(0x66000000), blurRadius: 16, offset: Offset(0, 6))]
+                    : null,
               ),
-              child: Icon(on ? Icons.star_rounded : Icons.star_outline_rounded,
-                  size: size * 0.52, color: on ? NwsbColors.ink : Colors.white),
+              child: Icon(
+                badge || on ? Icons.star_rounded : Icons.star_outline_rounded,
+                size: size * (badge ? 0.5 : 0.52),
+                color: badge || on ? NwsbColors.ink : Colors.white,
+              ),
             ),
           ),
         );

@@ -3,7 +3,8 @@
 /// Practice / Share, streak · time · words, "Your days" with a month
 /// switcher, that day's practice across the hours, Start session, the
 /// words practised lately and today's goals as a 2x2 grid with the next one
-/// lit. It is about your practice, not your profile: no name, no account
+/// lit. Under the streak row sit the same Rhythm / This week and Morning /
+/// Evening rows as Profile. It is about your practice, not your profile: no name, no account
 /// photo. Counts come from [ProgressSources] and [PracticeProgress];
 /// nothing here is made up.
 library;
@@ -18,6 +19,7 @@ import '../../data/practice_progress.dart';
 import '../../data/word_voice.dart';
 import '../../screens/daily_tasks.dart';
 import '../../screens/practice_player.dart';
+import '../../screens/profile_mind.dart';
 import '../../widgets/page_shell.dart';
 import 'my_progress_kit.dart';
 import 'progress_center.dart';
@@ -308,6 +310,11 @@ class _TodayProgressBodyState extends State<TodayProgressBody> {
                     style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12.5, height: 1.4)),
               ),
           ]);
+          final mindRows = PracticeMindLiveRows(
+            key: const ValueKey('progress-mind-rows'),
+            paletteIndex: 0,
+            onPractice: () => ProgressRoutes.goTab(context, 1),
+          );
           final days = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             MpMonthBar(
               title: 'Your days',
@@ -386,7 +393,7 @@ class _TodayProgressBodyState extends State<TodayProgressBody> {
                   const SizedBox(width: 20),
                   Expanded(
                     flex: 6,
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [stats, const SizedBox(height: 22), days]),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [stats, const SizedBox(height: 14), mindRows, const SizedBox(height: 22), days]),
                   ),
                 ]),
               ),
@@ -402,6 +409,8 @@ class _TodayProgressBodyState extends State<TodayProgressBody> {
             Padding(padding: pad, child: actions),
             const SizedBox(height: 14),
             Padding(padding: pad, child: stats),
+            const SizedBox(height: 14),
+            Padding(padding: pad, child: mindRows),
             const SizedBox(height: 22),
             Padding(padding: pad, child: days),
             const SizedBox(height: 28),

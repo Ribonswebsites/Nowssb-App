@@ -81,9 +81,8 @@ void main() {
       final p = await SharedPreferences.getInstance();
       final idx = p.getInt(kMindPalettePrefKey)!;
       final pal = kMindPalettes[idx];
-      // Empty state uses the focus shade (no sessions in this test).
-      final card = t.widget<EzOrangeCard>(
-        find.byKey(const ValueKey('mind-empty')),
+            final card = t.widget<EzOrangeCard>(
+        find.byKey(const ValueKey('mind-focus')),
       );
       expect(card.color, pal.focus);
       expect(card.headerFade, isFalse);
@@ -116,8 +115,6 @@ void main() {
       t.view.physicalSize = const Size(390, 900);
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.reset);
-      // Empty state only has the focus card. Forced index still colours it,
-      // and a second pump with the same API stays on that palette.
       await t.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -126,13 +123,24 @@ void main() {
         ),
       );
       await t.pumpAndSettle();
-      final empty = t.widget<EzOrangeCard>(
-        find.byKey(const ValueKey('mind-empty')),
+      final focus = t.widget<EzOrangeCard>(
+        find.byKey(const ValueKey('mind-focus')),
       );
-      expect(empty.color, kMindPalettes[2].focus);
-      expect(empty.headerFade, isFalse);
-      expect(empty.image, kMindPalettes[2].image);
+      expect(focus.color, kMindPalettes[2].focus);
+      expect(focus.headerFade, isFalse);
       expect(_shownPhoto(t), kMindPalettes[2].image);
+      final rhythm = t.widget<EzOrangeCard>(
+        find.byKey(const ValueKey('mind-rhythm')),
+      );
+      final week = t.widget<EzOrangeCard>(
+        find.byKey(const ValueKey('mind-week')),
+      );
+      expect(rhythm.color, kMindPalettes[2].rhythm);
+      expect(week.color, kMindPalettes[2].week);
+      expect(rhythm.color, isNot(focus.color));
+      expect(week.color, isNot(focus.color));
+      expect(week.color, isNot(rhythm.color));
+      expect(find.byKey(const ValueKey('mind-strip')), findsOneWidget);
     },
   );
 

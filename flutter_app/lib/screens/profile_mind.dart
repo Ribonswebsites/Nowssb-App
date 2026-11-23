@@ -2,7 +2,9 @@
 /// reference, rebuilt in the two Editeaze styles (orange-box cards and the
 /// two-photo strip). Every number is the user's own practice record from
 /// [PracticeProgress]; nothing is estimated, and nothing here is a brain or
-/// medical measurement. With no sessions yet it says so.
+/// medical measurement. With no sessions yet the cards still appear, with
+/// zeros, so Rhythm, This week and the Morning / Evening strip stay in
+/// place under Focus today.
 ///
 /// Each time the section is opened it picks a fresh, harmonious palette so
 /// the Focus, Rhythm, This week and Practise-now tiles don't share one
@@ -394,7 +396,7 @@ class _ProfileMindState extends State<ProfileMind>
                       ),
                     ),
                   ),
-                  if (m.total == 0) _empty(pal) else ..._cards(m, pal),
+                  ..._cards(m, pal),
                 ],
               );
             },
@@ -432,30 +434,7 @@ class _ProfileMindState extends State<ProfileMind>
     );
   }
 
-  Widget _empty(MindPalette pal) => EzOrangeCard(
-        key: const ValueKey('mind-empty'),
-        color: pal.focus,
-        headerFade: false,
-        title: 'Practice once to see this',
-        subtitle: 'Your rhythm, focus and streak appear after a session',
-        image: _to.image,
-        alignment: const Alignment(0, -.2),
-        height: 220,
-        icons: [
-          EzIcon(
-            Icons.play_arrow_rounded,
-            label: 'Practise now',
-            onTap: widget.onPractice,
-          ),
-        ],
-        onTap: widget.onPractice,
-        child: _photo(const Alignment(0, -.2)),
-      );
-
   List<Widget> _cards(MindStats m, MindPalette pal) {
-    const parts = ['Morning', 'Afternoon', 'Evening', 'Night'];
-    final best = m.byPart.reduce(math.max);
-    final bestPart = best == 0 ? null : parts[m.byPart.indexOf(best)];
     return [
       // Focus: today's sessions against the daily plan.
       EzOrangeCard(
@@ -493,72 +472,158 @@ class _ProfileMindState extends State<ProfileMind>
         ),
       ),
       const SizedBox(height: 14),
-      // Rhythm + load, the reference's curve and wave cards.
-      Row(
-        children: [
-          Expanded(
-            child: EzOrangeCard(
-              key: const ValueKey('mind-rhythm'),
-              color: pal.rhythm,
-              headerFade: false,
-              title: 'Rhythm',
-              subtitle:
-                  bestPart == null ? 'No times recorded' : 'Mostly $bestPart',
-              height: 150,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
-                child: _Graph(
-                  values: m.byPart,
-                  labels: const ['AM', 'PM', 'Eve', 'Night'],
-                  curve: true,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: EzOrangeCard(
-              key: const ValueKey('mind-week'),
-              color: pal.week,
-              headerFade: false,
-              title: 'This week',
-              subtitle:
-                  '${m.week.fold<int>(0, (a, b) => a + b)} sessions in 7 days',
-              height: 150,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
-                child: _Graph(
-                  values: m.week,
-                  labels: const ['', '', '', '', '', '', 'Today'],
-                  curve: false,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 14),
-      // Two-photo strip: morning vs evening practice, counted.
-      EzSplitStrip(
-        key: const ValueKey('mind-strip'),
-        tileColor: pal.tile,
-        left: EzTile(
-          image: 'assets/home/ez/ez-med-beach.webp',
-          label: 'Morning · ${m.byPart[0]}',
-          alignment: const Alignment(0, .2),
-          onTap: widget.onProgress,
-        ),
-        right: EzTile(
-          image: 'assets/home/ez/ez-med-candle.webp',
-          label: 'Evening · ${m.byPart[2] + m.byPart[3]}',
-          onTap: widget.onProgress,
-        ),
-        addLabel: 'Practise now',
-        addIcon: Icons.play_arrow_rounded,
-        onAdd: widget.onPractice,
+      PracticeMindRows(
+        stats: m,
+        palette: pal,
+        onPractice: widget.onPractice,
+        onProgress: widget.onProgress,
       ),
     ];
   }
+}
+
+/// The two rows under Focus today: Rhythm / This week, then the Morning
+/// vs Evening compare strip with Practise now. Shared by Profile and My
+/// progress so both pages show the same live cards.
+class PracticeMindRows extends StatelessWidget {
+  const PracticeMindRows({
+    super.key,
+    required this.stats,
+    required this.palette,
+    this.onPractice,
+    this.onProgress,
+  });
+
+  final MindStats stats;
+  final MindPalette palette;
+  final VoidCallback? onPractice;
+  final VoidCallback? onProgress;
+
+  @override
+  Widget build(BuildContext context) {
+    const parts = ['Morning', 'Afternoon', 'Evening', 'Night'];
+    final best = stats.byPart.reduce(math.max);
+    final bestPart = best == 0 ? null : parts[stats.byPart.indexOf(best)];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // Rhythm + load, the reference's curve and wave cards.
+        Row(
+          children: [
+            Expanded(
+              child: EzOrangeCard(
+                key: const ValueKey('mind-rhythm'),
+                color: palette.rhythm,
+                headerFade: false,
+                title: 'Rhythm',
+                subtitle: bestPart == null
+                    ? 'No times recorded'
+                    : 'Mostly $bestPart',
+                height: 150,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
+                  child: _Graph(
+                    values: stats.byPart,
+                    labels: const ['AM', 'PM', 'Eve', 'Night'],
+                    curve: true,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: EzOrangeCard(
+                key: const ValueKey('mind-week'),
+                color: palette.week,
+                headerFade: false,
+                title: 'This week',
+                subtitle:
+                    '${stats.week.fold<int>(0, (a, b) => a + b)} sessions in 7 days',
+                height: 150,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
+                  child: _Graph(
+                    values: stats.week,
+                    labels: const ['', '', '', '', '', '', 'Today'],
+                    curve: false,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        // Two-photo strip: morning vs evening practice, counted.
+        EzSplitStrip(
+          key: const ValueKey('mind-strip'),
+          tileColor: palette.tile,
+          left: EzTile(
+            image: 'assets/home/ez/ez-med-beach.webp',
+            label: 'Morning · ${stats.byPart[0]}',
+            alignment: const Alignment(0, .2),
+            onTap: onProgress,
+          ),
+          right: EzTile(
+            image: 'assets/home/ez/ez-med-candle.webp',
+            label: 'Evening · ${stats.byPart[2] + stats.byPart[3]}',
+            onTap: onProgress,
+          ),
+          addLabel: 'Practise now',
+          addIcon: Icons.play_arrow_rounded,
+          onAdd: onPractice,
+        ),
+      ],
+    );
+  }
+}
+
+/// Live Rhythm / This week / Morning-Evening rows for pages that are not
+/// Profile (My progress). Picks a palette on first open, same shades and
+/// photos as Profile, with numbers from [PracticeProgress].
+class PracticeMindLiveRows extends StatefulWidget {
+  const PracticeMindLiveRows({
+    super.key,
+    this.onPractice,
+    this.onProgress,
+    this.paletteIndex,
+  });
+
+  final VoidCallback? onPractice;
+  final VoidCallback? onProgress;
+
+  /// Tests and screenshots can pin a [kMindPalettes] index.
+  final int? paletteIndex;
+
+  @override
+  State<PracticeMindLiveRows> createState() => _PracticeMindLiveRowsState();
+}
+
+class _PracticeMindLiveRowsState extends State<PracticeMindLiveRows> {
+  late MindPalette _pal;
+
+  @override
+  void initState() {
+    super.initState();
+    final forced = widget.paletteIndex;
+    _pal = forced != null
+        ? kMindPalettes[forced.clamp(0, kMindPalettes.length - 1)]
+        : kMindPalettes[pickMindPaletteIndex(
+            last: -1,
+            length: kMindPalettes.length,
+            nextInt: math.Random().nextInt,
+          )];
+  }
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: PracticeProgress.instance,
+        builder: (context, _) => PracticeMindRows(
+          stats: MindStats.from(PracticeProgress.instance),
+          palette: _pal,
+          onPractice: widget.onPractice,
+          onProgress: widget.onProgress,
+        ),
+      );
 }
 
 class _Ring extends StatelessWidget {

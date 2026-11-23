@@ -236,9 +236,12 @@ void main() {
     expect(find.text('Ocean'), findsWidgets);
     expect(find.text('Nature'), findsWidgets);
     final star = find.byType(StoreWordStar).first;
+    await t.ensureVisible(star);
+    await settle(t, 3);
     await t.tap(star);
     await settle(t, 3);
     expect(CartBag.instance.inWish('word:ocean'), isTrue);
+    await t.ensureVisible(star);
     await t.tap(star);
     await settle(t, 3);
     expect(CartBag.instance.inWish('word:ocean'), isFalse);

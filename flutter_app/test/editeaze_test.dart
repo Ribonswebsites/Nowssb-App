@@ -146,14 +146,19 @@ void main() {
     await t.pumpWidget(const SizedBox());
   });
 
-  testWidgets('Profile mind: honest empty state with no sessions', (t) async {
+  testWidgets('Profile mind: Focus today and the two rows show with no sessions', (t) async {
     t.view.physicalSize = const Size(360, 900);
     t.view.devicePixelRatio = 1;
     addTearDown(t.view.reset);
     await t.pumpWidget(const MaterialApp(home: Scaffold(body: SingleChildScrollView(child: ProfileMind()))));
     await t.pump();
-    expect(find.text('Practice once to see this'), findsOneWidget);
-    expect(find.textContaining('%'), findsNothing);
+    expect(find.text('Focus today'), findsOneWidget);
+    expect(find.byKey(const ValueKey('mind-rhythm')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mind-week')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mind-strip')), findsOneWidget);
+    expect(find.text('Rhythm'), findsOneWidget);
+    expect(find.text('This week'), findsOneWidget);
+    expect(find.text('Practise now'), findsOneWidget);
   });
 
 }

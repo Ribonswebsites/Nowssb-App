@@ -86,6 +86,10 @@ void main() {
     await _mount(t);
     expect(find.byKey(const ValueKey('today-empty')), findsOneWidget);
     expect(find.byKey(const ValueKey('today-words-empty')), findsOneWidget);
+    expect(find.byKey(const ValueKey('progress-mind-rows')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mind-rhythm')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mind-week')), findsOneWidget);
+    expect(find.byKey(const ValueKey('mind-strip')), findsOneWidget);
     expect(find.text('Your first word'), findsOneWidget);
     expect(find.textContaining('Practising since'), findsNothing);
     expect(find.text('Practitioner'), findsNothing);
