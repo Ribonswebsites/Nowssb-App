@@ -25,6 +25,7 @@ import '../programs/program_router.dart';
 import '../coins/coins_screen.dart';
 import '../earn/earn_kit.dart';
 import '../earn/earnings_screen.dart';
+import '../account/account_kit.dart' show WhiteCircleBadges;
 import '../economy/money.dart';
 
 class CircleScreen extends StatefulWidget {
@@ -334,7 +335,7 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WhiteCircleBadges(child: Scaffold(
       backgroundColor: const Color(0xFF07070C),
       body: Stack(fit: StackFit.expand, children: [
         const Positioned.fill(child: AppBackdrop()),
@@ -358,8 +359,8 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  EarnHey(eyebrow: 'NowssB Earn', onBack: () => Navigator.of(context).maybePop()),
-                  const SizedBox(height: 18),
+                  EarnHey(onBack: () => Navigator.of(context).maybePop()),
+                  const SizedBox(height: 20),
                   ListenableBuilder(
                     listenable: Listenable.merge([EconomyMirror.instance, FxBook.instance]),
                     builder: (context, _) {
@@ -404,7 +405,7 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
           ),
         ),
       ]),
-    );
+    ));
   }
 }
 

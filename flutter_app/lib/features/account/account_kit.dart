@@ -53,7 +53,11 @@ class AccountPage extends StatelessWidget {
     this.onBack,
     this.trailing,
     this.bottom,
+    this.header,
   });
+
+  /// Replaces the NOWSSB + kicker line in the bar (the Earn "Hey, name").
+  final Widget? header;
 
   /// Second word in the bar after NOWSSB ("Your account", "Earn").
   final String kicker;
@@ -90,7 +94,7 @@ class AccountPage extends StatelessWidget {
                     AccountBackButton(onTap: onBack!),
                     const SizedBox(width: 12),
                   ],
-                  Expanded(
+                  if (header != null) Expanded(child: header!) else Expanded(
                     child: Text.rich(
                       TextSpan(children: [
                         const TextSpan(
@@ -206,6 +210,15 @@ class TileBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (WhiteCircleBadges.of(context)) {
+      return Container(
+        width: 38,
+        height: 38,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        child: child ?? Icon(icon, size: 18, color: NwsbColors.ink),
+      );
+    }
     return Container(
       width: 38,
       height: 38,
@@ -218,6 +231,15 @@ class TileBadge extends StatelessWidget {
       child: child ?? Icon(icon, size: 18, color: color),
     );
   }
+}
+
+/// Below this, every [TileBadge] is a WHITE CIRCLE with an ink icon (the
+/// Earn reference look on Complete your profile and the Earn forms).
+class WhiteCircleBadges extends InheritedWidget {
+  const WhiteCircleBadges({super.key, required super.child});
+  static bool of(BuildContext context) => context.getInheritedWidgetOfExactType<WhiteCircleBadges>() != null;
+  @override
+  bool updateShouldNotify(WhiteCircleBadges old) => false;
 }
 
 const _divider = SizedBox(
@@ -487,7 +509,7 @@ class FlagBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     return TileBadge(
       child: country == null
-          ? const Icon(Icons.public_rounded, size: 18, color: Colors.white)
+          ? Icon(Icons.public_rounded, size: 18, color: WhiteCircleBadges.of(context) ? NwsbColors.ink : Colors.white)
           : Text(country!.flag, style: const TextStyle(fontSize: 18)),
     );
   }

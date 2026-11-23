@@ -175,7 +175,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   @override
   Widget build(BuildContext context) {
     final name = _name.text.trim();
-    return AccountPage(
+    final first = name.isEmpty ? null : name.split(RegExp(r'\s+')).first;
+    return WhiteCircleBadges(child: AccountPage(
+      header: widget.editing ? null : EarnHey(name: first, title: first ?? 'Welcome', bell: false),
       kicker: widget.editing
           ? 'Your account'
           : (name.trim().isEmpty ? 'Welcome' : 'Hey, ${name.trim().split(RegExp(r'\s+')).first}'),
@@ -196,7 +198,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           countryOk: _country != null,
           phoneOk: validatePhone(_phone.text, _dial) == null,
         ),
-        GlassListCard( squareBadge: true,
+        GlassListCard(
           icon: Icons.badge_outlined,
           overline: 'About you',
           title: 'Your details',
@@ -263,7 +265,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             ),
           ],
         ),
-        GlassListCard( squareBadge: true,
+        GlassListCard(
           icon: Icons.card_giftcard_rounded,
           overline: 'Invited by a friend?',
           title: 'Friend’s code',
@@ -312,7 +314,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
         ),
         const _PrivacyNote('Your phone and birthday stay private to your account. They are never shown on your public profile.'),
       ],
-    );
+    ));
   }
 }
 
@@ -330,18 +332,19 @@ class _ProfileHead extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ready = nameOk && countryOk && phoneOk;
-    Widget chip(String label, bool ok) => EarnChip(label, icon: ok ? Icons.check_rounded : Icons.add_rounded);
+    EarnOdd odd(String label, bool ok) => EarnOdd(label, ok ? 'Done' : 'Add', icon: ok ? Icons.check_rounded : Icons.add_rounded);
     return Padding(
       key: const Key('profile-head'),
       padding: const EdgeInsets.only(bottom: 16),
       child: EarnStatCard(
-        mark: NwsbMarks.user,
         title: name.isEmpty ? 'Your name here' : name,
         status: EarnStatusPill(ready ? EarnStatus.reached : EarnStatus.ongoing, text: ready ? 'Ready' : 'In progress'),
-        number: '$filled',
-        unit: '/ 4 filled in',
-        progress: (filled / 4).clamp(0.0, 1.0),
-        chips: [chip('Name', nameOk), chip('Country', countryOk), chip('Phone', phoneOk)],
+        left: EarnSide(nameOk ? 'Name added' : 'Add your name', icon: Icons.person_outline_rounded),
+        eyebrow: 'Filled in',
+        number: '$filled / 4',
+        under: filled >= 4 ? 'All done' : '${4 - filled} to go',
+        right: EarnSide(phoneOk ? 'Phone added' : 'Add your phone', icon: Icons.phone_iphone_rounded),
+        odds: [odd('Name', nameOk), odd('Country', countryOk), odd('Phone', phoneOk)],
       ),
     );
   }

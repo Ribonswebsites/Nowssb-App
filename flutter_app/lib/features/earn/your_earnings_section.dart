@@ -223,6 +223,9 @@ class _TrioButton extends StatelessWidget {
   final VoidCallback onTap;
   final double? progress;
 
+  /// Your Earnings is the reference's yellow highlight (our gold glass).
+  bool get _gold => glow == const Color(0xFFE8C46A);
+
   @override
   Widget build(BuildContext context) => Semantics(
         button: true,
@@ -232,50 +235,39 @@ class _TrioButton extends StatelessWidget {
             AppHaptics.medium();
             onTap();
           },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              constraints: const BoxConstraints(minHeight: 112),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x2EFFFFFF), Color(0x0DFFFFFF)]),
-                border: Border.all(color: const Color(0x33FFFFFF)),
-              ),
-              child: Stack(children: [
-                // The tile's colour as a thin top edge, not a glow.
-                Positioned(left: 14, right: 14, top: 0, child: Container(height: 2, decoration: BoxDecoration(color: glow.withValues(alpha: .8), borderRadius: BorderRadius.circular(1)))),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(11, 11, 10, 11),
-                  child: ExcludeSemantics(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Container(
-                        width: 34,
-                        height: 34,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                        child: icon,
-                      ),
-                      const Spacer(),
-                      const SizedBox(height: 10),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(label, maxLines: 1, softWrap: false, style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.15, letterSpacing: -0.2)),
-                      ),
-                      const SizedBox(height: 2),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(sub, maxLines: 1, softWrap: false, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, fontWeight: FontWeight.w600, height: 1.15)),
-                      ),
-                      if (progress != null) ...[
-                        const SizedBox(height: 6),
-                        EarnBar(progress!.clamp(0, 1).toDouble(), height: 3),
-                      ],
-                    ]),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 112),
+            decoration: _gold
+                ? kEarnGoldGlass.copyWith(borderRadius: BorderRadius.circular(18), boxShadow: const [])
+                : BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    color: const Color(0x1FFFFFFF),
+                    border: Border.all(color: const Color(0x33FFFFFF)),
                   ),
-                ),
-              ]),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 10, 10, 11),
+              child: ExcludeSemantics(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  EarnCircle(size: 36, child: icon),
+                  const Spacer(),
+                  const SizedBox(height: 10),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(label, maxLines: 1, softWrap: false, style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.2)),
+                  ),
+                  const SizedBox(height: 2),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(sub, maxLines: 1, softWrap: false, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 10.5, fontWeight: FontWeight.w600, height: 1.15)),
+                  ),
+                  if (progress != null) ...[
+                    const SizedBox(height: 6),
+                    EarnBar(progress!.clamp(0, 1).toDouble(), height: 3),
+                  ],
+                ]),
+              ),
             ),
           ),
         ),
@@ -322,7 +314,7 @@ class _BlackBanner extends StatelessWidget {
                     Text(title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.2)),
+                        style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -0.3)),
                     if (subtitle != null) ...[
                       const SizedBox(height: 3),
                       Text(subtitle!,
@@ -534,9 +526,8 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
           child: Column(children: [
             Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0x80FFFFFF), borderRadius: BorderRadius.circular(9))),
             const SizedBox(height: 12),
-            Row(children: [
-              const Expanded(child: EarnHey(eyebrow: 'Your Earnings')),
-              const SizedBox(width: 8),
+            EarnHey(
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
               _HeadButton(
                 key: const ValueKey('earn-sheet-expand'),
                 label: _expanded ? 'Collapse' : 'Expand',
@@ -553,7 +544,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
                   _close();
                 },
               ),
-            ]),
+            ])),
           ]),
         ),
       );
@@ -591,6 +582,28 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
         const SizedBox(height: 12),
         EarnActions(onPayout: () => _Go.payouts(context), onInvite: () => _Go.invite(context)),
         const SizedBox(height: 20),
+        EarnSectionTitle('Target', onSeeAll: () => _Go.targets(context)),
+        const SizedBox(height: 8),
+        Semantics(
+          label: 'Target, $line',
+          child: EarnStatCard(
+            key: const ValueKey('earn-target-card'),
+            title: s.live && !s.topRank ? 'Next: ${s.nextRank ?? 'the next rank'}' : 'Your target',
+            status: EarnStatusPill(!s.live ? EarnStatus.off : s.topRank ? EarnStatus.reached : EarnStatus.ongoing),
+            left: const EarnSide('You', mark: NwsbMarks.user),
+            eyebrow: 'Words sold',
+            number: s.live ? '${s.sold} / ${s.target}' : '0',
+            under: line,
+            right: EarnSide(s.live && !s.topRank ? (s.nextRank ?? 'Next rank') : 'Top rank', mark: NwsbMarks.rewards),
+            odds: [
+              if (s.live) EarnOdd('Goal', '${s.target}'),
+              if (s.live && !s.topRank) EarnOdd('To go', '${math.max(0, s.target - s.sold)}'),
+              if (s.live) EarnOdd('Done', '${(s.progress * 100).round()}%'),
+            ],
+            onTap: () => _Go.targets(context),
+          ),
+        ),
+        const SizedBox(height: 20),
         EarnSectionTitle('Your position', onSeeAll: () => _Go.team(context)),
         const SizedBox(height: 8),
         EarnStatGrid([
@@ -606,28 +619,6 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
             padding: EdgeInsets.fromLTRB(4, 10, 4, 0),
             child: Text('Sign in to see your rank, your place and your team', style: TextStyle(color: kEarnSoft, fontSize: 12)),
           ),
-        const SizedBox(height: 20),
-        EarnSectionTitle('Target', onSeeAll: () => _Go.targets(context)),
-        const SizedBox(height: 8),
-        Semantics(
-          label: 'Target, $line',
-          child: EarnStatCard(
-            key: const ValueKey('earn-target-card'),
-            mark: NwsbMarks.rewards,
-            title: s.live && !s.topRank ? 'Next: ${s.nextRank ?? 'the next rank'}' : 'Your target',
-            status: EarnStatusPill(!s.live ? EarnStatus.off : s.topRank ? EarnStatus.reached : EarnStatus.ongoing),
-            number: s.live ? '${s.sold}' : '0',
-            unit: s.live ? '/ ${s.target} words' : 'words',
-            progress: s.progress,
-            footer: line,
-            chips: [
-              if (s.live) EarnChip('${s.target} words goal', mark: NwsbMarks.wordBag),
-              if (s.live && !s.topRank) EarnChip('${math.max(0, s.target - s.sold)} to go', mark: NwsbMarks.trending),
-              if (s.live) EarnChip('${(s.progress * 100).round()}% there', mark: NwsbMarks.bars),
-            ],
-            onTap: () => _Go.targets(context),
-          ),
-        ),
       ],
     );
   }
@@ -645,12 +636,7 @@ class _HeadButton extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(11), color: const Color(0x26FFFFFF), border: Border.all(color: const Color(0x33FFFFFF))),
-            child: Icon(icon, size: 17, color: Colors.white),
-          ),
+          child: EarnCircle(icon: icon, size: 38),
         ),
       );
 }

@@ -40,7 +40,7 @@ const kEarnSpec = ProgramSpec(
     ProgramTab('sales', 'Sales', _sales),
     ProgramTab('targets', 'Targets and Bonuses', _targets),
     ProgramTab('payouts', 'Payouts', _payouts),
-    ProgramTab('invite', 'Invite friends', referenceHubTab),
+    ProgramTab('invite', 'Invite friends', _invite),
     ProgramTab('academy', 'Academy', _academy),
     ProgramTab('rules', 'Rules and Disclaimer', _rules),
   ],
@@ -94,26 +94,35 @@ List<Widget> _overview(BuildContext context, Map<String, dynamic> s) => [
         final bal = sMap(r['balances']);
         final words = sInt(r['words']);
         final next = st['nextWords'] == null ? null : sInt(st['nextWords']);
+        final nextTitle = '${st['nextTitle'] ?? ''}';
+        final metal = '${st['metal'] ?? ''}';
         final fx = FxBook.instance;
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           if (r['enabled'] == false || r['countryOk'] == false)
             const PCard(children: [PEmpty('NowssB Earn is not open in your country yet. Links, coins and gifts still work.')]),
           EarnStatCard(
             key: const ValueKey('earn-overview-rank'),
-            mark: NwsbMarks.crown,
             title: '${st['title'] ?? 'No rank yet'}',
-            status: st['canEarn'] == true ? const EarnStatusPill(EarnStatus.ongoing, text: 'Earning') : const EarnStatusPill(EarnStatus.off, text: 'Not earning yet'),
-            number: '$words',
-            unit: 'words sold',
-            progress: next == null || next <= 0 ? null : (words / next).clamp(0.0, 1.0).toDouble(),
-            footer: next == null ? null : '$words / $next words to ${st['nextTitle']}',
-            chips: [
-              if ('${st['metal'] ?? ''}'.isNotEmpty) EarnChip('${st['metal']}', mark: NwsbMarks.rewards),
-              EarnChip('${sNum(st['ratePct'])}% per sale', mark: NwsbMarks.earn),
-              EarnChip('${sInt(r['words90'])} in 90 days', mark: NwsbMarks.trending),
+            status: st['canEarn'] == true ? const EarnStatusPill(EarnStatus.ongoing, text: 'Earning') : const EarnStatusPill(EarnStatus.upcoming, text: 'Not earning yet'),
+            left: EarnSide(metal.isEmpty ? 'Your rank' : metal, mark: NwsbMarks.crown),
+            eyebrow: 'Words sold',
+            number: next == null || next <= 0 ? '$words' : '$words / $next',
+            under: next == null || nextTitle.isEmpty ? 'Top rank' : 'to $nextTitle',
+            right: EarnSide(nextTitle.isEmpty ? 'Top rank' : nextTitle, mark: NwsbMarks.trending),
+            odds: [
+              EarnOdd('Rate', '${sNum(st['ratePct'])}%'),
+              EarnOdd('90 days', '${sInt(r['words90'])}'),
+              EarnOdd('Keep', '${sInt(st['keep90'])}'),
             ],
           ),
-          const SizedBox(height: 10),
+          const ProgramTabPills(),
+          EarnStatGrid([
+            EarnStat('Pending', fx.formatPrice(sNum(bal['pendingINR'])), sub: 'in the 30-day refund window'),
+            EarnStat('Available', fx.formatPrice(sNum(bal['availableINR'])), sub: 'ready to request', highlight: true),
+            EarnStat('Lifetime', fx.formatPrice(sNum(bal['lifetimeINR'])), sub: 'commission and bonuses earned'),
+            EarnStat('Last 90 days', '${sInt(r['words90'])} words', sub: '${sInt(st['keep90'])} needed to keep this rank'),
+          ]),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: Text(
@@ -123,13 +132,6 @@ List<Widget> _overview(BuildContext context, Map<String, dynamic> s) => [
           if (st['canEarn'] != true) const PEmpty('Commission needs your own active paid plan. Sales still count toward your rank.'),
           if (st['planShort'] == true) const PEmpty('Your rank needs the top plan to pay at its full rate. You earn at the rate your plan allows.'),
           const SizedBox(height: 6),
-          EarnStatGrid([
-            EarnStat('Pending', fx.formatPrice(sNum(bal['pendingINR'])), sub: 'in the 30-day refund window'),
-            EarnStat('Available', fx.formatPrice(sNum(bal['availableINR'])), sub: 'ready to request', highlight: true),
-            EarnStat('Lifetime', fx.formatPrice(sNum(bal['lifetimeINR'])), sub: 'commission and bonuses earned'),
-            EarnStat('Last 90 days', '${sInt(r['words90'])} words', sub: '${sInt(st['keep90'])} needed to keep this rank'),
-          ]),
-          const SizedBox(height: 12),
           if (r['sponsor'] != null) PCard(children: [PRow(title: 'Your sponsor', sub: '${sMap(r['sponsor'])['name'] ?? ''}', mark: NwsbMarks.people)]),
         ]);
       })),
@@ -142,7 +144,31 @@ List<Widget> _team(BuildContext context, Map<String, dynamic> s) => [
         final sent = sList(r['sentInvites']);
         final st = sMap(r['standing']);
         final appoints = ((st['appoints'] as List?) ?? const []).map((e) => '$e').toList();
+        final leg = (st['leg'] as List?) ?? const [0, 0];
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          EarnStatCard(
+            key: const ValueKey('earn-team-card'),
+            title: 'My team',
+            status: EarnStatusPill(team.isEmpty ? EarnStatus.upcoming : EarnStatus.ongoing, text: team.isEmpty ? 'Upcoming' : 'Ongoing'),
+            left: const EarnSide('You', mark: NwsbMarks.user),
+            eyebrow: 'People',
+            number: '${team.length} / ${sInt(st['teamMax'])}',
+            under: 'in your team',
+            right: const EarnSide('Your team', mark: NwsbMarks.people),
+            odds: [
+              EarnOdd('Level 1', '${leg.elementAtOrNull(0) ?? 0}%'),
+              EarnOdd('Level 2', '${leg.elementAtOrNull(1) ?? 0}%'),
+              EarnOdd('Sent', '${sent.length}'),
+            ],
+          ),
+          const ProgramTabPills(),
+          EarnStatGrid([
+            EarnStat('My team', '${team.length} of ${sInt(st['teamMax'])}', sub: 'people under you', highlight: true),
+            EarnStat('Level 1', '${leg.elementAtOrNull(0) ?? 0}%', sub: 'of their cleared sales'),
+            EarnStat('Level 2', '${leg.elementAtOrNull(1) ?? 0}%', sub: 'of level 2 cleared sales'),
+            EarnStat('Invitations', '${invites.length}', second: '${sent.length} sent', sub: 'to you · from you'),
+          ]),
+          const SizedBox(height: 12),
           if (invites.isNotEmpty)
             PCard(children: [
               const PHeading('Invitations', 'You were invited to a team', slot: 'earn_program.team', mark: NwsbMarks.people),
@@ -157,10 +183,6 @@ List<Widget> _team(BuildContext context, Map<String, dynamic> s) => [
                   ]),
                 ),
             ]),
-          EarnStatGrid([
-            EarnStat('My team', '${team.length} of ${sInt(st['teamMax'])}', sub: 'people under you', highlight: true),
-            EarnStat('Level 1', '${(((st['leg'] as List?) ?? const [0, 0]).elementAtOrNull(0)) ?? 0}%', sub: 'of their cleared sales'),
-          ]),
           const SizedBox(height: 12),
           PCard(children: [
             PHeading('Team', 'My team · ${team.length} of ${sInt(st['teamMax'])}', slot: 'earn_program.team', mark: NwsbMarks.people),
@@ -235,9 +257,27 @@ List<Widget> _sales(BuildContext context, Map<String, dynamic> s) => [
         final net = rows.fold<num>(0, (a, x) => a + sNum(x['inr'] ?? x['amount']));
         final waiting = rows.where((x) => sInt(x['availableAt']) > now).length;
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          EarnStatCard(
+            key: const ValueKey('earn-sales-card'),
+            title: 'Commission ledger',
+            status: EarnStatusPill(rows.isEmpty ? EarnStatus.upcoming : EarnStatus.ongoing, text: rows.isEmpty ? 'No sales yet' : 'Ongoing'),
+            left: EarnSide(rows.length == 1 ? '1 entry' : '${rows.length} entries', mark: NwsbMarks.trending),
+            eyebrow: 'Net',
+            number: signedMoney(net),
+            under: 'after refunds',
+            right: EarnSide('$waiting pending', mark: NwsbMarks.hourglass),
+            odds: [
+              EarnOdd('Entries', '${rows.length}'),
+              EarnOdd('Pending', '$waiting'),
+              EarnOdd('Cleared', '${rows.length - waiting}'),
+            ],
+          ),
+          const ProgramTabPills(),
           EarnStatGrid([
             EarnStat('Entries', '${rows.length}', sub: rows.isEmpty ? 'no sales yet' : 'sales and commission'),
             EarnStat('Net', signedMoney(net), sub: waiting > 0 ? '$waiting still in the refund window' : 'after refunds', highlight: true),
+            EarnStat('In refund window', '$waiting', sub: 'pending for 30 days'),
+            EarnStat('Cleared', '${rows.length - waiting}', sub: 'past the refund window'),
           ]),
           const SizedBox(height: 12),
           PCard(children: [
@@ -256,37 +296,59 @@ List<Widget> _sales(BuildContext context, Map<String, dynamic> s) => [
       const LSection('board', 'Leaderboard', SellersBoard()),
     ];
 
+Widget _targetCard(Map<String, dynamic> x, int words, {required bool open, required bool head}) {
+  final goal = sInt(x['words']);
+  final reached = x['reached'] == true;
+  final cash = sNum(x['cashINR']);
+  final coins = sInt(x['coins']);
+  final coupon = '${x['coupon'] ?? ''}';
+  return EarnStatCard(
+    key: ValueKey(head ? 'earn-target-$goal' : 'earn-target-list-$goal'),
+    gold: head || open,
+    title: '$goal words sold',
+    status: EarnStatusPill(reached ? EarnStatus.reached : (open ? EarnStatus.ongoing : EarnStatus.upcoming)),
+    left: const EarnSide('You', mark: NwsbMarks.user),
+    eyebrow: 'Words',
+    number: reached ? '$goal / $goal' : '$words / $goal',
+    under: reached || goal <= 0 ? 'Reached' : '${(goal - words).clamp(0, 1 << 31)} to go',
+    right: const EarnSide('Bonus', mark: NwsbMarks.rewards),
+    odds: [
+      if (cash > 0) EarnOdd('Cash', FxBook.instance.formatPrice(cash)),
+      if (coins > 0) EarnOdd('Coins', '$coins', coin: true),
+      if (coupon.isNotEmpty) EarnOdd('Coupon', rarityTitle(coupon)),
+    ],
+  );
+}
+
 List<Widget> _targets(BuildContext context, Map<String, dynamic> s) => [
       LSection('targets', 'Targets', _earn((context, r, _) {
         final t = sList(r['targets']);
         final words = sInt(r['words']);
         final firstOpen = t.indexWhere((x) => x['reached'] != true);
+        final head = firstOpen >= 0 ? firstOpen : t.length - 1;
+        final reached = t.where((x) => x['reached'] == true).length;
+        final cashLeft = t.where((x) => x['reached'] != true).fold<num>(0, (a, x) => a + sNum(x['cashINR']));
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const PHeading('One-time bonuses', 'Targets', slot: 'earn_program.targets', mark: NwsbMarks.rewards),
           if (t.isEmpty) const PCard(children: [PEmpty('No targets are set right now.', slot: 'earn_program.targets')]),
-          for (var i = 0; i < t.length; i++)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Builder(builder: (context) {
-                final x = t[i];
-                final goal = sInt(x['words']);
-                final reached = x['reached'] == true;
-                return EarnStatCard(
-                  key: ValueKey('earn-target-$goal'),
-                  title: '$goal words sold',
-                  status: EarnStatusPill(reached ? EarnStatus.reached : (i == firstOpen ? EarnStatus.ongoing : EarnStatus.upcoming)),
-                  number: reached ? '$goal' : '$words',
-                  unit: reached ? 'words' : '/ $goal words',
-                  progress: reached || goal <= 0 ? null : (words / goal).clamp(0.0, 1.0).toDouble(),
-                  footer: reached || goal <= 0 ? null : '${(goal - words).clamp(0, 1 << 31)} to go',
-                  chips: [
-                    if (sNum(x['cashINR']) > 0) EarnChip('${FxBook.instance.formatPrice(sNum(x['cashINR']))} bonus', mark: NwsbMarks.earn),
-                    if (sInt(x['coins']) > 0) EarnChip('${sInt(x['coins'])} coins', coin: true),
-                    if ('${x['coupon'] ?? ''}'.isNotEmpty) EarnChip('${rarityTitle('${x['coupon']}')} card', mark: NwsbMarks.coupon),
-                  ],
-                );
-              }),
-            ),
+          if (t.isNotEmpty) _targetCard(t[head], words, open: head == firstOpen, head: true),
+          const ProgramTabPills(),
+          if (t.isNotEmpty) ...[
+            EarnStatGrid([
+              EarnStat('Words sold', '$words', sub: 'cleared sales', highlight: true),
+              EarnStat('Targets reached', '$reached / ${t.length}', sub: 'one-time bonuses'),
+              EarnStat('Next target', firstOpen < 0 ? 'All reached' : '${sInt(t[firstOpen]['words'])} words', sub: firstOpen < 0 ? null : '${(sInt(t[firstOpen]['words']) - words).clamp(0, 1 << 31)} to go'),
+              EarnStat('Bonus still open', FxBook.instance.formatPrice(cashLeft), sub: 'across the targets ahead'),
+            ]),
+            const SizedBox(height: 18),
+            const EarnSectionTitle('All targets'),
+            const SizedBox(height: 8),
+            for (var i = 0; i < t.length; i++)
+              if (i != head)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _targetCard(t[i], words, open: i == firstOpen, head: false),
+                ),
+          ],
           const PEmpty('Cash bonuses stay pending for 30 days. Bonuses land on their own when a target is crossed by cleared sales and reverse if those sales are refunded.', slot: 'earn_program.targets'),
           const SizedBox(height: 6),
         ]);
@@ -316,20 +378,32 @@ List<Widget> _payouts(BuildContext context, Map<String, dynamic> s) => [
         final min = sNum(bal['minPayoutINR']);
         final enough = available > 0 && available >= min;
         final fx = FxBook.instance;
+        final method = '${acct['method'] ?? ''}';
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          EarnStatCard(
+            key: const ValueKey('earn-payouts-card'),
+            title: 'Payouts',
+            status: EarnStatusPill(ready && enough ? EarnStatus.ongoing : EarnStatus.upcoming, text: ready && enough ? 'Ready' : 'Not yet'),
+            left: const EarnSide('Your balance', mark: NwsbMarks.earn),
+            eyebrow: 'Available',
+            number: fx.formatPrice(available),
+            under: min > 0 ? 'Minimum ${fx.formatPrice(min)}' : 'No minimum',
+            right: EarnSide(ready ? 'Account ready' : 'No account yet', mark: NwsbMarks.shield),
+            odds: [
+              EarnOdd('Pending', fx.formatPrice(sNum(bal['pendingINR']))),
+              EarnOdd('Method', method.isEmpty ? 'None' : (method == 'paypal' ? 'PayPal' : 'Wise')),
+              EarnOdd('Account', ready ? 'Ready' : 'Add'),
+            ],
+          ),
+          const ProgramTabPills(),
+          EarnStatGrid([
+            EarnStat('Available', fx.formatPrice(available), sub: 'paid out after a person approves it', highlight: true),
+            EarnStat('Minimum', min > 0 ? fx.formatPrice(min) : 'None', sub: 'to request a payout'),
+            EarnStat('Pending', fx.formatPrice(sNum(bal['pendingINR'])), sub: 'in the 30-day refund window'),
+            EarnStat('Lifetime', fx.formatPrice(sNum(bal['lifetimeINR'])), sub: 'earned so far'),
+          ]),
+          const SizedBox(height: 12),
           PCard(children: [
-            Row(children: [
-              const Expanded(child: PHeading('Payouts', 'Your balance', slot: 'earn_program.payouts', mark: NwsbMarks.earn)),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: EarnStatusPill(ready && enough ? EarnStatus.ongoing : EarnStatus.off, text: ready && enough ? 'Ready' : 'Not yet'),
-              ),
-            ]),
-            EarnStatGrid([
-              EarnStat('Available', fx.formatPrice(available), sub: 'paid out after a person approves it', highlight: true),
-              EarnStat('Minimum', min > 0 ? fx.formatPrice(min) : 'None', sub: 'to request a payout'),
-            ]),
-            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: PClaim(label: 'Request payout', action: 'requestPayout', enabled: ready && enough, onDone: (_) => reload()),
@@ -480,20 +554,115 @@ class _PayoutFormState extends State<_PayoutForm> {
   }
 }
 
-List<Widget> _academy(BuildContext context, Map<String, dynamic> s) => const [
-      LSection('lessons', 'Academy', PRules([
-        'Share what you use. A link for the exact word or plan you love converts better than a general link.',
-        'Make a link per word, meaning or plan in Reference → Link Hub. Each one shows its opens, installs and buyers.',
-        'Your friend gets a discount on their first words and plan period, so lead with that.',
-        'Sales count only when Google Play clears them. They stay pending for 30 days (the refund window).',
-        'Never buy through your own link or ask for fake accounts — those sales are blocked and can close your Earn account.',
-        'Ranks come from words sold, not from money paid. Nobody can buy a rank.',
-      ], slot: 'earn_program.academy')),
+List<Widget> _invite(BuildContext context, Map<String, dynamic> s) => [
+      LSection('invitehead', 'Invite at a glance', ServerView(
+        action: 'linkHub',
+        builder: (context, r, _) {
+          final links = sList(r['links']);
+          int sum(String k) => links.fold<int>(0, (a, l) => a + sInt(l[k]));
+          final code = '${r['code'] ?? ''}';
+          return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            EarnStatCard(
+              key: const ValueKey('earn-invite-card'),
+              title: 'Invite friends',
+              status: EarnStatusPill(code.isEmpty ? EarnStatus.upcoming : EarnStatus.ongoing, text: code.isEmpty ? 'Code pending' : 'Ongoing'),
+              left: const EarnSide('Your link', mark: NwsbMarks.reference),
+              eyebrow: 'Your code',
+              number: code.isEmpty ? 'Pending' : code,
+              under: 'share it with friends',
+              right: const EarnSide('Friends', mark: NwsbMarks.people),
+              odds: [
+                EarnOdd('Links', '${links.length}'),
+                EarnOdd('Opens', '${sum('opens')}'),
+                EarnOdd('Buyers', '${sum('buyers')}'),
+              ],
+            ),
+            const ProgramTabPills(),
+            EarnStatGrid([
+              EarnStat('Links', '${links.length}', sub: 'made in Link Hub'),
+              EarnStat('Opens', '${sum('opens')}', sub: 'of your links'),
+              EarnStat('Installs', '${sum('installs')}', sub: 'from your links'),
+              EarnStat('Buyers', '${sum('buyers')}', second: '${sum('signups')} sign-ups', sub: 'bought through you', highlight: true),
+            ]),
+            const SizedBox(height: 12),
+          ]);
+        },
+      )),
+      ...referenceHubTab(context, s),
+    ];
+
+const _lessons = [
+  'Share what you use. A link for the exact word or plan you love converts better than a general link.',
+  'Make a link per word, meaning or plan in Reference → Link Hub. Each one shows its opens, installs and buyers.',
+  'Your friend gets a discount on their first words and plan period, so lead with that.',
+  'Sales count only when Google Play clears them. They stay pending for 30 days (the refund window).',
+  'Never buy through your own link or ask for fake accounts — those sales are blocked and can close your Earn account.',
+  'Ranks come from words sold, not from money paid. Nobody can buy a rank.',
+];
+
+List<Widget> _academy(BuildContext context, Map<String, dynamic> s) => [
+      LSection('academyhead', 'Academy at a glance', _earn((context, r, _) {
+        final st = sMap(r['standing']);
+        final words = sInt(r['words']);
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          EarnStatCard(
+            key: const ValueKey('earn-academy-card'),
+            title: 'Academy',
+            status: const EarnStatusPill(EarnStatus.ongoing, text: 'Open'),
+            left: const EarnSide('Lessons', mark: NwsbMarks.book),
+            eyebrow: 'Lessons',
+            number: '${_lessons.length}',
+            under: 'ways to earn well',
+            right: EarnSide('${st['title'] ?? 'Your rank'}', mark: NwsbMarks.crown),
+            odds: [
+              EarnOdd('Sold', '$words'),
+              EarnOdd('Rate', '${sNum(st['ratePct'])}%'),
+              const EarnOdd('Window', '30 days'),
+            ],
+          ),
+          const ProgramTabPills(),
+          EarnStatGrid([
+            EarnStat('Lessons', '${_lessons.length}', sub: 'below', highlight: true),
+            EarnStat('Words sold', '$words', sub: 'what ranks count'),
+            EarnStat('Refund window', '30 days', sub: 'before a sale clears'),
+            EarnStat('Your rate', '${sNum(st['ratePct'])}%', sub: 'of each cleared sale'),
+          ]),
+          const SizedBox(height: 12),
+        ]);
+      })),
+      const LSection('lessons', 'Academy', PRules(_lessons, slot: 'earn_program.academy')),
     ];
 
 List<Widget> _rules(BuildContext context, Map<String, dynamic> s) {
   final lock = sMap(sMap(s['config'])['lock']);
+  String pct(String k) => lock[k] == null ? '—' : '${sNum(lock[k])}%';
+  final hold = lock['holdDays'] == null ? '—' : '${sInt(lock['holdDays'])} days';
   return [
+    LSection('ruleshead', 'Rules at a glance', Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      EarnStatCard(
+        key: const ValueKey('earn-rules-card'),
+        title: 'The money lock',
+        status: const EarnStatusPill(EarnStatus.ongoing, text: 'Always on'),
+        left: EarnSide('Store fee ${pct('storeReservePct')}', mark: NwsbMarks.shield),
+        eyebrow: 'Commission cap',
+        number: pct('payoutCapPct'),
+        under: 'of Net, at most',
+        right: EarnSide('NowssB ${pct('companyFloorPct')}', mark: NwsbMarks.piggy),
+        odds: [
+          EarnOdd('Store', pct('storeReservePct')),
+          EarnOdd('Cap', pct('payoutCapPct')),
+          EarnOdd('Hold', hold),
+        ],
+      ),
+      const ProgramTabPills(),
+      EarnStatGrid([
+        EarnStat('Store fee', pct('storeReservePct'), sub: 'at least, off first'),
+        EarnStat('Commission cap', pct('payoutCapPct'), sub: 'of Net, all levels together', highlight: true),
+        EarnStat('NowssB keeps', pct('companyFloorPct'), sub: 'at least'),
+        EarnStat('Refund hold', hold, sub: 'before commission is available'),
+      ]),
+      const SizedBox(height: 12),
+    ])),
     LSection('lock', 'The money lock', PRules([
       'Every sale goes through the same order: tax comes off first, then the store fee (at least ${sNum(lock['storeReservePct'])}%, the real Play fee when higher). What is left is Net.',
       'All commission together can never pass ${sNum(lock['payoutCapPct'])}% of Net; NowssB keeps at least ${sNum(lock['companyFloorPct'])}%.',

@@ -1,4 +1,4 @@
-// Earn pages in the NowssB kit (Ribon, Nov 23): the Your Earnings sheet, the
+// Earn pages in the betting-reference layout, NowssB glass (Ribon, Nov 23): the Your Earnings sheet, the
 // Your day card, Complete your profile, every NowssB Earn Programmes tab and
 // the coin pill that drops over the page header. Fit checks at 360 and 390,
 // text scale 1.0 and 1.3. Shots: --dart-define=ES_SHOTS=<dir>.
@@ -232,6 +232,29 @@ void main() {
     await done(t);
   });
 
+  testWidgets('reference layout: header, balance card, icon chips and the detail pill row switch tabs', (t) async {
+    await _mount(t, const EarnTabsPage(initialTab: 'overview'), w: 390, h: 2200);
+    expect(find.byKey(const ValueKey('earn-avatar')), findsOneWidget);
+    expect(find.text('Hey,'), findsOneWidget);
+    expect(find.byKey(const ValueKey('earn-hey')), findsOneWidget);
+    expect(find.byKey(const ValueKey('earn-bell')), findsOneWidget);
+    expect(find.byKey(const ValueKey('earn-balance-card')), findsOneWidget);
+    expect(find.byKey(const ValueKey('earn-action-payout')), findsOneWidget);
+    expect(find.byKey(const ValueKey('earn-action-invite')), findsOneWidget);
+    expect(find.text('Statistics'), findsOneWidget);
+    expect(find.byKey(const ValueKey('program-tab-pills')), findsOneWidget);
+    // A round icon chip switches the tab.
+    await t.tap(find.bySemanticsLabel('Sales').first);
+    await _settle(t);
+    expect(find.byKey(const ValueKey('earn-sales-card')), findsOneWidget);
+    // The detail pill row switches it too.
+    await t.ensureVisible(find.bySemanticsLabel('My Team tab'));
+    await t.tap(find.bySemanticsLabel('My Team tab'));
+    await _settle(t);
+    expect(find.byKey(const ValueKey('earn-team-card')), findsOneWidget);
+    await done(t);
+  });
+
   testWidgets('shots', (t) async {
     if (_out.isEmpty) return;
     final warm = FlutterError.onError;
@@ -260,6 +283,21 @@ void main() {
       await _shot(t, '${'$i'.padLeft(2, '0')}_programmes_$id');
       i++;
     }
+    for (final id in _tabs) {
+      await _mount(t, EarnTabsPage(initialTab: id), w: 360, h: id == 'targets' || id == 'payouts' ? 1700 : 1300, scale: 1.3);
+      await _shot(t, '${'$i'.padLeft(2, '0')}_programmes_${id}_360_x1.3');
+      i++;
+    }
+    await _mount(t, _zen(), w: 360, h: 1000, scale: 1.3);
+    await t.tap(find.byKey(const ValueKey('trio-earnings')));
+    await _settle(t);
+    await t.tap(find.byKey(const ValueKey('earn-sheet-expand')));
+    await _settle(t);
+    await _shot(t, '${'$i'.padLeft(2, '0')}_your_earnings_sheet_360_x1.3');
+    i++;
+    await _mount(t, _profile(), w: 360, h: 1000, scale: 1.3);
+    await _shot(t, '${'$i'.padLeft(2, '0')}_complete_profile_360_x1.3');
+    i++;
     _hold = Completer();
     await _mount(t, const EarnTabsPage(initialTab: 'invite'));
     await _shot(t, '${'$i'.padLeft(2, '0')}_programmes_invite_loading');

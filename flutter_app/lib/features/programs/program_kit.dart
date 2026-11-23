@@ -74,14 +74,98 @@ class ProgramSpec {
 /// Lets content inside a programme page switch the tab below it
 /// (e.g. "Open them in Scratch") without opening a second page.
 class ProgramTabsScope extends InheritedWidget {
-  const ProgramTabsScope({super.key, required this.go, required super.child});
+  const ProgramTabsScope({super.key, required this.go, required super.child, this.tabs = const [], this.current = 0});
   final void Function(String tabId) go;
+
+  /// The programme's tabs and the picked one, for [ProgramTabPills].
+  final List<ProgramTab> tabs;
+  final int current;
 
   static void goTo(BuildContext context, String tabId) =>
       context.getInheritedWidgetOfExactType<ProgramTabsScope>()?.go(tabId);
 
   @override
-  bool updateShouldNotify(ProgramTabsScope old) => false;
+  bool updateShouldNotify(ProgramTabsScope old) => old.current != current || old.tabs != tabs;
+}
+
+/// The reference detail screen's tab pill row (Match · Odds · H2H ·
+/// Standings): the picked tab a white pill, the rest our gold glass. Reads
+/// the [ProgramTabsScope] around it; nothing outside a programme page.
+class ProgramTabPills extends StatefulWidget {
+  const ProgramTabPills({super.key});
+  @override
+  State<ProgramTabPills> createState() => _ProgramTabPillsState();
+}
+
+class _ProgramTabPillsState extends State<ProgramTabPills> {
+  final _keys = <int, GlobalKey>{};
+  int? _shown;
+
+  void _show(int i) {
+    final c = _keys[i]?.currentContext;
+    final ro = c?.findRenderObject();
+    final sc = c == null ? null : Scrollable.maybeOf(c);
+    if (ro == null || sc == null) return;
+    sc.position.ensureVisible(ro, alignment: 0.5, duration: Duration.zero);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<ProgramTabsScope>();
+    if (scope == null || scope.tabs.isEmpty) return const SizedBox.shrink();
+    if (_shown != scope.current) {
+      _shown = scope.current;
+      final i = scope.current;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _show(i);
+      });
+    }
+    return Padding(
+      key: const ValueKey('program-tab-pills'),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      child: SizedBox(
+        height: 40,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(children: [
+            for (var i = 0; i < scope.tabs.length; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              _pill(scope, i),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _pill(ProgramTabsScope scope, int i) {
+    final on = i == scope.current;
+    final t = scope.tabs[i];
+    return Semantics(
+      button: true,
+      selected: on,
+      label: '${t.title} tab',
+      excludeSemantics: true,
+      child: GestureDetector(
+        key: _keys.putIfAbsent(i, GlobalKey.new),
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (on) return;
+          RewardHaptics.tick();
+          scope.go(t.id);
+        },
+        child: Container(
+          height: 40,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          alignment: Alignment.center,
+          decoration: on
+              ? BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999))
+              : kEarnGoldGlass.copyWith(borderRadius: BorderRadius.circular(999), boxShadow: const []),
+          child: Text(t.title, maxLines: 1, style: TextStyle(color: on ? kEarnInk : Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
+        ),
+      ),
+    );
+  }
 }
 
 /// "Report one visit a day" for a programme page.
@@ -258,6 +342,8 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
     final tab = spec.tabs[_tab];
     return ProgramTabsScope(
       go: go,
+      tabs: spec.tabs,
+      current: _tab,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -270,7 +356,7 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
             key: _anchor,
             padding: const EdgeInsets.only(top: 6, bottom: 14),
             child: SizedBox(
-              height: 44,
+              height: 52,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(horizontal: widget.hPad),
@@ -322,12 +408,12 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
     );
   }
 
-  /// The tab switcher in the Sound Library chip look ([GlassPill]): white
-  /// when picked, translucent otherwise.
+  /// The reference category chips: the picked tab a white pill (its icon
+  /// in a white circle, its name), every other tab a round white icon
+  /// circle. Tapping one switches the tab.
   Widget _tabCard(String label, int i) {
     final on = i == _tab;
-    final mark = widget.marks[widget.spec.tabs[i].id];
-    final ink = on ? kEarnInk : Colors.white;
+    final mark = widget.marks[widget.spec.tabs[i].id] ?? NwsbMarks.arrow;
     return Semantics(
       button: true,
       selected: on,
@@ -335,30 +421,28 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
       excludeSemantics: true,
       child: GestureDetector(
         key: _pillKey(i),
-        onTap: () => _pick(i),
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (!on) _pick(i);
+        },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          height: 44,
-          padding: EdgeInsets.fromLTRB(mark == null ? 16 : 6, 0, 16, 0),
+          height: 48,
+          padding: EdgeInsets.fromLTRB(on ? 5 : 0, 0, on ? 18 : 0, 0),
+          constraints: const BoxConstraints(minWidth: 48),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: on ? Colors.white : const Color(0x24FFFFFF),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: on ? Colors.white : const Color(0x40FFFFFF)),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: on ? const [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))] : null,
           ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            if (mark != null) ...[
-              Container(
-                width: 32,
-                height: 32,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: on ? kEarnInk : Colors.white, borderRadius: BorderRadius.circular(10)),
-                child: NwsbIcon(mark, size: 16, color: on ? Colors.white : kEarnInk, strokeWidth: 1.9),
-              ),
-              const SizedBox(width: 9),
-            ],
-            Text(label, maxLines: 1, style: TextStyle(color: ink, fontWeight: FontWeight.w700, fontSize: 13.5)),
-          ]),
+          child: on
+              ? Row(mainAxisSize: MainAxisSize.min, children: [
+                  EarnCircle(mark: mark, size: 38, outlined: true),
+                  const SizedBox(width: 9),
+                  Text(label, maxLines: 1, style: const TextStyle(color: kEarnInk, fontWeight: FontWeight.w800, fontSize: 14)),
+                ])
+              : NwsbIcon(mark, size: 20, color: kEarnInk, strokeWidth: 1.9),
         ),
       ),
     );
@@ -456,7 +540,7 @@ class PRow extends StatelessWidget {
             height: 34,
             margin: const EdgeInsets.only(right: 12),
             alignment: Alignment.center,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
             child: NwsbIcon(mark!, size: 16, color: color == null ? kEarnInk : Color.lerp(color, kEarnInk, 0.35)!, strokeWidth: 1.9),
           ),
         Expanded(
