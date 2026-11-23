@@ -228,17 +228,15 @@ void main() {
     await _settle(t);
     expect(find.byType(TodayProgressScreen), findsOneWidget);
     expect(find.text('0 of 5 goals done'), findsOneWidget);
-    for (final k in ProgressKind.values.where((k) => k != ProgressKind.checkin)) {
+    for (final k in ProgressKind.values) {
       expect(find.byKey(ValueKey('today-goal-${k.name}')), findsOneWidget);
-      expect(find.byKey(ValueKey('today-arrow-${k.name}')), findsOneWidget);
     }
-    // Check in from the hero's square button.
+    // Check in from the page.
     await t.tap(find.byKey(const ValueKey('today-action-checkin')));
     await _settle(t);
+    expect(_count(t, 'today-count-checkin'), '1/1');
     expect(find.text('1 of 5 goals done'), findsOneWidget);
-    expect(DailyCheckIn.instance.doneToday, isTrue);
     // Practice card → Practice tab.
-    await t.ensureVisible(find.byKey(const ValueKey('today-goal-routine')));
     await t.tap(find.byKey(const ValueKey('today-goal-routine')));
     await _settle(t);
     expect(_tabs, [1]);
