@@ -20,7 +20,7 @@ import 'fake_video_platform.dart';
 import 'support/home_render.dart';
 import 'support/offline_google_fonts.dart';
 
-const _out = '/workspace/team-plan/shots/playerup';
+const _out = '/workspace/team-plan/shots/playerup2';
 const _shotKey = ValueKey('playerup-shot');
 
 Future<void> _write(WidgetTester t, String name) async {
@@ -155,7 +155,12 @@ void main() {
       }
       // Cover for the current word and its neighbour peeking in.
       expect(find.byKey(const ValueKey('player-up-cover-0')), findsOneWidget);
-      expect(find.byKey(const ValueKey('player-up-cover-1')), findsOneWidget);
+      if (size.width < 700) {
+        expect(find.byKey(const ValueKey('player-up-cover-1')), findsOneWidget);
+      } else {
+        // Tablet: the next words are in the Up next list beside the card.
+        expect(find.byKey(const ValueKey('player-up-row-1')).hitTestable(), findsOneWidget);
+      }
 
       // Repeat, favourite and shuffle are the player's own state.
       final v0 = t.widget<PlayerUpView>(find.byType(PlayerUpView));
@@ -207,6 +212,11 @@ void main() {
       // Play toggles.
       await t.tap(find.byKey(const ValueKey('player-up-play')));
       await _settle(t, 2);
+      if (t.widget<PlayerUpView>(find.byType(PlayerUpView)).playing) {
+        await _settle(t, 40);
+        await precacheAll(t);
+        await _write(t, 'open-playing-$tag');
+      }
 
       // Back closes the view, not the player.
       await t.binding.handlePopRoute();
