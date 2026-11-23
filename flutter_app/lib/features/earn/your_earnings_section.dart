@@ -17,6 +17,7 @@
 /// only shown here, never collected.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
@@ -398,7 +399,7 @@ Future<void> showYourEarningsSheet(BuildContext context) {
     // Firm scrim: the home recedes so nothing behind reads through the sheet.
     barrierColor: const Color(0x99000000),
     transitionDuration: const Duration(milliseconds: 520),
-    pageBuilder: (ctx, _, __) => const YourEarningsSheet(),
+    pageBuilder: (ctx, _, __) => const TabletSheet(child: YourEarningsSheet()),
     transitionBuilder: (ctx, a, _, child) {
       if (_still(ctx)) return FadeTransition(opacity: a, child: child);
       final fade = CurvedAnimation(parent: a, curve: const Interval(0, .45), reverseCurve: Curves.easeIn);

@@ -7,6 +7,7 @@
 /// is a different sheet — this is only the hamburger.
 library;
 
+import '../shell/tablet.dart';
 import 'package:flutter/material.dart';
 
 import '../media/nwsb_video.dart';
@@ -31,9 +32,14 @@ Future<void> showHomeMenuDrawer(
     barrierColor: Colors.transparent,
     transitionDuration: const Duration(milliseconds: 350),
     pageBuilder: (ctx, anim, secondary) {
-      return HomeMenuDrawer(
-        light: false,
-        goTab: goTab,
+      // Tablet: a side panel at the right, not the whole page.
+      return TabletSheet(
+        maxWidth: 440,
+        alignment: Alignment.centerRight,
+        child: HomeMenuDrawer(
+          light: false,
+          goTab: goTab,
+        ),
       );
     },
     transitionBuilder: (ctx, anim, secondary, child) {

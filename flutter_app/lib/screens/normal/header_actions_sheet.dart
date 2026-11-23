@@ -7,6 +7,7 @@
 /// Store, Player and Zen Plus.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -36,11 +37,11 @@ Future<void> showHeaderActionsSheet(
     barrierColor: const Color(0xB7040812),
     transitionDuration: const Duration(milliseconds: 280),
     pageBuilder: (context, anim, secondary) {
-      return HeaderActionsSheet(
+      return TabletSheet(child: HeaderActionsSheet(
         onNotifications: onNotifications,
         onStore: onStore,
         onPlayer: onPlayer,
-      );
+      ));
     },
     transitionBuilder: (context, anim, secondary, child) {
       final curved = CurvedAnimation(

@@ -1,6 +1,7 @@
 /// Cart / Wishlist header chips and the notifications-style glass sheets.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -154,7 +155,7 @@ Future<void> showBagSheet(BuildContext context, BagKind kind) {
     barrierLabel: kind == BagKind.cart ? 'Cart' : 'Wishlist',
     barrierColor: const Color(0xB7040812),
     transitionDuration: const Duration(milliseconds: 280),
-    pageBuilder: (context, anim, secondary) => _BagSheet(kind: kind),
+    pageBuilder: (context, anim, secondary) => TabletSheet(child: _BagSheet(kind: kind)),
     transitionBuilder: (context, anim, secondary, child) {
       final curved = CurvedAnimation(
         parent: anim,

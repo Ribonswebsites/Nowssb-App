@@ -9,6 +9,7 @@
 /// drawn here for the same reason.
 library;
 
+import '../../shell/tablet.dart';
 import 'package:nowssb/widgets/home_text.dart';
 import 'package:nowssb/data/day_part.dart';
 import 'dart:ui' as ui;
@@ -453,7 +454,7 @@ Future<void> showDestinationSearchSheet(
     barrierColor: const Color(0xB7040812),
     transitionDuration: const Duration(milliseconds: 280),
     pageBuilder: (context, anim, secondary) {
-      return _DestinationSearchSheet(onSelect: onSelect);
+      return TabletSheet(child: _DestinationSearchSheet(onSelect: onSelect));
     },
     transitionBuilder: (context, anim, secondary, child) {
       final curved = CurvedAnimation(

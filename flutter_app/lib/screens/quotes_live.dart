@@ -1,6 +1,7 @@
 /// "Today quotes to live by" tab, the week page, and the admin editor.
 library;
 
+import '../shell/tablet.dart';
 import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
@@ -1454,7 +1455,7 @@ Future<void> showTodayQuote(BuildContext context, {DateTime? now}) async {
       barrierColor: const Color(0xC8000000),
       transitionDuration: const Duration(milliseconds: 320),
       pageBuilder: (dialogContext, _, __) {
-        return _DailyQuotePopup(
+        return TabletSheet(child: _DailyQuotePopup(
           quote: line,
           day: now ?? DateTime.now(),
           onClose: () => Navigator.of(dialogContext).pop(),
@@ -1467,7 +1468,7 @@ Future<void> showTodayQuote(BuildContext context, {DateTime? now}) async {
               );
             });
           },
-        );
+        ));
       },
       transitionBuilder: (context, anim, _, child) {
         final a = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
@@ -1598,7 +1599,7 @@ class _DailyQuotePopupState extends State<_DailyQuotePopup> {
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(20),
-                            child: AspectRatio(
+                            child: TabletAspectRatio(
                               aspectRatio: 1.62,
                               child: Stack(
                                 fit: StackFit.expand,

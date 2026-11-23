@@ -4,6 +4,7 @@
 /// leads through to [NotificationsSettingsPage].
 library;
 
+import '../shell/tablet.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -26,7 +27,7 @@ Future<void> showNotificationsSheet(BuildContext context) {
     barrierColor: const Color(0xB7040812), // rgba(4,8,18,0.72)
     transitionDuration: const Duration(milliseconds: 280),
     pageBuilder: (context, anim, secondary) {
-      return const NotificationsSheet();
+      return const TabletSheet(child: NotificationsSheet());
     },
     transitionBuilder: (context, anim, secondary, child) {
       final curved = CurvedAnimation(

@@ -4,6 +4,7 @@
 /// Shared by Word Atelier, Meaning Store, and Ebooks.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
@@ -57,7 +58,7 @@ class StorePixelsHero extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
-          child: AspectRatio(
+          child: TabletAspectRatio(
             aspectRatio: 16 / 9,
             child: ColoredBox(
               color: Colors.black,
@@ -135,7 +136,7 @@ class StoreSubscribeBanner extends StatelessWidget {
     final editing = editModeOn(context);
     final frame = ClipRRect(
       borderRadius: BorderRadius.circular(18),
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: 16 / 9,
         child: Stack(
           fit: StackFit.expand,
@@ -721,7 +722,7 @@ class StoreGlassFilmBanner extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
-          child: AspectRatio(
+          child: TabletAspectRatio(
             aspectRatio: 16 / 9,
             child: NwsbVideo(
               asset: asset,
@@ -891,7 +892,7 @@ class StoreLimitedTimeFreeSection extends StatelessWidget {
                                 children: [
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
-                                    child: AspectRatio(
+                                    child: TabletAspectRatio(
                                       aspectRatio: 1,
                                       child: EditableImage.asset(
                                         tr.$3,
@@ -1690,10 +1691,12 @@ Future<void> showStoreViewAllPanel(
     barrierColor: Colors.black.withValues(alpha: 0.45),
     transitionDuration: const Duration(milliseconds: 260),
     pageBuilder: (ctx, anim, secondary) {
-      return _StoreViewAllOverlay(
-        title: title,
-        items: items,
-        onOpenWord: onOpenWord,
+      return TabletSheet(
+        child: _StoreViewAllOverlay(
+          title: title,
+          items: items,
+          onOpenWord: onOpenWord,
+        ),
       );
     },
     transitionBuilder: (ctx, anim, secondary, child) {

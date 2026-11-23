@@ -3,6 +3,7 @@
 /// Each store asks once. Agreeing in one does not agree for the others.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ Future<void> askStoreTerms(
     barrierLabel: 'Store terms',
     barrierColor: const Color(0xF008080A),
     transitionDuration: const Duration(milliseconds: 260),
-    pageBuilder: (context, _, __) => _StoreTermsSheet(head: head),
+    pageBuilder: (context, _, __) => TabletSheet(child: _StoreTermsSheet(head: head)),
   );
   if (agreed == true) {
     await prefs.setString(key, '1');
