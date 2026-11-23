@@ -13,7 +13,10 @@ import 'package:nowssb/features/progress/progress_center.dart';
 import 'package:nowssb/features/progress/progress_popup.dart';
 import 'package:nowssb/features/progress/progress_sources.dart';
 import 'package:nowssb/features/progress/today_progress_screen.dart';
+import 'package:nowssb/data/word_photos.dart';
+import 'package:nowssb/media/nwsb_video.dart';
 import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/widgets/faint_film.dart';
 import 'package:nowssb/screens/daily_tasks.dart';
 import 'package:nowssb/screens/practice_player.dart';
 import 'package:nowssb/screens/profile_mind.dart';
@@ -45,6 +48,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     PracticeProgress.instance.debugSetSessionsForTest({});
+    FaintFilmPause.debugReset();
   });
 
   Future<int?> openWord(WidgetTester t, {double width = 390, ValueChanged<int>? onTab}) async {
@@ -84,12 +88,18 @@ void main() {
   testWidgets('word page keeps its layout and adds a store mark that opens the Store', (t) async {
     var tab = -1;
     await openWord(t, onTab: (i) => tab = i);
-    expect(find.text('Hi there 👋'), findsOneWidget);
+    expect(find.text('Hi there'), findsOneWidget);
+    expect(find.textContaining('👋'), findsNothing);
+    expect(find.byType(NwsbVideo), findsNothing);
+    expect(FaintFilmPause.paused, isTrue);
     expect(find.text('Ocean\nNature'), findsOneWidget);
     expect(find.byKey(const ValueKey('word-store-mark')), findsOneWidget);
     await t.tap(find.byKey(const ValueKey('word-store-mark')));
     await _settle(t, 2);
     expect(tab == 3 || find.byKey(const ValueKey('go')).evaluate().isNotEmpty, isTrue);
+    await t.pumpWidget(const SizedBox());
+    await t.pump();
+    expect(FaintFilmPause.paused, isFalse);
   });
 
   testWidgets('stacked practice cards cycle on tap and Begin opens the player', (t) async {
@@ -165,6 +175,20 @@ void main() {
     expect(find.byKey(const ValueKey('mind-week')), findsOneWidget);
     expect(find.byKey(const ValueKey('mind-strip')), findsOneWidget);
     expect(t.takeException(), isNull);
+  });
+
+  test('word page backgrounds use own photos, never the five rejected ones, and fall back to default art', () {
+    final ocean = wordPageBackgrounds('Ocean');
+    expect(ocean, isNotEmpty);
+    expect(ocean, isNot(contains(kNowssbWordFallback)), reason: 'Ocean has its own photo');
+    expect(wordPhotoFor('ocean'), isNotNull);
+    for (final w in kBannedWordPhotos) {
+      final urls = wordPageBackgrounds(w);
+      expect(urls, isNotEmpty);
+      expect(urls.every((u) => !u.toLowerCase().contains('/$w.')), isTrue, reason: w);
+      expect(wordPhotoFor(w), isNull);
+    }
+    expect(wordPageBackgrounds('shield'), equals([kNowssbWordFallback]));
   });
 }
 

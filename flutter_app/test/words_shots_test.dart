@@ -207,7 +207,7 @@ void main() {
 
   testWidgets('the chips switch what the photo says, the tall pill is the wishlist', (t) async {
     await open(t, (c) => openAtelierWord(c, word: 'ocean', root: 'Old French', img: kNowssbStoreMark));
-    expect(find.text('Hi there 👋'), findsOneWidget);
+    expect(find.text('Hi there'), findsOneWidget);
     expect(find.text('Ocean\nNature'), findsOneWidget);
     expect(find.text('OLD FRENCH'), findsWidgets);
     await t.tap(find.byKey(const ValueKey('word-mode-listen')));

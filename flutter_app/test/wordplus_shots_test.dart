@@ -96,7 +96,7 @@ void main() {
       await CartBag.instance.load();
     });
 
-    Future<void> openWord({double w = 390, double h = 844}) async {
+    Future<void> openWord({String word = 'ocean', String root = 'Old French', double w = 390, double h = 844}) async {
       t.view.physicalSize = Size(w, h);
       t.view.devicePixelRatio = 1;
       addTearDown(t.view.reset);
@@ -115,7 +115,7 @@ void main() {
                 body: Center(
                   child: TextButton(
                     key: const ValueKey('go'),
-                    onPressed: () => openAtelierWord(c, word: 'ocean', root: 'Old French', img: kNowssbStoreMark),
+                    onPressed: () => openAtelierWord(c, word: word, root: root, img: kNowssbStoreMark),
                     child: const Text('go'),
                   ),
                 ),
@@ -250,5 +250,11 @@ void main() {
     // Also a 360 word-page top, to confirm the store mark still fits.
     await openWord(w: 360, h: 800);
     await _shot(t, '05_word_top_360');
+
+    // Two more words: their own photo, and a no-photo word (default art).
+    await openWord(word: 'serenity', root: 'Latin');
+    await _shot(t, '06_word_serenity');
+    await openWord(word: 'shield', root: 'Old English');
+    await _shot(t, '07_word_shield');
   });
 }

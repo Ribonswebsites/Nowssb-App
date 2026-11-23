@@ -6,7 +6,9 @@
 /// tall photo cards, a detail card with a nested hotel card, and a floating
 /// bottom bar) in NowssB's dark glass.
 ///
-///  * "Hi, name 👋" and the coin balance in a white circle (the weather badge).
+///  * "Hi, name" and the coin balance in a white circle (the weather badge).
+///  * The word's own photos (or default art) as the full-page background;
+///    no background video on this page.
 ///  * The word's origin in small caps (the flag and country), in plain words.
 ///  * The word over its collection as the huge title; Wishlist is the tall pill.
 ///  * Meaning / Listen / Practice chips; the selected one is the white pill.
@@ -21,6 +23,7 @@
 /// Every action works as before: wishlist, cart, buy or Yours, other words.
 library;
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, MaskFilter;
 
@@ -31,6 +34,7 @@ import '../../data/cart_bag.dart';
 import '../../data/content.dart';
 import '../../data/models.dart';
 import '../../data/practice_progress.dart';
+import '../../data/settings.dart';
 import '../../data/store_catalog.dart';
 import '../../data/store_prices.dart';
 import '../../data/word_art.dart';
@@ -38,11 +42,10 @@ import '../../data/word_photos.dart';
 import '../../data/word_posters.dart';
 import '../../features/earn/earn_kit.dart' show earnFirstName;
 import '../../features/economy/economy_api.dart' show EconomyMirror;
-import '../../media/nwsb_video.dart';
-import '../../media/video_pool.dart';
 import '../../shell/tablet.dart' show isTablet;
 import '../../theme/tokens.dart';
 import '../../shell/nav_shell.dart';
+import '../../widgets/faint_film.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 import '../../widgets/word_practice_stack.dart';
@@ -189,6 +192,33 @@ const _kDarkCard = Color(0xF20D1312);
 /// A word with no picture of its own shows the NowssB Store box.
 const kNowssbWordFallback = 'assets/store/nowssb-store-mark.png';
 
+/// Words whose replacement photos were rejected and must never be used.
+const kBannedWordPhotos = {'shield', 'honor', 'clan', 'sovereign', 'space'};
+
+/// This word's own pictures for the page background, unique and in order:
+/// admin art, practice poster, then photograph. The five rejected photos
+/// and any flag or country picture are skipped. Default art is the fallback
+/// when the word has no picture of its own.
+List<String> wordPageBackgrounds(String word, [String fallback = kNowssbWordFallback]) {
+  final key = WordArt.keyOf(word);
+  final out = <String>[];
+  void add(String? p) {
+    if (p == null || p.isEmpty) return;
+    final low = p.toLowerCase();
+    if (kBannedWordPhotos.any((w) => low.contains('/$w.') || low.contains('/$w-'))) return;
+    if (low.contains('flag') || low.contains('/country')) return;
+    if (!out.contains(p)) out.add(p);
+  }
+  if (!kBannedWordPhotos.contains(key)) {
+    add(WordArt.instance.imageOf(word));
+    add(wordPosterFor(word));
+    add(wordPhotoFor(word));
+  }
+  if (out.isEmpty) add(fallback.isNotEmpty ? fallback : kNowssbWordFallback);
+  return out;
+}
+
+
 /// The three chips under the title (the reference's Hiking / Kayaking /
 /// Biking): what the panel over the photo talks about.
 enum StoreWordMode { meaning, listen, practice }
@@ -213,7 +243,6 @@ class StoreWordScreen extends StatefulWidget {
     required this.onOpenOwned,
     required this.onOpenLink,
     required this.onStorePicker,
-    this.film = 'assets/video/subscription-bg.mp4',
   });
 
   final String title;
@@ -234,7 +263,6 @@ class StoreWordScreen extends StatefulWidget {
   final VoidCallback onOpenOwned;
   final void Function(StoreWordLink link) onOpenLink;
   final VoidCallback onStorePicker;
-  final String film;
 
   @override
   State<StoreWordScreen> createState() => _StoreWordScreenState();
@@ -242,6 +270,19 @@ class StoreWordScreen extends StatefulWidget {
 
 class _StoreWordScreenState extends State<StoreWordScreen> {
   StoreWordMode _mode = StoreWordMode.meaning;
+
+  @override
+  void initState() {
+    super.initState();
+    FaintFilmPause.hold();
+  }
+
+  @override
+  void dispose() {
+    FaintFilmPause.release();
+    super.dispose();
+  }
+
 
   String get _title => widget.title;
   StoreWordFacts get _f => widget.facts;
@@ -278,17 +319,10 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: const Color(0xFF07090F),
       body: Stack(children: [
         Positioned.fill(
-          child: NwsbVideo(
-            asset: widget.film,
-            priority: ClipPriority.decoration,
-            autoplay: true,
-            loop: true,
-            obeyMotion: true,
-            slot: 'store_word_page.film',
-          ),
+          child: _WordBackdrop(urls: wordPageBackgrounds(_title, _picture)),
         ),
         const Positioned.fill(
           child: IgnorePointer(
@@ -297,7 +331,7 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xD907090F), Color(0xEB07090F), Color(0xF707090F)],
+                  colors: [Color(0xB307090F), Color(0xD607090F), Color(0xEE07090F)],
                 ),
               ),
             ),
@@ -356,10 +390,8 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
       ),
       const SizedBox(width: 12),
       Expanded(
-        child: Text.rich(
-          TextSpan(text: n == null ? 'Hi there' : 'Hi, $n', children: const [
-            TextSpan(text: ' 👋', style: TextStyle(fontFamilyFallback: ['NotoColorEmoji', 'Apple Color Emoji', 'Segoe UI Emoji'])),
-          ]),
+        child: Text(
+          n == null ? 'Hi there' : 'Hi, $n',
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
@@ -1503,4 +1535,83 @@ class _MistyVignettePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+/// Full-page background: this word's own photos, slowly crossfading when
+/// it has more than one, or the default Store art when it has none.
+/// Holds still when motion is Still, without changing that setting.
+class _WordBackdrop extends StatefulWidget {
+  const _WordBackdrop({required this.urls});
+  final List<String> urls;
+
+  @override
+  State<_WordBackdrop> createState() => _WordBackdropState();
+}
+
+class _WordBackdropState extends State<_WordBackdrop> with SingleTickerProviderStateMixin {
+  late final AnimationController _fade;
+  int _index = 0;
+  Timer? _hold;
+
+  List<String> get _urls => widget.urls.isEmpty ? const [kNowssbWordFallback] : widget.urls;
+
+  bool get _moving => Settings.instance.fashionPlus && !(MediaQuery.maybeOf(context)?.disableAnimations ?? false);
+
+  @override
+  void initState() {
+    super.initState();
+    _fade = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+    Settings.instance.addListener(_onMotion);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _arm());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _arm();
+  }
+
+  void _onMotion() {
+    if (mounted) _arm();
+  }
+
+  void _arm() {
+    _hold?.cancel();
+    if (!mounted || _urls.length < 2 || !_moving) return;
+    _hold = Timer(const Duration(seconds: 7), _cross);
+  }
+
+  Future<void> _cross() async {
+    if (!mounted || _urls.length < 2 || !_moving) return;
+    await _fade.forward(from: 0);
+    if (!mounted) return;
+    setState(() {
+      _index = (_index + 1) % _urls.length;
+      _fade.value = 0;
+    });
+    _arm();
+  }
+
+  @override
+  void dispose() {
+    _hold?.cancel();
+    Settings.instance.removeListener(_onMotion);
+    _fade.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final urls = _urls;
+    final a = urls[_index % urls.length];
+    final b = urls[(_index + 1) % urls.length];
+    return Stack(fit: StackFit.expand, children: [
+      StoreNetImage(url: a, fit: BoxFit.cover),
+      if (urls.length > 1)
+        FadeTransition(
+          opacity: _fade,
+          child: StoreNetImage(url: b, fit: BoxFit.cover),
+        ),
+    ]);
+  }
 }
