@@ -34,10 +34,14 @@ import 'get_started_progress.dart';
 import 'glassmorphism_theme.dart';
 
 class NmHorizontalRoutineCards extends StatefulWidget {
-  const NmHorizontalRoutineCards({super.key, this.fashion = false});
+  const NmHorizontalRoutineCards({super.key, this.fashion = false, this.black = false});
 
   /// Zen home (dark glass). Off: the light surface of the Normal home.
   final bool fashion;
+
+  /// Normal home: the same cards as the Zen home, with a solid black
+  /// wrapper instead of the glass one.
+  final bool black;
 
   /// Tests and screenshots: stop the 5 s auto-advance.
   static bool autoAdvance = true;
@@ -325,6 +329,7 @@ class _NmHorizontalRoutineCardsState extends State<NmHorizontalRoutineCards> {
                     card: cards[index],
                     glass: glass,
                     fashion: widget.fashion,
+                    black: widget.black,
                     done: done.contains(index),
                     onSelect: () => _select(index),
                     onStart: () => _open(cards[index].id)),
@@ -354,6 +359,7 @@ class _EssentialCard extends StatelessWidget {
       {required this.card,
       required this.glass,
       required this.fashion,
+      this.black = false,
       required this.done,
       this.onSelect,
       this.onStart});
@@ -362,6 +368,7 @@ class _EssentialCard extends StatelessWidget {
   final VoidCallback? onStart;
   final bool glass;
   final bool fashion;
+  final bool black;
   final bool done;
 
   /// Fashion My Routine — GlassWrap / Notifications dark glass, not white.
@@ -371,8 +378,9 @@ class _EssentialCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final darkGlass = fashion;
-    final foreground = darkGlass ? Colors.white : const Color(0xFF263142);
+    final darkGlass = fashion && !black;
+    final inkOnDark = darkGlass || black;
+    final foreground = inkOnDark ? Colors.white : const Color(0xFF263142);
     final surface = darkGlass
         ? _darkGlassFill
         : (glass ? const Color(0xD9FFFFFF) : const Color(0xFFECEEF2));
@@ -391,7 +399,7 @@ class _EssentialCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       color:
-                          foreground.withValues(alpha: darkGlass ? .78 : .72),
+                          foreground.withValues(alpha: inkOnDark ? .78 : .72),
                       fontSize: 12))),
           if (done) ...[
             const SizedBox(width: 8),
@@ -419,7 +427,7 @@ class _EssentialCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-                color: foreground.withValues(alpha: darkGlass ? .75 : .7),
+                color: foreground.withValues(alpha: inkOnDark ? .75 : .7),
                 fontSize: 12)),
         const SizedBox(height: 4),
         Text(card.title,
@@ -434,7 +442,20 @@ class _EssentialCard extends StatelessWidget {
     );
 
     Widget cardPane;
-    if (darkGlass) {
+    if (black) {
+      cardPane = Container(
+        height: 297,
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: radius,
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x33000000), blurRadius: 28, offset: Offset(0, 14)),
+          ],
+        ),
+        child: ClipRRect(borderRadius: radius, child: face),
+      );
+    } else if (darkGlass) {
       cardPane = DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: radius,
