@@ -5,6 +5,8 @@
 /// text-to-speech and completed words are recorded locally.
 library;
 
+import '../shell/tablet.dart';
+import '../shell/tablet_frame.dart' show TabletShellGate, TabletSheet, isTablet;
 import '../features/stage_practice/stage_pack.dart';
 import '../features/stage_practice/stage_practice_screen.dart';
 import '../features/downloads/download_button.dart';
@@ -270,6 +272,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         child: AuraSoundLibraryScreen(),
       ),
     );
+  }
+
+  @override
+  void deactivate() {
+    if (_tabletRoute != null) TabletShellGate.dropPlayer(_tabletRoute);
+    super.deactivate();
   }
 
   @override
@@ -824,7 +832,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       barrierLabel: 'Player',
       barrierColor: Colors.black54,
       transitionDuration: const Duration(milliseconds: 280),
-      pageBuilder: (ctx, _, __) => _QueueSheet(
+      pageBuilder: (ctx, _, __) => TabletSheet(child: _QueueSheet(
         words: widget.words,
         index: _index,
         themes: _playerThemes,
@@ -853,7 +861,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         onReorderQueue: (ordered) {
           unawaited(_persistQueueOrder(ordered));
         },
-      ),
+      )),
       transitionBuilder: (ctx, anim, _, child) {
         final curved = CurvedAnimation(
           parent: anim,
@@ -1108,13 +1116,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       barrierLabel: 'Practice',
       barrierColor: Colors.transparent,
       transitionDuration: const Duration(milliseconds: 80),
-      pageBuilder: (ctx, _, __) => PracticeLabSheet(
+      pageBuilder: (ctx, _, __) => TabletSheet(child: PracticeLabSheet(
         word: _word,
         accent: _theme.accent,
         video: _theme.video,
         onSpeak: _prepareAndPlay,
         onClose: () => Navigator.of(ctx).pop(),
-      ),
+      )),
       transitionBuilder: (context, anim, _, child) {
         return FadeTransition(
           opacity: CurvedAnimation(parent: anim, curve: Curves.easeOutCubic),
@@ -1343,8 +1351,38 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     );
   }
 
+  Route<dynamic>? _tabletRoute;
+
+  /// Tablet: tell the frame's right panel what this player is playing.
+  void _publishTablet() {
+    if (!mounted || !isTablet(context) || widget.words.isEmpty) return;
+    _tabletRoute = ModalRoute.of(context);
+    TabletShellGate.publishPlayer(
+      _tabletRoute,
+      widget.words,
+      _index.clamp(0, widget.words.length - 1),
+      _playing,
+      _jumpTo,
+      () => unawaited(_togglePlay()),
+      (d) => unawaited(_move(d)),
+    );
+  }
+
+  /// Play the word at [i] (the tablet's Up next list).
+  void _jumpTo(int i) {
+    if (!mounted || i == _index || i < 0 || i >= widget.words.length) return;
+    final shuffle = _shuffle;
+    _shuffle = false; // _move reads it before its first await
+    final f = _move(i - _index);
+    _shuffle = shuffle;
+    unawaited(f);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (isTablet(context)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _publishTablet());
+    }
     if (widget.words.isEmpty) {
       return Scaffold(
         backgroundColor: NwsbColors.deep,
@@ -1826,7 +1864,7 @@ class _StatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final progress = PracticeProgress.instance;
-    return AspectRatio(
+    return TabletAspectRatio(
       aspectRatio: 1371 / 317,
       child: Stack(
         fit: StackFit.expand,
