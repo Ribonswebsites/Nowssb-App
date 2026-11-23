@@ -118,7 +118,7 @@ Widget _zen() => Scaffold(
       backgroundColor: Colors.black,
       body: DecoratedBox(
         decoration: const BoxDecoration(
-          gradient: RadialGradient(center: Alignment(.8, -.3), radius: 1.3, colors: [Color(0xFF3A1D78), Color(0xFF0E061E), Color(0xFF000000)], stops: [0, .55, 1]),
+          gradient: RadialGradient(center: Alignment(.8, -.3), radius: 1.3, colors: [Color(0xFF2A2A2E), Color(0xFF0E0E10), Color(0xFF000000)], stops: [0, .55, 1]),
         ),
         child: SafeArea(
           child: SingleChildScrollView(
@@ -194,6 +194,26 @@ void main() {
     VideoPool.instance.debugDropAll();
   });
 
+  /// Every text that is cut off (ellipsis or clipped past its max lines).
+  /// [within] limits it to one part (the home's own banners are not Earn's).
+  /// Hidden children of an IndexedStack (a dropdown's other items) are skipped.
+  List<String> cut(WidgetTester t, [Finder? within]) {
+    final out = <String>[];
+    void visit(RenderObject r) {
+      if (r is RenderParagraph && r.didExceedMaxLines) out.add(r.text.toPlainText());
+      if (r is RenderIndexedStack) {
+        var i = 0;
+        r.visitChildren((c) {
+          if (i++ == r.index) visit(c);
+        });
+        return;
+      }
+      r.visitChildren(visit);
+    }
+    visit(within == null ? t.binding.rootElement!.renderObject! : t.renderObject(within));
+    return out;
+  }
+
   Future<void> done(WidgetTester t) async {
     await t.pumpWidget(const SizedBox());
     await t.pump(const Duration(seconds: 5));
@@ -205,17 +225,21 @@ void main() {
         for (final id in _tabs) {
           await _mount(t, EarnTabsPage(initialTab: id), w: w, h: 2200, scale: s);
           expect(t.takeException(), isNull, reason: 'tab $id');
+          expect(cut(t), isEmpty, reason: 'cut-off text on tab $id');
         }
         await _mount(t, _zen(), w: w, h: 1000, scale: s);
         expect(t.takeException(), isNull, reason: 'Your day');
+        expect(cut(t, find.byKey(const ValueKey('home-trio-section'))), isEmpty, reason: 'cut-off text on Your day');
         await t.tap(find.byKey(const ValueKey('trio-earnings')));
         await _settle(t);
         expect(t.takeException(), isNull, reason: 'sheet');
         await t.tap(find.byKey(const ValueKey('earn-sheet-expand')));
         await _settle(t);
         expect(t.takeException(), isNull, reason: 'sheet expanded');
+        expect(cut(t, find.byKey(const ValueKey('your-earnings-sheet'))), isEmpty, reason: 'cut-off text on the sheet');
         await _mount(t, _profile(), w: w, h: 1200, scale: s);
         expect(t.takeException(), isNull, reason: 'profile');
+        expect(cut(t), isEmpty, reason: 'cut-off text on the profile');
         await done(t);
       });
     }
@@ -232,26 +256,64 @@ void main() {
     await done(t);
   });
 
-  testWidgets('reference layout: header, balance card, icon chips and the detail pill row switch tabs', (t) async {
+  testWidgets('redesign: top bar, balance hero, one tab bar that switches tabs', (t) async {
     await _mount(t, const EarnTabsPage(initialTab: 'overview'), w: 390, h: 2200);
     expect(find.byKey(const ValueKey('earn-avatar')), findsOneWidget);
-    expect(find.text('Hey,'), findsOneWidget);
-    expect(find.byKey(const ValueKey('earn-hey')), findsOneWidget);
+    expect(find.text('Hey, Ribon'), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-bell')), findsOneWidget);
+    expect(find.byKey(const ValueKey('earn-help')), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-balance-card')), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-action-payout')), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-action-invite')), findsOneWidget);
+    expect(find.byKey(const ValueKey('program-tab-bar')), findsOneWidget);
     expect(find.text('Statistics'), findsOneWidget);
-    expect(find.byKey(const ValueKey('program-tab-pills')), findsOneWidget);
-    // A round icon chip switches the tab.
+    // Every tab is named in the one bar (no icon-only chips, no second row).
+    for (final l in ['Overview', 'My Team', 'Sales', 'Payouts']) {
+      expect(find.descendant(of: find.byKey(const ValueKey('program-tab-bar')), matching: find.text(l)), findsOneWidget, reason: l);
+    }
+    expect(find.bySemanticsLabel('My Team tab'), findsNothing);
     await t.tap(find.bySemanticsLabel('Sales').first);
     await _settle(t);
     expect(find.byKey(const ValueKey('earn-sales-card')), findsOneWidget);
-    // The detail pill row switches it too.
-    await t.ensureVisible(find.bySemanticsLabel('My Team tab'));
-    await t.tap(find.bySemanticsLabel('My Team tab'));
+    await t.tap(find.bySemanticsLabel('My Team').first);
     await _settle(t);
     expect(find.byKey(const ValueKey('earn-team-card')), findsOneWidget);
+    // Payout and Invite still open their tabs.
+    await t.tap(find.byKey(const ValueKey('earn-action-payout')));
+    await _settle(t);
+    expect(find.byKey(const ValueKey('earn-payouts-card')), findsOneWidget);
+    await done(t);
+  });
+
+  testWidgets('how it works: opens from the row and the ? button, closes on outside tap, Got it and swipe; rules opens the Rules tab', (t) async {
+    await _mount(t, const EarnTabsPage(initialTab: 'overview'), w: 390, h: 1400);
+    Finder sheet() => find.byKey(const ValueKey('earn-how-sheet'));
+    await t.tap(find.byKey(const ValueKey('earn-how-it-works')));
+    await _settle(t);
+    expect(sheet(), findsOneWidget);
+    expect(find.text('From a link to a payout'), findsOneWidget);
+    await t.tapAt(const Offset(195, 40));
+    await _settle(t);
+    expect(sheet(), findsNothing);
+    await t.tap(find.byKey(const ValueKey('earn-help')));
+    await _settle(t);
+    expect(sheet(), findsOneWidget);
+    await t.ensureVisible(find.byKey(const ValueKey('earn-how-done')));
+    await t.tap(find.byKey(const ValueKey('earn-how-done')));
+    await _settle(t);
+    expect(sheet(), findsNothing);
+    await t.tap(find.byKey(const ValueKey('earn-help')));
+    await _settle(t);
+    await t.fling(sheet(), const Offset(0, 600), 2000);
+    await _settle(t);
+    expect(sheet(), findsNothing);
+    await t.tap(find.byKey(const ValueKey('earn-help')));
+    await _settle(t);
+    await t.ensureVisible(find.byKey(const ValueKey('earn-how-rules')));
+    await t.tap(find.byKey(const ValueKey('earn-how-rules')));
+    await _settle(t);
+    expect(sheet(), findsNothing);
+    expect(find.byKey(const ValueKey('earn-rules-card')), findsOneWidget);
     await done(t);
   });
 
@@ -308,6 +370,16 @@ void main() {
     _hold!.complete({'url': '', 'code': '', 'links': <Map<String, dynamic>>[]});
     await _mount(t, _withPill(const EarnTabsPage(initialTab: 'team')));
     await _shot(t, '${'$i'.padLeft(2, '0')}_programmes_team_coin_pill');
+    i++;
+    await _mount(t, const EarnTabsPage(initialTab: 'overview'));
+    await t.tap(find.byKey(const ValueKey('earn-help')));
+    await _settle(t);
+    await _shot(t, '${'$i'.padLeft(2, '0')}_how_it_works');
+    i++;
+    await _mount(t, const EarnTabsPage(initialTab: 'overview'), w: 360, scale: 1.3);
+    await t.tap(find.byKey(const ValueKey('earn-help')));
+    await _settle(t);
+    await _shot(t, '${'$i'.padLeft(2, '0')}_how_it_works_360_x1.3');
     await done(t);
     debugDisableShadows = true;
   });

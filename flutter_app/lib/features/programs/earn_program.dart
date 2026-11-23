@@ -287,7 +287,7 @@ List<Widget> _sales(BuildContext context, Map<String, dynamic> s) => [
                 title: _type('${x['type']}'),
                 sub: '${x['note'] ?? ''}${sInt(x['availableAt']) > now ? ' · available ${shortDate(x['availableAt'])}' : ''} · ${shortDate(x['at'])}',
                 mark: NwsbMarks.earn,
-                trailing: Text(signedMoney(sNum(x['inr'] ?? x['amount'])), style: TextStyle(color: sNum(x['inr'] ?? x['amount']) >= 0 ? Colors.white : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
+                trailing: Text(signedMoney(sNum(x['inr'] ?? x['amount'])), style: TextStyle(color: sNum(x['inr'] ?? x['amount']) >= 0 ? Colors.white : kEarnMuted, fontWeight: FontWeight.w800)),
               ),
           ]),
         ]);

@@ -1,21 +1,22 @@
-/// The NowssB Earn layout (Ribon, Nov 23): the sports-betting reference
-/// one-to-one, coloured in NowssB's own glass, the way the Sound Library,
-/// Subscription and player are: real frosted glass over the purple swirl,
-/// layered violet → indigo → near-black gradients, a fine top-left highlight
-/// edge, an inner sheen and soft violet glows beneath. White and black for
-/// emphasis, violet for small accents. No yellow, gold, amber or orange.
-/// Every icon sits in a WHITE CIRCLE badge.
+/// NowssB Earn (Ribon, Nov 23, redesign 5): NowssB's own black glass and
+/// nothing else, the way the Sound Library, Subscription, player and Menu
+/// look. Black / near-black translucent glass over the app's background,
+/// white type, white and black accents, fine white edges, soft black
+/// shadows. No colour of its own: depth comes from layering, blur, the
+/// highlight edge, type scale, NowssB's own photography and the real coin.
 ///
-///  * [EarnGlass]        the frosted glass surface every card is made of.
-///  * [EarnHey]          round avatar, "Hey," over the bold name, a bell.
-///  * [EarnBalanceCard]  one card, two balances, a round badge on its top
-///                       edge (cash earned · coins with the real coin).
-///  * [EarnActions]      Payout (glossy white pill) · Invite (glass pill).
-///  * [EarnSectionTitle] "Programmes" bold with a small See all.
-///  * [EarnStatCard]     the event card: a vivid purple → indigo hero glass,
-///                       a glow behind the big figure, three odds chips.
-///  * [EarnStatGrid]     the Statistics card: deep cells, one luminous
-///                       white / lavender highlighted cell.
+///  * [EarnGlass]        the glass every surface is made of (pane · plate ·
+///                       cell · white).
+///  * [EarnHey]          the top bar: back, an eyebrow over the name,
+///                       how-it-works, the bell and the avatar.
+///  * [EarnBalanceCard]  the balance hero: a black plate with a NowssB
+///                       photograph, the cash figure large, coins under it.
+///  * [EarnActions]      Payout (white pill) · Invite (glass pill).
+///  * [EarnStatCard]     the focus card: what this tab is about, the figure,
+///                       a progress line, from → to, and three key facts.
+///  * [EarnStatGrid]     a readable ledger: label and meaning on the left,
+///                       the figure on the right, the key one on white.
+///  * [showEarnHowItWorks] the how-it-works pop-up.
 library;
 
 import 'dart:math' as math;
@@ -32,19 +33,30 @@ import '../../screens/notifications_sheet.dart' show showNotificationsSheet;
 import '../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
 import '../../widgets/nwsb_icon.dart';
 
-const kEarnMuted = Color(0x99FFFFFF);
+// ─── tokens (lifted from GlassWrap / HeroGlassRecipe / restyle_kit) ────────
+
+const kEarnMuted = Color(0x8CFFFFFF);
 const kEarnSoft = Color(0xCCFFFFFF);
-const kEarnInk = Color(0xFF0B0B10);
-const kEarnGlass = Color(0x17FFFFFF);
+const kEarnInk = Color(0xFF111118);
+const kEarnGlass = Color(0x14FFFFFF);
 const kEarnLine = Color(0x26FFFFFF);
-const kEarnDark = Color(0xF20B0B10);
-/// The one accent: white (no gold anywhere in Earn).
+const kEarnDark = Color(0xF0111114);
+/// The one accent: white.
 const kEarnAccent = Colors.white;
 const kEarnRadius = 22.0;
 const kEarnTileRadius = 16.0;
 
-/// The grey of the small labels on white chips.
-const kEarnGrey = Color(0xFF8A8A93);
+/// The grey of small labels on white.
+const kEarnGrey = Color(0xFF6E6E76);
+
+/// The soft black drop under glass (GlassWrap: 0 16 40 rgba(0,0,0,.34)).
+const kEarnShadow = Color(0x57000000);
+
+/// Small caps eyebrow (CurrentlyPlayingHero / StoreNowCard).
+const kEarnEyebrow = TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 1.4, fontWeight: FontWeight.w700, height: 1.25);
+
+/// The NowssB photograph on the balance hero.
+const kEarnHeroArt = 'assets/banners/earn/man-dark.png';
 
 /// Tests: the name the header greets.
 String? debugEarnName;
@@ -73,6 +85,8 @@ String? _photo() {
   return p.isEmpty ? null : p;
 }
 
+// ─── circles and the top bar ───────────────────────────────────────────────
+
 /// A WHITE CIRCLE badge holding a dark mark, icon or [child].
 class EarnCircle extends StatelessWidget {
   const EarnCircle({super.key, this.mark, this.icon, this.size = 40, this.child, this.outlined = false});
@@ -81,7 +95,7 @@ class EarnCircle extends StatelessWidget {
   final Widget? child;
   final double size;
 
-  /// A hairline ring so the circle reads on a white pill.
+  /// A hairline ring so the circle reads on a white surface.
   final bool outlined;
 
   @override
@@ -92,7 +106,7 @@ class EarnCircle extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           shape: BoxShape.circle,
-          border: outlined ? Border.all(color: const Color(0x2E0B0B10)) : null,
+          border: outlined ? Border.all(color: const Color(0x26000000)) : null,
         ),
         child: child ??
             (mark != null
@@ -101,7 +115,25 @@ class EarnCircle extends StatelessWidget {
       );
 }
 
-/// Kept for callers: now the white circle badge.
+/// A BLACK circle with a white glyph, for use on white surfaces.
+class EarnInkCircle extends StatelessWidget {
+  const EarnInkCircle({super.key, this.mark, this.icon, this.size = 34});
+  final String? mark;
+  final IconData? icon;
+  final double size;
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: const BoxDecoration(color: kEarnInk, shape: BoxShape.circle),
+        child: mark != null
+            ? NwsbIcon(mark!, size: size * 0.46, color: Colors.white, strokeWidth: 1.9)
+            : Icon(icon ?? Icons.arrow_forward_rounded, size: size * 0.5, color: Colors.white),
+      );
+}
+
+/// Kept for callers: the white circle badge.
 class EarnSquare extends StatelessWidget {
   const EarnSquare({super.key, this.mark, this.icon, this.size = 36, this.child, this.dark = false});
   final String? mark;
@@ -113,13 +145,15 @@ class EarnSquare extends StatelessWidget {
   Widget build(BuildContext context) => EarnCircle(mark: mark, icon: icon, size: size, outlined: !dark, child: child);
 }
 
-/// A tappable white circle (back, bell, expand, close), softly lit.
+/// A tappable round button (back, expand, close): white, or black glass
+/// with a white glyph when [glass].
 class EarnCircleButton extends StatelessWidget {
-  const EarnCircleButton({super.key, required this.icon, required this.label, required this.onTap, this.size = 42});
+  const EarnCircleButton({super.key, required this.icon, required this.label, required this.onTap, this.size = 42, this.glass = false});
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final double size;
+  final bool glass;
   @override
   Widget build(BuildContext context) => Semantics(
         button: true,
@@ -127,13 +161,12 @@ class EarnCircleButton extends StatelessWidget {
         excludeSemantics: true,
         child: EarnPress(
           onTap: onTap,
-          child: Container(
-            decoration: const BoxDecoration(shape: BoxShape.circle, boxShadow: [
-              BoxShadow(color: Color(0x667C4DFF), blurRadius: 14, offset: Offset(0, 4)),
-              BoxShadow(color: Color(0x40000000), blurRadius: 6, offset: Offset(0, 2)),
-            ]),
-            child: EarnCircle(icon: icon, size: size),
-          ),
+          child: glass
+              ? EarnGlassCircle(icon: icon, size: size)
+              : DecoratedBox(
+                  decoration: const BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x66000000), blurRadius: 14, offset: Offset(0, 6))]),
+                  child: EarnCircle(icon: icon, size: size),
+                ),
         ),
       );
 }
@@ -146,9 +179,9 @@ class EarnBackSquare extends StatelessWidget {
   Widget build(BuildContext context) => EarnCircleButton(icon: Icons.arrow_back_rounded, label: 'Back', onTap: onTap);
 }
 
-/// The small round avatar: the account photo, else the initial.
+/// The round avatar: the account photo, else the initial, on white.
 class EarnAvatar extends StatelessWidget {
-  const EarnAvatar({super.key, this.size = 44, this.name});
+  const EarnAvatar({super.key, this.size = 42, this.name});
   final double size;
   final String? name;
   @override
@@ -163,7 +196,12 @@ class EarnAvatar extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2), boxShadow: const [BoxShadow(color: Color(0x807C4DFF), blurRadius: 16, offset: Offset(0, 4))]),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0x66FFFFFF), width: 2),
+        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 14, offset: Offset(0, 6))],
+      ),
       child: url == null
           ? initial
           : Image.network(url, width: size, height: size, fit: BoxFit.cover, errorBuilder: (_, __, ___) => initial),
@@ -171,17 +209,17 @@ class EarnAvatar extends StatelessWidget {
   }
 }
 
-/// The reference header: [back], the round avatar, "Hey," small with the
-/// name bold under it, and the bell (or [trailing]) at the far right.
+/// The top bar: [onBack], a small caps eyebrow over the bold greeting, then
+/// how-it-works ([onHelp]), the bell (or [trailing]) and the avatar.
 class EarnHey extends StatelessWidget {
-  const EarnHey({super.key, this.eyebrow, this.onBack, this.trailing, this.title, this.bell = true, this.name});
+  const EarnHey({super.key, this.eyebrow, this.onBack, this.trailing, this.title, this.bell = true, this.name, this.onHelp, this.avatar = true});
 
-  /// Kept for callers; the reference has no eyebrow.
+  /// The small caps line over the name; defaults to NOWSSB EARN.
   final String? eyebrow;
   final VoidCallback? onBack;
   final Widget? trailing;
 
-  /// Overrides the greeting's name line.
+  /// Overrides the greeting line.
   final String? title;
 
   /// Overrides the account's first name.
@@ -190,92 +228,97 @@ class EarnHey extends StatelessWidget {
   /// Shows the bell when there is no [trailing].
   final bool bell;
 
+  /// Shows the how-it-works button.
+  final VoidCallback? onHelp;
+
+  /// Shows the avatar at the right.
+  final bool avatar;
+
   @override
   Widget build(BuildContext context) {
     final n = name ?? earnFirstName();
+    final line = title ?? (n == null ? 'Hey there' : 'Hey, $n');
     return Row(children: [
-      if (onBack != null) ...[EarnBackSquare(onTap: onBack!), const SizedBox(width: 10)],
-      EarnAvatar(name: n),
-      const SizedBox(width: 12),
+      if (onBack != null) ...[EarnBackSquare(onTap: onBack!), const SizedBox(width: 12)],
       Expanded(
         child: Semantics(
-          label: title ?? earnHey(),
+          label: line,
           excludeSemantics: true,
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            const Text('Hey,', maxLines: 1, style: TextStyle(color: kEarnSoft, fontSize: 13, fontWeight: FontWeight.w500, height: 1.2)),
-            Text(title ?? n ?? 'there',
-                key: const ValueKey('earn-hey'),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -0.3)),
+            Text((eyebrow ?? 'NowssB Earn').toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: kEarnEyebrow),
+            const SizedBox(height: 2),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(line,
+                  key: const ValueKey('earn-hey'),
+                  maxLines: 1,
+                  style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -0.4)),
+            ),
           ]),
         ),
       ),
-      if (trailing != null) ...[const SizedBox(width: 10), trailing!]
-      else if (bell) ...[
-        const SizedBox(width: 10),
-        EarnCircleButton(key: const ValueKey('earn-bell'), icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () => showNotificationsSheet(context)),
+      if (onHelp != null) ...[
+        const SizedBox(width: 8),
+        EarnCircleButton(key: const ValueKey('earn-help'), icon: Icons.question_mark_rounded, label: 'How Earn works', onTap: onHelp!, glass: true, size: 40),
       ],
+      if (trailing != null) ...[const SizedBox(width: 8), trailing!]
+      else if (bell) ...[
+        const SizedBox(width: 8),
+        EarnCircleButton(key: const ValueKey('earn-bell'), icon: Icons.notifications_none_rounded, label: 'Notifications', onTap: () => showNotificationsSheet(context), glass: true, size: 40),
+      ],
+      if (avatar && trailing == null) ...[const SizedBox(width: 8), EarnAvatar(name: n, size: 40)],
     ]);
   }
 }
 
-/// A glass pane in the Earn shape: NowssB dark glass.
-
-// ─── the glass engine ──────────────────────────────────────────────────────
-
-/// NowssB violet accents.
-const kEarnViolet = Color(0xFF8B5CF6);
-const kEarnVioletDeep = Color(0xFF6D28D9);
-const kEarnLavender = Color(0xFFE9E2FF);
-const kEarnGlowViolet = Color(0x667C4DFF);
-const kEarnGlowBlue = Color(0x4D4F6BFF);
+// ─── the glass ──────────────────────────────────────────────────────────────
 
 enum EarnTone {
-  /// The everyday card: violet → indigo → near-black.
+  /// The everyday pane: black translucent glass over the background.
   pane,
 
-  /// The event card: vivid deep purple → indigo.
+  /// The plate: the near-black Store / Subscription card.
   hero,
 
-  /// A cell inside a card.
+  /// A cell inside a pane.
   cell,
 
-  /// The luminous white / lavender highlighted cell.
+  /// White (the one key figure, the picked tab).
   light,
 }
 
 bool earnStill(BuildContext context) => MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
 List<Color> _fill(EarnTone t) => switch (t) {
-      EarnTone.pane => const [Color(0xB8301C5C), Color(0xB31A1446), Color(0xD00B0918)],
-      EarnTone.hero => const [Color(0xF0592AC9), Color(0xEB34208F), Color(0xF5140C3A)],
-      EarnTone.cell => const [Color(0x2EFFFFFF), Color(0x14FFFFFF), Color(0x0AFFFFFF)],
-      EarnTone.light => const [Color(0xFFFFFFFF), Color(0xFFF1ECFF), Color(0xFFDCD0FF)],
+      EarnTone.pane => const [Color(0x8C0C0C0E), Color(0x99080809), Color(0xA6050506)],
+      EarnTone.hero => const [Color(0xF51C1C20), Color(0xF5101013), Color(0xF7070708)],
+      EarnTone.cell => const [Color(0x1AFFFFFF), Color(0x0DFFFFFF), Color(0x08FFFFFF)],
+      EarnTone.light => const [Color(0xFFFFFFFF), Color(0xFFF7F7F8), Color(0xFFEDEDEF)],
     };
 
-/// The fine highlight edge: bright at the top left, fading round the card,
-/// a violet whisper at the bottom right.
+/// The fine white edge: bright at the top left, fading round the shape.
 class _EdgePainter extends CustomPainter {
   const _EdgePainter(this.radius, {this.strong = 1});
   final double radius;
   final double strong;
   @override
   void paint(Canvas canvas, Size size) {
-    final r = RRect.fromRectAndRadius((Offset.zero & size).deflate(0.6), Radius.circular(math.max(0, radius - 0.6)));
+    if (strong <= 0) return;
+    final r = RRect.fromRectAndRadius((Offset.zero & size).deflate(0.5), Radius.circular(math.max(0, math.min(radius, size.shortestSide / 2) - 0.5)));
     final paint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.1
+      ..strokeWidth = 1
       ..shader = LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color.fromRGBO(255, 255, 255, 0.62 * strong),
+          Color.fromRGBO(255, 255, 255, 0.42 * strong),
+          Color.fromRGBO(255, 255, 255, 0.16 * strong),
+          Color.fromRGBO(255, 255, 255, 0.07 * strong),
           Color.fromRGBO(255, 255, 255, 0.14 * strong),
-          Color.fromRGBO(255, 255, 255, 0.05 * strong),
-          Color.fromRGBO(183, 156, 255, 0.30 * strong),
         ],
-        stops: const [0, 0.32, 0.7, 1],
+        stops: const [0, 0.35, 0.7, 1],
       ).createShader(Offset.zero & size);
     canvas.drawRRect(r, paint);
   }
@@ -284,7 +327,8 @@ class _EdgePainter extends CustomPainter {
   bool shouldRepaint(_EdgePainter old) => old.radius != radius || old.strong != strong;
 }
 
-/// Box shadows painted only outside the rounded shape.
+/// Box shadows painted only outside the rounded shape, so translucent glass
+/// never shows its own shadow through itself.
 class _OuterShadowPainter extends CustomPainter {
   const _OuterShadowPainter(this.shadows, this.radius);
   final List<BoxShadow> shadows;
@@ -294,7 +338,7 @@ class _OuterShadowPainter extends CustomPainter {
     if (shadows.isEmpty) return;
     final rr = RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(math.min(radius, size.shortestSide / 2)));
     canvas.save();
-    canvas.clipPath(Path.combine(PathOperation.difference, Path()..addRect((Offset.zero & size).inflate(80)), Path()..addRRect(rr)));
+    canvas.clipPath(Path.combine(PathOperation.difference, Path()..addRect((Offset.zero & size).inflate(90)), Path()..addRRect(rr)));
     for (final s in shadows) {
       canvas.drawRRect(rr.shift(s.offset).inflate(s.spreadRadius), s.toPaint());
     }
@@ -305,16 +349,16 @@ class _OuterShadowPainter extends CustomPainter {
   bool shouldRepaint(_OuterShadowPainter old) => old.radius != radius || old.shadows != shadows;
 }
 
-/// Static film grain for the hero glass.
+/// Static film grain for the plate.
 class _GrainPainter extends CustomPainter {
   const _GrainPainter();
   @override
   void paint(Canvas canvas, Size size) {
     final rnd = math.Random(7);
-    final p = Paint()..color = const Color(0x12FFFFFF);
-    final n = (size.width * size.height / 260).clamp(0, 1600).toInt();
+    final p = Paint()..color = const Color(0x0DFFFFFF);
+    final n = (size.width * size.height / 300).clamp(0, 1400).toInt();
     for (var i = 0; i < n; i++) {
-      canvas.drawCircle(Offset(rnd.nextDouble() * size.width, rnd.nextDouble() * size.height), rnd.nextDouble() * 0.7 + 0.2, p);
+      canvas.drawCircle(Offset(rnd.nextDouble() * size.width, rnd.nextDouble() * size.height), rnd.nextDouble() * 0.6 + 0.2, p);
     }
   }
 
@@ -322,7 +366,7 @@ class _GrainPainter extends CustomPainter {
   bool shouldRepaint(_GrainPainter old) => false;
 }
 
-/// One sweep of light across the hero glass on entrance.
+/// One sweep of white light across the plate on entrance.
 class _Shimmer extends StatelessWidget {
   const _Shimmer();
   @override
@@ -340,7 +384,7 @@ class _Shimmer extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment(v - 1, -1),
                     end: Alignment(v, 1),
-                    colors: const [Color(0x00FFFFFF), Color(0x1FFFFFFF), Color(0x00FFFFFF)],
+                    colors: const [Color(0x00FFFFFF), Color(0x14FFFFFF), Color(0x00FFFFFF)],
                   ),
                 ),
               ),
@@ -349,9 +393,10 @@ class _Shimmer extends StatelessWidget {
   }
 }
 
-/// The frosted glass surface: a real backdrop blur, the layered gradient
-/// of [tone], an inner sheen from the top left, the highlight edge and a
-/// soft coloured glow beneath.
+/// The glass surface: a real backdrop blur (GlassWrap's sigma), the black
+/// fill of [tone], a sheen from the top left, the white edge and a soft
+/// black shadow outside the shape. [glow] is kept for callers and only
+/// deepens the black shadow.
 class EarnGlass extends StatelessWidget {
   const EarnGlass({
     super.key,
@@ -359,7 +404,7 @@ class EarnGlass extends StatelessWidget {
     this.tone = EarnTone.pane,
     this.radius = kEarnRadius,
     this.padding = EdgeInsets.zero,
-    this.glow = kEarnGlowViolet,
+    this.glow = kEarnShadow,
     this.blur = true,
     this.circle = false,
   });
@@ -373,11 +418,11 @@ class EarnGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final br = BorderRadius.circular(radius);
-    final hero = tone == EarnTone.hero;
+    final br = BorderRadius.circular(circle ? 999 : radius);
+    final plate = tone == EarnTone.hero;
     final light = tone == EarnTone.light;
+    final cell = tone == EarnTone.cell;
     Widget body = Stack(children: [
-      // Layered fill.
       Positioned.fill(
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -385,57 +430,36 @@ class EarnGlass extends StatelessWidget {
           ),
         ),
       ),
-      if (hero) ...[
-        // A second, cooler light from the bottom right.
-        const Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(center: Alignment(1.1, 1.2), radius: 1.1, colors: [Color(0x664F6BFF), Color(0x004F6BFF)]),
-            ),
-          ),
-        ),
-        const Positioned.fill(child: RepaintBoundary(child: CustomPaint(painter: _GrainPainter()))),
-      ],
-      // Inner sheen.
+      if (plate) const Positioned.fill(child: RepaintBoundary(child: CustomPaint(painter: _GrainPainter()))),
+      // Sheen from the top.
       Positioned.fill(
         child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: const Alignment(0.4, 0.6),
-              colors: [Color(light ? 0x00FFFFFF : (hero ? 0x2EFFFFFF : 0x1FFFFFFF)), const Color(0x00FFFFFF)],
+              begin: Alignment.topCenter,
+              end: const Alignment(0, 0.2),
+              colors: [Color(light ? 0x00FFFFFF : (plate ? 0x1AFFFFFF : 0x14FFFFFF)), const Color(0x00FFFFFF)],
             ),
           ),
         ),
       ),
-      // Inner shadow at the foot, for depth.
-      if (tone == EarnTone.cell)
-        const Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0x33000000)], stops: [0.55, 1]),
-            ),
-          ),
-        ),
-      if (hero) const Positioned.fill(child: _Shimmer()),
+      if (plate) const Positioned.fill(child: _Shimmer()),
       Padding(padding: padding, child: child),
       Positioned.fill(
-        child: IgnorePointer(child: CustomPaint(painter: _EdgePainter(circle ? 999 : radius, strong: light ? 0.0 : (tone == EarnTone.cell ? 0.7 : 1)))),
+        child: IgnorePointer(child: CustomPaint(painter: _EdgePainter(circle ? 999 : radius, strong: light ? 0.0 : (cell ? 0.6 : (plate ? 1.15 : 1))))),
       ),
     ]);
     body = ClipRRect(
-      borderRadius: circle ? BorderRadius.circular(999) : br,
-      child: blur && !light
-          ? BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18), child: body)
+      borderRadius: br,
+      child: blur && !light && !plate && !cell
+          ? BackdropFilter(filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10), child: body)
           : body,
     );
     final shadows = <BoxShadow>[
-      if (glow != null) BoxShadow(color: glow!, blurRadius: hero ? 34 : 24, spreadRadius: -4, offset: Offset(0, hero ? 14 : 10)),
-      if (tone != EarnTone.cell) const BoxShadow(color: Color(0x4D000000), blurRadius: 18, offset: Offset(0, 8)),
+      if (!cell) BoxShadow(color: plate ? const Color(0x80000000) : kEarnShadow, blurRadius: plate ? 40 : 30, offset: Offset(0, plate ? 18 : 12)),
+      if (light) const BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 4)),
     ];
-    // Drawn outside the shape only, so the glass never shows a dark lip
-    // of its own shadow through itself.
-    return CustomPaint(painter: _OuterShadowPainter(shadows, circle ? 9999 : radius), child: body);
+    return CustomPaint(painter: _OuterShadowPainter(glow == null ? const [] : shadows, circle ? 9999 : radius), child: body);
   }
 }
 
@@ -489,43 +513,29 @@ class _EarnPressState extends State<EarnPress> {
         if (widget.haptic) AppHaptics.selection();
         widget.onTap!();
       },
-      child: AnimatedScale(scale: _down ? 0.965 : 1, duration: const Duration(milliseconds: 120), curve: Curves.easeOut, child: widget.child),
+      child: AnimatedScale(scale: _down ? 0.97 : 1, duration: const Duration(milliseconds: 120), curve: Curves.easeOut, child: widget.child),
     );
   }
 }
 
-/// The glossy white pill face (Payout, the active tab, odds chips).
+/// The white pill face (Payout, the picked tab, chips): white with a soft
+/// black drop.
 BoxDecoration earnGlossyWhite({double radius = 999, bool shadow = true}) => BoxDecoration(
       borderRadius: BorderRadius.circular(radius),
-      gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFFFFF), Color(0xFFF3EFFC), Color(0xFFE2DAF7)], stops: [0, 0.55, 1]),
+      gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFFFFFFF), Color(0xFFF1F1F3)]),
       boxShadow: shadow
           ? const [
-              BoxShadow(color: Color(0x557C4DFF), blurRadius: 18, spreadRadius: -4, offset: Offset(0, 8)),
-              BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 4)),
+              BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 8)),
+              BoxShadow(color: Color(0x33000000), blurRadius: 4, offset: Offset(0, 2)),
             ]
           : null,
     );
 
-/// The gloss band across the top half of a white pill.
-const _gloss = Positioned(
-  left: 0,
-  right: 0,
-  top: 0,
-  height: 18,
-  child: IgnorePointer(
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xB3FFFFFF), Color(0x00FFFFFF)]),
-      ),
-    ),
-  ),
-);
-
-/// A frosted glass circle with a highlight edge holding a white icon
-/// (the inactive tab chips).
+/// A round black-glass button with a white glyph and the white edge.
 class EarnGlassCircle extends StatelessWidget {
-  const EarnGlassCircle({super.key, required this.mark, this.size = 48});
-  final String mark;
+  const EarnGlassCircle({super.key, this.mark, this.icon, this.size = 48});
+  final String? mark;
+  final IconData? icon;
   final double size;
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -534,25 +544,34 @@ class EarnGlassCircle extends StatelessWidget {
         child: EarnGlass(
           circle: true,
           radius: size / 2,
-          glow: const Color(0x337C4DFF),
-          child: SizedBox(width: size, height: size, child: Center(child: NwsbIcon(mark, size: size * 0.42, color: Colors.white, strokeWidth: 1.9))),
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: Center(
+              child: mark != null
+                  ? NwsbIcon(mark!, size: size * 0.42, color: Colors.white, strokeWidth: 1.9)
+                  : Icon(icon ?? Icons.arrow_forward_rounded, size: size * 0.46, color: Colors.white),
+            ),
+          ),
         ),
       );
 }
 
-/// A card in the Earn shape: frosted NowssB glass.
+/// A card in the Earn shape: black glass ([dark] the near-black plate).
 class EarnPane extends StatelessWidget {
-  const EarnPane({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.dark = false, this.tone = EarnTone.pane, this.glow = kEarnGlowViolet});
+  const EarnPane({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.dark = false, this.tone = EarnTone.pane, this.glow = kEarnShadow});
   final Widget child;
   final EdgeInsets padding;
   final bool dark;
   final EarnTone tone;
   final Color? glow;
   @override
-  Widget build(BuildContext context) => EarnGlass(tone: tone, padding: padding, glow: dark ? kEarnGlowBlue : glow, child: child);
+  Widget build(BuildContext context) => EarnGlass(tone: dark ? EarnTone.hero : tone, padding: padding, glow: glow, child: child);
 }
 
-/// One side of [EarnBalanceCard].
+// ─── the balance hero ───────────────────────────────────────────────────────
+
+/// One figure of [EarnBalanceCard].
 class EarnBalance {
   const EarnBalance({required this.label, required this.value, this.sub, this.coin = false, this.mark, this.onTap, this.key});
   final String label;
@@ -564,104 +583,145 @@ class EarnBalance {
   final Key? key;
 }
 
-/// One card, two balances side by side, a white circle badge centred on
-/// its top edge (the reference's Current / Bonus balance card).
+/// Kept for callers; figures carry no glow.
+const kEarnNumberGlow = <Shadow>[Shadow(color: Color(0x59000000), blurRadius: 12, offset: Offset(0, 4))];
+
+/// The big number style of balances and focus cards.
+const kEarnBig = TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800, height: 1.05, letterSpacing: -0.8);
+
+/// The balance hero: a near-black plate, a NowssB photograph down its right
+/// side, the [left] figure (cash) very large and the [right] one (coins, the
+/// real coin) on a glass strip under it. Both open their page.
 class EarnBalanceCard extends StatelessWidget {
-  const EarnBalanceCard({super.key, required this.left, required this.right, this.badge = Icons.swap_horiz_rounded});
+  const EarnBalanceCard({super.key, required this.left, required this.right, this.badge = Icons.swap_horiz_rounded, this.art = kEarnHeroArt});
   final EarnBalance left;
   final EarnBalance right;
+
+  /// Kept for callers.
   final IconData badge;
 
-  Widget _side(EarnBalance b) {
-    final body = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Row(children: [
-          Flexible(
-            child: Text(b.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnSoft, fontSize: 12.5, fontWeight: FontWeight.w600)),
+  /// The photograph (a NowssB asset); null for none.
+  final String? art;
+
+  Widget _tap(EarnBalance b, Widget child) {
+    if (b.onTap == null) return KeyedSubtree(key: b.key, child: child);
+    return Semantics(button: true, label: b.label, child: EarnPress(key: b.key, onTap: b.onTap, child: child));
+  }
+
+  Widget _main(EarnBalance b) => _tap(
+        b,
+        Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          Row(children: [
+            if (b.mark != null) ...[EarnCircle(mark: b.mark, size: 26), const SizedBox(width: 8)],
+            Flexible(child: Text(b.label.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: kEarnEyebrow)),
+            if (b.onTap != null) ...[const SizedBox(width: 4), const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: kEarnMuted)],
+          ]),
+          const SizedBox(height: 10),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: DefaultTextStyle.merge(
+              style: const TextStyle(fontSize: 46, letterSpacing: -1.6, height: 1, shadows: kEarnNumberGlow),
+              child: b.value,
+            ),
           ),
-          if (b.onTap != null) ...[const SizedBox(width: 4), const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: kEarnMuted)],
+          if (b.sub != null) ...[
+            const SizedBox(height: 8),
+            Text(b.sub!, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnSoft, fontSize: 12.5, height: 1.3)),
+          ],
         ]),
-        const SizedBox(height: 8),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            if (b.coin) ...[
-              Container(
-                decoration: const BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x667C4DFF), blurRadius: 14)]),
-                child: const NwsbCoinDisc(size: 26),
-              ),
-              const SizedBox(width: 7),
-            ],
-            DefaultTextStyle.merge(style: const TextStyle(shadows: kEarnNumberGlow), child: b.value),
+      );
+
+  Widget _strip(EarnBalance b) => _tap(
+        b,
+        EarnGlass(
+          tone: EarnTone.cell,
+          radius: 18,
+          glow: null,
+          padding: const EdgeInsets.fromLTRB(8, 8, 12, 8),
+          child: Row(children: [
+            if (b.coin) const NwsbCoinDisc(size: 34) else EarnCircle(mark: b.mark, size: 34),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: DefaultTextStyle.merge(style: const TextStyle(fontSize: 20, letterSpacing: -0.4), child: b.value),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Flexible(child: Text(b.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnSoft, fontSize: 12.5, fontWeight: FontWeight.w700))),
+                ]),
+                if (b.sub != null) Text(b.sub!, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnMuted, fontSize: 11.5, height: 1.25)),
+              ]),
+            ),
+            if (b.onTap != null) const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: kEarnSoft),
           ]),
         ),
-        if (b.sub != null) ...[
-          const SizedBox(height: 4),
-          Text(b.sub!, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnMuted, fontSize: 11.5, height: 1.3)),
-        ],
-      ]),
-    );
-    if (b.onTap == null) return body;
-    return Semantics(
-      button: true,
-      label: b.label,
-      child: EarnPress(key: b.key, onTap: b.onTap, child: body),
-    );
-  }
+      );
 
   @override
   Widget build(BuildContext context) => EarnEnter(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 15),
-          child: Stack(clipBehavior: Clip.none, children: [
-            EarnGlass(
-              key: const ValueKey('earn-balance-card'),
-              radius: 20,
-              padding: const EdgeInsets.fromLTRB(18, 22, 18, 18),
-              child: IntrinsicHeight(
-                child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  Expanded(child: _side(left)),
-                  Container(
-                    width: 1,
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00FFFFFF), Color(0x40FFFFFF), Color(0x00FFFFFF)]),
+        child: EarnGlass(
+          key: const ValueKey('earn-balance-card'),
+          tone: EarnTone.hero,
+          radius: 26,
+          child: LayoutBuilder(builder: (context, c) {
+            final w = c.maxWidth;
+            final artW = art == null ? 0.0 : w * 0.42;
+            return Stack(children: [
+              if (art != null)
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  bottom: 0,
+                  width: artW,
+                  child: ExcludeSemantics(
+                    child: ShaderMask(
+                      blendMode: BlendMode.dstIn,
+                      shaderCallback: (r) => const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Color(0x00000000), Color(0x99000000), Color(0xFF000000)],
+                        stops: [0, 0.5, 1],
+                      ).createShader(r),
+                      child: ClipRect(
+                        child: Transform.scale(
+                          scale: 1.6,
+                          alignment: const Alignment(0, 0.55),
+                          child: Image.asset(art!, fit: BoxFit.cover, alignment: Alignment.center, errorBuilder: (_, __, ___) => const SizedBox()),
+                        ),
+                      ),
                     ),
                   ),
-                  Expanded(child: _side(right)),
+                ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 18, 16, 16),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: math.max(0, artW - 44)),
+                    child: _main(left),
+                  ),
+                  const SizedBox(height: 18),
+                  Padding(
+                    padding: EdgeInsets.only(right: math.max(0, artW - 26)),
+                    child: _strip(right),
+                  ),
                 ]),
               ),
-            ),
-            Positioned(
-              top: -15,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  decoration: const BoxDecoration(shape: BoxShape.circle, boxShadow: [
-                    BoxShadow(color: Color(0x887C4DFF), blurRadius: 16, offset: Offset(0, 4)),
-                    BoxShadow(color: Color(0x59000000), blurRadius: 8, offset: Offset(0, 3)),
-                  ]),
-                  child: EarnCircle(icon: badge, size: 30),
-                ),
-              ),
-            ),
-          ]),
+            ]);
+          }),
         ),
       );
 }
 
-/// A soft glow under big white figures.
-const kEarnNumberGlow = [Shadow(color: Color(0x99A78BFA), blurRadius: 18), Shadow(color: Color(0x40000000), blurRadius: 4, offset: Offset(0, 2))];
+// ─── actions and headings ───────────────────────────────────────────────────
 
-/// The big number style of balances and stat cards.
-const kEarnBig = TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800, height: 1.05, letterSpacing: -0.8);
-
-/// A reference pill button: a glossy white pill when [primary] (the
-/// Deposit), else a glass pill with a highlight edge (Withdraw); a white
-/// circle icon at its left.
+/// A pill button: white with a black circle icon when [primary], else
+/// black glass with a white circle icon.
 class EarnActionButton extends StatelessWidget {
   const EarnActionButton({super.key, required this.label, required this.icon, required this.onTap, this.primary = true});
   final String label;
@@ -669,24 +729,24 @@ class EarnActionButton extends StatelessWidget {
   final VoidCallback onTap;
   final bool primary;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, c) => _build(context, roomy: c.maxWidth >= 168 * MediaQuery.textScalerOf(context).scale(1)));
+
+  Widget _build(BuildContext context, {required bool roomy}) {
     final content = ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 52),
+      constraints: const BoxConstraints(minHeight: 54),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(7, 7, 10, 7),
+        padding: const EdgeInsets.fromLTRB(7, 7, 12, 7),
         child: Row(children: [
-          Container(
-            decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [BoxShadow(color: primary ? const Color(0x337C4DFF) : const Color(0x557C4DFF), blurRadius: 10, offset: const Offset(0, 3))]),
-            child: EarnCircle(icon: icon, size: 38, outlined: primary),
-          ),
+          if (primary) EarnInkCircle(icon: icon, size: 40) else EarnCircle(icon: icon, size: 40),
           const SizedBox(width: 10),
           Expanded(
             child: FittedBox(
               fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
               child: Text(label, maxLines: 1, style: TextStyle(color: primary ? kEarnInk : Colors.white, fontWeight: FontWeight.w800, fontSize: 15.5, letterSpacing: -0.1)),
             ),
           ),
-          const SizedBox(width: 8),
+          if (roomy) Icon(Icons.arrow_forward_rounded, size: 17, color: primary ? kEarnInk : kEarnSoft),
         ]),
       ),
     );
@@ -697,17 +757,14 @@ class EarnActionButton extends StatelessWidget {
       child: EarnPress(
         onTap: onTap,
         child: primary
-            ? DecoratedBox(
-                decoration: earnGlossyWhite(radius: 28),
-                child: ClipRRect(borderRadius: BorderRadius.circular(28), child: Stack(children: [content, _gloss])),
-              )
-            : EarnGlass(radius: 28, glow: const Color(0x557C4DFF), child: content),
+            ? DecoratedBox(decoration: earnGlossyWhite(radius: 28), child: content)
+            : EarnGlass(radius: 28, child: content),
       ),
     );
   }
 }
 
-/// Two equal pills side by side: Payout (glossy white) and Invite (glass).
+/// The next step under the balance: Payout (white) · Invite (glass).
 class EarnActions extends StatelessWidget {
   const EarnActions({super.key, required this.onPayout, required this.onInvite});
   final VoidCallback onPayout;
@@ -716,50 +773,62 @@ class EarnActions extends StatelessWidget {
   Widget build(BuildContext context) => EarnEnter(
         order: 1,
         child: Row(children: [
-          Expanded(child: EarnActionButton(key: const ValueKey('earn-action-payout'), label: 'Payout', icon: Icons.arrow_downward_rounded, onTap: onPayout)),
+          Expanded(child: EarnActionButton(key: const ValueKey('earn-action-payout'), label: 'Payout', icon: Icons.south_rounded, onTap: onPayout)),
           const SizedBox(width: 10),
-          Expanded(child: EarnActionButton(key: const ValueKey('earn-action-invite'), label: 'Invite', icon: Icons.arrow_upward_rounded, onTap: onInvite, primary: false)),
+          Expanded(child: EarnActionButton(key: const ValueKey('earn-action-invite'), label: 'Invite', icon: Icons.person_add_alt_rounded, onTap: onInvite, primary: false)),
         ]),
       );
 }
 
-/// A section header: bold title at the left, small See all at the right.
+/// A section heading: a small caps [eyebrow] over a bold title, and a glass
+/// pill ([action]) at the right.
 class EarnSectionTitle extends StatelessWidget {
-  const EarnSectionTitle(this.title, {super.key, this.onSeeAll, this.action = 'See all'});
+  const EarnSectionTitle(this.title, {super.key, this.onSeeAll, this.action = 'See all', this.eyebrow});
   final String title;
   final VoidCallback? onSeeAll;
   final String action;
+  final String? eyebrow;
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(2, 0, 0, 0),
-        child: Row(children: [
+        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Expanded(
-            child: Text(title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.3, shadows: [Shadow(color: Color(0x667C4DFF), blurRadius: 16)])),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              if (eyebrow != null) ...[Text(eyebrow!.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: kEarnEyebrow), const SizedBox(height: 2)],
+              Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800, letterSpacing: -0.4, height: 1.2)),
+            ]),
           ),
-          if (onSeeAll != null)
+          if (onSeeAll != null) ...[
+            const SizedBox(width: 10),
             Semantics(
               button: true,
               label: '$action, $title',
               excludeSemantics: true,
               child: EarnPress(
                 onTap: onSeeAll,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                  child: Text(action, style: const TextStyle(color: Color(0xFFC4B5FD), fontSize: 13, fontWeight: FontWeight.w700)),
+                child: EarnGlass(
+                  radius: 999,
+                  glow: null,
+                  padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(action, style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right_rounded, size: 16, color: kEarnSoft),
+                  ]),
                 ),
               ),
             ),
+          ],
         ]),
       );
 }
 
+// ─── status, chips, bar ─────────────────────────────────────────────────────
+
 enum EarnStatus { ongoing, upcoming, reached, off }
 
-/// The status pill: Ongoing a glowing violet, Reached luminous white,
-/// Upcoming and off a frosted glass pill.
+/// The status pill: Ongoing white with a black dot, Reached white with a
+/// tick, Upcoming and off a glass pill.
 class EarnStatusPill extends StatelessWidget {
   const EarnStatusPill(this.status, {super.key, this.text});
   final EarnStatus status;
@@ -773,43 +842,26 @@ class EarnStatusPill extends StatelessWidget {
           EarnStatus.reached => 'Reached',
           EarnStatus.off => 'Not yet',
         };
-    final (BoxDecoration deco, Color fg, bool dot) = switch (status) {
-      EarnStatus.ongoing => (
-          BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            gradient: const LinearGradient(colors: [Color(0xFFA78BFA), kEarnViolet, kEarnVioletDeep]),
-            border: Border.all(color: const Color(0x66FFFFFF)),
-            boxShadow: const [BoxShadow(color: Color(0x998B5CF6), blurRadius: 12, offset: Offset(0, 3))],
-          ),
-          Colors.white,
-          true,
-        ),
-      EarnStatus.reached => (earnGlossyWhite(), kEarnInk, false),
-      _ => (
-          BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x38FFFFFF), Color(0x14FFFFFF)]),
-            border: Border.all(color: const Color(0x4DFFFFFF)),
-          ),
-          Colors.white,
-          false,
-        ),
-    };
+    final white = status == EarnStatus.ongoing || status == EarnStatus.reached;
+    final row = Row(mainAxisSize: MainAxisSize.min, children: [
+      if (status == EarnStatus.ongoing) ...[
+        Container(width: 6, height: 6, decoration: const BoxDecoration(color: kEarnInk, shape: BoxShape.circle)),
+        const SizedBox(width: 6),
+      ],
+      if (status == EarnStatus.reached) ...[const Icon(Icons.check_rounded, size: 13, color: kEarnInk), const SizedBox(width: 4)],
+      Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, style: TextStyle(color: white ? kEarnInk : Colors.white, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.2)))),
+    ]);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: deco,
-      child: Row(mainAxisSize: MainAxisSize.min, children: [
-        if (dot) ...[
-          Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.white, blurRadius: 6)])),
-          const SizedBox(width: 6),
-        ],
-        Text(label, maxLines: 1, style: TextStyle(color: fg, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.2)),
-      ]),
+      decoration: white
+          ? earnGlossyWhite(shadow: false)
+          : BoxDecoration(borderRadius: BorderRadius.circular(999), color: const Color(0x1FFFFFFF), border: Border.all(color: const Color(0x40FFFFFF))),
+      child: row,
     );
   }
 }
 
-/// A small glossy white chip: a mark (or the real coin) and a short line.
+/// A small white chip: a mark (or the real coin) and a short line.
 class EarnChip extends StatelessWidget {
   const EarnChip(this.text, {super.key, this.mark, this.icon, this.coin = false});
   final String text;
@@ -824,15 +876,14 @@ class EarnChip extends StatelessWidget {
           if (coin)
             const NwsbCoinDisc(size: 18)
           else if (mark != null || icon != null)
-            EarnCircle(mark: mark, icon: icon, size: 18, outlined: true),
+            EarnInkCircle(mark: mark, icon: icon, size: 18),
           if (coin || mark != null || icon != null) const SizedBox(width: 5),
           Flexible(child: Text(text, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnInk, fontSize: 11.5, fontWeight: FontWeight.w700))),
         ]),
       );
 }
 
-/// The reference odds chip: a glossy white pill, a small grey label and a
-/// bold figure ("1x  1.8").
+/// One key fact of a focus card: a small caps label over a bold figure.
 class EarnOdd {
   const EarnOdd(this.label, this.value, {this.coin = false, this.icon});
   final String label;
@@ -841,42 +892,62 @@ class EarnOdd {
   final IconData? icon;
 }
 
+/// One key fact on its own (a glass chip).
 class EarnOddChip extends StatelessWidget {
   const EarnOddChip(this.odd, {super.key});
   final EarnOdd odd;
   @override
-  Widget build(BuildContext context) => Container(
-        height: 34,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        alignment: Alignment.center,
-        decoration: earnGlossyWhite().copyWith(boxShadow: const [BoxShadow(color: Color(0x4D1E0B4A), blurRadius: 10, offset: Offset(0, 4))]),
-        child: FittedBox(
+  Widget build(BuildContext context) => EarnGlass(
+        tone: EarnTone.cell,
+        radius: 14,
+        glow: null,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: _OddCell(odd),
+      );
+}
+
+class _OddCell extends StatelessWidget {
+  const _OddCell(this.odd);
+  final EarnOdd odd;
+  @override
+  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+        Text(odd.label.toUpperCase(), maxLines: 2, overflow: TextOverflow.ellipsis, style: kEarnEyebrow.copyWith(fontSize: 9.5, letterSpacing: 1.1, color: kEarnMuted)),
+        const SizedBox(height: 4),
+        FittedBox(
           fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(odd.label, maxLines: 1, style: const TextStyle(color: kEarnGrey, fontSize: 11.5, fontWeight: FontWeight.w600)),
-            const SizedBox(width: 6),
-            if (odd.coin) ...[const NwsbCoinDisc(size: 15), const SizedBox(width: 3)],
-            if (odd.icon != null) ...[Icon(odd.icon, size: 14, color: kEarnVioletDeep), const SizedBox(width: 2)],
-            Text(odd.value, maxLines: 1, style: const TextStyle(color: kEarnInk, fontSize: 13, fontWeight: FontWeight.w800)),
+            if (odd.coin) ...[const NwsbCoinDisc(size: 16), const SizedBox(width: 4)],
+            if (odd.icon != null) ...[Icon(odd.icon, size: 14, color: Colors.white), const SizedBox(width: 3)],
+            Text(odd.value, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: -0.2)),
+          ]),
+        ),
+      ]);
+}
+
+/// Up to three key facts in one inset black strip, split by hairlines.
+class EarnOddsRow extends StatelessWidget {
+  const EarnOddsRow(this.odds, {super.key});
+  final List<EarnOdd> odds;
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          color: const Color(0x59000000),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0x1AFFFFFF)),
+        ),
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (var i = 0; i < odds.length; i++) ...[
+              if (i > 0) const VerticalDivider(width: 1, thickness: 1, indent: 10, endIndent: 10, color: Color(0x1FFFFFFF)),
+              Expanded(child: Padding(padding: const EdgeInsets.fromLTRB(12, 10, 8, 10), child: _OddCell(odds[i]))),
+            ],
           ]),
         ),
       );
 }
 
-/// A row of up to three odds chips, equal widths.
-class EarnOddsRow extends StatelessWidget {
-  const EarnOddsRow(this.odds, {super.key});
-  final List<EarnOdd> odds;
-  @override
-  Widget build(BuildContext context) => Row(children: [
-        for (var i = 0; i < odds.length; i++) ...[
-          if (i > 0) const SizedBox(width: 6),
-          Expanded(child: EarnOddChip(odds[i])),
-        ],
-      ]);
-}
-
-/// A progress bar: a violet → white gradient on a glass track, softly lit.
+/// A progress line: white on a faint white track.
 class EarnBar extends StatelessWidget {
   const EarnBar(this.value, {super.key, this.height = 6, this.color});
   final double value;
@@ -888,13 +959,14 @@ class EarnBar extends StatelessWidget {
         child: SizedBox(
           height: height,
           child: Stack(fit: StackFit.expand, children: [
-            const ColoredBox(color: Color(0x26FFFFFF)),
+            const ColoredBox(color: Color(0x24FFFFFF)),
             FractionallySizedBox(
               alignment: Alignment.centerLeft,
               widthFactor: value.clamp(0.0, 1.0),
               child: DecoratedBox(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: color == null ? const [kEarnViolet, Color(0xFFC4B5FD), Colors.white] : [color!, color!]),
+                  borderRadius: BorderRadius.circular(height / 2),
+                  color: color ?? Colors.white,
                 ),
               ),
             ),
@@ -903,8 +975,9 @@ class EarnBar extends StatelessWidget {
       );
 }
 
-/// One side of [EarnStatCard]: the crest (a white circle badge) and its
-/// name under it.
+// ─── the focus card ─────────────────────────────────────────────────────────
+
+/// One end of a focus card's from → to line.
 class EarnSide {
   const EarnSide(this.label, {this.mark, this.icon, this.coin = false});
   final String label;
@@ -913,9 +986,21 @@ class EarnSide {
   final bool coin;
 }
 
-/// The reference event card as a vivid hero: deep purple → indigo glass
-/// with grain, a sweep of light on entrance and a glow behind the big
-/// figure; a crest each side, three glossy odds chips under it.
+/// "12 / 100" → 0.12; null when [s] is not a fraction.
+double? earnFraction(String s) {
+  final m = RegExp(r'^\s*([\d,.]+)\s*/\s*([\d,.]+)\s*$').firstMatch(s);
+  if (m == null) return null;
+  final a = double.tryParse(m.group(1)!.replaceAll(',', ''));
+  final b = double.tryParse(m.group(2)!.replaceAll(',', ''));
+  if (a == null || b == null || b <= 0) return null;
+  return (a / b).clamp(0.0, 1.0);
+}
+
+/// The focus card of a tab: its badge, a small caps [eyebrow] and the
+/// [title], the [status]; the [number] very large with [under] beneath; a
+/// progress line when the number is "x / y"; the [left] → [right] line;
+/// and up to three key facts ([odds]) in an inset strip. [hero] puts it on
+/// the near-black plate, else black glass.
 class EarnStatCard extends StatelessWidget {
   const EarnStatCard({
     super.key,
@@ -939,78 +1024,60 @@ class EarnStatCard extends StatelessWidget {
   final Widget? status;
   final List<EarnOdd> odds;
   final VoidCallback? onTap;
-
-  /// The vivid hero glass; off for the quieter list cards.
   final bool hero;
 
-  Widget _side(EarnSide s) => Column(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          decoration: const BoxDecoration(shape: BoxShape.circle, boxShadow: [
-            BoxShadow(color: Color(0x80A78BFA), blurRadius: 18, spreadRadius: -2),
-            BoxShadow(color: Color(0x59000000), blurRadius: 8, offset: Offset(0, 4)),
-          ]),
-          child: s.coin ? const NwsbCoinDisc(size: 46) : EarnCircle(mark: s.mark, icon: s.icon, size: 46),
-        ),
-        const SizedBox(height: 7),
-        Text(s.label,
-            maxLines: 3,
-            textAlign: TextAlign.center,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700, height: 1.2)),
-      ]);
+  Widget _badge(EarnSide s, double size) => s.coin ? NwsbCoinDisc(size: size) : EarnCircle(mark: s.mark, icon: s.icon, size: size);
 
   @override
   Widget build(BuildContext context) {
+    final p = earnFraction(number);
     final card = EarnGlass(
       tone: hero ? EarnTone.hero : EarnTone.pane,
-      glow: hero ? const Color(0x998B5CF6) : kEarnGlowViolet,
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      radius: 24,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
-        Row(children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (left != null) ...[_badge(left!, 42), const SizedBox(width: 12)],
           Expanded(
-            child: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800, height: 1.2, letterSpacing: -0.2)),
-          ),
-          if (status != null) ...[const SizedBox(width: 8), status!],
-          if (onTap != null) ...[const SizedBox(width: 6), const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: kEarnSoft)],
-        ]),
-        const SizedBox(height: 14),
-        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          Expanded(flex: 3, child: left == null ? const SizedBox() : _side(left!)),
-          Expanded(
-            flex: 4,
-            child: Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
-              // The soft light behind the figure.
-              Positioned(
-                left: -20,
-                right: -20,
-                top: -18,
-                bottom: -18,
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        radius: 0.62,
-                        colors: hero ? const [Color(0x99B79CFF), Color(0x408B5CF6), Color(0x008B5CF6)] : const [Color(0x40A78BFA), Color(0x008B5CF6)],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Column(mainAxisSize: MainAxisSize.min, children: [
-                if (eyebrow != null)
-                  FittedBox(fit: BoxFit.scaleDown, child: Text(eyebrow!, maxLines: 1, style: const TextStyle(color: Color(0xFFD9CCFF), fontSize: 11.5, fontWeight: FontWeight.w600))),
-                const SizedBox(height: 2),
-                FittedBox(fit: BoxFit.scaleDown, child: Text(number, maxLines: 1, style: kEarnBig.copyWith(fontSize: 34, shadows: kEarnNumberGlow))),
-                if (under != null) ...[
-                  const SizedBox(height: 2),
-                  Text(under!, maxLines: 3, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFFD9CCFF), fontSize: 11.5, fontWeight: FontWeight.w700, height: 1.25)),
-                ],
-              ]),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              if (eyebrow != null) Text(eyebrow!.toUpperCase(), maxLines: 2, overflow: TextOverflow.ellipsis, style: kEarnEyebrow),
+              Text(title, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800, height: 1.25, letterSpacing: -0.3)),
+              if (status != null) ...[const SizedBox(height: 8), status!],
             ]),
           ),
-          Expanded(flex: 3, child: right == null ? const SizedBox() : _side(right!)),
+          if (onTap != null) ...[const SizedBox(width: 4), const Padding(padding: EdgeInsets.only(top: 4), child: Icon(Icons.arrow_forward_ios_rounded, size: 12, color: kEarnSoft))],
         ]),
-        if (odds.isNotEmpty) ...[const SizedBox(height: 16), EarnOddsRow(odds)],
+        const SizedBox(height: 18),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(number, maxLines: 1, style: kEarnBig.copyWith(fontSize: 44, letterSpacing: -1.4, height: 1, shadows: kEarnNumberGlow)),
+        ),
+        if (under != null) ...[
+          const SizedBox(height: 6),
+          Text(under!, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnSoft, fontSize: 13, fontWeight: FontWeight.w600, height: 1.3)),
+        ],
+        if (p != null) ...[const SizedBox(height: 14), EarnBar(p, height: 6)],
+        if (left != null || right != null) ...[
+          SizedBox(height: p != null ? 10 : 14),
+          LayoutBuilder(
+            builder: (context, c) => Row(children: [
+              Expanded(
+                child: Text(left?.label ?? '', maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnMuted, fontSize: 12, fontWeight: FontWeight.w700, height: 1.25)),
+              ),
+              if (right != null) ...[
+                const Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Icon(Icons.arrow_forward_rounded, size: 14, color: kEarnMuted)),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: c.maxWidth * 0.5),
+                  child: Text(right!.label, maxLines: 3, textAlign: TextAlign.right, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w800, height: 1.25)),
+                ),
+                const SizedBox(width: 8),
+                _badge(right!, 26),
+              ],
+            ]),
+          ),
+        ],
+        if (odds.isNotEmpty) ...[const SizedBox(height: 14), EarnOddsRow(odds)],
       ]),
     );
     return EarnEnter(
@@ -1020,8 +1087,9 @@ class EarnStatCard extends StatelessWidget {
   }
 }
 
-/// One cell of [EarnStatGrid]: a label on top, the figure at the bottom
-/// ([second] at the bottom right, the reference's home · away pair).
+// ─── the ledger ─────────────────────────────────────────────────────────────
+
+/// One line of [EarnStatGrid].
 class EarnStat {
   const EarnStat(this.label, this.value, {this.sub, this.second, this.highlight = false, this.key, this.onTap});
   final VoidCallback? onTap;
@@ -1033,111 +1101,220 @@ class EarnStat {
   final Key? key;
 }
 
-/// The reference Statistics card: [title] over a grid of deep glass cells,
-/// one luminous white / lavender highlighted cell with black text.
+/// A readable ledger in black glass: each line's label and what it means on
+/// the left, its figure on the right; the [EarnStat.highlight] line on a
+/// white plate. [columns] is kept for callers.
 class EarnStatGrid extends StatelessWidget {
   const EarnStatGrid(this.stats, {super.key, this.columns = 2, this.title = 'Statistics'});
   final List<EarnStat> stats;
   final int columns;
   final String? title;
 
-  Widget _tile(EarnStat s) {
-    final tile = _plain(s);
-    if (s.onTap == null) return KeyedSubtree(key: s.key, child: tile);
+  Widget _line(EarnStat s, double maxValue) {
+    final hi = s.highlight;
+    final ink = hi ? kEarnInk : Colors.white;
+    final faint = hi ? kEarnGrey : kEarnMuted;
+    final body = Padding(
+      padding: EdgeInsets.fromLTRB(14, hi ? 14 : 12, 12, hi ? 14 : 12),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            Text(s.label, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w700, height: 1.25)),
+            if (s.sub != null) ...[
+              const SizedBox(height: 2),
+              Text(s.sub!, maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(color: faint, fontSize: 12, height: 1.3)),
+            ],
+          ]),
+        ),
+        const SizedBox(width: 12),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxValue),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, mainAxisSize: MainAxisSize.min, children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Text(s.value, maxLines: 1, style: TextStyle(color: ink, fontSize: hi ? 22 : 19, fontWeight: FontWeight.w800, height: 1.1, letterSpacing: -0.4)),
+            ),
+            if (s.second != null)
+              Text(s.second!, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: faint, fontSize: 12, fontWeight: FontWeight.w700)),
+          ]),
+        ),
+        if (s.onTap != null) ...[const SizedBox(width: 6), Icon(Icons.chevron_right_rounded, size: 18, color: hi ? kEarnInk : kEarnSoft)],
+      ]),
+    );
+    final face = hi
+        ? Padding(padding: const EdgeInsets.symmetric(vertical: 2), child: EarnGlass(tone: EarnTone.light, radius: 18, child: body))
+        : body;
+    if (s.onTap == null) return KeyedSubtree(key: s.key, child: face);
     return Semantics(
       key: s.key,
       button: true,
       label: '${s.label}, ${s.value}',
       excludeSemantics: true,
-      child: EarnPress(onTap: s.onTap, child: tile),
-    );
-  }
-
-  Widget _plain(EarnStat s) {
-    final hi = s.highlight;
-    final faint = hi ? const Color(0xFF5B5470) : kEarnSoft;
-    final inner = Container(
-      constraints: const BoxConstraints(minHeight: 92),
-      padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Row(children: [
-          Expanded(child: Text(s.label, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: faint, fontSize: 12, fontWeight: FontWeight.w600, height: 1.2))),
-          if (s.onTap != null) Icon(Icons.arrow_forward_ios_rounded, size: 10, color: hi ? kEarnInk : kEarnSoft),
-        ]),
-        const Spacer(),
-        const SizedBox(height: 10),
-        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Expanded(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(s.value,
-                  maxLines: 1,
-                  style: TextStyle(
-                      color: hi ? kEarnInk : Colors.white,
-                      fontSize: hi ? 24 : 20,
-                      fontWeight: FontWeight.w800,
-                      height: 1.1,
-                      letterSpacing: -0.4,
-                      shadows: hi ? null : const [Shadow(color: Color(0x66A78BFA), blurRadius: 12)])),
-            ),
-          ),
-          if (s.second != null) ...[
-            const SizedBox(width: 6),
-            Text(s.second!, maxLines: 1, style: TextStyle(color: faint, fontSize: 14, fontWeight: FontWeight.w800)),
-          ],
-        ]),
-        if (s.sub != null) ...[
-          const SizedBox(height: 3),
-          Text(s.sub!, maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(color: faint, fontSize: 11, height: 1.3)),
-        ],
-      ]),
-    );
-    return EarnGlass(
-      tone: hi ? EarnTone.light : EarnTone.cell,
-      radius: kEarnTileRadius,
-      blur: false,
-      glow: hi ? const Color(0x99A78BFA) : null,
-      child: inner,
+      child: EarnPress(onTap: s.onTap, child: face),
     );
   }
 
   @override
+  Widget build(BuildContext context) => EarnEnter(
+        order: 3,
+        child: EarnGlass(
+          radius: 24,
+          padding: const EdgeInsets.fromLTRB(6, 14, 6, 6),
+          child: LayoutBuilder(builder: (context, c) {
+            final maxValue = c.maxWidth * 0.44;
+            final lines = <Widget>[];
+            for (var i = 0; i < stats.length; i++) {
+              final s = stats[i];
+              final prevHi = i > 0 && stats[i - 1].highlight;
+              if (i > 0 && !s.highlight && !prevHi) lines.add(const Divider(height: 1, thickness: 1, indent: 14, endIndent: 14, color: Color(0x17FFFFFF)));
+              lines.add(_line(s, maxValue));
+            }
+            return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+              if (title != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                  child: Text(title!, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
+                ),
+              ...lines,
+            ]);
+          }),
+        ),
+      );
+}
+
+// ─── how it works ───────────────────────────────────────────────────────────
+
+/// The steps of NowssB Earn, plainly (no figures: those live in the tabs).
+const kEarnHowSteps = <(String, String, String)>[
+  (NwsbMarks.reference, 'Share your link', 'Make a link for a word, a meaning or a plan in Invite friends. Each link counts its opens, installs and buyers.'),
+  (NwsbMarks.cart, 'A friend buys', 'When someone buys through your link, the words count toward your rank. Your own purchases never count.'),
+  (NwsbMarks.hourglass, 'The sale clears', 'A sale waits out the refund window first. A refund or chargeback reverses it.'),
+  (NwsbMarks.earn, 'You earn commission', 'Your rank\u2019s rate on each cleared sale after tax and store fees. It needs your own active paid plan.'),
+  (NwsbMarks.piggy, 'Request a payout', 'Add your payout details in Payouts, then request what is available.'),
+];
+
+/// Opens the how-it-works pop-up. It closes on a tap outside, a swipe down
+/// or back. [onRules] adds a "Read the rules" button.
+Future<void> showEarnHowItWorks(BuildContext context, {VoidCallback? onRules}) {
+  return showModalBottomSheet<void>(
+    context: context,
+    isDismissible: true,
+    enableDrag: true,
+    isScrollControlled: true,
+    showDragHandle: false,
+    backgroundColor: Colors.transparent,
+    barrierColor: const Color(0xA6000000),
+    builder: (ctx) => EarnHowItWorks(onRules: onRules == null ? null : () {
+      Navigator.of(ctx).pop();
+      onRules();
+    }),
+  );
+}
+
+/// The how-it-works pop-up's body.
+class EarnHowItWorks extends StatelessWidget {
+  const EarnHowItWorks({super.key, this.onRules});
+  final VoidCallback? onRules;
+  @override
   Widget build(BuildContext context) {
-    final rows = <Widget>[];
-    for (var i = 0; i < stats.length; i += columns) {
-      final row = stats.sublist(i, (i + columns).clamp(0, stats.length));
-      rows.add(IntrinsicHeight(
-        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          for (var j = 0; j < columns; j++) ...[
-            if (j > 0) const SizedBox(width: 8),
-            Expanded(child: j < row.length ? _tile(row[j]) : const SizedBox()),
-          ],
-        ]),
-      ));
-      if (i + columns < stats.length) rows.add(const SizedBox(height: 8));
-    }
-    final grid = Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: rows);
-    if (title == null) return EarnEnter(order: 3, child: grid);
-    return EarnEnter(
-      order: 3,
-      child: EarnPane(
-        padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
-        glow: kEarnGlowBlue,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(4, 0, 4, 12),
-            child: Row(children: [
-              Container(width: 4, height: 18, decoration: BoxDecoration(borderRadius: BorderRadius.circular(2), gradient: const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFC4B5FD), kEarnViolet]), boxShadow: const [BoxShadow(color: Color(0x998B5CF6), blurRadius: 8)])),
-              const SizedBox(width: 9),
-              Expanded(child: Text(title!, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.3))),
-            ]),
+    final maxH = MediaQuery.sizeOf(context).height * 0.86;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: maxH, maxWidth: 560),
+          child: EarnGlass(
+            key: const ValueKey('earn-how-sheet'),
+            tone: EarnTone.hero,
+            radius: 28,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+                Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0x66FFFFFF), borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 16),
+                const Text('HOW IT WORKS', style: kEarnEyebrow),
+                const SizedBox(height: 4),
+                const Text('From a link to a payout', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.5)),
+                const SizedBox(height: 18),
+                for (var i = 0; i < kEarnHowSteps.length; i++) _step(i),
+                const SizedBox(height: 8),
+                const Text('Earnings depend on your own verified sales and are not guaranteed.', style: TextStyle(color: kEarnMuted, fontSize: 12, height: 1.35)),
+                const SizedBox(height: 16),
+                Row(children: [
+                  if (onRules != null) ...[
+                    Expanded(child: EarnActionButton(key: const ValueKey('earn-how-rules'), label: 'Read the rules', icon: Icons.gavel_rounded, onTap: onRules!, primary: false)),
+                    const SizedBox(width: 10),
+                  ],
+                  Expanded(
+                    child: EarnActionButton(key: const ValueKey('earn-how-done'), label: 'Got it', icon: Icons.check_rounded, onTap: () => Navigator.of(context).maybePop()),
+                  ),
+                ]),
+              ]),
+            ),
           ),
-          grid,
-        ]),
+        ),
       ),
     );
   }
+
+  Widget _step(int i) {
+    final (mark, title, line) = kEarnHowSteps[i];
+    final last = i == kEarnHowSteps.length - 1;
+    return IntrinsicHeight(
+      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Column(children: [
+          EarnCircle(mark: mark, size: 40),
+          if (!last) const Expanded(child: Padding(padding: EdgeInsets.symmetric(vertical: 4), child: VerticalDivider(width: 1, thickness: 1, color: Color(0x33FFFFFF)))),
+        ]),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: last ? 4 : 18, top: 2),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('STEP ${i + 1}', style: kEarnEyebrow.copyWith(fontSize: 9.5, color: kEarnMuted)),
+              const SizedBox(height: 2),
+              Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800, height: 1.25)),
+              const SizedBox(height: 3),
+              Text(line, style: const TextStyle(color: kEarnSoft, fontSize: 13, height: 1.4)),
+            ]),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+/// A glass row that opens the how-it-works pop-up.
+class EarnHowItWorksRow extends StatelessWidget {
+  const EarnHowItWorksRow({super.key, required this.onTap});
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: 'How Earn works',
+        excludeSemantics: true,
+        child: EarnPress(
+          key: const ValueKey('earn-how-it-works'),
+          onTap: onTap,
+          child: EarnGlass(
+            radius: 20,
+            padding: const EdgeInsets.fromLTRB(10, 10, 14, 10),
+            child: Row(children: [
+              const EarnCircle(icon: Icons.question_mark_rounded, size: 36),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  Text('How Earn works', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.w800)),
+                  Text('Five steps from a link to a payout', maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: kEarnMuted, fontSize: 12, height: 1.3)),
+                ]),
+              ),
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right_rounded, size: 20, color: kEarnSoft),
+            ]),
+          ),
+        ),
+      );
 }
 
 /// A slim loading line in place of the old thinking orb.
@@ -1215,6 +1392,7 @@ class EarnField extends StatelessWidget {
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(vertical: 1),
             hintText: hint,
+            hintMaxLines: 2,
             hintStyle: const TextStyle(color: Color(0x73FFFFFF), fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0),
           ),
         ),

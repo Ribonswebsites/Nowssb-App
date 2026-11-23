@@ -198,7 +198,7 @@ class HomeTrioSection extends StatelessWidget {
                     label: 'Your Earnings',
                     hero: true,
                     sub: live ? '${_cents(m.lifetimeCents)} earned' : 'Sign in to earn',
-                                        icon: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.black, strokeWidth: 1.9),
+                                        icon: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.white, strokeWidth: 1.9),
                     onTap: () => showYourEarningsSheet(context),
                   ),
                 ),
@@ -216,7 +216,7 @@ class HomeTrioSection extends StatelessWidget {
 class _TrioButton extends StatelessWidget {
   const _TrioButton({super.key, required this.label, required this.sub, required this.icon, required this.onTap, this.progress, this.hero = false});
 
-  /// The vivid purple hero glass (Your Earnings).
+  /// The white tile (Your Earnings), the one key action of the row.
   final bool hero;
   final String label;
   final String sub;
@@ -234,28 +234,27 @@ class _TrioButton extends StatelessWidget {
             onTap();
           },
           child: EarnGlass(
-            tone: hero ? EarnTone.hero : EarnTone.pane,
+            tone: hero ? EarnTone.light : EarnTone.pane,
             radius: 18,
-            glow: hero ? const Color(0x998B5CF6) : const Color(0x557C4DFF),
             child: Container(
             constraints: const BoxConstraints(minHeight: 112),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 11),
               child: ExcludeSemantics(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  EarnCircle(size: 36, child: icon),
+                  if (hero) Container(width: 36, height: 36, alignment: Alignment.center, decoration: const BoxDecoration(color: kEarnInk, shape: BoxShape.circle), child: icon) else EarnCircle(size: 36, child: icon),
                   const Spacer(),
                   const SizedBox(height: 10),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text(label, maxLines: 1, softWrap: false, style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.2)),
+                    child: Text(label, maxLines: 1, softWrap: false, style: TextStyle(color: hero ? kEarnInk : Colors.white, fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.2)),
                   ),
                   const SizedBox(height: 2),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text(sub, maxLines: 1, softWrap: false, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 10.5, fontWeight: FontWeight.w600, height: 1.15)),
+                    child: Text(sub, maxLines: 1, softWrap: false, style: TextStyle(color: hero ? kEarnGrey : const Color(0xCCFFFFFF), fontSize: 10.5, fontWeight: FontWeight.w600, height: 1.15)),
                   ),
                   if (progress != null) ...[
                     const SizedBox(height: 6),
@@ -477,7 +476,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0xE61A1726), Color(0xE60F0D17), Color(0xE6151320)],
+                        colors: [Color(0xF2161618), Color(0xF20B0B0C), Color(0xF2111113)],
                       ),
                       border: Border.all(color: const Color(0x40FFFFFF)),
                     ),
@@ -609,7 +608,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
             EarnStat('This month', s.place == null ? 'Not on board' : '#${s.place!.$1} of ${s.place!.$2}', onTap: () => _Go.team(context)),
             EarnStat('Under you', s.under == 1 ? '1 person' : '${s.under} people', onTap: () => _Go.team(context)),
           ],
-        ]),
+        ], title: null),
         if (!s.live)
           const Padding(
             padding: EdgeInsets.fromLTRB(4, 10, 4, 0),

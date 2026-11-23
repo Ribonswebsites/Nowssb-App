@@ -333,10 +333,12 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
 
   void _open(String id) => _go.value?.call(id);
 
+  void _help(BuildContext context) => showEarnHowItWorks(context, onRules: () => _open('rules'));
+
   @override
   Widget build(BuildContext context) {
     return WhiteCircleBadges(child: Scaffold(
-      backgroundColor: const Color(0xFF07070C),
+      backgroundColor: Colors.black,
       body: Stack(fit: StackFit.expand, children: [
         const Positioned.fill(child: AppBackdrop()),
         const Positioned.fill(
@@ -346,7 +348,7 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0x80060C18), Color(0xB3060C18), Color(0xCC060C18)],
+                  colors: [Color(0xB3000000), Color(0xD1000000), Color(0xE6000000)],
                 ),
               ),
             ),
@@ -359,7 +361,7 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  EarnHey(onBack: () => Navigator.of(context).maybePop()),
+                  EarnHey(onBack: () => Navigator.of(context).maybePop(), onHelp: () => _help(context)),
                   const SizedBox(height: 20),
                   ListenableBuilder(
                     listenable: Listenable.merge([EconomyMirror.instance, FxBook.instance]),
@@ -388,7 +390,9 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
                   ),
                   const SizedBox(height: 12),
                   EarnActions(onPayout: () => _open('payouts'), onInvite: () => _open('invite')),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 12),
+                  EarnEnter(order: 2, child: EarnHowItWorksRow(onTap: () => _help(context))),
+                  const SizedBox(height: 26),
                 ]),
               ),
               ProgramTabsBlock(

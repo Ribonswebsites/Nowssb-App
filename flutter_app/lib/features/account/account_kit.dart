@@ -80,14 +80,30 @@ class AccountPage extends StatelessWidget {
         children: [
           const Positioned.fill(child: AppBackdrop()),
           const Positioned.fill(child: QuietFilmVeil()),
+          // Earn's pages (white circle badges) sit on the same deep black veil
+          // as the Earn page, so the background stays quiet behind the glass.
+          if (WhiteCircleBadges.of(context))
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x99000000), Color(0xC7000000), Color(0xE0000000)],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
                 padding: EdgeInsets.fromLTRB(onBack == null ? 18 : 12, top + 10, 16, 14),
-                decoration: const BoxDecoration(
-                  color: Color(0x66060C18),
-                  border: Border(bottom: BorderSide(color: Color(0x12FFFFFF))),
+                decoration: BoxDecoration(
+                  color: WhiteCircleBadges.of(context) ? const Color(0x99000000) : const Color(0x66060C18),
+                  border: const Border(bottom: BorderSide(color: Color(0x12FFFFFF))),
                 ),
                 child: Row(children: [
                   if (onBack != null) ...[
@@ -139,9 +155,9 @@ class AccountPage extends StatelessWidget {
               if (bottom != null)
                 Container(
                   padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + pad),
-                  decoration: const BoxDecoration(
-                    color: Color(0x66060C18),
-                    border: Border(top: BorderSide(color: Color(0x12FFFFFF))),
+                  decoration: BoxDecoration(
+                    color: WhiteCircleBadges.of(context) ? const Color(0x99000000) : const Color(0x66060C18),
+                    border: const Border(top: BorderSide(color: Color(0x12FFFFFF))),
                   ),
                   child: bottom!,
                 ),
@@ -399,6 +415,7 @@ class TileInput extends StatelessWidget {
         border: InputBorder.none,
         contentPadding: const EdgeInsets.symmetric(vertical: 1),
         hintText: hint,
+        hintMaxLines: 2,
         hintStyle: const TextStyle(color: Color(0x59FFFFFF), fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0),
       ),
     );
@@ -466,7 +483,7 @@ class PrimaryBar extends StatelessWidget {
     if (!WhiteCircleBadges.of(context) || !(enabled || busy)) return bar;
     return DecoratedBox(
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), boxShadow: const [
-        BoxShadow(color: Color(0x667C4DFF), blurRadius: 22, spreadRadius: -4, offset: Offset(0, 10)),
+        BoxShadow(color: Color(0x80000000), blurRadius: 22, spreadRadius: -4, offset: Offset(0, 10)),
         BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 4)),
       ]),
       child: bar,
