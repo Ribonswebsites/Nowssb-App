@@ -257,6 +257,9 @@ void main() {
 
   testWidgets('shots', (t) async {
     if (_out.isEmpty) return;
+    // Tests draw hard, unblurred shadows by default; shots should look like
+    // the app, so draw the real soft glows here.
+    debugDisableShadows = false;
     final warm = FlutterError.onError;
     FlutterError.onError = (d) {
       if (!d.exceptionAsString().contains('overflowed')) warm?.call(d);
@@ -306,5 +309,6 @@ void main() {
     await _mount(t, _withPill(const EarnTabsPage(initialTab: 'team')));
     await _shot(t, '${'$i'.padLeft(2, '0')}_programmes_team_coin_pill');
     await done(t);
+    debugDisableShadows = true;
   });
 }

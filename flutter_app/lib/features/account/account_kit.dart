@@ -273,16 +273,17 @@ class TileRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bad = error != null;
+    final glass = WhiteCircleBadges.of(context);
     final row = Material(
-      color: kGlassTile,
+      color: glass ? Colors.transparent : kGlassTile,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: bad ? AccountColors.errorEdge : Colors.transparent),
+        side: BorderSide(color: bad ? AccountColors.errorEdge : (glass ? const Color(0x2EFFFFFF) : Colors.transparent)),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
+        child: _glassInk(glass, Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
           child: Row(children: [
             leading,
@@ -304,7 +305,7 @@ class TileRow extends StatelessWidget {
             ),
             if (trailing != null) ...[const SizedBox(width: 8), trailing!],
           ]),
-        ),
+        )),
       ),
     );
     if (!bad) return row;
@@ -314,6 +315,20 @@ class TileRow extends StatelessWidget {
     ]);
   }
 }
+
+/// Earn's frosted fill for a [TileRow] inside [WhiteCircleBadges].
+Widget _glassInk(bool glass, Widget child) => !glass
+    ? child
+    : Ink(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0x2BFFFFFF), Color(0x12FFFFFF), Color(0x0AFFFFFF)],
+          ),
+        ),
+        child: child,
+      );
 
 /// Validation line in the login screen's error ink.
 class FieldError extends StatelessWidget {
@@ -419,7 +434,7 @@ class PrimaryBar extends StatelessWidget {
     final enabled = onTap != null && !busy;
     // Off stays readable: glass fill, hairline, 70% white type.
     final ink = enabled || busy ? NwsbColors.ink : const Color(0xB3FFFFFF);
-    return Material(
+    final bar = Material(
         color: enabled || busy ? Colors.white : const Color(0x1FFFFFFF),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
@@ -447,6 +462,14 @@ class PrimaryBar extends StatelessWidget {
             ]),
           ),
         ),
+    );
+    if (!WhiteCircleBadges.of(context) || !(enabled || busy)) return bar;
+    return DecoratedBox(
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), boxShadow: const [
+        BoxShadow(color: Color(0x667C4DFF), blurRadius: 22, spreadRadius: -4, offset: Offset(0, 10)),
+        BoxShadow(color: Color(0x40000000), blurRadius: 10, offset: Offset(0, 4)),
+      ]),
+      child: bar,
     );
   }
 }

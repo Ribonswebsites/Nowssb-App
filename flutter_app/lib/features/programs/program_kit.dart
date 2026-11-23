@@ -122,11 +122,12 @@ class _ProgramTabPillsState extends State<ProgramTabPills> {
     }
     return Padding(
       key: const ValueKey('program-tab-pills'),
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: SizedBox(
-        height: 40,
+        height: 60,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
           child: Row(children: [
             for (var i = 0; i < scope.tabs.length; i++) ...[
               if (i > 0) const SizedBox(width: 8),
@@ -146,23 +147,24 @@ class _ProgramTabPillsState extends State<ProgramTabPills> {
       selected: on,
       label: '${t.title} tab',
       excludeSemantics: true,
-      child: GestureDetector(
+      child: EarnPress(
         key: _keys.putIfAbsent(i, GlobalKey.new),
-        behavior: HitTestBehavior.opaque,
+        haptic: false,
         onTap: () {
           if (on) return;
           RewardHaptics.tick();
           scope.go(t.id);
         },
-        child: Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          alignment: Alignment.center,
-          decoration: on
-              ? BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999))
-              : BoxDecoration(color: const Color(0x8C14141C), borderRadius: BorderRadius.circular(999), border: Border.all(color: const Color(0x40FFFFFF))),
-          child: Text(t.title, maxLines: 1, style: TextStyle(color: on ? kEarnInk : Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
-        ),
+        child: () {
+          final label = Container(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            alignment: Alignment.center,
+            decoration: on ? earnGlossyWhite() : null,
+            child: Text(t.title, maxLines: 1, style: TextStyle(color: on ? kEarnInk : Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
+          );
+          return on ? label : EarnGlass(radius: 20, glow: const Color(0x337C4DFF), child: label);
+        }(),
       ),
     );
   }
@@ -356,9 +358,10 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
             key: _anchor,
             padding: const EdgeInsets.only(top: 6, bottom: 14),
             child: SizedBox(
-              height: 52,
+              height: 64,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
                 padding: EdgeInsets.symmetric(horizontal: widget.hPad),
                 child: Row(children: [
                   for (var i = 0; i < spec.tabs.length; i++) ...[
@@ -419,31 +422,25 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
       selected: on,
       label: label,
       excludeSemantics: true,
-      child: GestureDetector(
+      child: EarnPress(
         key: _pillKey(i),
-        behavior: HitTestBehavior.opaque,
+        haptic: false,
         onTap: () {
           if (!on) _pick(i);
         },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          height: 48,
-          padding: EdgeInsets.fromLTRB(on ? 5 : 0, 0, on ? 18 : 0, 0),
-          constraints: const BoxConstraints(minWidth: 48),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: on ? const [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))] : null,
-          ),
-          child: on
-              ? Row(mainAxisSize: MainAxisSize.min, children: [
+        child: on
+            ? Container(
+                height: 48,
+                padding: const EdgeInsets.fromLTRB(5, 0, 18, 0),
+                alignment: Alignment.center,
+                decoration: earnGlossyWhite(),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
                   EarnCircle(mark: mark, size: 38, outlined: true),
                   const SizedBox(width: 9),
                   Text(label, maxLines: 1, style: const TextStyle(color: kEarnInk, fontWeight: FontWeight.w800, fontSize: 14)),
-                ])
-              : NwsbIcon(mark, size: 20, color: kEarnInk, strokeWidth: 1.9),
-        ),
+                ]),
+              )
+            : EarnGlassCircle(mark: mark, size: 48),
       ),
     );
   }
@@ -702,9 +699,8 @@ class PDisclaimer extends StatelessWidget {
   final String text;
   final String slot;
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => EarnPane(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(kEarnRadius), border: Border.all(color: kEarnLine), color: const Color(0x8C14141C)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const EditableLabel('program_kit.GoodToKnow', 'GOOD TO KNOW', style: TextStyle(color: Color(0xB3FFFFFF), letterSpacing: 1.6, fontWeight: FontWeight.w800, fontSize: 10.5)),
           const SizedBox(height: 6),

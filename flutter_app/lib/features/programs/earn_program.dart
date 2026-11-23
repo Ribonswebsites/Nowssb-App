@@ -303,6 +303,7 @@ Widget _targetCard(Map<String, dynamic> x, int words, {required bool open, requi
   final coupon = '${x['coupon'] ?? ''}';
   return EarnStatCard(
     key: ValueKey(head ? 'earn-target-$goal' : 'earn-target-list-$goal'),
+    hero: head || open,
     title: '$goal words sold',
     status: EarnStatusPill(reached ? EarnStatus.reached : (open ? EarnStatus.ongoing : EarnStatus.upcoming)),
     left: const EarnSide('You', mark: NwsbMarks.user),

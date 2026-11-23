@@ -196,6 +196,7 @@ class HomeTrioSection extends StatelessWidget {
                   child: _TrioButton(
                     key: const ValueKey('trio-earnings'),
                     label: 'Your Earnings',
+                    hero: true,
                     sub: live ? '${_cents(m.lifetimeCents)} earned' : 'Sign in to earn',
                                         icon: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.black, strokeWidth: 1.9),
                     onTap: () => showYourEarningsSheet(context),
@@ -213,7 +214,10 @@ class HomeTrioSection extends StatelessWidget {
 /// One glass button on the black banner: frosted face, hairline, a soft
 /// white circle mark, label and live line, all on dark glass.
 class _TrioButton extends StatelessWidget {
-  const _TrioButton({super.key, required this.label, required this.sub, required this.icon, required this.onTap, this.progress});
+  const _TrioButton({super.key, required this.label, required this.sub, required this.icon, required this.onTap, this.progress, this.hero = false});
+
+  /// The vivid purple hero glass (Your Earnings).
+  final bool hero;
   final String label;
   final String sub;
   final Widget icon;
@@ -229,13 +233,12 @@ class _TrioButton extends StatelessWidget {
             AppHaptics.medium();
             onTap();
           },
-          child: Container(
+          child: EarnGlass(
+            tone: hero ? EarnTone.hero : EarnTone.pane,
+            radius: 18,
+            glow: hero ? const Color(0x998B5CF6) : const Color(0x557C4DFF),
+            child: Container(
             constraints: const BoxConstraints(minHeight: 112),
-            decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    color: const Color(0x1FFFFFFF),
-                    border: Border.all(color: const Color(0x33FFFFFF)),
-                  ),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 11),
               child: ExcludeSemantics(
@@ -261,6 +264,7 @@ class _TrioButton extends StatelessWidget {
                 ]),
               ),
             ),
+          ),
           ),
         ),
       );
