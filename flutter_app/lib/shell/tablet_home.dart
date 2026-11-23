@@ -7,8 +7,9 @@
 ///   Trending ································ See more
 ///   01  [art]  title / line ·········· parts  [play]  ⋮
 ///
-/// Only a framed tablet (sidebar or rail) shows it; a phone keeps HomeNormal /
-/// HomeFashion exactly as they are.
+/// Only the Normal home on a framed tablet (sidebar or rail) shows it. The
+/// NowssB (zen) home keeps HomeFashion inside the frame, and a phone keeps
+/// HomeNormal / HomeFashion exactly as they are.
 library;
 
 import 'package:flutter/material.dart';
@@ -20,7 +21,6 @@ import '../screens/fashion/header.dart' show showDestinationSearchSheet;
 import '../screens/notifications_sheet.dart';
 import '../screens/practice_player.dart';
 import '../screens/sound_library.dart';
-import '../theme/tokens.dart';
 import 'nav_shell.dart';
 import 'tablet_frame.dart';
 
@@ -184,7 +184,7 @@ class _Hero extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFF1B2440), Color(0xFF0E1426), Color(0xFF2A2212)],
+                  colors: [Color(0xFF1B2440), Color(0xFF0E1426), Color(0xFF101A30)],
                 ),
                 border: Border.all(color: const Color(0x1AFFFFFF)),
                 borderRadius: BorderRadius.circular(20),
@@ -208,7 +208,7 @@ class _Hero extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text('NOWSSB',
-                      style: TextStyle(color: NwsbColors.goldLight, fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
+                      style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.6)),
                   const SizedBox(height: 8),
                   const Text('Listen to healing\nwords all the time',
                       maxLines: 2,

@@ -528,7 +528,7 @@ class _NavShellState extends State<NavShell> {
         // Match the visible tab so the home-indicator strip is never a black
         // chin on Normal home, and never a white line on dark tabs.
         // A tablet's home sits on the frame's glass panel.
-        backgroundColor: framed && _i == 0
+        backgroundColor: framed && _i == 0 && !_fashion
             ? Colors.transparent
             : lightHome
                 ? NwsbColors.surface
@@ -544,13 +544,16 @@ class _NavShellState extends State<NavShell> {
                 // Offstage + TickerMode: inactive IndexedStack tabs still layout,
                 // so without this their NwsbVideos keep claiming VideoPool seats
                 // and the visible tab (and player overlays) starve — "playing 1".
-                // Tablet (sidebar or rail): the reference's home column.
+                // Tablet (sidebar or rail): the Normal home is the reference's
+                // home column.
                 _tabAlive(
                     0,
-                    framed
-                        ? const TabletHome()
-                        : _fashion
-                            ? const HomeFashion()
+                    _fashion
+                        // The NowssB (zen) home keeps its own design and
+                        // gets the tablet frame around it.
+                        ? const HomeFashion()
+                        : framed
+                            ? const TabletHome()
                             : const HomeNormal()),
                 _tabAlive(1, const PracticeScreen()),
                 // Bottom-nav Library must be the media-rich Sound Library (website

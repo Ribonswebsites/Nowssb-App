@@ -106,7 +106,7 @@ class PracticePlayerScreen extends StatefulWidget {
 class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     with TickerProviderStateMixin {
   static const _likedWordsKey = 'nwsb_liked_words';
-  static const _shuffleKey = 'nwsb_player_shuffle';
+  static const _shuffleKey = kPlayerShuffleKey;
   static const _actionsTabVideo = 'assets/video/player-actions-tab.mp4';
   static const _marqueeLines = <String>[
     'NowssB · Words Without Dictionary',
@@ -170,7 +170,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     _upCtl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 320),
-    );
+    )..addListener(_onUpForTablet);
+    // The tablet's now-playing card can switch repeat on before the player
+    // opens (the session's loop). On a phone nothing sets it, so it is off.
+    _loop = PlaybackSession.instance.loop;
     _marqueeController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 18),
@@ -1365,7 +1368,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _jumpTo,
       () => unawaited(_togglePlay()),
       (d) => unawaited(_move(d)),
+      upOpen: _upCtl.value > 0.5,
     );
+  }
+
+  /// Tablet: tell the frame when the swipe-up view opens or closes.
+  bool _tabletUpOpen = false;
+  void _onUpForTablet() {
+    final open = _upCtl.value > 0.5;
+    if (open == _tabletUpOpen || _tabletRoute == null) return;
+    _tabletUpOpen = open;
+    _publishTablet();
   }
 
   /// Play the word at [i] (the tablet's Up next list).
@@ -5470,6 +5483,10 @@ List<String> get kPlayerThemeImages =>
 /// bundled poster uses its WordArt upload or own image; anything else gets
 /// the NowssB poster. Never a generic theme still and never a letter tile.
 /// [index] is kept so callers stay in queue order.
+/// Where the player saves its shuffle switch (the tablet now-playing card
+/// flips the same one).
+const kPlayerShuffleKey = 'nwsb_player_shuffle';
+
 String playerCoverArtFor(Word? word, int index) {
   if (word == null) return kNowssbPoster;
   final poster = wordPosterFor(word.word);

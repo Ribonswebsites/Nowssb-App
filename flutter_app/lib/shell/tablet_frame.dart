@@ -7,7 +7,8 @@
 /// bottom nav exactly as before.
 ///
 /// The look is the restyle kit's: dark glass panes (HeroGlassRecipe), white
-/// icon badges, small caps eyebrows, NowssB gold for the page you are on.
+/// icon badges, small caps eyebrows, a white glass pane for the page you are on
+/// (no gold or yellow fills).
 library;
 
 import 'dart:async';
@@ -59,14 +60,15 @@ class TabletShellGate {
   /// Tablet player: publish [route]'s queue. Called after a frame, never
   /// on a phone.
   static void publishPlayer(Route<dynamic>? route, List<Word> words, int index,
-      bool playing, void Function(int index) jump, VoidCallback toggle, void Function(int dir) move) {
+      bool playing, void Function(int index) jump, VoidCallback toggle, void Function(int dir) move,
+      {bool upOpen = false}) {
     if (route == null) return;
     final cur = player.value;
     if (cur != null && cur.route == route && cur.index == index && cur.playing == playing &&
-        identical(cur.words, words)) {
+        cur.upOpen == upOpen && identical(cur.words, words)) {
       return;
     }
-    player.value = TabletPlayerState(route, words, index, playing, jump, toggle, move);
+    player.value = TabletPlayerState(route, words, index, playing, jump, toggle, move, upOpen: upOpen);
   }
 
   static void dropPlayer(Route<dynamic>? route) {
@@ -79,7 +81,13 @@ class TabletShellGate {
 }
 
 class TabletPlayerState {
-  const TabletPlayerState(this.route, this.words, this.index, this.playing, this.jump, this.toggle, this.move);
+  const TabletPlayerState(this.route, this.words, this.index, this.playing, this.jump, this.toggle, this.move,
+      {this.upOpen = false});
+
+  /// The swipe-up view is open. It has its own Up next list and now-playing
+  /// card on a wide screen, so the frame drops its right column and gives the
+  /// view the whole panel instead of showing the queue twice.
+  final bool upOpen;
   final Route<dynamic> route;
   final List<Word> words;
   final int index;
@@ -187,7 +195,7 @@ class _TabletFrameState extends State<TabletFrame> {
     final top = TabletShellGate.observer.top.value;
     if (top == null) return _Panel.none;
     final p = TabletShellGate.player.value;
-    if (p != null && p.route == top) return _Panel.player;
+    if (p != null && p.route == top) return p.upOpen ? _Panel.none : _Panel.player;
     if (top == TabletShellGate.shellRoute) {
       final tab = TabletShellGate.tab.value;
       if (tab == 0 || tab == 1 || tab == 2) return _Panel.home;
@@ -226,7 +234,11 @@ class _TabletFrameState extends State<TabletFrame> {
     final big = w - side - gap - mq.padding.right;
     final centreW = big - (hasPanel ? panelW : 0);
     // Pages without a right column keep a reading width in the middle.
-    final pageW = hasPanel ? centreW : math.min(centreW, TabletBp.page);
+    // The swipe-up view lays out its own Up next and now-playing card side by
+    // side, so it gets the whole panel.
+    final pl = TabletShellGate.player.value;
+    final upWide = pl != null && pl.upOpen && pl.route == TabletShellGate.observer.top.value;
+    final pageW = hasPanel || upWide ? centreW : math.min(centreW, TabletBp.page);
     final inner = mq.copyWith(
       size: Size(pageW, mq.size.height - top - bottom),
       padding: EdgeInsets.zero,
@@ -552,6 +564,8 @@ class _TabletSidebarState extends State<TabletSidebar> {
                     label: t.label,
                     onTap: () => _open(key, t),
                   ),
+                // Ribon has both homes: the Normal / NowssB switch stays.
+                const _HomeModeSwitch(),
               ],
             ),
           ),
@@ -656,7 +670,7 @@ class _SideRow extends StatelessWidget {
     final row = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(children: [
-        Icon(icon, size: 20, color: active ? NwsbColors.goldLight : const Color(0xB3FFFFFF)),
+        Icon(icon, size: 20, color: active ? Colors.white : const Color(0x99FFFFFF)),
         const SizedBox(width: 14),
         Expanded(
           child: Text(label,
@@ -684,6 +698,75 @@ class _SideRow extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// The phone's Normal / NowssB home switch, as a row.
+class _HomeModeSwitch extends StatelessWidget {
+  const _HomeModeSwitch({this.compact = false});
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: Settings.instance,
+      builder: (context, _) {
+        final zen = Settings.instance.fashionHome;
+        void flip() {
+          AppHaptics.selection();
+          Settings.instance.setFashionHome(!zen);
+        }
+
+        if (compact) {
+          return _RailButton(
+            key: const ValueKey('tablet-home-mode'),
+            icon: zen ? Icons.light_mode : Icons.dark_mode,
+            label: zen ? 'Normal' : 'NowssB',
+            onTap: flip,
+          );
+        }
+        return _SideRow(
+          key: const ValueKey('tablet-home-mode'),
+          icon: zen ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+          label: zen ? 'Normal home' : 'NowssB home',
+          onTap: flip,
+        );
+      },
+    );
+  }
+}
+
+/// Repeat and shuffle for the now-playing card. Repeat is the playback
+/// session's loop (the session repeats the word it is on, and a player opened
+/// from the tablet starts with it); shuffle is the player's own saved switch.
+class _Toggles extends ChangeNotifier {
+  _Toggles._() {
+    PlaybackSession.instance.addListener(notifyListeners);
+    unawaited(_load());
+  }
+  static final instance = _Toggles._();
+
+  bool shuffle = false;
+  bool get repeat => PlaybackSession.instance.loop;
+
+  Future<void> _load() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final v = prefs.getBool(kPlayerShuffleKey) ?? false;
+      if (v != shuffle) {
+        shuffle = v;
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
+
+  void toggleRepeat() => PlaybackSession.instance.setLoop(!repeat);
+
+  Future<void> toggleShuffle() async {
+    shuffle = !shuffle;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(kPlayerShuffleKey, shuffle);
   }
 }
 
@@ -942,6 +1025,7 @@ class TabletRail extends StatelessWidget {
                   label: t.id == 'sound' ? 'Sounds' : 'Settings',
                   onTap: () => _open(key, t),
                 ),
+              const _HomeModeSwitch(compact: true),
             ],
           ),
         ),
@@ -964,7 +1048,7 @@ class _RailButton extends StatelessWidget {
     final glyph = SizedBox(
       width: 48,
       height: 34,
-      child: Icon(icon, size: 20, color: active ? NwsbColors.goldLight : const Color(0xB3FFFFFF)),
+      child: Icon(icon, size: 20, color: active ? Colors.white : const Color(0x99FFFFFF)),
     );
     return InkWell(
       onTap: onTap,
@@ -1190,12 +1274,30 @@ class _NowPlayingCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const dim = Color(0x8CFFFFFF);
-    Widget small(IconData i, String k) => GestureDetector(
-          key: ValueKey(k),
-          behavior: HitTestBehavior.opaque,
-          onTap: onOpen,
-          child: Padding(padding: const EdgeInsets.all(6), child: Icon(i, size: 18, color: dim)),
+    // Repeat and shuffle really switch: white on a glass square when on.
+    Widget small(IconData i, String k, bool on, VoidCallback f) => Semantics(
+          button: true,
+          toggled: on,
+          child: GestureDetector(
+            key: ValueKey(k),
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              AppHaptics.selection();
+              f();
+            },
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: on ? const Color(0x24FFFFFF) : null,
+                borderRadius: BorderRadius.circular(9),
+                border: on ? Border.all(color: HeroGlassRecipe.line) : null,
+              ),
+              child: Icon(i, size: 18, color: on ? Colors.white : dim),
+            ),
+          ),
         );
+    final t = _Toggles.instance;
     // The reference's tall dark card: big cover, title and line, a waveform
     // seek bar between two labels, then the controls.
     return ClipRRect(
@@ -1246,15 +1348,18 @@ class _NowPlayingCard extends StatelessWidget {
             Text('of $count', style: const TextStyle(color: dim, fontSize: 10.5, fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(height: 10),
-          Row(children: [
-            small(Icons.repeat_rounded, 'tablet-np-repeat'),
+          ListenableBuilder(
+            listenable: t,
+            builder: (context, _) => Row(children: [
+            small(Icons.repeat_one_rounded, 'tablet-np-repeat', t.repeat, t.toggleRepeat),
             Expanded(
               child: Center(
                 child: _Controls(tag: 'tablet-np', playing: playing, onPrev: onPrev, onToggle: onToggle, onNext: onNext),
               ),
             ),
-            small(Icons.shuffle_rounded, 'tablet-np-shuffle'),
-          ]),
+            small(Icons.shuffle_rounded, 'tablet-np-shuffle', t.shuffle, () => unawaited(t.toggleShuffle())),
+            ]),
+          ),
         ]),
       ),
     );
@@ -1298,7 +1403,7 @@ class _TopRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      color: current ? NwsbColors.goldLight : Colors.white, fontSize: 14.5, fontWeight: FontWeight.w800)),
+                      color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.w800)),
               if (stats != null && stats!.isNotEmpty) ...[
                 const SizedBox(height: 3),
                 Row(children: [
