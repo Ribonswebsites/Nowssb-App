@@ -208,29 +208,32 @@ class _TabletFrameState extends State<TabletFrame> {
       return TabletScope(width: kind, framed: false, child: host);
     }
     final w = mq.size.width;
+    // Ribon's reference: sidebar about a fifth of the screen, then one big
+    // rounded panel holding the page and (homes, Library, player) a right
+    // column about a quarter wide.
     final side = kind == TabletWidth.wide
-        ? (w * 0.18).clamp(232.0, 280.0)
+        ? (w * 0.2).clamp(232.0, 280.0)
         : TabletBp.railWidth;
-    final panelW = (w * 0.24).clamp(TabletBp.panelWidth, 340.0);
-    var panel = _panelFor();
-    // Room for a right panel: the centre keeps at least a phone-and-a-half.
-    if (kind != TabletWidth.wide || w - side - panelW - 12 < 680) panel = _Panel.none;
-    final hasPanel = panel != _Panel.none;
+    final panelW = (w * 0.25).clamp(TabletBp.panelWidth - 20, 340.0);
     const gap = 12.0;
+    var panel = _panelFor();
+    // Room for a right column: the page keeps at least 460 (a 1024 landscape
+    // tablet gets one, like the reference).
+    if (kind != TabletWidth.wide || w - side - gap - panelW < 460) panel = _Panel.none;
+    final hasPanel = panel != _Panel.none;
     final top = mq.padding.top + gap;
     final bottom = mq.padding.bottom + gap;
-    // The centre column, its right gap included. Pages without a right
-    // panel keep a reading width: the centre panel stops at
-    // [TabletBp.page] and sits in the middle of the space.
-    final room = w - side - (hasPanel ? panelW : 0);
-    final centreW = hasPanel ? room : math.min(room, TabletBp.page + gap);
-    final spare = room - centreW;
+    final big = w - side - gap - mq.padding.right;
+    final centreW = big - (hasPanel ? panelW : 0);
+    // Pages without a right column keep a reading width in the middle.
+    final pageW = hasPanel ? centreW : math.min(centreW, TabletBp.page);
     final inner = mq.copyWith(
-      size: Size(centreW - (hasPanel ? 0 : gap), mq.size.height - top - bottom),
+      size: Size(pageW, mq.size.height - top - bottom),
       padding: EdgeInsets.zero,
       viewPadding: EdgeInsets.zero,
       viewInsets: mq.viewInsets.copyWith(bottom: (mq.viewInsets.bottom - bottom).clamp(0.0, double.infinity)),
     );
+    const r = 28.0;
     return TabletScope(
       width: kind,
       framed: true,
@@ -248,37 +251,59 @@ class _TabletFrameState extends State<TabletFrame> {
                     : TabletRail(navigatorKey: widget.navigatorKey),
               ),
             ),
-            SizedBox(width: spare / 2),
             SizedBox(
-              width: centreW,
+              width: big,
               child: Padding(
-                padding: EdgeInsets.fromLTRB(0, top, hasPanel ? 0 : gap, bottom),
-                // The centre: one big rounded panel, like the reference.
+                padding: EdgeInsets.only(top: top, bottom: bottom),
+                // One big rounded glass panel: the page, then the right column.
                 child: DecoratedBox(
-                  key: const ValueKey('tablet-centre'),
+                  key: const ValueKey('tablet-panel'),
                   position: DecorationPosition.foreground,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(r),
                     border: Border.all(color: HeroGlassRecipe.line),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(24),
-                    child: MediaQuery(data: inner, child: host),
+                    borderRadius: BorderRadius.circular(r),
+                    child: DecoratedBox(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF111A2E), Color(0xFF0A0F1C), Color(0xFF0C0E16)],
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        textDirection: TextDirection.ltr,
+                        children: [
+                          SizedBox(
+                            width: centreW,
+                            child: Center(
+                              child: SizedBox(
+                                key: const ValueKey('tablet-centre'),
+                                width: pageW,
+                                child: MediaQuery(data: inner, child: host),
+                              ),
+                            ),
+                          ),
+                          if (hasPanel)
+                            SizedBox(
+                              width: panelW,
+                              child: Material(
+                                type: MaterialType.transparency,
+                                child: panel == _Panel.player
+                                    ? TabletPlayerPanel(state: TabletShellGate.player.value!)
+                                    : TabletRightPanel(navigatorKey: widget.navigatorKey),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
-            SizedBox(width: spare / 2),
-            if (hasPanel)
-              SizedBox(
-                width: panelW,
-                child: Material(
-                  type: MaterialType.transparency,
-                  child: panel == _Panel.player
-                      ? TabletPlayerPanel(state: TabletShellGate.player.value!)
-                      : TabletRightPanel(navigatorKey: widget.navigatorKey),
-                ),
-              ),
           ],
         ),
       ),
@@ -520,15 +545,13 @@ class _TabletSidebarState extends State<TabletSidebar> {
                 ),
                 const SizedBox(height: 14),
                 const _Eyebrow('Library'),
-                for (final t in _libraryItems())
+                for (final t in _libraryItems().where((i) => const {'sound', 'science', 'settings'}.contains(i.id)))
                   _SideRow(
                     key: ValueKey('tablet-side-${t.id}'),
                     icon: t.icon,
                     label: t.label,
                     onTap: () => _open(key, t),
                   ),
-                const SizedBox(height: 10),
-                const _HomeModeSwitch(),
               ],
             ),
           ),
@@ -596,29 +619,26 @@ class _ProfileHead extends StatelessWidget {
       key: const ValueKey('tablet-profile-head'),
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
+      // The reference stacks them: avatar, then "Hi!", then the name.
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 6),
-        child: Row(children: [
-          const _Avatar(size: 48),
-          const SizedBox(width: 12),
-          Expanded(
-            child: ListenableBuilder(
-              listenable: _ProfileInfo.instance,
-              builder: (context, _) => Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Hi!', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 13)),
-                  const SizedBox(height: 1),
-                  Text(_ProfileInfo.instance.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
-                ],
-              ),
-            ),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: ListenableBuilder(
+          listenable: _ProfileInfo.instance,
+          builder: (context, _) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const _Avatar(size: 56),
+              const SizedBox(height: 12),
+              const Text('Hi!', style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 13)),
+              const SizedBox(height: 1),
+              Text(_ProfileInfo.instance.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(color: Colors.white, fontSize: 19, height: 1.15, fontWeight: FontWeight.w800)),
+            ],
           ),
-        ]),
+        ),
       ),
     );
   }
@@ -667,41 +687,6 @@ class _SideRow extends StatelessWidget {
   }
 }
 
-/// The phone's Normal / NowssB home switch, as a row.
-class _HomeModeSwitch extends StatelessWidget {
-  const _HomeModeSwitch({this.compact = false});
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Settings.instance,
-      builder: (context, _) {
-        final zen = Settings.instance.fashionHome;
-        void flip() {
-          AppHaptics.selection();
-          Settings.instance.setFashionHome(!zen);
-        }
-
-        if (compact) {
-          return _RailButton(
-            key: const ValueKey('tablet-home-mode'),
-            icon: zen ? Icons.light_mode : Icons.dark_mode,
-            label: zen ? 'Normal' : 'NowssB',
-            onTap: flip,
-          );
-        }
-        return _SideRow(
-          key: const ValueKey('tablet-home-mode'),
-          icon: zen ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-          label: zen ? 'Normal home' : 'NowssB home',
-          onTap: flip,
-        );
-      },
-    );
-  }
-}
-
 /// What the mini player and now-playing card show: the live session, or
 /// this hour's words ready to start.
 class _NowState {
@@ -725,7 +710,8 @@ final _nowDeps = Listenable.merge([PlaybackSession.instance, WordArt.instance, C
 
 /// Prev, a rounded-square play/pause, next.
 class _Controls extends StatelessWidget {
-  const _Controls({required this.playing, required this.onPrev, required this.onToggle, required this.onNext, this.big = false});
+  const _Controls({required this.playing, required this.onPrev, required this.onToggle, required this.onNext, this.big = false, this.tag});
+  final String? tag;
   final bool playing;
   final VoidCallback onPrev;
   final VoidCallback onToggle;
@@ -735,6 +721,7 @@ class _Controls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = big ? 52.0 : 34.0;
+    final t = tag ?? (big ? 'tablet-np' : 'tablet-mini');
     Widget side(IconData i, VoidCallback f, String k) => GestureDetector(
           key: ValueKey(k),
           behavior: HitTestBehavior.opaque,
@@ -748,10 +735,10 @@ class _Controls extends StatelessWidget {
           ),
         );
     return Row(mainAxisSize: MainAxisSize.min, children: [
-      side(Icons.skip_previous_rounded, onPrev, big ? 'tablet-np-prev' : 'tablet-mini-prev'),
+      side(Icons.skip_previous_rounded, onPrev, '$t-prev'),
       SizedBox(width: big ? 10 : 2),
       GestureDetector(
-        key: ValueKey(big ? 'tablet-np-toggle' : 'tablet-mini-toggle'),
+        key: ValueKey('$t-toggle'),
         behavior: HitTestBehavior.opaque,
         onTap: () {
           AppHaptics.selection();
@@ -766,7 +753,7 @@ class _Controls extends StatelessWidget {
         ),
       ),
       SizedBox(width: big ? 10 : 2),
-      side(Icons.skip_next_rounded, onNext, big ? 'tablet-np-next' : 'tablet-mini-next'),
+      side(Icons.skip_next_rounded, onNext, '$t-next'),
     ]);
   }
 }
@@ -915,7 +902,7 @@ class TabletRail extends StatelessWidget {
   Widget build(BuildContext context) {
     final pad = MediaQuery.paddingOf(context);
     final key = navigatorKey;
-    final lib = _libraryItems().where((i) => const {'sound', 'plans', 'settings'}.contains(i.id));
+    final lib = _libraryItems().where((i) => const {'sound', 'settings'}.contains(i.id));
     return Padding(
       padding: EdgeInsets.fromLTRB(6 + pad.left, pad.top + 16, 6, pad.bottom + 12),
       child: Column(children: [
@@ -952,10 +939,9 @@ class TabletRail extends StatelessWidget {
                 _RailButton(
                   key: ValueKey('tablet-side-${t.id}'),
                   icon: t.icon,
-                  label: switch (t.id) { 'sound' => 'Sounds', 'plans' => 'Plan', _ => 'Settings' },
+                  label: t.id == 'sound' ? 'Sounds' : 'Settings',
                   onTap: () => _open(key, t),
                 ),
-              const _HomeModeSwitch(compact: true),
             ],
           ),
         ),
@@ -1105,22 +1091,37 @@ class TabletRightPanel extends StatelessWidget {
         return LayoutBuilder(builder: (context, c) {
           return ListView(
             key: const ValueKey('tablet-right-panel'),
-            padding: EdgeInsets.fromLTRB(12, pad.top + 14, 14 + pad.right, pad.bottom + 14),
+            padding: EdgeInsets.fromLTRB(4, pad.top + 20, 18 + pad.right, pad.bottom + 18),
             children: [
               if (top.isNotEmpty) ...[
-                _PanelHead('Top words', onMore: () {
-                  final ctx = key.currentState?.overlay?.context;
-                  if (ctx != null) NavScope.goTo(ctx, 1);
-                }),
+                const _PanelHead('Top words'),
                 for (var i = 0; i < top.length; i++)
                   _TopRow(
                     key: ValueKey('tablet-top-${top[i].key}'),
                     word: top[i],
                     art: playerCoverArtFor(top[i], i),
-                    stat: _wordStat(top[i]),
+                    stat: '',
+                    stats: _topStats(top[i]),
                     onTap: () => _playWord(top[i]),
                   ),
-                const SizedBox(height: 18),
+                // The reference's "See More" sits under the list.
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    key: const ValueKey('tablet-top-more'),
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      final ctx = key.currentState?.overlay?.context;
+                      if (ctx != null) NavScope.goTo(ctx, 1);
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.fromLTRB(6, 2, 6, 4),
+                      child: Text('See more',
+                          style: TextStyle(color: Color(0x8CFFFFFF), fontSize: 11.5, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
               ],
               if (lead != null)
                 _NowPlayingCard(
@@ -1142,6 +1143,16 @@ class TabletRightPanel extends StatelessWidget {
       },
     );
   }
+}
+
+/// The reference's two stats under each name, from the word itself.
+List<(IconData, String)> _topStats(Word w) {
+  final parts = w.parts.length;
+  final organ = w.organ.trim();
+  return [
+    if (organ.isNotEmpty) (Icons.favorite_border_rounded, organ),
+    if (parts > 0) (Icons.graphic_eq_rounded, '$parts ${parts == 1 ? 'part' : 'parts'}'),
+  ];
 }
 
 String _wordStat(Word w) {
@@ -1178,54 +1189,81 @@ class _NowPlayingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabletPane(
-      radius: 22,
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        GestureDetector(
+    const dim = Color(0x8CFFFFFF);
+    Widget small(IconData i, String k) => GestureDetector(
+          key: ValueKey(k),
           behavior: HitTestBehavior.opaque,
           onTap: onOpen,
-          child: AspectRatio(
-            aspectRatio: 0.92,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: TabletArt(art),
+          child: Padding(padding: const EdgeInsets.all(6), child: Icon(i, size: 18, color: dim)),
+        );
+    // The reference's tall dark card: big cover, title and line, a waveform
+    // seek bar between two labels, then the controls.
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF161E33), Color(0xFF05070D)],
+          ),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: HeroGlassRecipe.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onOpen,
+            child: AspectRatio(
+              aspectRatio: 1.12,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: TabletArt(art),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 14),
-        Text(word.word,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 2),
-        Text(line,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 12.5)),
-        const SizedBox(height: 14),
-        TabletWaveform(seed: word.word, progress: count == 0 ? 0 : (index + 1) / count, height: 30, bars: 40),
-        const SizedBox(height: 6),
-        Row(children: [
-          Text('Word ${index + 1}',
-              style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600)),
-          const Spacer(),
-          Text('$count ${count == 1 ? 'word' : 'words'}',
-              style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 14),
+          Text(word.word,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 2),
+          Text(line,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: dim, fontSize: 11.5)),
+          const SizedBox(height: 12),
+          Row(children: [
+            Text('${index + 1}', style: const TextStyle(color: dim, fontSize: 10.5, fontWeight: FontWeight.w700)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TabletWaveform(seed: word.word, progress: count == 0 ? 0 : (index + 1) / count, height: 26, bars: 34),
+            ),
+            const SizedBox(width: 8),
+            Text('of $count', style: const TextStyle(color: dim, fontSize: 10.5, fontWeight: FontWeight.w700)),
+          ]),
+          const SizedBox(height: 10),
+          Row(children: [
+            small(Icons.repeat_rounded, 'tablet-np-repeat'),
+            Expanded(
+              child: Center(
+                child: _Controls(tag: 'tablet-np', playing: playing, onPrev: onPrev, onToggle: onToggle, onNext: onNext),
+              ),
+            ),
+            small(Icons.shuffle_rounded, 'tablet-np-shuffle'),
+          ]),
         ]),
-        const SizedBox(height: 6),
-        Center(
-          child: _Controls(big: true, playing: playing, onPrev: onPrev, onToggle: onToggle, onNext: onNext),
-        ),
-      ]),
+      ),
     );
   }
 }
 
 class _TopRow extends StatelessWidget {
-  const _TopRow({super.key, required this.word, required this.art, required this.stat, required this.onTap, this.rank, this.current = false});
+  const _TopRow({super.key, required this.word, required this.art, required this.stat, required this.onTap, this.rank, this.current = false, this.stats});
+  final List<(IconData, String)>? stats;
   final Word word;
   final String art;
   final String stat;
@@ -1261,6 +1299,22 @@ class _TopRow extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       color: current ? NwsbColors.goldLight : Colors.white, fontSize: 14.5, fontWeight: FontWeight.w800)),
+              if (stats != null && stats!.isNotEmpty) ...[
+                const SizedBox(height: 3),
+                Row(children: [
+                  for (var k = 0; k < stats!.length; k++) ...[
+                    if (k > 0) const SizedBox(width: 10),
+                    Icon(stats![k].$1, size: 12, color: const Color(0x8CFFFFFF)),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(stats![k].$2,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 11)),
+                    ),
+                  ],
+                ]),
+              ],
               if (stat.isNotEmpty) ...[
                 const SizedBox(height: 2),
                 Text(stat,
@@ -1296,7 +1350,7 @@ class TabletPlayerPanel extends StatelessWidget {
     final words = state.words;
     return ListView(
       key: const ValueKey('tablet-player-panel'),
-      padding: EdgeInsets.fromLTRB(12, pad.top + 14, 14 + pad.right, pad.bottom + 14),
+      padding: EdgeInsets.fromLTRB(4, pad.top + 20, 18 + pad.right, pad.bottom + 18),
       children: [
         _PanelHead('Up next'),
         for (var k = 0; k < words.length; k++)
