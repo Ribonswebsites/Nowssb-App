@@ -18,6 +18,8 @@
 /// Every action works as before: wishlist, cart, buy or Yours, other words.
 library;
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../data/app_haptics.dart';
@@ -31,6 +33,7 @@ import '../../features/earn/earn_kit.dart' show earnFirstName;
 import '../../features/economy/economy_api.dart' show EconomyMirror;
 import '../../media/nwsb_video.dart';
 import '../../media/video_pool.dart';
+import '../../shell/tablet.dart' show isTablet;
 import '../../theme/tokens.dart';
 import '../../widgets/glass_wrap.dart';
 import '../../widgets/nwsb_coin_fly.dart' show NwsbCoinDisc;
@@ -402,7 +405,12 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
     final (head, body) = _panel;
     return LayoutBuilder(builder: (context, c) {
       final w = c.maxWidth;
-      final h = (w * 1.14).clamp(360.0, 560.0);
+      var h = (w * 1.14).clamp(360.0, 560.0);
+      // Tablet: the picture stays at about half the screen's height, so the
+      // meaning under it is on screen too. A phone keeps its height.
+      if (isTablet(context)) {
+        h = math.min(h, math.max(320.0, MediaQuery.sizeOf(context).height * .52));
+      }
       return SizedBox(
         height: h,
         child: Stack(fit: StackFit.expand, children: [
