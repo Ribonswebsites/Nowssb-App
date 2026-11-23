@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
 import 'shell_back.dart';
 import 'tablet_frame.dart';
+import 'tablet_home.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
 import '../data/home_widget_sync.dart';
@@ -512,7 +513,7 @@ class _NavShellState extends State<NavShell> {
 
   Widget _build(BuildContext context) {
     final framed = TabletScope.framedOf(context);
-    final lightHome = _i == 0 && !_fashion;
+    final lightHome = _i == 0 && !_fashion && !framed;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -526,7 +527,12 @@ class _NavShellState extends State<NavShell> {
       child: Scaffold(
         // Match the visible tab so the home-indicator strip is never a black
         // chin on Normal home, and never a white line on dark tabs.
-        backgroundColor: lightHome ? NwsbColors.surface : NwsbColors.deep,
+        // A tablet's home sits on the frame's glass panel.
+        backgroundColor: framed && _i == 0
+            ? Colors.transparent
+            : lightHome
+                ? NwsbColors.surface
+                : NwsbColors.deep,
         body: Stack(
           children: [
             // IndexedStack rather than swapping the child: it keeps each tab's
@@ -538,8 +544,14 @@ class _NavShellState extends State<NavShell> {
                 // Offstage + TickerMode: inactive IndexedStack tabs still layout,
                 // so without this their NwsbVideos keep claiming VideoPool seats
                 // and the visible tab (and player overlays) starve — "playing 1".
+                // Tablet (sidebar or rail): the reference's home column.
                 _tabAlive(
-                    0, _fashion ? const HomeFashion() : const HomeNormal()),
+                    0,
+                    framed
+                        ? const TabletHome()
+                        : _fashion
+                            ? const HomeFashion()
+                            : const HomeNormal()),
                 _tabAlive(1, const PracticeScreen()),
                 // Bottom-nav Library must be the media-rich Sound Library (website
                 // SLM), NOT the old plain letter list in library.dart.
