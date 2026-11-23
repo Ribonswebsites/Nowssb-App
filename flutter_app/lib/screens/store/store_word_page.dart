@@ -47,6 +47,13 @@ String storeWordPicture(String word, String fallback) {
   return wordPosterFor(word) ?? wordPhotoFor(word) ?? fallback;
 }
 
+/// True when [word] has a picture of its own (admin art, poster or photo);
+/// false when the page shows the default Store art instead.
+bool storeWordHasOwnPicture(String word) {
+  final admin = WordArt.instance.imageOf(word);
+  return (admin != null && admin.isNotEmpty) || wordPosterFor(word) != null || wordPhotoFor(word) != null;
+}
+
 /// One more word for the "More in …" list.
 class StoreWordLink {
   const StoreWordLink({required this.word, required this.root, this.meaning});
@@ -418,7 +425,15 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
                 colors: [Color(0x00FFFFFF), Color(0xFFFFFFFF), Color(0xFFFFFFFF), Color(0x00FFFFFF)],
               ).createShader(r),
               child: Stack(fit: StackFit.expand, children: [
-                StoreNetImage(url: widget.picture),
+                // A word without a picture of its own shows the default Store
+                // art whole in the upper part, clear of the text below it.
+                if (!storeWordHasOwnPicture(widget.title))
+                  Padding(
+                    padding: EdgeInsets.only(top: h * .06, bottom: h * .4),
+                    child: StoreNetImage(url: widget.picture, fit: BoxFit.contain),
+                  )
+                else
+                  StoreNetImage(url: widget.picture),
                 const DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(

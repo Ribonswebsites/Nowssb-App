@@ -341,7 +341,6 @@ One photograph per Store word / meaning page, chosen so it shows what the word m
 | `word_photos/cardinal.webp` | [Cardinal Birds in Winter](https://www.pexels.com/photo/20004652/) | Nicki Dick |
 | `word_photos/child.webp` | [Child Playing with Toys](https://www.pexels.com/photo/12788664/) | Mizuno K |
 | `word_photos/cipher.webp` | [Close-up of Padlock with Code](https://www.pexels.com/photo/5192037/) | Modun Studio |
-| `word_photos/clan.webp` | [Family Gathering for a Group Hug](https://www.pexels.com/photo/4262410/) | August de Richelieu |
 | `word_photos/clarity.webp` | [Shallow Water Surface](https://www.pexels.com/photo/9401949/) | Alice Castro |
 | `word_photos/clean.webp` | [Desk Area and Cleaning Robot on Floor](https://www.pexels.com/photo/10567507/) | Ron Lach |
 | `word_photos/cliff.webp` | [Cliff, Sea and Clear Sky Landscape](https://www.pexels.com/photo/4616317/) | Denis Larose |
@@ -382,7 +381,6 @@ One photograph per Store word / meaning page, chosen so it shows what the word m
 | `word_photos/heart.webp` | [Close-up Photo of Heart Shape on Wooden Panels](https://www.pexels.com/photo/6170724/) | Erik Mclean |
 | `word_photos/heaven.webp` | [Serene View of Fluffy Clouds from Above](https://www.pexels.com/photo/31904921/) | Ali |
 | `word_photos/holy.webp` | [Enchanting Candlelit Temple at Night](https://www.pexels.com/photo/33890650/) | Denis Larzul |
-| `word_photos/honor.webp` | [Studio Shot of Wreath with Leaves](https://www.pexels.com/photo/10311051/) | Agnese Lunecka |
 | `word_photos/ice.webp` | [A Whiskey Glass with Ice Cubes in Macro Photography](https://www.pexels.com/photo/7254237/) | Eva Bronzini |
 | `word_photos/identity.webp` | [Close up of Human Fingers](https://www.pexels.com/photo/7479535/) | Angela Roma |
 | `word_photos/infinity.webp` | [Asphalt Road through Desert](https://www.pexels.com/photo/1370721/) | Emiliano Arano |
@@ -437,7 +435,6 @@ One photograph per Store word / meaning page, chosen so it shows what the word m
 | `word_photos/serenity.webp` | [Lake in a Mountain Valley](https://www.pexels.com/photo/18094919/) | Amit  Majhi |
 | `word_photos/shadow.webp` | [Silhouetted Shadows on Urban Building Wall](https://www.pexels.com/photo/36534846/) | Letícia Alvares |
 | `word_photos/shaman.webp` | [Andean Shaman Blowing a Conch Shell in Cusco](https://www.pexels.com/photo/29854840/) | Da vid |
-| `word_photos/shield.webp` | [Medieval Helmet and Shield Display on Wall](https://www.pexels.com/photo/37188307/) | Natalia Sevruk |
 | `word_photos/silence.webp` | [Snow-Covered Coastal Landscape](https://www.pexels.com/photo/19727091/) | Frank Cone |
 | `word_photos/sister.webp` | [Photograph of a Girl Smiling while Hugging Her Sibling](https://www.pexels.com/photo/6668281/) | cottonbro studio |
 | `word_photos/sky.webp` | [Bright Blue Sky with Fluffy White Clouds](https://www.pexels.com/photo/38459847/) | Büşranur |
@@ -445,8 +442,6 @@ One photograph per Store word / meaning page, chosen so it shows what the word m
 | `word_photos/snow.webp` | [Snowy Street in Amsterdam Winter Wonderland](https://www.pexels.com/photo/39450849/) | Firdavs Murodov |
 | `word_photos/solace.webp` | [Bench in the Forest by the River](https://www.pexels.com/photo/17957808/) | Râmbeț Ioana |
 | `word_photos/soul.webp` | [Serene Candlelight in Dark Ambiance](https://www.pexels.com/photo/31966191/) | Oleg Nagovski |
-| `word_photos/sovereign.webp` | [Ornate Royal Throne Chair in Mysuru Palace](https://www.pexels.com/photo/34168587/) | Jayanth Muppaneni |
-| `word_photos/space.webp` | [Planet with Ring](https://www.pexels.com/photo/12491650/) | Zelch Csaba |
 | `word_photos/spirit.webp` | [Photo of Trees in the Woods](https://www.pexels.com/photo/14951695/) | Lucas Scheijde |
 | `word_photos/star.webp` | [Stars on Night Sky over Tree](https://www.pexels.com/photo/18409140/) | kublizz |
 | `word_photos/still.webp` | [Trees by the Lake](https://www.pexels.com/photo/11268044/) | Samuele Galiazzo |

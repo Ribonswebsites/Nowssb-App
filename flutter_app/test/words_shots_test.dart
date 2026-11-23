@@ -81,8 +81,15 @@ void main() {
       for (final c in kRmCategories) for (final w in c.words) w.word.toLowerCase(),
       for (final m in kMsBaseMeanings) m.word.toLowerCase(),
     };
+    // Ribon turned these photos down (Nov 23): they show the default art.
+    const noPhoto = {'shield', 'honor', 'clan', 'sovereign', 'space'};
+    for (final w in noPhoto) {
+      expect(wordPhotoFor(w), isNull, reason: w);
+      expect(File('assets/word_photos/$w.webp').existsSync(), isFalse, reason: w);
+      expect(storeWordPicture(w, kNowssbWordFallback), isNotEmpty, reason: w);
+    }
     final seen = <String>{};
-    for (final w in words) {
+    for (final w in words.difference(noPhoto)) {
       final p = wordPhotoFor(w);
       expect(p, isNotNull, reason: w);
       expect(File(p!).existsSync(), isTrue, reason: p);
