@@ -30,6 +30,7 @@ import 'package:nowssb/features/account/complete_profile_page.dart';
 import 'package:nowssb/features/circle/circle_screen.dart';
 import 'package:nowssb/features/draw/lucky_draw_screen.dart';
 import 'package:nowssb/screens/profile.dart';
+import 'package:nowssb/screens/store/product_detail.dart';
 import 'package:nowssb/features/downloads/downloads_screen.dart';
 import '../back_screens.g.dart';
 import '../fake_video_platform.dart';
@@ -131,6 +132,20 @@ Future<GlobalKey<NavigatorState>> _app(WidgetTester t, Size s) async {
   return nav;
 }
 
+/// A swipe up on the player, the way a finger opens the swipe-up view: from
+/// the middle of the page (the centre pane on a tablet).
+Future<void> openSwipeUp(WidgetTester t, Size size) async {
+  final centre = find.byKey(const ValueKey('tablet-centre'));
+  final box = centre.evaluate().isEmpty ? Offset.zero & size : t.getRect(centre);
+  final g = await t.startGesture(Offset(box.center.dx, box.top + box.height * .3));
+  for (var i = 0; i < 14; i++) {
+    await g.moveBy(Offset(0, -box.height * .65 / 14));
+    await t.pump(const Duration(milliseconds: 16));
+  }
+  await g.up();
+  await _settle(t, 12);
+}
+
 void tabletShots(List<String> sizes) {
   SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1', 'nowssb_name': 'Ribon'});
   setUpAll(() async {
@@ -211,6 +226,14 @@ void tabletShots(List<String> sizes) {
       'RecentActivityScreen': () => const RecentActivityScreen(),
       'DownloadsScreen': () => const DownloadsScreen(),
       'YourDetailsPage': () => const YourDetailsPage(uid: 'tablet-shots'),
+      'WordPage': () => const StoreProductPage(
+          kind: 'Natural Origin',
+          title: 'Prana',
+          root: 'Sanskrit',
+          img: '',
+          price: 99,
+          about: 'Every word carries a vibrational signature that predates its dictionary definition.',
+          highlights: ['Native pronunciation audio, generated on demand', 'Full phonetic root breakdown and origin story']),
     };
     for (final e in pages.entries) {
       if (!want(e.key)) continue;
@@ -252,6 +275,18 @@ void tabletShots(List<String> sizes) {
             await _settle(t, 10);
           }
           await _shot(t, '$tag/PlayerQueue');
+        });
+      }, skip: _out.isEmpty);
+    }
+
+    if (want('SwipeUp')) {
+      testWidgets('$tag SwipeUp', (t) async {
+        await run(t, 'SwipeUp', (nav) async {
+          nav.currentState!.push(MaterialPageRoute<void>(builder: (_) => PracticePlayerScreen(
+              words: ContentStore.instance.library.take(6).toList(), title: 'Morning Ritual', showIntro: false)));
+          await _settle(t, 18);
+          await openSwipeUp(t, size);
+          await _shot(t, '$tag/SwipeUp');
         });
       }, skip: _out.isEmpty);
     }

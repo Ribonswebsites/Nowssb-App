@@ -12,7 +12,13 @@ import 'package:nowssb/screens/splash.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/shell/tablet_frame.dart';
 import 'package:nowssb/shell/tablet_home.dart';
+import 'package:nowssb/data/playback_session.dart';
+import 'package:nowssb/data/settings.dart';
+import 'package:nowssb/screens/home_fashion.dart';
+import 'package:nowssb/screens/player_up_view.dart';
+import 'package:nowssb/screens/practice_player.dart';
 import 'fake_video_platform.dart';
+import 'support/tablet_shots_harness.dart' show openSwipeUp;
 
 Future<void> _settle(WidgetTester t, [int n = 12]) async {
   for (var i = 0; i < n; i++) {
@@ -123,6 +129,73 @@ void main() {
     expect(nav.currentState!.canPop(), isTrue);
     expect(find.byType(TabletSidebar), findsOneWidget);
     expect(find.byType(TabletRightPanel), findsNothing);
+    await _end(t);
+  });
+
+  testWidgets('1280 wide: the home switch keeps the NowssB home, in the frame', (t) async {
+    final errs = <String>[];
+    final prev = FlutterError.onError;
+    FlutterError.onError = (d) => errs.add(d.exceptionAsString().split('\n').first);
+    addTearDown(() => FlutterError.onError = prev);
+    await Settings.instance.setFashionHome(false);
+    await _app(t, const Size(1280, 800));
+    // Earlier tests leave the shell on another tab.
+    await t.tap(find.byKey(const ValueKey('tablet-side-home')));
+    await _settle(t, 8);
+    expect(find.byType(TabletHome), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('tablet-home-mode')));
+    await _settle(t, 10);
+    FlutterError.onError = prev;
+    expect(errs, isEmpty);
+    expect(Settings.instance.fashionHome, isTrue);
+    expect(find.byType(TabletHome), findsNothing);
+    expect(find.byType(HomeFashion), findsOneWidget);
+    expect(find.byType(TabletSidebar), findsOneWidget);
+    expect(find.byType(TabletRightPanel), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('tablet-home-mode')));
+    await _settle(t, 10);
+    expect(Settings.instance.fashionHome, isFalse);
+    expect(find.byType(TabletHome), findsOneWidget);
+    await _end(t);
+  });
+
+  testWidgets('1280 wide: repeat and shuffle on the now-playing card really switch', (t) async {
+    _quiet();
+    await _app(t, const Size(1280, 800));
+    final loop0 = PlaybackSession.instance.loop;
+    await t.tap(find.byKey(const ValueKey('tablet-np-repeat')));
+    await _settle(t, 2);
+    expect(PlaybackSession.instance.loop, !loop0);
+    final prefs = await SharedPreferences.getInstance();
+    final sh0 = prefs.getBool(kPlayerShuffleKey) ?? false;
+    await t.tap(find.byKey(const ValueKey('tablet-np-shuffle')));
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+    await _settle(t, 2);
+    expect(prefs.getBool(kPlayerShuffleKey), !sh0);
+    // Put both back.
+    await t.tap(find.byKey(const ValueKey('tablet-np-repeat')));
+    await t.tap(find.byKey(const ValueKey('tablet-np-shuffle')));
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+    await _settle(t, 2);
+    expect(PlaybackSession.instance.loop, loop0);
+    await _end(t);
+  });
+
+  testWidgets('1280 wide: Up next beside the player, the swipe-up view gets the whole panel', (t) async {
+    _quiet();
+    final nav = await _app(t, const Size(1280, 800));
+    nav.currentState!.push(MaterialPageRoute<void>(
+        builder: (_) => PracticePlayerScreen(
+            words: ContentStore.instance.library.take(6).toList(), title: 'Morning Ritual', showIntro: false)));
+    await _settle(t, 18);
+    expect(find.byType(TabletPlayerPanel), findsOneWidget);
+    await openSwipeUp(t, const Size(1280, 800));
+    expect(find.byType(PlayerUpView), findsOneWidget);
+    expect(TabletShellGate.player.value?.upOpen, isTrue);
+    expect(find.byType(TabletPlayerPanel), findsNothing);
+    // One Up next on screen: the view's own.
+    expect(find.text('Up next'), findsOneWidget);
+    expect(t.getSize(find.byKey(const ValueKey('tablet-centre'))).width, greaterThan(TabletBp.page));
     await _end(t);
   });
 
