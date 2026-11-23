@@ -33,7 +33,6 @@ const kStorePool = <String>[
 ];
 
 const _byWord = <String, String>{
-  'fire': 'assets/rails/store-elements.jpg',
   'water': 'assets/rails/store-nature.jpg',
   'earth': 'assets/rails/store-nature.jpg',
   'sun': 'assets/rails/store-cosmos.jpg',
@@ -59,7 +58,6 @@ const _byWord = <String, String>{
   'dream': 'assets/rails/store-mind.jpg',
   'voice': 'assets/rails/store-mind.jpg',
   'vision': 'assets/rails/store-mind.jpg',
-  'india': 'assets/rails/store-places.jpg',
   'time': 'assets/rails/store-cosmos.jpg',
   'space': 'assets/rails/store-cosmos.jpg',
   'star': 'assets/rails/store-cosmos.jpg',
@@ -89,9 +87,6 @@ const _byWord = <String, String>{
   'phoenix': 'assets/rails/store-myth.jpg',
   'zeus': 'assets/rails/store-myth.jpg',
   'anubis': 'assets/rails/store-myth.jpg',
-  'egypt': 'assets/rails/store-ancient.jpg',
-  'rome': 'assets/rails/store-ancient.jpg',
-  'troy': 'assets/rails/store-ancient.jpg',
   'peace': 'assets/rails/store-peace.jpg',
   'calm': 'assets/rails/store-peace.jpg',
   'silence': 'assets/rails/store-peace.jpg',
@@ -105,22 +100,6 @@ const _byWord = <String, String>{
   'snow': 'assets/rails/store-white.jpg',
   'dawn': 'assets/rails/store-white.jpg',
   'crystal': 'assets/rails/store-white.jpg',
-  'rupee': 'assets/rails/store-places.jpg',
-  'yen': 'assets/rails/store-places.jpg',
-  'dollar': 'assets/rails/store-places.jpg',
-  'euro': 'assets/rails/store-places.jpg',
-  'delhi': 'assets/rails/store-places.jpg',
-  'tokyo': 'assets/rails/store-places.jpg',
-  'paris': 'assets/rails/store-places.jpg',
-  'cairo': 'assets/rails/store-places.jpg',
-  'sanskrit': 'assets/rails/store-word.jpg',
-  'latin': 'assets/rails/store-meaning.jpg',
-  'greek': 'assets/rails/store-ancient.jpg',
-  'arabic': 'assets/rails/store-signature.jpg',
-  'english': 'assets/rails/store-ebooks.jpg',
-  'hindi': 'assets/rails/store-word.jpg',
-  'french': 'assets/rails/store-places.jpg',
-  'japanese': 'assets/rails/store-warriors.jpg',
 };
 
 const _byCat = <String, String>{
@@ -139,10 +118,6 @@ const _byCat = <String, String>{
   'peace': 'assets/rails/store-peace.jpg',
   'white': 'assets/rails/store-white.jpg',
   'black': 'assets/rails/store-black.jpg',
-  'Countries': 'assets/rails/store-places.jpg',
-  'Capitals': 'assets/rails/store-ancient.jpg',
-  'Currency': 'assets/rails/store-premium.jpg',
-  'Language': 'assets/rails/store-word.jpg',
 };
 
 /// The Store mark: white leather frame, headphones, NOWSSB STORE.
@@ -212,7 +187,6 @@ String meaningFlipArt(String word) {
   const named = <String, String>{
     'earth': 'assets/rails/mean-earth.jpg',
     'water': 'assets/rails/mean-water.jpg',
-    'fire': 'assets/rails/mean-fire.jpg',
     'sun': 'assets/rails/mean-sun.jpg',
     'moon': 'assets/rails/mean-moon.jpg',
     'light': 'assets/rails/mean-light.jpg',
@@ -229,8 +203,6 @@ String meaningFlipArt(String word) {
     'time': 'assets/rails/mean-time.jpg',
     'space': 'assets/rails/mean-space.jpg',
     'truth': 'assets/rails/mean-truth.jpg',
-    'country': 'assets/rails/mean-country.jpg',
-    'india': 'assets/rails/mean-india.jpg',
     'mother': 'assets/rails/mean-mother.jpg',
     'father': 'assets/rails/mean-father.jpg',
     'name': 'assets/rails/mean-name.jpg',

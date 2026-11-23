@@ -32,10 +32,6 @@ String _oct15CatArt(String id) {
     'peace': 'assets/rails/store-peace.jpg',
     'white': 'assets/rails/store-white.jpg',
     'black': 'assets/rails/store-black.jpg',
-    'Countries': 'assets/rails/store-places.jpg',
-    'Capitals': 'assets/rails/store-ancient.jpg',
-    'Currency': 'assets/rails/store-premium.jpg',
-    'Language': 'assets/rails/store-word.jpg',
   };
   return map[id] ?? _oct15WordArt;
 }

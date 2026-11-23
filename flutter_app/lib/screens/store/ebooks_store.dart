@@ -111,27 +111,6 @@ class _EbooksBody extends StatelessWidget {
               ),
           ],
         ),
-        for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
-          RoutineDeck(
-            title: group,
-            banner: group,
-            bannerSub: 'The ${group.toLowerCase()} row',
-            cards: [
-              for (final row in kPlaceRows)
-                if (row.$3 == group)
-                  WorkCard(
-                    category: group,
-                    title: row.$1,
-                    meta: row.$2,
-                    action: 'Open',
-                    image: kEbooksIcon,
-                    flip: storeWaveFor(row.$1),
-                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kNowssbStoreMark),
-                    onCart: () => storeAddToCart(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark)),
-                    onBuy: () => storeBuyNow(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark)),
-                  ),
-            ],
-          ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

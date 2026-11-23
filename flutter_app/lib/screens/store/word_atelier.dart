@@ -128,15 +128,12 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
         final name = w.word.isEmpty ? w.word : '${w.word[0].toUpperCase()}${w.word.substring(1)}';
         final id = 'word:${name.toLowerCase()}';
         final price = StorePrices.instance.priceFor(id);
-        add(name, w.root, storeGroup(w.word), kRmWordImg, () => openAtelierWord(context, word: w.word, root: w.root, img: kRmWordImg, price: price));
+        add(name, w.root, cat.label, kRmWordImg, () => openAtelierWord(context, word: w.word, root: w.root, img: kRmWordImg, price: price));
       }
     }
     for (final w in _stageWords()) {
       final name = _cap(w.word);
       add(name, _stageLine(w), 'Recorded stages', kRmWordImg, () => openAtelierWord(context, word: w.key, root: _stageLine(w), img: kRmWordImg, price: w.price));
-    }
-    for (final row in kPlaceRows) {
-      add(row.$1, row.$2, row.$3, kRmWordImg, () => openAtelierWord(context, word: row.$1, root: row.$2, img: kRmWordImg));
     }
     return out;
   }
@@ -212,27 +209,6 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                     ),
               ],
             ),
-        for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
-          RoutineDeck(
-            title: group,
-            banner: group,
-            bannerSub: 'The ${group.toLowerCase()} row',
-            cards: [
-              for (final row in kPlaceRows)
-                if (row.$3 == group && _match(row.$1, row.$2))
-                  WorkCard(
-                    category: group,
-                    title: row.$1,
-                    meta: row.$2,
-                    action: 'Open',
-                    image: kNowssbStoreMark,
-                    flip: storeWaveFor(row.$1),
-                    onTap: () => openAtelierWord(context, word: row.$1, root: row.$2, img: kNowssbStoreMark),
-                    onCart: () => storeAddToCart(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark)),
-                    onBuy: () => storeBuyNow(context, wordBagItem(name: row.$1, root: row.$2, img: kNowssbStoreMark)),
-                  ),
-            ],
-          ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

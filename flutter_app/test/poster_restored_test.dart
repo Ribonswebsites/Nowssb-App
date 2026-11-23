@@ -20,7 +20,6 @@ import 'package:nowssb/features/economy/money.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/poster/poster_pages.dart';
 import 'package:nowssb/screens/store/request_words.dart';
-import 'package:nowssb/screens/store/store_shelf.dart' show kPlaceRows;
 import 'package:nowssb/theme/tokens.dart';
 import 'package:nowssb/widgets/concept/stillwater.dart';
 

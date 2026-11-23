@@ -1,5 +1,7 @@
-// America end to end without a phone: the shipped client_words.json reaches
-// the library, its stage pack and assets are bundled, stages unlock 1 → 2 → 3,
+// The stage engine end to end without a phone, on the teacher's America
+// recordings. AMERICA left the catalogue on Nov 23, 2026 (country words are
+// out), so its client_words entry now lives in test/fixtures as a fixture:
+// the library must not show it, its stage pack still loads, stages unlock 1 → 2 → 3,
 // and the practice screen records (fake mic), scores on the real recordings
 // and shows a pass, specific corrections, or a "not scored" message.
 import 'dart:convert';
@@ -69,7 +71,7 @@ Uint8List _silence() {
 }
 
 List<dynamic> _clientItems() =>
-    (jsonDecode(File('assets/content/client_words.json').readAsStringSync()) as Map)['items'] as List;
+    (jsonDecode(File('test/fixtures/stage_word_america.json').readAsStringSync()) as Map)['items'] as List;
 
 Uint8List _ref(int n) => File('assets/words/america/america_stage${n}_ref.wav').readAsBytesSync();
 
@@ -101,11 +103,15 @@ void main() {
     ContentStore.instance.debugSetClientWords(_clientItems());
   });
 
-  test('America is in the library with 3 client stages, all assets bundled', () {
-    final pubspec = File('pubspec.yaml').readAsStringSync();
-    expect(pubspec, contains('- assets/words/america/'));
-    expect(pubspec, contains('- assets/content/'));
-    final w = ContentStore.instance.library.firstWhere((w) => w.key == 'america');
+  test('America is out of the library and the shipped client words', () {
+    final shipped = (jsonDecode(File('assets/content/client_words.json').readAsStringSync()) as Map)['items'] as List;
+    expect(shipped.where((e) => (e as Map)['key'] == 'america'), isEmpty);
+    expect(ContentStore.instance.library.where((w) => w.key == 'america'), isEmpty,
+        reason: 'a removed word stays out even when a client entry carries it');
+  });
+
+  test('The fixture word still has 3 client stages and its recordings', () {
+    final w = ContentStore.instance.clientWords.firstWhere((w) => w.key == 'america');
     expect(w.word, 'AMERICA');
     expect(w.stages, hasLength(3));
     expect(w.price, 99);

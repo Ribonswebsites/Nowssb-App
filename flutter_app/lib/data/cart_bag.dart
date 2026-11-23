@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'billing_config.dart';
 import 'firebase.dart';
+import 'store_catalog.dart' show isRemovedItemId;
 import '../screens/store/store_art.dart' show productArt;
 
 class BagItem {
@@ -182,6 +183,11 @@ class CartBag extends ChangeNotifier {
           for (final d in snap.docs) {
             final item = BagItem.fromJson(d.data());
             if (item.id.isEmpty || inWish(item.id)) continue;
+            // A word taken out of the catalogue: drop it remotely too.
+            if (isRemovedItemId(item.id)) {
+              unawaited(_dropWish(item.id));
+              continue;
+            }
             _wish.add(item);
             changed = true;
           }
@@ -331,7 +337,7 @@ class CartBag extends ChangeNotifier {
       return [
         for (final e in decoded)
           if (e is Map) BagItem.fromJson(Map<String, dynamic>.from(e)),
-      ];
+      ].where((it) => !isRemovedItemId(it.id)).toList();
     } catch (_) {
       return const [];
     }

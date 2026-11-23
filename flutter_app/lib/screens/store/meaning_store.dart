@@ -211,12 +211,7 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
       out.add(StorePiece(title: title, line: line, art: art, group: group, onTap: tap));
     }
     for (final m in _base) {
-      add(m.word, m.root, storeGroup(m.word) == 'Language' && m.category == 'Nations & People' ? 'Countries' : storeGroup(m.word), m.img, () => openMeaningDetail(context, m));
-    }
-    for (final row in kPlaceRows) {
-      add(row.$1, row.$2, row.$3, kMsMeaningProductArt, () {
-        openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kMsMeaningProductArt));
-      });
+      add(m.word, m.root, m.category, m.img, () => openMeaningDetail(context, m));
     }
     return out;
   }
@@ -270,27 +265,6 @@ class _MeaningStoreBodyState extends State<_MeaningStoreBody> {
                   onCart: () => storeAddToCart(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
                   onBuy: () => storeBuyNow(context, meaningBagItem(word: m.word, root: m.root, img: kNowssbStoreMark, price: m.price)),
                 ),
-            ],
-          ),
-        for (final group in const ['Countries', 'Capitals', 'Currency', 'Language'])
-          RoutineDeck(
-            title: group,
-            banner: group,
-            bannerSub: 'The ${group.toLowerCase()} row',
-            cards: [
-              for (final row in kPlaceRows)
-                if (row.$3 == group)
-                  WorkCard(
-                    category: group,
-                    title: row.$1,
-                    meta: row.$2,
-                    action: 'Open',
-                    image: kMeaningsIcon,
-                    flip: storeWaveFor(row.$1),
-                    onTap: () => openMeaningDetail(context, MsMeaning(word: row.$1, key: row.$1.toLowerCase(), root: row.$2, category: row.$3, price: 49, img: kNowssbStoreMark)),
-                    onCart: () => storeAddToCart(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
-                    onBuy: () => storeBuyNow(context, meaningBagItem(word: row.$1, root: row.$2, img: kNowssbStoreMark, price: 49)),
-                  ),
             ],
           ),
     ];

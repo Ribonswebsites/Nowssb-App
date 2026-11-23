@@ -312,3 +312,195 @@ Four 720px square stills for the Profile tab card (Coins, Cart, Wishlist, Order 
 | `profile/tabs/cart.webp` | First added in `763b854b` (Nov 18 2026) as a 720px square still for the Profile Cart tab card. No generation script, prompt, or third-party source is recorded in the repo or in git history. | Cart tab ("Your bag"). Source unverified; no outside licence is claimed. |
 | `profile/tabs/wishlist.webp` | First added in `763b854b` (Nov 18 2026) as a 720px square still for the Profile Wishlist tab card. No generation script, prompt, or third-party source is recorded in the repo or in git history. | Wishlist tab ("Saved"). Source unverified; no outside licence is claimed. |
 | `profile/tabs/orders.webp` | First added in `763b854b` (Nov 18 2026) as a 720px square still for the Profile Order history tab card. No generation script, prompt, or third-party source is recorded in the repo or in git history. | Orders tab ("Purchases"). Source unverified; no outside licence is claimed. |
+
+## Store word photographs — `assets/word_photos/` (Nov 23, 2026)
+
+One photograph per Store word / meaning page, chosen so it shows what the word means. Every photo is from [Pexels](https://www.pexels.com) under the [Pexels licence](https://www.pexels.com/license/) (free to use, modification allowed, no attribution required; credited anyway). Each is centre-cropped to 720×900 and saved as WebP. No photo is used twice, none is AI-generated art, and none is a Sound Library collection banner.
+
+| File | Photo | Photographer |
+|---|---|---|
+| `word_photos/abyss.webp` | [Underwater Bubbles Floating in Deep Ocean](https://www.pexels.com/photo/39726976/) | Ludvig Hedenborg |
+| `word_photos/alba.webp` | [Beautiful Sunrise over Misty Meadow](https://www.pexels.com/photo/31544471/) | Mohamed B. |
+| `word_photos/anubis.webp` | [Anubis Statue at a Theme Park in Daylight](https://www.pexels.com/photo/30085692/) | Oleksiy |
+| `word_photos/apex.webp` | [Green Trees on Mountain Beside a Snow Capped Mountain](https://www.pexels.com/photo/11831246/) | Roman |
+| `word_photos/archer.webp` | [Man Traning Archery](https://www.pexels.com/photo/16561360/) | Reymond Maliberan |
+| `word_photos/ash.webp` | [Black Ash on the Ground near the Volcano](https://www.pexels.com/photo/11139845/) | Celine J. |
+| `word_photos/aura.webp` | [Vibrant Abstract Light Swirls in Motion](https://www.pexels.com/photo/29523871/) | Landiva  Weber |
+| `word_photos/axiom.webp` | [Vintage Chalkboard with Protractor in Kaliningrad Classroom](https://www.pexels.com/photo/37358615/) | Alexander Popadin |
+| `word_photos/aztec.webp` | [Woman Looking at Ancient Statue in Museum](https://www.pexels.com/photo/12028952/) | Fer Martinez Gonzalez |
+| `word_photos/belief.webp` | [Lighthouse Under Milky Way Night Sky Landscape](https://www.pexels.com/photo/35109032/) | Horacio  Lander |
+| `word_photos/berserker.webp` | [Medieval Warrior Holding an Axe in Foggy Field](https://www.pexels.com/photo/39562299/) | Alexander Mass |
+| `word_photos/birth.webp` | [Parent Finger and Baby Hand](https://www.pexels.com/photo/19314748/) | Jonathan Borba |
+| `word_photos/blade.webp` | [Closeup Photo of Black Hilt and Brown Sword](https://www.pexels.com/photo/1383766/) | Susanne Jutzeler, suju-foto |
+| `word_photos/blank.webp` | [White Paper On Colored Papers](https://www.pexels.com/photo/8166563/) | Daria Liudnaya |
+| `word_photos/blessing.webp` | [Soil with Growth in Hands](https://www.pexels.com/photo/15678267/) | Ponnappa Ganesh |
+| `word_photos/blood.webp` | [Person Holding A White Diabetes Awareness Ribbon With Decorated Blood Drop](https://www.pexels.com/photo/6823411/) | Artem Podrez |
+| `word_photos/bloom.webp` | [Close-up of White and Pink Petunias](https://www.pexels.com/photo/26939122/) | Efrem  Efre |
+| `word_photos/body.webp` | [Balé](https://www.pexels.com/photo/27730237/) | Jean Gc |
+| `word_photos/breath.webp` | [Serene Sunrise Over Misty Pine Forest](https://www.pexels.com/photo/29342747/) | ᛟᛞᚨᛚᚹ ᚨᚱᚲᛟᚾᛊᚲᛁ |
+| `word_photos/breathe.webp` | [Woman in Blue Tank Top](https://www.pexels.com/photo/3822163/) | Elina Fairytale |
+| `word_photos/brother.webp` | [Portrait of Brothers](https://www.pexels.com/photo/16229169/) | samimibirfotografci |
+| `word_photos/calm.webp` | [Tree Trunk on Lake under Cloud](https://www.pexels.com/photo/23511043/) | Tomáš Malík |
+| `word_photos/cardinal.webp` | [Cardinal Birds in Winter](https://www.pexels.com/photo/20004652/) | Nicki Dick |
+| `word_photos/centurion.webp` | [Roman Legionary in Historical Reenactment Parade](https://www.pexels.com/photo/37405776/) | Laura Manzi |
+| `word_photos/cerberus.webp` | [Dogs on Stairs](https://www.pexels.com/photo/16435281/) | Jonathas Cardoso |
+| `word_photos/child.webp` | [Child Playing with Toys](https://www.pexels.com/photo/12788664/) | Mizuno K |
+| `word_photos/cipher.webp` | [Close-up of Padlock with Code](https://www.pexels.com/photo/5192037/) | Modun Studio |
+| `word_photos/clan.webp` | [Traditional Scottish Bagpiper in Edinburgh](https://www.pexels.com/photo/32793396/) | Clément Proust |
+| `word_photos/clarity.webp` | [Shallow Water Surface](https://www.pexels.com/photo/9401949/) | Alice Castro |
+| `word_photos/clean.webp` | [Desk Area and Cleaning Robot on Floor](https://www.pexels.com/photo/10567507/) | Ron Lach |
+| `word_photos/cliff.webp` | [Cliff, Sea and Clear Sky Landscape](https://www.pexels.com/photo/4616317/) | Denis Larose |
+| `word_photos/cosmos.webp` | [The milky way over the hills of the desert](https://www.pexels.com/photo/27771787/) | Zeynep Sude  Emek |
+| `word_photos/crown.webp` | [Close-Up of an Ornate Royal Crown on Display](https://www.pexels.com/photo/32937228/) | Regan Dsouza |
+| `word_photos/crusader.webp` | [Intricately Engraved Medieval Armor Helmet](https://www.pexels.com/photo/31350032/) | Blackcurrant Great |
+| `word_photos/crystal.webp` | [Vibrant Raw Amethyst Stones on White Background](https://www.pexels.com/photo/37964714/) | Mr.  Pugo |
+| `word_photos/dark.webp` | [Green Tree Painting](https://www.pexels.com/photo/1717214/) | Egor Kamelev |
+| `word_photos/dawn.webp` | [Silhouette of Mountains Under the Blue Sky](https://www.pexels.com/photo/10770234/) | Matteo Milan |
+| `word_photos/death.webp` | [Crisp Autumn Leaves in Close-up](https://www.pexels.com/photo/28806272/) | Dmitry Demidov |
+| `word_photos/depth.webp` | [Serene Underwater Ocean Depths Exploration](https://www.pexels.com/photo/39726974/) | Ludvig Hedenborg |
+| `word_photos/desert.webp` | [Golden Sand Dunes in Riyadh Desert Landscape](https://www.pexels.com/photo/31364749/) | Æmyr Sahli |
+| `word_photos/destiny.webp` | [Fog in Woods](https://www.pexels.com/photo/10124560/) | Kris Møklebust |
+| `word_photos/divine.webp` | [Gothic Cathedral Interior with Sunlight Rays](https://www.pexels.com/photo/30867433/) | Osviel Rodriguez Valdés |
+| `word_photos/dragon.webp` | [Photograph of a Dragon Sculpture](https://www.pexels.com/photo/7700740/) | belen capello |
+| `word_photos/dream.webp` | [White Clouds and Blue Sky](https://www.pexels.com/photo/12810820/) | Deniss Bojanini |
+| `word_photos/dusk.webp` | [Skyscrapers at Dawn](https://www.pexels.com/photo/20994709/) | Yuriko Salazar Luna |
+| `word_photos/dust.webp` | [Woman Walking in a Desert during a Sandstorm](https://www.pexels.com/photo/9359158/) | Angelica Reyn |
+| `word_photos/earth.webp` | [Hands Holding Soil in Chiapas Garden Setting](https://www.pexels.com/photo/36099357/) | Giacomo Alsarmi |
+| `word_photos/eclipse.webp` | [Eclipse.](https://www.pexels.com/photo/21287103/) | Cris Ménlés |
+| `word_photos/ego.webp` | [Grayscale Photo of Lion Lying on the Ground](https://www.pexels.com/photo/6241216/) | David Atkins |
+| `word_photos/elder.webp` | [Portrait of an Elderly Man](https://www.pexels.com/photo/27309469/) | DΛVΞ GΛRCIΛ |
+| `word_photos/energy.webp` | [Abstract close-up of vibrant orange sparks](https://www.pexels.com/photo/28589282/) | Tobi &Chris |
+| `word_photos/epoch.webp` | [Close-up of Ammonite Fossil on Rock Surface](https://www.pexels.com/photo/35198998/) | SONNIE WING |
+| `word_photos/eternal.webp` | [Ancient Olive Tree in Natural Habitat](https://www.pexels.com/photo/38072491/) | Christos S. |
+| `word_photos/faith.webp` | [Serene Gothic Room with Stained Glass Windows](https://www.pexels.com/photo/35252663/) | Yelena from Pexels |
+| `word_photos/father.webp` | [Father Walking with his Baby in the Park](https://www.pexels.com/photo/4543713/) | Elina Fairytale |
+| `word_photos/fear.webp` | [A Dark Hallway of a Building](https://www.pexels.com/photo/9358725/) | Julio  Agreda |
+| `word_photos/forest.webp` | [Serene Boreal Forest Pathway at Dusk](https://www.pexels.com/photo/37576022/) | Lauri Poldre |
+| `word_photos/forgive.webp` | [Close-Up Shot of People Holding Hands](https://www.pexels.com/photo/6014182/) | Anastasia  Shuraeva |
+| `word_photos/freedom.webp` | [Birds Flying in the Sky](https://www.pexels.com/photo/10231328/) | z f |
+| `word_photos/frost.webp` | [Close up of a Branch in Winter](https://www.pexels.com/photo/15263962/) | Tuğba |
+| `word_photos/gentle.webp` | [Photograph of an Ostrich Plumage](https://www.pexels.com/photo/5840692/) | kaboompics |
+| `word_photos/glacier.webp` | [Abstract uneven surface of dark gray ice pieces](https://www.pexels.com/photo/7787959/) | Ivan Babydov |
+| `word_photos/gladiator.webp` | [Majestic View of the Colosseum Interior, Rome](https://www.pexels.com/photo/36396954/) | Joan Costa |
+| `word_photos/glory.webp` | [Gold Trophy in Close-Up Photography](https://www.pexels.com/photo/6532362/) | Nataliya Vaitkevich |
+| `word_photos/glyph.webp` | [Carvings on Wall in Luxor, Egypt](https://www.pexels.com/photo/18934710/) | AXP Photography |
+| `word_photos/god.webp` | [Dramatic Clouds with Sun Rays in Blue Sky](https://www.pexels.com/photo/30246552/) | Archer  Hsu |
+| `word_photos/grace.webp` | [Two Swans Swimming in the Water](https://www.pexels.com/photo/26736136/) | Mohit Chanderh |
+| `word_photos/griffon.webp` | [Sculpture of a Lion near the Plants](https://www.pexels.com/photo/15149067/) | Maheshwar Reddy |
+| `word_photos/harmony.webp` | [Ivory Piano Keys in Close-up View](https://www.pexels.com/photo/10222172/) | cottonbro studio |
+| `word_photos/heart.webp` | [Close-up Photo of Heart Shape on Wooden Panels](https://www.pexels.com/photo/6170724/) | Erik Mclean |
+| `word_photos/heaven.webp` | [Serene View of Fluffy Clouds from Above](https://www.pexels.com/photo/31904921/) | Ali |
+| `word_photos/holy.webp` | [Enchanting Candlelit Temple at Night](https://www.pexels.com/photo/33890650/) | Denis Larzul |
+| `word_photos/honor.webp` | [Military Officer in Dress Uniform with Medals](https://www.pexels.com/photo/34602203/) | Caleb Oquendo |
+| `word_photos/hydra.webp` | [Close-up of a Coiled Python in Black and White](https://www.pexels.com/photo/31784444/) | Average GUY |
+| `word_photos/ice.webp` | [A Whiskey Glass with Ice Cubes in Macro Photography](https://www.pexels.com/photo/7254237/) | Eva Bronzini |
+| `word_photos/identity.webp` | [Close up of Human Fingers](https://www.pexels.com/photo/7479535/) | Angela Roma |
+| `word_photos/indus.webp` | [Stunning Himalayan River Valley under Clear Sky](https://www.pexels.com/photo/38087446/) | Raman Shukla |
+| `word_photos/infinity.webp` | [Asphalt Road through Desert](https://www.pexels.com/photo/1370721/) | Emiliano Arano |
+| `word_photos/ivory.webp` | [Close-up of Folded Silk and Velvet Fabric](https://www.pexels.com/photo/14935628/) | Eugenia Remark |
+| `word_photos/joy.webp` | [Photo of Two Kids Having Fun](https://www.pexels.com/photo/4473606/) | Ketut Subiyanto |
+| `word_photos/jungle.webp` | [Tropical Plants by the Shore](https://www.pexels.com/photo/19495020/) | Gizem Çelebi |
+| `word_photos/karma.webp` | [Artistic Balance with Stacked Stones Outdoors](https://www.pexels.com/photo/34279942/) | ABHIJEET  SINGH |
+| `word_photos/king.webp` | [White king on middle chessboard](https://www.pexels.com/photo/4038395/) | Joseph Ruwa |
+| `word_photos/kitsune.webp` | [Red Fox in Snowy Winter Scene](https://www.pexels.com/photo/35986458/) | G N |
+| `word_photos/lava.webp` | [Vertical Shot of Lava in a Volcano](https://www.pexels.com/photo/27245757/) | Tomáš Malík |
+| `word_photos/legacy.webp` | [Books on Shelves](https://www.pexels.com/photo/13061431/) | Jonathan Borba |
+| `word_photos/life.webp` | [Tiny small sprout in soft sunlight](https://www.pexels.com/photo/7501440/) | Nothing Ahead |
+| `word_photos/light.webp` | [Natural Light coming from a Window](https://www.pexels.com/photo/9733643/) | Наталья Маркина |
+| `word_photos/love.webp` | [Tender Touch of a Couple Outdoors](https://www.pexels.com/photo/33124439/) | Alexander Mass |
+| `word_photos/man.webp` | [A man in a shirt and jeans is looking at the camera](https://www.pexels.com/photo/28125140/) | julia yarmol |
+| `word_photos/mantra.webp` | [Prayer Beads and a Silver Container](https://www.pexels.com/photo/11006282/) | Alexey Demidov |
+| `word_photos/maya.webp` | [Temple of Kukulcan in Yucatan](https://www.pexels.com/photo/19725119/) | María Regina  Díaz |
+| `word_photos/medusa.webp` | [Statue of Perseus in Florence's Loggia dei Lanzi](https://www.pexels.com/photo/38579138/) | psicopompo . |
+| `word_photos/memory.webp` | [Old Photos](https://www.pexels.com/photo/3617531/) | Suzy Hazelwood |
+| `word_photos/midnight.webp` | [View of the Moon in the Night Sky](https://www.pexels.com/photo/13526930/) | Dan Monteggia |
+| `word_photos/mind.webp` | [Shadow of a Person Meditating](https://www.pexels.com/photo/6799850/) | cottonbro studio |
+| `word_photos/minotaur.webp` | [Close-up of Bull with Decorated Horns](https://www.pexels.com/photo/37888674/) | David de Andrés Martín |
+| `word_photos/moon.webp` | [Captivating Crescent Moon Against Night Sky](https://www.pexels.com/photo/30554143/) | Bejan  Adrian |
+| `word_photos/mother.webp` | [Crop tattooed mother holding sleeping baby with pacifier in mouth in studio](https://www.pexels.com/photo/3845419/) | Anna Shvets |
+| `word_photos/mountain.webp` | [Majestic Snow-Covered Himalayan Mountain Peak](https://www.pexels.com/photo/32261635/) | urtimud.89 |
+| `word_photos/name.webp` | [Close-up of Hand Signing Legal Document Outdoors](https://www.pexels.com/photo/41000010/) | Luis Morales Torres |
+| `word_photos/nebula.webp` | [Stunning View of Horsehead Nebula in Deep Space](https://www.pexels.com/photo/29214035/) | Ahmad Basem |
+| `word_photos/nexus.webp` | [Numerous Wires Mounted into Patch Panel](https://www.pexels.com/photo/5087172/) | Brett Sayles |
+| `word_photos/night.webp` | [Buildings in Downtown at Night](https://www.pexels.com/photo/20716167/) | Andres Idda Bianchi |
+| `word_photos/ninja.webp` | [A Person in Black Hakama Dress](https://www.pexels.com/photo/7792245/) | cottonbro studio |
+| `word_photos/noir.webp` | [A woman in a hat and vest is leaning against a wall](https://www.pexels.com/photo/27869187/) | Andy Coffie |
+| `word_photos/obsidian.webp` | [Obsidian Rock on Bold Orange Background](https://www.pexels.com/photo/38178509/) | Samiran Biswas |
+| `word_photos/ocean.webp` | [Aerial View of Ocean](https://www.pexels.com/photo/20250810/) | Benjamin Farren |
+| `word_photos/odin.webp` | [Portrait of a Raven Perching on a Branch](https://www.pexels.com/photo/20922423/) | Boys in Bristol Photography |
+| `word_photos/oni.webp` | [Mysterious Figure in Red Oni Mask](https://www.pexels.com/photo/33764668/) | zona .exe123ph |
+| `word_photos/onyx.webp` | [Natural Stone Wall Texture in Black and White](https://www.pexels.com/photo/35968856/) | Anton Stepanov |
+| `word_photos/oracle.webp` | [Close Up Photo of Crystal Balls](https://www.pexels.com/photo/6634297/) | Cup of  Couple |
+| `word_photos/orbit.webp` | [Long Exposure Shot Of Tower Under Starry Sky](https://www.pexels.com/photo/3892612/) | Rahul Ray |
+| `word_photos/peace.webp` | [Portrait of Pigeon](https://www.pexels.com/photo/15276566/) | Ashlee Marie |
+| `word_photos/pearl.webp` | [A Person in White Pearl Necklace](https://www.pexels.com/photo/6641228/) | cottonbro studio |
+| `word_photos/phoenix.webp` | [A Brass Statue of Eagle](https://www.pexels.com/photo/16255984/) | Atahan Demir |
+| `word_photos/power.webp` | [High Voltage Power Lines Against a Clear Blue Sky](https://www.pexels.com/photo/38548993/) | Doğan Alpaslan  Demir |
+| `word_photos/prayer.webp` | [Elegant Statue Depicting Praying Hands](https://www.pexels.com/photo/29925962/) | Magda Ehlers |
+| `word_photos/prime.webp` | [Illuminated '1st' Sign on Dark Background](https://www.pexels.com/photo/38352193/) | Sóc Năng Động |
+| `word_photos/pristine.webp` | [Sardinia Beach View with Clear Blue Waters](https://www.pexels.com/photo/38818652/) | Petra Nesti |
+| `word_photos/pure.webp` | [Anonymous black man touching blooming flower](https://www.pexels.com/photo/7533456/) | SHVETS production |
+| `word_photos/queen.webp` | [White Chess Queen Piece on Wooden Surface](https://www.pexels.com/photo/28868914/) | Doğan Alpaslan  Demir |
+| `word_photos/rain.webp` | [Raindrops on Window with Gloomy Background](https://www.pexels.com/photo/30667874/) | Bade Saba |
+| `word_photos/raven.webp` | [Close-up of the Head of a Raven](https://www.pexels.com/photo/16680290/) | Matt Richmond |
+| `word_photos/reef.webp` | [Fish and Plants on Sea Bottom](https://www.pexels.com/photo/16968569/) | Francesco Ungaro |
+| `word_photos/refuge.webp` | [Log house on grassy meadow near mountains](https://www.pexels.com/photo/4406354/) | eberhard grossgasteiger |
+| `word_photos/release.webp` | [Sky Lantern Festival with Glowing Lanterns at Night](https://www.pexels.com/photo/30271030/) | Naro K |
+| `word_photos/rift.webp` | [Rocks in Canyon in Golden Light](https://www.pexels.com/photo/26838179/) | Nigar Garay |
+| `word_photos/river.webp` | [Rocks in a River](https://www.pexels.com/photo/8945510/) | Sostene Costantino |
+| `word_photos/ronin.webp` | [Samurai-Inspired Warrior in Straw Hat Outdoors](https://www.pexels.com/photo/38480951/) | Daniel's Richard |
+| `word_photos/rune.webp` | [Runestone in Östergötlands Län, Sweden](https://www.pexels.com/photo/34000911/) | Damir K |
+| `word_photos/sacred.webp` | [Ancient Ruins In Sunlit Outdoor Landscape](https://www.pexels.com/photo/38267989/) | Ayşegül  Aytören |
+| `word_photos/samurai.webp` | [Traditional Japanese Samurai Armor in Museum Display](https://www.pexels.com/photo/27573828/) | Zonghao Feng |
+| `word_photos/savanna.webp` | [Tree Growing in Field in Wild Nature](https://www.pexels.com/photo/10800257/) | Mary |
+| `word_photos/sea.webp` | [Serene Ocean Horizon at Twilight](https://www.pexels.com/photo/31742157/) | gi gi |
+| `word_photos/self.webp` | [A Woman in Bathrobe Standing by the Window](https://www.pexels.com/photo/8946369/) | KoolShooters |
+| `word_photos/serenity.webp` | [Lake in a Mountain Valley](https://www.pexels.com/photo/18094919/) | Amit  Majhi |
+| `word_photos/shadow.webp` | [Silhouetted Shadows on Urban Building Wall](https://www.pexels.com/photo/36534846/) | Letícia Alvares |
+| `word_photos/shaman.webp` | [Andean Shaman Blowing a Conch Shell in Cusco](https://www.pexels.com/photo/29854840/) | Da vid |
+| `word_photos/shield.webp` | [Ottoman Warrior in Traditional Armor near Turkish Flag](https://www.pexels.com/photo/37147512/) | İslam Abruev |
+| `word_photos/sigil.webp` | [Vintage Wax Seal Stamp on Wooden Desk](https://www.pexels.com/photo/36824939/) | Raymond Petrik |
+| `word_photos/silence.webp` | [Snow-Covered Coastal Landscape](https://www.pexels.com/photo/19727091/) | Frank Cone |
+| `word_photos/sister.webp` | [Photograph of a Girl Smiling while Hugging Her Sibling](https://www.pexels.com/photo/6668281/) | cottonbro studio |
+| `word_photos/sky.webp` | [Bright Blue Sky with Fluffy White Clouds](https://www.pexels.com/photo/38459847/) | Büşranur |
+| `word_photos/smoke.webp` | [Close up of Smoke](https://www.pexels.com/photo/11516523/) | Marek Piwnicki |
+| `word_photos/snow.webp` | [Snowy Street in Amsterdam Winter Wonderland](https://www.pexels.com/photo/39450849/) | Firdavs Murodov |
+| `word_photos/solace.webp` | [Bench in the Forest by the River](https://www.pexels.com/photo/17957808/) | Râmbeț Ioana |
+| `word_photos/soul.webp` | [Serene Candlelight in Dark Ambiance](https://www.pexels.com/photo/31966191/) | Oleg Nagovski |
+| `word_photos/sovereign.webp` | [Intricate Throne Room Interior at Gyeongbokgung Palace](https://www.pexels.com/photo/39115331/) | Gizem Erim |
+| `word_photos/space.webp` | [Astronaut in the Space Suit](https://www.pexels.com/photo/11479921/) | Blue Arauz |
+| `word_photos/spartan.webp` | [Black and White Portrait of a Spartan Warrior](https://www.pexels.com/photo/31487200/) | Al-amin Muhammad |
+| `word_photos/spirit.webp` | [Photo of Trees in the Woods](https://www.pexels.com/photo/14951695/) | Lucas Scheijde |
+| `word_photos/star.webp` | [Stars on Night Sky over Tree](https://www.pexels.com/photo/18409140/) | kublizz |
+| `word_photos/still.webp` | [Trees by the Lake](https://www.pexels.com/photo/11268044/) | Samuele Galiazzo |
+| `word_photos/stone.webp` | [Textured Black and White Pebble Arrangement](https://www.pexels.com/photo/40278034/) | Peter Caretta |
+| `word_photos/storm.webp` | [Dramatic Stormy Seascape with Dark Clouds](https://www.pexels.com/photo/38790017/) | Peter Steiner 🇨🇭 1973 |
+| `word_photos/sun.webp` | [Photo](https://www.pexels.com/photo/38310882/) | Joost van Os |
+| `word_photos/tender.webp` | [Close-up of Pink Tulips in Bloom Outdoors](https://www.pexels.com/photo/31603569/) | Cup of Honey Lemon |
+| `word_photos/thor.webp` | [Dramatic Lightning Storm in Night Sky](https://www.pexels.com/photo/29350450/) | Salem Raju |
+| `word_photos/thought.webp` | [A person sitting at a table with a view of mountains](https://www.pexels.com/photo/28318328/) | Ruben Reijgwart |
+| `word_photos/thunder.webp` | [A cloudy sky with some clouds and some airplanes](https://www.pexels.com/photo/17725089/) | Outlaw Design Studio |
+| `word_photos/tide.webp` | [Waves on a Beach](https://www.pexels.com/photo/25785874/) | fzaytt |
+| `word_photos/time.webp` | [Luxury Pocket Watch on Leaves](https://www.pexels.com/photo/18359903/) | Ömer  BÜLBÜL |
+| `word_photos/titan.webp` | [A statue of a man holding a staff in front of a building](https://www.pexels.com/photo/28037424/) | Meaw  Zara |
+| `word_photos/totem.webp` | [Trees near a Totem Pole](https://www.pexels.com/photo/13244365/) | Wendy Wei |
+| `word_photos/tree.webp` | [Trees and Bushes in Countryside](https://www.pexels.com/photo/18641550/) | Georgi Kanov |
+| `word_photos/tribe.webp` | [A man in traditional african clothing is dancing](https://www.pexels.com/photo/27433167/) | Tosin Ayano |
+| `word_photos/truth.webp` | [Open Book in Low Light on Wooden Table](https://www.pexels.com/photo/28426413/) | night of the light |
+| `word_photos/valkyrie.webp` | [Man Dressed as Viking in Forest](https://www.pexels.com/photo/10547072/) | Vincuk Konan |
+| `word_photos/valley.webp` | [Mountain Landscape with Green Pastures in a Valley](https://www.pexels.com/photo/17024839/) | Beyza Kaplan |
+| `word_photos/viking.webp` | [Viking Longship Replica in Lush Green Landscape](https://www.pexels.com/photo/38795565/) | Jonathan Plumridge |
+| `word_photos/vision.webp` | [Human Eye](https://www.pexels.com/photo/2440264/) | Lukáš Dlutko |
+| `word_photos/voice.webp` | [Microphones Inside the Recording Studio](https://www.pexels.com/photo/4988132/) | Tima Miroshnichenko |
+| `word_photos/void.webp` | [Door to Dark Room](https://www.pexels.com/photo/10875019/) | Mathias Reding |
+| `word_photos/warlord.webp` | [Men Wearing Knights Armors during a Historical Reenactment](https://www.pexels.com/photo/20281874/) | Pravin Kannah  Photography |
+| `word_photos/warrior.webp` | [Silhouette of Samurai with Sword Ready to Strike](https://www.pexels.com/photo/34395639/) | Kalz📸🇺🇬 Michael |
+| `word_photos/water.webp` | [High-Speed Photography of Waterdrops](https://www.pexels.com/photo/9667643/) | cottonbro studio |
+| `word_photos/white.webp` | [Wrinkled Desert Dune](https://www.pexels.com/photo/17759126/) | Amanda Sweeney |
+| `word_photos/will.webp` | [Person Standing on Mountain Top](https://www.pexels.com/photo/13311790/) | Marija van Velzen |
+| `word_photos/wind.webp` | [Green Grass Field](https://www.pexels.com/photo/13267031/) | Jonathan Borba |
+| `word_photos/wisdom.webp` | [Close-up of Eurasian Eagle-Owl in Urban Setting](https://www.pexels.com/photo/36796546/) | Atai Anarbek |
+| `word_photos/woman.webp` | [Portrait of Woman with Short Hair in Black and White](https://www.pexels.com/photo/18890524/) | Alexander Krivitskiy |
+| `word_photos/worship.webp` | [Priest Performing Aarti at Pashupatinath Temple](https://www.pexels.com/photo/40911285/) | Govind Rai |
+| `word_photos/zenith.webp` | [Sunrise Over Clouds in Gomi, Guria, Georgia](https://www.pexels.com/photo/37564202/) | MuffinLand |
+| `word_photos/zeus.webp` | [Sculpture Artemision Bronze in National Archaeological Museum of Athens](https://www.pexels.com/photo/20550203/) | leopoldo  zenteno |

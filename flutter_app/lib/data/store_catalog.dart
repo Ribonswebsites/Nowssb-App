@@ -110,7 +110,6 @@ const List<RmCategory> kRmCategories = [
     sub: "Limited time — best words at half price",
     labelColor: 0xF2E8D5A3,
     words: [
-      RmWordEntry("fire", "Proto-Indo-European"),
       RmWordEntry("god", "Proto-Germanic"),
       RmWordEntry("spirit", "Latin"),
       RmWordEntry("warrior", "Old French"),
@@ -135,7 +134,6 @@ const List<RmCategory> kRmCategories = [
     words: [
       RmWordEntry("earth", "Proto-Germanic"),
       RmWordEntry("water", "Proto-Indo-European"),
-      RmWordEntry("fire", "Proto-Indo-European"),
       RmWordEntry("sun", "Proto-Indo-European"),
       RmWordEntry("moon", "Proto-Indo-European"),
       RmWordEntry("stone", "Proto-Germanic"),
@@ -181,7 +179,6 @@ const List<RmCategory> kRmCategories = [
     words: [
       RmWordEntry("name", "Proto-Indo-European"),
       RmWordEntry("mind", "Old English"),
-      RmWordEntry("india", "Persian"),
       RmWordEntry("breath", "Old English"),
       RmWordEntry("blood", "Old English"),
       RmWordEntry("dream", "Old English"),
@@ -372,21 +369,9 @@ const List<RmCategory> kRmCategories = [
     sub: "Words from the dawn of history",
     labelColor: 0xE6FFD06E,
     words: [
-      RmWordEntry("egypt", "Greek"),
-      RmWordEntry("babylon", "Hebrew"),
-      RmWordEntry("troy", "Greek"),
-      RmWordEntry("sparta", "Greek"),
-      RmWordEntry("rome", "Latin"),
       RmWordEntry("indus", "Persian"),
       RmWordEntry("maya", "Spanish"),
       RmWordEntry("aztec", "Spanish"),
-      RmWordEntry("persia", "Greek"),
-      RmWordEntry("carthage", "Phoenician"),
-      RmWordEntry("athens", "Greek"),
-      RmWordEntry("sumer", "Akkadian"),
-      RmWordEntry("akkad", "Sumerian"),
-      RmWordEntry("nubia", "Latin"),
-      RmWordEntry("phoenicia", "Greek"),
     ],
     signature: RmSignatureEntry(key: "ancientcivilizations", name: "Ancient Civilizations", img: kRmSignatureImg),
   ),
@@ -467,6 +452,36 @@ const List<RmCategory> kRmCategories = [
   ),
 ];
 
+/// Words taken out of the catalogue (Nov 23, 2026): "Fire", and every word
+/// that is only a country, a city, a language, a currency or a greeting in
+/// another language. Anything a phone still holds for one of these (a cart
+/// or wishlist line, a published library doc) is dropped on read, so they
+/// show up nowhere.
+const Set<String> kRemovedWordKeys = {
+  'fire', 'country', 'india', 'america',
+  'egypt', 'babylon', 'troy', 'sparta', 'rome', 'athens', 'carthage',
+  'persia', 'phoenicia', 'nubia', 'sumer', 'akkad',
+  // The old Countries / Capitals / Currency / Language store rows.
+  'japan', 'greece', 'france', 'brazil', 'kenya', 'canada',
+  'delhi', 'tokyo', 'cairo', 'paris', 'brasilia', 'nairobi', 'ottawa',
+  'rupee', 'yen', 'pound', 'dollar', 'euro', 'dinar', 'krone', 'peso',
+  'sanskrit', 'latin', 'greek', 'arabic', 'english', 'hindi', 'french', 'japanese',
+};
+
+/// True when [word] (any case or spacing) is one of [kRemovedWordKeys].
+bool isRemovedWord(String word) =>
+    kRemovedWordKeys.contains(word.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), ''));
+
+/// True when a bag / ownership id (`word:fire`, `meaning:india` ...) points
+/// at a removed word.
+bool isRemovedItemId(String id) {
+  final i = id.indexOf(':');
+  if (i < 0) return false;
+  final kind = id.substring(0, i);
+  if (kind != 'word' && kind != 'meaning') return false;
+  return isRemovedWord(id.substring(i + 1));
+}
+
 class MsMeaning {
   const MsMeaning({required this.word, required this.key, required this.root, required this.category, required this.price, required this.img});
   final String word, key, root, category, img;
@@ -476,7 +491,6 @@ class MsMeaning {
 const List<MsMeaning> kMsBaseMeanings = [
   MsMeaning(word: "Earth", key: "earth", root: "Proto-Germanic · erþō", category: "Elements", price: 49, img: "assets/meanings/meanings-device.png"),
   MsMeaning(word: "Water", key: "water", root: "Proto-Indo-European · wódr̥", category: "Elements", price: 49, img: "assets/meanings/meanings-branding.jpg"),
-  MsMeaning(word: "Fire", key: "fire", root: "Proto-Indo-European · péh₂wr̥", category: "Elements", price: 49, img: "assets/meanings/meanings-clean.jpg"),
   MsMeaning(word: "Sun", key: "sun", root: "Proto-Indo-European · séh₂wl̥", category: "Elements", price: 49, img: "assets/meanings/meanings-device.png"),
   MsMeaning(word: "Moon", key: "moon", root: "Proto-Germanic · mēnô", category: "Elements", price: 49, img: "assets/meanings/meanings-branding.jpg"),
   MsMeaning(word: "Light", key: "light", root: "Proto-Indo-European · leuk-", category: "Elements", price: 49, img: "assets/meanings/meanings-clean.jpg"),
@@ -493,8 +507,6 @@ const List<MsMeaning> kMsBaseMeanings = [
   MsMeaning(word: "Time", key: "time", root: "Proto-Indo-European · dī-", category: "Cosmos", price: 49, img: "assets/meanings/meanings-branding.jpg"),
   MsMeaning(word: "Space", key: "space", root: "Latin · spatium", category: "Cosmos", price: 49, img: "assets/meanings/meanings-clean.jpg"),
   MsMeaning(word: "Truth", key: "truth", root: "Proto-Germanic · trewwþō", category: "Cosmos", price: 49, img: "assets/meanings/meanings-device.png"),
-  MsMeaning(word: "Country", key: "country", root: "Latin · contra", category: "Nations & People", price: 49, img: "assets/meanings/meanings-branding.jpg"),
-  MsMeaning(word: "India", key: "india", root: "Natural Origin · Sindhu", category: "Nations & People", price: 49, img: "assets/meanings/meanings-clean.jpg"),
   MsMeaning(word: "Mother", key: "mother", root: "Proto-Indo-European · méh₂tēr", category: "Nations & People", price: 49, img: "assets/meanings/meanings-device.png"),
   MsMeaning(word: "Father", key: "father", root: "Proto-Indo-European · ph₂tḗr", category: "Nations & People", price: 49, img: "assets/meanings/meanings-branding.jpg"),
   MsMeaning(word: "Name", key: "name", root: "Proto-Indo-European · h₁nómn̥", category: "Nations & People", price: 49, img: "assets/meanings/meanings-clean.jpg"),
@@ -505,7 +517,7 @@ const Map<String, String> kMsCatSub = {
   "Human": "The truth of body, mind and soul",
   "Emotions": "What every feeling really means",
   "Cosmos": "Origins beyond understanding",
-  "Nations & People": "The people and places behind the meanings",
+  "Nations & People": "The people and names behind the meanings",
 };
 
 class MsSignatureEntry {
@@ -524,7 +536,6 @@ const Map<String, MsSignatureEntry> kMsSignature = {
 const Map<String, String> kMsWordBlurb = {
   "earth": "Earth is the place where we live — solid ground beneath every step.",
   "water": "Water is what moves through everything alive, the first thing the body remembers.",
-  "fire": "Fire is the spark that turns still matter into motion and light.",
   "sun": "Sun is the source every living rhythm on this planet keeps time by.",
   "moon": "Moon is the quiet pull that shapes tides, sleep, and the turning of months.",
   "light": "Light is what makes anything visible at all — the first sense to arrive.",
@@ -541,8 +552,6 @@ const Map<String, String> kMsWordBlurb = {
   "time": "Time is the one thing spent by everyone, saved by no one.",
   "space": "Space is the distance that makes it possible for anything to move at all.",
   "truth": "Truth is what&rsquo;s still standing after everything false has been said.",
-  "country": "Country is the shared ground a people agree to call home.",
-  "india": "India is the ancient root many of these very sounds first grew from.",
   "mother": "Mother is the first voice, the first shape, the first safety.",
   "father": "Father is the first structure — the one who shows what holding steady looks like.",
   "name": "Name is the sound a person is called back to, again and again.",

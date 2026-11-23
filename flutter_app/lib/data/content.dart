@@ -26,6 +26,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase.dart';
 import 'models.dart';
+import 'store_catalog.dart' show isRemovedWord;
 
 class ContentStore extends ChangeNotifier {
   ContentStore._();
@@ -130,6 +131,10 @@ class ContentStore extends ChangeNotifier {
   /// The raw shipped entry for a client-recorded word (with its `practice`
   /// block), or null when [key] is not one.
   Map<String, dynamic>? clientWordRaw(String key) => _clientRaw[key];
+
+  /// Client-recorded words as parsed, before the library's filters.
+  @visibleForTesting
+  List<Word> get clientWords => _client;
 
   Future<List<T>> _bundle<T>(String path, T? Function(dynamic) parse) async {
     try {
@@ -272,7 +277,12 @@ class ContentStore extends ChangeNotifier {
   /// Base library with admin-mode edits laid over it, in the base order;
   /// brand-new words go at the end.
   void _recompute() {
-    _library = _withClientWords(_overlayPublished());
+    // Removed words (store_catalog.dart kRemovedWordKeys) stay out even
+    // when a published doc or an old cache still carries one.
+    _library = [
+      for (final w in _withClientWords(_overlayPublished()))
+        if (!isRemovedWord(w.key) && !isRemovedWord(w.word)) w
+    ];
   }
 
   List<Word> _withClientWords(List<Word> lib) {

@@ -1274,7 +1274,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       art: kStoreProductArt,
       rows: [
         ('Water', 'Proto-Germanic'),
-        ('Fire', 'Proto-Germanic'),
+        ('Rain', 'Proto-Germanic'),
         ('Wind', 'Proto-Germanic'),
       ],
     ),
@@ -1310,7 +1310,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       art: kMsMeaningIntroArt,
       rows: [
         ('Water', 'Flowing life'),
-        ('Fire', 'Inner spark'),
+        ('Rain', 'Gentle renewal'),
         ('Wind', 'Clear breath'),
       ],
     ),
@@ -1539,7 +1539,7 @@ const kStoreMidRailBanners = <StoreMidRailBannerData>[
     artAsset: kStoreProductArt,
     accent: Color(0xFFFF6BCB),
     svgBody: NwsbMarks.sound,
-    sub: 'Earth · Water · Fire · Air',
+    sub: 'Earth · Water · Wind · Stone',
     pillLabel: 'ELEMENTS',
   ),
   StoreMidRailBannerData(

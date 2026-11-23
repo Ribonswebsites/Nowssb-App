@@ -25,16 +25,12 @@ const kDealPercents = [20, 25, 30, 35, 40, 45, 50, 55, 60];
 
 int _seedFor(DateTime day) => day.year * 10000 + day.month * 100 + day.day;
 
-/// Every word category in the store: the Word Atelier rows plus the
-/// Countries / Capitals / Currency / Language place rows.
+/// Every word category in the store: the Word Atelier rows.
 Map<String, List<(String, String)>> dealPool() {
   final pool = <String, List<(String, String)>>{};
   for (final c in kRmCategories) {
     if (c.id == 'off50') continue;
     pool[c.label] = [for (final w in c.words) (w.word, w.root)];
-  }
-  for (final r in kPlaceRows) {
-    (pool[r.$3] ??= []).add((r.$1, r.$2));
   }
   pool.removeWhere((_, v) => v.isEmpty);
   return pool;

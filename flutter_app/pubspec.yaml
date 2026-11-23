@@ -257,6 +257,7 @@ flutter:
     - assets/store/words/
     # One poster per practice word (black, word x3, NowssB headphones, ribbon).
     - assets/word_posters/
+    - assets/word_photos/
     - assets/store/waves/
     - assets/store/meaning-flips/
     - assets/store/ebook-flips/
@@ -290,6 +291,8 @@ flutter:
     - assets/content/
     # Client-recorded practice stages (America): playback m4a, music
     # versions, and the 16 kHz WAV references the scorer compares against.
+    # AMERICA left the catalogue on Nov 23, 2026 (country words are out);
+    # its recordings stay bundled for the stage engine and its tests.
     - assets/words/america/
     - assets/subscription/
     - assets/hero-curve/

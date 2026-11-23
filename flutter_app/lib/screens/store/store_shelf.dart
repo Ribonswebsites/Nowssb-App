@@ -22,51 +22,6 @@ class StorePiece {
   final VoidCallback onTap;
 }
 
-const kStoreFilters = ['All', 'Countries', 'Capitals', 'Currency', 'Language'];
-
-const kPlaceRows = <(String, String, String)>[
-  ('India', 'Country', 'Countries'),
-  ('Japan', 'Country', 'Countries'),
-  ('Egypt', 'Country', 'Countries'),
-  ('Greece', 'Country', 'Countries'),
-  ('France', 'Country', 'Countries'),
-  ('Brazil', 'Country', 'Countries'),
-  ('Kenya', 'Country', 'Countries'),
-  ('Canada', 'Country', 'Countries'),
-  ('Delhi', 'Capital', 'Capitals'),
-  ('Tokyo', 'Capital', 'Capitals'),
-  ('Cairo', 'Capital', 'Capitals'),
-  ('Athens', 'Capital', 'Capitals'),
-  ('Paris', 'Capital', 'Capitals'),
-  ('Brasilia', 'Capital', 'Capitals'),
-  ('Nairobi', 'Capital', 'Capitals'),
-  ('Ottawa', 'Capital', 'Capitals'),
-  ('Rupee', 'Currency', 'Currency'),
-  ('Yen', 'Currency', 'Currency'),
-  ('Pound', 'Currency', 'Currency'),
-  ('Dollar', 'Currency', 'Currency'),
-  ('Euro', 'Currency', 'Currency'),
-  ('Dinar', 'Currency', 'Currency'),
-  ('Krone', 'Currency', 'Currency'),
-  ('Peso', 'Currency', 'Currency'),
-  ('Sanskrit', 'Language', 'Language'),
-  ('Latin', 'Language', 'Language'),
-  ('Greek', 'Language', 'Language'),
-  ('Arabic', 'Language', 'Language'),
-  ('English', 'Language', 'Language'),
-  ('Hindi', 'Language', 'Language'),
-  ('French', 'Language', 'Language'),
-  ('Japanese', 'Language', 'Language'),
-];
-
-String storeGroup(String word) {
-  final n = word.toLowerCase();
-  for (final row in kPlaceRows) {
-    if (row.$1.toLowerCase() == n) return row.$3;
-  }
-  return 'Language';
-}
-
 /// The five rails used on Word, Meaning, Signature and Ebooks.
 class StoreShelf extends StatefulWidget {
   const StoreShelf({super.key, required this.pieces, this.labels = const ['Open', 'Your list', 'Guides', 'Glass', 'Clear']});
