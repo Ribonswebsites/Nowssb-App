@@ -18,7 +18,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../data/app_haptics.dart';
 import '../data/earn_wallet.dart';
 import '../features/economy/economy_api.dart';
 import '../data/models.dart';
@@ -45,7 +44,7 @@ import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
 import 'player_intro.dart';
-import 'player_glass_panel.dart';
+import 'player_up_view.dart';
 import 'player_guide.dart';
 import 'practice_overlay.dart';
 import '../widgets/pronunciation_survey.dart';
@@ -106,6 +105,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     with TickerProviderStateMixin {
   static const _likedWordsKey = 'nwsb_liked_words';
   static const _shuffleKey = 'nwsb_player_shuffle';
+  static const _actionsTabVideo = 'assets/video/player-actions-tab.mp4';
   static const _marqueeLines = <String>[
     'NowssB · Words Without Dictionary',
     'NowssB · The future of Meditation',
@@ -128,6 +128,14 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _pull = 0.0;
   var _pullStamp = 0;
 
+  /// The swipe-up view (PlayerUpView): 0 closed, 1 open. A swipe up on the
+  /// player moves it with the finger.
+  late final AnimationController _upCtl;
+  var _pullDx = 0.0;
+  var _upTracking = false;
+  var _upEligible = false;
+  var _pullBase = 0.0;
+  var _upHeight = 800.0;
   final _pageScroll = ScrollController();
   final _bottomStripKey = GlobalKey();
   var _handingOff = false;
@@ -157,6 +165,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   void initState() {
     super.initState();
     _bottomPageController = PageController();
+    _upCtl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
     _marqueeController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 18),
@@ -266,6 +278,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     _sleepTimer?.cancel();
     _listenTimer?.cancel();
     _bottomPageController.dispose();
+    _upCtl.dispose();
     _pageScroll.dispose();
     _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);
@@ -965,6 +978,44 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     await _prepareAndPlay();
   }
 
+  bool get _upOpen => _upCtl.value > 0;
+
+  void _openUp() {
+    unawaited(_upCtl.animateTo(1, curve: Curves.easeOutCubic));
+  }
+
+  void _closeUp() {
+    unawaited(_upCtl.animateBack(0, curve: Curves.easeOutCubic));
+  }
+
+  /// Ends a drag of the view: [velocity] in px/s, down is positive.
+  void _settleUp(double velocity) {
+    if (velocity < -400 || (velocity <= 400 && _upCtl.value > .35)) {
+      _openUp();
+    } else {
+      _closeUp();
+    }
+  }
+
+  void _dragUp(double dy) {
+    _upCtl.value = (_upCtl.value - dy / _upHeight).clamp(0.0, 1.0);
+  }
+
+  /// A swipe up only moves the view when the page under it has nothing
+  /// left to scroll and it did not start on the bottom strip (its pages
+  /// swipe sideways and its Next up card opens the queue).
+  bool _pageAtBottom() =>
+      !_pageScroll.hasClients || _pageScroll.position.extentAfter <= 1;
+
+  bool _outsideStrip(Offset global) {
+    final strip = _bottomStripKey.currentContext?.findRenderObject();
+    if (strip is RenderBox && strip.hasSize) {
+      final local = strip.globalToLocal(global);
+      if ((Offset.zero & strip.size).contains(local)) return false;
+    }
+    return true;
+  }
+
   void _openLevel() {
     showModalBottomSheet<void>(
       context: context,
@@ -1343,12 +1394,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       canPop: false,
       onPopInvoked: (didPop) {
         if (didPop) return;
+        if (_upOpen) {
+          _closeUp();
+          return;
+        }
         unawaited(_minimizeToPill());
       },
       child: Scaffold(
         backgroundColor: const Color(0xFF000000),
         body: Stack(
-          fit: StackFit.expand,
           children: [
             Positioned.fill(
               child: IgnorePointer(
@@ -1366,458 +1420,316 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 ),
               ),
             ),
-            // A soft deep-navy gradient over the page film (NowssB's palette).
-            const Positioned.fill(
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0x8C142142),
-                        Color(0xA60A1226),
-                        Color(0xE6040810),
-                      ],
-                      stops: [0, .5, 1],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            const Positioned.fill(child: ColoredBox(color: Color(0x55000000))),
             SafeArea(
               child: Listener(
-                onPointerDown: (_) {
+                onPointerDown: (e) {
                   _pull = 0;
+                  _pullDx = 0;
                   _pullStamp = DateTime.now().millisecondsSinceEpoch;
+                  _upEligible = !_upOpen && _outsideStrip(e.position);
+                  _upTracking = _upEligible && _pageAtBottom();
+                  _pullBase = 0;
                 },
-                onPointerMove: (e) => _pull += e.delta.dy,
+                onPointerMove: (e) {
+                  _pull += e.delta.dy;
+                  _pullDx += e.delta.dx;
+                  // Once the page has nothing left to scroll, the rest of the
+                  // swipe up raises the view with the finger.
+                  if (_upEligible && !_upTracking && _pageAtBottom()) {
+                    _upTracking = true;
+                    _pullBase = _pull;
+                  }
+                  final up = -(_pull - _pullBase);
+                  if (_upTracking && up > 12 && _pull.abs() > _pullDx.abs()) {
+                    _upCtl.value = ((up - 12) / _upHeight).clamp(0.0, 1.0);
+                  }
+                },
+                onPointerCancel: (_) {
+                  if (_upTracking && _upCtl.value > 0) _settleUp(0);
+                  _upTracking = false;
+                },
                 onPointerUp: (_) {
                   final ms = DateTime.now().millisecondsSinceEpoch - _pullStamp;
-                  // Swipe up opens the queue (the main screen is already the
-                  // full now-playing layout, so there is no second view).
-                  if (_pull < -90 && ms < 450) _openQueueSheet(context);
+                  // Swipe up opens the full now-playing view (the queue is
+                  // one tap away from its top bar and from Next up).
+                  if (_upEligible) {
+                    _upTracking = false;
+                    _upEligible = false;
+                    final flick = _pull < -90 && ms < 450;
+                    if (flick || _upCtl.value > .28) {
+                      _openUp();
+                    } else if (_upCtl.value > 0) {
+                      _closeUp();
+                    }
+                  }
                   // Swipe down collapses the player to the mini pill, like a
                   // music app's now-playing screen.
                   if (_pull > 140 && ms < 700) unawaited(_minimizeToPill());
                   _pull = 0;
                 },
                 child: LayoutBuilder(
-                  builder: (context, constraints) =>
-                      _mainBody(context, constraints),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// The player screen in Ribon's reference layout, in NowssB glass: the
-  /// header, then one large frosted pane with a curved top (cover carousel,
-  /// title, seek line, prev / rounded-square play / next, and the glass bar
-  /// with repeat, favourite and shuffle), then the Sentence / Practice /
-  /// Store row and its Up next page.
-  Widget _mainBody(BuildContext context, BoxConstraints c) {
-    final wide = c.maxWidth >= 700 && c.maxWidth > c.maxHeight;
-    final header = _PlayerHeader(
-      onBack: _minimizeToPill,
-      onSettings: _openSettings,
-      onMore: _openAuraClock,
-      onHowItWorks: _openHowItWorks,
-    );
-    if (wide) {
-      final panelW = math.min(c.maxWidth - 48, 1000.0);
-      final leftW = panelW * .54;
-      final avail = c.maxHeight - 330;
-      final card = math.min(leftW * .70, avail).clamp(160.0, 460.0).toDouble();
-      final stripW = math.min(panelW, 640.0);
-      return SingleChildScrollView(
-        controller: _pageScroll,
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
-        child: Center(
-          child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: math.max(0, c.maxHeight - 20)),
-          child: SizedBox(
-            width: panelW,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                header,
-                Column(
-                  children: [
-                const SizedBox(height: 4),
-                PlayerWavePanel(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 12, 0, 14),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: card,
-                          child: Row(
-                            children: [
-                              ClipRect(
-                                child: SizedBox(
-                                  width: leftW,
-                                  child: _carousel(leftW, card),
+                  builder: (context, constraints) {
+                    final stageWidth = math.min(
+                      constraints.maxWidth - 24,
+                      340.0,
+                    );
+                    return SingleChildScrollView(
+                      controller: _pageScroll,
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: math.max(0, constraints.maxHeight - 28),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            _PlayerHeader(
+                              onBack: _minimizeToPill,
+                              onSettings: _openSettings,
+                              onMore: _openAuraClock,
+                              onHowItWorks: _openHowItWorks,
+                            ),
+                            const SizedBox(height: 12),
+                            Center(
+                              child: SizedBox(
+                                width: stageWidth,
+                                child: _VisualStage(
+                                  word: _word,
+                                  video: _theme.video,
+                                  playing: _playing,
+                                  ritual: _ritual,
+                                  accent: theme.accent,
+                                  onReplay: _prepareAndPlay,
+                                  onCopy: _copyWord,
+                                  liked: _liked,
+                                  onLike: _toggleLike,
+                                  onSettings: _openSettings,
+                                  onInfo: _openInfo,
+                                  onLevel: _openLevel,
+                                  onStore: () => NavScope.goTo(context, 3),
+                                  onSyllable: (part) async {
+                                    // No synthetic voice: syllables have no
+                                    // recordings of their own yet.
+                                    ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+                                      content: Text('Syllable recordings for ${part.roman.isNotEmpty ? part.roman : part.deva} have not been added yet.'),
+                                    ));
+                                  },
                                 ),
                               ),
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.fromLTRB(28, 0, 32, 0),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      _titleRow(),
-                                      const SizedBox(height: 18),
-                                      _seek(),
-                                      const SizedBox(height: 10),
-                                      _transport(),
-                                      ..._status(),
-                                    ],
+                            ),
+                            const SizedBox(height: 18),
+                            Row(
+                              children: [
+                                const AppThinkingLoader(
+                                  size: 72,
+                                  state: OrbState.composing,
+                                  blackCircle: true,
+                                  circlePad: 8,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _prettyTitle(_word.word),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Color(0xFFF4F4F5),
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.1,
+                                      letterSpacing: -0.6,
+                                    ),
                                   ),
+                                ),
+                                GestureDetector(
+                                  onTap: _toggleLike,
+                                  child: SizedBox(
+                                    width: 44,
+                                    height: 44,
+                                    child: Icon(
+                                      _liked
+                                          ? Icons.favorite_rounded
+                                          : Icons.favorite_border_rounded,
+                                      color: _liked
+                                          ? const Color(0xFFF5F5F7)
+                                          : const Color(0xFF8B8B90),
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            ClipRect(
+                              child: SizedBox(
+                                height: 20,
+                                width: double.infinity,
+                                child: _SubtitleMarquee(
+                                  lines: _marqueeLines,
+                                  animation: _marqueeController,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _ProgressBar(
+                              playing: _playing,
+                              durationSec: _wordSecs(_word),
+                            ),
+                            const SizedBox(height: 8),
+                            _PlainTransportRow(
+                              playing: _playing,
+                              shuffle: _shuffle,
+                              loop: _loop,
+                              onShuffle: _toggleShuffle,
+                              onPrevious: _skipPrev,
+                              onPlay: _togglePlay,
+                              onNext: () => _move(1),
+                              onRepeat: () => setState(() => _loop = !_loop),
+                            ),
+                            const SizedBox(height: 16),
+                            if (_completed || _error != null) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                _error ??
+                                    'Completed and added to your progress.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: _error == null
+                                      ? Colors.white70
+                                      : const Color(0xFFFFB4B4),
+                                  fontSize: 12,
+                                  height: 1.4,
                                 ),
                               ),
                             ],
-                          ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              key: _bottomStripKey,
+                              width: stageWidth,
+                              height: 128,
+                              child: PageView(
+                                controller: _bottomPageController,
+                                physics: const BouncingScrollPhysics(),
+                                onPageChanged: (p) {
+                                  setState(() => _bottomPage = p);
+                                  _kickBottomAuto();
+                                },
+                                children: [
+                                  _WordActionStrip(
+                                    accent: theme.accent,
+                                    video: _actionsTabVideo,
+                                    onSentence: _openSentence,
+                                    onPractice: () =>
+                                        unawaited(_handlePracticeTap()),
+                                    onStore: () => NavScope.goTo(context, 3),
+                                  ),
+                                  _NextUpCard(
+                                    words: widget.words,
+                                    index: _index,
+                                    themes: _playerThemes,
+                                    onPlayAt: (i) async {
+                                      if (i == _index) {
+                                        await _prepareAndPlay();
+                                        return;
+                                      }
+                                      await _tts.stop();
+                                      unawaited(WordVoice.instance.stop());
+                                      setState(() {
+                                        _index = i;
+                                        _liked = false;
+                                        _completed = false;
+                                        _error = null;
+                                      });
+                                      await _loadLiked();
+                                      await _prepareAndPlay();
+                                    },
+                                    onOpenSoundLibrary: () =>
+                                        _openSoundLibrary(context),
+                                    onOpenQueue: () => _openQueueSheet(context),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _BottomDot(active: _bottomPage == 0),
+                                const SizedBox(width: 6),
+                                _BottomDot(active: _bottomPage == 1),
+                              ],
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 12),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: _glassBar(),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(width: stripW, child: _strip(context)),
-                const SizedBox(height: 8),
-                _dots(),
-                  ],
-                ),
-                const SizedBox(height: 2),
-              ],
-            ),
-          ),
-          ),
-        ),
-      );
-    }
-    final contentW = math.min(c.maxWidth - 32, 520.0);
-    final card = math
-        .min(contentW * .72, c.maxHeight - 492)
-        .clamp(150.0, 400.0)
-        .toDouble();
-    return SingleChildScrollView(
-      controller: _pageScroll,
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      child: Center(
-        child: ConstrainedBox(
-        constraints: BoxConstraints(minHeight: math.max(0, c.maxHeight - 24)),
-        child: SizedBox(
-          width: contentW,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              header,
-              Column(
-                children: [
-              const SizedBox(height: 6),
-              PlayerWavePanel(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 10, 0, 12),
-                  child: Column(
-                    children: [
-                      _carousel(contentW, card),
-                      const SizedBox(height: 14),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        child: _titleRow(),
                       ),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: _seek(),
-                      ),
-                      _transport(),
-                      ..._status(),
-                      const SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: _glassBar(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              _strip(context),
-              const SizedBox(height: 8),
-              _dots(),
-                ],
-              ),
-              const SizedBox(height: 4),
-            ],
-          ),
-        ),
-        ),
-      ),
-    );
-  }
-
-  Widget _carousel(double width, double card) => PlayerCoverCarousel(
-    words: widget.words,
-    index: _index,
-    coverFor: (w, i) => playerCoverArtFor(w, i),
-    width: width,
-    card: card,
-    onSelect: (i) => unawaited(_playAt(i)),
-    overlay: _coverOverlay(),
-  );
-
-  /// Chips on the current cover: Frequency, settings and help on top; the
-  /// syllables and the meaning label at the foot. During a frequency
-  /// ritual the cover shows its caption instead.
-  Widget _coverOverlay() {
-    final ritual = _ritual;
-    if (ritual != null) {
-      return ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: ColoredBox(
-            color: const Color(0xA6060C18),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Text(
-                  ritual.caption,
-                  key: const ValueKey('player-ritual-caption'),
-                  textAlign: TextAlign.center,
-                  maxLines: 6,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 19,
-                    height: 1.3,
-                    fontWeight: FontWeight.w600,
-                  ),
+                    );
+                  },
                 ),
               ),
             ),
-          ),
-        ),
-      );
-    }
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        const IgnorePointer(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0x59000000), Color(0x00000000), Color(0x00000000), Color(0xCC000000)],
-                stops: [0, .26, .5, 1],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 10,
-          left: 10,
-          right: 10,
-          child: Row(
-            children: [
-              Flexible(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: AnimatedBuilder(
-                    animation: PracticeProgress.instance,
-                    builder: (context, _) => _LevelPill(
-                      level: PracticeProgress.instance.level.clamp(1, 10),
-                      onTap: () => playerTap(_openLevel),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              _StageGlassChip(
-                onSettings: () => playerTap(_openSettings),
-                onInfo: () => playerTap(_openInfo),
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          left: 10,
-          right: 10,
-          bottom: 12,
-          child: _WordOverlay(
-            word: _word,
-            accent: _theme.accent,
-            playing: _playing,
-            liked: _liked,
-            onReplay: _prepareAndPlay,
-            onNotes: _copyWord,
-            onLike: _toggleLike,
-            onSyllable: (part) {
-              playerTap(() {});
-              // No synthetic voice: syllables have no recordings of their
-              // own yet.
-              ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
-                content: Text('Syllable recordings for ${part.roman.isNotEmpty ? part.roman : part.deva} have not been added yet.'),
-              ));
-            },
-            embedded: true,
-            glass: true,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Replay (left), the title and its line (centre), word notes (right).
-  Widget _titleRow() => Row(
-    children: [
-      PlayerGlassSquare(
-        key: const ValueKey('player-replay'),
-        icon: Icons.replay_rounded,
-        label: 'Replay',
-        onTap: () => unawaited(_prepareAndPlay()),
-      ),
-      const SizedBox(width: 10),
-      Expanded(
-        child: Column(
-          children: [
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                _prettyTitle(_word.word),
-                key: const ValueKey('player-title'),
-                maxLines: 1,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  height: 1.15,
-                  letterSpacing: -.3,
-                ),
-              ),
-            ),
-            const SizedBox(height: 3),
-            ClipRect(
-              child: SizedBox(
-                height: 18,
-                width: double.infinity,
-                child: _SubtitleMarquee(
-                  lines: _marqueeLines,
-                  animation: _marqueeController,
-                  centered: true,
-                ),
-              ),
-            ),
+            Positioned.fill(child: _buildUpView(context)),
           ],
         ),
       ),
-      const SizedBox(width: 10),
-      PlayerGlassSquare(
-        key: const ValueKey('player-notes'),
-        icon: Icons.dashboard_customize_outlined,
-        label: 'Word notes',
-        onTap: () => unawaited(_copyWord()),
-      ),
-    ],
-  );
+    );
+  }
 
-  Widget _seek() => _ProgressBar(
-    key: ValueKey('player-seek-$_index'),
-    playing: _playing,
-    durationSec: _wordSecs(_word),
-    startedAt: _startedAt,
-  );
-
-  Widget _transport() => PlayerTransport(
-    playing: _playing,
-    onPrevious: () => unawaited(_skipPrev()),
-    onPlay: () => unawaited(_togglePlay()),
-    onNext: () => unawaited(_move(1)),
-  );
-
-  Widget _glassBar() => PlayerGlassBar(
-    repeat: _loop,
-    liked: _liked,
-    shuffle: _shuffle,
-    onRepeat: () => setState(() => _loop = !_loop),
-    onLike: () => unawaited(_toggleLike()),
-    onShuffle: () => unawaited(_toggleShuffle()),
-  );
-
-  List<Widget> _status() => [
-    if (_completed || _error != null) ...[
-      const SizedBox(height: 4),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Text(
-          _error ?? 'Completed and added to your progress.',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: _error == null ? Colors.white70 : const Color(0xFFFFB4B4),
-            fontSize: 12,
-            height: 1.4,
-          ),
-        ),
-      ),
-    ],
-  ];
-
-  /// Sentence / Practice / Store, and the Up next page beside it.
-  Widget _strip(BuildContext context) => SizedBox(
-    key: _bottomStripKey,
-    height: 112,
-    child: PageView(
-      controller: _bottomPageController,
-      physics: const BouncingScrollPhysics(),
-      onPageChanged: (p) {
-        setState(() => _bottomPage = p);
-        _kickBottomAuto();
-      },
-      children: [
-        _WordActionStrip(
-          onSentence: () => playerTap(_openSentence),
-          onPractice: () => playerTap(() => unawaited(_handlePracticeTap())),
-          onStore: () => playerTap(() => NavScope.goTo(context, 3)),
-        ),
-        _NextUpCard(
-          words: widget.words,
-          index: _index,
-          themes: _playerThemes,
-          onPlayAt: (i) async {
-            AppHaptics.selection();
-            if (i == _index) {
-              await _prepareAndPlay();
-              return;
-            }
-            await _playAt(i);
+  Widget _buildUpView(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, box) {
+        _upHeight = math.max(1.0, box.maxHeight);
+        return AnimatedBuilder(
+          animation: _upCtl,
+          builder: (context, _) {
+            final v = _upCtl.value;
+            if (v <= 0) return const SizedBox.shrink();
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                IgnorePointer(
+                  child: ColoredBox(
+                    color: Color.fromRGBO(0, 0, 0, .55 * v),
+                  ),
+                ),
+                Transform.translate(
+                  offset: Offset(0, (1 - v) * box.maxHeight),
+                  child: PlayerUpView(
+                    key: const ValueKey('player-up-view'),
+                    words: widget.words,
+                    index: _index,
+                    mixTitle: widget.title,
+                    coverFor: (w, i) => playerCoverArtFor(w, i),
+                    playing: _playing,
+                    liked: _liked,
+                    shuffle: _shuffle,
+                    repeat: _loop,
+                    seekBar: _ProgressBar(
+                      key: ValueKey('player-up-seek-$_index'),
+                      playing: _playing,
+                      durationSec: _wordSecs(_word),
+                      startedAt: _startedAt,
+                    ),
+                    onClose: _closeUp,
+                    onTogglePlay: () => unawaited(_togglePlay()),
+                    onPrevious: () => unawaited(_skipPrev()),
+                    onNext: () => unawaited(_move(1)),
+                    onSelect: (i) => unawaited(_playAt(i)),
+                    onLike: () => unawaited(_toggleLike()),
+                    onShuffle: () => unawaited(_toggleShuffle()),
+                    onRepeat: () => setState(() => _loop = !_loop),
+                    onQueue: () => _openQueueSheet(context),
+                    onDragUpdate: _dragUp,
+                    onDragEnd: _settleUp,
+                  ),
+                ),
+              ],
+            );
           },
-          onOpenSoundLibrary: () => _openSoundLibrary(context),
-          onOpenQueue: () => _openQueueSheet(context),
-        ),
-      ],
-    ),
-  );
-
-  Widget _dots() => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      _BottomDot(active: _bottomPage == 0),
-      const SizedBox(width: 6),
-      _BottomDot(active: _bottomPage == 1),
-    ],
-  );
+        );
+      },
+    );
+  }
 }
 
 class _PlayerThemeArtwork extends StatelessWidget {
@@ -2227,9 +2139,9 @@ class _NextUpCard extends StatelessWidget {
       child: Container(
         height: double.infinity,
         decoration: BoxDecoration(
-          color: GlassWrap.fill,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: GlassWrap.line),
+          color: const Color(0xD1161618),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0x14FFFFFF)),
         ),
         clipBehavior: Clip.hardEdge,
         child: next == null
@@ -2367,7 +2279,7 @@ class _NextUpCard extends StatelessWidget {
                               height: 34,
                               decoration: const BoxDecoration(
                                 color: Color(0xFFF5F5F7),
-                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
                                     color: Color(0x59000000),
@@ -3542,6 +3454,233 @@ class _QueueStickyHeadDelegate extends SliverPersistentHeaderDelegate {
       oldDelegate.filter != filter;
 }
 
+class _StoreGlassVideoBox extends StatelessWidget {
+  const _StoreGlassVideoBox({required this.onTap, this.size = 84});
+  final VoidCallback onTap;
+  final double size;
+
+  static const _asset = 'assets/store/nowssb-bag-headphones.webp';
+
+  @override
+  Widget build(BuildContext context) {
+    // Small video-box style frame inside a glass wrapper (Store strip companion).
+    return GestureDetector(
+      onTap: onTap,
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: GlassWrap(
+          margin: EdgeInsets.zero,
+          padding: const EdgeInsets.all(6),
+          radius: 14,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                const ColoredBox(color: Color(0xFF050505)),
+                EditableImage.asset(
+                  _asset,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                      const ColoredBox(color: Color(0xFF111111)),
+                  slot: 'practice_player.StoreGlassVideoBox',
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0x33FFFFFF)),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VisualStage extends StatelessWidget {
+  const _VisualStage({
+    required this.word,
+    required this.video,
+    required this.playing,
+    this.ritual,
+    required this.accent,
+    required this.onReplay,
+    required this.onCopy,
+    required this.onSettings,
+    required this.onInfo,
+    required this.onLevel,
+    required this.onStore,
+    required this.onSyllable,
+    this.liked = false,
+    this.onLike,
+  });
+
+  /// Saved to the Saved words list (same store as the heart button).
+  final bool liked;
+  final VoidCallback? onLike;
+
+  final Word word;
+  final String video;
+  final bool playing;
+  final RitualFrame? ritual;
+  final Color accent;
+  final VoidCallback onReplay;
+  final VoidCallback onCopy;
+  final VoidCallback onSettings;
+  final VoidCallback onInfo;
+  final VoidCallback onLevel;
+  final VoidCallback onStore;
+  final ValueChanged<WordPart> onSyllable;
+
+  @override
+  Widget build(BuildContext context) => AspectRatio(
+    aspectRatio: 1,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: const Color(0x38FFFFFF)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x8C000000),
+            blurRadius: 28,
+            offset: Offset(0, 18),
+          ),
+          BoxShadow(color: Color(0x24FFFFFF), blurRadius: 0, spreadRadius: 1),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(34),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const ColoredBox(color: Colors.black),
+            NwsbVideo(
+              asset: video,
+              fit: BoxFit.cover,
+              alignment: Alignment.center,
+              priority: ClipPriority.feature,
+              autoplay: true,
+              loop: true,
+              showPoster: true,
+              obeyMotion: false,
+              slot: 'practice_player.VisualStage',
+            ),
+            if (ritual != null)
+              Positioned.fill(
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+                    child: ColoredBox(
+                      color: const Color(0x66101014),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: const BorderRadius.all(Radius.circular(26)),
+                            border: Border.all(color: const Color(0x33FFFFFF)),
+                          ),
+                          child: Column(
+                            children: [
+                              const Spacer(flex: 3),
+                              const AppThinkingLoader(size: 132, state: OrbState.composing),
+                              const SizedBox(height: 18),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 22),
+                                child: Text(
+                                  ritual!.caption,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 4,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(color: Colors.white, fontSize: 22, height: 1.25, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              const Spacer(flex: 4),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            if (ritual == null)
+              const DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0x00000000),
+                      Color(0x00000000),
+                      Color(0xD9000000),
+                    ],
+                    stops: [0, 0.42, 1],
+                  ),
+                ),
+              ),
+            if (ritual == null)
+              Positioned(
+              top: 10,
+              left: 10,
+              right: 10,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      AnimatedBuilder(
+                        animation: PracticeProgress.instance,
+                        builder: (context, _) => _LevelPill(
+                          level: PracticeProgress.instance.level.clamp(1, 10),
+                          onTap: onLevel,
+                        ),
+                      ),
+                      const Spacer(),
+                      _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: _StoreGlassVideoBox(onTap: onStore, size: 56),
+                  ),
+                ],
+              ),
+            ),
+            if (ritual == null)
+              Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 40, 16, 14),
+                child: _WordOverlay(
+                  word: word,
+                  accent: accent,
+                  playing: playing,
+                  liked: liked,
+                  onReplay: onReplay,
+                  onNotes: onCopy,
+                  onLike: onLike ?? () {},
+                  onSyllable: onSyllable,
+                  embedded: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 class _LevelPill extends StatelessWidget {
   const _LevelPill({required this.level, required this.onTap});
   final int level;
@@ -3578,18 +3717,12 @@ class _LevelPill extends StatelessWidget {
               color: Color(0xFFE8D5A3),
             ),
             const SizedBox(width: 6),
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  'Frequency · ${frequencyName(level)}',
-                  maxLines: 1,
-                  style: const TextStyle(
-                    color: Color(0xFFF4F4F5),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+            Text(
+              'Frequency · ${frequencyName(level)}',
+              style: const TextStyle(
+                color: Color(0xFFF4F4F5),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -3763,13 +3896,84 @@ class _ProgressBarState extends State<_ProgressBar>
     animation: _c,
     builder: (context, _) {
       final t = _c.value.clamp(0.0, 1.0);
-      // A thin filled line, no knob (the reference's seek bar).
+      // Fixed 38px envelope — matches hero progressH, no overflow.
       return SizedBox(
         height: 38,
-        child: PlayerSeekLine(
-          t: t,
-          elapsed: _fmtClock(widget.durationSec * t),
-          total: _fmtClock(widget.durationSec),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: 14,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final x = t * constraints.maxWidth;
+                  return Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Container(
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2C2C2E),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                      Container(
+                        width: x,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F5F7),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                      Positioned(
+                        left: (x - 5.5).clamp(
+                          0.0,
+                          math.max(0.0, constraints.maxWidth - 11),
+                        ),
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF5F5F7),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Color(0xFF050505),
+                                blurRadius: 0,
+                                spreadRadius: 3,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _fmtClock(widget.durationSec * t),
+                  style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 11,
+                    height: 1.1,
+                  ),
+                ),
+                Text(
+                  _fmtClock(widget.durationSec),
+                  style: const TextStyle(
+                    color: Color(0xFF8E8E93),
+                    fontSize: 11,
+                    height: 1.1,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       );
     },
@@ -4131,12 +4335,7 @@ class _WordOverlay extends StatelessWidget {
     required this.onLike,
     this.onSyllable,
     this.embedded = false,
-    this.glass = false,
   });
-
-  /// On the player's cover: glass syllable chips, short bars between them
-  /// (no dots), and no replay / notes bar (those sit beside the title).
-  final bool glass;
   final Word word;
   final Color accent;
   final bool playing;
@@ -4171,7 +4370,7 @@ class _WordOverlay extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               for (var i = 0; i < word.parts.length; i++) ...[
-                if (i > 0 && !glass)
+                if (i > 0)
                   Container(
                     width: 4,
                     height: 4,
@@ -4182,7 +4381,6 @@ class _WordOverlay extends StatelessWidget {
                   ),
                 _SyllablePill(
                   part: word.parts[i],
-                  glass: glass,
                   onTap: onSyllable == null
                       ? null
                       : () => onSyllable!(word.parts[i]),
@@ -4198,7 +4396,7 @@ class _WordOverlay extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               for (var i = 0; i < word.syllables.length; i++) ...[
-                if (i > 0 && !glass)
+                if (i > 0)
                   Container(
                     width: 4,
                     height: 4,
@@ -4207,7 +4405,7 @@ class _WordOverlay extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                   ),
-                _SyllablePill(label: word.syllables[i], glass: glass),
+                _SyllablePill(label: word.syllables[i]),
               ],
             ],
           ),
@@ -4225,8 +4423,8 @@ class _WordOverlay extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
                   word.organ.toUpperCase(),
-                  style: TextStyle(
-                    color: glass ? const Color(0xD9FFFFFF) : const Color(0xFF8B8B90),
+                  style: const TextStyle(
+                    color: Color(0xFF8B8B90),
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 4.2,
@@ -4241,8 +4439,8 @@ class _WordOverlay extends StatelessWidget {
             ],
           ),
         ],
-        if (!glass) const SizedBox(height: 8),
-        if (!glass) Container(
+        const SizedBox(height: 8),
+        Container(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             color: const Color(0xE6222226),
@@ -4263,8 +4461,7 @@ class _WordOverlay extends StatelessWidget {
 }
 
 class _SyllablePill extends StatelessWidget {
-  const _SyllablePill({this.part, this.label, this.onTap, this.glass = false});
-  final bool glass;
+  const _SyllablePill({this.part, this.label, this.onTap});
   final WordPart? part;
   final String? label;
   final VoidCallback? onTap;
@@ -4274,25 +4471,6 @@ class _SyllablePill extends StatelessWidget {
     final text = (part == null)
         ? (label ?? '')
         : (part!.roman.isNotEmpty ? part!.roman : part!.deva);
-    if (glass) {
-      return GestureDetector(
-        onTap: onTap,
-        child: PlayerGlassChip(
-          radius: 12,
-          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 5),
-          child: EditableLabel(
-            'practice_player.SyllablePill',
-            text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.1,
-            ),
-          ),
-        ),
-      );
-    }
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -4539,59 +4717,70 @@ class _QueueFilterPill extends StatelessWidget {
   }
 }
 
-/// Sentence / Practice / Store as a clean glass row: white icon badges
-/// with a label under each, on one kit glass pane (no bezel, no border box).
 class _WordActionStrip extends StatelessWidget {
   const _WordActionStrip({
+    required this.accent,
+    required this.video,
     required this.onSentence,
     required this.onPractice,
     required this.onStore,
   });
+  final Color accent;
+  final String video;
   final VoidCallback onSentence;
   final VoidCallback onPractice;
   final VoidCallback onStore;
 
-  Widget _sep() => const SizedBox(
-    width: 1,
-    height: 40,
-    child: ColoredBox(color: Color(0x1FFFFFFF)),
+  Widget _sep() => const Center(
+    child: SizedBox(
+      width: 1.5,
+      height: 34,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Color(0xB8FFFFFF),
+          borderRadius: BorderRadius.all(Radius.circular(1)),
+          boxShadow: [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 5)],
+        ),
+      ),
+    ),
   );
 
   @override
   Widget build(BuildContext context) {
-    return GlassWrap(
-      margin: EdgeInsets.zero,
-      radius: 22,
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: _WordAction(
-              key: const ValueKey('player-action-sentence'),
-              svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
-              label: 'Sentence',
-              onTap: onSentence,
+    // Match WebView `.lgp-pr-glass`: word-acts-tab is an OPAQUE background;
+    // the looping tab film paints ON TOP in the aperture (DeviceFrame.wordActs
+    // opaqueAperture). Stacking the bezel over the video hid it as a dark blur.
+    return TvFrame(
+      asset: video,
+      frame: DeviceFrame.wordActs,
+      priority: ClipPriority.feature,
+      autoplay: true,
+      obeyMotion: false,
+      overlay: ColoredBox(
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            Expanded(
+              child: _WordAction(
+                svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
+                label: 'Sentence',
+                onTap: onSentence,
+              ),
             ),
-          ),
-          _sep(),
-          Expanded(
-            child: _WordAction(
-              key: const ValueKey('player-action-practice'),
-              icon: Icons.mic_none_rounded,
-              label: 'Practice',
-              onTap: onPractice,
+            _sep(),
+            Expanded(
+              child: PracticeDockOrb(onTap: onPractice, accent: accent),
             ),
-          ),
-          _sep(),
-          Expanded(
-            child: _WordAction(
-              key: const ValueKey('player-action-store'),
-              svg: NwsbMarks.bag,
-              label: 'Store',
-              onTap: onStore,
+            _sep(),
+            Expanded(
+              child: _WordAction(
+                svg: NwsbMarks.bag,
+                label: 'Store',
+                onTap: onStore,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -4599,15 +4788,12 @@ class _WordActionStrip extends StatelessWidget {
 
 class _WordAction extends StatelessWidget {
   const _WordAction({
-    super.key,
-    this.svg,
-    this.icon,
+    required this.svg,
     required this.label,
     required this.onTap,
     this.accent,
   });
-  final String? svg;
-  final IconData? icon;
+  final String svg;
   final String label;
   final VoidCallback onTap;
   final Color? accent;
@@ -4622,35 +4808,15 @@ class _WordAction extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // White icon badge, as on the rest of the app (a rounded square).
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
+          NwsbIcon(svg, size: 22, color: Colors.white, strokeWidth: 1.7),
+          const SizedBox(height: 2),
+          Text(
+            label.toUpperCase(),
+            style: const TextStyle(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(13),
-              boxShadow: const [
-                BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 5)),
-              ],
-            ),
-            child: Center(
-              child: svg != null
-                  ? NwsbIcon(svg!, size: 21, color: NwsbColors.deep, strokeWidth: 1.8)
-                  : Icon(icon, size: 22, color: NwsbColors.deep),
-            ),
-          ),
-          const SizedBox(height: 7),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              label,
-              maxLines: 1,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                letterSpacing: .2,
-              ),
+              fontSize: 8,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.0,
             ),
           ),
         ],
@@ -5165,10 +5331,10 @@ class _BottomDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AnimatedContainer(
     duration: const Duration(milliseconds: 220),
-    width: active ? 16 : 6,
-    height: 4,
+    width: 5,
+    height: 5,
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(1.5),
+      shape: BoxShape.circle,
       color: active ? const Color(0xFFF5F5F7) : const Color(0x47FFFFFF),
       boxShadow: active
           ? const [BoxShadow(color: Color(0x59FFFFFF), blurRadius: 8)]
@@ -5178,14 +5344,7 @@ class _BottomDot extends StatelessWidget {
 }
 
 class _SubtitleMarquee extends StatelessWidget {
-  const _SubtitleMarquee({
-    required this.lines,
-    required this.animation,
-    this.centered = false,
-  });
-
-  /// Centred under the title, scaled down to fit instead of cut off.
-  final bool centered;
+  const _SubtitleMarquee({required this.lines, required this.animation});
   final List<String> lines;
   final Animation<double> animation;
 
@@ -5196,23 +5355,6 @@ class _SubtitleMarquee extends StatelessWidget {
       builder: (context, _) {
         if (lines.isEmpty) return const SizedBox.shrink();
         final i = (animation.value * lines.length).floor() % lines.length;
-        if (centered) {
-          return Center(
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                lines[i],
-                key: const ValueKey('player-subtitle'),
-                maxLines: 1,
-                style: const TextStyle(
-                  color: Color(0xB3FFFFFF),
-                  fontSize: 13,
-                  height: 1.2,
-                ),
-              ),
-            ),
-          );
-        }
         return Text(
           lines[i],
           maxLines: 1,

@@ -38,16 +38,14 @@ void main() {
     expect(src, isNot(contains('_BlenderOrbPainter')));
   });
 
-  test('Now Playing glass row opens the Practice Lab', () {
+  test('Now Playing dock uses the practice orb', () {
     final src = File('lib/screens/practice_player.dart').readAsStringSync();
-    // Sentence / Practice / Store sit on one glass row of white badges.
-    expect(src, contains("ValueKey('player-action-practice')"));
-    expect(src, contains('onTap: onPractice'));
+    expect(src, contains('PracticeDockOrb(onTap: onPractice'));
     expect(src, contains('_handlePracticeTap()'));
     expect(src, contains('showGeneralDialog'));
     expect(src, contains('_practiceOpen'));
-    expect(src, contains("ValueKey('player-action-store')"));
-    expect(src, contains('fontSize: 22'));
+    expect(src, contains('assets/store/nowssb-bag-headphones.webp'));
+    expect(src, contains('fontSize: 28'));
     expect(src, contains('FontWeight.w800'));
     expect(src, contains('_kPlayerBoxFilm'));
     expect(src, contains('kPlayerBoxFilm'));
