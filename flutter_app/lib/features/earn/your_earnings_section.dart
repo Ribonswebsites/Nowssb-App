@@ -175,8 +175,7 @@ class HomeTrioSection extends StatelessWidget {
                     key: const ValueKey('trio-quick'),
                     label: 'Quick',
                     sub: 'Your shortcuts',
-                    glow: const Color(0xFF8B6CF0),
-                    icon: const NwsbIcon(NwsbMarks.features, size: 18, color: Colors.black, strokeWidth: 1.8),
+                                        icon: const NwsbIcon(NwsbMarks.features, size: 18, color: Colors.black, strokeWidth: 1.8),
                     onTap: onQuick,
                   ),
                 ),
@@ -186,8 +185,7 @@ class HomeTrioSection extends StatelessWidget {
                     key: const ValueKey('trio-today'),
                     label: 'Today',
                     sub: '$done/${items.length} done',
-                    glow: const Color(0xFF4FD1B5),
-                    progress: items.isEmpty ? null : done / items.length,
+                                        progress: items.isEmpty ? null : done / items.length,
                     icon: const Icon(Icons.check_rounded, size: 19, color: Colors.black),
                     onTap: () => ProgressPanel.open(context),
                   ),
@@ -198,8 +196,7 @@ class HomeTrioSection extends StatelessWidget {
                     key: const ValueKey('trio-earnings'),
                     label: 'Your Earnings',
                     sub: live ? '${_cents(m.lifetimeCents)} earned' : 'Sign in to earn',
-                    glow: const Color(0xFFE8C46A),
-                    icon: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.black, strokeWidth: 1.9),
+                                        icon: const NwsbIcon(NwsbMarks.earn, size: 18, color: Colors.black, strokeWidth: 1.9),
                     onTap: () => showYourEarningsSheet(context),
                   ),
                 ),
@@ -213,18 +210,14 @@ class HomeTrioSection extends StatelessWidget {
 }
 
 /// One glass button on the black banner: frosted face, hairline, a soft
-/// coloured glow in its corner, a white disc mark, label and live line.
+/// white circle mark, label and live line, all on dark glass.
 class _TrioButton extends StatelessWidget {
-  const _TrioButton({super.key, required this.label, required this.sub, required this.glow, required this.icon, required this.onTap, this.progress});
+  const _TrioButton({super.key, required this.label, required this.sub, required this.icon, required this.onTap, this.progress});
   final String label;
   final String sub;
-  final Color glow;
   final Widget icon;
   final VoidCallback onTap;
   final double? progress;
-
-  /// Your Earnings is the reference's yellow highlight (our gold glass).
-  bool get _gold => glow == const Color(0xFFE8C46A);
 
   @override
   Widget build(BuildContext context) => Semantics(
@@ -237,9 +230,7 @@ class _TrioButton extends StatelessWidget {
           },
           child: Container(
             constraints: const BoxConstraints(minHeight: 112),
-            decoration: _gold
-                ? kEarnGoldGlass.copyWith(borderRadius: BorderRadius.circular(18), boxShadow: const [])
-                : BoxDecoration(
+            decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
                     color: const Color(0x1FFFFFFF),
                     border: Border.all(color: const Color(0x33FFFFFF)),

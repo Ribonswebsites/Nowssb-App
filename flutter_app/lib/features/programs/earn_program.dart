@@ -33,7 +33,7 @@ const kEarnSpec = ProgramSpec(
   title: 'NowssB Earn',
   mark: NwsbMarks.piggy,
   disclaimer: kEarnDisclaimer,
-  accent: ProgramAccent.earn,
+  accent: Colors.white,
   tabs: [
     ProgramTab('overview', 'Overview', _overview),
     ProgramTab('team', 'My Team', _team),
@@ -86,7 +86,6 @@ String signedMoney(num v) => '${v >= 0 ? '+' : '\u2212'}${FxBook.instance.format
 
 Widget _earn(Widget Function(BuildContext, Map<String, dynamic>, VoidCallback) b) => ServerView(action: 'earnSummary', builder: b);
 
-const _metal = {'Bronze': Color(0xFFCD8B54), 'Silver': Color(0xFFD9DDE3), 'Gold': Color(0xFFFFC857), 'Diamond': Color(0xFF9EE7FF)};
 
 List<Widget> _overview(BuildContext context, Map<String, dynamic> s) => [
       LSection('standing', 'Standing', _earn((context, r, _) {
@@ -288,7 +287,7 @@ List<Widget> _sales(BuildContext context, Map<String, dynamic> s) => [
                 title: _type('${x['type']}'),
                 sub: '${x['note'] ?? ''}${sInt(x['availableAt']) > now ? ' · available ${shortDate(x['availableAt'])}' : ''} · ${shortDate(x['at'])}',
                 mark: NwsbMarks.earn,
-                trailing: Text(signedMoney(sNum(x['inr'] ?? x['amount'])), style: TextStyle(color: sNum(x['inr'] ?? x['amount']) >= 0 ? NwsbColors.goldLight : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
+                trailing: Text(signedMoney(sNum(x['inr'] ?? x['amount'])), style: TextStyle(color: sNum(x['inr'] ?? x['amount']) >= 0 ? Colors.white : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
               ),
           ]),
         ]);
@@ -304,7 +303,6 @@ Widget _targetCard(Map<String, dynamic> x, int words, {required bool open, requi
   final coupon = '${x['coupon'] ?? ''}';
   return EarnStatCard(
     key: ValueKey(head ? 'earn-target-$goal' : 'earn-target-list-$goal'),
-    gold: head || open,
     title: '$goal words sold',
     status: EarnStatusPill(reached ? EarnStatus.reached : (open ? EarnStatus.ongoing : EarnStatus.upcoming)),
     left: const EarnSide('You', mark: NwsbMarks.user),
@@ -363,7 +361,6 @@ List<Widget> _targets(BuildContext context, Map<String, dynamic> s) => [
               title: '${x['title']}',
               sub: 'From ${sInt(x['minWords'])} words sold · you earn ${sNum(x['ratePct'])}% · team ${((x['leg'] as List?) ?? const []).join('/')}% · needs ${x['plan'] == 'top' ? 'the top plan' : 'any paid plan'}',
               mark: NwsbMarks.crown,
-              color: _metal['${x['metal']}'],
             ),
         ]);
       })),

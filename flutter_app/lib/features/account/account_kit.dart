@@ -4,7 +4,7 @@
 ///
 ///  * the purple film behind ([AppBackdrop]) under the Menu's
 ///    [QuietFilmVeil];
-///  * the Menu's top bar: white circle back button, `NOWSSB` in gold and
+///  * the Menu's top bar: white circle back button, `NOWSSB` in soft white and
 ///    the page name;
 ///  * the Store's big white heading and grey subline;
 ///  * cards are [GlassListCard] (white badge, small grey overline, big white
@@ -99,7 +99,7 @@ class AccountPage extends StatelessWidget {
                       TextSpan(children: [
                         const TextSpan(
                           text: 'NOWSSB',
-                          style: TextStyle(fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w700, color: NwsbColors.goldLight),
+                          style: TextStyle(fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w700, color: Color(0xB3FFFFFF)),
                         ),
                         const TextSpan(text: '  '),
                         TextSpan(

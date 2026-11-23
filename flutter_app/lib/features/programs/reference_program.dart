@@ -60,7 +60,7 @@ List<Widget> referenceHubTab(BuildContext context, Map<String, dynamic> s) => [
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('LINK', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 4),
-                  SelectableText('${r['url'] ?? ''}', style: const TextStyle(color: kEarnGold, fontWeight: FontWeight.w800, fontSize: 14)),
+                  SelectableText('${r['url'] ?? ''}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
                 ]),
               ),
               const SizedBox(height: 8),
@@ -294,7 +294,7 @@ class SellersBoard extends StatelessWidget {
           for (var i = 0; i < entries.length && i < 20; i++)
             PRow(
               title: '#${i + 1} ${entries[i].$2['name'] ?? 'Seller'}${entries[i].$1 == me ? ' (you)' : ''}',
-              trailing: Text('${sInt(entries[i].$2[metric])} words', style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w800)),
+              trailing: Text('${sInt(entries[i].$2[metric])} words', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
             ),
         ]);
       },

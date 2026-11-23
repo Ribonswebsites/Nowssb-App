@@ -1,19 +1,20 @@
 /// The NowssB Earn layout (Ribon, Nov 23, redo): the sports-betting
-/// reference one-to-one, in the NowssB glass (dark panes, white ink, our
-/// gold where the reference is yellow, black for emphasis). Every icon sits
-/// in a WHITE CIRCLE badge.
+/// reference one-to-one in NowssB dark glass only (dark translucent panes,
+/// subtle white hairlines) with white and black accents: highlighted cells
+/// and active pills are white with black text. No yellow, gold, amber or
+/// orange anywhere. Every icon sits in a WHITE CIRCLE badge.
 ///
 ///  * [EarnHey]          round avatar, "Hey," over the bold name, a bell.
 ///  * [EarnBalanceCard]  one card, two balances, a round badge on its top
 ///                       edge (cash earned · coins with the real coin).
-///  * [EarnActions]      Payout (gold glass pill) · Invite (black pill), each
+///  * [EarnActions]      Payout (white pill) · Invite (dark glass pill), each
 ///                       with its white circle icon.
 ///  * [EarnSectionTitle] "Programmes" bold with a small See all.
 ///  * [EarnStatCard]     the event card: title + status pill, a side mark
 ///                       and label each side of a big central figure, then
 ///                       a row of three white odds chips ([EarnOdd]).
-///  * [EarnStatGrid]     the Statistics card: a gold glass card of cells,
-///                       one black highlighted cell.
+///  * [EarnStatGrid]     the Statistics card: a dark glass card of cells,
+///                       one white highlighted cell.
 library;
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,24 +35,13 @@ const kEarnInk = Color(0xFF0B0B10);
 const kEarnGlass = Color(0x17FFFFFF);
 const kEarnLine = Color(0x26FFFFFF);
 const kEarnDark = Color(0xF20B0B10);
-const kEarnGold = NwsbColors.goldLight;
+/// The one accent: white (no gold anywhere in Earn).
+const kEarnAccent = Colors.white;
 const kEarnRadius = 22.0;
 const kEarnTileRadius = 16.0;
 
 /// The grey of the small labels on white chips.
 const kEarnGrey = Color(0xFF8A8A93);
-
-/// Our gold glass: where the reference fills a card yellow.
-const kEarnGoldGlass = BoxDecoration(
-  borderRadius: BorderRadius.all(Radius.circular(kEarnRadius)),
-  gradient: LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xD9A9853A), Color(0xBF7F6227), Color(0xD95C461A)],
-  ),
-  border: Border.fromBorderSide(BorderSide(color: Color(0x99F1D58A))),
-  boxShadow: [BoxShadow(color: Color(0x40000000), offset: Offset(0, 12), blurRadius: 30)],
-);
 
 /// The dark NowssB glass pane.
 const kEarnDarkGlass = BoxDecoration(
@@ -233,21 +223,16 @@ class EarnHey extends StatelessWidget {
   }
 }
 
-/// A glass pane in the Earn shape: dark glass, or our gold glass.
+/// A glass pane in the Earn shape: NowssB dark glass.
 class EarnPane extends StatelessWidget {
-  const EarnPane({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.dark = false, this.gold = false});
+  const EarnPane({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.dark = false});
   final Widget child;
   final EdgeInsets padding;
   final bool dark;
-  final bool gold;
   @override
   Widget build(BuildContext context) => Container(
         padding: padding,
-        decoration: gold
-            ? kEarnGoldGlass
-            : dark
-                ? kEarnDarkGlass.copyWith(color: kEarnDark)
-                : kEarnDarkGlass,
+        decoration: dark ? kEarnDarkGlass.copyWith(color: kEarnDark) : kEarnDarkGlass,
         child: child,
       );
 }
@@ -354,8 +339,8 @@ class EarnBalanceCard extends StatelessWidget {
 /// The big number style of balances and stat cards.
 const kEarnBig = TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800, height: 1.05, letterSpacing: -0.8);
 
-/// A reference pill button: our gold glass when [primary] (the yellow
-/// Deposit), else black (Withdraw); a white circle icon at its left.
+/// A reference pill button: white with black text when [primary] (the
+/// Deposit), else dark glass (Withdraw); a white circle icon at its left.
 class EarnActionButton extends StatelessWidget {
   const EarnActionButton({super.key, required this.label, required this.icon, required this.onTap, this.primary = true});
   final String label;
@@ -366,7 +351,7 @@ class EarnActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(26),
-      side: BorderSide(color: primary ? const Color(0x99F1D58A) : const Color(0x33FFFFFF)),
+      side: BorderSide(color: primary ? Colors.white : const Color(0x40FFFFFF)),
     );
     return Semantics(
       button: true,
@@ -375,13 +360,9 @@ class EarnActionButton extends StatelessWidget {
       child: Material(
         shape: shape,
         clipBehavior: Clip.antiAlias,
-        color: primary ? Colors.transparent : const Color(0xF2000000),
+        color: primary ? Colors.white : const Color(0x8C14141C),
         child: Ink(
-          decoration: primary
-              ? const BoxDecoration(
-                  gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xE6B8933F), Color(0xE68A6A2A)]),
-                )
-              : null,
+          decoration: null,
           child: InkWell(
             onTap: () {
               AppHaptics.selection();
@@ -392,12 +373,12 @@ class EarnActionButton extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(7, 7, 10, 7),
                 child: Row(children: [
-                  EarnCircle(icon: icon, size: 36),
+                  EarnCircle(icon: icon, size: 36, outlined: primary),
                   const SizedBox(width: 10),
                   Expanded(
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text(label, maxLines: 1, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 15.5)),
+                      child: Text(label, maxLines: 1, style: TextStyle(color: primary ? kEarnInk : Colors.white, fontWeight: FontWeight.w800, fontSize: 15.5)),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -411,7 +392,7 @@ class EarnActionButton extends StatelessWidget {
   }
 }
 
-/// Two equal pills side by side: Payout (gold) and Invite (black).
+/// Two equal pills side by side: Payout (white) and Invite (dark glass).
 class EarnActions extends StatelessWidget {
   const EarnActions({super.key, required this.onPayout, required this.onInvite});
   final VoidCallback onPayout;
@@ -463,8 +444,8 @@ class EarnSectionTitle extends StatelessWidget {
 
 enum EarnStatus { ongoing, upcoming, reached, off }
 
-/// The reference status pill: Ongoing green, Upcoming orange, Reached our
-/// gold, off a quiet glass.
+/// The reference status pill, neutral only: Ongoing and Reached white with
+/// black text; Upcoming and off a grey glass with white text.
 class EarnStatusPill extends StatelessWidget {
   const EarnStatusPill(this.status, {super.key, this.text});
   final EarnStatus status;
@@ -472,10 +453,10 @@ class EarnStatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (bg, fg, label) = switch (status) {
-      EarnStatus.ongoing => (const Color(0xFF2FBF71), Colors.white, 'Ongoing'),
-      EarnStatus.upcoming => (const Color(0xFFF2994A), Colors.white, 'Upcoming'),
-      EarnStatus.reached => (kEarnGold, kEarnInk, 'Reached'),
-      EarnStatus.off => (const Color(0x33FFFFFF), Colors.white, 'Not yet'),
+      EarnStatus.ongoing => (Colors.white, kEarnInk, 'Ongoing'),
+      EarnStatus.upcoming => (const Color(0x2EFFFFFF), Colors.white, 'Upcoming'),
+      EarnStatus.reached => (Colors.white, kEarnInk, 'Reached'),
+      EarnStatus.off => (const Color(0x2EFFFFFF), Colors.white, 'Not yet'),
     };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -589,7 +570,7 @@ class EarnSide {
 
 /// The reference event card: title and status pill on top, a crest each
 /// side of a big central figure (small line above, small line under), and
-/// a row of three white odds chips. Gold glass unless [gold] is off.
+/// a row of three white odds chips, on dark glass.
 class EarnStatCard extends StatelessWidget {
   const EarnStatCard({
     super.key,
@@ -602,7 +583,6 @@ class EarnStatCard extends StatelessWidget {
     this.status,
     this.odds = const [],
     this.onTap,
-    this.gold = true,
   });
   final String title;
   final String number;
@@ -613,7 +593,6 @@ class EarnStatCard extends StatelessWidget {
   final Widget? status;
   final List<EarnOdd> odds;
   final VoidCallback? onTap;
-  final bool gold;
 
   Widget _side(EarnSide s) => Column(mainAxisSize: MainAxisSize.min, children: [
         s.coin ? const NwsbCoinDisc(size: 46) : EarnCircle(mark: s.mark, icon: s.icon, size: 46),
@@ -628,7 +607,6 @@ class EarnStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final card = EarnPane(
-      gold: gold,
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
         Row(children: [
@@ -687,8 +665,8 @@ class EarnStat {
   final Key? key;
 }
 
-/// The reference Statistics card: [title] over a grid of glass cells on
-/// our gold glass, one BLACK highlighted cell. Without a [title] it is the
+/// The reference Statistics card: [title] over a grid of dark glass cells,
+/// one WHITE highlighted cell with black text. Without a [title] it is the
 /// bare grid.
 class EarnStatGrid extends StatelessWidget {
   const EarnStatGrid(this.stats, {super.key, this.columns = 2, this.title = 'Statistics'});
@@ -719,17 +697,17 @@ class EarnStatGrid extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 92),
         padding: const EdgeInsets.fromLTRB(13, 12, 12, 12),
         decoration: BoxDecoration(
-          color: s.highlight ? const Color(0xFF050507) : const Color(0x2E000000),
+          color: s.highlight ? Colors.white : const Color(0x14FFFFFF),
           borderRadius: BorderRadius.circular(kEarnTileRadius),
-          border: Border.all(color: s.highlight ? const Color(0xFF050507) : const Color(0x33FFFFFF)),
-          boxShadow: s.highlight ? const [BoxShadow(color: Color(0x66000000), blurRadius: 14, offset: Offset(0, 6))] : null,
+          border: Border.all(color: s.highlight ? Colors.white : const Color(0x26FFFFFF)),
+          boxShadow: s.highlight ? const [BoxShadow(color: Color(0x40000000), blurRadius: 14, offset: Offset(0, 6))] : null,
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
           Row(children: [
             Expanded(
-              child: Text(s.label, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnSoft, fontSize: 12, fontWeight: FontWeight.w600, height: 1.2)),
+              child: Text(s.label, maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(color: s.highlight ? kEarnGrey : kEarnSoft, fontSize: 12, fontWeight: FontWeight.w600, height: 1.2)),
             ),
-            if (s.onTap != null) const Icon(Icons.arrow_forward_ios_rounded, size: 10, color: kEarnSoft),
+            if (s.onTap != null) Icon(Icons.arrow_forward_ios_rounded, size: 10, color: s.highlight ? kEarnInk : kEarnSoft),
           ]),
           const Spacer(),
           const SizedBox(height: 10),
@@ -738,17 +716,17 @@ class EarnStatGrid extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: Text(s.value, maxLines: 1, style: TextStyle(color: Colors.white, fontSize: s.highlight ? 24 : 20, fontWeight: FontWeight.w800, height: 1.1, letterSpacing: -0.4)),
+                child: Text(s.value, maxLines: 1, style: TextStyle(color: s.highlight ? kEarnInk : Colors.white, fontSize: s.highlight ? 24 : 20, fontWeight: FontWeight.w800, height: 1.1, letterSpacing: -0.4)),
               ),
             ),
             if (s.second != null) ...[
               const SizedBox(width: 6),
-              Text(s.second!, maxLines: 1, style: const TextStyle(color: kEarnSoft, fontSize: 14, fontWeight: FontWeight.w800)),
+              Text(s.second!, maxLines: 1, style: TextStyle(color: s.highlight ? kEarnGrey : kEarnSoft, fontSize: 14, fontWeight: FontWeight.w800)),
             ],
           ]),
           if (s.sub != null) ...[
             const SizedBox(height: 3),
-            Text(s.sub!, maxLines: 3, overflow: TextOverflow.ellipsis, style: const TextStyle(color: kEarnSoft, fontSize: 11, height: 1.3)),
+            Text(s.sub!, maxLines: 3, overflow: TextOverflow.ellipsis, style: TextStyle(color: s.highlight ? kEarnGrey : kEarnSoft, fontSize: 11, height: 1.3)),
           ],
         ]),
       );
@@ -771,7 +749,6 @@ class EarnStatGrid extends StatelessWidget {
     final grid = Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: rows);
     if (title == null) return grid;
     return EarnPane(
-      gold: true,
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
         Padding(

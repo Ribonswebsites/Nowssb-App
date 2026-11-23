@@ -53,7 +53,7 @@ class ProgramSpec {
     required this.mark,
     required this.tabs,
     required this.disclaimer,
-    this.accent = NwsbColors.goldLight,
+    this.accent = Colors.white,
   });
   final String pageId;
   final String title;
@@ -89,7 +89,7 @@ class ProgramTabsScope extends InheritedWidget {
 }
 
 /// The reference detail screen's tab pill row (Match · Odds · H2H ·
-/// Standings): the picked tab a white pill, the rest our gold glass. Reads
+/// Standings): the picked tab a white pill, the rest dark glass. Reads
 /// the [ProgramTabsScope] around it; nothing outside a programme page.
 class ProgramTabPills extends StatefulWidget {
   const ProgramTabPills({super.key});
@@ -160,7 +160,7 @@ class _ProgramTabPillsState extends State<ProgramTabPills> {
           alignment: Alignment.center,
           decoration: on
               ? BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(999))
-              : kEarnGoldGlass.copyWith(borderRadius: BorderRadius.circular(999), boxShadow: const []),
+              : BoxDecoration(color: const Color(0x8C14141C), borderRadius: BorderRadius.circular(999), border: Border.all(color: const Color(0x40FFFFFF))),
           child: Text(t.title, maxLines: 1, style: TextStyle(color: on ? kEarnInk : Colors.white, fontWeight: FontWeight.w800, fontSize: 13.5)),
         ),
       ),
@@ -385,7 +385,7 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
                       const EditableLabel('program_kit.ProgramPage', 'Sign in to see your coins, cards, gifts and links. Everything is kept on your account.',
                           style: TextStyle(color: NwsbColors.mist, height: 1.4)),
                       const SizedBox(height: 10),
-                      GoldButton(label: 'Sign in', onTap: () => NwsbSignInPage.open(context)),
+                      TextButton(onPressed: () => NwsbSignInPage.open(context), style: earnButtonStyle(), child: const Text('Sign in', style: TextStyle(fontWeight: FontWeight.w800))),
                     ])
                   else if (s.isEmpty && _loading)
                     const Center(child: EarnLoading(label: 'Opening your account…'))
@@ -465,7 +465,7 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
           color: on ? accent : const Color(0x14FFFFFF),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(color: on ? accent : const Color(0x33FFFFFF)),
-          boxShadow: on ? [BoxShadow(color: accent.withValues(alpha: 0.35), blurRadius: 14)] : null,
+          boxShadow: null,
         ),
         child: EditableLabel('program_kit.ProgramPage', label, style: TextStyle(color: on ? Colors.black : Colors.white, fontWeight: FontWeight.w700, fontSize: 12.5)),
       ),

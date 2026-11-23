@@ -304,9 +304,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                   key: Key('profile-ref-from-link'),
                   padding: EdgeInsets.fromLTRB(8, 2, 8, 0),
                   child: Row(children: [
-                    Icon(Icons.link_rounded, size: 16, color: NwsbColors.goldLight),
+                    Icon(Icons.link_rounded, size: 16, color: Colors.white),
                     SizedBox(width: 8),
-                    Expanded(child: Text('Added from your friend’s link.', style: TextStyle(color: NwsbColors.goldLight, fontSize: 12.5, fontWeight: FontWeight.w600))),
+                    Expanded(child: Text('Added from your friend’s link.', style: TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w600))),
                   ]),
                 ),
             ],

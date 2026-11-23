@@ -135,7 +135,7 @@ class _CircleScreenState extends State<CircleScreen> {
           children: [
             TextField(controller: _code, textCapitalization: TextCapitalization.characters, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(hintText: 'Enter a referral code')),
             const SizedBox(height: 12),
-            GoldButton(label: 'Apply code', onTap: () { Navigator.pop(ctx); runPrivate(context, () => EconomyApi.call('applyReferralCode', {'code': _code.text.trim()})); }),
+            SizedBox(width: double.infinity, child: TextButton(style: earnButtonStyle(), onPressed: () { Navigator.pop(ctx); runPrivate(context, () => EconomyApi.call('applyReferralCode', {'code': _code.text.trim()})); }, child: const Text('Apply code', style: TextStyle(fontWeight: FontWeight.w800)))),
           ],
         ),
       ),
@@ -187,7 +187,7 @@ class _CircleScreenState extends State<CircleScreen> {
                     const Spacer(),
                     TextButton(
                       onPressed: () => Navigator.of(ctx).pop(),
-                      child: const EditableLabel('circle_screen.CircleScreen', 'Continue', style: TextStyle(color: Color(0xFFE4C56A), fontWeight: FontWeight.w700)),
+                      child: const EditableLabel('circle_screen.CircleScreen', 'Continue', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
