@@ -300,6 +300,7 @@ class TvFrame extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: TabletAspectRatio(
+        keepShape: true,
         aspectRatio: aspect ?? frame.aspect,
         child: LayoutBuilder(
           builder: (context, c) {
@@ -498,6 +499,7 @@ class FramedSlot extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: TabletAspectRatio(
+        keepShape: true,
         aspectRatio: aspect ?? frame.aspect,
         child: LayoutBuilder(
           builder: (context, c) {

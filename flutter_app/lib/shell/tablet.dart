@@ -202,7 +202,13 @@ class TabletAspectRatio extends StatelessWidget {
     required this.aspectRatio,
     this.child,
     this.maxHeight,
+    this.keepShape = false,
   });
+
+  /// Keep the true aspect ratio on a tablet: a box that would be taller than
+  /// [maxHeight] gets narrower instead (centred), for things drawn to their
+  /// box's width, like a device frame and the text on its screen.
+  final bool keepShape;
 
   final double aspectRatio;
   final Widget? child;
@@ -213,6 +219,16 @@ class TabletAspectRatio extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!isTablet(context)) return AspectRatio(aspectRatio: aspectRatio, child: child);
+    if (keepShape) {
+      final cap = maxHeight ?? (aspectRatio < 1 ? 560 : 420);
+      return LayoutBuilder(builder: (context, c) {
+        final w = c.hasBoundedWidth ? c.maxWidth : cap * aspectRatio;
+        final width = math.min(w, cap * aspectRatio);
+        return Center(
+          child: SizedBox(width: width, child: AspectRatio(aspectRatio: aspectRatio, child: child)),
+        );
+      });
+    }
     return _CappedAspect(
       aspectRatio: aspectRatio,
       maxHeight: maxHeight ?? (aspectRatio < 1 ? 560 : 420),
