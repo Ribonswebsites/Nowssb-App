@@ -44,6 +44,7 @@ import 'sentence_builder.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
 import 'player_intro.dart';
+import 'player_up_view.dart';
 import 'player_guide.dart';
 import 'practice_overlay.dart';
 import '../widgets/pronunciation_survey.dart';
@@ -126,6 +127,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _fadeToken = 0;
   var _pull = 0.0;
   var _pullStamp = 0;
+
+  /// The swipe-up view (PlayerUpView): 0 closed, 1 open. A swipe up on the
+  /// player moves it with the finger.
+  late final AnimationController _upCtl;
+  var _pullDx = 0.0;
+  var _upTracking = false;
+  var _upEligible = false;
+  var _pullBase = 0.0;
+  var _upHeight = 800.0;
+  final _pageScroll = ScrollController();
+  final _bottomStripKey = GlobalKey();
   var _handingOff = false;
   var _practiceOpen = false;
   var _bottomPage = 0;
@@ -153,6 +165,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   void initState() {
     super.initState();
     _bottomPageController = PageController();
+    _upCtl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 320),
+    );
     _marqueeController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 18),
@@ -262,6 +278,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     _sleepTimer?.cancel();
     _listenTimer?.cancel();
     _bottomPageController.dispose();
+    _upCtl.dispose();
+    _pageScroll.dispose();
     _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);
     WordArt.instance.removeListener(_onProgress);
@@ -370,6 +388,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _ritual = null;
     });
     bool alive() => mounted && _playing && _playGen == gen;
+    var repeatAgain = false;
     try {
       final prefs = Settings.instance;
       var rate = (0.34 * prefs.speed).clamp(0.2, 0.85);
@@ -467,7 +486,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         _word,
         durationSec: elapsed > 0 ? elapsed : 1,
       );
-      if (mounted && alive()) setState(() => _completed = true);
+      if (mounted && alive()) {
+        setState(() => _completed = true);
+        // Repeat is on: the same word starts again once this run ends.
+        if (_loop) repeatAgain = true;
+      }
     } catch (_) {
       if (mounted) {
         setState(
@@ -481,6 +504,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           _ritual = null;
         });
       }
+    }
+    if (repeatAgain && mounted && _loop && _playGen == gen) {
+      await _prepareAndPlay();
     }
   }
 
@@ -930,6 +956,66 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     await _prepareAndPlay(fadeInSeconds: fade);
   }
 
+  /// Plays word [i] from the swipe-up view's carousel.
+  Future<void> _playAt(int i) async {
+    if (widget.words.isEmpty || i < 0 || i >= widget.words.length) return;
+    if (i == _index) return;
+    _playGen++;
+    await _tts.stop();
+    unawaited(WordVoice.instance.stop());
+    await PlayerRitual.stop();
+    _fadeToken++;
+    if (!mounted) return;
+    setState(() {
+      _index = i;
+      _playing = false;
+      _ritual = null;
+      _liked = false;
+      _completed = false;
+      _error = null;
+    });
+    await _loadLiked();
+    await _prepareAndPlay();
+  }
+
+  bool get _upOpen => _upCtl.value > 0;
+
+  void _openUp() {
+    unawaited(_upCtl.animateTo(1, curve: Curves.easeOutCubic));
+  }
+
+  void _closeUp() {
+    unawaited(_upCtl.animateBack(0, curve: Curves.easeOutCubic));
+  }
+
+  /// Ends a drag of the view: [velocity] in px/s, down is positive.
+  void _settleUp(double velocity) {
+    if (velocity < -400 || (velocity <= 400 && _upCtl.value > .35)) {
+      _openUp();
+    } else {
+      _closeUp();
+    }
+  }
+
+  void _dragUp(double dy) {
+    _upCtl.value = (_upCtl.value - dy / _upHeight).clamp(0.0, 1.0);
+  }
+
+  /// A swipe up only moves the view when the page under it has nothing
+  /// left to scroll and it did not start on the bottom strip (its pages
+  /// swipe sideways and its Next up card opens the queue).
+  bool _pageAtBottom() =>
+      !_pageScroll.hasClients || _pageScroll.position.extentAfter <= 1;
+
+  bool _outsideStrip(Offset global) {
+    final strip = _bottomStripKey.currentContext?.findRenderObject();
+    if (strip is RenderBox && strip.hasSize) {
+      final local = strip.globalToLocal(global);
+      if ((Offset.zero & strip.size).contains(local)) return false;
+    }
+    return true;
+  }
+
   void _openLevel() {
     showModalBottomSheet<void>(
       context: context,
@@ -1308,6 +1394,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       canPop: false,
       onPopInvoked: (didPop) {
         if (didPop) return;
+        if (_upOpen) {
+          _closeUp();
+          return;
+        }
         unawaited(_minimizeToPill());
       },
       child: Scaffold(
@@ -1333,14 +1423,46 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
             const Positioned.fill(child: ColoredBox(color: Color(0x55000000))),
             SafeArea(
               child: Listener(
-                onPointerDown: (_) {
+                onPointerDown: (e) {
                   _pull = 0;
+                  _pullDx = 0;
                   _pullStamp = DateTime.now().millisecondsSinceEpoch;
+                  _upEligible = !_upOpen && _outsideStrip(e.position);
+                  _upTracking = _upEligible && _pageAtBottom();
+                  _pullBase = 0;
                 },
-                onPointerMove: (e) => _pull += e.delta.dy,
+                onPointerMove: (e) {
+                  _pull += e.delta.dy;
+                  _pullDx += e.delta.dx;
+                  // Once the page has nothing left to scroll, the rest of the
+                  // swipe up raises the view with the finger.
+                  if (_upEligible && !_upTracking && _pageAtBottom()) {
+                    _upTracking = true;
+                    _pullBase = _pull;
+                  }
+                  final up = -(_pull - _pullBase);
+                  if (_upTracking && up > 12 && _pull.abs() > _pullDx.abs()) {
+                    _upCtl.value = ((up - 12) / _upHeight).clamp(0.0, 1.0);
+                  }
+                },
+                onPointerCancel: (_) {
+                  if (_upTracking && _upCtl.value > 0) _settleUp(0);
+                  _upTracking = false;
+                },
                 onPointerUp: (_) {
                   final ms = DateTime.now().millisecondsSinceEpoch - _pullStamp;
-                  if (_pull < -90 && ms < 450) _openQueueSheet(context);
+                  // Swipe up opens the full now-playing view (the queue is
+                  // one tap away from its top bar and from Next up).
+                  if (_upEligible) {
+                    _upTracking = false;
+                    _upEligible = false;
+                    final flick = _pull < -90 && ms < 450;
+                    if (flick || _upCtl.value > .28) {
+                      _openUp();
+                    } else if (_upCtl.value > 0) {
+                      _closeUp();
+                    }
+                  }
                   // Swipe down collapses the player to the mini pill, like a
                   // music app's now-playing screen.
                   if (_pull > 140 && ms < 700) unawaited(_minimizeToPill());
@@ -1353,6 +1475,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                       340.0,
                     );
                     return SingleChildScrollView(
+                      controller: _pageScroll,
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
@@ -1482,6 +1605,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                             ],
                             const SizedBox(height: 10),
                             SizedBox(
+                              key: _bottomStripKey,
                               width: stageWidth,
                               height: 128,
                               child: PageView(
@@ -1544,9 +1668,66 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 ),
               ),
             ),
+            Positioned.fill(child: _buildUpView(context)),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildUpView(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, box) {
+        _upHeight = math.max(1.0, box.maxHeight);
+        return AnimatedBuilder(
+          animation: _upCtl,
+          builder: (context, _) {
+            final v = _upCtl.value;
+            if (v <= 0) return const SizedBox.shrink();
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                IgnorePointer(
+                  child: ColoredBox(
+                    color: Color.fromRGBO(0, 0, 0, .55 * v),
+                  ),
+                ),
+                Transform.translate(
+                  offset: Offset(0, (1 - v) * box.maxHeight),
+                  child: PlayerUpView(
+                    key: const ValueKey('player-up-view'),
+                    words: widget.words,
+                    index: _index,
+                    mixTitle: widget.title,
+                    coverFor: (w, i) => playerCoverArtFor(w, i),
+                    playing: _playing,
+                    liked: _liked,
+                    shuffle: _shuffle,
+                    repeat: _loop,
+                    seekBar: _ProgressBar(
+                      key: ValueKey('player-up-seek-$_index'),
+                      playing: _playing,
+                      durationSec: _wordSecs(_word),
+                      startedAt: _startedAt,
+                    ),
+                    onClose: _closeUp,
+                    onTogglePlay: () => unawaited(_togglePlay()),
+                    onPrevious: () => unawaited(_skipPrev()),
+                    onNext: () => unawaited(_move(1)),
+                    onSelect: (i) => unawaited(_playAt(i)),
+                    onLike: () => unawaited(_toggleLike()),
+                    onShuffle: () => unawaited(_toggleShuffle()),
+                    onRepeat: () => setState(() => _loop = !_loop),
+                    onQueue: () => _openQueueSheet(context),
+                    onDragUpdate: _dragUp,
+                    onDragEnd: _settleUp,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -3653,9 +3834,18 @@ class _ArtWavePainter extends CustomPainter {
 }
 
 class _ProgressBar extends StatefulWidget {
-  const _ProgressBar({required this.playing, required this.durationSec});
+  const _ProgressBar({
+    super.key,
+    required this.playing,
+    required this.durationSec,
+    this.startedAt,
+  });
   final bool playing;
   final double durationSec;
+
+  /// When the current run began. A bar built mid-run (the swipe-up view)
+  /// starts at the real elapsed time instead of zero.
+  final DateTime? startedAt;
 
   @override
   State<_ProgressBar> createState() => _ProgressBarState();
@@ -3674,6 +3864,11 @@ class _ProgressBarState extends State<_ProgressBar>
         milliseconds: (widget.durationSec * 1000).round().clamp(400, 120000),
       ),
     );
+    final began = widget.startedAt;
+    if (widget.playing && began != null && widget.durationSec > 0) {
+      final secs = DateTime.now().difference(began).inMilliseconds / 1000;
+      _c.value = (secs / widget.durationSec).clamp(0.0, 1.0);
+    }
     if (widget.playing) _c.forward();
   }
 
