@@ -6,6 +6,7 @@
 library;
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import '../admin/template/editable.dart';
@@ -34,7 +35,7 @@ class NwsbCoinFly {
       context: context,
       useRootNavigator: true,
       barrierDismissible: false,
-      barrierColor: const Color(0x40000000),
+      barrierColor: const Color(0x8C000000),
       pageBuilder: (context, _, __) => _FlyStage(count: count, from: from, to: to, day: day, target: CoinPillAnchor.target()),
     );
   }
@@ -230,15 +231,24 @@ class CoinWalletPill extends StatelessWidget {
     final hasCap = earned != null && cap != null && cap > 0;
     // Collected today vs still earnable today (open activities, under the cap).
     final day = this.day ?? CoinDay.fromSummary(EconomyMirror.instance.summary);
-    return Container(
+    // Solid, blurred glass: the page header under it never reads through.
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [BoxShadow(color: Color(0x80000000), blurRadius: 22, offset: Offset(0, 8))],
+      ),
+      child: ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+      child: Container(
       width: width,
       height: height,
       padding: const EdgeInsets.fromLTRB(10, pad, pad, pad),
       decoration: BoxDecoration(
-        color: const Color(0xCC0B0B10),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: const Color(0x66E4C56A)),
-        boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 18, offset: Offset(0, 6))],
+        color: const Color(0xF20B0B10),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0x40FFFFFF)),
       ),
       child: Row(children: [
         const NwsbCoinDisc(size: 28),
@@ -281,19 +291,14 @@ class CoinWalletPill extends StatelessWidget {
             width: circle,
             height: circle,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0x40FFFFFF), Color(0x14FFFFFF)],
-              ),
-              border: Border.all(color: const Color(0x66FFFFFF)),
-              boxShadow: [BoxShadow(color: const Color(0xFFE4C56A).withValues(alpha: 0.25 + 0.4 * punch), blurRadius: 14)],
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(13),
+              boxShadow: [BoxShadow(color: const Color(0xFFE4C56A).withValues(alpha: 0.2 + 0.4 * punch), blurRadius: 12)],
             ),
-            child: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFFE4C56A), size: 22),
+            child: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF0B0B10), size: 22),
           ),
         ),
       ]),
-    );
+    ))));
   }
 }

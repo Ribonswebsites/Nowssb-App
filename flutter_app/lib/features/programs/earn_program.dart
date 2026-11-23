@@ -13,6 +13,8 @@ import '../economy/economy_api.dart';
 import '../economy/money.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
+import '../account/account_kit.dart';
+import '../earn/earn_kit.dart';
 import 'program_heroes.dart';
 import '../circle/circle_screen.dart';
 import 'reference_program.dart';
@@ -90,38 +92,48 @@ List<Widget> _overview(BuildContext context, Map<String, dynamic> s) => [
       LSection('standing', 'Standing', _earn((context, r, _) {
         final st = sMap(r['standing']);
         final bal = sMap(r['balances']);
-        final color = _metal['${st['metal']}'] ?? NwsbColors.gold;
         final words = sInt(r['words']);
+        final next = st['nextWords'] == null ? null : sInt(st['nextWords']);
+        final fx = FxBook.instance;
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           if (r['enabled'] == false || r['countryOk'] == false)
             const PCard(children: [PEmpty('NowssB Earn is not open in your country yet. Links, coins and gifts still work.')]),
-          PCard(glow: color, children: [
-            Text('${st['metal'] ?? ''}'.toUpperCase(), style: TextStyle(color: color, letterSpacing: 1.6, fontSize: 11, fontWeight: FontWeight.w800)),
-            Text('${st['title'] ?? 'No rank yet'}', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
-            Text('You earn ${sNum(st['ratePct'])}% of each cleared sale after tax and store fees${sNum(st['fastStartPct']) > 0 ? ', plus ${sNum(st['fastStartPct'])}% early bonus' : ''}${st['provisional'] == true ? ' · not final yet' : ''}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
-            if (st['canEarn'] != true) const PEmpty('Commission needs your own active paid plan. Sales still count toward your rank.'),
-            if (st['planShort'] == true) const PEmpty('Your rank needs the top plan to pay at its full rate. You earn at the rate your plan allows.'),
-            if (st['nextWords'] != null) PProgress(value: words, goal: sInt(st['nextWords']), label: '$words / ${sInt(st['nextWords'])} words to ${st['nextTitle']}'),
-            Text('Last 90 days: ${sInt(r['words90'])} words sold · ${sInt(st['keep90'])} needed to keep this rank', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+          EarnStatCard(
+            key: const ValueKey('earn-overview-rank'),
+            mark: NwsbMarks.crown,
+            title: '${st['title'] ?? 'No rank yet'}',
+            status: st['canEarn'] == true ? const EarnStatusPill(EarnStatus.ongoing, text: 'Earning') : const EarnStatusPill(EarnStatus.off, text: 'Not earning yet'),
+            number: '$words',
+            unit: 'words sold',
+            progress: next == null || next <= 0 ? null : (words / next).clamp(0.0, 1.0).toDouble(),
+            footer: next == null ? null : '$words / $next words to ${st['nextTitle']}',
+            chips: [
+              if ('${st['metal'] ?? ''}'.isNotEmpty) EarnChip('${st['metal']}', mark: NwsbMarks.rewards),
+              EarnChip('${sNum(st['ratePct'])}% per sale', mark: NwsbMarks.earn),
+              EarnChip('${sInt(r['words90'])} in 90 days', mark: NwsbMarks.trending),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Text(
+                'You earn ${sNum(st['ratePct'])}% of each cleared sale after tax and store fees${sNum(st['fastStartPct']) > 0 ? ', plus ${sNum(st['fastStartPct'])}% early bonus' : ''}${st['provisional'] == true ? ' · not final yet' : ''}',
+                style: const TextStyle(color: kEarnSoft, fontSize: 12.5, height: 1.4)),
+          ),
+          if (st['canEarn'] != true) const PEmpty('Commission needs your own active paid plan. Sales still count toward your rank.'),
+          if (st['planShort'] == true) const PEmpty('Your rank needs the top plan to pay at its full rate. You earn at the rate your plan allows.'),
+          const SizedBox(height: 6),
+          EarnStatGrid([
+            EarnStat('Pending', fx.formatPrice(sNum(bal['pendingINR'])), sub: 'in the 30-day refund window'),
+            EarnStat('Available', fx.formatPrice(sNum(bal['availableINR'])), sub: 'ready to request', highlight: true),
+            EarnStat('Lifetime', fx.formatPrice(sNum(bal['lifetimeINR'])), sub: 'commission and bonuses earned'),
+            EarnStat('Last 90 days', '${sInt(r['words90'])} words', sub: '${sInt(st['keep90'])} needed to keep this rank'),
           ]),
-          PCard(children: [
-            Row(children: [
-              Expanded(child: _money('Pending', sNum(bal['pendingINR']), 'in the 30-day refund window')),
-              Expanded(child: _money('Available', sNum(bal['availableINR']), 'ready to request')),
-            ]),
-            const SizedBox(height: 8),
-            _money('Lifetime', sNum(bal['lifetimeINR']), 'commission and bonuses earned'),
-          ]),
+          const SizedBox(height: 12),
           if (r['sponsor'] != null) PCard(children: [PRow(title: 'Your sponsor', sub: '${sMap(r['sponsor'])['name'] ?? ''}', mark: NwsbMarks.people)]),
         ]);
       })),
     ];
-
-Widget _money(String label, num v, String sub) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label.toUpperCase(), style: const TextStyle(color: NwsbColors.gold, fontSize: 10, letterSpacing: 1.3, fontWeight: FontWeight.w800)),
-      Text(FxBook.instance.formatPrice(v), style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
-      EditableLabel('earn_program.shared', sub, style: const TextStyle(color: NwsbColors.mist, fontSize: 11)),
-    ]);
 
 List<Widget> _team(BuildContext context, Map<String, dynamic> s) => [
       LSection('team', 'Team', _earn((context, r, reload) {
@@ -132,8 +144,8 @@ List<Widget> _team(BuildContext context, Map<String, dynamic> s) => [
         final appoints = ((st['appoints'] as List?) ?? const []).map((e) => '$e').toList();
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           if (invites.isNotEmpty)
-            PCard(glow: NwsbColors.gold, children: [
-              const PHeading('Invitations', 'You were invited to a team', slot: 'earn_program.team'),
+            PCard(children: [
+              const PHeading('Invitations', 'You were invited to a team', slot: 'earn_program.team', mark: NwsbMarks.people),
               for (final i in invites)
                 PRow(
                   title: '${i['fromName'] ?? 'Someone'} invites you as ${i['rank'] ?? 'a member'}',
@@ -145,12 +157,20 @@ List<Widget> _team(BuildContext context, Map<String, dynamic> s) => [
                   ]),
                 ),
             ]),
+          EarnStatGrid([
+            EarnStat('My team', '${team.length} of ${sInt(st['teamMax'])}', sub: 'people under you', highlight: true),
+            EarnStat('Level 1', '${(((st['leg'] as List?) ?? const [0, 0]).elementAtOrNull(0)) ?? 0}%', sub: 'of their cleared sales'),
+          ]),
+          const SizedBox(height: 12),
           PCard(children: [
-            PHeading('Team', 'My team · ${team.length} of ${sInt(st['teamMax'])}', slot: 'earn_program.team'),
+            PHeading('Team', 'My team · ${team.length} of ${sInt(st['teamMax'])}', slot: 'earn_program.team', mark: NwsbMarks.people),
             if (team.isEmpty) const PEmpty('No team yet. Officers and above can appoint people who already sell through their own links.'),
             for (final m in team)
               PRow(title: '${m['name'] ?? 'Team member'}', sub: '${m['rank'] ?? ''} · level ${sInt(m['level'])} · ${sInt(m['words'])} words (${sInt(m['words90'])} in 90 days)', mark: NwsbMarks.user),
-            Text('Team share: ${((st['leg'] as List?) ?? const [0, 0]).map((e) => '$e%').join(' (level 1) / ')} (level 2) of what your team\u2019s cleared sales make after tax and store fees', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text('Team share: ${((st['leg'] as List?) ?? const [0, 0]).map((e) => '$e%').join(' (level 1) / ')} (level 2) of what your team\u2019s cleared sales make after tax and store fees', style: const TextStyle(color: kEarnSoft, fontSize: 12, height: 1.4)),
+            ),
           ]),
           if (appoints.isNotEmpty) _Appoint(ranks: appoints, onDone: reload),
           if (sent.isNotEmpty)
@@ -181,18 +201,13 @@ class _AppointState extends State<_Appoint> {
 
   @override
   Widget build(BuildContext context) => PCard(children: [
-        const PHeading('Grow the team', 'Appoint by their NowssB code', slot: 'earn_program.team'),
-        TextField(
-          controller: _c,
-          onChanged: (_) => setState(() {}),
-          textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(color: Colors.white),
-          textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(hintText: 'Their referral code', hintStyle: TextStyle(color: NwsbColors.mist)),
-        ),
-        Wrap(spacing: 8, children: [
-          for (final r in widget.ranks) ChoiceChip(label: Text(r), selected: _rank == r, onSelected: (_) => setState(() => _rank = r)),
+        const PHeading('Grow the team', 'Appoint by their NowssB code', slot: 'earn_program.team', mark: NwsbMarks.people),
+        EarnField(controller: _c, label: 'Referral code', hint: 'Their referral code', icon: Icons.tag_rounded, caps: TextCapitalization.characters, onChanged: (_) => setState(() {})),
+        const SizedBox(height: 10),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final r in widget.ranks) GlassChoice(label: r, selected: _rank == r, onTap: () => setState(() => _rank = r)),
         ]),
+        const SizedBox(height: 12),
         Align(alignment: Alignment.centerLeft, child: PClaim(label: 'Send invitation', action: 'appoint', enabled: _c.text.trim().length >= 3, data: {'code': _c.text.trim(), 'rank': _rank}, onDone: (_) {
           _c.clear();
           widget.onDone();
@@ -217,16 +232,25 @@ List<Widget> _sales(BuildContext context, Map<String, dynamic> s) => [
       LSection('ledger', 'Commission ledger', _earn((context, r, _) {
         final rows = sList(r['ledger']);
         final now = DateTime.now().millisecondsSinceEpoch;
-        return PCard(children: [
-          const PHeading('History', 'Sales and commission', slot: 'earn_program.sales'),
-          if (rows.isEmpty) const PEmpty('No sales yet. When someone buys through your link and Google Play clears it, the sale shows here — pending for 30 days, then available.'),
-          for (final x in rows)
-            PRow(
-              title: _type('${x['type']}'),
-              sub: '${x['note'] ?? ''}${sInt(x['availableAt']) > now ? ' · available ${shortDate(x['availableAt'])}' : ''} · ${shortDate(x['at'])}',
-              mark: NwsbMarks.earn,
-              trailing: Text(signedMoney(sNum(x['inr'] ?? x['amount'])), style: TextStyle(color: sNum(x['inr'] ?? x['amount']) >= 0 ? NwsbColors.goldLight : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
-            ),
+        final net = rows.fold<num>(0, (a, x) => a + sNum(x['inr'] ?? x['amount']));
+        final waiting = rows.where((x) => sInt(x['availableAt']) > now).length;
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          EarnStatGrid([
+            EarnStat('Entries', '${rows.length}', sub: rows.isEmpty ? 'no sales yet' : 'sales and commission'),
+            EarnStat('Net', signedMoney(net), sub: waiting > 0 ? '$waiting still in the refund window' : 'after refunds', highlight: true),
+          ]),
+          const SizedBox(height: 12),
+          PCard(children: [
+            const PHeading('History', 'Sales and commission', slot: 'earn_program.sales', mark: NwsbMarks.trending),
+            if (rows.isEmpty) const PEmpty('No sales yet. When someone buys through your link and Google Play clears it, the sale shows here — pending for 30 days, then available.'),
+            for (final x in rows)
+              PRow(
+                title: _type('${x['type']}'),
+                sub: '${x['note'] ?? ''}${sInt(x['availableAt']) > now ? ' · available ${shortDate(x['availableAt'])}' : ''} · ${shortDate(x['at'])}',
+                mark: NwsbMarks.earn,
+                trailing: Text(signedMoney(sNum(x['inr'] ?? x['amount'])), style: TextStyle(color: sNum(x['inr'] ?? x['amount']) >= 0 ? NwsbColors.goldLight : const Color(0xFFFF8A8A), fontWeight: FontWeight.w800)),
+              ),
+          ]),
         ]);
       })),
       const LSection('board', 'Leaderboard', SellersBoard()),
@@ -236,30 +260,41 @@ List<Widget> _targets(BuildContext context, Map<String, dynamic> s) => [
       LSection('targets', 'Targets', _earn((context, r, _) {
         final t = sList(r['targets']);
         final words = sInt(r['words']);
-        return PCard(children: [
-          const PHeading('One-time bonuses', 'Targets', slot: 'earn_program.targets'),
-          if (t.isEmpty) const PEmpty('No targets are set right now.', slot: 'earn_program.targets'),
-          for (final x in t)
-            Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              PRow(
-                title: '${sInt(x['words'])} words sold',
-                sub: [
-                  if (sNum(x['cashINR']) > 0) '${FxBook.instance.formatPrice(sNum(x['cashINR']))} bonus (pending 30 days)',
-                  if (sInt(x['coins']) > 0) '${sInt(x['coins'])} coins',
-                  if ('${x['coupon'] ?? ''}'.isNotEmpty) '${rarityTitle('${x['coupon']}')} card',
-                ].join(' · '),
-                mark: NwsbMarks.rewards,
-                trailing: x['reached'] == true ? const PPill('Reached', color: NwsbColors.goldLight) : null,
-              ),
-              if (x['reached'] != true && sInt(x['words']) > 0) PProgress(value: words, goal: sInt(x['words']), label: '$words / ${sInt(x['words'])} words · ${(sInt(x['words']) - words).clamp(0, 1 << 31)} to go'),
-            ]),
-          const PEmpty('Bonuses land on their own when a target is crossed by cleared sales and reverse if those sales are refunded.', slot: 'earn_program.targets'),
+        final firstOpen = t.indexWhere((x) => x['reached'] != true);
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          const PHeading('One-time bonuses', 'Targets', slot: 'earn_program.targets', mark: NwsbMarks.rewards),
+          if (t.isEmpty) const PCard(children: [PEmpty('No targets are set right now.', slot: 'earn_program.targets')]),
+          for (var i = 0; i < t.length; i++)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Builder(builder: (context) {
+                final x = t[i];
+                final goal = sInt(x['words']);
+                final reached = x['reached'] == true;
+                return EarnStatCard(
+                  key: ValueKey('earn-target-$goal'),
+                  title: '$goal words sold',
+                  status: EarnStatusPill(reached ? EarnStatus.reached : (i == firstOpen ? EarnStatus.ongoing : EarnStatus.upcoming)),
+                  number: reached ? '$goal' : '$words',
+                  unit: reached ? 'words' : '/ $goal words',
+                  progress: reached || goal <= 0 ? null : (words / goal).clamp(0.0, 1.0).toDouble(),
+                  footer: reached || goal <= 0 ? null : '${(goal - words).clamp(0, 1 << 31)} to go',
+                  chips: [
+                    if (sNum(x['cashINR']) > 0) EarnChip('${FxBook.instance.formatPrice(sNum(x['cashINR']))} bonus', mark: NwsbMarks.earn),
+                    if (sInt(x['coins']) > 0) EarnChip('${sInt(x['coins'])} coins', coin: true),
+                    if ('${x['coupon'] ?? ''}'.isNotEmpty) EarnChip('${rarityTitle('${x['coupon']}')} card', mark: NwsbMarks.coupon),
+                  ],
+                );
+              }),
+            ),
+          const PEmpty('Cash bonuses stay pending for 30 days. Bonuses land on their own when a target is crossed by cleared sales and reverse if those sales are refunded.', slot: 'earn_program.targets'),
+          const SizedBox(height: 6),
         ]);
       })),
       LSection('ranks', 'Rank ladder', _earn((context, r, _) {
         final ranks = sList(r['ranks']);
         return PCard(children: [
-          const PHeading('Ranks', 'The ladder', slot: 'earn_program.targets'),
+          const PHeading('Ranks', 'The ladder', slot: 'earn_program.targets', mark: NwsbMarks.crown),
           if (ranks.isEmpty) const PEmpty('The rank ladder did not load. Pull back and open it again.', slot: 'earn_program.targets'),
           for (final x in ranks)
             PRow(
@@ -280,27 +315,40 @@ List<Widget> _payouts(BuildContext context, Map<String, dynamic> s) => [
         final available = sNum(bal['availableINR']);
         final min = sNum(bal['minPayoutINR']);
         final enough = available > 0 && available >= min;
+        final fx = FxBook.instance;
         return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          PCard(glow: NwsbColors.gold, children: [
-            _money('Available', available, '${min > 0 ? 'Minimum ${FxBook.instance.formatPrice(min)} · ' : ''}paid out after a person approves it'),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
+          PCard(children: [
+            Row(children: [
+              const Expanded(child: PHeading('Payouts', 'Your balance', slot: 'earn_program.payouts', mark: NwsbMarks.earn)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: EarnStatusPill(ready && enough ? EarnStatus.ongoing : EarnStatus.off, text: ready && enough ? 'Ready' : 'Not yet'),
+              ),
+            ]),
+            EarnStatGrid([
+              EarnStat('Available', fx.formatPrice(available), sub: 'paid out after a person approves it', highlight: true),
+              EarnStat('Minimum', min > 0 ? fx.formatPrice(min) : 'None', sub: 'to request a payout'),
+            ]),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
               child: PClaim(label: 'Request payout', action: 'requestPayout', enabled: ready && enough, onDone: (_) => reload()),
             ),
             if (!ready)
               const PEmpty('Add your payout details below to request a payout.', slot: 'earn_program.payouts')
             else if (!enough)
-              PEmpty(min > 0 ? 'You can request a payout once ${FxBook.instance.formatPrice(min)} is available.' : 'Nothing is available to pay out yet.', slot: 'earn_program.payouts'),
+              PEmpty(min > 0 ? 'You can request a payout once ${fx.formatPrice(min)} is available.' : 'Nothing is available to pay out yet.', slot: 'earn_program.payouts'),
           ]),
           PCard(children: [
             PRow(
               key: const ValueKey('earn.payout.bank'),
               title: 'Bank / payout details',
               sub: 'Bank account, IBAN, PayPal or Wise · shown back masked',
+              mark: NwsbMarks.shield,
               trailing: TextButton(
                 onPressed: () => PayoutDetailsPage.open(context).then((_) => reload()),
-                child: const Text('Open', style: TextStyle(color: NwsbColors.gold, fontWeight: FontWeight.w700)),
+                style: earnButtonStyle(),
+                child: const Text('Open', style: TextStyle(fontWeight: FontWeight.w800)),
               ),
             ),
           ]),
@@ -308,7 +356,6 @@ List<Widget> _payouts(BuildContext context, Map<String, dynamic> s) => [
         ]);
       })),
     ];
-
 class _PayoutForm extends StatefulWidget {
   const _PayoutForm({required this.account, required this.onSaved});
   final Map<String, dynamic> account;
@@ -363,50 +410,69 @@ class _PayoutFormState extends State<_PayoutForm> {
   Widget build(BuildContext context) {
     final saved = '${widget.account['email'] ?? ''}';
     return PCard(children: [
-      const PHeading('Payout details', 'Where your money goes', slot: 'earn_program.payouts'),
-      if (saved.isNotEmpty) Text('Saved: $saved', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
-      DropdownButtonFormField<String>(
-        key: const ValueKey('earn.payout.country'),
-        initialValue: _country,
-        isExpanded: true,
-        dropdownColor: const Color(0xFF141820),
-        style: const TextStyle(color: Colors.white),
-        decoration: const InputDecoration(labelText: 'Payout country', labelStyle: TextStyle(color: NwsbColors.mist)),
-        items: [for (final c in kPayoutCountries) DropdownMenuItem(value: c.$1, child: Text(c.$2))],
-        onChanged: (v) => setState(() => _country = v ?? _country),
+      const PHeading('Payout details', 'Where your money goes', slot: 'earn_program.payouts', mark: NwsbMarks.reference),
+      if (saved.isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Text('Saved: $saved', style: const TextStyle(color: kEarnSoft, fontSize: 12.5)),
+        ),
+      TileRow(
+        leading: const TileBadge(icon: Icons.public_rounded),
+        label: 'Payout country',
+        body: DropdownButtonFormField<String>(
+          key: const ValueKey('earn.payout.country'),
+          initialValue: _country,
+          isExpanded: true,
+          isDense: true,
+          dropdownColor: const Color(0xFF141820),
+          borderRadius: BorderRadius.circular(16),
+          iconEnabledColor: kEarnMuted,
+          style: (Theme.of(context).textTheme.titleMedium ?? const TextStyle()).merge(accountFieldStyle),
+          decoration: const InputDecoration(isDense: true, isCollapsed: true, border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 1)),
+          items: [for (final c in kPayoutCountries) DropdownMenuItem(value: c.$1, child: Text(c.$2, maxLines: 1, overflow: TextOverflow.ellipsis))],
+          onChanged: (v) => setState(() => _country = v ?? _country),
+        ),
       ),
+      const SizedBox(height: 10),
       if (!_supported)
         const PEmpty('Payouts are not available in your country yet. Your balance stays safe here.', slot: 'earn_program.payouts')
       else ...[
-        Wrap(spacing: 8, children: [
-          ChoiceChip(label: const Text('Wise'), selected: _method == 'wise', onSelected: (_) => setState(() => _method = 'wise')),
-          ChoiceChip(label: const Text('PayPal'), selected: _method == 'paypal', onSelected: (_) => setState(() => _method = 'paypal')),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          GlassChoice(label: 'Wise', selected: _method == 'wise', onTap: () => setState(() => _method = 'wise')),
+          GlassChoice(label: 'PayPal', selected: _method == 'paypal', onTap: () => setState(() => _method = 'paypal')),
         ]),
-        TextField(
-          key: const ValueKey('earn.payout.email'),
+        const SizedBox(height: 10),
+        EarnField(
+          fieldKey: const ValueKey('earn.payout.email'),
           controller: _email,
+          label: _method == 'paypal' ? 'PayPal email' : 'Wise email',
+          hint: 'you@example.com',
+          icon: Icons.alternate_email_rounded,
+          keyboard: TextInputType.emailAddress,
+          action: TextInputAction.next,
           onChanged: (_) => setState(() {}),
-          keyboardType: TextInputType.emailAddress,
-          textInputAction: TextInputAction.next,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(hintText: _method == 'paypal' ? 'PayPal email' : 'Wise email', hintStyle: const TextStyle(color: NwsbColors.mist)),
         ),
-        TextField(
-          key: const ValueKey('earn.payout.name'),
+        const SizedBox(height: 8),
+        EarnField(
+          fieldKey: const ValueKey('earn.payout.name'),
           controller: _name,
+          label: 'Full legal name',
+          hint: 'As on your account',
+          icon: Icons.badge_outlined,
+          action: TextInputAction.done,
           onChanged: (_) => setState(() {}),
-          textInputAction: TextInputAction.done,
           onSubmitted: (_) {
             if (_valid && !_busy) _save();
           },
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(hintText: 'Full legal name', hintStyle: TextStyle(color: NwsbColors.mist)),
         ),
-        const SizedBox(height: 10),
-        TextButton(
-          onPressed: _busy || !_valid ? null : _save,
-          style: TextButton.styleFrom(backgroundColor: _valid ? NwsbColors.goldLight : const Color(0x33E8D5A3), foregroundColor: Colors.black, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(vertical: 12)),
-          child: Text(_busy ? 'Saving…' : 'Save payout details', style: const TextStyle(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: _busy || !_valid ? null : _save,
+            style: earnButtonStyle(enabled: !_busy && _valid),
+            child: Text(_busy ? 'Saving…' : 'Save payout details', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+          ),
         ),
       ],
       const PEmpty('One payout account per person. Paid in your local currency where the provider supports it; taxes may apply where you live.', slot: 'earn_program.payouts'),

@@ -244,7 +244,7 @@ class _PayoutDetailsPageState extends State<PayoutDetailsPage> {
           const SizedBox(height: 16),
           const LoadingBlock(height: 260),
         ] else if (_loadError != null)
-          GlassListCard(
+          GlassListCard( squareBadge: true,
             icon: Icons.wifi_off_rounded,
             overline: 'Not loaded',
             title: 'Could not open your payout details',
@@ -374,7 +374,7 @@ class _PayoutDetailsPageState extends State<PayoutDetailsPage> {
     final methods = availableMethods(_country?.code ?? '', _serverMethods);
     final m = _method;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      GlassListCard(
+      GlassListCard( squareBadge: true,
         icon: Icons.account_balance_outlined,
         overline: 'Payout account',
         title: 'Where should we send your money?',
@@ -420,7 +420,7 @@ class _PayoutDetailsPageState extends State<PayoutDetailsPage> {
         ],
       ),
       if (m != null)
-        GlassListCard(
+        GlassListCard( squareBadge: true,
           icon: _methodIcon(m),
           overline: m.label,
           title: 'Account details',
@@ -555,7 +555,7 @@ class _PayoutDetailsPageState extends State<PayoutDetailsPage> {
     final day = (b['payoutDay'] as num?)?.toInt() ?? 0;
     final pending = (b['pendingINR'] as num?) ?? 0;
     final available = (b['availableINR'] as num?) ?? 0;
-    return GlassListCard(
+    return GlassListCard( squareBadge: true,
       key: const Key('payout-when'),
       icon: Icons.schedule_rounded,
       overline: 'How payouts work',

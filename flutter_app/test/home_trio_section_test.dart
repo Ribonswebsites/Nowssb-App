@@ -277,7 +277,7 @@ void main() {
     expect(find.byType(TabBar), findsNothing);
     await t.pump(const Duration(seconds: 2));
     expect(find.text('140'), findsOneWidget);
-    expect(find.text('/ 25 words'), findsOneWidget);
+    expect(find.textContaining('/ 25 words', findRichText: true), findsOneWidget);
     expect(find.text('Senior Officer'), findsOneWidget);
     final part = t.getSize(_sheet).height;
     await t.tap(find.byKey(const ValueKey('earn-sheet-expand')));

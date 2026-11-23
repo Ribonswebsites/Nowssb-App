@@ -22,7 +22,11 @@ class GlassListCard extends StatelessWidget {
     this.children = const [],
     this.margin = const EdgeInsets.only(bottom: 16),
     this.trailing,
+    this.squareBadge = false,
   });
+
+  /// The Earn pages' white rounded square instead of the round badge.
+  final bool squareBadge;
 
   final IconData icon;
   final String overline;
@@ -54,7 +58,9 @@ class GlassListCard extends StatelessWidget {
                   Container(
                     width: 46,
                     height: 46,
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    decoration: squareBadge
+                        ? BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14))
+                        : const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                     child: Icon(icon, size: 22, color: const Color(0xFF0B0B10)),
                   ),
                   const SizedBox(width: 12),

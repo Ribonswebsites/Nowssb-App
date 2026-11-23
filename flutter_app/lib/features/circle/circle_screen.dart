@@ -22,6 +22,10 @@ import '../../admin/template/editable.dart';
 import '../programs/program_kit.dart';
 import '../programs/earn_program.dart';
 import '../programs/program_router.dart';
+import '../coins/coins_screen.dart';
+import '../earn/earn_kit.dart';
+import '../earn/earnings_screen.dart';
+import '../economy/money.dart';
 
 class CircleScreen extends StatefulWidget {
   const CircleScreen({super.key, this.initialTab});
@@ -305,11 +309,28 @@ class _TabMark extends StatelessWidget {
       );
 }
 
-/// The Earn programme tabs (Overview … Rules) on the app film, with the
-/// liked pages' header: white round back button, eyebrow, bold title.
-class EarnTabsPage extends StatelessWidget {
+/// The Earn programme tabs (Overview … Rules) on the app film, in the
+/// Earn layout: "Hey, name", one card with both balances (cash earned and
+/// coins), Payout and Invite, then Programmes with See all, the tab pills
+/// with their marks, and the picked tab.
+class EarnTabsPage extends StatefulWidget {
   const EarnTabsPage({super.key, required this.initialTab});
   final String initialTab;
+
+  @override
+  State<EarnTabsPage> createState() => _EarnTabsPageState();
+}
+
+class _EarnTabsPageState extends State<EarnTabsPage> {
+  final _go = ValueNotifier<void Function(String)?>(null);
+
+  @override
+  void dispose() {
+    _go.dispose();
+    super.dispose();
+  }
+
+  void _open(String id) => _go.value?.call(id);
 
   @override
   Widget build(BuildContext context) {
@@ -324,7 +345,7 @@ class EarnTabsPage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0x66060C18), Color(0x99060C18), Color(0xB3060C18)],
+                  colors: [Color(0x80060C18), Color(0xB3060C18), Color(0xCC060C18)],
                 ),
               ),
             ),
@@ -332,34 +353,53 @@ class EarnTabsPage extends StatelessWidget {
         ),
         SafeArea(
           child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
+            padding: const EdgeInsets.fromLTRB(0, 12, 0, 40),
             children: [
-              Row(children: [
-                GestureDetector(
-                  onTap: () => Navigator.of(context).maybePop(),
-                  behavior: HitTestBehavior.opaque,
-                  child: Semantics(
-                    button: true,
-                    label: 'Back',
-                    child: Container(
-                      width: 42,
-                      height: 42,
-                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                      child: const Icon(Icons.arrow_back, size: 19, color: Color(0xFF111118)),
-                    ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  EarnHey(eyebrow: 'NowssB Earn', onBack: () => Navigator.of(context).maybePop()),
+                  const SizedBox(height: 18),
+                  ListenableBuilder(
+                    listenable: Listenable.merge([EconomyMirror.instance, FxBook.instance]),
+                    builder: (context, _) {
+                      final m = EconomyMirror.instance;
+                      final live = m.live && m.uid != null;
+                      return EarnBalanceCard(
+                        left: EarnBalance(
+                          key: const ValueKey('earn-balance-cash'),
+                          label: 'Cash earned',
+                          mark: NwsbMarks.earn,
+                          value: Text(FxBook.instance.formatCents(live ? m.lifetimeCents : 0), maxLines: 1, style: kEarnBig),
+                          sub: live ? '${FxBook.instance.formatCents(m.cash)} available' : 'Sign in to see',
+                          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())),
+                        ),
+                        right: EarnBalance(
+                          key: const ValueKey('earn-balance-coins'),
+                          label: 'Coins',
+                          coin: true,
+                          value: Text('${live ? m.coins : 0}', maxLines: 1, style: kEarnBig),
+                          sub: live ? 'In your wallet' : 'Sign in to see',
+                          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsScreen())),
+                        ),
+                      );
+                    },
                   ),
-                ),
-                const SizedBox(width: 14),
-                const Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('NOWSSB EARN', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
-                    SizedBox(height: 2),
-                    Text('Programmes', style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.15, letterSpacing: -0.5)),
-                  ]),
-                ),
-              ]),
-              const SizedBox(height: 8),
-              ProgramTabsBlock(spec: kEarnSpec, initialTab: initialTab, scrollTo: true, showDisclaimer: false),
+                  const SizedBox(height: 12),
+                  EarnActions(onPayout: () => _open('payouts'), onInvite: () => _open('invite')),
+                  const SizedBox(height: 22),
+                ]),
+              ),
+              ProgramTabsBlock(
+                spec: kEarnSpec,
+                initialTab: widget.initialTab,
+                scrollTo: widget.initialTab != 'overview',
+                showDisclaimer: false,
+                goRef: _go,
+                marks: kEarnTabMarks,
+                hPad: 16,
+                sectionTitle: 'Programmes',
+              ),
             ],
           ),
         ),
@@ -367,6 +407,9 @@ class EarnTabsPage extends StatelessWidget {
     );
   }
 }
+
+/// Each Earn tab's mark (pills, See all, the hub rows).
+const kEarnTabMarks = _earnTabMark;
 
 final _refLedgers = <String, Stream<QuerySnapshot<Map<String, dynamic>>>>{};
 Stream<QuerySnapshot<Map<String, dynamic>>> _refLedger(String uid) => _refLedgers.putIfAbsent(

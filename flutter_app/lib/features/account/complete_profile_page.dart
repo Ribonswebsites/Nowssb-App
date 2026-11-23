@@ -13,6 +13,8 @@ import '../../theme/tokens.dart';
 import '../economy/coin_collect.dart';
 import '../economy/economy_api.dart';
 import 'account_kit.dart';
+import '../earn/earn_kit.dart';
+import '../../widgets/nwsb_icon.dart';
 import 'countries.dart';
 import 'profile_details.dart';
 import 'referral_capture.dart';
@@ -174,7 +176,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   Widget build(BuildContext context) {
     final name = _name.text.trim();
     return AccountPage(
-      kicker: widget.editing ? 'Your account' : 'Welcome',
+      kicker: widget.editing
+          ? 'Your account'
+          : (name.trim().isEmpty ? 'Welcome' : 'Hey, ${name.trim().split(RegExp(r'\s+')).first}'),
       title: widget.editing ? 'Your details' : 'Complete your profile',
       subtitle: 'So rewards, referrals and payouts reach the right person.',
       onBack: widget.editing ? () => Navigator.maybePop(context) : null,
@@ -185,8 +189,14 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
       ]),
       children: [
         // The Menu card: white badge (the initial), overline, the name.
-        _ProfileHead(name: name, filled: _filled),
-        GlassListCard(
+        _ProfileHead(
+          name: name,
+          filled: _filled,
+          nameOk: validateName(_name.text) == null,
+          countryOk: _country != null,
+          phoneOk: validatePhone(_phone.text, _dial) == null,
+        ),
+        GlassListCard( squareBadge: true,
           icon: Icons.badge_outlined,
           overline: 'About you',
           title: 'Your details',
@@ -253,7 +263,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
             ),
           ],
         ),
-        GlassListCard(
+        GlassListCard( squareBadge: true,
           icon: Icons.card_giftcard_rounded,
           overline: 'Invited by a friend?',
           title: 'Friend’s code',
@@ -306,29 +316,33 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
   }
 }
 
-/// The page's head card: the Menu card with the initial in the white badge
-/// and a white progress line (the Player's bar) for how much is filled in.
+/// The page's head card in the Earn stat shape: the name, a status pill,
+/// the big "n / 4" filled in, a white progress line and three chips for the
+/// details that matter (name, country, phone).
 class _ProfileHead extends StatelessWidget {
-  const _ProfileHead({required this.name, required this.filled});
+  const _ProfileHead({required this.name, required this.filled, required this.nameOk, required this.countryOk, required this.phoneOk});
   final String name;
   final int filled;
+  final bool nameOk;
+  final bool countryOk;
+  final bool phoneOk;
 
   @override
   Widget build(BuildContext context) {
-    return GlassListCard(
+    final ready = nameOk && countryOk && phoneOk;
+    Widget chip(String label, bool ok) => EarnChip(label, icon: ok ? Icons.check_rounded : Icons.add_rounded);
+    return Padding(
       key: const Key('profile-head'),
-      icon: Icons.person_rounded,
-      overline: 'Your profile · $filled of 4',
-      title: name.isEmpty ? 'Your name here' : name,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(99),
-          child: Stack(children: [
-            Container(height: 4, color: const Color(0x33FFFFFF)),
-            FractionallySizedBox(widthFactor: (filled / 4).clamp(0.0, 1.0), child: Container(height: 4, color: Colors.white)),
-          ]),
-        ),
-      ],
+      padding: const EdgeInsets.only(bottom: 16),
+      child: EarnStatCard(
+        mark: NwsbMarks.user,
+        title: name.isEmpty ? 'Your name here' : name,
+        status: EarnStatusPill(ready ? EarnStatus.reached : EarnStatus.ongoing, text: ready ? 'Ready' : 'In progress'),
+        number: '$filled',
+        unit: '/ 4 filled in',
+        progress: (filled / 4).clamp(0.0, 1.0),
+        chips: [chip('Name', nameOk), chip('Country', countryOk), chip('Phone', phoneOk)],
+      ),
     );
   }
 }

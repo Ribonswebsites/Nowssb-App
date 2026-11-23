@@ -15,6 +15,8 @@ import '../../widgets/nwsb_icon.dart';
 import '../economy/economy_api.dart';
 import '../economy/reward_fx.dart';
 import 'program_kit.dart';
+import '../account/account_kit.dart' show GlassChoice;
+import '../earn/earn_kit.dart';
 import 'program_heroes.dart';
 
 const kReferenceDisclaimer =
@@ -50,23 +52,41 @@ List<Widget> referenceHubTab(BuildContext context, Map<String, dynamic> s) => [
         builder: (context, r, reload) {
           final links = sList(r['links']);
           return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            PCard(glow: NwsbColors.gold, children: [
-              const EditableLabel('reference_program.shared', 'Your NowssB link', style: TextStyle(color: NwsbColors.mist, fontSize: 12)),
-              SelectableText('${r['url'] ?? ''}', style: const TextStyle(color: NwsbColors.goldLight, fontWeight: FontWeight.w800)),
-              Text('Code ${r['code'] ?? ''}${r['hold'] != null ? ' · you joined through a friend (${sInt(sMap(r['hold'])['days'])} days left on the hold)' : ''}', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+            PCard(children: [
+              const PHeading('Invite friends', 'Your NowssB link', slot: 'reference_program.shared', mark: NwsbMarks.reference),
+              Container(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                decoration: BoxDecoration(color: const Color(0xFF07070B), borderRadius: BorderRadius.circular(kEarnTileRadius), border: Border.all(color: const Color(0x66FFFFFF))),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('LINK', style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10, letterSpacing: 1.2, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 4),
+                  SelectableText('${r['url'] ?? ''}', style: const TextStyle(color: kEarnGold, fontWeight: FontWeight.w800, fontSize: 14)),
+                ]),
+              ),
               const SizedBox(height: 8),
-              Wrap(spacing: 8, children: [
-                TextButton(
-                  onPressed: () => _copy(context, '${r['url']}'),
-                  style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder()),
-                  child: const EditableLabel('reference_program.shared', 'Copy link', style: TextStyle(fontWeight: FontWeight.w800)),
+              Text('Code ${r['code'] ?? ''}${r['hold'] != null ? ' · you joined through a friend (${sInt(sMap(r['hold'])['days'])} days left on the hold)' : ''}', style: const TextStyle(color: kEarnSoft, fontSize: 12.5)),
+              const SizedBox(height: 12),
+              Row(children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => _copy(context, '${r['url']}'),
+                    style: earnButtonStyle(),
+                    child: const EditableLabel('reference_program.shared', 'Copy link', style: TextStyle(fontWeight: FontWeight.w800)),
+                  ),
                 ),
-                TextButton(onPressed: () => _copy(context, '${r['code']}', 'Code copied.'), child: const EditableLabel('reference_program.shared', 'Copy code', style: TextStyle(color: NwsbColors.goldLight))),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => _copy(context, '${r['code']}', 'Code copied.'),
+                    style: earnButtonStyle(filled: false),
+                    child: const EditableLabel('reference_program.shared', 'Copy code', style: TextStyle(fontWeight: FontWeight.w800)),
+                  ),
+                ),
               ]),
             ]),
             _MakeLink(onMade: reload),
             PCard(children: [
-              const PHeading('Per word, plan and meaning', 'Your links', slot: 'reference_program.hub'),
+              const PHeading('Per word, plan and meaning', 'Your links', slot: 'reference_program.hub', mark: NwsbMarks.trending),
               if (links.isEmpty) const PEmpty('Make a link for a word, a plan or a meaning and its opens, installs and buyers show here.'),
               for (final l in links)
                 PRow(
@@ -117,23 +137,25 @@ class _MakeLinkState extends State<_MakeLink> {
 
   @override
   Widget build(BuildContext context) => PCard(children: [
-        const PHeading('Make a link', 'For a word, plan or meaning', slot: 'reference_program.hub'),
-        Wrap(spacing: 8, children: [
+        const PHeading('Make a link', 'For a word, plan or meaning', slot: 'reference_program.hub', mark: NwsbMarks.word),
+        Wrap(spacing: 8, runSpacing: 8, children: [
           for (final k in const ['word', 'meaning', 'plan', 'bundle', 'ebook'])
-            ChoiceChip(label: Text(k[0].toUpperCase() + k.substring(1)), selected: _kind == k, onSelected: (_) => setState(() => _kind = k)),
+            GlassChoice(label: k[0].toUpperCase() + k.substring(1), selected: _kind == k, onTap: () => setState(() => _kind = k)),
         ]),
-        TextField(
+        const SizedBox(height: 10),
+        EarnField(
           controller: _c,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(hintText: _kind == 'plan' ? 'Resonance, Frequency or Frequency X' : 'Which $_kind? e.g. Love', hintStyle: const TextStyle(color: NwsbColors.mist)),
+          label: 'Which ${_kind == 'ebook' ? 'eBook' : _kind}',
+          hint: _kind == 'plan' ? 'Resonance, Frequency or Frequency X' : 'Which $_kind? e.g. Love',
+          icon: Icons.link_rounded,
         ),
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
           child: TextButton(
             onPressed: _busy ? null : _make,
-            style: TextButton.styleFrom(backgroundColor: NwsbColors.goldLight, foregroundColor: Colors.black, shape: const StadiumBorder()),
-            child: Text(_busy ? 'Making…' : 'Make and copy', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+            style: earnButtonStyle(enabled: !_busy),
+            child: Text(_busy ? 'Making…' : 'Make and copy', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
           ),
         ),
       ]);
@@ -155,16 +177,18 @@ class _EnterCodeState extends State<_EnterCode> {
 
   @override
   Widget build(BuildContext context) => PCard(children: [
-        const PHeading('Invited by a friend?', 'Enter their code', slot: 'reference_program.hub'),
-        TextField(
+        const PHeading('Invited by a friend?', 'Enter their code', slot: 'reference_program.hub', mark: NwsbMarks.gift),
+        EarnField(
           controller: _c,
+          label: 'Friend\u2019s code',
+          hint: 'e.g. AB12CD34',
+          icon: Icons.tag_rounded,
+          caps: TextCapitalization.characters,
+          spacing: 1.2,
           onChanged: (_) => setState(() {}),
-          textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(color: Colors.white, letterSpacing: 1.2),
-          decoration: const InputDecoration(hintText: 'Friend\u2019s code', hintStyle: TextStyle(color: NwsbColors.mist)),
         ),
-        const SizedBox(height: 8),
-        Align(alignment: Alignment.centerLeft, child: PClaim(label: 'Apply', action: 'attachReferral', data: {'code': _c.text.trim(), 'source': 'typed'}, title: 'Welcome gift')),
+        const SizedBox(height: 12),
+        SizedBox(width: double.infinity, child: PClaim(label: 'Apply', action: 'attachReferral', data: {'code': _c.text.trim(), 'source': 'typed'}, title: 'Welcome gift')),
         const PEmpty('Your friend\u2019s discount applies to your first purchases. A code can be added once, within 30 days of joining.', slot: 'reference_program.hub'),
       ]);
 }
@@ -252,7 +276,12 @@ class SellersBoard extends StatelessWidget {
   final String metric;
   @override
   Widget build(BuildContext context) {
-    if (!NwsbFirebase.ready) return const PEmpty('The board loads once you are online.');
+    if (!NwsbFirebase.ready) {
+      return const PCard(children: [
+        PHeading('This month', 'Leaderboard', slot: 'reference_program.board', mark: NwsbMarks.crown),
+        PEmpty('The board loads once you are online.'),
+      ]);
+    }
     final me = EconomyMirror.instance.uid;
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _boardStream(monthKeyIst()),
@@ -260,7 +289,7 @@ class SellersBoard extends StatelessWidget {
         final entries = sMap(snap.data?.data()?['entries']).entries.map((e) => (e.key, sMap(e.value))).toList()
           ..sort((a, b) => sInt(b.$2[metric]).compareTo(sInt(a.$2[metric])));
         return PCard(children: [
-          const PHeading('This month', 'Leaderboard', slot: 'reference_program.board'),
+          const PHeading('This month', 'Leaderboard', slot: 'reference_program.board', mark: NwsbMarks.crown),
           if (entries.isEmpty) const PEmpty('No sales cleared this month yet. The board fills as real purchases clear.'),
           for (var i = 0; i < entries.length && i < 20; i++)
             PRow(

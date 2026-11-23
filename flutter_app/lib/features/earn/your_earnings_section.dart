@@ -3,9 +3,11 @@
 /// as the greeting's Quick and the Begin banner's Today (the host passes its
 /// own Quick opener; Today is ProgressPanel.open).
 ///
-/// Your Earnings opens the Your Earnings tab: a deep-blur glass sheet with a
-/// black Cash earned hero, Coins and Sold, then the Your position and Target
-/// cards. Each figure is shown once and each card opens its own page. It
+/// Your Earnings opens the Your Earnings tab in the Earn layout: "Hey, name",
+/// one card with cash earned and coins side by side, Payout and Invite, then
+/// Your position (a statistics grid, rank as the dark tile) and Target (a
+/// stat card: big number, status pill, three chips). Each figure is shown
+/// once and each card opens its own page. It
 /// opens part way and expands to full screen (button, or drag the handle up)
 /// and collapses back.
 ///
@@ -33,16 +35,13 @@ import '../economy/money.dart';
 import '../programs/reference_program.dart' show monthKeyIst;
 import '../progress/progress_center.dart';
 import '../progress/progress_popup.dart' show ProgressPanel;
+import 'earn_kit.dart';
 import 'earnings_screen.dart';
 
 // Same tokens as NewReleasesCard / PickedForYouCard.
 const _radius = 28.0;
-const _tile = 78.0;
 const _gap = 8.0;
-const _tileRadius = 16.0;
 const _grey = Color(0xFF9A9A9A);
-const _seeAll = Color(0xFFB3B3B3);
-const _gold = NwsbColors.goldLight;
 
 bool _still(BuildContext context) => MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
@@ -128,6 +127,8 @@ class _Go {
   static void sales(BuildContext c) => _push(c, const EarnTabsPage(initialTab: 'sales'));
   static void targets(BuildContext c) => _push(c, const EarnTabsPage(initialTab: 'targets'));
   static void team(BuildContext c) => _push(c, const EarnTabsPage(initialTab: 'team'));
+  static void payouts(BuildContext c) => _push(c, const EarnTabsPage(initialTab: 'payouts'));
+  static void invite(BuildContext c) => _push(c, const EarnTabsPage(initialTab: 'invite'));
 }
 
 String _cents(int v) => FxBook.instance.formatCents(v);
@@ -232,29 +233,17 @@ class _TrioButton extends StatelessWidget {
             onTap();
           },
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             child: Container(
               constraints: const BoxConstraints(minHeight: 112),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(18),
                 gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x2EFFFFFF), Color(0x0DFFFFFF)]),
                 border: Border.all(color: const Color(0x33FFFFFF)),
               ),
               child: Stack(children: [
-                Positioned(
-                  right: -26,
-                  top: -26,
-                  child: IgnorePointer(
-                    child: Container(
-                      width: 92,
-                      height: 92,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(colors: [glow.withValues(alpha: .55), glow.withValues(alpha: 0)]),
-                      ),
-                    ),
-                  ),
-                ),
+                // The tile's colour as a thin top edge, not a glow.
+                Positioned(left: 14, right: 14, top: 0, child: Container(height: 2, decoration: BoxDecoration(color: glow.withValues(alpha: .8), borderRadius: BorderRadius.circular(1)))),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(11, 11, 10, 11),
                   child: ExcludeSemantics(
@@ -263,11 +252,7 @@ class _TrioButton extends StatelessWidget {
                         width: 34,
                         height: 34,
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: glow.withValues(alpha: .45), blurRadius: 14)],
-                        ),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                         child: icon,
                       ),
                       const Spacer(),
@@ -281,19 +266,11 @@ class _TrioButton extends StatelessWidget {
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
-                        child: Text(sub, maxLines: 1, softWrap: false, style: const TextStyle(color: _grey, fontSize: 10.5, fontWeight: FontWeight.w600, height: 1.15)),
+                        child: Text(sub, maxLines: 1, softWrap: false, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, fontWeight: FontWeight.w600, height: 1.15)),
                       ),
                       if (progress != null) ...[
                         const SizedBox(height: 6),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(9),
-                          child: LinearProgressIndicator(
-                            value: progress!.clamp(0, 1).toDouble(),
-                            minHeight: 3,
-                            backgroundColor: const Color(0x26FFFFFF),
-                            valueColor: AlwaysStoppedAnimation(glow),
-                          ),
-                        ),
+                        EarnBar(progress!.clamp(0, 1).toDouble(), height: 3),
                       ],
                     ]),
                   ),
@@ -367,246 +344,14 @@ class _BlackBanner extends StatelessWidget {
   }
 }
 
-// ─── featured hero: Cash earned ─────────────────────────────────────────────
 
-class _CashHero extends StatelessWidget {
-  const _CashHero({required this.s, required this.onTap, this.tall = false});
-  final EarnSnapshot s;
-  final VoidCallback onTap;
-  final bool tall;
 
-  @override
-  Widget build(BuildContext context) {
-    final sub = !s.live || (s.lifetimeCents == 0 && s.availableCents == 0)
-        ? 'Sales through your links show up here'
-        : '${_cents(s.availableCents)} available${s.availableCents > 0 ? ' · tap to request' : ''}';
-    return Semantics(
-      button: true,
-      label: 'Cash earned, ${_cents(s.lifetimeCents)}, $sub',
-      child: _Press(
-        key: const ValueKey('earn-hero-cash'),
-        onTap: onTap,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: SizedBox(
-            height: tall ? 168 : 146,
-            child: Stack(fit: StackFit.expand, children: [
-              const _Glow(),
-              // Fine grain of sound-wave dots, the NowssB mark of the hero art.
-              const CustomPaint(painter: _DotWave()),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0x26FFFFFF)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-                child: ExcludeSemantics(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Row(children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                        decoration: BoxDecoration(color: const Color(0x26E8D5A3), borderRadius: BorderRadius.circular(99), border: Border.all(color: const Color(0x55E8D5A3))),
-                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                          NwsbIcon(NwsbMarks.earn, size: 12, color: _gold, strokeWidth: 2),
-                          SizedBox(width: 5),
-                          Text('CASH EARNED', style: TextStyle(color: _gold, fontSize: 9.5, letterSpacing: 1.6, fontWeight: FontWeight.w800)),
-                        ]),
-                      ),
-                      const Spacer(),
-                      Container(
-                        width: 30,
-                        height: 30,
-                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                        child: const Icon(Icons.north_east_rounded, size: 16, color: Colors.black),
-                      ),
-                    ]),
-                    const Spacer(),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: EarnCount(
-                        s.lifetimeCents,
-                        format: _cents,
-                        style: TextStyle(color: Colors.white, fontSize: tall ? 40 : 34, fontWeight: FontWeight.w800, height: 1.05, letterSpacing: -1),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 11.5, fontWeight: FontWeight.w600)),
-                  ]),
-                ),
-              ),
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
-/// Slow drifting gold/violet glow (still under reduced motion).
-class _Glow extends StatefulWidget {
-  const _Glow();
-  @override
-  State<_Glow> createState() => _GlowState();
-}
 
-class _GlowState extends State<_Glow> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(seconds: 9));
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_still(context)) {
-      _c.stop();
-    } else if (!_c.isAnimating) {
-      _c.repeat();
-    }
-  }
+// ─── shared ──────────────────────────────────────────────────────────────────
 
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
 
-  @override
-  Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _c,
-        builder: (context, _) {
-          final t = _c.value * 2 * math.pi;
-          return DecoratedBox(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF0E0B14), Color(0xFF000000)]),
-            ),
-            child: Stack(fit: StackFit.expand, children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment(0.75 + 0.18 * math.cos(t), -0.35 + 0.25 * math.sin(t)),
-                    radius: 0.95,
-                    colors: const [Color(0x99D9B970), Color(0x33D9B970), Color(0x00D9B970)],
-                    stops: const [0, .45, 1],
-                  ),
-                ),
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment(-0.9 + 0.15 * math.sin(t), 1.1 + 0.1 * math.cos(t)),
-                    radius: 1.0,
-                    colors: const [Color(0x667A5BE0), Color(0x007A5BE0)],
-                  ),
-                ),
-              ),
-            ]),
-          );
-        },
-      );
-}
-
-/// Dot-matrix sound wave across the right of the hero.
-class _DotWave extends CustomPainter {
-  const _DotWave();
-  @override
-  void paint(Canvas canvas, Size size) {
-    final p = Paint()..color = const Color(0x40FFFFFF);
-    const step = 7.0;
-    final startX = size.width * 0.42;
-    for (var x = startX; x < size.width - 6; x += step) {
-      final k = (x - startX) / (size.width - startX);
-      final amp = (math.sin(k * math.pi * 3.2) * 0.5 + 0.5) * size.height * 0.22 * (0.4 + k);
-      final cy = size.height * 0.62;
-      for (var y = cy - amp; y <= cy + amp; y += step) {
-        canvas.drawCircle(Offset(x, y), 1.1, p);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DotWave old) => false;
-}
-
-// ─── Coins and Sold: the two figures no other card shows ───────────────────
-
-class _TileRow extends StatelessWidget {
-  const _TileRow({required this.s});
-  final EarnSnapshot s;
-  @override
-  Widget build(BuildContext context) => IntrinsicHeight(
-        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Expanded(
-            child: _StatCard(
-              id: 'coins',
-              label: 'Coins',
-              sub: s.live ? 'In your wallet' : 'Sign in to see',
-              value: s.coins,
-              icon: const Icon(Icons.toll_rounded, size: 19, color: Colors.black),
-              onTap: () => _Go.coins(context),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: _StatCard(
-              id: 'sold',
-              label: 'Sold',
-              sub: !s.live ? 'Sign in to see' : s.sold == 0 ? 'No sales yet' : 'Words and meanings',
-              value: s.sold,
-              icon: const NwsbIcon(NwsbMarks.wordBag, size: 18, color: Colors.black, strokeWidth: 1.9),
-              onTap: () => _Go.sales(context),
-            ),
-          ),
-        ]),
-      );
-}
-
-class _StatCard extends StatelessWidget {
-  const _StatCard({required this.id, required this.label, required this.sub, required this.value, required this.icon, required this.onTap});
-  final String id;
-  final String label;
-  final String sub;
-  final int value;
-  final Widget icon;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: '$label, $value, $sub',
-        child: _Press(
-          key: ValueKey('earn-tile-$id'),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
-            decoration: _surface(),
-            child: ExcludeSemantics(
-              child: Row(children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                  child: icon,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: EarnCount(value, format: (v) => '$v', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, height: 1.05, letterSpacing: -0.5)),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 12.5, fontWeight: FontWeight.w700)),
-                    Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _grey, fontSize: 10.5, fontWeight: FontWeight.w500)),
-                  ]),
-                ),
-              ]),
-            ),
-          ),
-        ),
-      );
-}
 
 /// Counts up to [value] (from its last value on change); still under
 /// reduced motion.
@@ -667,8 +412,8 @@ Future<void> showYourEarningsSheet(BuildContext context) {
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Your Earnings',
-    // Light scrim: the glass does the frosting, so the home shows through.
-    barrierColor: const Color(0x59000000),
+    // Firm scrim: the home recedes so nothing behind reads through the sheet.
+    barrierColor: const Color(0x99000000),
     transitionDuration: const Duration(milliseconds: 520),
     pageBuilder: (ctx, _, __) => const YourEarningsSheet(),
     transitionBuilder: (ctx, a, _, child) {
@@ -716,7 +461,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
     final base = _expanded ? full : part;
     final height = (base + _pull).clamp(part * .55, full).toDouble();
     final still = _still(context);
-    final r = BorderRadius.circular(_expanded ? 30 : _radius);
+    final r = BorderRadius.circular(_expanded ? 26 : kEarnRadius + 4);
     return SafeArea(
       child: Align(
         alignment: Alignment.bottomCenter,
@@ -744,7 +489,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
                       gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [Color(0x4D3A3550), Color(0x33201C2C), Color(0x40302A44)],
+                        colors: [Color(0xE61A1726), Color(0xE60F0D17), Color(0xE6151320)],
                       ),
                       border: Border.all(color: const Color(0x40FFFFFF)),
                     ),
@@ -790,9 +535,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
             Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0x80FFFFFF), borderRadius: BorderRadius.circular(9))),
             const SizedBox(height: 12),
             Row(children: [
-              const Expanded(
-                child: Text('Your Earnings', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.3)),
-              ),
+              const Expanded(child: EarnHey(eyebrow: 'Your Earnings')),
               const SizedBox(width: 8),
               _HeadButton(
                 key: const ValueKey('earn-sheet-expand'),
@@ -815,20 +558,79 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
         ),
       );
 
-  Widget _body(EarnSnapshot s) => ListView(
-        padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
-        children: [
-          _CashHero(s: s, tall: true, onTap: () => _Go.cash(context)),
-          const SizedBox(height: 12),
-          _TileRow(s: s),
-          const SizedBox(height: 18),
-          const _RowHead('Your position'),
-          _PositionCard(s: s),
-          const SizedBox(height: 18),
-          const _RowHead('Target'),
-          _TargetCard(s: s),
-        ],
-      );
+  Widget _body(EarnSnapshot s) {
+    final sub = !s.live || (s.lifetimeCents == 0 && s.availableCents == 0)
+        ? 'Sales through your links show up here'
+        : '${_cents(s.availableCents)} available${s.availableCents > 0 ? ' · tap to request' : ''}';
+    final line = !s.live
+        ? 'Sign in to see your target'
+        : s.topRank
+            ? 'Top rank reached'
+            : '${math.max(0, s.target - s.sold)} more words to ${s.nextRank ?? 'the next rank'}';
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(14, 4, 14, 20),
+      children: [
+        EarnBalanceCard(
+          left: EarnBalance(
+            key: const ValueKey('earn-hero-cash'),
+            label: 'Cash earned',
+            mark: NwsbMarks.earn,
+            value: EarnCount(s.lifetimeCents, format: _cents, style: kEarnBig),
+            sub: sub,
+            onTap: () => _Go.cash(context),
+          ),
+          right: EarnBalance(
+            key: const ValueKey('earn-tile-coins'),
+            label: 'Coins',
+            coin: true,
+            value: EarnCount(s.coins, format: (v) => '$v', style: kEarnBig),
+            sub: s.live ? 'In your wallet' : 'Sign in to see',
+            onTap: () => _Go.coins(context),
+          ),
+        ),
+        const SizedBox(height: 12),
+        EarnActions(onPayout: () => _Go.payouts(context), onInvite: () => _Go.invite(context)),
+        const SizedBox(height: 20),
+        EarnSectionTitle('Your position', onSeeAll: () => _Go.team(context)),
+        const SizedBox(height: 8),
+        EarnStatGrid([
+          EarnStat('Rank', s.live ? s.rank : 'Not ranked yet', highlight: true, key: const ValueKey('earn-position-card'), onTap: () => _Go.team(context)),
+          EarnStat('Sold', s.live ? '${s.sold}' : '0', sub: !s.live ? 'Sign in to see' : s.sold == 0 ? 'No sales yet' : 'Words and meanings', key: const ValueKey('earn-tile-sold'), onTap: () => _Go.sales(context)),
+          if (s.live) ...[
+            EarnStat('This month', s.place == null ? 'Not on board' : '#${s.place!.$1} of ${s.place!.$2}', onTap: () => _Go.team(context)),
+            EarnStat('Under you', s.under == 1 ? '1 person' : '${s.under} people', onTap: () => _Go.team(context)),
+          ],
+        ]),
+        if (!s.live)
+          const Padding(
+            padding: EdgeInsets.fromLTRB(4, 10, 4, 0),
+            child: Text('Sign in to see your rank, your place and your team', style: TextStyle(color: kEarnSoft, fontSize: 12)),
+          ),
+        const SizedBox(height: 20),
+        EarnSectionTitle('Target', onSeeAll: () => _Go.targets(context)),
+        const SizedBox(height: 8),
+        Semantics(
+          label: 'Target, $line',
+          child: EarnStatCard(
+            key: const ValueKey('earn-target-card'),
+            mark: NwsbMarks.rewards,
+            title: s.live && !s.topRank ? 'Next: ${s.nextRank ?? 'the next rank'}' : 'Your target',
+            status: EarnStatusPill(!s.live ? EarnStatus.off : s.topRank ? EarnStatus.reached : EarnStatus.ongoing),
+            number: s.live ? '${s.sold}' : '0',
+            unit: s.live ? '/ ${s.target} words' : 'words',
+            progress: s.progress,
+            footer: line,
+            chips: [
+              if (s.live) EarnChip('${s.target} words goal', mark: NwsbMarks.wordBag),
+              if (s.live && !s.topRank) EarnChip('${math.max(0, s.target - s.sold)} to go', mark: NwsbMarks.trending),
+              if (s.live) EarnChip('${(s.progress * 100).round()}% there', mark: NwsbMarks.bars),
+            ],
+            onTap: () => _Go.targets(context),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _HeadButton extends StatelessWidget {
@@ -846,156 +648,13 @@ class _HeadButton extends StatelessWidget {
           child: Container(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0x26FFFFFF), border: Border.all(color: const Color(0x33FFFFFF))),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(11), color: const Color(0x26FFFFFF), border: Border.all(color: const Color(0x33FFFFFF))),
             child: Icon(icon, size: 17, color: Colors.white),
           ),
         ),
       );
 }
 
-class _RowHead extends StatelessWidget {
-  const _RowHead(this.text);
-  final String text;
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(2, 0, 2, 10),
-        child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: -0.2)),
-      );
-}
 
-/// Glass surface used by the sheet's cards.
-BoxDecoration _surface({bool gold = false}) => BoxDecoration(
-      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0x26FFFFFF), Color(0x0FFFFFFF)]),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: gold ? const Color(0x77E8D5A3) : const Color(0x33FFFFFF)),
-    );
 
-class _PositionCard extends StatelessWidget {
-  const _PositionCard({required this.s});
-  final EarnSnapshot s;
-  @override
-  Widget build(BuildContext context) {
-    Widget stat(String k, String v) => Expanded(
-          child: Container(
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-            decoration: BoxDecoration(color: const Color(0x1AFFFFFF), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0x1FFFFFFF))),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(k, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: _grey, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: .6)),
-              const SizedBox(height: 3),
-              FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(v, maxLines: 1, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w800))),
-            ]),
-          ),
-        );
-    return Semantics(
-      button: true,
-      label: 'Your position, ${s.rank}',
-      child: _Press(
-        key: const ValueKey('earn-position-card'),
-        onTap: () => _Go.team(context),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: _surface(gold: true),
-          child: ExcludeSemantics(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Row(children: [
-                Container(
-                  width: 46,
-                  height: 46,
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(colors: [Color(0xFFF3E6BF), Color(0xFFB8914A)]),
-                    boxShadow: [BoxShadow(color: Color(0x66D9B970), blurRadius: 18, offset: Offset(0, 4))],
-                  ),
-                  child: const NwsbIcon(NwsbMarks.crown, size: 22, color: Colors.black, strokeWidth: 1.9),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('Rank', style: TextStyle(color: _grey, fontSize: 11, fontWeight: FontWeight.w600)),
-                    Text(s.live ? s.rank : 'Not ranked yet',
-                        maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.15)),
-                  ]),
-                ),
-                const Icon(Icons.chevron_right_rounded, color: _seeAll),
-              ]),
-              const SizedBox(height: 12),
-              if (!s.live)
-                const Text('Sign in to see your rank, your place and your team', style: TextStyle(color: _grey, fontSize: 11.5, fontWeight: FontWeight.w500))
-              else
-                Row(children: [
-                  stat('THIS MONTH', s.place == null ? 'Not on board' : '#${s.place!.$1} of ${s.place!.$2}'),
-                  const SizedBox(width: 8),
-                  stat('UNDER YOU', s.under == 1 ? '1 person' : '${s.under} people'),
-                ]),
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
-class _TargetCard extends StatelessWidget {
-  const _TargetCard({required this.s});
-  final EarnSnapshot s;
-  @override
-  Widget build(BuildContext context) {
-    final line = !s.live
-        ? 'Sign in to see your target'
-        : s.topRank
-            ? 'Top rank reached'
-            : '${math.max(0, s.target - s.sold)} more words to ${s.nextRank ?? 'the next rank'}';
-    Widget bar(double v) => LayoutBuilder(
-          builder: (context, c) => Stack(children: [
-            Container(height: 8, decoration: BoxDecoration(color: const Color(0x26FFFFFF), borderRadius: BorderRadius.circular(9))),
-            Container(
-              height: 8,
-              width: c.maxWidth * v,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(9),
-                gradient: const LinearGradient(colors: [Color(0xFFF3E6BF), Color(0xFF7FE0D0)]),
-                boxShadow: const [BoxShadow(color: Color(0x667FE0D0), blurRadius: 10)],
-              ),
-            ),
-          ]),
-        );
-    return Semantics(
-      button: true,
-      label: 'Target, $line',
-      child: _Press(
-        key: const ValueKey('earn-target-card'),
-        onTap: () => _Go.targets(context),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: _surface(),
-          child: ExcludeSemantics(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                Text(s.live ? '${s.sold}' : '0', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800, height: 1)),
-                Padding(
-                  padding: const EdgeInsets.only(left: 4, bottom: 3),
-                  child: Text(s.live ? '/ ${s.target} words' : 'words', style: const TextStyle(color: _grey, fontSize: 12, fontWeight: FontWeight.w600)),
-                ),
-                const Spacer(),
-                const Icon(Icons.chevron_right_rounded, color: _seeAll),
-              ]),
-              const SizedBox(height: 10),
-              if (_still(context))
-                bar(s.progress)
-              else
-                TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0, end: s.progress),
-                  duration: const Duration(milliseconds: 1100),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, v, _) => bar(v),
-                ),
-              const SizedBox(height: 8),
-              Text(line, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12, fontWeight: FontWeight.w600)),
-            ]),
-          ),
-        ),
-      ),
-    );
-  }
-}

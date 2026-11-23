@@ -20,6 +20,7 @@ import '../economy/economy_api.dart';
 import '../economy/money.dart';
 import '../economy/economy_theme.dart';
 import '../economy/reward_fx.dart';
+import '../earn/earn_kit.dart';
 
 class ProgramTab {
   const ProgramTab(this.id, this.title, this.build);
@@ -98,7 +99,27 @@ void reportExploreOnce(String page) {
 /// Only this block listens to the economy, so the play area above it
 /// isn't rebuilt when a number changes.
 class ProgramTabsBlock extends StatefulWidget {
-  const ProgramTabsBlock({super.key, required this.spec, this.initialTab, this.scrollTo = false, this.goRef, this.showDisclaimer = true});
+  const ProgramTabsBlock({
+    super.key,
+    required this.spec,
+    this.initialTab,
+    this.scrollTo = false,
+    this.goRef,
+    this.showDisclaimer = true,
+    this.marks = const {},
+    this.hPad = 0,
+    this.sectionTitle,
+  });
+
+  /// Each tab's mark in its pill (tab id → [NwsbMarks]).
+  final Map<String, String> marks;
+
+  /// Side air of the content; the pill row runs edge to edge and starts
+  /// at this inset, so no pill is cut at the page margin.
+  final double hPad;
+
+  /// A section title with See all above the pills (See all lists every tab).
+  final String? sectionTitle;
   /// Off when the page already shows the same text in its Good to know bar.
   final bool showDisclaimer;
   final ProgramSpec spec;
@@ -126,7 +147,10 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
     if (EconomyMirror.instance.summary.isEmpty) _refresh();
     reportExploreOnce(widget.spec.pageId);
     widget.goRef?.value = go;
-    if (widget.scrollTo) WidgetsBinding.instance.addPostFrameCallback((_) => _reveal());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showPill();
+      if (widget.scrollTo) _reveal();
+    });
   }
 
   void go(String id) {
@@ -134,6 +158,83 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
     if (i < 0 || !mounted) return;
     setState(() => _tab = i);
     WidgetsBinding.instance.addPostFrameCallback((_) => _reveal());
+  }
+
+  final _pillKeys = <int, GlobalKey>{};
+  GlobalKey _pillKey(int i) => _pillKeys.putIfAbsent(i, GlobalKey.new);
+
+  /// Brings the picked pill fully on screen in the pill row.
+  void _showPill() {
+    final c = _pillKey(_tab).currentContext;
+    if (c == null) return;
+    final ro = c.findRenderObject();
+    final sc = Scrollable.maybeOf(c);
+    if (ro == null || sc == null) return;
+    sc.position.ensureVisible(ro, alignment: 0.5, duration: Duration.zero);
+  }
+
+  void _pick(int i) {
+    RewardHaptics.tick();
+    setState(() => _tab = i);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showPill());
+  }
+
+  void _seeAll() {
+    final spec = widget.spec;
+    showModalBottomSheet<void>(
+      context: context,
+      isDismissible: true,
+      enableDrag: true,
+      showDragHandle: false,
+      backgroundColor: Colors.transparent,
+      barrierColor: const Color(0x99000000),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+          child: EarnPane(
+            dark: true,
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: const Color(0x66FFFFFF), borderRadius: BorderRadius.circular(2)))),
+              const SizedBox(height: 14),
+              Text(widget.sectionTitle ?? spec.title, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 12),
+              for (var i = 0; i < spec.tabs.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Material(
+                    color: i == _tab ? Colors.white : const Color(0x14FFFFFF),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      key: ValueKey('see-all-${spec.tabs[i].id}'),
+                      onTap: () {
+                        Navigator.of(ctx).pop();
+                        _pick(i);
+                        WidgetsBinding.instance.addPostFrameCallback((_) => _reveal());
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+                        child: Row(children: [
+                          EarnSquare(mark: widget.marks[spec.tabs[i].id] ?? NwsbMarks.arrow, size: 34, dark: i != _tab),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(spec.tabs[i].title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: i == _tab ? kEarnInk : Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+                          ),
+                          Icon(Icons.arrow_forward_ios_rounded, size: 13, color: i == _tab ? kEarnInk : kEarnMuted),
+                        ]),
+                      ),
+                    ),
+                  ),
+                ),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 
   void _reveal() {
@@ -160,20 +261,31 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          if (widget.sectionTitle != null)
+            Padding(
+              padding: EdgeInsets.fromLTRB(widget.hPad, 4, widget.hPad, 4),
+              child: EarnSectionTitle(widget.sectionTitle!, onSeeAll: _seeAll),
+            ),
           Padding(
             key: _anchor,
-            padding: const EdgeInsets.only(top: 6, bottom: 12),
+            padding: const EdgeInsets.only(top: 6, bottom: 14),
             child: SizedBox(
-              height: 40,
-              child: ListView.separated(
+              height: 44,
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                itemCount: spec.tabs.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (_, i) => _tabCard(spec.tabs[i].title, i),
+                padding: EdgeInsets.symmetric(horizontal: widget.hPad),
+                child: Row(children: [
+                  for (var i = 0; i < spec.tabs.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 8),
+                    _tabCard(spec.tabs[i].title, i),
+                  ],
+                ]),
               ),
             ),
           ),
-          ListenableBuilder(
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: widget.hPad),
+            child: ListenableBuilder(
             listenable: EconomyMirror.instance,
             builder: (context, _) {
               final m = EconomyMirror.instance;
@@ -190,16 +302,20 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
                       GoldButton(label: 'Sign in', onTap: () => NwsbSignInPage.open(context)),
                     ])
                   else if (s.isEmpty && _loading)
-                    const Padding(padding: EdgeInsets.all(40), child: Center(child: AppThinkingLoader(label: 'Opening your account…')))
+                    const Center(child: EarnLoading(label: 'Opening your account…'))
                   else
                     ...layoutChildren(context, '${spec.pageId}.${tab.id}', tab.build(context, s)),
                 ],
               );
             },
           ),
+          ),
           if (widget.showDisclaimer) ...[
             const SizedBox(height: 18),
-            PDisclaimer(spec.disclaimer, slot: 'program_kit.${spec.pageId}'),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: widget.hPad),
+              child: PDisclaimer(spec.disclaimer, slot: 'program_kit.${spec.pageId}'),
+            ),
           ],
         ],
       ),
@@ -210,26 +326,39 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
   /// when picked, translucent otherwise.
   Widget _tabCard(String label, int i) {
     final on = i == _tab;
+    final mark = widget.marks[widget.spec.tabs[i].id];
+    final ink = on ? kEarnInk : Colors.white;
     return Semantics(
       button: true,
       selected: on,
       label: label,
       excludeSemantics: true,
       child: GestureDetector(
-        onTap: () {
-          RewardHaptics.tick();
-          setState(() => _tab = i);
-        },
+        key: _pillKey(i),
+        onTap: () => _pick(i),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          height: 44,
+          padding: EdgeInsets.fromLTRB(mark == null ? 16 : 6, 0, 16, 0),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: on ? Colors.white : const Color(0x24FFFFFF),
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(color: on ? Colors.white : const Color(0x40FFFFFF)),
           ),
-          child: Text(label, maxLines: 1, style: TextStyle(color: on ? const Color(0xFF111118) : Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            if (mark != null) ...[
+              Container(
+                width: 32,
+                height: 32,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(color: on ? kEarnInk : Colors.white, borderRadius: BorderRadius.circular(10)),
+                child: NwsbIcon(mark, size: 16, color: on ? Colors.white : kEarnInk, strokeWidth: 1.9),
+              ),
+              const SizedBox(width: 9),
+            ],
+            Text(label, maxLines: 1, style: TextStyle(color: ink, fontWeight: FontWeight.w700, fontSize: 13.5)),
+          ]),
         ),
       ),
     );
@@ -260,49 +389,46 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
   }
 }
 
-/// Glass card holding a column.
+/// Glass card holding a column (the Earn pane: rounded 22, kit glass).
 class PCard extends StatelessWidget {
   const PCard({super.key, required this.children, this.glow});
   final List<Widget> children;
+
+  /// Kept for callers; the kit look has no coloured glow.
   final Color? glow;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: GlassWrap(
-        margin: EdgeInsets.zero,
-        padding: const EdgeInsets.all(6),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: glow == null ? null : [BoxShadow(color: glow!.withValues(alpha: 0.3), blurRadius: 22)],
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: children),
-        ),
+      child: EarnPane(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: children),
       ),
     );
   }
 }
 
-/// Section heading (gold eyebrow + white title).
+/// Section heading: small caps eyebrow over a bold title, an optional white
+/// rounded-square mark.
 class PHeading extends StatelessWidget {
-  const PHeading(this.eyebrow, this.title, {super.key, this.slot = 'program_kit.PHeading'});
+  const PHeading(this.eyebrow, this.title, {super.key, this.slot = 'program_kit.PHeading', this.mark});
   final String eyebrow;
   final String title;
   final String slot;
+  final String? mark;
 
   @override
   Widget build(BuildContext context) {
+    final text = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+      EditableLabel(slot, eyebrow.toUpperCase(), style: const TextStyle(color: Color(0xB3FFFFFF), letterSpacing: 1.4, fontSize: 10.5, fontWeight: FontWeight.w700)),
+      const SizedBox(height: 3),
+      EditableLabel(slot, title, style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800, height: 1.2)),
+    ]);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(2, 6, 2, 10),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        EditableLabel(slot, eyebrow.toUpperCase(), style: const TextStyle(color: Color(0xB3FFFFFF), letterSpacing: 1.4, fontSize: 10.5, fontWeight: FontWeight.w700)),
-        const SizedBox(height: 4),
-        EditableLabel(slot, title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800)),
-      ]),
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 12),
+      child: mark == null
+          ? text
+          : Row(children: [EarnSquare(mark: mark, size: 40), const SizedBox(width: 12), Expanded(child: text)]),
     );
   }
 }
@@ -326,20 +452,23 @@ class PRow extends StatelessWidget {
           const Padding(padding: EdgeInsets.only(right: 10), child: _MiniCoin())
         else if (mark != null)
           Container(
-            width: 32,
-            height: 32,
-            margin: const EdgeInsets.only(right: 10),
+            width: 34,
+            height: 34,
+            margin: const EdgeInsets.only(right: 12),
             alignment: Alignment.center,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: color ?? Colors.white),
-            child: NwsbIcon(mark!, size: 15, color: const Color(0xFF0B0B10)),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+            child: NwsbIcon(mark!, size: 16, color: color == null ? kEarnInk : Color.lerp(color, kEarnInk, 0.35)!, strokeWidth: 1.9),
           ),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            EditableLabel('program_kit.PRow', title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-            if (sub != null && sub!.isNotEmpty) Text(sub!, style: const TextStyle(color: Color(0x8CFFFFFF), fontSize: 12.5, height: 1.3)),
+            EditableLabel('program_kit.PRow', title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14.5)),
+            if (sub != null && sub!.isNotEmpty) ...[
+              const SizedBox(height: 2),
+              Text(sub!, style: const TextStyle(color: kEarnMuted, fontSize: 12.5, height: 1.3)),
+            ],
           ]),
         ),
-        if (trailing != null) trailing!,
+        if (trailing != null) ...[const SizedBox(width: 8), trailing!],
       ]),
     );
   }
@@ -368,13 +497,10 @@ class PProgress extends StatelessWidget {
           tween: Tween(begin: 0, end: v),
           duration: const Duration(milliseconds: 900),
           curve: Curves.easeOutCubic,
-          builder: (context, x, _) => ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(value: x, minHeight: 7, color: NwsbColors.goldLight, backgroundColor: const Color(0x22FFFFFF)),
-          ),
+          builder: (context, x, _) => EarnBar(x),
         ),
-        const SizedBox(height: 4),
-        Text(label ?? '${value.toInt()} / ${goal.toInt()}', style: const TextStyle(color: NwsbColors.mist, fontSize: 11)),
+        const SizedBox(height: 6),
+        Text(label ?? '${value.toInt()} / ${goal.toInt()}', style: const TextStyle(color: kEarnSoft, fontSize: 11.5, fontWeight: FontWeight.w600)),
       ]),
     );
   }
@@ -417,30 +543,39 @@ class _PClaimState extends State<PClaim> {
     final on = widget.enabled && !_busy;
     return TextButton(
       onPressed: on ? _go : null,
-      style: TextButton.styleFrom(
-        backgroundColor: widget.filled ? (on ? NwsbColors.goldLight : const Color(0x33E8D5A3)) : Colors.transparent,
-        foregroundColor: widget.filled ? Colors.black : NwsbColors.goldLight,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        minimumSize: const Size(0, 34),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: BorderSide(color: widget.filled ? Colors.transparent : const Color(0x66E8D5A3))),
-      ),
+      style: earnButtonStyle(filled: widget.filled, enabled: on),
       child: _busy
-          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-          : EditableLabel('program_kit.PClaim', widget.label, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: kEarnInk))
+          : EditableLabel('program_kit.PClaim', widget.label, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
     );
   }
 }
 
+/// The Earn button look for a [TextButton]: white with ink when filled,
+/// glass with white when not. Off stays readable: glass fill, a hairline and
+/// 70% white, never a faded ghost.
+ButtonStyle earnButtonStyle({bool filled = true, bool enabled = true}) => ButtonStyle(
+      backgroundColor: WidgetStatePropertyAll(!enabled ? const Color(0x1FFFFFFF) : (filled ? Colors.white : const Color(0x24FFFFFF))),
+      foregroundColor: WidgetStatePropertyAll(!enabled ? const Color(0xB3FFFFFF) : (filled ? kEarnInk : Colors.white)),
+      overlayColor: const WidgetStatePropertyAll(Color(0x14000000)),
+      padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 16, vertical: 10)),
+      minimumSize: const WidgetStatePropertyAll(Size(0, 42)),
+      shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: !enabled || !filled ? const Color(0x40FFFFFF) : Colors.transparent),
+      )),
+    );
+
 /// A status pill ("Done", "Locked", "3 left").
 class PPill extends StatelessWidget {
-  const PPill(this.text, {super.key, this.color = NwsbColors.mist});
+  const PPill(this.text, {super.key, this.color = Colors.white});
   final String text;
   final Color color;
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: color.withValues(alpha: 0.6))),
-        child: EditableLabel('program_kit.PPill', text, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(9), color: color.withValues(alpha: 0.14), border: Border.all(color: color.withValues(alpha: 0.6))),
+        child: EditableLabel('program_kit.PPill', text, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800)),
       );
 }
 
@@ -451,7 +586,7 @@ class PEmpty extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 10),
-        child: EditableLabel(slot, text, style: const TextStyle(color: NwsbColors.mist, fontSize: 13, height: 1.4)),
+        child: EditableLabel(slot, text, style: const TextStyle(color: kEarnSoft, fontSize: 13, height: 1.45)),
       );
 }
 
@@ -464,10 +599,15 @@ class PRules extends StatelessWidget {
   Widget build(BuildContext context) => PCard(children: [
         for (final l in lines)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: 10),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Padding(padding: EdgeInsets.only(top: 6, right: 8), child: CircleAvatar(radius: 2.5, backgroundColor: NwsbColors.gold)),
-              Expanded(child: EditableLabel(slot, l, style: const TextStyle(color: Colors.white, height: 1.4, fontSize: 13))),
+              Container(
+                width: 6,
+                height: 6,
+                margin: const EdgeInsets.only(top: 7, right: 10),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(1.5)),
+              ),
+              Expanded(child: EditableLabel(slot, l, style: const TextStyle(color: Colors.white, height: 1.45, fontSize: 13.5))),
             ]),
           ),
       ]);
@@ -480,9 +620,9 @@ class PDisclaimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0x33FFFFFF)), color: const Color(0x0DFFFFFF)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(kEarnRadius), border: Border.all(color: kEarnLine), color: const Color(0x8C14141C)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const EditableLabel('program_kit.GoodToKnow', 'GOOD TO KNOW', style: TextStyle(color: Color(0xFFE4C56A), letterSpacing: 1.6, fontWeight: FontWeight.w800, fontSize: 11)),
+          const EditableLabel('program_kit.GoodToKnow', 'GOOD TO KNOW', style: TextStyle(color: Color(0xB3FFFFFF), letterSpacing: 1.6, fontWeight: FontWeight.w800, fontSize: 10.5)),
           const SizedBox(height: 6),
           EditableLabel(slot, text, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11.5, height: 1.45)),
         ]),
@@ -520,14 +660,14 @@ class _ServerViewState extends State<ServerView> {
       future: _f,
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Padding(padding: EdgeInsets.all(28), child: Center(child: AppThinkingLoader(size: 56)));
+          return const Center(child: EarnLoading());
         }
         if (snap.hasError) {
           final e = snap.error;
           return PCard(children: [
-            Text(e is EconomyException ? e.message : 'That did not load. Pull to try again.', style: const TextStyle(color: NwsbColors.mist, height: 1.4)),
-            const SizedBox(height: 8),
-            Align(alignment: Alignment.centerLeft, child: TextButton(onPressed: _reload, child: const EditableLabel('program_kit.ServerView', 'Try again', style: TextStyle(color: NwsbColors.goldLight)))),
+            Text(e is EconomyException ? e.message : 'That did not load. Pull to try again.', style: const TextStyle(color: kEarnSoft, height: 1.4)),
+            const SizedBox(height: 10),
+            Align(alignment: Alignment.centerLeft, child: TextButton(onPressed: _reload, style: earnButtonStyle(filled: false), child: const EditableLabel('program_kit.ServerView', 'Try again', style: TextStyle(fontWeight: FontWeight.w800)))),
           ]);
         }
         return widget.builder(context, snap.data ?? const {}, _reload);
@@ -558,14 +698,14 @@ class PBalance extends StatelessWidget {
   final int coins;
   final String? caption;
   @override
-  Widget build(BuildContext context) => PCard(glow: NwsbColors.gold, children: [
+  Widget build(BuildContext context) => PCard(children: [
         Row(children: [
           EditableImage.asset('assets/icons/nwsb-coin.webp', width: 48, height: 48, errorBuilder: (_, __, ___) => const SizedBox(width: 48), slot: 'program_kit.PBalance'),
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              CountUp(coins, style: const TextStyle(color: NwsbColors.goldLight, fontSize: 30, fontWeight: FontWeight.w800)),
-              Text(caption ?? 'NowssB coins', style: const TextStyle(color: NwsbColors.mist, fontSize: 12)),
+              CountUp(coins, style: kEarnBig),
+              Text(caption ?? 'NowssB coins', style: const TextStyle(color: kEarnSoft, fontSize: 12)),
             ]),
           ),
         ]),
@@ -586,7 +726,7 @@ class ProgramLink extends StatelessWidget {
   Widget build(BuildContext context) => GestureDetector(
         onTap: () => openProgram(context, page()),
         child: PCard(children: [
-          PRow(title: title, sub: sub, mark: mark, trailing: const Icon(Icons.chevron_right, color: NwsbColors.goldLight)),
+          PRow(title: title, sub: sub, mark: mark, trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 13, color: kEarnMuted)),
         ]),
       );
 }

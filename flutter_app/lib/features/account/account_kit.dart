@@ -165,8 +165,8 @@ class AccountBackButton extends StatelessWidget {
         child: Container(
           width: 42,
           height: 42,
-          decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-          child: const Icon(Icons.arrow_back, size: 19, color: NwsbColors.ink),
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(13)),
+          child: const Icon(Icons.arrow_back_rounded, size: 19, color: NwsbColors.ink),
         ),
       ),
     );
@@ -212,7 +212,7 @@ class TileBadge extends StatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: const Color(0x1AFFFFFF),
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0x1FFFFFFF)),
       ),
       child: child ?? Icon(icon, size: 18, color: color),
@@ -395,10 +395,15 @@ class PrimaryBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null && !busy;
-    return Opacity(
-      opacity: enabled || busy ? 1 : 0.5,
-      child: Material(
-        color: Colors.white,
+    // Off stays readable: glass fill, hairline, 70% white type.
+    final ink = enabled || busy ? NwsbColors.ink : const Color(0xB3FFFFFF);
+    return Material(
+        color: enabled || busy ? Colors.white : const Color(0x1FFFFFFF),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: enabled || busy ? BorderSide.none : const BorderSide(color: Color(0x40FFFFFF)),
+        ),
+        clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: enabled ? onTap : null,
           child: SizedBox(
@@ -410,17 +415,16 @@ class PrimaryBar extends StatelessWidget {
                   busy ? 'PLEASE WAIT' : label.toUpperCase(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, letterSpacing: 1.5, color: NwsbColors.ink),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: 1.5, color: ink),
                 ),
               ),
               if (!busy) ...[
                 const SizedBox(width: 14),
-                const Icon(Icons.arrow_forward, size: 17, color: NwsbColors.ink),
+                Icon(Icons.arrow_forward_rounded, size: 17, color: ink),
               ],
             ]),
           ),
         ),
-      ),
     );
   }
 }
@@ -462,7 +466,7 @@ class GlassChoice extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(12),
           color: selected ? Colors.white : const Color(0x1AFFFFFF),
           border: Border.all(color: selected ? Colors.white : const Color(0x1FFFFFFF)),
         ),
@@ -587,7 +591,7 @@ class _CountrySheetState extends State<_CountrySheet> {
             Container(
               width: 46,
               height: 46,
-              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
               child: const Icon(Icons.public_rounded, size: 22, color: Color(0xFF0B0B10)),
             ),
             const SizedBox(width: 12),
@@ -639,7 +643,7 @@ Future<DateTime?> pickBirthday(BuildContext context, {DateTime? initial}) {
   var value = initial ?? DateTime(now.year - 25, now.month, now.day);
   return showAccountSheet<DateTime>(
     context,
-    builder: (ctx) => GlassListCard(
+    builder: (ctx) => GlassListCard( squareBadge: true,
       key: const Key('dob-sheet'),
       margin: EdgeInsets.zero,
       icon: Icons.cake_outlined,
