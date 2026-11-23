@@ -435,7 +435,7 @@ class ContentPricesCardState extends State<ContentPricesCard> {
             child: TextField(
               controller: _id,
               style: const TextStyle(color: Colors.white, fontSize: 13),
-              decoration: const InputDecoration(isDense: true, hintText: 'word / book id, e.g. phoenix', hintStyle: TextStyle(color: kFaint, fontSize: 12)),
+              decoration: const InputDecoration(isDense: true, hintText: 'word / book id, e.g. peace', hintStyle: TextStyle(color: kFaint, fontSize: 12)),
             ),
           ),
           _tierPick(_kind, _price ?? sp.defaultFor(_kind).toInt(), (t) => setState(() => _price = t)),

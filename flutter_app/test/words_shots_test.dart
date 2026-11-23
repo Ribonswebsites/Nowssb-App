@@ -7,6 +7,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +33,26 @@ void main() {
     FakeVideoPlatform();
     VideoPool.debugDeadlines = false;
     await setUpHomeRender();
+    final emoji = File('/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf');
+    if (emoji.existsSync()) {
+      await (FontLoader('NotoColorEmoji')..addFont(Future.value(ByteData.sublistView(emoji.readAsBytesSync())))).load();
+    }
+  });
+
+  test('fantasy filler words, warrior titles and ancient peoples are gone', () {
+    const gone = ['dragon', 'zeus', 'phoenix', 'kitsune', 'oni', 'samurai', 'ninja', 'viking', 'aztec', 'sigil', 'griffon', 'titan'];
+    final atelier = {for (final c in kRmCategories) for (final w in c.words) w.word.toLowerCase()};
+    for (final w in gone) {
+      expect(isRemovedWord(w), isTrue, reason: w);
+      expect(atelier.contains(w), isFalse, reason: w);
+      expect(wordPhotoFor(w), isNull, reason: w);
+    }
+    expect(kRmCategories.any((c) => c.id == 'mythical' || c.id == 'ancient'), isFalse);
+    for (final c in kRmCategories) {
+      expect(c.words, isNotEmpty, reason: c.id);
+    }
+    // Real words in the same rows stay.
+    expect(atelier, containsAll(['warrior', 'shield', 'archer', 'oracle', 'rune']));
   });
 
   test('removed words are out of every catalogue list', () {
@@ -68,7 +89,8 @@ void main() {
       expect(seen.add(p), isTrue, reason: 'repeated: $p');
     }
     expect(kWordPhotos.values.toSet(), hasLength(kWordPhotos.length));
-    expect(languageFamily('Old French'), 'Romance');
+    expect(plainOrigin('Proto-Indo-European'), 'Ancient roots');
+    expect(plainOrigin('Old French'), 'Old French');
     expect(drawableRoot('péh₂wr̥'), 'péh2wr');
   });
 
@@ -102,9 +124,9 @@ void main() {
     }
   }
 
-  Future<void> open(WidgetTester t, void Function(BuildContext) go) async {
+  Future<void> open(WidgetTester t, void Function(BuildContext) go, {double width = 390}) async {
     SharedPreferences.setMockInitialValues({});
-    t.view.physicalSize = const Size(390 * 2, 844 * 2);
+    t.view.physicalSize = Size(width * 2, 844 * 2);
     t.view.devicePixelRatio = 2;
     addTearDown(t.view.reset);
     await t.runAsync(() async {
@@ -140,9 +162,9 @@ void main() {
   final pages = <String, void Function(BuildContext)>{
     'meaning-water': (c) => openMeaningDetail(c, meaning('water')),
     'meaning-moon': (c) => openMeaningDetail(c, meaning('moon')),
-    'word-dragon': (c) => openAtelierWord(c, word: 'dragon', root: 'Greek', img: kNowssbStoreMark),
+    'word-shield': (c) => openAtelierWord(c, word: 'shield', root: 'Proto-Germanic', img: kNowssbStoreMark),
     'word-ocean': (c) => openAtelierWord(c, word: 'ocean', root: 'Old French', img: kNowssbStoreMark),
-    'word-samurai': (c) => openAtelierWord(c, word: 'samurai', root: 'Japanese', img: kNowssbStoreMark),
+    'word-serenity': (c) => openAtelierWord(c, word: 'serenity', root: 'Latin', img: kNowssbStoreMark),
     'word-peace': (c) => openAtelierWord(c, word: 'peace', root: 'Old French', img: kNowssbStoreMark),
   };
   if (const bool.fromEnvironment('WORDS_BEFORE')) {
@@ -154,19 +176,54 @@ void main() {
     testWidgets('word page ${e.key}', (t) async {
       await open(t, e.value);
       await shot(t, '${e.key}-top');
-      final s = find.byType(Scrollable);
-      if (s.evaluate().isNotEmpty) {
-        await t.drag(s.last, const Offset(0, -700));
-        await settle(t, 8);
-        await shot(t, '${e.key}-scrolled');
-      }
+      final s = find.byKey(const ValueKey('store-word-list'));
+      expect(s, findsOneWidget);
+      await t.drag(s, const Offset(0, -640));
+      await settle(t, 8);
+      await shot(t, '${e.key}-scrolled');
+      await t.drag(s, const Offset(0, -760));
+      await settle(t, 8);
+      await shot(t, '${e.key}-more');
       expect(t.takeException(), isNull);
+    });
+    testWidgets('word page ${e.key} fits at 360', (t) async {
+      await open(t, e.value, width: 360);
+      expect(t.takeException(), isNull);
+      final s = find.byKey(const ValueKey('store-word-list'));
+      for (var i = 0; i < 4; i++) {
+        await t.drag(s, const Offset(0, -600));
+        await settle(t, 3);
+        expect(t.takeException(), isNull);
+      }
     });
   }
 
+  testWidgets('the chips switch what the photo says, the tall pill is the wishlist', (t) async {
+    await open(t, (c) => openAtelierWord(c, word: 'ocean', root: 'Old French', img: kNowssbStoreMark));
+    expect(find.text('Hi there 👋'), findsOneWidget);
+    expect(find.text('Ocean\nNature'), findsOneWidget);
+    expect(find.text('OLD FRENCH'), findsWidgets);
+    await t.tap(find.byKey(const ValueKey('word-mode-listen')));
+    await settle(t, 2);
+    expect(find.text('Hear Ocean said right'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('word-mode-practice')));
+    await settle(t, 2);
+    expect(find.text('Practise Ocean daily'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('word-wish')));
+    await settle(t, 3);
+    expect(CartBag.instance.inWish('word:ocean'), isTrue);
+    await t.tap(find.byKey(const ValueKey('word-wish')));
+    await settle(t, 3);
+    expect(CartBag.instance.inWish('word:ocean'), isFalse);
+    // No jargon labels on the page.
+    expect(find.textContaining('Hellenic'), findsNothing);
+    expect(find.textContaining('Romance'), findsNothing);
+    expect(find.textContaining('Proto-'), findsNothing);
+  });
+
   testWidgets('the word page keeps its actions and the star saves to the wishlist', (t) async {
     await open(t, (c) => openAtelierWord(c, word: 'ocean', root: 'Old French', img: kNowssbStoreMark));
-    expect(find.text('Wishlist'), findsOneWidget);
+    expect(find.byKey(const ValueKey('word-wish')), findsOneWidget);
     expect(find.text('Add to Cart'), findsOneWidget);
     expect(find.text('Buy on Google Play'), findsOneWidget);
     expect(find.text('Ocean'), findsWidgets);

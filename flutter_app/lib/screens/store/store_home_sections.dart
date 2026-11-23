@@ -434,10 +434,10 @@ class StoreFeaturedBundleSection extends StatelessWidget {
       kStoreProductArt,
     ),
     _BundleRow(
-      'Dragon',
-      'Mythical · Greek',
-      'dragon',
-      'Greek',
+      'Shield',
+      'Warriors Edition',
+      'shield',
+      'Proto-Germanic',
       kStoreProductArt,
     ),
     _BundleRow('Peace', 'Peace Edition', 'peace', 'Latin', kStoreProductArt),
@@ -1256,7 +1256,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       art: kStoreProductArt,
       rows: [
         ('Warrior', 'Old French'),
-        ('Dragon', 'Greek'),
+        ('Shield', 'Proto-Germanic'),
         ('Earth', 'Proto-Germanic'),
       ],
     ),
@@ -1288,7 +1288,7 @@ class StoreGlassPlaylistCarousel extends StatelessWidget {
       art: kMsMeaningIconAsset,
       rows: [
         ('Warrior', 'Inner courage'),
-        ('Dragon', 'Transforming power'),
+        ('Shield', 'Steady protection'),
         ('Earth', 'Grounding presence'),
       ],
     ),
@@ -1716,7 +1716,7 @@ List<StoreViewAllItem> storeDefaultViewAllItems() {
     ('Elements', 'Nature', kStoreProductArt),
     ('Time & Cosmos', 'Infinity', kStoreProductArt),
     ('Peace', 'Stillness', kStoreProductArt),
-    ('Mythical', 'Ancient forces', kStoreProductArt),
+    ('Nature', 'Living world', kStoreProductArt),
   ];
   return [
     for (final c in cats)

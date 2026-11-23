@@ -25,7 +25,6 @@ import 'bag_ui.dart';
 import 'store_actions.dart';
 import 'store_cards.dart';
 import 'store_word_page.dart';
-import '../../widgets/restyle_kit.dart' show KitPane, GlassWrap, kKitMuted, kKitEyebrow;
 import '../../admin/template/editable.dart';
 
 void openAtelierWord(
@@ -236,7 +235,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
     // Same Store shell as the departments, cart and checkout.
     return ListenableBuilder(
       listenable: Listenable.merge([StorePrices.instance, Entitlements.instance]),
-      builder: (context, _) => PageShell(
+      builder: (context, _) => _wordPage ? _wordScreen(context) : PageShell(
       eyebrow: '',
       title: 'NowssB Store',
       subtitle: title,
@@ -247,7 +246,7 @@ class _StoreProductPageState extends State<StoreProductPage> {
         context,
         onSelect: (id) => openStoreFromPicker(context, id, current: ''),
       ),
-      slivers: _wordPage ? _wordSlivers(context) : [
+      slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 40),
           sliver: SliverList(
@@ -462,195 +461,56 @@ class _StoreProductPageState extends State<StoreProductPage> {
     );
   }
 
-  /// Wishlist, Add to Cart and the Yours / Buy button, unchanged.
-  Widget _actions(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _ActBtn(
-                  label: 'Wishlist',
-                  mark: NwsbMarks.wishlist,
-                  filled: false,
-                  onTap: () {
-                    CartBag.instance.addWishlist(_bagItem);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Saved $title to wishlist'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _ActBtn(
-                  key: _addCartKey,
-                  label: 'Add to Cart',
-                  mark: NwsbMarks.cart,
-                  filled: false,
-                  onTap: () {
-                    if (_open) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('$title is already yours — no need to buy it again'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                      return;
-                    }
-                    storeAddToCart(context, _bagItem, origin: _addCartKey);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Added $title to cart'),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          _ActBtn(
-            label: _open ? 'Yours — open it in the Library' : 'Buy on Google Play',
-            mark: NwsbMarks.bag,
-            filled: true,
-            onTap: () {
-              if (_open) {
-                Navigator.of(context).pop();
-                return;
-              }
-              storeBuyNow(context, _bagItem, origin: _addCartKey);
-            },
-          ),
-        ],
-      );
-
-  /// The word / meaning page, on the layout of Ribon's Nov 23 reference.
-  List<Widget> _wordSlivers(BuildContext context) {
-    final facts = StoreWordFacts.of(title, root, meaning: _meaning);
-    final letters = title.replaceAll(RegExp(r'[^A-Za-z]'), '').length;
-    final priceLabel = _open
-        ? (price <= 0 ? 'Free' : (Entitlements.instance.ownsItem(_id) ? 'Owned' : 'Included in your plan'))
-        : inr(price, sku: _id);
-    return [
-      SliverPadding(
-        padding: const EdgeInsets.fromLTRB(0, 4, 0, 40),
-        sliver: SliverList(
-          delegate: SliverChildListDelegate([
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 6, 20, 0),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
-                  facts.category.isNotEmpty ? facts.category : (_meaning ? 'Meaning' : 'Word'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    height: 1.1,
-                    letterSpacing: -0.6,
-                  ),
-                ),
-                if (facts.related.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    '${facts.related.length + 1} ${_meaning ? 'meanings' : 'words'} in this collection',
-                    style: const TextStyle(color: kKitMuted, fontSize: 13.5, height: 1.35),
-                  ),
-                ],
-              ]),
-            ),
-            const SizedBox(height: 14),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Wrap(spacing: 8, runSpacing: 8, children: [
-                StoreWordPill(
-                  icon: _meaning ? Icons.menu_book_rounded : Icons.graphic_eq_rounded,
-                  label: _meaning ? 'Meaning' : 'Natural Origin',
-                  strong: true,
-                ),
-                if (facts.family.isNotEmpty)
-                  StoreWordPill(icon: Icons.account_tree_outlined, label: facts.family),
-                const StoreWordPill(icon: Icons.all_inclusive_rounded, label: 'Owned forever'),
-              ]),
-            ),
-            const SizedBox(height: 14),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: StoreWordHero(
-                picture: _picture,
-                title: title,
-                tag: _meaning ? 'Meaning' : 'Word',
-                line: facts.line,
-                chips: [
-                  if (facts.origin.isNotEmpty) StoreWordChip(icon: Icons.public_rounded, label: drawableRoot(facts.origin)),
-                  if (facts.rootForm.isNotEmpty) StoreWordChip(icon: Icons.history_edu_rounded, label: drawableRoot(facts.rootForm)),
-                  if (letters > 0) StoreWordChip(icon: Icons.text_fields_rounded, label: '$letters letters'),
-                ],
-                star: StoreWordStar(item: () => _bagItem),
-              ),
-            ),
-            GlassWrap(
-              margin: const EdgeInsets.fromLTRB(16, 14, 16, 8),
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(_open ? 'YOURS' : 'PRICE', style: kKitEyebrow),
-                      const SizedBox(height: 4),
-                      Text(priceLabel,
-                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: NwsbColors.goldLight)),
-                    ]),
-                  ),
-                ]),
-                const SizedBox(height: 14),
-                _actions(context),
-              ]),
-            ),
-            KitPane(
-              eyebrow: 'About',
-              title: title,
-              mark: _meaning ? NwsbMarks.meaning : NwsbMarks.word,
-              child: Text(about, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 14.5, height: 1.55)),
-            ),
-            KitPane(
-              eyebrow: 'With this ${_meaning ? 'meaning' : 'word'}',
-              title: "What's included",
-              mark: NwsbMarks.bag,
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                for (final h in highlights)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Icon(Icons.check_rounded, size: 17, color: NwsbColors.goldLight),
-                      const SizedBox(width: 10),
-                      Expanded(child: Text(h, style: const TextStyle(fontSize: 13.5, height: 1.4, color: Color(0xCCFFFFFF)))),
-                    ]),
-                  ),
-              ]),
-            ),
-            if (facts.related.isNotEmpty)
-              StoreWordMore(
-                category: facts.category,
-                links: facts.related.take(6).toList(),
-                onOpen: (l) {
-                  final m = l.meaning;
-                  if (m != null) {
-                    openMeaningDetail(context, m);
-                  } else {
-                    openAtelierWord(context,
-                        word: l.word, root: l.root, img: kNowssbWordFallback, price: StorePrices.instance.priceFor(l.id));
-                  }
-                },
-              ),
-          ]),
+  void _addToCart(BuildContext context) {
+    if (_open) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$title is already yours — no need to buy it again'),
+          behavior: SnackBarBehavior.floating,
         ),
+      );
+      return;
+    }
+    storeAddToCart(context, _bagItem, origin: _addCartKey);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Added $title to cart'),
+        behavior: SnackBarBehavior.floating,
       ),
-    ];
+    );
+  }
+
+  /// The word / meaning page, one-to-one on Ribon's Nov 23 reference.
+  Widget _wordScreen(BuildContext context) {
+    return StoreWordScreen(
+      title: title,
+      meaning: _meaning,
+      facts: StoreWordFacts.of(title, root, meaning: _meaning),
+      picture: _picture,
+      about: about,
+      highlights: highlights,
+      open: _open,
+      price: price,
+      itemId: _id,
+      item: () => _bagItem,
+      cartKey: _addCartKey,
+      onAddToCart: () => _addToCart(context),
+      onBuy: () => storeBuyNow(context, _bagItem, origin: _addCartKey),
+      onOpenOwned: () => Navigator.of(context).pop(),
+      onStorePicker: () => showStoreSelectSheet(
+        context,
+        onSelect: (id) => openStoreFromPicker(context, id, current: ''),
+      ),
+      onOpenLink: (l) {
+        final m = l.meaning;
+        if (m != null) {
+          openMeaningDetail(context, m);
+        } else {
+          openAtelierWord(context,
+              word: l.word, root: l.root, img: kNowssbWordFallback, price: StorePrices.instance.priceFor(l.id));
+        }
+      },
+    );
   }
 }
 

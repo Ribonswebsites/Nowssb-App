@@ -130,7 +130,7 @@ class _RequestWordsScreenState extends State<RequestWordsScreen> {
                       cursorColor: NwsbColors.goldLight,
                       textCapitalization: TextCapitalization.words,
                       decoration: InputDecoration(
-                        hintText: 'e.g. Serenity, Phoenix, Dharma…',
+                        hintText: 'e.g. Serenity, Courage, Dharma…',
                         hintStyle: const TextStyle(color: Color(0x55FFFFFF)),
                         filled: true,
                         fillColor: const Color(0x22000000),
