@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
 import 'shell_back.dart';
+import 'tablet_frame.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
 import '../data/home_widget_sync.dart';
@@ -130,6 +131,9 @@ class _NavShellState extends State<NavShell> {
     Settings.instance.addListener(_onSettings);
     PlaybackSession.instance.addListener(_onSettings);
     NotificationBanner.setOnHome(_i == 0);
+    // Tablet: the frame's sidebar shows once this shell is up.
+    TabletShellGate.tab.value = _i;
+    TabletShellGate.live.value = true;
     unawaited(PlaybackSession.instance.ensureLoaded());
     // Home-screen widget taps (Android): nowssb://widget/practice?word=…
     _widgetTaps = HomeWidgetSync.instance.clicks.listen(_onWidgetTap);
@@ -181,6 +185,7 @@ class _NavShellState extends State<NavShell> {
     Settings.instance.removeListener(_onSettings);
     PlaybackSession.instance.removeListener(_onSettings);
     unawaited(_widgetTaps?.cancel());
+    TabletShellGate.live.value = false;
     if (NavScope._global == _goToTab) {
       NavScope._global = null;
       NavScope._shellRoute = null;
@@ -320,6 +325,7 @@ class _NavShellState extends State<NavShell> {
       _i = tab;
       if (_coach != null && _coach != 'welcome') _coach = null;
     });
+    TabletShellGate.tab.value = tab;
     Settings.instance.setLastTab(tab);
   }
 
@@ -435,8 +441,11 @@ class _NavShellState extends State<NavShell> {
   Widget _tabAlive(int index, Widget child) {
     final on = _i == index;
     final pill = index == 0 || PlaybackSession.instance.showPill;
-    final clearance = (pill ? NavClearance.navAndPill : NavClearance.navOnly) +
-        MediaQuery.viewPaddingOf(context).bottom;
+    // Tablet frame: no bottom nav or mini player row to clear.
+    final clearance = TabletScope.framedOf(context)
+        ? 16 + MediaQuery.viewPaddingOf(context).bottom
+        : (pill ? NavClearance.navAndPill : NavClearance.navOnly) +
+            MediaQuery.viewPaddingOf(context).bottom;
     return TickerMode(
       enabled: on,
       child: Offstage(
@@ -451,6 +460,7 @@ class _NavShellState extends State<NavShell> {
     super.didChangeDependencies();
     NavScope._global = _goToTab;
     NavScope._shellRoute = ModalRoute.of(context);
+    TabletShellGate.shellRoute = NavScope._shellRoute;
   }
 
   DateTime? _backAt;
@@ -501,6 +511,7 @@ class _NavShellState extends State<NavShell> {
   }
 
   Widget _build(BuildContext context) {
+    final framed = TabletScope.framedOf(context);
     final lightHome = _i == 0 && !_fashion;
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -539,7 +550,7 @@ class _NavShellState extends State<NavShell> {
               ],
             ),
             // Normal/NowssB switch + mini player share one row above the nav.
-            if (_i == 0 || PlaybackSession.instance.showPill)
+            if (!framed && (_i == 0 || PlaybackSession.instance.showPill))
               Positioned(
                 // Inset mode pill from screen/card edge (Normal/NowssB toggle).
                 left: 20,
@@ -577,7 +588,8 @@ class _NavShellState extends State<NavShell> {
             // than something you have to take on trust.
             const Positioned(
                 top: 4, right: 8, child: SafeArea(child: PoolHud())),
-            Positioned(
+            // On a tablet the frame's sidebar is the nav.
+            if (!framed) Positioned(
               left: 0,
               right: 0,
               bottom: 14,

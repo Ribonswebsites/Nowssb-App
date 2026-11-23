@@ -59,6 +59,7 @@ import 'widgets/update_prompt.dart';
 import 'features/progress/progress_popup.dart';
 import 'features/progress/progress_sources.dart';
 import 'shell/nav_shell.dart';
+import 'shell/tablet_frame.dart';
 import 'theme/theme.dart';
 import 'theme/tokens.dart';
 import 'widgets/faint_film.dart';
@@ -68,7 +69,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ensureHypeRoutes();
 
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // Phones stay portrait. A tablet (shortest side 600+) turns freely, so
+  // the wide sidebar layout gets landscape.
+  await SystemChrome.setPreferredOrientations(
+      isTabletDevice() ? DeviceOrientation.values : [DeviceOrientation.portraitUp]);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
@@ -251,7 +255,7 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
     return UiScope(
       child: MaterialApp(
         navigatorKey: _navigatorKey,
-        navigatorObservers: [_popupRoutes],
+        navigatorObservers: [_popupRoutes, TabletShellGate.observer],
         // Every route, dialog and overlay inherits a real text style here.
         // Without it, text in a showGeneralDialog / OverlayEntry that has no
         // Material above it falls back to Flutter's debug style (monospace,
@@ -270,7 +274,12 @@ class _NowssbAppState extends State<NowssbApp> with WidgetsBindingObserver {
                     child: Stack(
                       children: [
                         const Positioned.fill(child: FaintFilm()),
-                        child ?? const SizedBox(),
+                        // Tablet: sidebar / rail beside the pages. A phone
+                        // gets the navigator as is.
+                        TabletFrame(
+                          navigatorKey: _navigatorKey,
+                          child: child ?? const SizedBox(),
+                        ),
                       ],
                     ),
                   ),
