@@ -37,7 +37,11 @@ Future<void> _openPanel(WidgetTester t) async {
   expect(find.byType(ProgressPanel), findsOneWidget);
 }
 
-String _count(WidgetTester t, String key) => (t.widget(find.byKey(ValueKey(key))) as Text).data!;
+/// A goal card's count ("1/3"), from its "1/3  today" line.
+String _count(WidgetTester t, String key) {
+  final w = t.widget(find.byKey(ValueKey(key))) as Text;
+  return (w.data ?? w.textSpan!.toPlainText()).split(' ').first;
+}
 
 Future<void> _settle(WidgetTester t) async {
   await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
@@ -228,15 +232,20 @@ void main() {
     await _settle(t);
     expect(find.byType(TodayProgressScreen), findsOneWidget);
     expect(find.text('0 of 5 goals done'), findsOneWidget);
-    for (final k in ProgressKind.values) {
+    // My progress: four goal cards; check-in is the circle by the heading.
+    for (final k in ProgressKind.values.where((k) => k != ProgressKind.checkin)) {
       expect(find.byKey(ValueKey('today-goal-${k.name}')), findsOneWidget);
     }
     // Check in from the page.
+    await t.ensureVisible(find.byKey(const ValueKey('today-action-checkin')));
+    await _settle(t);
     await t.tap(find.byKey(const ValueKey('today-action-checkin')));
     await _settle(t);
-    expect(_count(t, 'today-count-checkin'), '1/1');
+    expect(ProgressCenter.instance.items.firstWhere((e) => e.kind == ProgressKind.checkin).complete, isTrue);
     expect(find.text('1 of 5 goals done'), findsOneWidget);
     // Practice card → Practice tab.
+    await t.ensureVisible(find.byKey(const ValueKey('today-goal-routine')));
+    await _settle(t);
     await t.tap(find.byKey(const ValueKey('today-goal-routine')));
     await _settle(t);
     expect(_tabs, [1]);
