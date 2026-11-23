@@ -11,6 +11,7 @@ import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/splash.dart';
 import 'package:nowssb/shell/nav_shell.dart';
 import 'package:nowssb/shell/tablet_frame.dart';
+import 'package:nowssb/shell/tablet_home.dart';
 import 'fake_video_platform.dart';
 
 Future<void> _settle(WidgetTester t, [int n = 12]) async {
@@ -37,11 +38,19 @@ Future<GlobalKey<NavigatorState>> _app(WidgetTester t, Size size) async {
     await t.tap(agree.first, warnIfMissed: false);
     await _settle(t, 10);
   }
-  while (nav.currentState!.canPop()) {
+  for (var i = 0; i < 3 && nav.currentState!.canPop(); i++) {
     nav.currentState!.pop();
     await _settle(t, 4);
   }
   return nav;
+}
+
+/// Layout noise from pages rendered without network art: collect it and put
+/// the handler back when the test ends.
+void _quiet() {
+  final prev = FlutterError.onError;
+  FlutterError.onError = (_) {};
+  addTearDown(() => FlutterError.onError = prev);
 }
 
 Future<void> _end(WidgetTester t) async {
@@ -70,7 +79,7 @@ void main() {
   });
 
   testWidgets('phone: no sidebar, the bottom nav as before', (t) async {
-    FlutterError.onError = (_) {};
+    _quiet();
     await _app(t, const Size(390, 844));
     expect(find.byType(TabletSidebar), findsNothing);
     expect(find.byType(TabletRail), findsNothing);
@@ -79,7 +88,7 @@ void main() {
   });
 
   testWidgets('1280 wide: sidebar, no bottom nav, right panel on Home and Library only', (t) async {
-    FlutterError.onError = (_) {};
+    _quiet();
     final nav = await _app(t, const Size(1280, 800));
     expect(find.byType(TabletSidebar), findsOneWidget);
     expect(find.byKey(const ValueKey('nav-glass')), findsNothing);
@@ -88,6 +97,11 @@ void main() {
     expect(find.byType(TabletRightPanel), findsOneWidget);
     expect(find.byKey(const ValueKey('tablet-now-playing')), findsOneWidget);
     expect(find.text('Top words'), findsOneWidget);
+    // The home is the reference's column: header, hero, playlists, trending.
+    expect(find.byType(TabletHome), findsOneWidget);
+    expect(find.byKey(const ValueKey('tablet-home-hero')), findsOneWidget);
+    expect(find.text('Playlist'), findsOneWidget);
+    expect(find.text('Trending'), findsOneWidget);
     expect(find.text('Hi!'), findsOneWidget);
     expect(find.byKey(const ValueKey('tablet-mini-player')), findsOneWidget);
 
@@ -113,7 +127,7 @@ void main() {
   });
 
   testWidgets('800 wide portrait: nav rail', (t) async {
-    FlutterError.onError = (_) {};
+    _quiet();
     await _app(t, const Size(800, 1280));
     expect(find.byType(TabletRail), findsOneWidget);
     expect(find.byType(TabletSidebar), findsNothing);
