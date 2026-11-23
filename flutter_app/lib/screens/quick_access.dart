@@ -4,6 +4,7 @@
 /// notifications-tab language (glass cards, gold accents, soft film).
 library;
 
+import '../shell/tablet.dart';
 import '../widgets/glass_list_card.dart';
 import 'dart:ui' as ui;
 
@@ -819,7 +820,7 @@ class _FeatureGrid extends StatelessWidget {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 4,
+      crossAxisCount: tabletColumnsOf(context, phone: 4, minTile: 110, max: 6),
       mainAxisSpacing: 8,
       crossAxisSpacing: 8,
       childAspectRatio: 0.95,

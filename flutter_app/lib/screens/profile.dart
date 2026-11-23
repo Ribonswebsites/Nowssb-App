@@ -1,4 +1,5 @@
 import 'profile_mind.dart';
+import '../shell/tablet.dart';
 import '../widgets/restyle_kit.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -745,7 +746,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: kNwsbBanners.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.5),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: tabletColumnsOf(context, phone: 2, minTile: 220, max: 3), mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.5),
       itemBuilder: (_, i) {
         final url = kNwsbBanners[i];
         final on = url == _bannerUrl;
@@ -885,7 +886,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: GridView.builder(
             shrinkWrap: true,
             itemCount: kNwsbBanners.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.6),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: tabletColumnsOf(ctx, phone: 2, minTile: 200, max: 3), mainAxisSpacing: 10, crossAxisSpacing: 10, childAspectRatio: 1.6),
             itemBuilder: (_, i) => GestureDetector(
               onTap: () => Navigator.pop(ctx, kNwsbBanners[i]),
               child: ClipRRect(
@@ -920,7 +921,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: GridView.builder(
             shrinkWrap: true,
             itemCount: kPrebuiltAvatars.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, mainAxisSpacing: 12, crossAxisSpacing: 12),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: tabletColumnsOf(ctx, phone: 4, minTile: 96, max: 6), mainAxisSpacing: 12, crossAxisSpacing: 12),
             itemBuilder: (_, i) => GestureDetector(
               onTap: () => Navigator.pop(ctx, kPrebuiltAvatars[i]),
               child: ClipOval(child: CachedNetworkImage(imageUrl: kPrebuiltAvatars[i], fit: BoxFit.cover)),
@@ -1430,7 +1431,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(right: i == 6 ? 0 : 6),
-                  child: AspectRatio(
+                  child: TabletAspectRatio(
                     aspectRatio: 1,
                     child: AnimatedContainer(
                       key: ValueKey('profile-week-day-$i'),

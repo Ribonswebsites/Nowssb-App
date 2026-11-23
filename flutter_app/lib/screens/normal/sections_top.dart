@@ -11,6 +11,7 @@
 /// on each class say where.
 library;
 
+import '../../shell/tablet.dart';
 import '../../admin/layout/scopes.dart' show effectiveOverride;
 import 'package:nowssb/data/day_part.dart';
 import 'package:nowssb/screens/normal/home_v4.dart' show V4Lottie, kSearchLottie, kSunLottie;
@@ -373,7 +374,7 @@ class _NmPromoDiscState extends State<NmPromoDisc>
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(18),
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 1080 / 411,
               child: Stack(
                 fit: StackFit.expand,
@@ -668,7 +669,7 @@ class NmTiles extends StatelessWidget {
           ],
         ),
         GridView.count(
-          crossAxisCount: 2,
+          crossAxisCount: isTablet(context) ? _tiles.length.clamp(2, 4) : 2,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: 12,
@@ -800,7 +801,7 @@ class NmStore extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 3 / 4,
               child: Stack(
                 fit: StackFit.expand,
@@ -946,7 +947,7 @@ class NmTrending extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: AspectRatio(
+            child: TabletAspectRatio(
               aspectRatio: 16 / 9,
               child: Stack(
                 fit: StackFit.expand,

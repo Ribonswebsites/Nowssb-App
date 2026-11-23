@@ -2,6 +2,7 @@
 /// `.rm-cat-banner`, ebook rows, and gold Signature tags.
 library;
 
+import '../../shell/tablet.dart';
 import 'dart:async';
 import 'dart:ui' show ImageFilter;
 
@@ -794,7 +795,7 @@ class RmRowVid extends StatelessWidget {
         padding: const EdgeInsets.all(6),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
-          child: AspectRatio(
+          child: TabletAspectRatio(
             aspectRatio: 16 / 6.4,
             child: NwsbVideo(asset: url, priority: ClipPriority.feature, slot: 'store_cards.RmRowVid'),
           ),
@@ -1310,7 +1311,7 @@ class MsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: AspectRatio(
+      child: TabletAspectRatio(
         aspectRatio: 3 / 4,
         child: Container(
           decoration: BoxDecoration(
@@ -1476,7 +1477,7 @@ class MsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.count(
-      crossAxisCount: 3,
+      crossAxisCount: tabletColumnsOf(context, phone: 3, minTile: 170, max: 5),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       mainAxisSpacing: 7,
