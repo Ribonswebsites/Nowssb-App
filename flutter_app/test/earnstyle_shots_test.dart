@@ -1,4 +1,4 @@
-// Earn pages in the betting-reference layout, NowssB glass (Ribon, Nov 23): the Your Earnings sheet, the
+// Earn pages in the betting-reference layout, NowssB black glass and white (Ribon, Nov 23): the Your Earnings sheet, the
 // Your day card, Complete your profile, every NowssB Earn Programmes tab and
 // the coin pill that drops over the page header. Fit checks at 360 and 390,
 // text scale 1.0 and 1.3. Shots: --dart-define=ES_SHOTS=<dir>.
@@ -256,22 +256,27 @@ void main() {
     await done(t);
   });
 
-  testWidgets('redesign: top bar, balance hero, one tab bar that switches tabs', (t) async {
+  testWidgets('redesign: top bar, white balance card, icon filter pills that switch tabs', (t) async {
     await _mount(t, const EarnTabsPage(initialTab: 'overview'), w: 390, h: 2200);
     expect(find.byKey(const ValueKey('earn-avatar')), findsOneWidget);
-    expect(find.text('Hey, Ribon'), findsOneWidget);
+    expect(find.text('Hey,'), findsOneWidget);
+    expect(find.text('Ribon'), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-bell')), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-help')), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-balance-card')), findsOneWidget);
+    expect(find.text('Cash balance'), findsWidgets);
+    expect(find.text('Coins balance'), findsWidgets);
+    expect(find.text('Top programmes'), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-action-payout')), findsOneWidget);
     expect(find.byKey(const ValueKey('earn-action-invite')), findsOneWidget);
     expect(find.byKey(const ValueKey('program-tab-bar')), findsOneWidget);
     expect(find.text('Statistics'), findsOneWidget);
-    // Every tab is named in the one bar (no icon-only chips, no second row).
-    for (final l in ['Overview', 'My Team', 'Sales', 'Payouts']) {
-      expect(find.descendant(of: find.byKey(const ValueKey('program-tab-bar')), matching: find.text(l)), findsOneWidget, reason: l);
+    expect(find.text('0 : 100'), findsOneWidget);
+    // The picked filter pill shows its name; the others are icon-only.
+    expect(find.descendant(of: find.byKey(const ValueKey('program-tab-bar')), matching: find.text('Overview')), findsOneWidget);
+    for (final l in ['My Team', 'Sales', 'Payouts']) {
+      expect(find.descendant(of: find.byKey(const ValueKey('program-tab-bar')), matching: find.text(l)), findsNothing, reason: l);
     }
-    expect(find.bySemanticsLabel('My Team tab'), findsNothing);
     await t.tap(find.bySemanticsLabel('Sales').first);
     await _settle(t);
     expect(find.byKey(const ValueKey('earn-sales-card')), findsOneWidget);

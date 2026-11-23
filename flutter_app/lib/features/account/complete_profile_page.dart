@@ -177,7 +177,7 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     final name = _name.text.trim();
     final first = name.isEmpty ? null : name.split(RegExp(r'\s+')).first;
     return WhiteCircleBadges(child: AccountPage(
-      header: widget.editing ? null : EarnHey(name: first, eyebrow: 'Your NowssB profile', title: first == null ? 'Welcome' : 'Hey, $first', bell: false),
+      header: widget.editing ? null : EarnHey(name: first, eyebrow: 'Your NowssB profile', title: first ?? 'Welcome', bell: false),
       kicker: widget.editing
           ? 'Your account'
           : (name.trim().isEmpty ? 'Welcome' : 'Hey, ${name.trim().split(RegExp(r'\s+')).first}'),
@@ -341,7 +341,7 @@ class _ProfileHead extends StatelessWidget {
         status: EarnStatusPill(ready ? EarnStatus.reached : EarnStatus.ongoing, text: ready ? 'Ready' : 'In progress'),
         left: EarnSide(nameOk ? 'Name added' : 'Add your name', icon: Icons.person_outline_rounded),
         eyebrow: 'Filled in',
-        number: '$filled / 4',
+        number: '$filled : 4',
         under: filled >= 4 ? 'All done' : '${4 - filled} to go',
         right: EarnSide(phoneOk ? 'Phone added' : 'Add your phone', icon: Icons.phone_iphone_rounded),
         odds: [odd('Name', nameOk), odd('Country', countryOk), odd('Phone', phoneOk)],

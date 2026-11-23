@@ -559,17 +559,17 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
         EarnBalanceCard(
           left: EarnBalance(
             key: const ValueKey('earn-hero-cash'),
-            label: 'Cash earned',
+            label: 'Cash balance',
             mark: NwsbMarks.earn,
-            value: EarnCount(s.lifetimeCents, format: _cents, style: kEarnBig),
+            value: EarnCount(s.lifetimeCents, format: _cents, style: kEarnInkBig),
             sub: sub,
             onTap: () => _Go.cash(context),
           ),
           right: EarnBalance(
             key: const ValueKey('earn-tile-coins'),
-            label: 'Coins',
+            label: 'Coins balance',
             coin: true,
-            value: EarnCount(s.coins, format: (v) => '$v', style: kEarnBig),
+            value: EarnCount(s.coins, format: (v) => '$v', style: kEarnInkBig),
             sub: s.live ? 'In your wallet' : 'Sign in to see',
             onTap: () => _Go.coins(context),
           ),
@@ -587,7 +587,7 @@ class _YourEarningsSheetState extends State<YourEarningsSheet> {
             status: EarnStatusPill(!s.live ? EarnStatus.off : s.topRank ? EarnStatus.reached : EarnStatus.ongoing),
             left: const EarnSide('You', mark: NwsbMarks.user),
             eyebrow: 'Words sold',
-            number: s.live ? '${s.sold} / ${s.target}' : '0',
+            number: s.live ? '${s.sold} : ${s.target}' : '0',
             under: line,
             right: EarnSide(s.live && !s.topRank ? (s.nextRank ?? 'Next rank') : 'Top rank', mark: NwsbMarks.rewards),
             odds: [

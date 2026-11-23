@@ -311,8 +311,8 @@ class _TabMark extends StatelessWidget {
 }
 
 /// The Earn programme tabs (Overview … Rules) on the app film, in the
-/// Earn layout: "Hey, name", one card with both balances (cash earned and
-/// coins), Payout and Invite, then Programmes with See all, the tab pills
+/// Earn layout: avatar, "Hey," over the name, one white card with both balances
+/// (cash and coins), Payout and Invite, then Top programmes with See all, the tab pills
 /// with their marks, and the picked tab.
 class EarnTabsPage extends StatefulWidget {
   const EarnTabsPage({super.key, required this.initialTab});
@@ -371,17 +371,17 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
                       return EarnBalanceCard(
                         left: EarnBalance(
                           key: const ValueKey('earn-balance-cash'),
-                          label: 'Cash earned',
+                          label: 'Cash balance',
                           mark: NwsbMarks.earn,
-                          value: Text(FxBook.instance.formatCents(live ? m.lifetimeCents : 0), maxLines: 1, style: kEarnBig),
+                          value: Text(FxBook.instance.formatCents(live ? m.lifetimeCents : 0), maxLines: 1, style: kEarnInkBig),
                           sub: live ? '${FxBook.instance.formatCents(m.cash)} available' : 'Sign in to see',
                           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const EarningsScreen())),
                         ),
                         right: EarnBalance(
                           key: const ValueKey('earn-balance-coins'),
-                          label: 'Coins',
+                          label: 'Coins balance',
                           coin: true,
-                          value: Text('${live ? m.coins : 0}', maxLines: 1, style: kEarnBig),
+                          value: Text('${live ? m.coins : 0}', maxLines: 1, style: kEarnInkBig),
                           sub: live ? 'In your wallet' : 'Sign in to see',
                           onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const CoinsScreen())),
                         ),
@@ -403,7 +403,7 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
                 goRef: _go,
                 marks: kEarnTabMarks,
                 hPad: 16,
-                sectionTitle: 'Programmes',
+                sectionTitle: 'Top programmes',
               ),
             ],
           ),

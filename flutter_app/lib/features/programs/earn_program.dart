@@ -105,7 +105,7 @@ List<Widget> _overview(BuildContext context, Map<String, dynamic> s) => [
             status: st['canEarn'] == true ? const EarnStatusPill(EarnStatus.ongoing, text: 'Earning') : const EarnStatusPill(EarnStatus.upcoming, text: 'Not earning yet'),
             left: EarnSide(metal.isEmpty ? 'Your rank' : metal, mark: NwsbMarks.crown),
             eyebrow: 'Words sold',
-            number: next == null || next <= 0 ? '$words' : '$words / $next',
+            number: next == null || next <= 0 ? '$words' : '$words : $next',
             under: next == null || nextTitle.isEmpty ? 'Top rank' : 'to $nextTitle',
             right: EarnSide(nextTitle.isEmpty ? 'Top rank' : nextTitle, mark: NwsbMarks.trending),
             odds: [
@@ -151,7 +151,7 @@ List<Widget> _team(BuildContext context, Map<String, dynamic> s) => [
             status: EarnStatusPill(team.isEmpty ? EarnStatus.upcoming : EarnStatus.ongoing, text: team.isEmpty ? 'Upcoming' : 'Ongoing'),
             left: const EarnSide('You', mark: NwsbMarks.user),
             eyebrow: 'People',
-            number: '${team.length} / ${sInt(st['teamMax'])}',
+            number: '${team.length} : ${sInt(st['teamMax'])}',
             under: 'in your team',
             right: const EarnSide('Your team', mark: NwsbMarks.people),
             odds: [
@@ -308,7 +308,7 @@ Widget _targetCard(Map<String, dynamic> x, int words, {required bool open, requi
     status: EarnStatusPill(reached ? EarnStatus.reached : (open ? EarnStatus.ongoing : EarnStatus.upcoming)),
     left: const EarnSide('You', mark: NwsbMarks.user),
     eyebrow: 'Words',
-    number: reached ? '$goal / $goal' : '$words / $goal',
+    number: reached ? '$goal : $goal' : '$words : $goal',
     under: reached || goal <= 0 ? 'Reached' : '${(goal - words).clamp(0, 1 << 31)} to go',
     right: const EarnSide('Bonus', mark: NwsbMarks.rewards),
     odds: [

@@ -279,7 +279,7 @@ void main() {
     expect(find.text('140'), findsOneWidget);
     // The redesigned sheet leads with the balance hero; the target and the
     // rank are further down the same list (built, a scroll away).
-    expect(find.textContaining(' / 25', skipOffstage: false), findsOneWidget);
+    expect(find.textContaining(' : 25', skipOffstage: false), findsOneWidget);
     expect(find.text('Senior Officer', skipOffstage: false), findsOneWidget);
     final part = t.getSize(_sheet).height;
     await t.tap(find.byKey(const ValueKey('earn-sheet-expand')));

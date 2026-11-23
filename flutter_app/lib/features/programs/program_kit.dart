@@ -88,13 +88,88 @@ class ProgramTabsScope extends InheritedWidget {
   bool updateShouldNotify(ProgramTabsScope old) => old.current != current || old.tabs != tabs;
 }
 
-/// Kept for callers: the old second tab row. Draws nothing now.
-class ProgramTabPills extends StatelessWidget {
+/// The detail screen's tab row (Overview · Team · Payouts): text tabs,
+/// the picked one bold with a white underline. Reads the
+/// [ProgramTabsScope] around it; nothing outside a programme page.
+class ProgramTabPills extends StatefulWidget {
   const ProgramTabPills({super.key});
-  // Redesign 5: the one tab bar above the content is the only switcher;
-  // this row is kept for callers and draws nothing.
   @override
-  Widget build(BuildContext context) => const SizedBox(key: ValueKey('program-tab-pills'), height: 14);
+  State<ProgramTabPills> createState() => _ProgramTabPillsState();
+}
+
+class _ProgramTabPillsState extends State<ProgramTabPills> {
+  final _keys = <int, GlobalKey>{};
+  int? _shown;
+
+  void _show(int i) {
+    final c = _keys[i]?.currentContext;
+    final ro = c?.findRenderObject();
+    final sc = c == null ? null : Scrollable.maybeOf(c);
+    if (ro == null || sc == null) return;
+    sc.position.ensureVisible(ro, alignment: 0.5, duration: Duration.zero);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = context.dependOnInheritedWidgetOfExactType<ProgramTabsScope>();
+    if (scope == null || scope.tabs.isEmpty) return const SizedBox.shrink();
+    if (_shown != scope.current) {
+      _shown = scope.current;
+      final i = scope.current;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _show(i);
+      });
+    }
+    return Padding(
+      key: const ValueKey('program-tab-pills'),
+      padding: const EdgeInsets.only(top: 4, bottom: 14),
+      child: SizedBox(
+        height: 40,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(children: [
+            for (var i = 0; i < scope.tabs.length; i++) ...[
+              if (i > 0) const SizedBox(width: 4),
+              _tab(scope, i),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Widget _tab(ProgramTabsScope scope, int i) {
+    final on = i == scope.current;
+    final t = scope.tabs[i];
+    return Semantics(
+      button: true,
+      selected: on,
+      label: '${t.title} tab',
+      excludeSemantics: true,
+      child: GestureDetector(
+        key: _keys.putIfAbsent(i, GlobalKey.new),
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (on) return;
+          RewardHaptics.tick();
+          scope.go(t.id);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+            Text(t.title, maxLines: 1, style: TextStyle(color: on ? Colors.white : kEarnMuted, fontWeight: on ? FontWeight.w800 : FontWeight.w600, fontSize: 14)),
+            const SizedBox(height: 8),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 2.5,
+              width: on ? 28 : 0,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2)),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
 }
 
 /// "Report one visit a day" for a programme page.
@@ -284,21 +359,18 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
           Padding(
             key: _anchor,
             padding: const EdgeInsets.only(top: 6, bottom: 14),
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: widget.hPad),
-              child: EarnGlass(
-                key: const ValueKey('program-tab-bar'),
-                radius: 30,
-                padding: const EdgeInsets.all(5),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(children: [
-                    for (var i = 0; i < spec.tabs.length; i++) ...[
-                      if (i > 0) const SizedBox(width: 2),
-                      _tabCard(spec.tabs[i].title, i),
-                    ],
-                  ]),
-                ),
+            child: SizedBox(
+              key: const ValueKey('program-tab-bar'),
+              height: 52,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: widget.hPad),
+                child: Row(children: [
+                  for (var i = 0; i < spec.tabs.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 8),
+                    _tabCard(spec.tabs[i].title, i),
+                  ],
+                ]),
               ),
             ),
           ),
@@ -341,9 +413,8 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
     );
   }
 
-  /// The reference category chips: the picked tab a white pill (its icon
-  /// in a white circle, its name), every other tab a round white icon
-  /// circle. Tapping one switches the tab.
+  /// The reference category chips: the picked tab a black-glass pill (its
+  /// icon and its name), every other tab a round white icon circle.
   Widget _tabCard(String label, int i) {
     final on = i == _tab;
     final mark = widget.marks[widget.spec.tabs[i].id] ?? NwsbMarks.arrow;
@@ -359,17 +430,24 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
           if (!on) _pick(i);
         },
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          height: 44,
-          padding: const EdgeInsets.fromLTRB(5, 0, 16, 0),
+          duration: const Duration(milliseconds: 200),
+          height: 48,
+          padding: EdgeInsets.fromLTRB(on ? 5 : 0, 0, on ? 16 : 0, 0),
+          constraints: const BoxConstraints(minWidth: 48),
           alignment: Alignment.center,
-          decoration: on ? earnGlossyWhite(shadow: false) : const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(999))),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            on ? EarnInkCircle(mark: mark, size: 34) : SizedBox(width: 34, height: 34, child: Center(child: NwsbIcon(mark, size: 17, color: kEarnSoft, strokeWidth: 1.9))),
-            const SizedBox(width: 6),
-            Text(label, maxLines: 1, style: TextStyle(color: on ? kEarnInk : kEarnSoft, fontWeight: on ? FontWeight.w800 : FontWeight.w700, fontSize: 13.5)),
-          ]),
+          decoration: BoxDecoration(
+            color: on ? kEarnInk : Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 12, offset: Offset(0, 4))],
+          ),
+          child: on
+              ? Row(mainAxisSize: MainAxisSize.min, children: [
+                  const SizedBox(width: 8),
+                  NwsbIcon(mark, size: 20, color: Colors.white, strokeWidth: 1.9),
+                  const SizedBox(width: 8),
+                  Text(label, maxLines: 1, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
+                ])
+              : NwsbIcon(mark, size: 20, color: kEarnInk, strokeWidth: 1.9),
         ),
       ),
     );
