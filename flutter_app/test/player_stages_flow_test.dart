@@ -120,21 +120,23 @@ void main() {
     expect(find.text('STAGE 1'), findsOneWidget);
     expect(find.text('ळमेरिका'), findsOneWidget);
     expect(find.text('STAGE 2'), findsOneWidget);
-    expect(find.text('Pass Stage 1 to open'), findsOneWidget);
+    expect(find.textContaining('Pass Stage'), findsNothing, reason: 'every recorded stage is open');
     expect(find.text('STAGE 3 · COMING SOON'), findsOneWidget);
     expect(find.textContaining('Buy'), findsNothing);
     expect(find.byKey(const ValueKey('stages-expand')), findsNothing);
     expect(find.textContaining('streak', findRichText: true), findsNothing);
-    // Stage 2 is locked until Stage 1 is passed; Stage 3 is not recorded.
+    // Both recorded stages open straight away; only Stage 3 (not recorded) is locked.
     await t.tap(find.byKey(const ValueKey('stages-row-2')));
     await t.pump();
-    expect(picked, isEmpty);
+    expect(picked, [2]);
     await t.tap(find.byKey(const ValueKey('stages-row-3')));
     await t.pump();
-    expect(picked, isEmpty);
+    expect(picked, [2]);
     await t.tap(find.byKey(const ValueKey('stages-row-1')));
     await t.pump();
-    expect(picked, [1]);
+    await t.tap(find.byKey(const ValueKey('stages-row-2')));
+    await t.pump();
+    expect(picked, [2, 1, 2], reason: 'switching back and forth');
     // Request more stages.
     await t.runAsync(() async {
       await t.tap(find.byKey(const ValueKey('stages-request')));
@@ -145,7 +147,7 @@ void main() {
     expect(WordRequestStore.instance.items.first.word, 'America');
   });
 
-  testWidgets('passing Stage 1 opens Stage 2 in the list', (t) async {
+  testWidgets('a passed stage shows its best score; every recorded stage stays open', (t) async {
     await t.runAsync(() => StageProgressStore.instance.addAttempt('america', 1, score: 88, passed: true));
     final picked = <int>[];
     await pumpList(t, _lib('america'), onStage: picked.add);
@@ -246,10 +248,7 @@ void main() {
   for (final e in _expected.entries) {
     for (final n in e.value) {
       testWidgets('${e.key} stage $n: record, score against that recording, sub-scores, pointer, tips, progress', (t) async {
-        // Earlier stages passed so this one is open.
-        for (var k = 1; k < n; k++) {
-          await t.runAsync(() => StageProgressStore.instance.addAttempt(e.key, k, score: 90, passed: true));
-        }
+        // No earlier stage passed: every recorded stage is open anyway.
         final ref = File('assets/words/${e.key}/${e.key}_stage${n}_ref.wav').readAsBytesSync();
         final mic = FakeMic(ref);
         final went = <int>[];
@@ -260,9 +259,11 @@ void main() {
         expect(find.byKey(const ValueKey('stage-result')), findsOneWidget);
         final score = int.parse((t.widget(find.byKey(const ValueKey('stage-score'))) as Text).data!);
         expect(score, greaterThanOrEqualTo(70), reason: 'the stage’s own recording passes');
-        for (final k in ['sounds', 'rhythm', 'pitch', 'vowel', 'completeness']) {
-          expect(find.byKey(ValueKey('stage-sub-$k')), findsOneWidget);
-        }
+        // Simple score screen: one big score, one word, the waveform pointer, one sentence.
+        expect(find.byKey(const ValueKey('stage-verdict')), findsOneWidget);
+        expect(find.byKey(const ValueKey('stage-sub-sounds')), findsNothing);
+        expect(find.textContaining('You need'), findsNothing);
+        expect(find.textContaining('%'), findsNothing);
         expect(find.byKey(const ValueKey('stage-pointer')), findsOneWidget);
         expect(StageProgressStore.instance.record(e.key, n).passed, isTrue);
         final pack = StagePack.forWord(_lib(e.key))!;
@@ -276,15 +277,15 @@ void main() {
     }
   }
 
-  testWidgets('America stage 1 said as Ram Ram fails, with a pointer on where and specific fixes', (t) async {
+  testWidgets('America stage 1 said as Ram Ram: Try again, a pointer and one plain sentence', (t) async {
     await pumpSheet(t, _lib('america'), 1, FakeMic(_ramRam3()));
     await takeAndScore(t);
     final score = int.parse((t.widget(find.byKey(const ValueKey('stage-score'))) as Text).data!);
     expect(score, lessThan(70));
-    expect(find.byKey(const ValueKey('stage-fix-0')), findsOneWidget);
+    expect(find.byKey(const ValueKey('stage-fix-0')), findsNothing);
+    expect((t.widget(find.byKey(const ValueKey('stage-verdict'))) as Text).data, 'Try again');
     final note = (t.widget(find.byKey(const ValueKey('stage-pointer-note'))) as Text).data!;
-    expect(note, matches(RegExp(r'^(Beginning|Middle|Ending) of the word: ')));
-    expect(find.byIcon(Icons.arrow_drop_up_rounded), findsOneWidget, reason: 'the pointer');
+    expect(note, matches(RegExp(r'^Focus on the (beginning|middle|ending), [a-z’ ]+\.$')));
     expect(find.byKey(const ValueKey('practice-next-stage')), findsNothing);
     expect(StageProgressStore.instance.record('america', 1).passed, isFalse);
     expect(StageProgressStore.instance.record('america', 1).attempts, 1);

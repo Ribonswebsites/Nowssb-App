@@ -15,10 +15,8 @@ import 'package:nowssb/shell/tablet_home.dart';
 import 'package:nowssb/data/playback_session.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/screens/home_fashion.dart';
-import 'package:nowssb/screens/player_up_view.dart';
 import 'package:nowssb/screens/practice_player.dart';
 import 'fake_video_platform.dart';
-import 'support/tablet_shots_harness.dart' show openSwipeUp;
 
 Future<void> _settle(WidgetTester t, [int n = 12]) async {
   for (var i = 0; i < n; i++) {
@@ -178,24 +176,6 @@ void main() {
     await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
     await _settle(t, 2);
     expect(PlaybackSession.instance.loop, loop0);
-    await _end(t);
-  });
-
-  testWidgets('1280 wide: Up next beside the player, the swipe-up view gets the whole panel', (t) async {
-    _quiet();
-    final nav = await _app(t, const Size(1280, 800));
-    nav.currentState!.push(MaterialPageRoute<void>(
-        builder: (_) => PracticePlayerScreen(
-            words: ContentStore.instance.library.take(6).toList(), title: 'Morning Ritual', showIntro: false)));
-    await _settle(t, 18);
-    expect(find.byType(TabletPlayerPanel), findsOneWidget);
-    await openSwipeUp(t, const Size(1280, 800));
-    expect(find.byType(PlayerUpView), findsOneWidget);
-    expect(TabletShellGate.player.value?.upOpen, isTrue);
-    expect(find.byType(TabletPlayerPanel), findsNothing);
-    // One Up next on screen: the view's own.
-    expect(find.text('Up next'), findsOneWidget);
-    expect(t.getSize(find.byKey(const ValueKey('tablet-centre'))).width, greaterThan(TabletBp.page));
     await _end(t);
   });
 

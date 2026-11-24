@@ -18,6 +18,7 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io' show Platform;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -279,10 +280,36 @@ class ContentStore extends ChangeNotifier {
   void _recompute() {
     // Removed words (store_catalog.dart kRemovedWordKeys) stay out even
     // when a published doc or an old cache still carries one.
-    _library = [
+    final all = [
       for (final w in _withClientWords(_overlayPublished()))
         if (!isRemovedWord(w.key) && !isRemovedWord(w.word)) w
     ];
+    // Only words with the client's own recordings are shown. Every other
+    // word keeps its data and assets and comes back the moment its
+    // recording is added to client_words.json (or this switch is off).
+    final recorded = {for (final w in _client) w.key};
+    _library = recordedWordsOnly && recorded.isNotEmpty
+        ? [for (final w in all) if (recorded.contains(w.key)) w]
+        : all;
+  }
+
+  /// Show only words that have the client's recordings (Ribon, Nov 24).
+  /// Off in the unit-test runner, whose fixtures use the full library; a
+  /// test of the switch sets it on.
+  static bool recordedWordsOnly = !_runningTests;
+  static bool get _runningTests {
+    try {
+      return Platform.environment.containsKey('FLUTTER_TEST');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Recomputes the shown library after [recordedWordsOnly] changes.
+  @visibleForTesting
+  void debugRecompute() {
+    _recompute();
+    notifyListeners();
   }
 
   List<Word> _withClientWords(List<Word> lib) {

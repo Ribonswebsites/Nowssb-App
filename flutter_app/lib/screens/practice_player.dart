@@ -46,7 +46,6 @@ import 'my_routine.dart';
 import 'select_level.dart';
 export '../data/word_devanagari.dart' show wordDevanagari;
 import 'player_intro.dart';
-import 'player_up_view.dart';
 import 'player_guide.dart';
 import 'practice_overlay.dart';
 import '../widgets/pronunciation_survey.dart';
@@ -137,14 +136,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   var _pull = 0.0;
   var _pullStamp = 0;
 
-  /// The swipe-up view (PlayerUpView): 0 closed, 1 open. A swipe up on the
-  /// player moves it with the finger.
-  late final AnimationController _upCtl;
-  var _pullDx = 0.0;
-  var _upTracking = false;
-  var _upEligible = false;
-  var _pullBase = 0.0;
-  var _upHeight = 800.0;
+  /// Bumped at the start of every run, so the seek bar restarts from 0:00.
+  var _runId = 0;
   final _pageScroll = ScrollController();
   final _bottomStripKey = GlobalKey();
   var _handingOff = false;
@@ -169,13 +162,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   StagePack? get _pack => widget.words.isEmpty ? null : StagePack.forWord(_word);
 
-  /// The stage in play: the one picked in Stages, else the first not passed.
+  /// The stage in play: the one picked in Stages, else Stage 1. Every
+  /// recorded stage is open; only a stage with no recording yet is locked.
   PackStage? get _packStage {
     final p = _pack;
     if (p == null || p.stages.isEmpty) return null;
-    final n = _stageKey == _word.key
-        ? _stageSel
-        : StageProgressStore.instance.currentStage(p.wordKey, p.stages.length);
+    final n = _stageKey == _word.key ? _stageSel : p.stages.first.number;
     return p.stages.firstWhere((s) => s.number == n, orElse: () => p.stages.first);
   }
 
@@ -187,9 +179,27 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     return Settings.instance.stageMusic && st.music.isNotEmpty ? st.music : st.audio;
   }
 
+  /// How long the stage in play's recording runs (what the seek bar shows).
+  double? get _stageSeconds {
+    final st = _packStage;
+    final asset = _stageAsset;
+    if (st == null || asset == null) return null;
+    if (asset == st.music && st.musicSeconds > 0) return st.musicSeconds;
+    return st.seconds;
+  }
+
+  /// Store from the Player: drop to the mini player, then show the Store.
+  void _goStore() {
+    NavScope.goTo(context, 3);
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    if (route != null && route.isCurrent) unawaited(_minimizeToPill());
+  }
+
   /// Picked in Stages: stop what is playing and play stage [n] here.
   Future<void> _selectStage(int n) async {
     _playGen++;
+    _fadeToken++;
     try {
       await _tts.stop();
       await PlayerRitual.stop();
@@ -218,10 +228,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   void initState() {
     super.initState();
     _bottomPageController = PageController();
-    _upCtl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 320),
-    )..addListener(_onUpForTablet);
     // The tablet's now-playing card can switch repeat on before the player
     // opens (the session's loop). On a phone nothing sets it, so it is off.
     _loop = PlaybackSession.instance.loop;
@@ -346,7 +352,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     _listenTimer?.cancel();
     _routineTimer?.cancel();
     _bottomPageController.dispose();
-    _upCtl.dispose();
     _pageScroll.dispose();
     _marqueeController.dispose();
     PracticeProgress.instance.removeListener(_onProgress);
@@ -454,6 +459,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _error = null;
       _startedAt = DateTime.now();
       _ritual = null;
+      _runId++;
     });
     bool alive() => mounted && _playing && _playGen == gen;
     var repeatAgain = false;
@@ -522,8 +528,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           : frequencyLine(_word, PracticeProgress.instance.level);
       var voiceFailed = false;
       if (stageAsset != null) {
-        // A teacher stage: its edited recording plays straight away.
-        setState(() => _ritual = RitualFrame(caption: line));
+        // A teacher stage: its edited recording plays straight away over
+        // the word's own artwork (the small stage badge says which one).
         if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed, asset: stageAsset)) {
           voiceFailed = true;
         }
@@ -554,7 +560,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         setState(() => _error = 'The recording for ${_word.word} could not be loaded. Check your connection and try again.');
         return;
       }
-      final again = _inRoutine ? false : await _askHearAgain();
+      // A recorded stage just ends; tapping it (or Play) plays it again.
+      final again = (_inRoutine || stageAsset != null) ? false : await _askHearAgain();
       if (again && alive()) {
         if (mounted) setState(() => _ritual = RitualFrame(caption: line));
         if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed, asset: stageAsset)) voiceFailed = true;
@@ -663,19 +670,33 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     final theme = _theme;
     final wasPlaying = _playing;
     _handingOff = true;
+    _playGen++;
     try {
       await _tts.stop();
-      unawaited(WordVoice.instance.stop());
     } catch (_) {}
-    await PlaybackSession.instance.adoptFromPlayer(
-      words: widget.words,
-      title: widget.title,
-      index: _index,
-      wasPlaying: wasPlaying,
-      artwork: theme.image,
-    );
+    unawaited(WordVoice.instance.stop());
+    unawaited(PlayerRitual.stop());
+    try {
+      await PlaybackSession.instance
+          .adoptFromPlayer(
+            words: widget.words,
+            title: widget.title,
+            index: _index,
+            wasPlaying: wasPlaying,
+            artwork: theme.image,
+          )
+          .timeout(const Duration(seconds: 2));
+    } catch (_) {}
     if (!mounted) return;
-    Navigator.of(context).pop();
+    // Down chevron / swipe down / back: the Player always closes, like a
+    // music app's now-playing screen dropping to its mini player.
+    final nav = Navigator.of(context);
+    final route = ModalRoute.of(context);
+    if (route != null && route.isCurrent) {
+      nav.pop();
+    } else if (route != null && route.isActive) {
+      nav.removeRoute(route);
+    }
   }
 
   Future<void> _togglePlay() async {
@@ -1040,7 +1061,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     await _prepareAndPlay(fadeInSeconds: fade);
   }
 
-  /// Plays word [i] from the swipe-up view's carousel.
+  /// Plays word [i] (the Up next card).
   Future<void> _playAt(int i) async {
     if (widget.words.isEmpty || i < 0 || i >= widget.words.length) return;
     if (i == _index) return;
@@ -1061,44 +1082,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     });
     await _loadLiked();
     await _prepareAndPlay();
-  }
-
-  bool get _upOpen => _upCtl.value > 0;
-
-  void _openUp() {
-    unawaited(_upCtl.animateTo(1, curve: Curves.easeOutCubic));
-  }
-
-  void _closeUp() {
-    unawaited(_upCtl.animateBack(0, curve: Curves.easeOutCubic));
-  }
-
-  /// Ends a drag of the view: [velocity] in px/s, down is positive.
-  void _settleUp(double velocity) {
-    if (velocity < -400 || (velocity <= 400 && _upCtl.value > .35)) {
-      _openUp();
-    } else {
-      _closeUp();
-    }
-  }
-
-  void _dragUp(double dy) {
-    _upCtl.value = (_upCtl.value - dy / _upHeight).clamp(0.0, 1.0);
-  }
-
-  /// A swipe up only moves the view when the page under it has nothing
-  /// left to scroll and it did not start on the bottom strip (its pages
-  /// swipe sideways and its Next up card opens the queue).
-  bool _pageAtBottom() =>
-      !_pageScroll.hasClients || _pageScroll.position.extentAfter <= 1;
-
-  bool _outsideStrip(Offset global) {
-    final strip = _bottomStripKey.currentContext?.findRenderObject();
-    if (strip is RenderBox && strip.hasSize) {
-      final local = strip.globalToLocal(global);
-      if ((Offset.zero & strip.size).contains(local)) return false;
-    }
-    return true;
   }
 
   void _openLevel() {
@@ -1494,17 +1477,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _jumpTo,
       () => unawaited(_togglePlay()),
       (d) => unawaited(_move(d)),
-      upOpen: _upCtl.value > 0.5,
     );
-  }
-
-  /// Tablet: tell the frame when the swipe-up view opens or closes.
-  bool _tabletUpOpen = false;
-  void _onUpForTablet() {
-    final open = _upCtl.value > 0.5;
-    if (open == _tabletUpOpen || _tabletRoute == null) return;
-    _tabletUpOpen = open;
-    _publishTablet();
   }
 
   /// Play the word at [i] (the tablet's Up next list).
@@ -1571,10 +1544,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       canPop: false,
       onPopInvoked: (didPop) {
         if (didPop) return;
-        if (_upOpen) {
-          _closeUp();
-          return;
-        }
         unawaited(_minimizeToPill());
       },
       child: Scaffold(
@@ -1602,47 +1571,15 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
               child: Listener(
                 onPointerDown: (e) {
                   _pull = 0;
-                  _pullDx = 0;
                   _pullStamp = DateTime.now().millisecondsSinceEpoch;
-                  _upEligible = !_upOpen && _outsideStrip(e.position);
-                  _upTracking = _upEligible && _pageAtBottom();
-                  _pullBase = 0;
                 },
-                onPointerMove: (e) {
-                  _pull += e.delta.dy;
-                  _pullDx += e.delta.dx;
-                  // Once the page has nothing left to scroll, the rest of the
-                  // swipe up raises the view with the finger.
-                  if (_upEligible && !_upTracking && _pageAtBottom()) {
-                    _upTracking = true;
-                    _pullBase = _pull;
-                  }
-                  final up = -(_pull - _pullBase);
-                  if (_upTracking && up > 12 && _pull.abs() > _pullDx.abs()) {
-                    _upCtl.value = ((up - 12) / _upHeight).clamp(0.0, 1.0);
-                  }
-                },
-                onPointerCancel: (_) {
-                  if (_upTracking && _upCtl.value > 0) _settleUp(0);
-                  _upTracking = false;
-                },
+                onPointerMove: (e) => _pull += e.delta.dy,
                 onPointerUp: (_) {
                   final ms = DateTime.now().millisecondsSinceEpoch - _pullStamp;
-                  // Swipe up opens the full now-playing view (the queue is
-                  // one tap away from its top bar and from Next up).
-                  if (_upEligible) {
-                    _upTracking = false;
-                    _upEligible = false;
-                    final flick = _pull < -90 && ms < 450;
-                    if (flick || _upCtl.value > .28) {
-                      _openUp();
-                    } else if (_upCtl.value > 0) {
-                      _closeUp();
-                    }
-                  }
-                  // Swipe down collapses the player to the mini pill, like a
-                  // music app's now-playing screen.
-                  if (_pull > 140 && ms < 700) unawaited(_minimizeToPill());
+                  // Swipe down from the top of the page collapses the player
+                  // to the mini pill, like a music app's now-playing screen.
+                  final atTop = !_pageScroll.hasClients || _pageScroll.offset <= 0;
+                  if (atTop && _pull > 140 && ms < 700) unawaited(_minimizeToPill());
                   _pull = 0;
                 },
                 child: LayoutBuilder(
@@ -1683,7 +1620,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   onSettings: _openSettings,
                                   onInfo: _openInfo,
                                   onLevel: _openLevel,
-                                  onStore: () => NavScope.goTo(context, 3),
+                                  stage: _packStage?.number,
+                                  stageNumbers: [
+                                    ...?_pack?.stages.map((st) => st.number),
+                                  ],
+                                  comingSoon: _pack?.comingSoon ?? const [],
+                                  onStore: _goStore,
                                   onSyllable: (part) async {
                                     // No synthetic voice: syllables have no
                                     // recordings of their own yet.
@@ -1761,8 +1703,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                             ),
                             const SizedBox(height: 16),
                             _ProgressBar(
+                              key: ValueKey('player-seek-$_runId'),
                               playing: _playing,
-                              durationSec: _wordSecs(_word),
+                              durationSec: _stageSeconds ?? _wordSecs(_word),
                             ),
                             const SizedBox(height: 8),
                             _PlainTransportRow(
@@ -1810,7 +1753,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                     onRoutine: _openRoutine,
                                     onPractice: () =>
                                         unawaited(_handlePracticeTap()),
-                                    onStore: () => NavScope.goTo(context, 3),
+                                    onStore: _goStore,
                                   ),
                                   _NextUpCard(
                                     words: widget.words,
@@ -1818,19 +1761,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                     themes: _playerThemes,
                                     onPlayAt: (i) async {
                                       if (i == _index) {
+                                        if (_playing) return;
                                         await _prepareAndPlay();
                                         return;
                                       }
-                                      await _tts.stop();
-                                      unawaited(WordVoice.instance.stop());
-                                      setState(() {
-                                        _index = i;
-                                        _liked = false;
-                                        _completed = false;
-                                        _error = null;
-                                      });
-                                      await _loadLiked();
-                                      await _prepareAndPlay();
+                                      await _playAt(i);
                                     },
                                     onOpenSoundLibrary: () =>
                                         _openSoundLibrary(context),
@@ -1856,65 +1791,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                 ),
               ),
             ),
-            Positioned.fill(child: _buildUpView(context)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildUpView(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, box) {
-        _upHeight = math.max(1.0, box.maxHeight);
-        return AnimatedBuilder(
-          animation: _upCtl,
-          builder: (context, _) {
-            final v = _upCtl.value;
-            if (v <= 0) return const SizedBox.shrink();
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                IgnorePointer(
-                  child: ColoredBox(
-                    color: Color.fromRGBO(0, 0, 0, .55 * v),
-                  ),
-                ),
-                Transform.translate(
-                  offset: Offset(0, (1 - v) * box.maxHeight),
-                  child: PlayerUpView(
-                    key: const ValueKey('player-up-view'),
-                    words: widget.words,
-                    index: _index,
-                    mixTitle: widget.title,
-                    coverFor: (w, i) => playerCoverArtFor(w, i),
-                    playing: _playing,
-                    liked: _liked,
-                    shuffle: _shuffle,
-                    repeat: _loop,
-                    durationSec: _wordSecs(_word),
-                    startedAt: _startedAt,
-                    secondsFor: _wordSecs,
-                    onClose: _closeUp,
-                    onTogglePlay: () => unawaited(_togglePlay()),
-                    onPrevious: () => unawaited(_skipPrev()),
-                    onNext: () => unawaited(_move(1)),
-                    onSelect: (i) => unawaited(_playAt(i)),
-                    onLike: () => unawaited(_toggleLike()),
-                    onShuffle: () => unawaited(_toggleShuffle()),
-                    onRepeat: () => setState(() => _loop = !_loop),
-                    onQueue: () => _openQueueSheet(context),
-                    onDragUpdate: _dragUp,
-                    onDragEnd: _settleUp,
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
 }
 
 class _PlayerThemeArtwork extends StatelessWidget {
@@ -3699,7 +3581,16 @@ class _VisualStage extends StatelessWidget {
     required this.onSyllable,
     this.liked = false,
     this.onLike,
+    this.stage,
+    this.stageNumbers = const [],
+    this.comingSoon = const [],
   });
+
+  /// A teacher-recorded word: the stage in play, its recorded stages and the
+  /// ones still to come. Shown as a small 1 / 2 / 3 badge on the artwork.
+  final int? stage;
+  final List<int> stageNumbers;
+  final List<int> comingSoon;
 
   /// Saved to the Saved words list (same store as the heart button).
   final bool liked;
@@ -3822,6 +3713,9 @@ class _VisualStage extends StatelessWidget {
                         builder: (context, _) => _LevelPill(
                           level: PracticeProgress.instance.level.clamp(1, 10),
                           onTap: onLevel,
+                          stage: stage,
+                          stageNumbers: stageNumbers,
+                          comingSoon: comingSoon,
                         ),
                       ),
                       const Spacer(),
@@ -3864,55 +3758,87 @@ class _VisualStage extends StatelessWidget {
 }
 
 class _LevelPill extends StatelessWidget {
-  const _LevelPill({required this.level, required this.onTap});
+  const _LevelPill({
+    required this.level,
+    required this.onTap,
+    this.stage,
+    this.stageNumbers = const [],
+    this.comingSoon = const [],
+  });
   final int level;
   final VoidCallback onTap;
+  final int? stage;
+  final List<int> stageNumbers;
+  final List<int> comingSoon;
+
+  static const _deco = BoxDecoration(
+    borderRadius: BorderRadius.all(Radius.circular(999)),
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
+    ),
+    boxShadow: [
+      BoxShadow(color: Color(0x59000000), blurRadius: 18, offset: Offset(0, 8)),
+      BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
+    ],
+  );
+
+  Widget _num(int n) {
+    final on = n == stage;
+    final soon = comingSoon.contains(n) && !stageNumbers.contains(n);
+    return Container(
+      key: ValueKey('player-stage-badge-$n'),
+      width: 22,
+      height: 22,
+      margin: const EdgeInsets.only(left: 3),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: on ? const Color(0xFFF4F4F5) : const Color(0x00000000),
+        border: Border.all(color: on ? const Color(0xFFF4F4F5) : const Color(0x40FFFFFF)),
+      ),
+      child: Text(
+        '$n',
+        style: TextStyle(
+          color: on ? Colors.black : (soon ? const Color(0x59FFFFFF) : const Color(0xFFF4F4F5)),
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          height: 1,
+        ),
+      ),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    key: const ValueKey('player-stages-chip'),
-    onTap: onTap,
-    child: DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0x8C46464E), Color(0xB80C0C0E)],
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x59000000),
-            blurRadius: 18,
-            offset: Offset(0, 8),
+  Widget build(BuildContext context) {
+    final all = {...stageNumbers, ...comingSoon}.toList()..sort();
+    return GestureDetector(
+      key: const ValueKey('player-stages-chip'),
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: DecoratedBox(
+        decoration: _deco,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(8, all.isEmpty ? 6 : 4, all.isEmpty ? 12 : 5, all.isEmpty ? 6 : 4),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const NwsbIcon(NwsbMarks.stages, size: 14, color: Color(0xFFE8D5A3)),
+              const SizedBox(width: 6),
+              if (all.isEmpty)
+                const Text(
+                  'Stages',
+                  style: TextStyle(color: Color(0xFFF4F4F5), fontSize: 12, fontWeight: FontWeight.w500),
+                )
+              else
+                for (final n in all) _num(n),
+            ],
           ),
-          BoxShadow(color: Color(0x29FFFFFF), blurRadius: 0, spreadRadius: 1),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const NwsbIcon(
-              NwsbMarks.stages,
-              size: 14,
-              color: Color(0xFFE8D5A3),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              'Stages',
-              style: const TextStyle(
-                color: Color(0xFFF4F4F5),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _StageGlassChip extends StatelessWidget {

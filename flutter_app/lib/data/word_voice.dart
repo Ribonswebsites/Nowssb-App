@@ -8,6 +8,7 @@
 library;
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
@@ -62,49 +63,90 @@ class WordVoice {
   @visibleForTesting
   static final List<String> debugPlayed = [];
 
+  /// The run that is playing now: [stop] or a newer [play] completes it at
+  /// once, so a caller never waits on a player event that may never come.
+  Completer<void>? _run;
+
+  /// Player set-up and tear-down run one at a time. A stop still releasing
+  /// the platform player must never land after the next play has loaded
+  /// (that left the second stage silent with the clock stuck at the end).
+  Future<void> _lane = Future<void>.value();
+  Future<T> _serial<T>(Future<T> Function() job) {
+    final next = _lane.then((_) => job());
+    _lane = next.then((_) {}, onError: (_) {});
+    return next;
+  }
+
+  void _endRun() {
+    final r = _run;
+    _run = null;
+    if (r != null && !r.isCompleted) r.complete();
+  }
+
   /// Plays [w]'s recording, or the bundled [asset] when given (a teacher
   /// stage's edited recording, e.g. `assets/words/america/america_stage1_music.m4a`).
+  /// Every call starts from the beginning on a fresh player, however often
+  /// it is called and whatever the last run did (ended, stopped, replaced).
   Future<bool> play(Word w, {double volume = 1, double speed = 1, String? asset}) async {
     if (asset == null && !hasVoice(w)) return false;
     final token = ++_token;
+    _endRun();
     final bundled = asset ?? (isBundled(w) ? assetPath(w) : null);
     if (bundled != null) debugPlayed.add(bundled);
     if (debugPlay != null) return debugPlay!(w, () => token != _token);
+    final run = Completer<void>();
+    _run = run;
+    StreamSubscription<PlayerState>? sub;
     try {
-      if (bundled != null) {
-        final p = _player ??= AudioPlayer();
-        await p.stop();
-        await p.setAsset(bundled);
-        if (token != _token) return true;
+      AudioSource? offline;
+      File? file;
+      if (bundled == null) {
+        // A downloaded word plays from its encrypted copy, decrypted in memory.
+        offline = await SecureDownloads.instance.audioSource(downloadId(w));
+        file = offline == null ? await cache.getSingleFile(w.voice).timeout(const Duration(seconds: 15)) : null;
+      }
+      if (token != _token) return true; // stopped or replaced meanwhile
+      Duration? length;
+      final started = await _serial(() async {
+        if (token != _token) return false;
+        final old = _player;
+        _player = null;
+        if (old != null) {
+          try {
+            await old.dispose();
+          } catch (_) {}
+        }
+        if (token != _token) return false;
+        final p = AudioPlayer();
+        _player = p;
+        if (bundled != null) {
+          length = await p.setAsset(bundled);
+        } else if (offline != null) {
+          length = await p.setAudioSource(offline);
+        } else {
+          length = await p.setFilePath(file!.path);
+        }
+        if (token != _token) return false;
         await p.setVolume(volume.clamp(0.0, 1.0));
         await p.setSpeed(speed.clamp(0.5, 2.0));
-        final done = p.playerStateStream
-            .firstWhere((s) => s.processingState == ProcessingState.completed || token != _token);
+        sub = p.playerStateStream.listen((s) {
+          if (s.processingState == ProcessingState.completed && !run.isCompleted) run.complete();
+        });
         unawaited(p.play());
-        await done.timeout(const Duration(minutes: 2), onTimeout: () => p.playerState);
         return true;
-      }
-      // A downloaded word plays from its encrypted copy, decrypted in memory.
-      final offline = await SecureDownloads.instance.audioSource(downloadId(w));
-      final file = offline == null ? await cache.getSingleFile(w.voice).timeout(const Duration(seconds: 15)) : null;
-      if (token != _token) return true; // stopped or replaced meanwhile
-      final p = _player ??= AudioPlayer();
-      await p.stop();
-      if (offline != null) {
-        await p.setAudioSource(offline);
-      } else {
-        await p.setFilePath(file!.path);
-      }
-      await p.setVolume(volume.clamp(0.0, 1.0));
-      await p.setSpeed(speed.clamp(0.5, 2.0));
-      final done = p.playerStateStream
-          .firstWhere((s) => s.processingState == ProcessingState.completed || token != _token);
-      unawaited(p.play());
-      await done.timeout(const Duration(minutes: 2), onTimeout: () => p.playerState);
+      });
+      if (!started) return true;
+      final cap = length == null
+          ? const Duration(minutes: 2)
+          : Duration(milliseconds: (length!.inMilliseconds / speed.clamp(0.5, 2.0)).round() + 2500);
+      await run.future.timeout(cap, onTimeout: () {});
       return true;
     } catch (e) {
-      debugPrint('NowssB voice for ${w.key}: $e — using text-to-speech');
+      debugPrint('NowssB voice for ${w.key}: $e');
       return false;
+    } finally {
+      await sub?.cancel();
+      if (identical(_run, run)) _run = null;
     }
   }
 
@@ -117,8 +159,11 @@ class WordVoice {
 
   Future<void> stop() async {
     _token++;
-    try {
-      await _player?.stop();
-    } catch (_) {}
+    _endRun();
+    await _serial(() async {
+      try {
+        await _player?.stop();
+      } catch (_) {}
+    });
   }
 }

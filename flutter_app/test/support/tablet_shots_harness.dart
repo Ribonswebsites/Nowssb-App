@@ -132,20 +132,6 @@ Future<GlobalKey<NavigatorState>> _app(WidgetTester t, Size s) async {
   return nav;
 }
 
-/// A swipe up on the player, the way a finger opens the swipe-up view: from
-/// the middle of the page (the centre pane on a tablet).
-Future<void> openSwipeUp(WidgetTester t, Size size) async {
-  final centre = find.byKey(const ValueKey('tablet-centre'));
-  final box = centre.evaluate().isEmpty ? Offset.zero & size : t.getRect(centre);
-  final g = await t.startGesture(Offset(box.center.dx, box.top + box.height * .3));
-  for (var i = 0; i < 14; i++) {
-    await g.moveBy(Offset(0, -box.height * .65 / 14));
-    await t.pump(const Duration(milliseconds: 16));
-  }
-  await g.up();
-  await _settle(t, 12);
-}
-
 void tabletShots(List<String> sizes) {
   SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1', 'nowssb_name': 'Ribon'});
   setUpAll(() async {
@@ -275,18 +261,6 @@ void tabletShots(List<String> sizes) {
             await _settle(t, 10);
           }
           await _shot(t, '$tag/PlayerQueue');
-        });
-      }, skip: _out.isEmpty);
-    }
-
-    if (want('SwipeUp')) {
-      testWidgets('$tag SwipeUp', (t) async {
-        await run(t, 'SwipeUp', (nav) async {
-          nav.currentState!.push(MaterialPageRoute<void>(builder: (_) => PracticePlayerScreen(
-              words: ContentStore.instance.library.take(6).toList(), title: 'Morning Ritual', showIntro: false)));
-          await _settle(t, 18);
-          await openSwipeUp(t, size);
-          await _shot(t, '$tag/SwipeUp');
         });
       }, skip: _out.isEmpty);
     }

@@ -49,14 +49,14 @@
       "audio": "assets/words/america/america_stage1_clean.m4a",
       "music": "assets/words/america/america_stage1_music.m4a",
       "reference": "assets/words/america/america_stage1_ref.wav",
-      "seconds": 2.72
+      "seconds": 2.72, "musicSeconds": 8.72
      },
      {
       "stage": 2,
       "audio": "assets/words/america/america_stage2_clean.m4a",
       "music": "assets/words/america/america_stage2_music.m4a",
       "reference": "assets/words/america/america_stage2_ref.wav",
-      "seconds": 2.84
+      "seconds": 2.84, "musicSeconds": 8.84
      }
     ],
     "musicCredit": "Background music: “meditationdrone1.wav” by Jim-Bretherick, freesound.org/s/674255 — CC0 (public domain).",
@@ -119,14 +119,14 @@
       "audio": "assets/words/ramram/ramram_stage1_clean.m4a",
       "music": "assets/words/ramram/ramram_stage1_music.m4a",
       "reference": "assets/words/ramram/ramram_stage1_ref.wav",
-      "seconds": 2.04
+      "seconds": 2.04, "musicSeconds": 8.04
      },
      {
       "stage": 2,
       "audio": "assets/words/ramram/ramram_stage2_clean.m4a",
       "music": "assets/words/ramram/ramram_stage2_music.m4a",
       "reference": "assets/words/ramram/ramram_stage2_ref.wav",
-      "seconds": 3.32
+      "seconds": 3.32, "musicSeconds": 9.32
      },
      {
       "stage": 3,
@@ -134,7 +134,7 @@
       "audio": "assets/words/ramram/ramram_stage3_clean.m4a",
       "music": "assets/words/ramram/ramram_stage3_music.m4a",
       "reference": "assets/words/ramram/ramram_stage3_ref.wav",
-      "seconds": 2.39
+      "seconds": 2.39, "musicSeconds": 8.39
      }
     ],
     "musicCredit": "Background music: “meditationdrone1.wav” by Jim-Bretherick, freesound.org/s/674255 — CC0 (public domain)."
@@ -186,14 +186,14 @@
       "audio": "assets/words/washington/washington_stage1_clean.m4a",
       "music": "assets/words/washington/washington_stage1_music.m4a",
       "reference": "assets/words/washington/washington_stage1_ref.wav",
-      "seconds": 2.17
+      "seconds": 2.17, "musicSeconds": 8.17
      },
      {
       "stage": 2,
       "audio": "assets/words/washington/washington_stage2_clean.m4a",
       "music": "assets/words/washington/washington_stage2_music.m4a",
       "reference": "assets/words/washington/washington_stage2_ref.wav",
-      "seconds": 4.15
+      "seconds": 4.15, "musicSeconds": 10.15
      }
     ],
     "musicCredit": "Background music: “meditationdrone1.wav” by Jim-Bretherick, freesound.org/s/674255 — CC0 (public domain)."

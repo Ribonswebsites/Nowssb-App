@@ -314,11 +314,11 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     });
   }
 
-  /// The next recorded stage, once this one is passed.
+  /// The next recorded stage, offered after a good take.
   PackStage? get _nextStage {
     final pack = widget.pack, stage = widget.stage;
     if (pack == null || stage == null) return null;
-    if (!StageProgressStore.instance.record(pack.wordKey, stage.number).passed) return null;
+    if (_take?.result.passed != true) return null;
     return pack.stages.where((s) => s.number == stage.number + 1).firstOrNull;
   }
 
@@ -683,7 +683,11 @@ class _BlackTab extends StatelessWidget {
     this.startLabel,
     this.result,
     this.next,
+    this.centre,
   });
+
+  /// Replaces the orb: the 3-2-1 countdown, or the live level while listening.
+  final Widget? centre;
 
   final String? startLabel;
   final Widget? result;
@@ -766,6 +770,7 @@ class _BlackTab extends StatelessWidget {
               ),
             ],
           ),
+          if (result == null) ...[
           const SizedBox(height: 4),
           Text(
             status.toUpperCase(),
@@ -778,7 +783,7 @@ class _BlackTab extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const SizedBox(height: 132, child: Center(child: _OrbFilm())),
+          SizedBox(height: 132, child: Center(child: centre ?? const _OrbFilm())),
           const SizedBox(height: 10),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -804,8 +809,9 @@ class _BlackTab extends StatelessWidget {
               ),
             ),
           ),
+          ],
           if (result != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
             result!,
           ],
           if (next != null) ...[
@@ -817,11 +823,12 @@ class _BlackTab extends StatelessWidget {
                 key: const ValueKey('practice-next-stage'),
                 onPressed: next!.$2,
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF7BE0A8),
-                  foregroundColor: const Color(0xFF08090D),
+                  backgroundColor: const Color(0x26FFFFFF),
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Color(0x40FFFFFF)),
                   shape: const StadiumBorder(),
                 ),
-                child: Text('Go to Stage ${next!.$1}  ›', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                child: Text('Next: Stage ${next!.$1}  ›', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
               ),
             ),
           ],

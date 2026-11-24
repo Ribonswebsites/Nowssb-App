@@ -189,15 +189,8 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
             onTap: () => _tell(stageComingSoonNote(n))));
         continue;
       }
+      // Every recorded stage is open: tap it and it plays.
       final rec = progress.record(pack.wordKey, n);
-      if (!Entitlements.instance.isAdmin && !progress.isUnlocked(pack.wordKey, n)) {
-        out.add(_stageRow(n,
-            deva: st.deva,
-            sub: 'Pass Stage ${n - 1} to open',
-            locked: true,
-            onTap: () => _tell('Pass Stage ${n - 1} to open Stage $n.')));
-        continue;
-      }
       final best = rec.attempts == 0 ? 'Tap to play, then Practice' : 'Best ${rec.best}${rec.passed ? ' · passed' : ''}';
       out.add(_stageRow(n,
           deva: st.deva,

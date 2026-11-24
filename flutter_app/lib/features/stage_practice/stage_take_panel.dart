@@ -17,7 +17,7 @@ const _kWarn = Color(0xFFFFC86B);
 const _kBad = Color(0xFFFF8A80);
 const _kMuted = Color(0x99FFFFFF);
 
-/// Stage 1 → 2 → 3: passed, the one in play, locked, and not recorded yet.
+/// Stage 1 → 2 → 3: passed, the one in play, open, and not recorded yet.
 class StageProgressStrip extends StatelessWidget {
   const StageProgressStrip({super.key, required this.pack, required this.current, this.admin = false});
   final StagePack pack;
@@ -30,7 +30,9 @@ class StageProgressStrip extends StatelessWidget {
     final numbers = <int>{for (final s in pack.stages) s.number, ...pack.comingSoon}.toList()..sort();
     final passed = progress.passedCount(pack.wordKey);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Text('$passed of ${pack.stages.length} recorded stages passed',
+      Text(
+          '${pack.stages.length} recorded ${pack.stages.length == 1 ? 'stage' : 'stages'}, all open'
+          '${passed > 0 ? ' · $passed passed' : ''}',
           key: const ValueKey('stage-progress-label'),
           style: const TextStyle(color: _kMuted, fontSize: 11.5, fontWeight: FontWeight.w600)),
       const SizedBox(height: 6),
@@ -43,10 +45,11 @@ class StageProgressStrip extends StatelessWidget {
   Widget _chip(int n, StageProgressStore progress) {
     final recorded = pack.stages.any((s) => s.number == n);
     final rec = progress.record(pack.wordKey, n);
-    final open = recorded && (admin || progress.isUnlocked(pack.wordKey, n));
+    // Every recorded stage is open; only one not recorded yet is locked.
+    final open = recorded;
     final here = n == current;
-    final Color fill = here ? Colors.white : (rec.passed ? const Color(0x337BE0A8) : const Color(0x14FFFFFF));
-    final Color ink = here ? const Color(0xFF0B0B10) : (rec.passed ? _kGood : (open ? Colors.white : const Color(0x80FFFFFF)));
+    final Color fill = here ? Colors.white : const Color(0x14FFFFFF);
+    final Color ink = here ? const Color(0xFF0B0B10) : (rec.passed ? Colors.white : (open ? Colors.white : const Color(0x80FFFFFF)));
     return Container(
       key: ValueKey('stage-chip-$n'),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -85,45 +88,24 @@ class StageResultPanel extends StatelessWidget {
         Text(r.message, style: const TextStyle(color: Color(0xCCF4F4F5), fontSize: 13, height: 1.35)),
       ]);
     }
-    final tone = r.passed ? _kGood : (r.overall >= 55 ? _kWarn : _kBad);
-    return Column(key: const ValueKey('stage-result'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Row(children: [
-        Text('${r.overall}',
-            key: const ValueKey('stage-score'),
-            style: TextStyle(color: tone, fontSize: 40, fontWeight: FontWeight.w800, height: 1)),
-        const SizedBox(width: 4),
-        const Padding(padding: EdgeInsets.only(top: 14), child: Text('/100', style: TextStyle(color: _kMuted, fontSize: 12))),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(r.headline, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 2),
-            Text(r.message, style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, height: 1.3)),
-          ]),
-        ),
-      ]),
-      const SizedBox(height: 12),
-      for (final s in r.subs) _subBar(s),
+    final word = r.overall >= 85 ? 'Great' : (r.passed ? 'Close' : 'Try again');
+    return Column(key: const ValueKey('stage-result'), crossAxisAlignment: CrossAxisAlignment.center, children: [
+      Text('${r.overall}',
+          key: const ValueKey('stage-score'),
+          style: const TextStyle(color: Colors.white, fontSize: 64, fontWeight: FontWeight.w300, height: 1, letterSpacing: -2)),
+      const SizedBox(height: 4),
+      Text(word,
+          key: const ValueKey('stage-verdict'),
+          style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
       if (r.score != null) ...[
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         StageWordPointer(take: take),
-      ],
-      if (r.fixes.isNotEmpty) ...[
-        const SizedBox(height: 12),
-        Text(r.passed ? 'To make it even closer' : 'What to fix',
-            style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 6),
-        for (var i = 0; i < r.fixes.length; i++) _tip('${i + 1}', r.fixes[i], _kWarn, ValueKey('stage-fix-$i')),
-      ],
-      if (r.good.isNotEmpty) ...[
-        const SizedBox(height: 10),
-        const Text('What you got right', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 6),
-        for (final g in r.good) _tip('', g, _kGood, null),
       ],
     ]);
   }
 
+  // Kept for the sheet's older layout; the score screen no longer shows them.
+  // ignore: unused_element
   Widget _subBar(SubScore s) {
     final c = s.value >= 70 ? _kGood : (s.value >= 45 ? _kWarn : _kBad);
     return Padding(
@@ -193,38 +175,55 @@ class StageWordPointer extends StatelessWidget {
     final m = marks(take);
     final worst = m.isEmpty ? null : m.first;
     return Column(key: const ValueKey('stage-pointer'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const Text('Where in the word', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
-      const SizedBox(height: 6),
-      SizedBox(
-        height: 64,
-        child: CustomPaint(
-          painter: _PointerPainter(take.refTimes, take.refEnergyDb, a, b, m),
-          child: const SizedBox.expand(),
-        ),
-      ),
-      const Row(children: [
-        Text('beginning', style: TextStyle(color: _kMuted, fontSize: 10.5)),
-        Spacer(),
-        Text('middle', style: TextStyle(color: _kMuted, fontSize: 10.5)),
-        Spacer(),
-        Text('ending', style: TextStyle(color: _kMuted, fontSize: 10.5)),
-      ]),
-      const SizedBox(height: 4),
-      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(worst == null ? Icons.check_circle_rounded : Icons.arrow_drop_up_rounded,
-            size: worst == null ? 16 : 22, color: worst == null ? _kGood : _kBad),
-        const SizedBox(width: 4),
-        Expanded(
-          child: Text(
-            worst == null
-                ? 'No single place stands out — the whole word lines up with the recording.'
-                : '${_cap(_part((worst.start + worst.end) / 2, a, b))} of the word: ${worst.detail}.',
-            key: const ValueKey('stage-pointer-note'),
-            style: TextStyle(color: worst == null ? _kGood : _kBad, fontSize: 12, fontWeight: FontWeight.w600, height: 1.3),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+          decoration: BoxDecoration(
+            color: const Color(0x14FFFFFF),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: const Color(0x26FFFFFF)),
+          ),
+          child: SizedBox(
+            height: 58,
+            child: CustomPaint(
+              painter: _PointerPainter(take.refTimes, take.refEnergyDb, a, b, worst == null ? const [] : [worst]),
+              child: const SizedBox.expand(),
+            ),
           ),
         ),
-      ]),
+      ),
+      const SizedBox(height: 10),
+      Text(
+        plainTip(take),
+        key: const ValueKey('stage-pointer-note'),
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.35),
+      ),
     ]);
+  }
+
+  /// One short, plain sentence: where to focus and what to do there.
+  static String plainTip(StageTake take) {
+    final s = take.result.score;
+    final m = marks(take);
+    if (s == null || m.isEmpty) return 'Lovely — it matches the teacher. Say it once more to make it stick.';
+    final w = m.first;
+    final where = _part((w.start + w.end) / 2, s.refStart, s.refEnd);
+    final d = w.detail.toLowerCase();
+    final String how;
+    if (w.kind == 'missing') {
+      how = 'say every sound there';
+    } else if (w.kind == 'timing') {
+      how = d.contains('fast') || d.contains('short') || d.contains('quick')
+          ? 'say it a little slower'
+          : (d.contains('slow') || d.contains('long') ? 'say it a little quicker' : 'match the teacher’s timing');
+    } else if (w.kind == 'pitch') {
+      how = 'follow the teacher’s rise and fall';
+    } else {
+      how = 'copy the teacher’s sound closely';
+    }
+    return 'Focus on the $where, $how.';
   }
 
   static String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
@@ -246,14 +245,14 @@ class _PointerPainter extends CustomPainter {
     // Shaded places that differed (worst darkest).
     for (var i = marks.length - 1; i >= 0; i--) {
       final e = marks[i];
-      final p = Paint()..color = _kBad.withOpacity(i == 0 ? .32 : .16);
+      final p = Paint()..color = const Color(0x1FFFFFFF);
       canvas.drawRRect(
           RRect.fromRectAndRadius(Rect.fromLTRB(x(e.start), 0, math.max(x(e.end), x(e.start) + 3), h), const Radius.circular(4)), p);
     }
     // The teacher's recording as bars.
     const bars = 56;
     final bw = size.width / bars;
-    final bar = Paint()..color = const Color(0xCCFFFFFF);
+    final bar = Paint()..color = const Color(0x99FFFFFF);
     for (var k = 0; k < bars; k++) {
       final t0 = a + span * k / bars, t1 = a + span * (k + 1) / bars;
       var v = -80.0;
@@ -273,10 +272,10 @@ class _PointerPainter extends CustomPainter {
         ..lineTo(cx - 7, size.height)
         ..lineTo(cx + 7, size.height)
         ..close();
-      canvas.drawPath(tri, Paint()..color = _kBad);
+      canvas.drawPath(tri, Paint()..color = Colors.white);
       canvas.drawLine(Offset(cx, 0), Offset(cx, h), Paint()
-        ..color = _kBad
-        ..strokeWidth = 2);
+        ..color = Colors.white
+        ..strokeWidth = 1.5);
     }
   }
 

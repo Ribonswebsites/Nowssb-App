@@ -25,6 +25,7 @@ class PackStage {
     required this.music,
     required this.reference,
     required this.seconds,
+    this.musicSeconds = 0,
     this.deva = '',
   });
 
@@ -49,6 +50,9 @@ class PackStage {
 
   /// Length of [audio] in seconds.
   final double seconds;
+
+  /// Length of [music] in seconds (0 when unknown).
+  final double musicSeconds;
 }
 
 class StagePack {
@@ -103,6 +107,7 @@ class StagePack {
         music: '${m['music'] ?? ''}',
         reference: ref,
         seconds: (m['seconds'] as num?)?.toDouble() ?? 2.5,
+        musicSeconds: (m['musicSeconds'] as num?)?.toDouble() ?? 0,
         deva: '${m['deva'] ?? meta['deva'] ?? ''}'.trim(),
       ));
     }

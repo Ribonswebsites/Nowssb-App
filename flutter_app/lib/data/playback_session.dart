@@ -195,7 +195,9 @@ class PlaybackSession extends ChangeNotifier {
     notifyListeners();
     if (volume01 != null) await _persistVolume();
     if (wasPlaying) {
-      await play();
+      // Hand-off only starts the pill's playback; the caller (the Player's
+      // down chevron) must not wait for the whole recording to end.
+      unawaited(play());
     } else {
       _playing = false;
       _stopDoseClock();
