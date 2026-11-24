@@ -15,6 +15,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'models.dart';
+import 'settings.dart';
 import 'secure_downloads.dart';
 
 class WordVoice {
@@ -66,6 +67,24 @@ class WordVoice {
   /// The run that is playing now: [stop] or a newer [play] completes it at
   /// once, so a caller never waits on a player event that may never come.
   Completer<void>? _run;
+  AndroidLoudnessEnhancer? _enhancer;
+
+  /// Applies a new Voice boost to what is playing now (the next play picks
+  /// it up anyway).
+  Future<void> applyBoost(int db) async {
+    final e = _enhancer;
+    if (e == null) return;
+    try {
+      await e.setTargetGain(db.toDouble());
+      await e.setEnabled(db > 0);
+    } catch (_) {}
+  }
+
+  /// How far into the recording now playing, or null when nothing plays.
+  final ValueNotifier<Duration?> position = ValueNotifier<Duration?>(null);
+
+  /// The bundled asset now playing (null for a word's own recording).
+  String? currentAsset;
 
   /// Player set-up and tear-down run one at a time. A stop still releasing
   /// the platform player must never land after the next play has loaded
@@ -93,10 +112,16 @@ class WordVoice {
     _endRun();
     final bundled = asset ?? (isBundled(w) ? assetPath(w) : null);
     if (bundled != null) debugPlayed.add(bundled);
-    if (debugPlay != null) return debugPlay!(w, () => token != _token);
+    currentAsset = bundled;
+    if (debugPlay != null) {
+      final r = await debugPlay!(w, () => token != _token);
+      if (token == _token) position.value = null;
+      return r;
+    }
     final run = Completer<void>();
     _run = run;
     StreamSubscription<PlayerState>? sub;
+    StreamSubscription<Duration>? posSub;
     try {
       AudioSource? offline;
       File? file;
@@ -117,8 +142,15 @@ class WordVoice {
           } catch (_) {}
         }
         if (token != _token) return false;
-        final p = AudioPlayer();
+        // Voice boost (Settings): Android's loudness enhancer raises the
+        // recording with its own limiter, so it never clips.
+        final boost = Settings.instance.voiceBoost;
+        final enhancer = Platform.isAndroid && boost > 0 ? AndroidLoudnessEnhancer() : null;
+        final p = enhancer == null
+            ? AudioPlayer()
+            : AudioPlayer(audioPipeline: AudioPipeline(androidAudioEffects: [enhancer]));
         _player = p;
+        _enhancer = enhancer;
         if (bundled != null) {
           length = await p.setAsset(bundled);
         } else if (offline != null) {
@@ -127,8 +159,19 @@ class WordVoice {
           length = await p.setFilePath(file!.path);
         }
         if (token != _token) return false;
+        if (enhancer != null) {
+          try {
+            await enhancer.setTargetGain(boost.toDouble());
+            await enhancer.setEnabled(true);
+          } catch (_) {}
+        }
         await p.setVolume(volume.clamp(0.0, 1.0));
         await p.setSpeed(speed.clamp(0.5, 2.0));
+        currentAsset = bundled;
+        position.value = Duration.zero;
+        posSub = p.positionStream.listen((d) {
+          if (token == _token) position.value = d;
+        });
         sub = p.playerStateStream.listen((s) {
           if (s.processingState == ProcessingState.completed && !run.isCompleted) run.complete();
         });
@@ -146,6 +189,8 @@ class WordVoice {
       return false;
     } finally {
       await sub?.cancel();
+      await posSub?.cancel();
+      if (token == _token) position.value = null;
       if (identical(_run, run)) _run = null;
     }
   }
@@ -159,6 +204,7 @@ class WordVoice {
 
   Future<void> stop() async {
     _token++;
+    position.value = null;
     _endRun();
     await _serial(() async {
       try {

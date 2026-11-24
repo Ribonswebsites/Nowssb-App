@@ -21,7 +21,6 @@ import '../shell/tablet.dart';
 import 'dart:async';
 
 import '../data/word_voice.dart';
-import '../features/downloads/download_button.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -152,19 +151,7 @@ class _WordDetailState extends State<WordDetail> {
           subline: sub.isEmpty ? null : sub,
           cornerLabel: open ? null : 'Locked',
         ),
-        if (open && WordVoice.hasVoice(word))
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: DownloadButton(
-                id: WordVoice.downloadId(word),
-                title: word.word,
-                kind: 'word',
-                url: word.voice,
-              ),
-            ),
-          ),
+        // No download: recordings stay inside the Player.
         if (!open) _LockedCard(word: word),
         if (open && word.video.startsWith('http'))
           Padding(

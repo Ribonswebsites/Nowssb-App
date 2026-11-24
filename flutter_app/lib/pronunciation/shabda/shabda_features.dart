@@ -108,6 +108,10 @@ Float64List _preemph(Float64List x) {
   return y;
 }
 
+/// Mel filterbank range (see [melFilterbank]).
+const double kMelLowHz = 200.0;
+const double kMelHighHz = 4000.0;
+
 double hzToMel(double hz) => 2595.0 * log10(1.0 + hz / 700.0);
 double melToHz(double mel) => 700.0 * (math.pow(10.0, mel / 2595.0) - 1.0);
 
@@ -115,7 +119,9 @@ List<Float64List> melFilterbank({double alpha = 1.0}) {
   const nBins = kNfft ~/ 2 + 1;
   final warped = alpha != 1.0;
   final a = alpha.clamp(0.67, 1.50).toDouble();
-  final low = hzToMel(0.0), high = hzToMel(kSr / 2.0);
+  // The speech band a phone mic reliably carries (200 Hz – 4 kHz), so a
+  // different handset, a cheap mic or a speakerphone reads the same.
+  final low = hzToMel(kMelLowHz), high = hzToMel(kMelHighHz);
   final bins = <int>[];
   for (var i = 0; i < kMels + 2; i++) {
     final mel = low + (high - low) * i / (kMels + 1);

@@ -1,7 +1,12 @@
-// Parity: the Dart Shabda scorer must reproduce the Python prototype
-// (shabda-score) on the client's three America recordings and on synthetic
-// wrong attempts made from them. Golden numbers: test/fixtures/shabda/
-// python_golden.json (written by the prototype, see AUDIT.md).
+// The Dart Shabda scorer started as a port of the Python prototype
+// (shabda-score; golden numbers in test/fixtures/shabda/python_golden.json).
+// Feature extraction still matches it exactly. Scoring deliberately departs
+// from it since Nov 24 (Ribon: the teacher scored 33 on her own word): the
+// take is normalised per utterance, pitch is compared by shape only, and
+// pace may differ by about 30 %. So these tests now pin behaviour, not the
+// prototype's numbers: same recording 99+, another stage of the word never
+// passes, a slower/faster or higher/lower take of the same word passes, and
+// a take with a missing middle or end never passes.
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -9,7 +14,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nowssb/pronunciation/shabda/audio_io.dart';
 import 'package:nowssb/pronunciation/shabda/shabda_features.dart';
-import 'package:nowssb/pronunciation/shabda/shabda_practice.dart' show kPracticeConfig;
+import 'package:nowssb/pronunciation/shabda/shabda_practice.dart' show kPracticeConfig, calibratedScore, kMinAlignedRhythm;
 import 'package:nowssb/pronunciation/shabda/shabda_scorer.dart';
 
 const _fx = 'test/fixtures/shabda';
@@ -42,14 +47,9 @@ void main() {
   final raw = {for (var n = 1; n <= 3; n++) n: extractFeatures(_load('$_fx/raw_stage$n.wav'))};
   final clean = {for (var n = 1; n <= 3; n++) n: extractFeatures(_load('$_fx/clean_stage$n.wav'))};
 
-  void expectClose(ShabdaScore s, Map<String, dynamic> g, String label) {
-    final got = {'overall': s.overall, ...s.subs};
-    final msg = '$label dart=$got python=$g';
-    expect((s.overall - (g['overall'] as num)).abs(), lessThanOrEqualTo(0.5), reason: msg);
-    for (final k in s.subs.keys) {
-      expect((got[k]! - (g[k] as num)).abs(), lessThanOrEqualTo(1.0), reason: '$k: $msg');
-    }
-  }
+  const c = kPracticeConfig;
+  bool passes(ShabdaScore s) =>
+      calibratedScore(s.overall) >= c.passMark && s.completeness >= c.minCompleteness && s.rhythm >= kMinAlignedRhythm;
 
   group('feature parity', () {
     test('frames, speech span and pitch median match the prototype', () {
@@ -66,39 +66,37 @@ void main() {
     });
   });
 
-  group('score parity (raw recordings)', () {
+  group('scores (raw recordings)', () {
     for (var r = 1; r <= 3; r++) {
       for (var u = 1; u <= 3; u++) {
         test('stage $r reference vs stage $u take', () {
           final s = scorePair(raw[r]!, raw[u]!);
-          expectClose(s, golden['raw']['$r-$u'] as Map<String, dynamic>, 'raw $r-$u');
           if (r == u) {
             expect(s.overall, greaterThanOrEqualTo(99));
           } else {
-            expect(s.overall, inInclusiveRange(20, 46));
+            expect(passes(s), isFalse, reason: '${s.overall} ${s.subs}');
           }
         });
       }
     }
   });
 
-  group('score parity (scoring references shipped in the app)', () {
+  group('scores (clean references)', () {
     for (var r = 1; r <= 3; r++) {
       for (var u = 1; u <= 3; u++) {
         test('ref $r vs $u', () {
           final s = scorePair(clean[r]!, clean[u]!);
-          expectClose(s, golden['ref']['$r-$u'] as Map<String, dynamic>, 'ref $r-$u');
           if (r == u) {
             expect(s.overall, greaterThanOrEqualTo(99));
           } else {
-            expect(s.overall, inInclusiveRange(20, 46));
+            expect(passes(s), isFalse, reason: '${s.overall} ${s.subs}');
           }
         });
       }
     }
   });
 
-  group('score parity (synthetic wrong attempts)', () {
+  group('scores (same word re-said, or cut off)', () {
     for (var n = 1; n <= 3; n++) {
       for (final v in ['tempo0.8', 'tempo1.25', 'pitchn3', 'pitchp3', 'midcut', 'trunc']) {
         test('stage $n $v', () {
@@ -111,14 +109,16 @@ void main() {
             take = _load('$_fx/stage${n}_$v.wav');
           }
           final s = scorePair(clean[n]!, extractFeatures(take));
-          expectClose(s, golden['degraded']['$n-$v'] as Map<String, dynamic>, 'degraded $n-$v');
-          const c = kPracticeConfig;
-          final passes = s.overall >= c.passMark &&
-              s.completeness >= c.minCompleteness &&
-              s.rhythm >= c.minRhythm &&
-              s.pitch >= c.minPitch;
-          expect(passes, isFalse, reason: 'a wrong attempt must not pass: overall ${s.overall} ${s.subs}');
-          expect(s.overall, lessThan(72));
+          if (v == 'midcut' || v == 'trunc') {
+            expect(passes(s), isFalse, reason: 'a cut-off attempt must not pass: ${s.overall} ${s.subs}');
+          } else if (v.startsWith('pitch')) {
+            // Three semitones moves the voice's formants too (another
+            // speaker, in effect): clearly above a different word, but not
+            // a guaranteed pass. Two semitones passes (scorer_robustness).
+            expect(calibratedScore(s.overall), greaterThan(55), reason: '${s.overall} ${s.subs}');
+          } else {
+            expect(passes(s), isTrue, reason: 'same word, other pace or pitch: ${s.overall} ${s.subs}');
+          }
         });
       }
     }

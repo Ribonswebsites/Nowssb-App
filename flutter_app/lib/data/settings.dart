@@ -36,6 +36,7 @@ class Settings extends ChangeNotifier {
   static const _kBass = 'nwsb_player_bass';
   static const _kStageMusic = 'nwsb_stage_music';
   static const _kStageBed = 'nwsb_stage_bed';
+  static const _kVoiceBoost = 'nwsb_voice_boost';
   static const _kSpeed = 'nwsb_player_speed';
   static const _kCrossfade = 'nwsb_player_crossfade';
   static const _kSleep = 'nwsb_player_sleep';
@@ -115,6 +116,7 @@ class Settings extends ChangeNotifier {
   bool _bassBoost = false;
   bool _stageMusic = true;
   String _stageBed = 'drone';
+  int _voiceBoost = 0;
   double _speed = 1.0;
   String _crossfade = 'Off';
   String _sleepTimer = 'Off';
@@ -184,6 +186,9 @@ class Settings extends ChangeNotifier {
   /// Background under the teacher's stage recordings: 'drone', 'pad' or
   /// 'bowl' ([stageMusic] false = voice only).
   String get stageBed => _stageBed;
+
+  /// Extra loudness for the teacher's recordings, in dB: 0, 6 or 12.
+  int get voiceBoost => _voiceBoost;
   double get speed => _speed;
   String get crossfade => _crossfade;
   String get sleepTimer => _sleepTimer;
@@ -257,6 +262,8 @@ class Settings extends ChangeNotifier {
       _bassBoost = p.getBool(_kBass) ?? _bassBoost;
       _stageMusic = p.getBool(_kStageMusic) ?? _stageMusic;
       _stageBed = p.getString(_kStageBed) ?? _stageBed;
+      _voiceBoost = p.getInt(_kVoiceBoost) ?? _voiceBoost;
+      if (![0, 6, 12].contains(_voiceBoost)) _voiceBoost = 0;
       _speed = p.getDouble(_kSpeed) ?? _speed;
       _crossfade = p.getString(_kCrossfade) ?? _crossfade;
       _sleepTimer = p.getString(_kSleep) ?? _sleepTimer;
@@ -438,7 +445,14 @@ class Settings extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Picks the stage background: 'drone', 'pad', 'bowl', or 'voice' (none).
+  Future<void> setVoiceBoost(int db) async {
+    _voiceBoost = [0, 6, 12].contains(db) ? db : 0;
+    await _saveInt(_kVoiceBoost, _voiceBoost);
+    notifyListeners();
+  }
+
+  /// Picks the stage background: 'drone', 'pad', 'bowl', 'bansuri',
+  /// 'tanpura', or 'voice' (none).
   Future<void> setStageBed(String bed) async {
     if (bed == 'voice') {
       _stageMusic = false;

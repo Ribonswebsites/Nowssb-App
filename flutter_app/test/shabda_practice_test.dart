@@ -117,25 +117,25 @@ void main() {
         expect(r48.passed, isTrue);
       });
 
-      test('20% slower: fails, says slower', () {
-        final r = assessTake(ref[n]!, _pad(_load('$_fx/stage${n}_tempo0.8.wav')), stage: n);
-        expect(r.passed, isFalse, reason: '${r.overall}');
-        expect(all(r), anyOf(contains('slower'), contains('drawn out'), contains('too long')), reason: '${r.fixes}');
-      });
-
-      test('25% faster: fails, says faster / rushed', () {
-        final r = assessTake(ref[n]!, _pad(_load('$_fx/stage${n}_tempo1.25.wav')), stage: n);
-        expect(r.passed, isFalse, reason: '${r.overall}');
-        expect(all(r), anyOf(contains('faster'), contains('rushed'), contains('too short')), reason: '${r.fixes}');
-      });
+      // Since Nov 24 (Ribon): a fresh take is never said at exactly the
+      // recording's pace or pitch, so the same word said 20–25 % slower or
+      // faster passes; a different speaker's pitch (±3 semitones, formants
+      // moved too) stays clearly above a different word.
+      for (final v in ['tempo0.8', 'tempo1.25']) {
+        test('the same word ${v == 'tempo0.8' ? '20% slower' : '25% faster'} still passes', () {
+          final r = assessTake(ref[n]!, _pad(_load('$_fx/stage${n}_$v.wav')), stage: n);
+          expect(r.status, AttemptStatus.scored);
+          expect(r.passed, isTrue, reason: '${r.overall} ${r.fixes}');
+          expect(r.overall, greaterThanOrEqualTo(75));
+        });
+      }
 
       for (final p in ['pitchn3', 'pitchp3']) {
-        test('3 semitones ${p == 'pitchp3' ? 'up' : 'down'}: fails, names pitch', () {
+        test('3 semitones ${p == 'pitchp3' ? 'up' : 'down'}: scored well above a different word', () {
           final r = assessTake(ref[n]!, _pad(_load('$_fx/stage${n}_$p.wav')), stage: n);
-          expect(r.passed, isFalse, reason: '${r.overall}');
-          expect(r.subs.firstWhere((s) => s.key == 'pitch').value, lessThan(50));
-          expect(all(r), anyOf(contains('pitch'), contains('semitone'), contains('melody'), contains('sounds')),
-              reason: '${r.fixes}');
+          final other = assessTake(ref[n]!, _pad(refAudio[n == 1 ? 2 : 1]!), stage: n);
+          expect(r.status, AttemptStatus.scored);
+          expect(r.overall, greaterThan(other.overall + 10), reason: '${r.overall} vs ${other.overall}');
         });
       }
 
@@ -217,9 +217,12 @@ void main() {
     });
   });
 
-  test('heavy background noise (10 dB SNR) asks for a quieter place', () {
+  test('a busy room (10 dB SNR) is still scored and passes; 5 dB asks for a quieter place', () {
     for (var n = 1; n <= 3; n++) {
-      final r = assessTake(ref[n]!, _addNoise(_pad(refAudio[n]!), 10), stage: n);
+      final ok = assessTake(ref[n]!, _addNoise(_pad(refAudio[n]!), 10), stage: n);
+      expect(ok.status, AttemptStatus.scored, reason: ok.message);
+      expect(ok.passed, isTrue, reason: '${ok.overall} ${ok.fixes}');
+      final r = assessTake(ref[n]!, _addNoise(_pad(refAudio[n]!), 5), stage: n);
       expect(r.status, AttemptStatus.tooNoisy);
       expect(r.message, contains('quieter'));
       expect(r.scored, isFalse);

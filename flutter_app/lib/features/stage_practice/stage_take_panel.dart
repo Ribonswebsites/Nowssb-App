@@ -4,9 +4,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show HapticFeedback;
 
 import '../../pronunciation/shabda/shabda_practice.dart';
 import '../../pronunciation/shabda/shabda_scorer.dart' show SegmentError;
+import 'stage_checklist.dart';
 import 'stage_pack.dart';
 import 'stage_progress.dart';
 import 'stage_scoring.dart';
@@ -69,31 +71,42 @@ class StageProgressStrip extends StatelessWidget {
 }
 
 /// The score for one take: a count-up from 0 inside a thin white ring, one
-/// word, and "See what to improve", which opens the waveform with a white
-/// marker on each weak spot and a short plain line for each.
+/// word, and "See what to improve", which opens the checklist page.
 class StageResultPanel extends StatefulWidget {
-  const StageResultPanel({super.key, required this.take, required this.stage});
+  const StageResultPanel({super.key, required this.take, required this.stage, this.title = 'What to improve'});
   final StageTake take;
   final int stage;
+
+  /// Heading of the checklist page (the word).
+  final String title;
 
   @override
   State<StageResultPanel> createState() => _StageResultPanelState();
 }
 
 class _StageResultPanelState extends State<StageResultPanel> with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(milliseconds: 650))..forward();
-  bool _open = false;
+  // One smooth ease-out: fast at first, settling softly on the score, with
+  // a light tap when it lands (a firmer one for a pass).
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100));
+  late final Animation<double> _ease = CurvedAnimation(parent: _c, curve: Curves.easeOutQuart);
+
+  @override
+  void initState() {
+    super.initState();
+    _run();
+  }
+
+  void _run() {
+    _c.forward(from: 0).whenCompleteOrCancel(() {
+      if (!mounted || _c.value < 1 || !widget.take.result.scored) return;
+      widget.take.result.passed ? HapticFeedback.mediumImpact() : HapticFeedback.lightImpact();
+    });
+  }
 
   @override
   void didUpdateWidget(StageResultPanel old) {
     super.didUpdateWidget(old);
-    if (!identical(old.take, widget.take)) {
-      _open = false;
-      _c
-        ..reset()
-        ..forward();
-    }
+    if (!identical(old.take, widget.take)) _run();
   }
 
   @override
@@ -114,26 +127,30 @@ class _StageResultPanelState extends State<StageResultPanel> with SingleTickerPr
       ]);
     }
     final word = r.overall >= 85 ? 'Great' : (r.passed ? 'Close' : 'Try again');
-    final curve = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
     return Column(key: const ValueKey('stage-result'), crossAxisAlignment: CrossAxisAlignment.center, children: [
-      AnimatedBuilder(
-        animation: curve,
-        builder: (_, __) {
-          final v = curve.value;
-          return SizedBox(
-            width: 132,
-            height: 132,
-            child: CustomPaint(
-              key: const ValueKey('stage-score-ring'),
-              painter: _ScoreRing(v * r.overall / 100),
-              child: Center(
-                child: Text('${(r.overall * v).round()}',
+      RepaintBoundary(
+        child: SizedBox(
+          width: 132,
+          height: 132,
+          child: CustomPaint(
+            key: const ValueKey('stage-score-ring'),
+            painter: _ScoreRing(_ease, r.overall / 100),
+            child: Center(
+              child: AnimatedBuilder(
+                animation: _ease,
+                builder: (_, __) => Text('${(r.overall * _ease.value).round()}',
                     key: const ValueKey('stage-score'),
-                    style: const TextStyle(color: Colors.white, fontSize: 52, fontWeight: FontWeight.w300, height: 1, letterSpacing: -2)),
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 52,
+                        fontWeight: FontWeight.w300,
+                        height: 1,
+                        letterSpacing: -2,
+                        fontFeatures: [FontFeature.tabularFigures()])),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
       const SizedBox(height: 8),
       FadeTransition(
@@ -147,7 +164,7 @@ class _StageResultPanelState extends State<StageResultPanel> with SingleTickerPr
         GestureDetector(
           key: const ValueKey('stage-improve-btn'),
           behavior: HitTestBehavior.opaque,
-          onTap: () => setState(() => _open = !_open),
+          onTap: () => openStageChecklist(context, take, title: widget.title),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
@@ -156,19 +173,12 @@ class _StageResultPanelState extends State<StageResultPanel> with SingleTickerPr
               border: Border.all(color: const Color(0x33FFFFFF)),
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Text(_open ? 'Hide' : 'See what to improve',
-                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+              const Text('See what to improve',
+                  style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
               const SizedBox(width: 4),
-              Icon(_open ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 18, color: Colors.white),
+              const Icon(Icons.chevron_right_rounded, size: 18, color: Colors.white),
             ]),
           ),
-        ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          child: _open
-              ? Padding(padding: const EdgeInsets.only(top: 12), child: StageWordPointer(take: take))
-              : const SizedBox(width: double.infinity),
         ),
       ],
     ]);
@@ -176,11 +186,13 @@ class _StageResultPanelState extends State<StageResultPanel> with SingleTickerPr
 }
 
 class _ScoreRing extends CustomPainter {
-  _ScoreRing(this.fill);
-  final double fill;
+  _ScoreRing(this.t, this.target) : super(repaint: t);
+  final Animation<double> t;
+  final double target;
 
   @override
   void paint(Canvas canvas, Size size) {
+    final fill = t.value * target;
     final rect = Offset.zero & size;
     final r = rect.deflate(4);
     canvas.drawArc(r, 0, math.pi * 2, false, Paint()
@@ -195,7 +207,7 @@ class _ScoreRing extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_ScoreRing old) => old.fill != fill;
+  bool shouldRepaint(_ScoreRing old) => old.target != target || old.t != t;
 }
 
 /// Where in the word the take differed: the teacher's recording drawn as a

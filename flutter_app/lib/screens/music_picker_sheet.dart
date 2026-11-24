@@ -17,6 +17,8 @@ const kMusicBeds = <MusicBed>[
   MusicBed('drone', 'Drone', 'A deep, steady hum'),
   MusicBed('pad', 'Warm pad', 'A soft chord that breathes'),
   MusicBed('bowl', 'Singing bowl', 'A gentle bell, now and then'),
+  MusicBed('bansuri', 'Bansuri', 'A soft bamboo flute'),
+  MusicBed('tanpura', 'Tanpura', 'Strings that hum in a circle'),
   MusicBed('voice', 'Voice only', 'Just your teacher'),
 ];
 
@@ -130,7 +132,7 @@ class _MusicPickerSheetState extends State<MusicPickerSheet> with SingleTickerPr
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
-                  childAspectRatio: .92,
+                  childAspectRatio: 1.02,
                   children: [
                     for (final b in kMusicBeds)
                       _BedCard(
@@ -192,19 +194,31 @@ class _BedCard extends StatelessWidget {
               Positioned.fill(
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(14),
-                  child: DecoratedBox(
-                    decoration: const BoxDecoration(
-                      gradient: RadialGradient(
-                        center: Alignment(-.3, -.4),
-                        radius: 1.2,
-                        colors: [Color(0x26FFFFFF), Color(0x05FFFFFF)],
+                  child: Stack(fit: StackFit.expand, children: [
+                    AnimatedScale(
+                      scale: playing ? 1.06 : 1.0,
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.easeOutCubic,
+                      child: ColorFiltered(
+                        colorFilter: ColorFilter.matrix(selected ? _kSoftMono : _kMono),
+                        child: Image.asset(
+                          'assets/images/sound_beds/${bed.id}.webp',
+                          key: ValueKey('music-photo-${bed.id}'),
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0x14FFFFFF)),
+                        ),
                       ),
                     ),
-                    child: AnimatedBuilder(
-                      animation: eq,
-                      builder: (_, __) => CustomPaint(painter: _BedArt(bed.id, playing ? eq.value : 0, playing)),
+                    const DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0x00000000), Color(0x8C000000)],
+                        ),
+                      ),
                     ),
-                  ),
+                  ]),
                 ),
               ),
               Positioned(
@@ -279,61 +293,17 @@ class _Eq extends StatelessWidget {
   }
 }
 
-/// Small monochrome artwork for each sound.
-class _BedArt extends CustomPainter {
-  _BedArt(this.id, this.t, this.live);
-  final String id;
-  final double t;
-  final bool live;
-
-  @override
-  void paint(Canvas canvas, Size s) {
-    final c = Offset(s.width * .62, s.height * .45);
-    final p = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.2
-      ..color = const Color(0x80FFFFFF);
-    final ph = t * math.pi * 2;
-    switch (id) {
-      case 'drone':
-        for (var i = 1; i <= 5; i++) {
-          final r = i * s.shortestSide * .09 + (live ? 2 * math.sin(ph + i) : 0);
-          canvas.drawCircle(c, r, p..color = Color.fromRGBO(255, 255, 255, .55 - i * .08));
-        }
-      case 'pad':
-        for (var k = 0; k < 4; k++) {
-          final path = Path();
-          for (var x = 0.0; x <= s.width; x += 3) {
-            final y = s.height * (.3 + k * .12) +
-                8 * math.sin(x / s.width * math.pi * 2 + ph + k * .8) * (live ? 1.2 : .8);
-            x == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
-          }
-          canvas.drawPath(path, p..color = Color.fromRGBO(255, 255, 255, .6 - k * .12));
-        }
-      case 'bowl':
-        final rim = Rect.fromCenter(center: c.translate(0, 6), width: s.width * .46, height: s.height * .16);
-        canvas.drawArc(rim.inflate(0), 0, math.pi, false, p..color = const Color(0xB3FFFFFF));
-        canvas.drawOval(rim, p..color = const Color(0x80FFFFFF));
-        for (var i = 1; i <= 3; i++) {
-          final g = ((t + i / 3) % 1);
-          canvas.drawOval(rim.inflate(6 + 16 * (live ? g : i / 3)),
-              p..color = Color.fromRGBO(255, 255, 255, (live ? (1 - g) : (1 - i / 3)) * .35));
-        }
-      default:
-        final bars = 18;
-        final w = s.width * .64;
-        for (var i = 0; i < bars; i++) {
-          final x = c.dx - w / 2 + w * i / (bars - 1);
-          final h = s.height * (.08 + .22 * (.5 + .5 * math.sin(i * .9 + ph)).abs() * (1 - (i - bars / 2).abs() / bars));
-          canvas.drawLine(Offset(x, c.dy - h), Offset(x, c.dy + h),
-              Paint()
-                ..strokeWidth = 2
-                ..strokeCap = StrokeCap.round
-                ..color = const Color(0x99FFFFFF));
-        }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_BedArt o) => o.t != t || o.live != live || o.id != id;
+/// Photos sit in the black-and-white look: mostly grey until picked, then
+/// in their own colour.
+List<double> _sat(double v) {
+  const r = 0.2126, g = 0.7152, b = 0.0722;
+  return [
+    r + (1 - r) * v, g - g * v, b - b * v, 0, 0,
+    r - r * v, g + (1 - g) * v, b - b * v, 0, 0,
+    r - r * v, g - g * v, b + (1 - b) * v, 0, 0,
+    0, 0, 0, 1, 0,
+  ];
 }
+
+final _kMono = _sat(0.25);
+final _kSoftMono = _sat(1.0);

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../data/settings.dart';
+import '../data/word_voice.dart';
 import '../theme/player_aura.dart';
 import '../widgets/colored_split_promo_banner.dart';
 import '../admin/template/editable.dart';
@@ -20,34 +21,23 @@ class PlayerSettingsScreen extends StatefulWidget {
 
 class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   Settings get s => Settings.instance;
-  int? _batteryPct;
 
-  static const _eqOptions = ['Flat', 'Bass', 'Treble', 'Vocal', 'Electronic'];
-  static const _qualityOptions = ['Low', 'Normal', 'High', 'Lossless'];
-  static const _crossfadeOptions = ['Off', '3 Sec', '5 Sec', '8 Sec', '12 Sec'];
+  static const _boostOptions = ['Off', '+6 dB', '+12 dB'];
   static const _sleepOptions = ['Off', '15 Min', '30 Min', '45 Min', '1 Hour'];
-  static const _playlistOptions = ['Classic', 'Grid', 'Compact'];
-  static const _nowPlayingOptions = ['On', 'Mini Only', 'Off'];
-  static const _viewOptions = ['Classic', 'Minimal', 'Grid'];
+  static const _nowPlayingOptions = ['On', 'Off'];
+
+  String get _boostLabel => switch (s.voiceBoost) { 6 => '+6 dB', 12 => '+12 dB', _ => 'Off' };
+
+  void _setBoost(String label) {
+    final db = switch (label) { '+6 dB' => 6, '+12 dB' => 12, _ => 0 };
+    s.setVoiceBoost(db);
+    WordVoice.instance.applyBoost(db);
+  }
 
   @override
   void initState() {
     super.initState();
     s.addListener(_refresh);
-    _readBattery();
-  }
-
-  Future<void> _readBattery() async {
-    try {
-      const ch = MethodChannel('nowssb/device');
-      final level = await ch.invokeMethod<num>('batteryLevel');
-      if (mounted && level != null) {
-        setState(() => _batteryPct = level.round().clamp(0, 100));
-      }
-    } catch (_) {
-      // No device battery reading on this build: show nothing, never a made-up value.
-      if (mounted) setState(() => _batteryPct = null);
-    }
   }
 
   @override
@@ -58,25 +48,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
 
   void _refresh() {
     if (mounted) setState(() {});
-  }
-
-  String get _eqLabel => switch (s.eq) {
-        'deep' => 'Bass',
-        'bright' => 'Treble',
-        'focus' => 'Vocal',
-        'custom' => 'Electronic',
-        _ => 'Flat',
-      };
-
-  void _setEq(String label) {
-    final key = switch (label) {
-      'Bass' => 'deep',
-      'Treble' => 'bright',
-      'Vocal' => 'focus',
-      'Electronic' => 'custom',
-      _ => 'flat',
-    };
-    s.setEq(key);
   }
 
   Future<void> _choose(String title, List<String> options, String current,
@@ -125,7 +96,6 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.paddingOf(context).bottom;
-    final batt = _batteryPct;
 
     // Shared player shell (Saved words / Library uses the same one).
     return PlayerAuraPage(
@@ -137,33 +107,10 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
         children: [
           ...layoutChildren(context, 'player.settings', [
           LSection(
-              'eq',
-              'Equalizer',
-              _nav(Icons.tune, 'Equalizer', _eqLabel,
-                  () => _choose('Equalizer', _eqOptions, _eqLabel, _setEq))),
-          LSection(
-              'quality',
-              'Audio quality',
-              _nav(
-                  Icons.graphic_eq,
-                  'Audio Quality',
-                  s.quality,
-                  () => _choose('Audio Quality', _qualityOptions, s.quality,
-                      s.setQuality))),
-          LSection(
-              'bass',
-              'Bass boost',
-              _toggle(Icons.multitrack_audio, 'Bass Boost', s.bassBoost,
-                  s.toggleBass)),
-          LSection(
-              'crossfade',
-              'Crossfade',
-              _nav(
-                  Icons.compare_arrows,
-                  'Crossfade',
-                  s.crossfade,
-                  () => _choose('Crossfade', _crossfadeOptions, s.crossfade,
-                      s.setCrossfade))),
+              'voiceboost',
+              'Voice boost',
+              _nav(Icons.volume_up_rounded, 'Voice Boost', _boostLabel,
+                  () => _choose('Voice Boost', _boostOptions, _boostLabel, _setBoost))),
           LSection(
               'sleep',
               'Sleep timer',
@@ -174,62 +121,15 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
                   () => _choose('Sleep Timer', _sleepOptions, s.sleepTimer,
                       s.setSleepTimer))),
           LSection(
-              'download',
-              'Download only',
-              _toggle(Icons.download_outlined, 'Download Only', s.downloadOnly,
-                  s.toggleDownloadOnly)),
-          LSection(
-              'nowview',
-              'Now playing view',
-              _nav(
-                  Icons.queue_music,
-                  'Now Playing View',
-                  s.nowView,
-                  () => _choose('Now Playing View', _viewOptions, s.nowView,
-                      s.setNowView))),
-          LSection(
-              'playlist',
-              'Playlist view',
-              _nav(
-                Icons.view_list_outlined,
-                'Playlist View',
-                s.playlist == 'Classic' ||
-                        s.playlist == 'Grid' ||
-                        s.playlist == 'Compact'
-                    ? s.playlist
-                    : 'Classic',
-                () => _choose('Playlist View', _playlistOptions, s.playlist,
-                    s.setPlaylist),
-              )),
-          LSection(
               'nowplaying',
-              'Now playing',
+              'Mini player',
               _nav(
-                  Icons.notifications_none,
-                  'Now Playing',
-                  s.nowPlaying,
-                  () => _choose('Now Playing', _nowPlayingOptions, s.nowPlaying,
+                  Icons.picture_in_picture_alt_rounded,
+                  'Mini Player',
+                  s.nowPlaying == 'Off' ? 'Off' : 'On',
+                  () => _choose('Mini Player', _nowPlayingOptions, s.nowPlaying == 'Off' ? 'Off' : 'On',
                       s.setNowPlaying),
                   last: true)),
-          LSection(
-              'battery',
-              'Battery note',
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (batt != null) Icon(Icons.battery_full,
-                      size: 14, color: Colors.white.withOpacity(0.55)),
-                  const SizedBox(width: 6),
-                  Text(
-                    batt == null ? '' : '$batt%',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.55),
-                      fontSize: 12,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                ],
-              )),
           ]),
           SizedBox(height: 12 + bottomInset),
         ],
@@ -240,19 +140,4 @@ class _PlayerSettingsScreenState extends State<PlayerSettingsScreen> {
   Widget _nav(IconData icon, String label, String value, VoidCallback onTap,
           {bool last = false}) =>
       GlassItemCard(icon: icon, overline: 'Player', title: label, pill: value, pillSub: 'Tap to change', onTap: onTap);
-
-  Widget _toggle(IconData icon, String label, bool value, VoidCallback onTap) =>
-      GlassItemCard(
-        icon: icon,
-        overline: 'Player',
-        title: label,
-        pill: value ? 'On' : 'Off',
-        pillSub: 'Tap to switch',
-        onTap: onTap,
-        trailing: Switch.adaptive(
-          value: value,
-          onChanged: (_) => onTap(),
-          activeThumbColor: Colors.white,
-        ),
-      );
 }

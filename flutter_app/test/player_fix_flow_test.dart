@@ -153,12 +153,14 @@ void main() {
     await t.pump(const Duration(seconds: 2));
   });
 
-  testWidgets('Music: Drone, Warm pad, Singing bowl or Voice only, remembered and played', (t) async {
+  testWidgets('Music: Drone, Warm pad, Singing bowl, Bansuri, Tanpura or Voice only, remembered and played', (t) async {
     await openPlayer(t, [_lib('america')]);
     await run(t, 10);
     for (final (opt, file) in [
       ('pad', 'america_stage1_music2.m4a'),
       ('bowl', 'america_stage1_music3.m4a'),
+      ('bansuri', 'america_stage1_music4.m4a'),
+      ('tanpura', 'america_stage1_music5.m4a'),
       ('voice', 'america_stage1_clean.m4a'),
       ('drone', 'america_stage1_music.m4a'),
     ]) {

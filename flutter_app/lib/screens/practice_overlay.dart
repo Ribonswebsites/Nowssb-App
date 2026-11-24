@@ -23,6 +23,7 @@ import '../data/models.dart';
 import '../data/word_devanagari.dart';
 import '../data/entitlements.dart';
 import '../features/stage_practice/stage_mic.dart';
+import '../features/stage_practice/akshara_karaoke.dart';
 import '../features/stage_practice/stage_vad.dart';
 import '../data/word_voice.dart';
 import '../features/stage_practice/stage_pack.dart';
@@ -630,9 +631,19 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                                     : (_holding || _status == _PracticeStatus.recording)
                                         ? _ListeningRing(level: _level)
                                         : null,
+                            header: _staged && hasKaraoke(widget.stage, widget.pack!.deva)
+                                ? (only) => AksharaKaraoke(
+                                      key: const ValueKey('practice-karaoke'),
+                                      deva: widget.stage!.deva.isNotEmpty ? widget.stage!.deva : widget.pack!.deva,
+                                      times: widget.stage!.akshara,
+                                      size: 40,
+                                      english: widget.word.word,
+                                      onlyWhilePlaying: only,
+                                    )
+                                : null,
                             result: _take == null
                                 ? null
-                                : StageResultPanel(take: _take!, stage: widget.stage!.number),
+                                : StageResultPanel(take: _take!, stage: widget.stage!.number, title: widget.word.word),
                             next: _nextStage == null || widget.onStage == null
                                 ? null
                                 : (_nextStage!.number, () => widget.onStage!(_nextStage!.number)),
@@ -758,7 +769,12 @@ class _BlackTab extends StatelessWidget {
     this.result,
     this.next,
     this.centre,
+    this.header,
   });
+
+  /// The word in Devanagari with the voiced akshara lit; the flag hides it
+  /// unless the teacher's recording is playing (used over the score).
+  final Widget Function(bool onlyWhilePlaying)? header;
 
   /// Replaces the orb: the 3-2-1 countdown, or the live level while listening.
   final Widget? centre;
@@ -856,6 +872,10 @@ class _BlackTab extends StatelessWidget {
               letterSpacing: 4.6,
             ),
           ),
+          if (header != null) ...[
+            const SizedBox(height: 10),
+            header!(false),
+          ],
           const SizedBox(height: 8),
           SizedBox(height: 132, child: Center(child: centre ?? const _OrbFilm())),
           const SizedBox(height: 10),
@@ -885,6 +905,7 @@ class _BlackTab extends StatelessWidget {
           ),
           ],
           if (result != null) ...[
+            if (header != null) header!(true),
             const SizedBox(height: 4),
             result!,
           ],

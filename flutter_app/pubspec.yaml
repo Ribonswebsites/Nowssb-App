@@ -294,6 +294,7 @@ flutter:
     # versions, and the 16 kHz WAV references the scorer compares against.
     # AMERICA left the catalogue on Nov 23, 2026 (country words are out);
     # its recordings stay bundled for the stage engine and its tests.
+    - assets/images/sound_beds/
     - assets/words/america/
     - assets/words/ramram/
     - assets/words/washington/

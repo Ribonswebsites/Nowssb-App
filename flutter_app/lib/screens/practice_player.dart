@@ -5,12 +5,12 @@
 /// text-to-speech and completed words are recorded locally.
 library;
 
+import '../features/stage_practice/akshara_karaoke.dart';
 import 'music_picker_sheet.dart';
 import '../shell/tablet.dart';
 import '../shell/tablet_frame.dart' show TabletShellGate, TabletSheet, isTablet;
 import '../features/stage_practice/stage_pack.dart';
 import '../features/stage_practice/stage_progress.dart';
-import '../features/downloads/download_button.dart';
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter, lerpDouble;
@@ -181,6 +181,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     return switch (Settings.instance.stageBed) {
       'pad' => st.music.replaceFirst('_music.m4a', '_music2.m4a'),
       'bowl' => st.music.replaceFirst('_music.m4a', '_music3.m4a'),
+      'bansuri' => st.music.replaceFirst('_music.m4a', '_music4.m4a'),
+      'tanpura' => st.music.replaceFirst('_music.m4a', '_music5.m4a'),
       _ => st.music,
     };
   }
@@ -509,42 +511,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       final prefs = Settings.instance;
       var rate = (0.34 * prefs.speed).clamp(0.2, 0.85);
       var pitch = 1.0;
-      final bands = prefs.eqBands;
-      if (bands.length >= 5) {
-        pitch *= 1 + bands[4] * 0.22 - bands[0] * 0.2;
-        rate = (rate * (1 + bands[2] * 0.12)).clamp(0.2, 0.85);
-      }
-      if (prefs.bassBoost) pitch *= 0.86;
-      switch (prefs.eq) {
-        case 'deep':
-          pitch = 0.76;
-          break;
-        case 'bright':
-          pitch = 1.24;
-          break;
-        case 'focus':
-          pitch = 1.05;
-          rate = (rate * 0.9).clamp(0.2, 0.85);
-          break;
-        case 'custom':
-          pitch = 1.14;
-          rate = (rate * 1.08).clamp(0.2, 0.85);
-          break;
-        default:
-          break;
-      }
-      // Quality may soften Low; never override mute / user volume (Lossless).
+      // EQ / bass / tone presets are no longer offered in Player settings,
+      // so an old saved choice must not colour the voice either.
       var volume = _effectiveVolume(_volume);
-      if (prefs.downloadOnly) {
-        final store = await SharedPreferences.getInstance();
-        final saved = store.getStringList(_likedWordsKey) ?? const <String>[];
-        if (saved.isNotEmpty && !saved.contains(_word.word)) {
-          final next = widget.words.indexWhere((w) => saved.contains(w.word));
-          if (next >= 0 && next != _index && mounted) {
-            setState(() => _index = next);
-          }
-        }
-      }
       await _tts.awaitSpeakCompletion(true);
       await _tts.setLanguage('en-US');
       final voiceStore = await SharedPreferences.getInstance();
@@ -1019,11 +988,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   /// Playback volume from the user slider, with Low softening only.
   /// Never forces full volume for Lossless (that overrode mute).
+  // The old Quality / Bass boost options are gone (they only made the
+  // teacher's recording quieter or did nothing): the user's volume is final.
   double _effectiveVolume(double userVol) {
-    final prefs = Settings.instance;
-    var volume = userVol;
-    if (prefs.bassBoost) volume = (volume * 1.12).clamp(0.0, 1.0);
-    if (prefs.quality == 'Low') volume *= 0.7;
+    final volume = userVol;
     return volume.clamp(0.0, 1.0);
   }
 
@@ -1081,14 +1049,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     unawaited(WordVoice.instance.stop());
     await PlayerRitual.stop();
     _fadeToken++; // cancel any in-flight fade-in
-    final fade = switch (Settings.instance.crossfade) {
-      '3 Sec' => 3,
-      '5 Sec' => 5,
-      '8 Sec' => 8,
-      '12 Sec' => 12,
-      _ => 0,
-    };
-    // Switch immediately (no silent wait); fade the next word in.
+    // No crossfade: a fade-in would swallow most of a 2–3 s recording.
+    const fade = 0;
+    // Switch immediately (no silent wait).
     if (!mounted) return;
     setState(() {
       _index = next;
@@ -1663,6 +1626,12 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   onInfo: _openInfo,
                                   onLevel: _openLevel,
                                   onMusic: _pack == null ? null : _openMusicPicker,
+                                  karaoke: hasKaraoke(_packStage, _pack?.deva ?? '')
+                                      ? _KaraokePill(
+                                          deva: _packStage!.deva.isNotEmpty ? _packStage!.deva : _pack!.deva,
+                                          times: _packStage!.akshara,
+                                        )
+                                      : null,
                                   stage: _packStage?.number,
                                   stageNumbers: [
                                     ...?_pack?.stages.map((st) => st.number),
@@ -2958,14 +2927,6 @@ class _QueueSheetState extends State<_QueueSheet> {
                                                   ],
                                                 ),
                                               ),
-                                              DownloadButton(
-                                                id: WordVoice.downloadId(w),
-                                                title: w.word,
-                                                kind: 'session',
-                                                url: w.voice,
-                                                compact: true,
-                                                color: const Color(0xFF8E8E93),
-                                              ),
                                               const Padding(
                                                 padding: EdgeInsets.symmetric(
                                                   horizontal: 10,
@@ -3628,7 +3589,11 @@ class _VisualStage extends StatelessWidget {
     this.stageNumbers = const [],
     this.comingSoon = const [],
     this.onMusic,
+    this.karaoke,
   });
+
+  /// The Devanagari pill over the replay pill, lit in step with playback.
+  final Widget? karaoke;
 
   /// Teacher-recorded words: the music choice under the recording.
   final VoidCallback? onMusic;
@@ -3797,6 +3762,7 @@ class _VisualStage extends StatelessWidget {
                   onLike: onLike ?? () {},
                   onSyllable: onSyllable,
                   embedded: true,
+                  karaoke: karaoke,
                 ),
               ),
             ),
@@ -4513,6 +4479,7 @@ class _WordOverlay extends StatelessWidget {
     required this.onLike,
     this.onSyllable,
     this.embedded = false,
+    this.karaoke,
   });
   final Word word;
   final Color accent;
@@ -4523,6 +4490,7 @@ class _WordOverlay extends StatelessWidget {
   final VoidCallback onLike;
   final ValueChanged<WordPart>? onSyllable;
   final bool embedded;
+  final Widget? karaoke;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -4572,6 +4540,7 @@ class _WordOverlay extends StatelessWidget {
             ],
           ),
         ],
+        if (karaoke != null) karaoke!,
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -5765,4 +5734,42 @@ class _PracticeNotesSheet extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Shown only while a teacher recording plays: the word in Devanagari in a
+/// small glass pill (same look as the replay pill) with the akshara being
+/// voiced lit up.
+class _KaraokePill extends StatelessWidget {
+  const _KaraokePill({required this.deva, required this.times});
+  final String deva;
+  final List<List<double>> times;
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<Duration?>(
+        valueListenable: WordVoice.instance.position,
+        builder: (_, pos, __) => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (c, a) => FadeTransition(
+            opacity: a,
+            child: SizeTransition(sizeFactor: a, axisAlignment: 1, child: c),
+          ),
+          child: pos == null
+              ? const SizedBox(key: ValueKey('player-karaoke-off'), width: double.infinity)
+              : Padding(
+                  key: const ValueKey('player-karaoke-pill'),
+                  padding: const EdgeInsets.only(top: 8),
+                  // Centred straight above the replay / grid pill.
+                  child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(16, 2, 16, 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xE6222226),
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                      child: AksharaKaraoke(deva: deva, times: times, size: 22),
+                    ),
+                  ),
+                ),
+        ),
+      );
 }

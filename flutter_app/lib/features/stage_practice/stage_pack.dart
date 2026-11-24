@@ -27,7 +27,12 @@ class PackStage {
     required this.seconds,
     this.musicSeconds = 0,
     this.deva = '',
+    this.akshara = const [],
   });
+
+  /// When each akshara of [deva] (or the word's) is voiced in [audio], in
+  /// seconds: [[start, end], ...]. Empty when not measured.
+  final List<List<double>> akshara;
 
   /// The client's Devanagari for this stage (from the recording's own
   /// label), or '' when the client has not given one.
@@ -109,6 +114,11 @@ class StagePack {
         seconds: (m['seconds'] as num?)?.toDouble() ?? 2.5,
         musicSeconds: (m['musicSeconds'] as num?)?.toDouble() ?? 0,
         deva: '${m['deva'] ?? meta['deva'] ?? ''}'.trim(),
+        akshara: [
+          if (m['akshara'] is List)
+            for (final a in m['akshara'] as List)
+              if (a is List && a.length == 2) [(a[0] as num).toDouble(), (a[1] as num).toDouble()],
+        ],
       ));
     }
     if (out.isEmpty) return null;

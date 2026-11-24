@@ -12,7 +12,6 @@ library;
 import '../shell/tablet.dart' show TabletAspectRatio, TabletScope;
 import '../features/downloads/downloads_screen.dart';
 import '../data/word_voice.dart';
-import '../features/downloads/download_button.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -1111,14 +1110,6 @@ class _SlmFeed extends StatelessWidget {
             ? counts[p.word.word] != null
             : counts[p.word.word] == null,
         emptyLabel: 'Nothing here yet.',
-        trailingFor: (p) => DownloadButton(
-          id: WordVoice.downloadId(p.word),
-          title: p.word.word,
-          kind: 'word',
-          url: p.word.voice,
-          compact: true,
-          color: const Color(0xB3FFFFFF),
-        ),
       ),
     );
   }

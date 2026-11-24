@@ -29,15 +29,21 @@ const double tauPitchShape = 55.0;
 const double tauRhythmDev = 0.18;
 const double tauVowel = 0.28;
 
+/// Overall tempo change a natural re-take may have without penalty.
+const double kTempoTolerance = 1.32;
+
 /// Voices further apart than this (≈ 4 semitones) count as a different
 /// register when [scorePair] runs with `adaptRegister`.
 const double kRegisterShiftCents = 400;
 
+// The sounds carry the word; rhythm, pitch and vowel length are the
+// parts a fresh take by the same speaker varies most in (mic, room, pace),
+// so they weigh less.
 const Map<String, double> kWeights = {
-  'sounds': 0.34,
-  'rhythm': 0.20,
-  'pitch': 0.20,
-  'vowel': 0.14,
+  'sounds': 0.52,
+  'rhythm': 0.14,
+  'pitch': 0.10,
+  'vowel': 0.12,
   'completeness': 0.12,
 };
 
@@ -181,23 +187,33 @@ List<Float64List> _z(List<Float64List> rows, Float64List mu, Float64List sd, int
   if (rs.where((s) => s).length < 5) rs = List<bool>.filled(r.mfcc.length, true);
   final (mu, sd) = _stats(r.mfcc, rs, 1, 13);
   final rz = _z(r.mfcc, mu, sd, 1);
-  final uz = _z(u.mfcc, mu, sd, 1);
+  // Each recording is normalised on its own speech (CMVN): a different
+  // phone, mic, distance or room shifts the cepstrum as a whole, and that
+  // shift is removed instead of being scored as "wrong sounds".
+  var us = [for (final s in u.speech) s];
+  if (us.where((s) => s).length < 5) us = List<bool>.filled(u.mfcc.length, true);
+  final (umu, usd) = _stats(u.mfcc, us, 1, 13);
+  final uz = _z(u.mfcc, umu, usd, 1);
   final re = [
     for (final e in r.energy) Float64List.fromList([e])
   ];
+  final ue = [
+    for (final e in u.energy) Float64List.fromList([e])
+  ];
   final (emu, esd) = _stats(re, rs, 0, 1);
-  Float64List row(Float64List m, double e) {
+  final (uemu, uesd) = _stats(ue, us, 0, 1);
+  Float64List row(Float64List m, double e, double mu0, double sd0) {
     final out = Float64List(13);
     for (var c = 0; c < 12; c++) {
       out[c] = m[c] * wMfcc;
     }
-    out[12] = (e - emu[0]) / esd[0] * wEnergy;
+    out[12] = (e - mu0) / sd0 * wEnergy;
     return out;
   }
 
   return (
-    [for (var i = 0; i < rz.length; i++) row(rz[i], r.energy[i])],
-    [for (var i = 0; i < uz.length; i++) row(uz[i], u.energy[i])],
+    [for (var i = 0; i < rz.length; i++) row(rz[i], r.energy[i], emu[0], esd[0])],
+    [for (var i = 0; i < uz.length; i++) row(uz[i], u.energy[i], uemu[0], uesd[0])],
   );
 }
 
@@ -316,10 +332,14 @@ List<double> _localTempo(List<(int, int)> path) {
     final sm = List<double>.filled(n, 0);
     for (var i = 0; i < n; i++) {
       var s = 0.0;
-      for (var k = i - 2; k <= i + 2; k++) {
-        if (k >= 0 && k < n) s += slope[k];
+      var c = 0;
+      for (var k = i - 5; k <= i + 5; k++) {
+        if (k >= 0 && k < n) {
+          s += slope[k];
+          c++;
+        }
       }
-      sm[i] = s / 5;
+      sm[i] = s / c;
     }
     slope = sm;
   }
@@ -364,7 +384,9 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
   final sel = rsp.where((s) => s).length >= 5 ? rsp : List<bool>.filled(rm.mfcc.length, true);
   final (mu, sd) = _stats(rm.mfcc, sel, 1, 13);
   final rz = _z(rm.mfcc, mu, sd, 1);
-  final uz = _z(um.mfcc, mu, sd, 1);
+  final usel = um.speech.where((s) => s).length >= 5 ? um.speech : List<bool>.filled(um.mfcc.length, true);
+  final (umu, usd) = _stats(um.mfcc, usel, 1, 13);
+  final uz = _z(um.mfcc, umu, usd, 1);
   var mfccLocal = [for (final (a, b) in path) _cosineDist(rz[a], uz[b])];
 
   // ---- activity ----
@@ -376,7 +398,23 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
       if (rSp[k]) uDbAl[k]
   ];
   final peakSp = spVals.isNotEmpty ? percentile(spVals, 90) : uDbAl.reduce(math.max);
-  var missing = [for (var k = 0; k < np; k++) uDbAl[k] < peakSp - 24.0 && rSp[k]];
+  // "Missing" = no louder than the take's own background where the
+  // recording has voice. On a quiet mic that is 24 dB under the voice; in a
+  // noisy room the background sits closer, so the line follows it.
+  final bg = [for (final d in usr.energyDb) if (d > -90) d];
+  final floorDb = bg.length >= 10 ? percentile(bg, 10) : peakSp - 40;
+  final missLine = math.max(peakSp - 24.0, math.min(floorDb + 4.0, peakSp - 14.0));
+  // Only where the recording is clearly voiced (well above its own floor),
+  // so soft onsets and tails never count as left out.
+  final rDb = ref.energyDb.sublist(r0, r1);
+  final rDbAl = [for (final (a, _) in path) rDb[math.min(a, rDb.length - 1)]];
+  final rBg = [for (final d in ref.energyDb) if (d > -90) d];
+  final rFloor = rBg.length >= 10 ? percentile(rBg, 10) : -90.0;
+  final rVoiced = [for (var k = 0; k < np; k++) rSp[k] && rDbAl[k] > rFloor + 12];
+  var missing = [
+    for (var k = 0; k < np; k++)
+      rSp[k] && (uDbAl[k] < peakSp - 24.0 || (rVoiced[k] && uDbAl[k] < missLine))
+  ];
   final active = [for (final m in missing) !m];
   final activeCount = active.where((a) => a).length;
   final refE = [for (final (a, _) in path) rm.energy[a]];
@@ -406,7 +444,8 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
 
   var soundsDist = avg(mfccLocal);
   if (uWarp != null && uWarp.length == um.mfcc.length) {
-    final uz2 = _z(uWarp, mu, sd, 1);
+    final (wmu, wsd) = _stats(uWarp, usel, 1, 13);
+    final uz2 = _z(uWarp, wmu, wsd, 1);
     final locW = [for (final (a, b) in path) _cosineDist(rz[a], uz2[b])];
     final dw = avg(locW);
     if (dw < soundsDist) {
@@ -420,11 +459,16 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
   final rDur = math.max(1e-3, rm.times.last - rm.times.first + kHopS);
   final uDur = math.max(1e-3, um.times.last - um.times.first + kHopS);
   final durRatio = uDur / rDur;
-  final logDur = math.log(durRatio).abs();
+  // A natural re-take can be up to about 30 % quicker or slower: only the
+  // part of the overall tempo change beyond that counts, and the local
+  // timing is read relative to the take's own overall pace.
+  final logDur = math.max(0.0, math.log(durRatio).abs() - math.log(kTempoTolerance));
   final tempo = _localTempo(path);
   double rhythmDev, rhythmVar;
   if (tempo.isNotEmpty) {
-    final ll = [for (final t in tempo) math.log(math.max(t, 1e-3)).abs()];
+    final g = math.log(durRatio);
+    // Small local wobbles (about ±8 %) are how anyone re-says a word.
+    final ll = [for (final t in tempo) math.max(0.0, (math.log(math.max(t, 1e-3)) - g).abs() - 0.08)];
     rhythmDev = mean(ll);
     rhythmVar = stdDev(ll);
   } else {
@@ -450,10 +494,14 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
   var registerAdapted = false;
   final nBoth = both.where((b) => b).length;
   if (nBoth >= 8) {
-    final cents = [
+    final raw = [
       for (var k = 0; k < np; k++)
         if (both[k]) 1200.0 * log2(uF0[k] / rF0[k])
     ];
+    // Pitch trackers jump an octave in a reverberant room or on a thin mic:
+    // fold those jumps back next to the take's median offset.
+    final m0 = median(raw);
+    final cents = [for (final c in raw) c - 1200.0 * ((c - m0) / 1200.0).roundToDouble()];
     absCents = mean([for (final c in cents) c.abs()]);
     final med = median(cents);
     medianCents = med;
@@ -462,7 +510,9 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
       absCents = shapeCents;
       registerAdapted = true;
     }
-    pitch = _clamp(0.60 * _exp(absCents, tauPitchCents) + 0.40 * _exp(shapeCents, tauPitchShape));
+    // Rise and fall only: the contour relative to the take's own median,
+    // so a higher or lower voice (or a pitch-shifted mic) is not penalised.
+    pitch = _clamp(_exp(shapeCents, tauPitchShape));
     pitch *= 0.7 + 0.3 * voicingAgree;
     pitch = _clamp(pitch);
   } else {
@@ -491,8 +541,10 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
     if (cnt < 2) continue;
     final uLen = anyActive ? idxs.length * kHopS : kHopS * 0.25;
     final rLen = math.max(v.dur, 1e-3);
-    ratios.add(uLen / rLen);
-    compares.add(VowelCompare(v.start, v.end, uLen / rLen));
+    // Relative to the take's overall pace: a quicker re-take shortens every
+    // vowel a little, which is not a vowel-length mistake.
+    ratios.add(uLen / rLen / durRatio);
+    compares.add(VowelCompare(v.start, v.end, uLen / rLen / durRatio));
   }
   double vowelRaw;
   if (ratios.isNotEmpty) {
@@ -522,7 +574,7 @@ ShabdaScore scorePair(ShabdaFeatures ref, ShabdaFeatures usr, {bool adaptRegiste
   final visited = {for (final (a, _) in path) a};
   final skipFrac = 1.0 - visited.length / math.max(1, rm.times.length);
   final uActiveS = activeCount * kHopS;
-  final shortfall = math.max(0.0, 1.0 - (uActiveS / math.max(rDur, 1e-3)));
+  final shortfall = math.max(0.0, 1.0 - (uActiveS / math.max(rDur * math.min(durRatio, 1.0), 1e-3)));
   final completeness = _clamp(100.0 * math.pow(1.0 - missFrac, 1.15) * math.exp(-0.5 * skipFrac - 0.3 * shortfall));
 
   final overall = _clamp(kWeights['sounds']! * sounds +

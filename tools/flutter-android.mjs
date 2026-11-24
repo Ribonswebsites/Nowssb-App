@@ -381,6 +381,12 @@ if (!m.includes('android.permission.FOREGROUND_SERVICE_DATA_SYNC')) {
     '    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>',
   );
 }
+// Teacher recordings and practice takes stay inside the app: no cloud or
+// adb backup of app data.
+if (!m.includes('android:allowBackup=')) {
+  m = m.replace('<application', '<application android:allowBackup="false" android:fullBackupContent="false"');
+  done.push('allowBackup=false (recordings never leave the app through backups)');
+}
 if (!m.includes('androidx.core.content.FileProvider')) {
   m = m.replace(
     '</application>',
@@ -453,7 +459,7 @@ mkdirSync(xmlDir, { recursive: true });
 writeFileSync(join(xmlDir, 'update_paths.xml'),
   '<?xml version="1.0" encoding="utf-8"?>\n' +
   '<paths xmlns:android="http://schemas.android.com/apk/res/android">\n' +
-  '    <files-path name="updates" path="." />\n' +
+  '    <files-path name="updates" path="updates/" />\n' +
   '</paths>\n');
 
 const kotlinDir = join(android, 'app', 'src', 'main', 'kotlin', 'com', 'nowssb', 'nowssb');
@@ -481,6 +487,9 @@ class MainActivity : FlutterActivity() {
                     "installApk" -> {
                         val file = File(call.argument<String>("path") ?: "")
                         if (!file.exists()) { result.error("MISSING_APK", "Downloaded APK is missing", null); return@setMethodCallHandler }
+                        // Only the app's own downloaded update can be handed out, never any other file.
+                        val updates = File(filesDir, "updates").canonicalPath + File.separator
+                        if (!file.canonicalPath.startsWith(updates) || !file.name.endsWith(".apk")) { result.error("NOT_AN_UPDATE", "Only app updates can be installed", null); return@setMethodCallHandler }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
                             startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
                             result.error("INSTALL_PERMISSION", "Allow NowssB to install updates, then try again", null)

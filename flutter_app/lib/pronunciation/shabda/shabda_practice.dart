@@ -22,13 +22,13 @@ import 'shabda_scorer.dart';
 class PracticeConfig {
   const PracticeConfig({
     this.passMark = 70,
-    this.minCompleteness = 60,
+    this.minCompleteness = 75,
     this.minRhythm = 50,
     this.minVowel = 45,
     this.minPitch = 35,
     this.minSpeechSeconds = 0.25,
     this.maxLengthRatio = 3.0,
-    this.minSnrDb = 15,
+    this.minSnrDb = 10,
     this.silentPeakDb = -50,
     this.quietPeakDb = -36,
   });
@@ -148,25 +148,28 @@ AttemptResult assessTake(ShabdaFeatures ref, Float64List take,
   }
 
   final s = scorePair(ref, usr, adaptRegister: true);
-  final passed = s.overall >= config.passMark &&
-      s.completeness >= config.minCompleteness &&
-      s.rhythm >= config.minRhythm &&
-      s.pitch >= config.minPitch &&
-      s.vowel >= config.minVowel;
+  final matched = calibratedScore(s.overall).round();
+  // A pass needs the score and the whole word said. Rhythm, pitch and vowel
+  // length vary too much between a fresh take and the recording (mic, room,
+  // pace) to veto a pass on their own; they still show what to improve.
+  // The one exception: a take whose timing cannot be lined up with the
+  // recording at all (rhythm near 0, e.g. a word cut off mid-way and
+  // stretched) is not the same word said again.
+  final inOrder = s.rhythm >= kMinAlignedRhythm && wholeWordSaid(s);
+  // A part left out keeps the score under the pass mark too, so the number
+  // and the verdict never disagree.
+  final overall = inOrder ? matched : math.min(matched, 60);
+  final passed = overall >= config.passMark && s.completeness >= config.minCompleteness && inOrder;
   final fb = buildFeedback(s, passed: passed, stage: stage, config: config);
-  final overall = s.overall.round();
   // Why a take did or did not pass, in one line.
   final short = <String>[
-    if (s.completeness < config.minCompleteness) 'Completeness ${config.minCompleteness.round()}',
-    if (s.rhythm < config.minRhythm) 'Rhythm ${config.minRhythm.round()}',
-    if (s.pitch < config.minPitch) 'Pitch ${config.minPitch.round()}',
-    if (s.vowel < config.minVowel) 'Vowel length ${config.minVowel.round()}',
+    if (s.completeness < config.minCompleteness || !inOrder) 'the whole word, start to end',
   ];
   final message = passed
       ? 'Close to the recording — well done.'
       : overall >= config.passMark
-          ? 'Your score is over the pass mark, but to pass ${short.length == 1 ? 'this also needs' : 'these also need'} to reach: ${short.join(', ')}.'
-          : 'You need ${config.passMark.round()} to pass${short.isEmpty ? '' : ', with ${short.join(', ')} or more'}.';
+          ? 'Nearly there. Say ${short.join(', ')}.'
+          : 'You need ${config.passMark.round()} to pass${short.isEmpty ? '' : '. Say ${short.join(', ')}'}.';
   return AttemptResult(
     status: AttemptStatus.scored,
     headline: passed
@@ -195,6 +198,23 @@ AttemptResult assessTake(ShabdaFeatures ref, Float64List take,
   );
 }
 
+/// Maps the raw match (0–100) to the score shown. Calibrated on the
+/// teacher recordings under phone-like conditions (noise 10–20 dB SNR,
+/// reverb, a thin mic, gain ±12 dB, pace 0.75–1.3×, pitch ±2 semitones,
+/// added silence): the same word lands at raw 60–100, a different word at
+/// raw 25–45. Below 45 the score is unchanged; 45–65 opens up so a fresh
+/// re-take reads as a pass; above 65 it rises gently to 100.
+/// Rhythm below this means the take could not be lined up with the
+/// recording (see the pass rule in [assessTake]).
+const double kMinAlignedRhythm = 5;
+
+double calibratedScore(double raw) {
+  final r = raw.clamp(0.0, 100.0).toDouble();
+  if (r <= 50) return r;
+  if (r <= 65) return 50 + (r - 50) * (78 - 50) / 15;
+  return 78 + (r - 65) * (100 - 78) / 35;
+}
+
 /// Keeps the spoken part plus 0.35 s before and 0.5 s after — the same
 /// framing the shipped client references have.
 Float64List _trimToSpeech(Float64List x) {
@@ -210,8 +230,11 @@ Float64List _trimToSpeech(Float64List x) {
     }
     db.add(10 * log10(s / w + 1e-12));
   }
+  // The room's floor, ignoring digital silence (a phone that gates its
+  // mic, or padding) so the threshold is not pulled down to -120 dB.
+  final live = [for (final v in db) if (v > -90) v]..sort();
   final sorted = List<double>.from(db)..sort();
-  final floor = median(sorted.sublist(0, math.max(1, (n * 0.2).floor())));
+  final floor = live.length >= 5 ? median(live.sublist(0, math.max(1, (live.length * 0.2).floor()))) : median(sorted.sublist(0, math.max(1, (n * 0.2).floor())));
   final peak = sorted.last;
   final th = math.max(floor + 10, peak - 35);
   var a = db.indexWhere((v) => v >= th);
@@ -238,15 +261,13 @@ String _region(double t, double start, double end) {
 
 String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
-/// Turns the alignment into located, practical feedback.
-Feedback buildFeedback(ShabdaScore s, {required bool passed, int stage = 1, PracticeConfig config = kPracticeConfig}) {
-  final fixes = <(double, String)>[]; // (priority: lower = more important, text)
-  final good = <String>[];
+/// Per third of the word: alignment cost, local tempo and missing share,
+/// plus the parts that were left out.
+({List<double> cost, List<double> tempoMed, List<double> miss, List<int> missQ, bool cutEnd}) _thirdStats(
+    ShabdaScore s) {
   final st = s.refStart, en = s.refEnd;
   final third = (en - st) / 3;
 
-  // Per third of the word: alignment cost, local tempo, missing share.
-  final thirds = ['beginning', 'middle', 'ending'];
   final cost = List<double>.filled(3, 0), tempoMed = List<double>.filled(3, 1), miss = List<double>.filled(3, 0);
   for (var q = 0; q < 3; q++) {
     final lo = st + q * third, hi = q == 2 ? en + 1e-6 : st + (q + 1) * third;
@@ -268,6 +289,27 @@ Feedback buildFeedback(ShabdaScore s, {required bool passed, int stage = 1, Prac
       if (miss[q] > 0.3) q
   ];
   final cutEnd = tempoMed[2] < 0.4 && s.durRatio < 0.8;
+  return (cost: cost, tempoMed: tempoMed, miss: miss, missQ: missQ, cutEnd: cutEnd);
+}
+
+/// False when part of the word was left out: the ending cut off, or a third
+/// of the word mostly silent where the recording has voice.
+bool wholeWordSaid(ShabdaScore s) {
+  final t = _thirdStats(s);
+  // Stricter than the feedback line: a thin phone mic can drop a soft final
+  // consonant, which is worth a tip but is not a cut-off word.
+  final cut = t.tempoMed[2] < 0.25 && s.durRatio < 0.8;
+  return !cut && t.missQ.isEmpty;
+}
+
+/// Turns the alignment into located, practical feedback.
+Feedback buildFeedback(ShabdaScore s, {required bool passed, int stage = 1, PracticeConfig config = kPracticeConfig}) {
+  final fixes = <(double, String)>[]; // (priority: lower = more important, text)
+  final good = <String>[];
+  final st = s.refStart, en = s.refEnd;
+  final third = (en - st) / 3;
+  final thirds = ['beginning', 'middle', 'ending'];
+  final (:cost, :tempoMed, :miss, :missQ, :cutEnd) = _thirdStats(s);
   bool shortVowelIn(int q) => s.vowelCompares.any((v) {
         final mid = (v.start + v.end) / 2;
         return v.ratio < 0.6 && mid >= st + q * third && mid < st + (q + 1) * third;

@@ -73,7 +73,7 @@ final List<AppDest> menuDestinations = [
 /// Settings pages the hamburger search can also reach directly.
 final List<AppDest> settingsDestinations = [
   AppDest(id: 'notifications', icon: Icons.notifications_none_rounded, overline: 'Settings · Alerts', title: 'Notifications', pill: 'Daily words and reminders', sub: 'What this phone tells you', page: (_) => const NotificationsSettingsPage(), keywords: 'alerts push reminders'),
-  AppDest(id: 'player', icon: Icons.equalizer_rounded, overline: 'Settings · Player', title: 'Player Settings', pill: 'Equalizer, quality, sleep', sub: 'How words play', page: (_) => const PlayerSettingsScreen(), keywords: 'equalizer bass crossfade sleep timer audio quality download'),
+  AppDest(id: 'player', icon: Icons.equalizer_rounded, overline: 'Settings · Player', title: 'Player Settings', pill: 'Voice boost, sleep timer', sub: 'How words play', page: (_) => const PlayerSettingsScreen(), keywords: 'voice boost louder volume sleep timer mini player'),
   AppDest(id: 'quickaccess', icon: Icons.dashboard_customize_outlined, overline: 'Settings · Nav', title: 'Quick Access', pill: 'Bottom navigation', sub: 'Shape, colour and icons', page: (_) => const QuickAccessScreen(), keywords: 'nav bar bottom tabs customize'),
   AppDest(id: 'request', icon: Icons.edit_note_rounded, overline: 'Words', title: 'Request Words', pill: 'Ask the atelier', sub: 'Request a word to be made', action: openRequestWords, keywords: 'request word atelier'),
 ];

@@ -242,20 +242,38 @@ void main() {
     addTearDown(t.view.reset);
     PracticeLabSheet.debugMic = () => mic;
     final pack = StagePack.forWord(w)!;
+    // Hosted the way the Player hosts it: app home → Player page (which
+    // never pops on back) → the practice pop-up as a dialog route on top.
+    final nav = GlobalKey<NavigatorState>();
     await t.pumpWidget(MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: PracticeLabSheet(
+      navigatorKey: nav,
+      home: const Scaffold(key: ValueKey('app-home'), backgroundColor: Colors.black),
+    ));
+    nav.currentState!.push(MaterialPageRoute<void>(
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Scaffold(key: const ValueKey('player-host'), backgroundColor: Colors.black, body: const SizedBox.expand()),
+      ),
+    ));
+    await t.pumpAndSettle();
+    showGeneralDialog<void>(
+      context: nav.currentContext!,
+      barrierDismissible: true,
+      barrierLabel: 'Practice',
+      barrierColor: Colors.transparent,
+      pageBuilder: (ctx, _, __) => Material(
+        color: Colors.black,
+        child: PracticeLabSheet(
           word: w,
           pack: pack,
           stage: pack.stages.firstWhere((s) => s.number == stage),
           onSpeak: () async {},
-          onClose: () {},
+          onClose: () => Navigator.of(ctx).pop(),
           onStage: onStage,
           video: '',
         ),
       ),
-    ));
+    );
     await t.pump(const Duration(milliseconds: 400));
   }
 
@@ -305,10 +323,16 @@ void main() {
         expect(find.textContaining('You need'), findsNothing);
         expect(find.textContaining('%'), findsNothing);
         expect(find.byKey(const ValueKey('stage-score-ring')), findsOneWidget);
-        expect(find.byKey(const ValueKey('stage-pointer')), findsNothing, reason: 'closed until asked');
+        expect(find.byKey(const ValueKey('stage-checklist')), findsNothing, reason: 'its own page, opened on request');
         await t.tap(find.byKey(const ValueKey('stage-improve-btn')));
-        await t.pump(const Duration(milliseconds: 300));
-        expect(find.byKey(const ValueKey('stage-pointer')), findsOneWidget);
+        await t.pump(const Duration(milliseconds: 400));
+        expect(find.byKey(const ValueKey('stage-checklist')), findsOneWidget);
+        expect(find.byKey(const ValueKey('check-ok-whole')), findsOneWidget, reason: 'the whole word was said');
+        expect(find.byKey(const ValueKey('check-ok-sounds')), findsOneWidget, reason: 'her own sounds');
+        expect(find.descendant(of: find.byKey(const ValueKey('stage-checklist')), matching: find.textContaining(RegExp(r'\d'))), findsNothing, reason: 'no numbers on the checklist');
+        await t.binding.handlePopRoute();
+        await t.pump(const Duration(milliseconds: 400));
+        expect(find.byKey(const ValueKey('stage-checklist')), findsNothing);
         expect(StageProgressStore.instance.record(e.key, n).passed, isTrue);
         final pack = StagePack.forWord(_lib(e.key))!;
         if (pack.stages.any((s) => s.number == n + 1)) {
@@ -329,13 +353,47 @@ void main() {
     expect(find.byKey(const ValueKey('stage-fix-0')), findsNothing);
     expect((t.widget(find.byKey(const ValueKey('stage-verdict'))) as Text).data, 'Try again');
     await t.tap(find.byKey(const ValueKey('stage-improve-btn')));
-    await t.pump(const Duration(milliseconds: 300));
-    final note = (t.widget(find.byKey(const ValueKey('stage-pointer-note'))) as Text).data!;
-    expect(note, matches(RegExp(r'^(Beginning|Middle|Ending): [a-z’ ]+\.$')));
-    expect(find.textContaining('%'), findsNothing);
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('stage-checklist')), findsOneWidget);
+    for (final id in ['sounds', 'pace', 'long', 'pitch', 'whole']) {
+      expect(find.byKey(ValueKey('check-row-$id')), findsOneWidget);
+    }
+    expect(find.byKey(const ValueKey('check-fix-sounds')), findsOneWidget, reason: 'another word: the sounds are wrong');
+    expect(find.byKey(const ValueKey('check-wave-sounds')), findsOneWidget, reason: 'with the marker on the waveform');
+    final line = (t.widget(find.byKey(const ValueKey('check-line-sounds'))) as Text).data!;
+    expect(line, startsWith('Copy the teacher’s sounds'));
+    expect(find.descendant(of: find.byKey(const ValueKey('stage-checklist')), matching: find.textContaining(RegExp(r'\d'))), findsNothing);
+    await t.tap(find.byKey(const ValueKey('checklist-back')));
+    await t.pump(const Duration(milliseconds: 400));
     expect(find.byKey(const ValueKey('practice-next-stage')), findsNothing);
     expect(StageProgressStore.instance.record('america', 1).passed, isFalse);
     expect(StageProgressStore.instance.record('america', 1).attempts, 1);
+  });
+
+  testWidgets('system back: checklist → score → Player; never leaves the Player', (t) async {
+    await pumpSheet(t, _lib('america'), 1, FakeMic(_ramRam3()));
+    await takeAndScore(t);
+    await t.tap(find.byKey(const ValueKey('stage-improve-btn')));
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('stage-checklist')), findsOneWidget);
+    // Back 1: the checklist closes, the score pop-up is still there.
+    await t.binding.handlePopRoute();
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('stage-checklist')), findsNothing);
+    expect(find.byKey(const ValueKey('stage-result')), findsOneWidget);
+    expect(find.byKey(const ValueKey('player-host')), findsOneWidget);
+    // Back 2: only the pop-up closes; the Player stays.
+    await t.binding.handlePopRoute();
+    for (var i = 0; i < 10; i++) {
+      await t.pump(const Duration(milliseconds: 60));
+    }
+    expect(find.byKey(const ValueKey('stage-result')), findsNothing);
+    expect(find.byType(PracticeLabSheet), findsNothing);
+    expect(find.byKey(const ValueKey('player-host')), findsOneWidget);
+    // Back 3 on the Player itself does not pop it (it minimises instead).
+    await t.binding.handlePopRoute();
+    await t.pump(const Duration(milliseconds: 400));
+    expect(find.byKey(const ValueKey('player-host')), findsOneWidget);
   });
 
   testWidgets('silence: a message, no score, not counted', (t) async {
