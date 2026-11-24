@@ -1,9 +1,9 @@
-// The stage engine end to end without a phone, on the teacher's America
-// recordings. AMERICA left the catalogue on Nov 23, 2026 (country words are
-// out), so its client_words entry now lives in test/fixtures as a fixture:
-// the library must not show it, its stage pack still loads, stages unlock 1 → 2 → 3,
-// and the practice screen records (fake mic), scores on the real recordings
-// and shows a pass, specific corrections, or a "not scored" message.
+// America end to end without a phone: the shipped client_words.json reaches
+// the library with the teacher's two real America stages (अमेरिका; Stage 1
+// ळमेरिका), stages unlock 1 → 2, and the practice screen records (fake mic),
+// scores on the real recordings and shows a pass, specific corrections, or a
+// "not scored" message. The Ram Ram take (ळामन्ळाम) that was once filed as
+// America's first stage is only a wrong-word fixture now.
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -71,9 +71,12 @@ Uint8List _silence() {
 }
 
 List<dynamic> _clientItems() =>
-    (jsonDecode(File('test/fixtures/stage_word_america.json').readAsStringSync()) as Map)['items'] as List;
+    (jsonDecode(File('assets/content/client_words.json').readAsStringSync()) as Map)['items'] as List;
 
 Uint8List _ref(int n) => File('assets/words/america/america_stage${n}_ref.wav').readAsBytesSync();
+
+/// The teacher's Ram Ram (ळामन्ळाम) take: a different word, never America.
+Uint8List _ramRam() => File('test/fixtures/shabda/clean_stage1.wav').readAsBytesSync();
 
 Future<void> _attempt(WidgetTester t) async {
   await t.tap(find.byKey(const ValueKey('stage-mic')));
@@ -103,29 +106,29 @@ void main() {
     ContentStore.instance.debugSetClientWords(_clientItems());
   });
 
-  test('America is out of the library and the shipped client words', () {
-    final shipped = (jsonDecode(File('assets/content/client_words.json').readAsStringSync()) as Map)['items'] as List;
-    expect(shipped.where((e) => (e as Map)['key'] == 'america'), isEmpty);
-    expect(ContentStore.instance.library.where((w) => w.key == 'america'), isEmpty,
-        reason: 'a removed word stays out even when a client entry carries it');
-  });
-
-  test('The fixture word still has 3 client stages and its recordings', () {
-    final w = ContentStore.instance.clientWords.firstWhere((w) => w.key == 'america');
+  test('America is in the library with its 2 real stages, all assets bundled', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    expect(pubspec, contains('- assets/words/america/'));
+    expect(pubspec, contains('- assets/content/'));
+    final w = ContentStore.instance.library.firstWhere((w) => w.key == 'america');
     expect(w.word, 'AMERICA');
-    expect(w.stages, hasLength(3));
+    expect(w.deva, 'अमेरिका');
+    expect(w.stages, hasLength(2));
     expect(w.price, 99);
     expect(WordVoice.hasVoice(w), isTrue);
     expect(WordVoice.isRemote(w), isFalse);
     expect(File(WordVoice.assetPath(w)).existsSync(), isTrue);
     final pack = StagePack.forWord(w)!;
-    expect(pack.stages.map((s) => s.number), [1, 2, 3]);
+    expect(pack.deva, 'अमेरिका');
+    expect(pack.stages.map((s) => s.number), [1, 2]);
+    expect(pack.stages.first.deva, 'ळमेरिका');
     expect(pack.passMark, 70);
     for (final s in pack.stages) {
       for (final f in [s.audio, s.music, s.reference]) {
         expect(File(f).existsSync(), isTrue, reason: f);
       }
     }
+    expect(File('assets/words/america/america_stage3_ref.wav').existsSync(), isFalse);
     expect(pack.musicCredit, contains('CC0'));
   });
 
@@ -141,8 +144,7 @@ void main() {
     expect(p.record('america', 1).best, 82);
     expect(p.record('america', 1).attempts, 3);
     expect(p.isUnlocked('america', 2), isTrue);
-    expect(p.isUnlocked('america', 3), isFalse);
-    expect(p.currentStage('america', 3), 2);
+    expect(p.currentStage('america', 2), 2);
     // Survives a reload.
     p.debugReset();
     await p.ensureLoaded();
@@ -174,10 +176,10 @@ void main() {
     await t.pump(const Duration(seconds: 5));
   });
 
-  testWidgets('a different stage’s sound fails with specific corrections', (t) async {
+  testWidgets('saying a different word (Ram Ram) fails with specific corrections', (t) async {
     tall(t);
     final pack = StagePack.forKey('america')!;
-    await t.pumpWidget(app(pack, FakeMic(_ref(3)), stage: 1));
+    await t.pumpWidget(app(pack, FakeMic(_ramRam()), stage: 1));
     await t.pump();
     await _attempt(t);
     expect(find.text('What to fix'), findsOneWidget);
@@ -223,10 +225,11 @@ void main() {
     final pack = StagePack.forKey('america')!;
     await t.pumpWidget(app(pack, FakeMic(_ref(1))));
     await t.pump();
-    await t.tap(find.byKey(const ValueKey('stage-chip-3')));
+    await t.tap(find.byKey(const ValueKey('stage-chip-2')));
     await t.pump();
-    expect(find.text('Pass Stage 2 to open Stage 3.'), findsOneWidget);
-    expect(find.text('Stage 1 of 3'), findsOneWidget);
+    expect(find.text('Pass Stage 1 to open Stage 2.'), findsOneWidget);
+    expect(find.text('Stage 1 of 2'), findsOneWidget);
+    expect(find.text('ळमेरिका'), findsWidgets);
     await t.pumpWidget(const SizedBox());
     await t.pump(const Duration(seconds: 5));
   });

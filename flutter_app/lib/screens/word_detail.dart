@@ -275,6 +275,27 @@ class _StagePracticePaneState extends State<_StagePracticePane> {
             ),
             const SizedBox(height: 10),
             for (final st in pack.stages) _row(st, admin),
+            for (final n in pack.comingSoon)
+              InkWell(
+                key: ValueKey('word-stage-$n'),
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => ScaffoldMessenger.maybeOf(context)
+                    ?.showSnackBar(SnackBar(content: Text(stageComingSoonNote(n)))),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(children: [
+                    const KitIconBadge(Icons.lock_rounded, size: 32),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Stage $n', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 2),
+                        const Text(kStageComingSoon, style: TextStyle(color: kKitMuted, fontSize: 12.5)),
+                      ]),
+                    ),
+                  ]),
+                ),
+              ),
             const SizedBox(height: 8),
             KitActionPill(
               widget.open ? (passed == 0 ? 'Start practice' : 'Practise Stage $current') : 'Unlock to practise',
@@ -316,6 +337,8 @@ class _StagePracticePaneState extends State<_StagePracticePane> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(st.title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
+              if (st.deva.isNotEmpty)
+                Text(st.deva, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600, height: 1.35)),
               const SizedBox(height: 2),
               Text(sub, style: const TextStyle(color: kKitMuted, fontSize: 12.5)),
             ]),

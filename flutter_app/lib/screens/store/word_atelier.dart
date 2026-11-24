@@ -25,6 +25,7 @@ import 'request_words.dart';
 import 'store_actions.dart';
 import 'store_art.dart';
 import 'store_routes.dart';
+import 'store_word_page.dart' show storeWordPicture;
 import 'store_drift_banners.dart';
 import 'daily_deals.dart';
 import 'store_shelf.dart';
@@ -133,7 +134,7 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
     }
     for (final w in _stageWords()) {
       final name = _cap(w.word);
-      add(name, _stageLine(w), 'Recorded stages', kRmWordImg, () => openAtelierWord(context, word: w.key, root: _stageLine(w), img: kRmWordImg, price: w.price));
+      add(name, _stageLine(w), 'Recorded stages', kRmWordImg, () => openAtelierWord(context, word: w.key, root: _stageRoot(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}')));
     }
     return out;
   }
@@ -145,6 +146,9 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
       ];
 
   static String _cap(String w) => w.isEmpty ? w : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}';
+
+  /// The word's origin for its Store page (the stage count is on the card).
+  static String _stageRoot(Word w) => w.origin.trim().isNotEmpty ? w.origin.trim() : 'Natural Origin';
 
   static String _stageLine(Word w) {
     final n = StagePack.forWord(w)?.stages.length ?? 0;
@@ -178,11 +182,12 @@ class _WordAtelierBodyState extends State<_WordAtelierBody> {
                   title: _cap(w.word),
                   meta: _stageLine(w),
                   action: 'Open',
-                  image: kNowssbStoreMark,
+                  // A teacher-recorded word shows its own photograph.
+                  image: storeWordPicture(w.word, kNowssbStoreMark),
                   flip: storeWaveFor(w.word),
-                  onTap: () => openAtelierWord(context, word: w.key, root: _stageLine(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}')),
-                  onCart: () => storeAddToCart(context, wordBagItem(name: _cap(w.word), root: _stageLine(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}'))),
-                  onBuy: () => storeBuyNow(context, wordBagItem(name: _cap(w.word), root: _stageLine(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}'))),
+                  onTap: () => openAtelierWord(context, word: w.key, root: _stageRoot(w), img: kNowssbStoreMark, price: StorePrices.instance.priceFor('word:${w.key}')),
+                  onCart: () => storeAddToCart(context, wordBagItem(name: _cap(w.word), root: _stageLine(w), img: storeWordPicture(w.word, kNowssbStoreMark), price: StorePrices.instance.priceFor('word:${w.key}'))),
+                  onBuy: () => storeBuyNow(context, wordBagItem(name: _cap(w.word), root: _stageLine(w), img: storeWordPicture(w.word, kNowssbStoreMark), price: StorePrices.instance.priceFor('word:${w.key}'))),
                 ),
             ],
           ),

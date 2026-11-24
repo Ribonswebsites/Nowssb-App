@@ -61,7 +61,7 @@ class StorePrices extends ChangeNotifier {
   /// what a card shows is what Google Play charges. An admin price of 0
   /// makes an item free.
   num priceFor(String itemId, {String? kind, num? shown}) {
-    final k = kind ?? contentKindOfItem(itemId) ?? 'word';
+    final k = kind ?? contentKindOfItem(itemId) ?? (itemId.startsWith('stage:') ? 'stage' : 'word');
     final base = regularPriceFor(itemId, kind: k, shown: shown);
     // Deal of the Day: today's rotating discount is charged for real. The
     // sale price is snapped UP to a Play price point, so Play charges what
@@ -74,7 +74,7 @@ class StorePrices extends ChangeNotifier {
 
   /// The price before any Deal of the Day discount.
   num regularPriceFor(String itemId, {String? kind, num? shown}) {
-    final k = kind ?? contentKindOfItem(itemId) ?? 'word';
+    final k = kind ?? contentKindOfItem(itemId) ?? (itemId.startsWith('stage:') ? 'stage' : 'word');
     final set = _items[itemId];
     if (set != null) return set <= 0 ? 0 : contentTierFor(k, set);
     if (k == 'ebook' && shown != null && shown > 0) return contentTierFor(k, shown);
@@ -84,7 +84,7 @@ class StorePrices extends ChangeNotifier {
   /// The regular price when [itemId] is on an admin sale (its own price
   /// below the kind default), else null — for the strike-through.
   num? regularIfOnSale(String itemId, {String? kind}) {
-    final k = kind ?? contentKindOfItem(itemId) ?? 'word';
+    final k = kind ?? contentKindOfItem(itemId) ?? (itemId.startsWith('stage:') ? 'stage' : 'word');
     final now = priceFor(itemId, kind: k);
     final regular = regularPriceFor(itemId, kind: k);
     if (now > 0 && now < regular) return regular;

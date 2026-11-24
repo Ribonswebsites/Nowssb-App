@@ -403,7 +403,7 @@ const List<RmCategory> kRmCategories = [
 /// or wishlist line, a published library doc) is dropped on read, so they
 /// show up nowhere.
 const Set<String> kRemovedWordKeys = {
-  'fire', 'country', 'india', 'america',
+  'fire', 'country', 'india',
   'egypt', 'babylon', 'troy', 'sparta', 'rome', 'athens', 'carthage',
   'persia', 'phoenicia', 'nubia', 'sumer', 'akkad',
   // The old Countries / Capitals / Currency / Language store rows.

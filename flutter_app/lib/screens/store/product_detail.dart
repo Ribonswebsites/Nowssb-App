@@ -42,16 +42,12 @@ void openAtelierWord(
       .toList();
   // A library word opens straight in Word Detail only when this account can
   // already open it; otherwise the product page with its Buy button.
-  // Words that ship with the client's recorded stages always open their
-  // own page: it shows the stages and practice, and its lock card sells
-  // the word when this account does not own it yet.
-  if (!signature && found.isNotEmpty && StagePack.forWord(found.first) != null) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => WordDetail(word: found.first)),
-    );
-    return;
-  }
-  final open = found.isNotEmpty &&
+  // Words that ship with the client's recorded stages always open the Store
+  // word page: its "Practice · Stages" card lists the stages and opens
+  // Listen → Your turn → Score, and its buy card sells the word when this
+  // account does not own it yet.
+  final staged = !signature && found.isNotEmpty && StagePack.forWord(found.first) != null;
+  final open = !staged && found.isNotEmpty &&
       (signature
           ? Entitlements.instance.canOpenStoreWord(word, signature: true, price: price > 0 ? price : StorePrices.instance.priceFor('signature:$key', kind: 'signature'))
           : Entitlements.instance.canOpenWord(found.first));
@@ -69,14 +65,22 @@ void openAtelierWord(
         root: root,
         img: img,
         price: signature && price <= 0 ? StorePrices.instance.priceFor('signature:$key', kind: 'signature') : price,
-        about: signature
+        about: staged && found.first.description.trim().isNotEmpty
+            ? found.first.description.trim()
+            : signature
             ? 'The rarest word in its collection. One signature exists per collection, it is never discounted on its own, and it is never restocked.'
             : 'Every word carries a vibrational signature that predates its dictionary definition. Unlock the phonetic origin of ${_titleCase(word)} — what the sound does inside your body, and where it existed before anyone wrote it down.',
-        highlights: const [
-          'Native pronunciation audio, generated on demand',
-          'Full phonetic root breakdown and origin story',
-          'Permanent access — owned words never expire',
-        ],
+        highlights: staged
+            ? [
+                '${StagePack.forWord(found.first)!.stages.length} stages recorded by the teacher, voice only or with music',
+                'Scored on your phone against each recording, with what to fix',
+                'Permanent access — owned words never expire',
+              ]
+            : const [
+                'Native pronunciation audio, generated on demand',
+                'Full phonetic root breakdown and origin story',
+                'Permanent access — owned words never expire',
+              ],
       ),
     ),
   );

@@ -14,6 +14,7 @@ const kWordPhotoDir = 'assets/word_photos';
 const kWordPhotos = <String, String>{
   'abyss': '$kWordPhotoDir/abyss.webp',
   'alba': '$kWordPhotoDir/alba.webp',
+  'america': '$kWordPhotoDir/america.webp',
   'apex': '$kWordPhotoDir/apex.webp',
   'archer': '$kWordPhotoDir/archer.webp',
   'ash': '$kWordPhotoDir/ash.webp',

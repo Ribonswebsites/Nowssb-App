@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import '../../data/app_haptics.dart';
 import '../../data/cart_bag.dart';
 import '../../data/content.dart';
+import '../../data/entitlements.dart';
 import '../../data/models.dart';
 import '../../data/practice_progress.dart';
 import '../../data/settings.dart';
@@ -43,6 +44,9 @@ import '../../data/word_photos.dart';
 import '../../data/word_posters.dart';
 import '../../features/earn/earn_kit.dart' show earnFirstName;
 import '../../features/economy/economy_api.dart' show EconomyMirror;
+import '../../features/stage_practice/stage_pack.dart';
+import '../../features/stage_practice/stage_practice_screen.dart' show openStagePractice;
+import '../../features/stage_practice/stage_progress.dart';
 import '../../shell/tablet.dart' show isTablet;
 import '../../theme/tokens.dart';
 import '../../shell/nav_shell.dart';
@@ -136,6 +140,18 @@ class StoreWordFacts {
         break;
       }
     }
+    // Teacher-recorded words (client_words.json) are not in a catalogue
+    // collection; they sit in their own "Recorded stages" collection.
+    if (cat == null && StagePack.forKey(key) != null) {
+      return StoreWordFacts(
+        category: kRecordedStagesLabel,
+        categorySub: kRecordedStagesSub,
+        origin: origin,
+        rootForm: rootForm,
+        line: kRecordedStagesSub,
+        related: const [],
+      );
+    }
     return StoreWordFacts(
       category: cat?.label ?? '',
       categorySub: cat?.sub ?? '',
@@ -183,6 +199,10 @@ String plainOrigin(String origin) {
   }
   return o;
 }
+
+/// The Store collection for words that ship with the teacher's recordings.
+const kRecordedStagesLabel = 'Recorded stages';
+const kRecordedStagesSub = 'Teacher-recorded words you practise stage by stage';
 
 const _kBg = Color(0xFF07090F);
 const _kGlass = Color(0x1AFFFFFF);
@@ -310,7 +330,23 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
     return about;
   }
 
+  /// The teacher's stage recordings for this word, when the app ships them.
+  StagePack? get _pack => widget.meaning ? null : StagePack.forKey(WordArt.keyOf(_title));
+
   (String, String) get _panel {
+    if (_pack case final pack?) {
+      final n = pack.stages.length;
+      switch (_mode) {
+        case StoreWordMode.meaning:
+          break;
+        case StoreWordMode.listen:
+          return ('Hear your teacher say $_title',
+              'The teacher recorded all $n stages. Play each one with voice only or over soft music, then say it back.');
+        case StoreWordMode.practice:
+          return ('Practise $_title stage by stage',
+              'Say each stage back and get a score with what to fix. Pass a stage to open the next.');
+      }
+    }
     switch (_mode) {
       case StoreWordMode.meaning:
         final head = _f.categorySub.isNotEmpty ? _f.categorySub : 'What $_title means';
@@ -364,6 +400,11 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
                   _hero(),
                   const SizedBox(height: 18),
                   _detailCard(),
+                  if (_pack case final pack?)
+                    if (_findLibraryWord(_title) case final staged?) ...[
+                      const SizedBox(height: 18),
+                      _StageStepsCard(word: staged, pack: pack, open: widget.open),
+                    ],
                   if (_stackEntries().isNotEmpty) ...[
                     const SizedBox(height: 18),
                     _practiceStack(),
@@ -471,15 +512,22 @@ class _StoreWordScreenState extends State<StoreWordScreen> {
     return '$done of ${PracticeProgress.dailyPracticeGoal} done';
   }
 
-  void _beginWord(String title) {
+  Word? _findLibraryWord(String title) {
     final key = title.trim().toLowerCase();
-    Word? found;
     for (final w in ContentStore.instance.library) {
-      if (w.key.toLowerCase() == key || w.word.toLowerCase() == key) {
-        found = w;
-        break;
-      }
+      if (w.key.toLowerCase() == key || w.word.toLowerCase() == key) return w;
     }
+    return null;
+  }
+
+  void _beginWord(String title) {
+    final found = _findLibraryWord(title);
+    // A teacher-recorded word starts its stage practice (listen, speak, score).
+    if (found != null && StagePack.forWord(found) != null) {
+      unawaited(openStagePractice(context, found));
+      return;
+    }
+    final key = title.trim().toLowerCase();
     final word = found ??
         Word(
           key: key,
@@ -1620,5 +1668,177 @@ class _WordBackdropState extends State<_WordBackdrop> with SingleTickerProviderS
           child: StoreNetImage(url: b, fit: BoxFit.cover),
         ),
     ]);
+  }
+}
+
+
+/// "Practice · Stages" on the word page of a teacher-recorded word: each
+/// stage with its lock, best score and attempts, and the way into
+/// Listen → Your turn → Score. Same dark card as "More in …".
+class _StageStepsCard extends StatefulWidget {
+  const _StageStepsCard({required this.word, required this.pack, required this.open});
+  final Word word;
+  final StagePack pack;
+  final bool open;
+
+  @override
+  State<_StageStepsCard> createState() => _StageStepsCardState();
+}
+
+class _StageStepsCardState extends State<_StageStepsCard> {
+  final _progress = StageProgressStore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_progress.ensureLoaded());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: _progress,
+      builder: (context, _) {
+        final pack = widget.pack;
+        final key = pack.wordKey;
+        final passed = _progress.passedCount(key);
+        final current = _progress.currentStage(key, pack.stages.length);
+        return Container(
+          key: const ValueKey('word-stages-card'),
+          padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+          decoration: BoxDecoration(
+            color: _kDarkCard,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0x26FFFFFF)),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            const _OriginLabel('Practice · Stages'),
+            const SizedBox(height: 6),
+            if (pack.deva.isNotEmpty)
+              Text(pack.deva,
+                  key: const ValueKey('word-stages-deva'),
+                  style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700, height: 1.3)),
+            Text('$passed of ${pack.stages.length} passed',
+                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w800, height: 1.2)),
+            const SizedBox(height: 6),
+            const Text(
+              'Listen to the teacher, say it back, and get a score with what to fix. Pass a stage to open the next.',
+              style: TextStyle(color: _kMuted, fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 8),
+            for (final st in pack.stages) _row(st),
+            for (final n in pack.comingSoon) _soonRow(n),
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerRight,
+              child: _WhitePill(
+                key: const ValueKey('word-stages-start'),
+                label: widget.open ? (passed == 0 ? 'Start practice' : 'Practise Stage $current') : 'Unlock to practise',
+                onTap: () => unawaited(openStagePractice(context, widget.word)),
+              ),
+            ),
+          ]),
+        );
+      },
+    );
+  }
+
+  Widget _soonRow(int n) {
+    return GestureDetector(
+      key: ValueKey('word-stages-$n'),
+      behavior: HitTestBehavior.opaque,
+      onTap: () => ScaffoldMessenger.maybeOf(context)
+          ?.showSnackBar(SnackBar(content: Text(stageComingSoonNote(n)))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(shape: BoxShape.circle, color: _kGlass, border: Border.all(color: _kLine)),
+            child: const Icon(Icons.lock_rounded, size: 18, color: _kMuted),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Stage $n', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 2),
+              const Text(kStageComingSoon, style: TextStyle(color: _kMuted, fontSize: 12.5)),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _row(PackStage st) {
+    final key = widget.pack.wordKey;
+    final r = _progress.record(key, st.number);
+    final unlocked = Entitlements.instance.isAdmin || _progress.isUnlocked(key, st.number);
+    final sub = !unlocked
+        ? 'Opens when Stage ${st.number - 1} is passed'
+        : r.attempts == 0
+            ? 'Not tried yet · ${st.seconds.toStringAsFixed(1)} s recording'
+            : 'Best ${r.best} · ${r.attempts} ${r.attempts == 1 ? 'attempt' : 'attempts'}${r.passed ? ' · passed' : ''}';
+    return Semantics(
+      button: true,
+      label: '${st.title}. $sub',
+      excludeSemantics: true,
+      child: GestureDetector(
+        key: ValueKey('word-stages-${st.number}'),
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          AppHaptics.selection();
+          if (!unlocked) {
+            ScaffoldMessenger.maybeOf(context)
+                ?.showSnackBar(SnackBar(content: Text('Pass Stage ${st.number - 1} to open Stage ${st.number}.')));
+            return;
+          }
+          unawaited(openStagePractice(context, widget.word, stage: st.number));
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _kGlass,
+                border: Border.all(color: _kLine),
+              ),
+              child: Icon(
+                !unlocked ? Icons.lock_rounded : (r.passed ? Icons.check_rounded : Icons.graphic_eq_rounded),
+                size: 18,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(st.title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
+                if (st.deva.isNotEmpty)
+                  Text(st.deva, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600, height: 1.35)),
+                const SizedBox(height: 2),
+                Text(sub, style: const TextStyle(color: _kMuted, fontSize: 12.5)),
+              ]),
+            ),
+            if (r.attempts > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(99),
+                  color: r.passed ? Colors.white : _kGlass,
+                ),
+                child: Text('${r.best}',
+                    style: TextStyle(
+                        color: r.passed ? NwsbColors.ink : Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
+              )
+            else
+              const Icon(Icons.chevron_right_rounded, color: _kMuted),
+          ]),
+        ),
+      ),
+    );
   }
 }

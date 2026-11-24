@@ -13,7 +13,6 @@ import 'package:nowssb/pronunciation/shabda/shabda_practice.dart' show kPractice
 import 'package:nowssb/pronunciation/shabda/shabda_scorer.dart';
 
 const _fx = 'test/fixtures/shabda';
-const _assets = 'assets/words/america';
 
 Float64List _load(String path) => wavTo16k(File(path).readAsBytesSync());
 
@@ -41,7 +40,7 @@ Float64List _trunc(Float64List x) {
 void main() {
   final golden = jsonDecode(File('$_fx/python_golden.json').readAsStringSync()) as Map<String, dynamic>;
   final raw = {for (var n = 1; n <= 3; n++) n: extractFeatures(_load('$_fx/raw_stage$n.wav'))};
-  final clean = {for (var n = 1; n <= 3; n++) n: extractFeatures(_load('$_assets/america_stage${n}_ref.wav'))};
+  final clean = {for (var n = 1; n <= 3; n++) n: extractFeatures(_load('$_fx/clean_stage$n.wav'))};
 
   void expectClose(ShabdaScore s, Map<String, dynamic> g, String label) {
     final got = {'overall': s.overall, ...s.subs};
@@ -105,9 +104,9 @@ void main() {
         test('stage $n $v', () {
           final Float64List take;
           if (v == 'midcut') {
-            take = _q16(_midcut(_load('$_assets/america_stage${n}_ref.wav')));
+            take = _q16(_midcut(_load('$_fx/clean_stage$n.wav')));
           } else if (v == 'trunc') {
-            take = _q16(_trunc(_load('$_assets/america_stage${n}_ref.wav')));
+            take = _q16(_trunc(_load('$_fx/clean_stage$n.wav')));
           } else {
             take = _load('$_fx/stage${n}_$v.wav');
           }

@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../data/models.dart';
+import '../../data/word_photos.dart';
 import '../../widgets/restyle_kit.dart';
 import 'stage_pack.dart';
 import 'stage_practice_screen.dart';
@@ -63,7 +64,11 @@ class _StagedWordsCardState extends State<StagedWordsCard> {
           SizedBox(
               width: 56,
               height: 56,
-              child: ClipRRect(borderRadius: BorderRadius.circular(12), child: KitWordArt(word: w.word, deva: w.deva))),
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: wordPhotoFor(w.word) != null
+                      ? Image.asset(wordPhotoFor(w.word)!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => KitWordArt(word: w.word, deva: w.deva))
+                      : KitWordArt(word: w.word, deva: w.deva))),
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

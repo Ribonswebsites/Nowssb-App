@@ -321,6 +321,7 @@ One photograph per Store word / meaning page, chosen so it shows what the word m
 |---|---|---|
 | `word_photos/abyss.webp` | [Underwater Bubbles Floating in Deep Ocean](https://www.pexels.com/photo/39726976/) | Ludvig Hedenborg |
 | `word_photos/alba.webp` | [Beautiful Sunrise over Misty Meadow](https://www.pexels.com/photo/31544471/) | Mohamed B. |
+| `word_photos/america.webp` | [Stunning Landscape of Monument Valley, Arizona](https://www.pexels.com/photo/35119364/) | Chiara Salvi |
 | `word_photos/apex.webp` | [Green Trees on Mountain Beside a Snow Capped Mountain](https://www.pexels.com/photo/11831246/) | Roman |
 | `word_photos/archer.webp` | [Man Traning Archery](https://www.pexels.com/photo/16561360/) | Reymond Maliberan |
 | `word_photos/ash.webp` | [Black Ash on the Ground near the Volcano](https://www.pexels.com/photo/11139845/) | Celine J. |

@@ -52,20 +52,19 @@ void main() {
     expect(settings, isNot(contains('HeavyGlassPanel')));
     expect(settings, isNot(contains('NestedDarkWrap')));
 
-    final dial = File('lib/screens/player_dial.dart').readAsStringSync();
-    expect(dial, contains('PlayerAuraBackdrop'));
-    expect(dial, contains('PlayerAuraBackButton'));
-    expect(dial, contains('film: kPlayerPageFilm'));
-    expect(dial, contains('_GlassCircle'));
-    expect(dial, contains('_GlassDatePill'));
-    expect(dial, contains('onLibrary'));
+    // Ribon (Nov 24): the clock / "Music player settings" dial is gone; the
+    // player's own settings stay reachable from the player.
+    expect(File('lib/screens/player_dial.dart').existsSync(), isFalse);
 
     final library = File('lib/screens/sound_library.dart').readAsStringSync();
     expect(library, contains('film: kPlayerSharedFilm'));
     expect(library, isNot(contains('assets/store/intro-words.webp')));
 
     final level = File('lib/screens/select_level.dart').readAsStringSync();
-    expect(level, contains('PlayerAuraBackdrop'));
+    // The Stages tab is a plain tab: no film, orb video or promo banner.
+    expect(level, isNot(contains('PlayerAuraBackdrop')));
+    expect(level, isNot(contains('NwsbVideo')));
+    expect(level, isNot(contains('ColoredSplitPromoBanner')));
 
     final practice = File('lib/screens/practice.dart').readAsStringSync();
     expect(practice, contains('film: kPlayerSharedFilm'));

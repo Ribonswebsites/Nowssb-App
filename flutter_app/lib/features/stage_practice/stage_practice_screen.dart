@@ -384,7 +384,46 @@ class _StagePracticeScreenState extends State<StagePracticeScreen> {
           if (s.number > 1) const SizedBox(width: 8),
           Expanded(child: _stageChip(s.number)),
         ],
+        for (final n in pack.comingSoon) ...[
+          const SizedBox(width: 8),
+          Expanded(child: _soonChip(n)),
+        ],
       ]),
+    );
+  }
+
+  /// A stage the teacher has not recorded yet: locked, no audio.
+  Widget _soonChip(int n) {
+    return Semantics(
+      button: true,
+      label: 'Stage $n, $kStageComingSoon',
+      child: GestureDetector(
+        key: ValueKey('stage-chip-$n'),
+        onTap: () => ScaffoldMessenger.maybeOf(context)
+            ?.showSnackBar(SnackBar(content: Text(stageComingSoonNote(n)))),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
+          decoration: BoxDecoration(
+            color: const Color(0x0FFFFFFF),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0x22FFFFFF)),
+          ),
+          child: Row(children: [
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('STAGE $n',
+                    style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 1.2)),
+                const SizedBox(height: 3),
+                const Text(kStageComingSoon,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: kKitMuted, fontSize: 11.5, fontWeight: FontWeight.w600)),
+              ]),
+            ),
+            const Icon(Icons.lock_rounded, size: 18, color: kKitMuted),
+          ]),
+        ),
+      ),
     );
   }
 
@@ -462,9 +501,15 @@ class _StagePracticeScreenState extends State<StagePracticeScreen> {
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(name.toUpperCase(),
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
+              // The client's Devanagari for this stage (else for the word).
+              if ((stage.deva.isNotEmpty ? stage.deva : pack.deva) case final deva when deva.isNotEmpty)
+                Text(deva,
+                    key: const ValueKey('stage-deva'),
+                    style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700, height: 1.3))
+              else
+                Text(name.toUpperCase(),
+                    style: const TextStyle(
+                        color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: 1.5)),
               const SizedBox(height: 3),
               Text(
                 playing
@@ -758,6 +803,20 @@ class _StagePracticeScreenState extends State<StagePracticeScreen> {
         ),
         const SizedBox(height: 12),
         for (final s in pack.stages) _progressRow(s.number),
+        for (final n in pack.comingSoon)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Row(children: [
+              const KitIconBadge(Icons.lock_rounded, size: 30),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('Stage $n', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+                  const Text(kStageComingSoon, style: TextStyle(color: kKitMuted, fontSize: 12)),
+                ]),
+              ),
+            ]),
+          ),
         if (_admin)
           const Padding(
             padding: EdgeInsets.only(top: 4),

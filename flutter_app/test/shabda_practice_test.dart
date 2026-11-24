@@ -12,7 +12,6 @@ import 'package:nowssb/pronunciation/shabda/shabda_features.dart';
 import 'package:nowssb/pronunciation/shabda/shabda_practice.dart';
 
 const _fx = 'test/fixtures/shabda';
-const _assets = 'assets/words/america';
 
 Float64List _load(String p) => wavTo16k(File(p).readAsBytesSync());
 
@@ -85,9 +84,9 @@ Uint8List _wav(Float64List x, int rate, {int channels = 1}) {
 }
 
 void main() {
-  final refAudio = {for (var n = 1; n <= 3; n++) n: _load('$_assets/america_stage${n}_ref.wav')};
+  final refAudio = {for (var n = 1; n <= 3; n++) n: _load('$_fx/clean_stage$n.wav')};
   final ref = {
-    for (var n = 1; n <= 3; n++) n: referenceFeatures(File('$_assets/america_stage${n}_ref.wav').readAsBytesSync())
+    for (var n = 1; n <= 3; n++) n: referenceFeatures(File('$_fx/clean_stage$n.wav').readAsBytesSync())
   };
 
   String all(AttemptResult r) => r.fixes.join(' ').toLowerCase();

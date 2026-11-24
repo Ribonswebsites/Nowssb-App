@@ -44,7 +44,6 @@ import 'sound_settings_sheet.dart';
 import 'player_settings.dart';
 import 'my_routine.dart';
 import 'select_level.dart';
-import 'player_dial.dart';
 import 'player_intro.dart';
 import 'player_up_view.dart';
 import 'player_guide.dart';
@@ -1168,24 +1167,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     );
   }
 
-  void _openAuraClock() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => PlayerDial(
-          word: _word.word,
-          playing: _playing,
-          onPlay: _togglePlay,
-          onClose: () => Navigator.of(context).pop(),
-          onSettings: _openSettings,
-          onLibrary: () {
-            // Aura "Library" opens the Sound Library tab, not Saved Words.
-            NavScope.goTo(context, 2);
-          },
-        ),
-      ),
-    );
-  }
-
   void _openPracticeLab() {
     if (!mounted || _practiceOpen) return;
     // Words with the client's recorded stages practise stage by stage.
@@ -1620,7 +1601,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                             _PlayerHeader(
                               onBack: _minimizeToPill,
                               onSettings: _openSettings,
-                              onMore: _openAuraClock,
                               onHowItWorks: _openHowItWorks,
                             ),
                             const SizedBox(height: 12),
@@ -1900,12 +1880,10 @@ class _PlayerHeader extends StatelessWidget {
   const _PlayerHeader({
     required this.onBack,
     required this.onSettings,
-    required this.onMore,
     required this.onHowItWorks,
   });
   final VoidCallback onBack;
   final VoidCallback onSettings;
-  final VoidCallback onMore;
   final VoidCallback onHowItWorks;
 
   @override
@@ -1956,7 +1934,6 @@ class _PlayerHeader extends StatelessWidget {
                   onTap: onHowItWorks,
                 ),
               ),
-              _BareIconButton(icon: Icons.more_horiz_rounded, onTap: onMore),
             ],
           ),
         ),
@@ -2156,7 +2133,7 @@ class _ProfileHeader extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Frequency · ${frequencyName(progress.level)}  ›',
+                        'Stages  ›',
                         style: const TextStyle(
                           color: Color(0xFFE8D5A3),
                           fontSize: 12,
@@ -3860,7 +3837,7 @@ class _LevelPill extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Frequency · ${frequencyName(level)}',
+              'Stages',
               style: const TextStyle(
                 color: Color(0xFFF4F4F5),
                 fontSize: 12,
@@ -4466,6 +4443,16 @@ class _ModeBtn extends StatelessWidget {
   );
 }
 
+/// The word's Devanagari from its content data: the word's own `deva`,
+/// else its sound parts' Devanagari joined, when every part has one. Null
+/// when there is none; never transliterated.
+String? wordDevanagari(Word word) {
+  final own = word.deva.trim();
+  if (own.isNotEmpty) return own;
+  if (word.parts.isEmpty || word.parts.any((p) => p.deva.trim().isEmpty)) return null;
+  return word.parts.map((p) => p.deva.trim()).join();
+}
+
 class _WordOverlay extends StatelessWidget {
   const _WordOverlay({
     required this.word,
@@ -4504,52 +4491,19 @@ class _WordOverlay extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (word.parts.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (var i = 0; i < word.parts.length; i++) ...[
-                if (i > 0)
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: Color(0xCCF4F4F5),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                _SyllablePill(
-                  part: word.parts[i],
-                  onTap: onSyllable == null
-                      ? null
-                      : () => onSyllable!(word.parts[i]),
-                ),
-              ],
-            ],
-          )
-        else if (word.syllables.isNotEmpty)
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (var i = 0; i < word.syllables.length; i++) ...[
-                if (i > 0)
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: Color(0xCCF4F4F5),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                _SyllablePill(label: word.syllables[i]),
-              ],
-            ],
+        // The word in Devanagari only (from the book / content data); no
+        // English syllable split. Nothing when we have no Devanagari.
+        if (wordDevanagari(word) case final deva?)
+          Text(
+            deva,
+            key: const ValueKey('word-card-deva'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Color(0xFFF4F4F5),
+              fontSize: 26,
+              fontWeight: FontWeight.w600,
+              height: 1.3,
+            ),
           ),
         if (word.organ.isNotEmpty) ...[
           const SizedBox(height: 8),
@@ -4600,40 +4554,6 @@ class _WordOverlay extends StatelessWidget {
       ],
     ),
   );
-}
-
-class _SyllablePill extends StatelessWidget {
-  const _SyllablePill({this.part, this.label, this.onTap});
-  final WordPart? part;
-  final String? label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = (part == null)
-        ? (label ?? '')
-        : (part!.roman.isNotEmpty ? part!.roman : part!.deva);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.circular(99),
-        ),
-        child: EditableLabel(
-          'practice_player.SyllablePill',
-          text,
-          style: const TextStyle(
-            color: Color(0xFF0A0A0B),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            letterSpacing: 0.1,
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class _ActBtn extends StatelessWidget {
