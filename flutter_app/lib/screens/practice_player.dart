@@ -3766,7 +3766,10 @@ class _VisualStage extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      _StageGlassChip(onSettings: onSettings, onInfo: onInfo, onMusic: onMusic),
+                      ListenableBuilder(
+                        listenable: Settings.instance,
+                        builder: (_, __) => _StageGlassChip(onSettings: onSettings, onInfo: onInfo, onMusic: onMusic),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -3918,11 +3921,21 @@ class _StageGlassChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (onMusic != null)
-            _StageGlassBtn(
-              key: const ValueKey('player-music-btn'),
-              icon: Icons.music_note_rounded,
-              label: 'Music',
-              onTap: onMusic!,
+            Semantics(
+              button: true,
+              label: 'Sound',
+              child: GestureDetector(
+                key: const ValueKey('player-music-btn'),
+                behavior: HitTestBehavior.opaque,
+                onTap: onMusic,
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  margin: const EdgeInsets.only(right: 2),
+                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                  child: const Icon(Icons.music_note_rounded, size: 18, color: Colors.black),
+                ),
+              ),
             ),
           _StageGlassBtn(
             icon: Icons.settings_rounded,
