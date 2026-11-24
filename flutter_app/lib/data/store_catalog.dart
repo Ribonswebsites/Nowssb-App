@@ -4,6 +4,8 @@
 /// part074.js (Signature), part017.js (Ebooks). Prefer these over inventing.
 library;
 
+import 'content.dart' show ContentStore;
+
 const kRmWordImg =
     "https://media.nowssb.com/migrated-images/35423222df3850a9_grok_image_1778520937416_jazknf.jpg";
 const kRmSignatureImg =
@@ -102,7 +104,38 @@ class RmCategory {
   final RmSignatureEntry? signature;
 }
 
-const List<RmCategory> kRmCategories = [
+/// The Store's word categories as shown. While only words with the
+/// client's own recordings are shown ([ContentStore.recordedWordsOnly]),
+/// that is one category holding just those words; every other word stays
+/// in [kRmCategoriesAll] and comes back with its recording.
+List<RmCategory> get kRmCategories {
+  if (!ContentStore.recordedWordsOnly) return kRmCategoriesAll;
+  final words = ContentStore.instance.clientWords;
+  if (words.isEmpty) return kRmCategoriesAll;
+  final key = words.map((w) => w.key).join(',');
+  if (_shownKey == key && _shown != null) return _shown!;
+  _shownKey = key;
+  return _shown = [
+    RmCategory(
+      id: 'sacred', // its collection art
+      label: 'Teacher recorded',
+      sub: 'Words in your teacher’s own voice',
+      words: [for (final w in words) RmWordEntry(_titleCase(w.word), 'Teacher recorded')],
+    ),
+  ];
+}
+
+String? _shownKey;
+List<RmCategory>? _shown;
+
+String _titleCase(String s) => s
+    .trim()
+    .split(RegExp(r'\s+'))
+    .where((p) => p.isNotEmpty)
+    .map((p) => '${p[0].toUpperCase()}${p.substring(1).toLowerCase()}')
+    .join(' ');
+
+const List<RmCategory> kRmCategoriesAll = [
   RmCategory(
     id: "off50",
     label: "50% OFF",

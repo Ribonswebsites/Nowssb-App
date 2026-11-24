@@ -142,6 +142,12 @@ void tabletShots(List<String> sizes) {
     FakeVideoPlatform();
     VideoPool.debugDeadlines = false;
     await ContentStore.instance.start();
+    // --dart-define=RECORDED_ONLY=true: the app as shipped (only words with
+    // the client's recordings).
+    if (const bool.fromEnvironment('RECORDED_ONLY')) {
+      ContentStore.recordedWordsOnly = true;
+      ContentStore.instance.debugRecompute();
+    }
     final m = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     m.setMockMethodCallHandler(const MethodChannel('flutter_tts'), (c) async => 1);
     m.setMockMethodCallHandler(const MethodChannel('plugins.flutter.io/url_launcher'), (c) async => true);
