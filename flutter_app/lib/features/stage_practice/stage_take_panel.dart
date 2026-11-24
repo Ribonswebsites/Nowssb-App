@@ -1,7 +1,6 @@
-// What the Player's practice sheet shows for a teacher-recorded stage: the
-// stage progress (Stage 1 → 2 → 3), and after a take the score, the five
-// sub-scores, a pointer on the teacher's recording showing WHERE the take
-// differed, and the tips.
+// What the Player's practice sheet shows for a teacher-recorded stage after a
+// take: the score (counted up in a ring), one word, and on request the
+// teacher's waveform with the weak spots marked and a plain line for each.
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -12,9 +11,6 @@ import 'stage_pack.dart';
 import 'stage_progress.dart';
 import 'stage_scoring.dart';
 
-const _kGood = Color(0xFF7BE0A8);
-const _kWarn = Color(0xFFFFC86B);
-const _kBad = Color(0xFFFF8A80);
 const _kMuted = Color(0x99FFFFFF);
 
 /// Stage 1 → 2 → 3: passed, the one in play, open, and not recorded yet.
@@ -72,14 +68,43 @@ class StageProgressStrip extends StatelessWidget {
   }
 }
 
-/// Score, sub-scores, the pointer and the tips for one scored take.
-class StageResultPanel extends StatelessWidget {
+/// The score for one take: a count-up from 0 inside a thin white ring, one
+/// word, and "See what to improve", which opens the waveform with a white
+/// marker on each weak spot and a short plain line for each.
+class StageResultPanel extends StatefulWidget {
   const StageResultPanel({super.key, required this.take, required this.stage});
   final StageTake take;
   final int stage;
 
   @override
+  State<StageResultPanel> createState() => _StageResultPanelState();
+}
+
+class _StageResultPanelState extends State<StageResultPanel> with SingleTickerProviderStateMixin {
+  late final AnimationController _c =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 650))..forward();
+  bool _open = false;
+
+  @override
+  void didUpdateWidget(StageResultPanel old) {
+    super.didUpdateWidget(old);
+    if (!identical(old.take, widget.take)) {
+      _open = false;
+      _c
+        ..reset()
+        ..forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final take = widget.take;
     final r = take.result;
     if (!r.scored) {
       return Column(key: const ValueKey('stage-unscored'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -89,63 +114,88 @@ class StageResultPanel extends StatelessWidget {
       ]);
     }
     final word = r.overall >= 85 ? 'Great' : (r.passed ? 'Close' : 'Try again');
+    final curve = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
     return Column(key: const ValueKey('stage-result'), crossAxisAlignment: CrossAxisAlignment.center, children: [
-      Text('${r.overall}',
-          key: const ValueKey('stage-score'),
-          style: const TextStyle(color: Colors.white, fontSize: 64, fontWeight: FontWeight.w300, height: 1, letterSpacing: -2)),
-      const SizedBox(height: 4),
-      Text(word,
-          key: const ValueKey('stage-verdict'),
-          style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+      AnimatedBuilder(
+        animation: curve,
+        builder: (_, __) {
+          final v = curve.value;
+          return SizedBox(
+            width: 132,
+            height: 132,
+            child: CustomPaint(
+              key: const ValueKey('stage-score-ring'),
+              painter: _ScoreRing(v * r.overall / 100),
+              child: Center(
+                child: Text('${(r.overall * v).round()}',
+                    key: const ValueKey('stage-score'),
+                    style: const TextStyle(color: Colors.white, fontSize: 52, fontWeight: FontWeight.w300, height: 1, letterSpacing: -2)),
+              ),
+            ),
+          );
+        },
+      ),
+      const SizedBox(height: 8),
+      FadeTransition(
+        opacity: CurvedAnimation(parent: _c, curve: const Interval(.55, 1)),
+        child: Text(word,
+            key: const ValueKey('stage-verdict'),
+            style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 15, fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+      ),
       if (r.score != null) ...[
-        const SizedBox(height: 16),
-        StageWordPointer(take: take),
+        const SizedBox(height: 12),
+        GestureDetector(
+          key: const ValueKey('stage-improve-btn'),
+          behavior: HitTestBehavior.opaque,
+          onTap: () => setState(() => _open = !_open),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0x14FFFFFF),
+              borderRadius: BorderRadius.circular(99),
+              border: Border.all(color: const Color(0x33FFFFFF)),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(_open ? 'Hide' : 'See what to improve',
+                  style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+              const SizedBox(width: 4),
+              Icon(_open ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 18, color: Colors.white),
+            ]),
+          ),
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          child: _open
+              ? Padding(padding: const EdgeInsets.only(top: 12), child: StageWordPointer(take: take))
+              : const SizedBox(width: double.infinity),
+        ),
       ],
     ]);
   }
+}
 
-  // Kept for the sheet's older layout; the score screen no longer shows them.
-  // ignore: unused_element
-  Widget _subBar(SubScore s) {
-    final c = s.value >= 70 ? _kGood : (s.value >= 45 ? _kWarn : _kBad);
-    return Padding(
-      key: ValueKey('stage-sub-${s.key}'),
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(children: [
-        SizedBox(width: 96, child: Text(s.label, style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 12))),
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: s.value / 100,
-              minHeight: 6,
-              backgroundColor: const Color(0x1FFFFFFF),
-              valueColor: AlwaysStoppedAnimation(c),
-            ),
-          ),
-        ),
-        SizedBox(width: 34, child: Text('${s.value}', textAlign: TextAlign.right, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700))),
-      ]),
-    );
+class _ScoreRing extends CustomPainter {
+  _ScoreRing(this.fill);
+  final double fill;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final r = rect.deflate(4);
+    canvas.drawArc(r, 0, math.pi * 2, false, Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..color = const Color(0x1FFFFFFF));
+    canvas.drawArc(r, -math.pi / 2, math.pi * 2 * fill.clamp(0.0, 1.0), false, Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round
+      ..color = Colors.white);
   }
 
-  Widget _tip(String mark, String text, Color c, Key? key) => Padding(
-        key: key,
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            width: 20,
-            height: 20,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: c.withOpacity(.18)),
-            child: mark.isEmpty
-                ? Icon(Icons.check_rounded, size: 13, color: c)
-                : Text(mark, style: TextStyle(color: c, fontSize: 11, fontWeight: FontWeight.w800)),
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(text, style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 12.5, height: 1.35))),
-        ]),
-      );
+  @override
+  bool shouldRepaint(_ScoreRing old) => old.fill != fill;
 }
 
 /// Where in the word the take differed: the teacher's recording drawn as a
@@ -173,7 +223,7 @@ class StageWordPointer extends StatelessWidget {
     final s = take.result.score!;
     final a = s.refStart, b = s.refEnd;
     final m = marks(take);
-    final worst = m.isEmpty ? null : m.first;
+    final lines = improveLines(take);
     return Column(key: const ValueKey('stage-pointer'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       ClipRRect(
         borderRadius: BorderRadius.circular(18),
@@ -187,20 +237,59 @@ class StageWordPointer extends StatelessWidget {
           child: SizedBox(
             height: 58,
             child: CustomPaint(
-              painter: _PointerPainter(take.refTimes, take.refEnergyDb, a, b, worst == null ? const [] : [worst]),
+              painter: _PointerPainter(take.refTimes, take.refEnergyDb, a, b, m),
               child: const SizedBox.expand(),
             ),
           ),
         ),
       ),
       const SizedBox(height: 10),
-      Text(
-        plainTip(take),
-        key: const ValueKey('stage-pointer-note'),
-        textAlign: TextAlign.center,
-        style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.35),
-      ),
+      if (lines.isEmpty)
+        const Text('Nothing to fix, well done.',
+            key: ValueKey('stage-pointer-note'),
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.35))
+      else
+        for (var i = 0; i < lines.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(lines[i],
+                key: ValueKey(i == 0 ? 'stage-pointer-note' : 'stage-improve-$i'),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: i == 0 ? const Color(0xF2FFFFFF) : const Color(0xB3FFFFFF),
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35)),
+          ),
     ]);
+  }
+
+  static String _how(SegmentError w) {
+    final d = w.detail.toLowerCase();
+    if (w.kind == 'missing') return 'say every sound';
+    if (w.kind == 'timing') {
+      return d.contains('fast') || d.contains('short') || d.contains('quick')
+          ? 'say it a little slower'
+          : (d.contains('slow') || d.contains('long') ? 'say it a little quicker' : 'match the teacher’s timing');
+    }
+    if (w.kind == 'pitch') return 'follow the teacher’s rise and fall';
+    return 'copy the teacher’s sound closely';
+  }
+
+  /// One to three short lines, one per weak part of the word, worst first:
+  /// "Ending: say it a little quicker." Empty when nothing is weak.
+  static List<String> improveLines(StageTake take) {
+    final s = take.result.score;
+    if (s == null) return const [];
+    final seen = <String>{};
+    final out = <String>[];
+    for (final w in marks(take)) {
+      final where = _part((w.start + w.end) / 2, s.refStart, s.refEnd);
+      if (!seen.add(where)) continue;
+      out.add('${_cap(where)}: ${_how(w)}.');
+    }
+    return out;
   }
 
   /// One short, plain sentence: where to focus and what to do there.
@@ -265,8 +354,8 @@ class _PointerPainter extends CustomPainter {
           RRect.fromRectAndRadius(Rect.fromLTWH(k * bw + bw * .2, (h - bh) / 2, bw * .6, bh), const Radius.circular(2)), bar);
     }
     // The pointer: a triangle under the worst place.
-    if (marks.isNotEmpty) {
-      final cx = (x(marks.first.start) + x(marks.first.end)) / 2;
+    for (final e in marks) {
+      final cx = (x(e.start) + x(e.end)) / 2;
       final tri = Path()
         ..moveTo(cx, h + 2)
         ..lineTo(cx - 7, size.height)

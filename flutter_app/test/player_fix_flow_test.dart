@@ -167,7 +167,10 @@ void main() {
       await t.tap(find.byKey(ValueKey('music-opt-$opt')));
       await run(t, 5);
       expect(WordVoice.debugPlayed.last, 'assets/words/america/$file', reason: opt);
+      expect(find.byKey(const ValueKey('music-eq')), findsOneWidget, reason: 'previewing');
+      await t.tap(find.byKey(const ValueKey('music-done')));
       await run(t, 8);
+      expect(find.byKey(const ValueKey('music-sheet')), findsNothing);
     }
     expect(Settings.instance.stageBed, 'drone');
     expect(Settings.instance.stageMusic, isTrue);

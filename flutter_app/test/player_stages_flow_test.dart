@@ -290,7 +290,9 @@ void main() {
         final mic = FakeMic(ref);
         final went = <int>[];
         await pumpSheet(t, _lib(e.key), n, mic, onStage: went.add);
-        expect(find.byKey(ValueKey('stage-chip-$n')), findsOneWidget);
+        // One pop-up only: no word/stage card above the sheet.
+        expect(find.byKey(const ValueKey('stage-progress-label')), findsNothing);
+        expect(find.byKey(ValueKey('stage-chip-$n')), findsNothing);
         await takeAndScore(t);
         expect(mic.starts, 1);
         expect(find.byKey(const ValueKey('stage-result')), findsOneWidget);
@@ -301,6 +303,10 @@ void main() {
         expect(find.byKey(const ValueKey('stage-sub-sounds')), findsNothing);
         expect(find.textContaining('You need'), findsNothing);
         expect(find.textContaining('%'), findsNothing);
+        expect(find.byKey(const ValueKey('stage-score-ring')), findsOneWidget);
+        expect(find.byKey(const ValueKey('stage-pointer')), findsNothing, reason: 'closed until asked');
+        await t.tap(find.byKey(const ValueKey('stage-improve-btn')));
+        await t.pump(const Duration(milliseconds: 300));
         expect(find.byKey(const ValueKey('stage-pointer')), findsOneWidget);
         expect(StageProgressStore.instance.record(e.key, n).passed, isTrue);
         final pack = StagePack.forWord(_lib(e.key))!;
@@ -321,8 +327,11 @@ void main() {
     expect(score, lessThan(70));
     expect(find.byKey(const ValueKey('stage-fix-0')), findsNothing);
     expect((t.widget(find.byKey(const ValueKey('stage-verdict'))) as Text).data, 'Try again');
+    await t.tap(find.byKey(const ValueKey('stage-improve-btn')));
+    await t.pump(const Duration(milliseconds: 300));
     final note = (t.widget(find.byKey(const ValueKey('stage-pointer-note'))) as Text).data!;
-    expect(note, matches(RegExp(r'^Focus on the (beginning|middle|ending), [a-z’ ]+\.$')));
+    expect(note, matches(RegExp(r'^(Beginning|Middle|Ending): [a-z’ ]+\.$')));
+    expect(find.textContaining('%'), findsNothing);
     expect(find.byKey(const ValueKey('practice-next-stage')), findsNothing);
     expect(StageProgressStore.instance.record('america', 1).passed, isFalse);
     expect(StageProgressStore.instance.record('america', 1).attempts, 1);

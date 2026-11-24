@@ -5,6 +5,7 @@
 /// text-to-speech and completed words are recorded locally.
 library;
 
+import 'music_picker_sheet.dart';
 import '../shell/tablet.dart';
 import '../shell/tablet_frame.dart' show TabletShellGate, TabletSheet, isTablet;
 import '../features/stage_practice/stage_pack.dart';
@@ -186,77 +187,17 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   /// Music under the teacher's recordings: three beds or the voice only.
   void _openMusicPicker() {
-    const options = [
-      ('drone', 'Drone', 'Deep, slow and steady'),
-      ('pad', 'Warm pad', 'Soft chord that breathes'),
-      ('bowl', 'Singing bowl', 'A gentle bell every few seconds'),
-      ('voice', 'Voice only', 'Just your teacher'),
-    ];
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black.withOpacity(.5),
-      builder: (ctx) {
-        final cur = Settings.instance.stageMusic ? Settings.instance.stageBed : 'voice';
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: const Color(0xE6000000),
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(color: const Color(0x33FFFFFF)),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const Text('MUSIC',
-                            style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 10),
-                        for (final o in options)
-                          GestureDetector(
-                            key: ValueKey('music-opt-${o.$1}'),
-                            behavior: HitTestBehavior.opaque,
-                            onTap: () async {
-                              Navigator.of(ctx).pop();
-                              await Settings.instance.setStageBed(o.$1);
-                              if (!mounted || _packStage == null) return;
-                              unawaited(_selectStage(_packStage!.number));
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Row(children: [
-                                Icon(o.$1 == 'voice' ? Icons.mic_none_rounded : Icons.music_note_rounded,
-                                    color: Colors.white, size: 20),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                    Text(o.$2,
-                                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
-                                    Text(o.$3, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
-                                  ]),
-                                ),
-                                if (cur == o.$1) const Icon(Icons.check_rounded, color: Colors.white, size: 20),
-                              ]),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
+    final cur = Settings.instance.stageMusic ? Settings.instance.stageBed : 'voice';
+    unawaited(showMusicPicker(
+      context,
+      current: cur,
+      previewSeconds: _stageSeconds ?? 9,
+      onPick: (id) async {
+        await Settings.instance.setStageBed(id);
+        if (!mounted || _packStage == null) return;
+        unawaited(_selectStage(_packStage!.number));
       },
-    );
+    ));
   }
 
   /// How long the stage in play's recording runs (what the seek bar shows).

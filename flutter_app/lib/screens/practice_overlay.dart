@@ -11,6 +11,7 @@ import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart' show Ticker;
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -533,7 +534,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
       final t = _take;
       if (_status == _PracticeStatus.processing) return 'Scoring';
       if (t != null && t.result.scored) return 'Score ${t.result.overall}';
-      return 'Stage ${widget.stage!.number}';
+      return '${widget.word.word} · Stage ${widget.stage!.number}';
     }
     final r = _result;
     if (r != null && r.outcome == PronunciationOutcome.scored) {
@@ -608,21 +609,11 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                       child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _WordBreakTab(
-                          word: widget.word,
-                          result: _result,
-                          stages: _staged
-                              ? ListenableBuilder(
-                                  listenable: StageProgressStore.instance,
-                                  builder: (_, __) => StageProgressStrip(
-                                    pack: widget.pack!,
-                                    current: widget.stage!.number,
-                                    admin: Entitlements.instance.isAdmin,
-                                  ),
-                                )
-                              : null,
-                        ),
-                        const SizedBox(height: 10),
+                        // Staged words: ONE pop-up only, no word card above it.
+                        if (!_staged) ...[
+                          _WordBreakTab(word: widget.word, result: _result, stages: null),
+                          const SizedBox(height: 10),
+                        ],
                         GestureDetector(
                           onTap: () {},
                           child: _BlackTab(
@@ -635,9 +626,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                             centre: !_staged
                                 ? null
                                 : _count != null
-                                    ? Text('$_count',
-                                        key: const ValueKey('practice-countdown'),
-                                        style: const TextStyle(color: Colors.white, fontSize: 84, fontWeight: FontWeight.w200, height: 1))
+                                    ? _Countdown(n: _count!, tick: const Duration(milliseconds: 450))
                                     : (_holding || _status == _PracticeStatus.recording)
                                         ? _ListeningRing(level: _level)
                                         : null,
@@ -1015,31 +1004,170 @@ class _OrbFilm extends StatelessWidget {
 
 
 /// Listening: a white ring that swells with the voice.
-class _ListeningRing extends StatelessWidget {
+/// Live voice: a soft glass blob whose edge ripples with the real mic level,
+/// two echo rings that swell as you speak, and a white mic at the centre.
+class _ListeningRing extends StatefulWidget {
   const _ListeningRing({required this.level});
   final double level;
 
   @override
+  State<_ListeningRing> createState() => _ListeningRingState();
+}
+
+class _ListeningRingState extends State<_ListeningRing> with SingleTickerProviderStateMixin {
+  late final Ticker _ticker;
+  double _t = 0;
+  double _amp = 0; // smoothed 0..1
+  final List<double> _trail = List<double>.filled(48, 0, growable: true);
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((d) {
+      final target = ((widget.level + 55) / 40).clamp(0.0, 1.0);
+      // Rise fast, fall slowly: feels alive without jitter.
+      _amp += (target - _amp) * (target > _amp ? .35 : .08);
+      _trail
+        ..removeAt(0)
+        ..add(_amp);
+      setState(() => _t = d.inMicroseconds / 1e6);
+    })
+      ..start();
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final v = ((level + 55) / 45).clamp(0.0, 1.0);
     return SizedBox(
       key: const ValueKey('practice-listening'),
-      width: 120,
-      height: 120,
+      width: 170,
+      height: 170,
       child: Stack(alignment: Alignment.center, children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 90),
-          width: 70 + 46 * v,
-          height: 70 + 46 * v,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: Color.fromRGBO(255, 255, 255, .08 + .14 * v)),
-        ),
+        Positioned.fill(child: CustomPaint(painter: _VoiceBlob(_t, _amp, List.of(_trail)))),
         Container(
-          width: 64,
-          height: 64,
-          decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-          child: const Icon(Icons.mic_rounded, color: Colors.black, size: 28),
+          width: 58,
+          height: 58,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+            boxShadow: [BoxShadow(color: Color.fromRGBO(255, 255, 255, .25 + .35 * _amp), blurRadius: 18 + 24 * _amp)],
+          ),
+          child: const Icon(Icons.mic_rounded, color: Colors.black, size: 26),
         ),
       ]),
     );
   }
+}
+
+class _VoiceBlob extends CustomPainter {
+  _VoiceBlob(this.t, this.amp, this.trail);
+  final double t;
+  final double amp;
+  final List<double> trail;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero);
+    final base = size.shortestSide * .22;
+    // Echo rings.
+    for (var k = 0; k < 2; k++) {
+      final g = ((t * .6 + k * .5) % 1);
+      final r = base + 10 + g * (size.shortestSide * .26) * (.4 + amp);
+      canvas.drawCircle(
+          c,
+          r,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1
+            ..color = Color.fromRGBO(255, 255, 255, (1 - g) * (.10 + .30 * amp)));
+    }
+    // Fluid edge driven by the recent mic levels, layered twice.
+    for (var layer = 0; layer < 2; layer++) {
+      final path = Path();
+      const n = 96;
+      for (var i = 0; i <= n; i++) {
+        final a = i / n * math.pi * 2;
+        final h = trail[(i * trail.length ~/ n) % trail.length];
+        final wob = math.sin(a * 3 + t * 2.2 + layer) * .5 + math.sin(a * 5 - t * 3.1) * .3 + math.sin(a * 7 + t * 1.3) * .2;
+        final r = base + 6 + (8 + 26 * h) * (.6 + .4 * wob) * (layer == 0 ? 1 : .7);
+        final p = c + Offset(math.cos(a), math.sin(a)) * r;
+        i == 0 ? path.moveTo(p.dx, p.dy) : path.lineTo(p.dx, p.dy);
+      }
+      path.close();
+      canvas.drawPath(
+          path,
+          Paint()
+            ..color = Color.fromRGBO(255, 255, 255, layer == 0 ? .07 + .10 * amp : .10 + .12 * amp));
+      canvas.drawPath(
+          path,
+          Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = layer == 0 ? 1.2 : 1.6
+            ..color = Color.fromRGBO(255, 255, 255, layer == 0 ? .35 + .3 * amp : .55 + .4 * amp));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_VoiceBlob o) => true;
+}
+
+/// 3-2-1: each number pops in, and a thin ring runs down around it.
+class _Countdown extends StatelessWidget {
+  const _Countdown({required this.n, required this.tick});
+  final int n;
+  final Duration tick;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      key: const ValueKey('practice-countdown'),
+      width: 150,
+      height: 150,
+      child: TweenAnimationBuilder<double>(
+        key: ValueKey('cd-ring-$n'),
+        tween: Tween(begin: 1, end: 0),
+        duration: tick,
+        builder: (_, v, child) => CustomPaint(painter: _CountRing(v), child: child),
+        child: Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 220),
+            transitionBuilder: (child, a) => FadeTransition(
+              opacity: a,
+              child: ScaleTransition(scale: Tween(begin: 1.6, end: 1.0).animate(CurvedAnimation(parent: a, curve: Curves.easeOutBack)), child: child),
+            ),
+            child: Text('$n',
+                key: ValueKey('cd-$n'),
+                style: const TextStyle(color: Colors.white, fontSize: 76, fontWeight: FontWeight.w200, height: 1)),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CountRing extends CustomPainter {
+  _CountRing(this.v);
+  final double v;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final r = (Offset.zero & size).deflate(6);
+    canvas.drawArc(r, 0, math.pi * 2, false, Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..color = const Color(0x1AFFFFFF));
+    canvas.drawArc(r, -math.pi / 2, math.pi * 2 * v, false, Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round
+      ..color = Colors.white);
+  }
+
+  @override
+  bool shouldRepaint(_CountRing o) => o.v != v;
 }
