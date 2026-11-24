@@ -9,7 +9,9 @@
 //    passing opens the next stage.
 // Every shipped recording (America 1–2, Ram Ram 1–3, Washington 1–2) is
 // played and scored through the sheet.
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -35,21 +37,51 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_video_platform.dart';
 
+/// Mic level (dBFS) every 50 ms of a 16-bit mono WAV, as the phone reports it.
+List<double> wavLevels(Uint8List wav) {
+  final d = ByteData.sublistView(wav);
+  final out = <double>[];
+  const frame = 800; // 50 ms at 16 kHz
+  for (var i = 44; i + frame * 2 <= wav.length; i += frame * 2) {
+    var sum = 0.0;
+    for (var k = 0; k < frame; k++) {
+      final v = d.getInt16(i + k * 2, Endian.little) / 32768;
+      sum += v * v;
+    }
+    final rms = math.sqrt(sum / frame);
+    out.add(rms <= 1e-6 ? -90 : 20 * math.log(rms) / math.ln10);
+  }
+  return out;
+}
+
+/// A microphone that "hears" [take]: its levels while the take plays, then
+/// room quiet (-65 dBFS) until stopped — so the sheet's auto-stop decides.
 class FakeMic implements StageMic {
   FakeMic(this.take, {this.permitted = true});
   Uint8List? take;
   bool permitted;
   int starts = 0;
+  int stops = 0;
+  Timer? _feed;
   @override
   String? get lastPath => null;
   @override
   Future<bool> hasPermission() async => permitted;
   @override
-  Future<void> start(String name, void Function(double dbfs) level) async => starts++;
+  Future<void> start(String name, void Function(double dbfs) level) async {
+    starts++;
+    final lv = take == null ? const <double>[] : wavLevels(take!);
+    var i = 0;
+    _feed = Timer.periodic(const Duration(milliseconds: 50), (_) => level(i < lv.length ? lv[i++] : -65));
+  }
   @override
-  Future<Uint8List?> stop() async => take;
+  Future<Uint8List?> stop() async {
+    stops++;
+    _feed?.cancel();
+    return take;
+  }
   @override
-  Future<void> cancel() async {}
+  Future<void> cancel() async => _feed?.cancel();
   @override
   void dispose() {}
 }
@@ -226,23 +258,28 @@ void main() {
     await t.pump(const Duration(milliseconds: 400));
   }
 
-  Future<void> takeAndScore(WidgetTester t) async {
-    await t.tap(find.byKey(const ValueKey('practice-start')));
-    for (var i = 0; i < 20 && find.text('Stop').evaluate().isEmpty; i++) {
-      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
-      await t.pump(const Duration(milliseconds: 20));
-    }
-    expect(find.text('Stop'), findsOneWidget, reason: 'recording');
-    await t.tap(find.byKey(const ValueKey('practice-start')));
-    for (var i = 0; i < 400; i++) {
-      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 25)));
-      await t.pump(const Duration(milliseconds: 20));
+  /// The sheet counts 3-2-1, records, stops by itself after the word and
+  /// scores — no Start or Stop taps.
+  Future<void> takeAndScore(WidgetTester t, {bool expectCountdown = true}) async {
+    var sawCount = false, sawListening = false;
+    for (var i = 0; i < 600; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 5)));
+      await t.pump(const Duration(milliseconds: 50));
+      sawCount |= find.byKey(const ValueKey('practice-countdown')).evaluate().isNotEmpty;
+      sawListening |= find.byKey(const ValueKey('practice-listening')).evaluate().isNotEmpty;
       if (find.byKey(const ValueKey('stage-result')).evaluate().isNotEmpty ||
           find.byKey(const ValueKey('stage-unscored')).evaluate().isNotEmpty) {
         break;
       }
     }
-    await t.pump(const Duration(milliseconds: 50));
+    if (expectCountdown) {
+      expect(sawCount, isTrue, reason: '3-2-1 shows first');
+      expect(sawListening, isTrue, reason: 'then it listens');
+    }
+    for (var i = 0; i < 40; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 5)));
+      await t.pump(const Duration(milliseconds: 20));
+    }
   }
 
   for (final e in _expected.entries) {
@@ -301,9 +338,25 @@ void main() {
 
   testWidgets('a refused microphone says how to allow it', (t) async {
     await pumpSheet(t, _lib('america'), 1, FakeMic(null, permitted: false));
-    await t.tap(find.byKey(const ValueKey('practice-start')));
-    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
-    await t.pump(const Duration(milliseconds: 100));
+    for (var i = 0; i < 30; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 5)));
+      await t.pump(const Duration(milliseconds: 100));
+    }
     expect(find.text('Allow the microphone in phone settings to practise.'), findsOneWidget);
+  });
+
+  testWidgets('Cancel during the countdown stops it; Start runs it again', (t) async {
+    final mic = FakeMic(File('assets/words/america/america_stage1_ref.wav').readAsBytesSync());
+    await pumpSheet(t, _lib('america'), 1, mic);
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('practice-countdown')), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('practice-start')));
+    await t.pump(const Duration(seconds: 3));
+    expect(mic.starts, 0, reason: 'cancelled before recording');
+    expect(find.text('Start'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('practice-start')));
+    await takeAndScore(t);
+    expect(mic.starts, 1);
+    expect(find.byKey(const ValueKey('stage-result')), findsOneWidget);
   });
 }

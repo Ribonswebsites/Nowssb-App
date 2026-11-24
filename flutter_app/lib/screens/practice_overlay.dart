@@ -22,6 +22,8 @@ import '../data/models.dart';
 import '../data/word_devanagari.dart';
 import '../data/entitlements.dart';
 import '../features/stage_practice/stage_mic.dart';
+import '../features/stage_practice/stage_vad.dart';
+import '../data/word_voice.dart';
 import '../features/stage_practice/stage_pack.dart';
 import '../features/stage_practice/stage_progress.dart';
 import '../features/stage_practice/stage_scoring.dart';
@@ -165,6 +167,14 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   StageMic? _mic;
   StageTake? _take;
 
+  // Stage takes start by themselves after a quick 3-2-1 and stop by
+  // themselves once the word has been said (StageVad).
+  int? _count;
+  Timer? _countTimer;
+  StageVad? _vad;
+  double _level = -60;
+  bool _ending = false;
+
   bool get _staged => widget.pack != null && widget.stage != null;
 
   @override
@@ -186,8 +196,15 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     ).animate(_open);
     _cardScale = Tween<double>(begin: 0.96, end: 1).animate(_punch);
     _entry.addStatusListener((status) {
-      if (status == AnimationStatus.completed) unawaited(_playReference());
+      if (status != AnimationStatus.completed) return;
+      if (_staged) {
+        _startCountdown();
+      } else {
+        unawaited(_playReference());
+      }
     });
+    // The Player's recording must not play into the microphone.
+    if (_staged) unawaited(WordVoice.instance.stop());
     _entry.forward();
     _spin.forward();
     if (!_staged) unawaited(_loadRefs());
@@ -203,6 +220,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   @override
   void dispose() {
     _clock?.cancel();
+    _countTimer?.cancel();
     unawaited(_finishCapture());
     if (_mic != null) {
       unawaited(_mic!.cancel());
@@ -223,22 +241,61 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     if (mounted) setState(() => _status = _PracticeStatus.ready);
   }
 
-  // ── Teacher stage: record, then score against that stage's recording ──
+  // ── Teacher stage: 3-2-1, record, stop by itself, score ──
+  bool get _busy => _count != null || _holding || _status == _PracticeStatus.recording;
+
+  /// The main button: Cancel while counting down or listening, else a new take.
   Future<void> _stageTap() async {
-    if (_holding || _status == _PracticeStatus.recording) {
-      await _endStageTake();
+    if (_busy) {
+      await _cancelTake();
     } else if (_status != _PracticeStatus.processing) {
-      await _beginStageTake();
+      _startCountdown();
     }
+  }
+
+  void _startCountdown() {
+    if (!mounted || _busy || _status == _PracticeStatus.processing) return;
+    _countTimer?.cancel();
+    setState(() {
+      _take = null;
+      _count = 3;
+      _status = _PracticeStatus.ready;
+    });
+    _countTimer = Timer.periodic(const Duration(milliseconds: 450), (t) {
+      if (!mounted) return t.cancel();
+      if ((_count ?? 0) <= 1) {
+        t.cancel();
+        setState(() => _count = null);
+        unawaited(_beginStageTake());
+      } else {
+        setState(() => _count = _count! - 1);
+      }
+    });
+  }
+
+  Future<void> _cancelTake() async {
+    _countTimer?.cancel();
+    _clock?.cancel();
+    final wasRecording = _holding || _status == _PracticeStatus.recording;
+    if (!mounted) return;
+    setState(() {
+      _count = null;
+      _holding = false;
+      _status = _PracticeStatus.ready;
+    });
+    if (wasRecording) await _mic?.cancel();
   }
 
   Future<void> _beginStageTake() async {
     final stage = widget.stage!;
     _clock?.cancel();
+    _ending = false;
+    final vad = _vad = StageVad.forStage(stage.seconds);
     setState(() {
       _holding = true;
       _elapsed = 0;
       _take = null;
+      _level = -60;
       _status = _PracticeStatus.listening;
     });
     try {
@@ -254,21 +311,32 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
         return;
       }
       if (!_holding || !mounted) return;
-      await mic.start('nwsb-stage-${widget.pack!.wordKey}-${stage.number}', (_) {});
+      var heardLevel = false;
+      // Time is counted in mic frames (the level stream runs every 50 ms),
+      // so a busy UI thread cannot stretch or squeeze the take.
+      var frames = 0;
+      await mic.start('nwsb-stage-${widget.pack!.wordKey}-${stage.number}', (db) {
+        if (!mounted || !_holding || _ending || !identical(_vad, vad)) return;
+        heardLevel = true;
+        frames++;
+        final d = vad.add(db, Duration(milliseconds: 50 * frames));
+        if ((db - _level).abs() > 1.5) setState(() => _level = db);
+        if (d != VadDecision.keepGoing) unawaited(_endStageTake(silent: d == VadDecision.noSpeech));
+      });
       if (!mounted) return;
       if (!_holding) {
         await mic.cancel();
         return;
       }
       setState(() => _status = _PracticeStatus.recording);
-      // Stops by itself a little after the recording's own length.
-      final cap = math.min(_sessionLength, (stage.seconds * 3 + 4).ceil());
-      _clock = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (!mounted || !_holding) return;
-        if (_elapsed >= cap - 1) {
-          unawaited(_endStageTake());
-        } else {
-          setState(() => _elapsed++);
+      // Back-stop when the level stream is late or absent: the take still
+      // ends at the stage's max length.
+      var ticks = 0;
+      _clock = Timer.periodic(const Duration(milliseconds: 250), (_) {
+        if (!mounted || !_holding || _ending) return;
+        final t = Duration(milliseconds: 250 * ++ticks);
+        if (t >= vad.maxLength || (!heardLevel && t >= vad.noSpeechTimeout + const Duration(seconds: 2))) {
+          unawaited(_endStageTake(silent: heardLevel && !vad.heardSpeech));
         }
       });
     } catch (_) {
@@ -281,28 +349,33 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     }
   }
 
-  Future<void> _endStageTake() async {
+  Future<void> _endStageTake({bool silent = false}) async {
+    if (_ending) return;
     if (!_holding && _status != _PracticeStatus.recording) return;
+    _ending = true;
     _clock?.cancel();
     final pack = widget.pack!, stage = widget.stage!;
     setState(() {
       _holding = false;
       _status = _PracticeStatus.processing;
     });
+    final unheard = AttemptResult(
+        status: AttemptStatus.silent,
+        headline: 'We didn’t hear you',
+        message: 'Say the word clearly after the 3-2-1. Tap Try again when you’re ready.');
     StageTake take;
     try {
+      if (silent) {
+        await _mic?.cancel();
+        throw StateError('no speech');
+      }
       final bytes = await _mic?.stop();
       if (bytes == null) throw StateError('no take');
       final ref = (await rootBundle.load(stage.reference)).buffer.asUint8List();
       take = await scoreStageTakeWithContour(ref, bytes, stage: stage.number, passMark: pack.passMark);
+      if (!take.result.scored) take = StageTake(unheard, take.refTimes, take.refEnergyDb);
     } catch (_) {
-      take = StageTake(
-          AttemptResult(
-              status: AttemptStatus.silent,
-              headline: 'We didn’t hear you',
-              message: 'Nothing came through the microphone. Tap Start, say the word right after the recording, then tap Stop.'),
-          const [],
-          const []);
+      take = StageTake(unheard, const [], const []);
     }
     if (take.result.scored) {
       await StageProgressStore.instance.addAttempt(pack.wordKey, stage.number, score: take.result.overall, passed: take.result.passed);
@@ -310,6 +383,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     if (!mounted) return;
     setState(() {
       _take = take;
+      _ending = false;
       _status = take.result.passed ? _PracticeStatus.complete : _PracticeStatus.results;
     });
   }
@@ -433,6 +507,8 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 
   Future<void> _replay() async {
     _clock?.cancel();
+    _countTimer?.cancel();
+    _count = null;
     await _finishCapture();
     await _mic?.cancel();
     if (!mounted) return;
@@ -451,6 +527,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   }
 
   String get _statusLabel {
+    if (_staged && _count != null) return 'Get ready';
     if (_holding || _status == _PracticeStatus.recording) return 'Listening';
     if (_staged) {
       final t = _take;
@@ -473,11 +550,12 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   /// Feedback line under the orb; null keeps the template copy.
   String? get _message {
     if (_staged) {
-      if (_holding || _status == _PracticeStatus.recording) return 'Say it now, then tap Stop.';
+      if (_count != null) return 'Recording starts in a moment.';
+      if (_holding || _status == _PracticeStatus.recording) return 'Say it now. It stops by itself when you finish.';
       if (_status == _PracticeStatus.processing) return 'Comparing your take with the teacher’s recording…';
       if (_take != null) return 'Tap Try again to say it once more, or Replay to hear the teacher.';
       final st = widget.stage!;
-      return 'Listen to Stage ${st.number}${st.deva.isNotEmpty ? ' (${st.deva})' : ''}, then tap Start and say it back.';
+      return 'Tap Start, wait for 3-2-1, then say Stage ${st.number}${st.deva.isNotEmpty ? ' (${st.deva})' : ''}.';
     }
     final r = _result;
     if (r != null) {
@@ -552,10 +630,17 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                             message: _message,
                             holding: _holding,
                             startLabel: _staged
-                                ? (_holding || _status == _PracticeStatus.recording
-                                    ? 'Stop'
-                                    : (_take != null ? 'Try again' : 'Start'))
+                                ? (_busy ? 'Cancel' : (_take != null ? 'Try again' : 'Start'))
                                 : null,
+                            centre: !_staged
+                                ? null
+                                : _count != null
+                                    ? Text('$_count',
+                                        key: const ValueKey('practice-countdown'),
+                                        style: const TextStyle(color: Colors.white, fontSize: 84, fontWeight: FontWeight.w200, height: 1))
+                                    : (_holding || _status == _PracticeStatus.recording)
+                                        ? _ListeningRing(level: _level)
+                                        : null,
                             result: _take == null
                                 ? null
                                 : StageResultPanel(take: _take!, stage: widget.stage!.number),
@@ -924,6 +1009,37 @@ class _OrbFilm extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+/// Listening: a white ring that swells with the voice.
+class _ListeningRing extends StatelessWidget {
+  const _ListeningRing({required this.level});
+  final double level;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = ((level + 55) / 45).clamp(0.0, 1.0);
+    return SizedBox(
+      key: const ValueKey('practice-listening'),
+      width: 120,
+      height: 120,
+      child: Stack(alignment: Alignment.center, children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 90),
+          width: 70 + 46 * v,
+          height: 70 + 46 * v,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: Color.fromRGBO(255, 255, 255, .08 + .14 * v)),
+        ),
+        Container(
+          width: 64,
+          height: 64,
+          decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+          child: const Icon(Icons.mic_rounded, color: Colors.black, size: 28),
+        ),
+      ]),
     );
   }
 }

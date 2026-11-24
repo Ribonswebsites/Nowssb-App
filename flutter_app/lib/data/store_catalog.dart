@@ -110,7 +110,7 @@ class RmCategory {
 /// in [kRmCategoriesAll] and comes back with its recording.
 List<RmCategory> get kRmCategories {
   if (!ContentStore.recordedWordsOnly) return kRmCategoriesAll;
-  final words = ContentStore.instance.clientWords;
+  final words = ContentStore.instance.library;
   if (words.isEmpty) return kRmCategoriesAll;
   final key = words.map((w) => w.key).join(',');
   if (_shownKey == key && _shown != null) return _shown!;

@@ -35,6 +35,7 @@ class Settings extends ChangeNotifier {
   static const _kQuality = 'nwsb_player_quality';
   static const _kBass = 'nwsb_player_bass';
   static const _kStageMusic = 'nwsb_stage_music';
+  static const _kStageBed = 'nwsb_stage_bed';
   static const _kSpeed = 'nwsb_player_speed';
   static const _kCrossfade = 'nwsb_player_crossfade';
   static const _kSleep = 'nwsb_player_sleep';
@@ -113,6 +114,7 @@ class Settings extends ChangeNotifier {
   String _quality = 'Normal';
   bool _bassBoost = false;
   bool _stageMusic = true;
+  String _stageBed = 'drone';
   double _speed = 1.0;
   String _crossfade = 'Off';
   String _sleepTimer = 'Off';
@@ -178,6 +180,10 @@ class Settings extends ChangeNotifier {
   /// Teacher stage recordings play over the soft music that ducks under the
   /// voice (on), or as the cleaned voice alone (off).
   bool get stageMusic => _stageMusic;
+
+  /// Background under the teacher's stage recordings: 'drone', 'pad' or
+  /// 'bowl' ([stageMusic] false = voice only).
+  String get stageBed => _stageBed;
   double get speed => _speed;
   String get crossfade => _crossfade;
   String get sleepTimer => _sleepTimer;
@@ -250,6 +256,7 @@ class Settings extends ChangeNotifier {
       _quality = p.getString(_kQuality) ?? _quality;
       _bassBoost = p.getBool(_kBass) ?? _bassBoost;
       _stageMusic = p.getBool(_kStageMusic) ?? _stageMusic;
+      _stageBed = p.getString(_kStageBed) ?? _stageBed;
       _speed = p.getDouble(_kSpeed) ?? _speed;
       _crossfade = p.getString(_kCrossfade) ?? _crossfade;
       _sleepTimer = p.getString(_kSleep) ?? _sleepTimer;
@@ -428,6 +435,20 @@ class Settings extends ChangeNotifier {
   Future<void> setStageMusic(bool on) async {
     _stageMusic = on;
     await _save(_kStageMusic, on);
+    notifyListeners();
+  }
+
+  /// Picks the stage background: 'drone', 'pad', 'bowl', or 'voice' (none).
+  Future<void> setStageBed(String bed) async {
+    if (bed == 'voice') {
+      _stageMusic = false;
+      await _save(_kStageMusic, false);
+    } else {
+      _stageMusic = true;
+      _stageBed = bed;
+      await _save(_kStageMusic, true);
+      await _saveString(_kStageBed, bed);
+    }
     notifyListeners();
   }
 

@@ -176,7 +176,87 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   String? get _stageAsset {
     final st = _packStage;
     if (st == null) return null;
-    return Settings.instance.stageMusic && st.music.isNotEmpty ? st.music : st.audio;
+    if (!Settings.instance.stageMusic || st.music.isEmpty) return st.audio;
+    return switch (Settings.instance.stageBed) {
+      'pad' => st.music.replaceFirst('_music.m4a', '_music2.m4a'),
+      'bowl' => st.music.replaceFirst('_music.m4a', '_music3.m4a'),
+      _ => st.music,
+    };
+  }
+
+  /// Music under the teacher's recordings: three beds or the voice only.
+  void _openMusicPicker() {
+    const options = [
+      ('drone', 'Drone', 'Deep, slow and steady'),
+      ('pad', 'Warm pad', 'Soft chord that breathes'),
+      ('bowl', 'Singing bowl', 'A gentle bell every few seconds'),
+      ('voice', 'Voice only', 'Just your teacher'),
+    ];
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withOpacity(.5),
+      builder: (ctx) {
+        final cur = Settings.instance.stageMusic ? Settings.instance.stageBed : 'voice';
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: const Color(0xE6000000),
+                    borderRadius: BorderRadius.circular(28),
+                    border: Border.all(color: const Color(0x33FFFFFF)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 10),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text('MUSIC',
+                            style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 12, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+                        const SizedBox(height: 10),
+                        for (final o in options)
+                          GestureDetector(
+                            key: ValueKey('music-opt-${o.$1}'),
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () async {
+                              Navigator.of(ctx).pop();
+                              await Settings.instance.setStageBed(o.$1);
+                              if (!mounted || _packStage == null) return;
+                              unawaited(_selectStage(_packStage!.number));
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Row(children: [
+                                Icon(o.$1 == 'voice' ? Icons.mic_none_rounded : Icons.music_note_rounded,
+                                    color: Colors.white, size: 20),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                    Text(o.$2,
+                                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
+                                    Text(o.$3, style: const TextStyle(color: Color(0x99FFFFFF), fontSize: 12)),
+                                  ]),
+                                ),
+                                if (cur == o.$1) const Icon(Icons.check_rounded, color: Colors.white, size: 20),
+                              ]),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   /// How long the stage in play's recording runs (what the seek bar shows).
@@ -184,7 +264,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     final st = _packStage;
     final asset = _stageAsset;
     if (st == null || asset == null) return null;
-    if (asset == st.music && st.musicSeconds > 0) return st.musicSeconds;
+    if (asset != st.audio && st.musicSeconds > 0) return st.musicSeconds;
     return st.seconds;
   }
 
@@ -194,6 +274,27 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!mounted) return;
     final route = ModalRoute.of(context);
     if (route != null && route.isCurrent) unawaited(_minimizeToPill());
+  }
+
+  /// The artwork's replay button: always starts the word (or stage) again
+  /// from the top, even mid-play.
+  Future<void> _restart() async {
+    final st = _packStage;
+    if (st != null) return _selectStage(st.number);
+    _playGen++;
+    try {
+      await _tts.stop();
+      await PlayerRitual.stop();
+    } catch (_) {}
+    unawaited(WordVoice.instance.stop());
+    if (!mounted) return;
+    setState(() {
+      _playing = false;
+      _ritual = null;
+      _completed = false;
+      _error = null;
+    });
+    await _prepareAndPlay();
   }
 
   /// Picked in Stages: stop what is playing and play stage [n] here.
@@ -1613,13 +1714,14 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   playing: _playing,
                                   ritual: _ritual,
                                   accent: theme.accent,
-                                  onReplay: _prepareAndPlay,
+                                  onReplay: _restart,
                                   onCopy: _copyWord,
                                   liked: _liked,
                                   onLike: _toggleLike,
                                   onSettings: _openSettings,
                                   onInfo: _openInfo,
                                   onLevel: _openLevel,
+                                  onMusic: _pack == null ? null : _openMusicPicker,
                                   stage: _packStage?.number,
                                   stageNumbers: [
                                     ...?_pack?.stages.map((st) => st.number),
@@ -3584,7 +3686,11 @@ class _VisualStage extends StatelessWidget {
     this.stage,
     this.stageNumbers = const [],
     this.comingSoon = const [],
+    this.onMusic,
   });
+
+  /// Teacher-recorded words: the music choice under the recording.
+  final VoidCallback? onMusic;
 
   /// A teacher-recorded word: the stage in play, its recorded stages and the
   /// ones still to come. Shown as a small 1 / 2 / 3 badge on the artwork.
@@ -3719,7 +3825,7 @@ class _VisualStage extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      _StageGlassChip(onSettings: onSettings, onInfo: onInfo),
+                      _StageGlassChip(onSettings: onSettings, onInfo: onInfo, onMusic: onMusic),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -3842,9 +3948,10 @@ class _LevelPill extends StatelessWidget {
 }
 
 class _StageGlassChip extends StatelessWidget {
-  const _StageGlassChip({required this.onSettings, required this.onInfo});
+  const _StageGlassChip({required this.onSettings, required this.onInfo, this.onMusic});
   final VoidCallback onSettings;
   final VoidCallback onInfo;
+  final VoidCallback? onMusic;
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
@@ -3869,6 +3976,13 @@ class _StageGlassChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (onMusic != null)
+            _StageGlassBtn(
+              key: const ValueKey('player-music-btn'),
+              icon: Icons.music_note_rounded,
+              label: 'Music',
+              onTap: onMusic!,
+            ),
           _StageGlassBtn(
             icon: Icons.settings_rounded,
             label: 'Settings',
@@ -3887,6 +4001,7 @@ class _StageGlassChip extends StatelessWidget {
 
 class _StageGlassBtn extends StatelessWidget {
   const _StageGlassBtn({
+    super.key,
     required this.icon,
     required this.label,
     required this.onTap,

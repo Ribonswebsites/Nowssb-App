@@ -45,6 +45,22 @@ List<Word> routineWords() {
 /// Opens the Player on [r]: its words in order, each for its minutes.
 Future<void> startRoutine(BuildContext context, Routine r) async {
   final resolved = RoutineStore.resolve(r, ContentStore.instance.library);
+  final lib = ContentStore.instance.library;
+  if (resolved.isEmpty && ContentStore.recordedWordsOnly && lib.isNotEmpty) {
+    // Its words are hidden until their recordings arrive: the routine plays
+    // the teacher-recorded words instead, two minutes each, in the Player.
+    AppHaptics.medium();
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+      builder: (_) => PracticePlayerScreen(
+        words: lib,
+        title: r.name,
+        showIntro: false,
+        routineName: r.name,
+        routineMinutes: [for (final _ in lib) 2],
+      ),
+    ));
+    return;
+  }
   if (resolved.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('The words in this routine are not in your library any more. Edit it to add words.'),

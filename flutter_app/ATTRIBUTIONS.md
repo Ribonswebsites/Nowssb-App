@@ -25,6 +25,7 @@ client's recording only; nothing synthetic.
 | What | Source | Licence |
 |---|---|---|
 | Background drone | “meditationdrone1.wav” by Jim-Bretherick, [freesound.org/s/674255](https://freesound.org/s/674255/) | CC0 1.0 |
+| Background “Warm pad” and “Singing bowl” (stage `_music2` / `_music3` versions) | Synthesised from sine waves for NowssB by `tool/audio/make_beds.py`; mixed and ducked by `tool/audio/mix.py` | CC0 1.0 (own work) |
 | Voice noise reduction (build time only, not shipped) | ffmpeg `arnndn` with `std.rnnn` from [richardpl/arnndn-models](https://github.com/richardpl/arnndn-models) | BSD-3-Clause |
 
 ## Not yet traced

@@ -79,13 +79,16 @@ void main() {
     expect(words, isNotEmpty);
     await t.pumpWidget(MaterialApp(home: PracticePlayerScreen(words: words, title: 'Test', showIntro: false)));
     await _pumps(t, 20);
-    // A swipe up opens the now-playing view; its queue button opens the
-    // queue sheet.
-    await t.flingFrom(const Offset(180, 600), const Offset(0, -300), 1500);
-    await _pumps(t, 10);
-    expect(find.byKey(const ValueKey('player-up-view')), findsOneWidget);
-    await t.tap(find.byKey(const ValueKey('player-up-queue')));
-    await _pumps(t, 10);
+    // The old swipe-up "Now playing" screen is gone; the queue opens from
+    // the Player's own Up next card (swipe up on it).
+    Future<void> openQueue() async {
+      final pv = find.byType(PageView).last;
+      await t.drag(pv, const Offset(-400, 0));
+      await _pumps(t, 6);
+      await t.fling(find.text('UP NEXT').first, const Offset(0, -300), 1500, warnIfMissed: false);
+      await _pumps(t, 10);
+    }
+    await openQueue();
     final handle = find.byKey(const ValueKey('queue-grab-handle'));
     expect(handle, findsOneWidget);
     // The queue list scrolls.
@@ -99,8 +102,7 @@ void main() {
     await _pumps(t, 10);
     expect(handle, findsNothing);
     // Handle drag also dismisses.
-    await t.tap(find.byKey(const ValueKey('player-up-queue')));
-    await _pumps(t, 10);
+    await openQueue();
     expect(handle, findsOneWidget);
     await t.drag(handle, const Offset(0, 120));
     await _pumps(t, 10);
