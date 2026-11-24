@@ -9,6 +9,8 @@
 ///   plan ending       3 days and 1 day before a plan that will not renew
 ///                     ends, and when it has ended
 ///   reader reminders  the exact "remind me" times set in the Reader
+///   my routine        each routine's time on its days, when its reminder
+///                     is on (My routine), 7 days ahead
 ///
 /// One-shot alarms (zonedSchedule, inexact while idle — no exact-alarm
 /// permission), re-planned whenever the inputs change and whenever the app
@@ -34,6 +36,7 @@ import '../../data/models.dart';
 import '../../data/practice_progress.dart';
 import '../../data/reader_store.dart';
 import '../economy/economy_api.dart';
+import '../routine/routine_store.dart';
 import 'notif_categories.dart';
 import 'notif_center.dart';
 import 'notif_prefs.dart';
@@ -82,6 +85,7 @@ class PlanInput {
     this.planRenews = true,
     this.planName = '',
     this.readerReminders = const [],
+    this.routines = const [],
   });
 
   final DateTime now;
@@ -108,6 +112,9 @@ class PlanInput {
   final bool planRenews;
   final String planName;
   final List<({int at, String title})> readerReminders;
+
+  /// My routine reminders: minute of day (local) on days 1 (Mon) .. 7 (Sun).
+  final List<({String id, String name, int minute, Set<int> days})> routines;
 }
 
 class NotifPlanner {
@@ -120,8 +127,10 @@ class NotifPlanner {
   static const weeklyId = 1400;
   static const readerBase = 1500;
   static const readerMax = 40;
+  static const routineBase = 1600;
+  static const routineMax = 98; // 14 routines x 7 days
   static const firstId = 1000;
-  static const lastId = 1599;
+  static const lastId = 1699;
 
   /// The older build's daily periodic reminder (periodicallyShow).
   static const legacyDailyId = 88001;
@@ -260,6 +269,27 @@ class NotifPlanner {
       ));
     }
 
+    // ── my routine (the user set this time and these days themselves) ──
+    var k = 0;
+    for (final r in i.routines) {
+      if (r.days.isEmpty) continue;
+      for (var d = 0; d < 7 && k < routineMax; d++) {
+        final date = DateTime(today.year, today.month, today.day + d);
+        if (!r.days.contains(date.weekday)) continue;
+        final when = at(date, r.minute);
+        if (!when.isAfter(now)) continue;
+        out.add(PlannedNotice(
+          id: routineBase + k++,
+          category: NotifCategories.wordOfDay,
+          at: when,
+          title: 'Time for ${r.name}',
+          body: 'Your routine is ready. Tap Start to play it in order.',
+          route: 'routine:${r.id}',
+          silent: quiet(when),
+        ));
+      }
+    }
+
     return spaced(out);
   }
 
@@ -308,6 +338,7 @@ class NotifScheduler with WidgetsBindingObserver {
       ReaderStore.instance,
       NotifPrefs.instance,
       EconomyMirror.instance,
+      RoutineStore.instance,
     ]) {
       l.addListener(replanSoon);
     }
@@ -315,6 +346,7 @@ class NotifScheduler with WidgetsBindingObserver {
       _auth = FirebaseAuth.instance.authStateChanges().listen((_) => unawaited(refreshAccount()));
     }
     unawaited(PracticeProgress.instance.start());
+    unawaited(RoutineStore.instance.start());
     replanSoon();
   }
 
@@ -412,6 +444,7 @@ class NotifScheduler with WidgetsBindingObserver {
       planRenews: _plan.renews,
       planName: _plan.name,
       readerReminders: reader,
+      routines: RoutineStore.instance.reminders,
     );
   }
 

@@ -42,7 +42,7 @@ import 'sound_library.dart';
 import 'aura_sound_library.dart';
 import 'sound_settings_sheet.dart';
 import 'player_settings.dart';
-import 'sentence_builder.dart';
+import 'my_routine.dart';
 import 'select_level.dart';
 import 'player_dial.dart';
 import 'player_intro.dart';
@@ -93,11 +93,18 @@ class PracticePlayerScreen extends StatefulWidget {
     required this.words,
     required this.title,
     this.showIntro = true,
+    this.routineName,
+    this.routineMinutes,
   });
 
   final List<Word> words;
   final String title;
   final bool showIntro;
+
+  /// My routine: [words] play in this order (shuffle is ignored), each one
+  /// repeating for its minutes in [routineMinutes], then the next starts.
+  final String? routineName;
+  final List<int>? routineMinutes;
 
   @override
   State<PracticePlayerScreen> createState() => _PracticePlayerScreenState();
@@ -201,6 +208,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       _guideDone = true;
       _flagsReady = true;
       _rewardPlayerOpen();
+      if (_inRoutine) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _startRoutine();
+        });
+      }
     } else {
       unawaited(_loadIntroFlags());
     }
@@ -288,6 +300,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     _bottomAutoTimer?.cancel();
     _sleepTimer?.cancel();
     _listenTimer?.cancel();
+    _routineTimer?.cancel();
     _bottomPageController.dispose();
     _upCtl.dispose();
     _pageScroll.dispose();
@@ -485,7 +498,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         setState(() => _error = 'The recording for ${_word.word} could not be loaded. Check your connection and try again.');
         return;
       }
-      final again = await _askHearAgain();
+      final again = _inRoutine ? false : await _askHearAgain();
       if (again && alive()) {
         if (mounted) setState(() => _ritual = RitualFrame(caption: line));
         if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed)) voiceFailed = true;
@@ -500,7 +513,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       if (mounted && alive()) {
         setState(() => _completed = true);
         // Repeat is on: the same word starts again once this run ends.
-        if (_loop) repeatAgain = true;
+        if (_loop || (_inRoutine && !_routineDone)) repeatAgain = true;
       }
     } catch (_) {
       if (mounted) {
@@ -509,14 +522,16 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         );
       }
     } finally {
-      if (mounted) {
+      // A newer run (Next, a routine's next word) owns the state now; this
+      // older one ending late must not stop it.
+      if (mounted && _playGen == gen) {
         setState(() {
           _playing = false;
           _ritual = null;
         });
       }
     }
-    if (repeatAgain && mounted && _loop && _playGen == gen) {
+    if (repeatAgain && mounted && (_loop || (_inRoutine && !_routineDone)) && _playGen == gen) {
       await _prepareAndPlay();
     }
   }
@@ -662,6 +677,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!mounted) return;
     setState(() {
       _index = next;
+      _routineReset();
       _playing = false;
       _ritual = null;
       _liked = false;
@@ -928,7 +944,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   Future<void> _move(int direction) async {
     if (widget.words.isEmpty) return;
     int next;
-    if (_shuffle && direction > 0 && widget.words.length > 1) {
+    if (_shuffle && !_inRoutine && direction > 0 && widget.words.length > 1) {
       next = _index;
       var guard = 0;
       while (next == _index && guard++ < 24) {
@@ -957,6 +973,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!mounted) return;
     setState(() {
       _index = next;
+      _routineReset();
       _playing = false;
       _ritual = null;
       _liked = false;
@@ -979,6 +996,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     if (!mounted) return;
     setState(() {
       _index = i;
+      _routineReset();
       _playing = false;
       _ritual = null;
       _liked = false;
@@ -1045,10 +1063,74 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     );
   }
 
-  void _openSentence() {
+  void _openRoutine() {
     Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => const SentenceBuilderScreen()),
+      MaterialPageRoute<void>(builder: (_) => const MyRoutineScreen()),
     );
+  }
+
+  // ── My routine playback ──
+  bool get _inRoutine =>
+      widget.routineMinutes != null && widget.routineMinutes!.length == widget.words.length;
+  Timer? _routineTimer;
+  var _routineLeft = 0;
+  var _routineDone = false;
+  var _routineStuck = 0;
+  var _routineMoving = false;
+
+  void _routineReset() {
+    if (!_inRoutine) return;
+    _routineLeft = widget.routineMinutes![_index] * 60;
+    _routineStuck = 0;
+    _routineMoving = false;
+  }
+
+  void _startRoutine() {
+    _routineReset();
+    _routineTimer?.cancel();
+    _routineTimer = Timer.periodic(const Duration(seconds: 1), (_) => _routineTick());
+    unawaited(_prepareAndPlay());
+  }
+
+  void _routineTick() {
+    if (!mounted || _routineDone) return;
+    if (_playing) {
+      _routineStuck = 0;
+      if (_routineLeft > 0) setState(() => _routineLeft--);
+    } else if (_error != null) {
+      // This word cannot play (no recording, no connection): move on.
+      if (++_routineStuck >= 4) _routineLeft = 0;
+    }
+    if (_routineLeft > 0 || _routineMoving) return;
+    if (_index < widget.words.length - 1) {
+      // _move switches the word, then keeps playing it; the switch itself
+      // (_routineReset) clears the flag.
+      _routineMoving = true;
+      unawaited(_move(1));
+    } else {
+      _playGen++;
+      unawaited(_tts.stop());
+      unawaited(WordVoice.instance.stop());
+      unawaited(PlayerRitual.stop());
+      _routineTimer?.cancel();
+      setState(() {
+        _routineDone = true;
+        _playing = false;
+        _ritual = null;
+        _completed = true;
+      });
+      ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
+        content: Text('${widget.routineName ?? 'Your routine'} is complete'),
+        behavior: SnackBarBehavior.floating,
+      ));
+    }
+  }
+
+  String get _routineLine {
+    if (_routineDone) return '${widget.routineName ?? 'My routine'} · Complete';
+    final m = _routineLeft ~/ 60, sec = _routineLeft % 60;
+    return '${widget.routineName ?? 'My routine'} · ${_index + 1} of ${widget.words.length} · '
+        '$m:${sec.toString().padLeft(2, '0')} left';
   }
 
   void _openInfo() {
@@ -1616,10 +1698,22 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               child: SizedBox(
                                 height: 20,
                                 width: double.infinity,
-                                child: _SubtitleMarquee(
-                                  lines: _marqueeLines,
-                                  animation: _marqueeController,
-                                ),
+                                child: _inRoutine
+                                    ? Text(
+                                        _routineLine,
+                                        key: const ValueKey('routine-status'),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Color(0xFFB8B8BD),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      )
+                                    : _SubtitleMarquee(
+                                        lines: _marqueeLines,
+                                        animation: _marqueeController,
+                                      ),
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -1670,7 +1764,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   _WordActionStrip(
                                     accent: theme.accent,
                                     video: _actionsTabVideo,
-                                    onSentence: _openSentence,
+                                    onRoutine: _openRoutine,
                                     onPractice: () =>
                                         unawaited(_handlePracticeTap()),
                                     onStore: () => NavScope.goTo(context, 3),
@@ -4769,13 +4863,13 @@ class _WordActionStrip extends StatelessWidget {
   const _WordActionStrip({
     required this.accent,
     required this.video,
-    required this.onSentence,
+    required this.onRoutine,
     required this.onPractice,
     required this.onStore,
   });
   final Color accent;
   final String video;
-  final VoidCallback onSentence;
+  final VoidCallback onRoutine;
   final VoidCallback onPractice;
   final VoidCallback onStore;
 
@@ -4810,9 +4904,9 @@ class _WordActionStrip extends StatelessWidget {
           children: [
             Expanded(
               child: _WordAction(
-                svg: '<path d="M4 5.5h16v10.5H9.5L5.5 19.5V16H4z"/><path d="M7.5 9.5h9M7.5 12.6h6"/>',
-                label: 'Sentence',
-                onTap: onSentence,
+                svg: kRoutineMark,
+                label: 'My routine',
+                onTap: onRoutine,
               ),
             ),
             _sep(),

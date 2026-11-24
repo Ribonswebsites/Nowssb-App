@@ -13,8 +13,7 @@
 /// Free content (price 0) is always open. What each plan opens follows its
 /// benefits on the Subscription page: Resonance — every word for practice;
 /// Frequency — + every meaning ("Advanced word meanings"); Frequency X —
-/// + Signature pieces and ebooks ("Complete NowssB access"). The sentence
-/// builder needs a plan or uses only the words you can open.
+/// + Signature pieces and ebooks ("Complete NowssB access").
 library;
 
 import 'dart:async';
@@ -184,10 +183,6 @@ class Entitlements extends ChangeNotifier {
     if (pass != null && pass.isAfter(DateTime.now())) return true;
     return ownsItem('ebook:${title.toLowerCase()}');
   }
-
-  /// The sentence builder needs a plan; without one it works from the
-  /// words you can open (free + owned).
-  bool get sentenceBuilderUnlimited => isAdmin || hasTier('resonance');
 
   /// Any bag item (cart, wishlist, product detail).
   bool ownsOrIncluded(String itemId, {num price = 1}) {

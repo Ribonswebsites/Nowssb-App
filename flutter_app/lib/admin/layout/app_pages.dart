@@ -25,7 +25,7 @@ import '../../screens/profile.dart';
 import '../../screens/quick_access.dart';
 import '../../screens/quotes_live.dart';
 import '../../screens/saved_words.dart';
-import '../../screens/sentence_builder.dart';
+import '../../screens/my_routine.dart';
 import '../../screens/sound_library.dart';
 import '../../screens/store.dart';
 import '../../screens/store/request_words.dart';
@@ -68,7 +68,7 @@ final List<AppPage> kAppPages = [
   AppPage('sound.library', 'Sound Library', 'Player', Icons.graphic_eq_rounded, () => const SoundLibraryScreen(embedded: true)),
   AppPage('library', 'Library', 'Learn', Icons.local_library_rounded, () => const LibraryScreen(), tab: 2),
   AppPage('saved', 'Saved words', 'Learn', Icons.bookmark_rounded, () => const SavedWordsScreen()),
-  AppPage('sentence', 'Sentence builder', 'Learn', Icons.short_text_rounded, () => const SentenceBuilderScreen()),
+  AppPage('routine', 'My routine', 'Learn', Icons.event_repeat_rounded, () => const MyRoutineScreen()),
   AppPage('quotes', 'Quotes of the week', 'Learn', Icons.format_quote_rounded, () => const QuotesWeekScreen()),
   AppPage('profile', 'Profile', 'You', Icons.person_rounded, () => const ProfileScreen(), tab: 4),
   AppPage('subscription', 'Subscription', 'You', Icons.workspace_premium_rounded, () => const SubscriptionScreen()),

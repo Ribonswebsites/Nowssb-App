@@ -13,7 +13,7 @@ void main() {
     expect(src, contains('Welcome to Your Practice Player'));
     expect(src, contains('Listen & Navigate'));
     expect(src, contains('Practice & Get Scored'));
-    expect(src, contains('Build Your Library & Sentences'));
+    expect(src, contains('Build Your Library & Routine'));
     expect(src, contains('Word Info & Player Settings'));
     expect(src, contains('Grow Your Collection'));
     expect(src, contains('You’re All Set'));

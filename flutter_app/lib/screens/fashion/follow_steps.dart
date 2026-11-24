@@ -153,7 +153,7 @@ const kFstSteps = <FstStep>[
     points: [
       ('Five windows', 'Morning, midday, afternoon, evening, night.'),
       ('One tap starts it', 'The words queue up and the session runs itself.'),
-      ('It closes itself', 'A healing sentence from everything you practised.'),
+      ('Your own order', 'Save the words you like in My routine and play them through.'),
     ],
   ),
   FstStep(
@@ -186,7 +186,7 @@ const kFstSteps = <FstStep>[
     goTab: 2,
     lead: 'Everything you own, arranged to be listened to.',
     points: [
-      ('Sentences', 'Healing sentences built from your words. Tap to play.'),
+      ('Listen first', 'Hear any word before you add it to your routine.'),
       ('Words', 'The phonetic breakdown and organ tag on every one.'),
       ('Straight through', 'Tap any word and it opens where you practise it.'),
     ],

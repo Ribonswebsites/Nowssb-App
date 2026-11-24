@@ -63,7 +63,6 @@
 | screens/reader/reader_hub.dart | 0 | 0 | 0 | 1 | 1 | 4 |
 | screens/saved_words.dart | 1 | 0 | 0 | 0 | 0 | 2 |
 | screens/select_level.dart | 0 | 0 | 0 | 1 | 0 | 2 |
-| screens/sentence_builder.dart | 0 | 0 | 0 | 0 | 0 | 17 |
 | screens/shared_sections.dart | 2 | 0 | 0 | 3 | 1 | 21 |
 | screens/sound_library.dart | 15 | 0 | 0 | 2 | 1 | 25 |
 | screens/sound_settings_sheet.dart | 0 | 0 | 0 | 0 | 0 | 9 |
@@ -295,12 +294,6 @@
 - screens/saved_words.dart:292 text — interpolated/concatenated text
 - screens/select_level.dart:132 text — interpolated/concatenated text
 - screens/select_level.dart:138 text — interpolated/concatenated text
-- screens/sentence_builder.dart:217 text — interpolated/concatenated text
-- screens/sentence_builder.dart:286 text — interpolated/concatenated text
-- screens/sentence_builder.dart:421 text — interpolated/concatenated text
-- screens/sentence_builder.dart:481 text — interpolated/concatenated text
-- screens/sentence_builder.dart:492 text — interpolated/concatenated text
-- screens/sentence_builder.dart:782 text — interpolated/concatenated text
 - screens/sound_library.dart:1268 text — interpolated/concatenated text
 - screens/sound_library.dart:1321 text — interpolated/concatenated text
 - screens/sound_library.dart:1331 text — interpolated/concatenated text

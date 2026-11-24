@@ -4,7 +4,7 @@
 /// in `data.route` (pushes): `practice`, `practice:<wordKey>`,
 /// `word:<wordKey>`, `progress`, `rewards`, `coupons`, `gifts`, `earn`,
 /// `reference`, `subscription`, `ebooks`, `library`, `store`, `inbox`,
-/// `requests`, `reader`, `notifications`, `home`.
+/// `requests`, `reader`, `notifications`, `routine:<id>`, `home`.
 ///
 /// The shell attaches once it is on screen ([attach]); a tap that arrives
 /// before that — a cold start from the notification — waits until the
@@ -19,6 +19,7 @@ import '../../data/notifications.dart';
 import '../../data/content.dart';
 import '../../data/home_widget_sync.dart';
 import '../../data/models.dart';
+import '../../screens/my_routine.dart';
 import '../../screens/practice_player.dart';
 import '../../screens/store/ebooks_store.dart';
 import '../../screens/store/request_words.dart';
@@ -145,6 +146,8 @@ class NotifRouter {
         return const InboxScreen();
       case 'notifications':
         return const NotifPreferencesScreen();
+      case 'routine':
+        return const MyRoutineScreen();
     }
     return null;
   }

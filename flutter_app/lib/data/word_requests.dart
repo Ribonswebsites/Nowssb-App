@@ -194,7 +194,7 @@ class WordRequestStore extends ChangeNotifier {
     );
   }
 
-  /// [kind] 'word' (default), 'sentence', 'healing' or 'verify' — the admin
+  /// [kind] 'word' (default), 'healing' or 'verify' — the admin
   /// Requests queue shows it.
   Future<WordRequest> submit({required String word, String notes = '', String kind = 'word'}) async {
     await ensureLoaded();

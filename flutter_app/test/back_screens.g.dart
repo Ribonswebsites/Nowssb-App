@@ -38,7 +38,7 @@ import 'package:nowssb/screens/quotes_live.dart';
 import 'package:nowssb/screens/reader/reader_book.dart';
 import 'package:nowssb/screens/saved_words.dart';
 import 'package:nowssb/screens/select_level.dart';
-import 'package:nowssb/screens/sentence_builder.dart';
+import 'package:nowssb/screens/my_routine.dart';
 import 'package:nowssb/screens/sound_library.dart';
 import 'package:nowssb/screens/store.dart';
 import 'package:nowssb/screens/store/cart_pages.dart';
@@ -87,7 +87,7 @@ final btScreens = <String, Widget Function()>{
   'RequestWordsScreen': () => const RequestWordsScreen(),
   'SavedWordsScreen': () => const SavedWordsScreen(),
   'SelectLevelScreen': () => const SelectLevelScreen(),
-  'SentenceBuilderScreen': () => const SentenceBuilderScreen(),
+  'MyRoutineScreen': () => const MyRoutineScreen(),
   'SoundLibraryScreen': () => const SoundLibraryScreen(),
   'StoreScreen': () => const StoreScreen(),
   'SubscriptionScreen': () => const SubscriptionScreen(),

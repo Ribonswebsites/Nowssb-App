@@ -76,9 +76,9 @@ const kPlayerGuideSlides = <PlayerGuideSlide>[
     title: 'Player Library',
     icon: _kLibraryIcon,
     img: 'assets/player/guide/04.webp',
-    heading: 'Build Your Library & Sentences',
+    heading: 'Build Your Library & Routine',
     desc:
-        'Tap the Library icon to open every word you’ve unlocked. Every word you purchase is added here automatically — combine them to build your own healing sentences, saved for practice anytime.',
+        'Tap the Library icon to open every word you’ve unlocked. Every word you purchase is added here automatically — put them in your own order in My routine and play them through anytime.',
   ),
   PlayerGuideSlide(
     title: 'Player Settings',

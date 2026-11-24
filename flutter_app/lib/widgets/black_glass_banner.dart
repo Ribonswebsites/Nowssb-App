@@ -2,7 +2,7 @@
 ///
 /// Layout: title/sub on the left, thin vertical divider, then an SVG (or
 /// child) icon inside a **white circle** on the **right**. Used by the
-/// Sentence builder and anywhere a NowssB black/white glass action row
+/// My routine page and anywhere a NowssB black/white glass action row
 /// is needed. No emoji — SVG only.
 library;
 

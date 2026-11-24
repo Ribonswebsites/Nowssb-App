@@ -53,9 +53,15 @@ class WordVoice {
 
   /// Plays [w]'s recording to the end. True if it played; false means
   /// "use text-to-speech".
+  /// Tests: stands in for the audio plugin. [stopped] turns true once
+  /// [stop] (or another play) ends this one, as the real player does.
+  @visibleForTesting
+  static Future<bool> Function(Word w, bool Function() stopped)? debugPlay;
+
   Future<bool> play(Word w, {double volume = 1, double speed = 1}) async {
     if (!hasVoice(w)) return false;
     final token = ++_token;
+    if (debugPlay != null) return debugPlay!(w, () => token != _token);
     try {
       if (isBundled(w)) {
         final p = _player ??= AudioPlayer();

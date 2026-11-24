@@ -251,7 +251,7 @@ applyLayout(context, 'home.normal', items, hiddenByDefault: {...})
 * New generic templates go in `layout/template_sections.dart`
   (`kTemplateKinds`, `kTemplateNames`, `kTemplateGallery`, `templateStarter`).
 * Drops that miss every section (the gaps, the page's own header) go to
-  the nearest section. `reader`, `store.request`, `quotes`, `sentence` and
+  the nearest section. `reader`, `store.request`, `quotes` and
   `sound.library` were one block and now use `layoutIndexed`.
 * A page built as one block (a lazy list, a staged flow) wraps it in
   `PageBlock(pageId: …, child: …)` (`layout/page_block.dart`): the block

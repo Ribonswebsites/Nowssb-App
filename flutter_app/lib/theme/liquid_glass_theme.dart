@@ -14,7 +14,7 @@
 /// - Practice player (Now Playing) — stage, chips, slider, icon buttons
 /// - Player settings, sound settings, quick tools
 /// - Earn, Gifts, Rewards, Bazaar, Vault, Wordprint, Echo wall
-/// - Reader, sentence builder, subscriptions, app settings
+/// - Reader, My routine, subscriptions, app settings
 /// - Notifications sheet and inbox
 /// - Login / auth gate overlays that sit on GlassWrap
 /// - Menu drawer — LGAppBar + HeavyGlassPanel groups

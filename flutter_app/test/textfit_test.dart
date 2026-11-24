@@ -33,7 +33,7 @@ final _bannerPool = [
   PracticeBannerSpec('Words for today', 'Queued and ready to play', () {}),
   PracticeBannerSpec('Breathe and repeat', 'Start a word session', () {}),
   PracticeBannerSpec(
-      'Close with a sentence', 'Healing words from your session', () {}),
+      'Follow your routine', 'Your words, your order, your time', () {}),
 ];
 
 List<StoreNowItem> _storeItems() => [
@@ -298,8 +298,8 @@ void main() {
               banners: [
                 PracticeBannerSpec('Listen, then repeat',
                     'Three, seven or twenty-one reps', () {}),
-                PracticeBannerSpec('Close with a sentence',
-                    'Healing words from your session', () {}),
+                PracticeBannerSpec('Follow your routine',
+                    'Your words, your order, your time', () {}),
                 PracticeBannerSpec(
                     'Sit with one word', 'Five quiet minutes', () {}),
               ],

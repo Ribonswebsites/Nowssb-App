@@ -82,7 +82,7 @@ import 'personal_coach.dart';
 import 'subscription.dart';
 import 'store/ebooks_store.dart';
 import 'store/request_words.dart';
-import 'sentence_builder.dart';
+import 'my_routine.dart';
 import '../widgets/program_shelf.dart';
 import '../widgets/nwsb_icon.dart';
 import 'app_settings.dart';
@@ -331,8 +331,8 @@ class _HomeFashionState extends State<HomeFashion> {
         _push(const AppSettingsScreen());
       case 'quick-access':
         _push(const AppSettingsScreen());
-      case 'sentence':
-        _push(const SentenceBuilderScreen());
+      case 'routine':
+        _push(const MyRoutineScreen());
       case 'request-words':
         _push(const RequestWordsScreen());
       case 'subscribe':
@@ -506,8 +506,9 @@ class _HomeFashionState extends State<HomeFashion> {
             'Words for today', 'Queued and ready to play', () => _go(1)),
         PracticeBannerSpec(
             'Breathe and repeat', 'Start a word session', () => _go(1)),
-        PracticeBannerSpec('Close with a sentence',
-            'Healing words from your session', () => _go(1)),
+        PracticeBannerSpec('Follow your routine',
+            'Your words, your order, your time',
+            () => _push(const MyRoutineScreen())),
       ];
 
   void _openQuickActions() {

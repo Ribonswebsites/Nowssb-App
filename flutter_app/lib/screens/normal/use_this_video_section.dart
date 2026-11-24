@@ -18,13 +18,13 @@ class NmUseThisVideoSection extends StatelessWidget {
     super.key,
     this.fashion = false,
     this.onPlayer,
-    this.onSentence,
+    this.onRoutine,
     this.onLibrary,
   });
 
   final bool fashion;
   final VoidCallback? onPlayer;
-  final VoidCallback? onSentence;
+  final VoidCallback? onRoutine;
   final VoidCallback? onLibrary;
 
   @override
@@ -66,7 +66,7 @@ class NmUseThisVideoSection extends StatelessWidget {
                 child: _RingRow(
                   glass: glass,
                   onPlayer: onPlayer,
-                  onSentence: onSentence,
+                  onRoutine: onRoutine,
                   onLibrary: onLibrary,
                 ),
               ),
@@ -82,13 +82,13 @@ class _RingRow extends StatefulWidget {
   const _RingRow({
     required this.glass,
     this.onPlayer,
-    this.onSentence,
+    this.onRoutine,
     this.onLibrary,
   });
 
   final bool glass;
   final VoidCallback? onPlayer;
-  final VoidCallback? onSentence;
+  final VoidCallback? onRoutine;
   final VoidCallback? onLibrary;
 
   @override
@@ -133,8 +133,8 @@ class _RingRowState extends State<_RingRow>
             phase: (_motion.value + .33) % 1,
             asset: 'assets/icons/icon_01.svg',
             svg: true,
-            title: 'Sentence',
-            onTap: widget.onSentence,
+            title: 'My routine',
+            onTap: widget.onRoutine,
             glass: widget.glass,
           ),
           _DividerGlow(phase: (_motion.value + .5) % 1),

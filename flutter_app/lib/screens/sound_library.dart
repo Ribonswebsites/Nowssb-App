@@ -1,7 +1,7 @@
 /// Sound Library — COMBINE previous website SLM feed + YTM polish (NO WIPE).
 ///
 /// Keeps every prior section (intro, speed dial, quick picks, Store video rail,
-/// Meaning promo, sentences, Atelier collections, big cards, category mosaics,
+/// Meaning promo, Atelier collections, big cards, category mosaics,
 /// meanings, Currently Playing, Buy Request, banner) and ADDS YTM Global Hits
 /// rails, Trending rows, featured Play+Save card, and artist-style category
 /// hero. Full-page home AppBackdrop film under light scrim (match Normal/Fashion home).
@@ -105,7 +105,7 @@ Map<String, RmCategory> _wordToCol() {
 
 
 /// Filter chips that stay on Sound Library (do not open Category page).
-const _kFilterOnly = {'All', 'Currently Playing', 'Sentences', 'My Words', 'Purchased', 'Trending', 'Global'};
+const _kFilterOnly = {'All', 'Currently Playing', 'My Words', 'Purchased', 'Trending', 'Global'};
 
 String _playsLabel(int n) {
   if (n <= 0) return '0 plays';
@@ -184,7 +184,6 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
       'Currently Playing',
       'Trending',
       'Global',
-      'Sentences',
       'My Words',
       'Purchased',
       ...sorted,
@@ -223,8 +222,6 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
           for (var i = 0; i < all.length; i++)
             if (i.isOdd) all[i],
         ];
-      case 'Sentences':
-        return all;
       case 'My Words':
         return practiced();
       case 'Purchased':
@@ -335,7 +332,7 @@ class _SoundLibraryScreenState extends State<SoundLibraryScreen> {
       tag: 'Personal Collection',
       eyebrow: 'Shabdapathy · Sound Archive',
       title: 'Sound\nLibrary',
-      body: 'Your saved sentences, subscription words, and purchased '
+      body: 'Your saved words, subscription words and purchased '
           'frequencies — all in one place.',
       stats: [
         '${all.length} words',
@@ -474,23 +471,6 @@ class _SlmFeed extends StatelessWidget {
                       ),
                       _currentlyPlaying(),
                       _buyRequest(),
-                    ] else if (chip == 'Sentences') ...[
-                      _sentencesSec(),
-                      if (featured != null) _featuredMain(featured),
-                      if (trending.isNotEmpty)
-                        _ytmPlainSection(
-                          'Healing lines for you',
-                          trailing: _pill('Play all', () => onPlayWord(trending.first)),
-                          child: _YtmTrackList(
-                            words: trending,
-                            art: art,
-                            counts: counts,
-                            onTap: onPlayWord,
-                            onMore: onOpenWord,
-                          ),
-                        ),
-                      _promoAt(0),
-                      _buyRequest(),
                     ] else if (chip == 'Global') ...[
                       _ytmPlainSection(
                         "Today's Global Hits",
@@ -572,7 +552,6 @@ class _SlmFeed extends StatelessWidget {
                       _promoAt(1),
                       if (trending.isNotEmpty) _glassNowPlaying(trending, ledger),
                       _storeVideos(wide),
-                      _sentencesSec(),
                       _collections(context, wide),
                       _bigCards(wide),
                       _glassStations(ledger),
@@ -609,7 +588,6 @@ class _SlmFeed extends StatelessWidget {
       case 'Trending':
         return 0;
       case 'Purchased':
-      case 'Sentences':
         return 1;
       case 'Currently Playing':
       case 'My Words':
@@ -1099,7 +1077,7 @@ class _SlmFeed extends StatelessWidget {
   // ─── Glass layouts (Spotify-style) ─────────────────────────────────────────
   //
   // The Library feed repeated two layouts again and again: the thumbnail-row
-  // list (Quick picks, Trending, Your sentences, Meanings & origins) and the
+  // list (Quick picks, Trending, Meanings & origins) and the
   // card rail (Global Hits, Collections, Not practised yet, Browse by
   // category, Listen again). Three of them now get their own glass style:
   //   Quick picks             → GlassQuickGrid      (2-column compact rows)
@@ -1219,7 +1197,7 @@ class _SlmFeed extends StatelessWidget {
     final items = <_StoreVid>[
       _StoreVid(
         title: 'Sound Library',
-        sub: 'Every word and sentence you own',
+        sub: 'Every word you own',
         asset: 'assets/video/sound-library-banner.mp4',
         onTap: onPractice,
       ),
@@ -1267,133 +1245,6 @@ class _SlmFeed extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 6),
       child: banner,
-    );
-  }
-
-
-  Widget _sentencesSec() {
-    final pool = (words.isNotEmpty ? words : allWords).toList();
-    final items = <({String title, String sub, List<Word> trio})>[];
-    for (var i = 0; i + 2 < pool.length && items.length < 10; i += 3) {
-      final trio = pool.sublist(i, i + 3);
-      final benefit = trio
-          .map((w) => w.benefit.isNotEmpty
-              ? w.benefit
-              : (w.meaning.isNotEmpty ? w.meaning : w.organ))
-          .where((s) => s.isNotEmpty)
-          .take(1)
-          .join();
-      items.add((
-        title: trio.map((w) => w.word).join(' · '),
-        sub: benefit.isEmpty
-            ? 'One healing sentence, spoken as one breath'
-            : '$benefit — one healing sentence',
-        trio: trio,
-      ));
-    }
-    // Always show something — never an empty Sentences cage.
-    if (items.isEmpty && pool.isNotEmpty) {
-      final w = pool.first;
-      items.add((
-        title: w.word,
-        sub: w.meaning.isNotEmpty
-            ? w.meaning
-            : 'Start a session to weave more sentences',
-        trio: [w],
-      ));
-    }
-
-    return _section(
-      'Your sentences',
-      trailing: _pill('Build', onPractice),
-      child: items.isEmpty
-          ? Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0x0FFFFFFF),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0x14FFFFFF)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const EditableLabel('sound_library.SlmFeed',
-                      'Finish a practice session and the sentence you built is saved here.',
-                      style: TextStyle(
-                          color: Color(0x99FFFFFF), fontSize: 13, height: 1.45),
-                    ),
-                    const SizedBox(height: 12),
-                    _pill('Start a session', onPractice),
-                  ],
-                ),
-              ),
-            )
-          : Column(
-              children: [
-                for (final it in items)
-                  InkWell(
-                    onTap: () => onPlayWord(it.trio.first),
-                    onLongPress: onPractice,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 6, 4, 6),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 76,
-                            child: FramedSlot(
-                              frame: DeviceFrame.tab6Landscape,
-                              child: EditableImage.asset(
-                                art(it.trio.first.word),
-                                fit: BoxFit.cover,
-                                word: it.trio.first.word,
-                                errorBuilder: (_, __, ___) =>
-                                    const ColoredBox(color: Color(0xFF1A1A1A)),
-                                    slot: 'sound_library.SlmFeed',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  it.title,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Color(0xFFF5F5F7),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  it.sub,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Color(0x80EBEBF5),
-                                    fontSize: 12.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => onPlayWord(it.trio.first),
-                            icon: const Icon(Icons.play_arrow_rounded,
-                                color: Colors.white),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
     );
   }
 

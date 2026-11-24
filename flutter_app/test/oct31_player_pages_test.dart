@@ -1,4 +1,4 @@
-// The two pages the Player opens (Select frequency, Sentence builder) must
+// The two pages the Player opens (Select frequency, My routine) must
 // lay out without a RenderFlex overflow on a narrow phone and with large text.
 // (320 with large text still overflows inside the shared promo banner —
 // colored_split_promo_banner.dart, left as a known item.)
@@ -9,7 +9,7 @@ import 'package:nowssb/data/content.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/media/video_pool.dart';
 import 'package:nowssb/screens/select_level.dart';
-import 'package:nowssb/screens/sentence_builder.dart';
+import 'package:nowssb/screens/my_routine.dart';
 
 import 'fake_video_platform.dart';
 
@@ -22,7 +22,8 @@ void main() {
 
   for (final c in <(String, Widget Function())>[
     ('Select frequency', () => const SelectLevelScreen()),
-    ('Sentence builder', () => const SentenceBuilderScreen()),
+    ('My routine', () => const MyRoutineScreen()),
+    ('New routine', () => const RoutineEditorScreen()),
   ]) {
     for (final (w, sc) in [(320.0, 1.0), (390.0, 1.3)]) {
       testWidgets('${c.$1} lays out at $w@$sc without overflow', (t) async {

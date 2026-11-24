@@ -63,7 +63,6 @@ enum SplitPromoSurface {
   progress,
   coach,
   library,
-  sentenceBuilder,
   requestWords,
   storeHome,
   selectLevel,
@@ -219,15 +218,6 @@ class SplitPromoSpec {
           leftColor: const Color(0xFF1A2838),
           rightColor: const Color(0xFF5DADE2),
           art: SplitPromoArts.blondeLotus,
-          onTap: onTap,
-        );
-      case SplitPromoSurface.sentenceBuilder:
-        return SplitPromoSpec(
-          title: 'Expand your\nSound Library.',
-          cta: 'Open Sound Library',
-          leftColor: const Color(0xFF2C1A3A),
-          rightColor: const Color(0xFFAF7AC5),
-          art: SplitPromoArts.robotLotus,
           onTap: onTap,
         );
       case SplitPromoSurface.requestWords:

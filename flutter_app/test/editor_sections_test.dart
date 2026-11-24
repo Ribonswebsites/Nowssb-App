@@ -284,7 +284,7 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    for (final page in ['store.request', 'quotes', 'sentence', 'sound.library']) {
+    for (final page in ['store.request', 'quotes', 'sound.library']) {
       testWidgets('$page (one block before) takes a section and an orb', (tester) async {
         _ignoreOverflow();
         final c = await _open(tester, page);

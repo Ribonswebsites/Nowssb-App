@@ -419,7 +419,6 @@ void main() {
           'Quick picks',
           'Trending songs for you',
           'Browse by category',
-          'Your sentences',
           'Collections',
           "Today's Global Hits",
           'Listen again',

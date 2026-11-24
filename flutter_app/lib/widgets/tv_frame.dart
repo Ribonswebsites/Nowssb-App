@@ -47,7 +47,7 @@ class DeviceFrame {
   /// hole). `word-acts-tab.webp` is this kind: the website uses it as a
   /// BACKGROUND and places the `<video>` ON TOP of the aperture. Stacking
   /// the bezel over the clip (the transparent-frame path) hides the video
-  /// behind solid grey — the "dark blur" users see on Sentence/Practice/Store
+  /// behind solid grey — the "dark blur" users see on Practice/Store
   /// and on the home Customize · Features · Earn strip.
   final bool opaqueAperture;
 
