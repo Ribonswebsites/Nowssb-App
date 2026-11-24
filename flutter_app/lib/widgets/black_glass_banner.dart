@@ -297,12 +297,16 @@ class CustomizeBlackBanner extends StatelessWidget {
     this.subtitle,
     this.onTap,
     this.margin = const EdgeInsets.only(bottom: 14),
+    this.scrollSubtitle = true,
   });
 
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
   final EdgeInsets margin;
+
+  /// False: the subtitle sits still and wraps onto a second line if needed.
+  final bool scrollSubtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -336,6 +340,19 @@ class CustomizeBlackBanner extends StatelessWidget {
                 ),
                 if (subtitle != null && subtitle!.isNotEmpty) ...[
                   const SizedBox(height: 6),
+                  if (!scrollSubtitle)
+                    Text(
+                      subtitle!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0x99FFFFFF),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        height: 1.35,
+                      ),
+                    )
+                  else
                   GentleMarqueeText(
                     subtitle!,
                     style: const TextStyle(

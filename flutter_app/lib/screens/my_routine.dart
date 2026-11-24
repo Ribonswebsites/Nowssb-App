@@ -144,6 +144,7 @@ class _MyRoutineScreenState extends State<MyRoutineScreen> {
                   CustomizeBlackBanner(
                     title: 'Build your\nroutine',
                     subtitle: 'Your words, in your order, at your time',
+                    scrollSubtitle: false,
                     onTap: _create,
                   ),
                   NestedDarkWrap(

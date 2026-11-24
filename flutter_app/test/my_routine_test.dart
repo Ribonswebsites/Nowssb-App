@@ -397,4 +397,33 @@ void main() {
     await t.pumpWidget(const SizedBox());
     await _settle(t, 30);
   });
+
+  for (final w in [320.0, 390.0]) {
+    testWidgets('the top banner subtitle is still and whole at $w', (t) async {
+      t.view.physicalSize = Size(w, 844);
+      t.view.devicePixelRatio = 1;
+      addTearDown(t.view.reset);
+      SharedPreferences.setMockInitialValues({'nwsb_terms_hub': '1'});
+      await t.runAsync(() => RoutineStore.instance.debugReset());
+      await t.pumpWidget(_app(const MyRoutineScreen()));
+      await t.runAsync(() => RoutineStore.instance.start().timeout(const Duration(seconds: 5), onTimeout: () {}));
+      await _settle(t);
+      final sub = find.text('Your words, in your order, at your time');
+      expect(sub, findsOneWidget);
+      final p = t.renderObject<RenderParagraph>(sub);
+      // Line count only means something with real glyph widths (font cache).
+      if (homeFontCache != null) {
+        expect(p.didExceedMaxLines, isFalse, reason: 'fits in two lines');
+        expect(p.size.height, lessThanOrEqualTo(12 * 1.35 * 2 + 1));
+      }
+      expect(p.maxLines, 2);
+      expect(t.getRect(sub).right, lessThanOrEqualTo(w - 16));
+      final before = t.getTopLeft(sub);
+      await t.pump(const Duration(seconds: 3));
+      expect(t.getTopLeft(sub), before, reason: 'does not scroll');
+      await _shot(t, '10_banner_${w.toInt()}');
+      await t.pumpWidget(const SizedBox());
+      await _settle(t, 30);
+    });
+  }
 }
