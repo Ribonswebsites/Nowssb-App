@@ -1,10 +1,17 @@
-/// Coins are never credited silently. A real activity (open the app, word of
-/// the day, a full listen, a share, a page visit…) only *offers* its coins:
-/// a gold glass card asks "Collect". Only that tap calls the server
-/// (reportAction). The coins fly into the wallet and today's bar counts
+/// Coins are never credited silently. Only two kinds of thing earn coins:
+/// finishing a real task (a full practice, a share, a first post, a finished
+/// profile, a friend's link) and the daily check-in (the first launch of
+/// the IST day, once). Opening or visiting a page never earns coins. A
+/// reward only *offers* its coins: a frosted glass card asks "Collect".
+/// Only that tap calls the server (reportAction). The coins fly into the wallet and today's bar counts
 /// up only after that credit is confirmed. If the phone is offline, the
 /// coins stay pending and the card shows they will collect when online;
 /// the balance does not change.
+///
+/// Later (or tapping outside) puts the card away for the rest of this run:
+/// it does not come back when another page opens. Waiting coins can be
+/// collected any time from the Coins wallet, and the card is offered again
+/// at most once, on the next app launch.
 ///
 /// Uncollected offers wait on this phone (SharedPreferences) for the rest of
 /// the IST day; the server's daily limits are per day, so an offer from an
@@ -16,7 +23,6 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +33,7 @@ import '../../widgets/swipe_away.dart';
 import 'economy_api.dart';
 import 'reward_fx.dart' show coinsIn, playCoins;
 import 'reward_overlay.dart';
+import '../../widgets/restyle_kit.dart' show KitActionPill, kKitMuted;
 import 'package:nowssb/data/app_haptics.dart';
 
 /// One activity's coins waiting for a Collect tap.
@@ -37,6 +44,9 @@ class PendingEarn {
   final int coins;
   final String title;
   String get id => '$action:$key';
+
+  /// What the card says for this reward (real copy, not the server's id).
+  String get label => action == 'open' ? 'Daily check-in' : title;
   Map<String, dynamic> toJson() => {'action': action, 'key': key, 'coins': coins, 'title': title};
   static PendingEarn fromJson(Map m) => PendingEarn(
         action: '${m['action'] ?? ''}',
@@ -67,7 +77,7 @@ class CoinDay {
     if (collected == null || ceiling == null || ceiling <= 0) return null;
     var open = 0;
     for (final a in (today['actions'] as List?) ?? const []) {
-      if (a is! Map || a['free'] == false) continue;
+      if (a is! Map || a['free'] == false || PendingCoins._pageVisits.contains(a['id'])) continue;
       final per = '${a['per'] ?? 'day'}';
       if (per != 'day' && per != 'key') continue;
       final limit = (a['limit'] as num?)?.toInt() ?? 1;
@@ -97,13 +107,15 @@ class PendingCoins extends ChangeNotifier {
     'sound_bath': (10, 'Sound Bath session'),
     'quote': (3, 'Read or share the daily quote'),
     'read_meaning': (8, 'Read one meaning to the end'),
-    'explore': (2, 'Visit a program page'),
     'first_share': (15, 'First share of a word'),
     'echo_first_post': (10, 'First Echo Wall post'),
     'profile_complete': (50, 'Complete your profile'),
     'referral_welcome': (100, 'Welcome gift from a friend’s link'),
     'referral_friend': (50, 'A friend joined with your link'),
   };
+
+  /// Server actions that are page visits, not tasks. They are never offered.
+  static const _pageVisits = {'explore'};
 
   final List<PendingEarn> items = [];
   final Set<String> _handled = {}; // collected (or offered) today
@@ -122,6 +134,14 @@ class PendingCoins extends ChangeNotifier {
   /// Ids already put in front of the user this run (so "Later" is not asked
   /// again in a loop, but a reward that arrives while the card is up is).
   final Set<String> _shownIds = {};
+
+  /// Ids put away with Later this run. They are not shown again until the
+  /// next launch (or the user opens them from the Coins wallet).
+  final Set<String> _snoozed = {};
+
+  /// The launch card has been offered this run (the home shell can be
+  /// rebuilt many times in one run; the launch card is offered once).
+  bool _launchShown = false;
 
   /// Tests: do not wait for the splash and the daily quote.
   @visibleForTesting
@@ -184,6 +204,8 @@ class PendingCoins extends ChangeNotifier {
     _showing = false;
     busy = false;
     _shownIds.clear();
+    _snoozed.clear();
+    _launchShown = false;
     _retries = 0;
     _balanceBefore = null;
     _dayBefore = null;
@@ -202,11 +224,21 @@ class PendingCoins extends ChangeNotifier {
   /// A real activity happened: hold its coins and ask the user to collect.
   /// Nothing is credited here.
   Future<void> offer(String action, {String? key}) async {
+    if (_pageVisits.contains(action)) return; // visiting a page earns nothing
     await _load();
     final k = key ?? '';
     final id = '$action:$k';
     if (_handled.contains(id) || items.any((e) => e.id == id)) return;
-    final server = _serverAction(action);
+    var server = _serverAction(action);
+    if (server == null && action == 'open' && EconomyMirror.instance.uid != null) {
+      // A fresh install has no record of today's check-in on the phone:
+      // ask the server first, so a reinstall the same day offers nothing.
+      try {
+        await EconomyApi.call('summary').timeout(const Duration(seconds: 5));
+      } catch (_) {}
+      server = _serverAction(action);
+      if (_handled.contains(id) || items.any((e) => e.id == id)) return;
+    }
     if (server != null) {
       final limit = (server['limit'] as num?)?.toInt() ?? 1;
       final done = (server['done'] as num?)?.toInt() ?? 0;
@@ -254,33 +286,54 @@ class PendingCoins extends ChangeNotifier {
     _retry = Timer(const Duration(milliseconds: 600), () => unawaited(show()));
   }
 
+  /// Loads what is waiting on this phone (the Coins wallet lists it).
+  Future<void> ensureLoaded() async {
+    await _load();
+    notifyListeners();
+  }
+
+  /// The home shell is up. Offers the card for what is waiting once per
+  /// run, including coins put away with Later on an earlier launch.
+  Future<void> showOnLaunch() {
+    if (_launchShown) return Future<void>.value();
+    _launchShown = true;
+    return show(includeSnoozed: true);
+  }
+
+  /// The Coins wallet's Collect: everything waiting, Later or not.
+  Future<void> showWaiting() => show(includeSnoozed: true);
+
   /// Shows the Collect card for everything waiting (no-op when empty).
+  /// Rewards put away with Later this run are left out unless
+  /// [includeSnoozed] (launch and the wallet).
   ///
   /// It always shows for an uncollected reward: if the screen is not ready
   /// (no navigator yet, splash or the daily quote still up) it waits and
   /// tries again instead of silently giving up. Coins move only on the
   /// Collect tap; Later and a dismissed card leave them waiting.
-  Future<void> show() async {
+  Future<void> show({bool includeSnoozed = false}) async {
     await _load();
+    List<PendingEarn> due() => [for (final e in items) if (includeSnoozed || !_snoozed.contains(e.id)) e];
     // Widget tests switch plays off: no gate waits or retries to leave behind.
-    if (items.isEmpty || _showing || RewardOverlay.quiet) return;
+    if (due().isEmpty || _showing || RewardOverlay.quiet) return;
     _showing = true;
     Future<int>? collecting;
     List<PendingEarn> shown = const [];
     var played = false;
     try {
       await _whenClear();
-      if (items.isEmpty) return;
-      shown = List.of(items);
+      if (due().isEmpty) return;
+      shown = due();
       await RewardOverlay.enqueue((nav) async {
         played = true;
+        _launchShown = true; // a card this run counts as this launch's card
         _shownIds.addAll(shown.map((e) => e.id));
         await nav.push<bool>(RawDialogRoute<bool>(
           // A tap on the dim area is the same as Later: the coins stay
           // pending and nothing is collected.
           barrierDismissible: true,
           barrierLabel: 'coins',
-          barrierColor: const Color(0xCC03060C),
+          barrierColor: const Color(0x8C03060C),
           transitionDuration: const Duration(milliseconds: 420),
           transitionBuilder: (context, a, _, child) => FadeTransition(
             opacity: a,
@@ -324,8 +377,13 @@ class PendingCoins extends ChangeNotifier {
       // runs only now, on the confirmed amount, never on an optimistic one.
       if (gained > 0) await _playConfirmed(gained);
     }
+    // Later, a tap outside or a swipe: put away for the rest of this run.
+    for (final e in shown) {
+      if (items.any((x) => x.id == e.id)) _snoozed.add(e.id);
+    }
+    notifyListeners();
     // A reward that arrived while the card was open gets its own card.
-    if (items.any((e) => !_shownIds.contains(e.id))) unawaited(show());
+    if (items.any((e) => !_shownIds.contains(e.id) && !_snoozed.contains(e.id))) unawaited(show());
   }
 
   /// Credits everything waiting. Tests and the card's tap both land here.
@@ -411,9 +469,9 @@ class PendingCoins extends ChangeNotifier {
   }
 }
 
-/// The Collect card: black glass with the gold hairline of the
-/// Breath · Stillness · Awakening cards, the coins on offer, today's bar
-/// and the Collect button.
+/// The Collect card in the NowssB glass (the Player, Sound Library, Store
+/// and menu panes): deep-blur frosted glass, white type, the coin, the
+/// white pill Collect and an outlined Later.
 class CoinOfferCard extends StatefulWidget {
   const CoinOfferCard({super.key, required this.items, required this.day, required this.onCollect, this.onLater});
   final List<PendingEarn> items;
@@ -426,129 +484,106 @@ class CoinOfferCard extends StatefulWidget {
   State<CoinOfferCard> createState() => _CoinOfferCardState();
 }
 
-class _CoinOfferCardState extends State<CoinOfferCard> with SingleTickerProviderStateMixin {
+class _CoinOfferCardState extends State<CoinOfferCard> {
   bool _tapped = false;
   bool _saved = false;
-  late final AnimationController _t = AnimationController(vsync: this, duration: const Duration(milliseconds: 3600))..repeat();
-
-  @override
-  void dispose() {
-    _t.dispose();
-    super.dispose();
-  }
 
   int get _total => widget.items.fold(0, (s, e) => s + e.coins);
 
+  Future<void> _collect() async {
+    if (_tapped) return;
+    setState(() => _tapped = true);
+    final nav = Navigator.of(context);
+    final gained = await widget.onCollect();
+    if (!mounted) return;
+    if (gained > 0) {
+      nav.maybePop(true);
+      return;
+    }
+    final still = widget.items.any((e) => PendingCoins.instance.items.any((x) => x.id == e.id));
+    if (still) {
+      setState(() => _saved = true);
+    } else {
+      nav.maybePop(false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    const gold = Color(0xFFE4C56A);
     final day = widget.day;
+    final one = widget.items.length == 1;
     return Material(
       color: Colors.transparent,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 360),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 22),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-              child: AnimatedBuilder(
-                animation: _t,
-                builder: (context, child) {
-                  final a = _t.value * 2 * math.pi;
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(28),
-                      gradient: LinearGradient(
-                        begin: Alignment(math.cos(a), math.sin(a)),
-                        end: Alignment(-math.cos(a), -math.sin(a)),
-                        colors: const [Color(0xF0101014), Color(0xF0050507), Color(0xF0141210)],
-                      ),
-                      border: Border.all(color: gold.withValues(alpha: 0.42 + 0.18 * math.sin(a).abs()), width: 1),
-                      boxShadow: [BoxShadow(color: gold.withValues(alpha: 0.16), blurRadius: 42)],
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              boxShadow: const [BoxShadow(color: Color(0x66000000), offset: Offset(0, 18), blurRadius: 44)],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(28),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0x2EFFFFFF), Color(0x14FFFFFF)],
                     ),
-                    child: child,
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(22, 22, 22, 16),
+                    border: Border.all(color: const Color(0x33FFFFFF)),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(22, 26, 22, 20),
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    const Text('COLLECT · RECEIVE · KEEP',
-                        style: TextStyle(color: gold, letterSpacing: 3, fontSize: 10.5, fontWeight: FontWeight.w700)),
+                    const _Disc(),
                     const SizedBox(height: 16),
-                    _Disc(spin: _t),
-                    const SizedBox(height: 14),
                     Text('+$_total coins',
                         key: const Key('coin-collect-amount'),
                         style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800, height: 1.1)),
-                    const SizedBox(height: 4),
-                    Text(widget.items.length == 1 ? widget.items.first.title : '${widget.items.length} activities ready',
+                    const SizedBox(height: 6),
+                    Text(one ? widget.items.first.label : '${widget.items.length} rewards ready',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 13)),
-                    if (widget.items.length > 1) ...[
-                      const SizedBox(height: 10),
+                        style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 14, fontWeight: FontWeight.w600)),
+                    if (one && widget.items.first.action == 'open') ...[
+                      const SizedBox(height: 4),
+                      const Text('Once a day, for opening NowssB today.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: kKitMuted, fontSize: 12.5, height: 1.3)),
+                    ],
+                    if (!one) ...[
+                      const SizedBox(height: 12),
                       for (final e in widget.items)
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 3),
+                          padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Row(children: [
-                            Expanded(child: Text(e.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 13))),
-                            Text('+${e.coins}', style: const TextStyle(color: gold, fontWeight: FontWeight.w700, fontSize: 13)),
+                            Expanded(child: Text(e.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xD9FFFFFF), fontSize: 13))),
+                            Text('+${e.coins}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
                           ]),
                         ),
                     ],
                     if (day != null) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 18),
                       CoinDayBar(day: day),
                     ],
-                    const SizedBox(height: 18),
-                    if (_saved) ...[
+                    const SizedBox(height: 20),
+                    if (_saved)
                       const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                         child: Text('Saved, will collect when online',
                             key: Key('coin-collect-saved'),
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: gold, fontWeight: FontWeight.w700, fontSize: 15, height: 1.3)),
-                      ),
-                    ] else
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          key: const Key('coin-collect-button'),
-                          style: TextButton.styleFrom(
-                            backgroundColor: gold,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                          ),
-                          onPressed: _tapped
-                              ? null
-                              : () async {
-                                  setState(() => _tapped = true);
-                                  final nav = Navigator.of(context);
-                                  final gained = await widget.onCollect();
-                                  if (!mounted) return;
-                                  if (gained > 0) {
-                                    nav.maybePop(true);
-                                    return;
-                                  }
-                                  final still = widget.items.any((e) => PendingCoins.instance.items.any((x) => x.id == e.id));
-                                  if (still) {
-                                    setState(() => _saved = true);
-                                  } else {
-                                    nav.maybePop(false);
-                                  }
-                                },
-                          child: _tapped
-                              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: Colors.black))
-                              : const Text('Collect', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Colors.black)),
-                        ),
-                      ),
-                    if (widget.onLater != null && (!_tapped || _saved))
-                      TextButton(
-                        onPressed: widget.onLater,
-                        child: const Text('Later', style: TextStyle(color: Color(0x99FFFFFF), fontSize: 13)),
-                      ),
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15, height: 1.3)),
+                      )
+                    else
+                      KitActionPill('Collect', key: const Key('coin-collect-button'), busy: _tapped, onTap: _tapped ? null : _collect),
+                    if (widget.onLater != null && (!_tapped || _saved)) ...[
+                      const SizedBox(height: 10),
+                      KitActionPill(_saved ? 'Close' : 'Later', primary: false, onTap: widget.onLater),
+                    ],
                   ]),
                 ),
               ),
@@ -561,34 +596,19 @@ class _CoinOfferCardState extends State<CoinOfferCard> with SingleTickerProvider
 }
 
 class _Disc extends StatelessWidget {
-  const _Disc({required this.spin});
-  final Animation<double> spin;
+  const _Disc();
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 104,
-      height: 104,
-      child: AnimatedBuilder(
-        animation: spin,
-        builder: (context, child) => Stack(alignment: Alignment.center, children: [
-          Transform.rotate(
-            angle: spin.value * 2 * math.pi,
-            child: Container(
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: SweepGradient(colors: [Color(0x00E4C56A), Color(0xAAE4C56A), Color(0x00E4C56A)]),
-              ),
-            ),
-          ),
-          Container(
-            width: 92,
-            height: 92,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF07070A)),
-          ),
-          Transform.scale(scale: 1 + 0.04 * math.sin(spin.value * 4 * math.pi), child: child),
-        ]),
-        child: const ClipOval(child: NwsbCoinDisc(size: 66)),
+    return Container(
+      width: 92,
+      height: 92,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0x1FFFFFFF),
+        border: Border.all(color: const Color(0x33FFFFFF)),
       ),
+      alignment: Alignment.center,
+      child: const ClipOval(child: NwsbCoinDisc(size: 66)),
     );
   }
 }
@@ -599,7 +619,6 @@ class CoinDayBar extends StatelessWidget {
   final CoinDay day;
   @override
   Widget build(BuildContext context) {
-    const gold = Color(0xFFE4C56A);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Row(children: [
         const Text('TODAY', style: TextStyle(color: Color(0x99FFFFFF), letterSpacing: 2.4, fontSize: 10, fontWeight: FontWeight.w700)),
@@ -627,7 +646,7 @@ class CoinDayBar extends StatelessWidget {
           builder: (context, v, _) => LinearProgressIndicator(
             value: v,
             minHeight: 6,
-            color: gold,
+            color: Colors.white,
             backgroundColor: const Color(0x26FFFFFF),
           ),
         ),

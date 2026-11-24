@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/restyle_kit.dart';
+import '../economy/coin_collect.dart' show PendingCoins, PendingEarn;
 import '../economy/economy_api.dart';
 import '../economy/economy_theme.dart';
 import '../economy/money.dart';
@@ -28,6 +29,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
   void initState() {
     super.initState();
     if (EconomyMirror.instance.uid != null) EconomyMirror.instance.refresh();
+    PendingCoins.instance.ensureLoaded();
   }
 
   @override
@@ -36,7 +38,7 @@ class _CoinsScreenState extends State<CoinsScreen> {
       title: 'Coins',
       showBalance: false,
       child: ListenableBuilder(
-        listenable: Listenable.merge([EconomyMirror.instance, FxBook.instance]),
+        listenable: Listenable.merge([EconomyMirror.instance, FxBook.instance, PendingCoins.instance]),
         builder: (context, _) {
           final m = EconomyMirror.instance;
           if (m.uid == null) {
@@ -74,8 +76,10 @@ class CoinsBody extends StatelessWidget {
     final cap = ((_today['ceilingNow'] ?? _today['ceiling']) as num?)?.toInt() ?? 0;
     final acts = [
       for (final a in (_today['actions'] as List? ?? const []))
-        if (a is Map && a['per'] != 'once' && a['per'] != 'month') a,
+        // Page visits ("explore") no longer earn coins, so they are not listed.
+        if (a is Map && a['per'] != 'once' && a['per'] != 'month' && a['id'] != 'explore') a,
     ];
+    final waiting = List<PendingEarn>.of(PendingCoins.instance.items);
     final once = [
       for (final a in (_today['actions'] as List? ?? const []))
         if (a is Map && (a['per'] == 'once' || a['per'] == 'month') && ((a['done'] as num?) ?? 0) < ((a['limit'] as num?) ?? 1)) a,
@@ -84,6 +88,7 @@ class CoinsBody extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 32),
       children: [
         _hero(earned, cap),
+        if (waiting.isNotEmpty) _waiting(waiting),
         LuckyDrawGate(child:         _section('Daily lucky draw', [
           _link(context, Icons.card_giftcard_rounded, 'Enter today\u2019s draw', 'Free to enter. Winners are picked at random.',
               () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const LuckyDrawScreen()))),
@@ -131,6 +136,30 @@ class CoinsBody extends StatelessWidget {
               const SizedBox(height: 6),
               Text('Daily cap for activity coins: $cap', style: const TextStyle(color: _dim, fontSize: 12)),
             ]),
+    );
+  }
+
+  /// Coins earned but not collected yet (put away with Later): one tap
+  /// opens the Collect card for all of them.
+  Widget _waiting(List<PendingEarn> items) {
+    final total = items.fold(0, (s, e) => s + e.coins);
+    return KitPane(
+      key: const ValueKey('coins-waiting'),
+      eyebrow: 'Ready for you',
+      title: 'Waiting to collect',
+      mark: NwsbMarks.rewards,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        for (final e in items)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            child: Row(children: [
+              Expanded(child: Text(e.label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
+              Text('+${e.coins}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+            ]),
+          ),
+        const SizedBox(height: 10),
+        KitActionPill('Collect $total coins', key: const Key('coins-waiting-collect'), onTap: () => PendingCoins.instance.showWaiting()),
+      ]),
     );
   }
 
@@ -182,7 +211,7 @@ class CoinsBody extends StatelessWidget {
         Row(children: [
           Icon(done >= limit ? Icons.check_circle_rounded : Icons.radio_button_unchecked, size: 18, color: done >= limit ? Colors.white : _dim),
           const SizedBox(width: 8),
-          Expanded(child: Text('${a['title'] ?? ''}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
+          Expanded(child: Text(a['id'] == 'open' ? 'Daily check-in' : '${a['title'] ?? ''}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
           Text('+$coins', style: const TextStyle(color: _gold, fontWeight: FontWeight.w800)),
         ]),
         const SizedBox(height: 6),

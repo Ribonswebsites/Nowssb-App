@@ -172,16 +172,6 @@ class _ProgramTabPillsState extends State<ProgramTabPills> {
   }
 }
 
-/// "Report one visit a day" for a programme page.
-final _explored = <String>{};
-void reportExploreOnce(String page) {
-  final now = DateTime.now().toUtc().add(const Duration(minutes: 330));
-  final k = '${now.year}-${now.month}-${now.day}:$page';
-  if (!_explored.add(k)) return;
-  // Offered, not credited: the user collects it from the Collect card.
-  reportEarn('explore', key: page);
-}
-
 /// The tab chips + the selected tab's sections + the disclaimer, as a
 /// block inside a programme page's own scroll (no inner scrollable).
 /// Only this block listens to the economy, so the play area above it
@@ -233,7 +223,6 @@ class _ProgramTabsBlockState extends State<ProgramTabsBlock> {
   void initState() {
     super.initState();
     if (EconomyMirror.instance.summary.isEmpty) _refresh();
-    reportExploreOnce(widget.spec.pageId);
     widget.goRef?.value = go;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showPill();

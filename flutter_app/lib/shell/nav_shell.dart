@@ -138,10 +138,11 @@ class _NavShellState extends State<NavShell> {
     unawaited(PlaybackSession.instance.ensureLoaded());
     // Home-screen widget taps (Android): nowssb://widget/practice?word=…
     _widgetTaps = HomeWidgetSync.instance.clicks.listen(_onWidgetTap);
-    // Daily 'open the app' activity (server caps it at once a day).
+    // Daily check-in: the first launch of the IST day offers its coins once
+    // (saved on the phone; the server caps it at once a day per account).
     reportEarn('open');
-    // Coins left uncollected earlier today come back to collect.
-    unawaited(PendingCoins.instance.show());
+    // Coins still waiting are offered once per launch, never per page.
+    unawaited(PendingCoins.instance.showOnLaunch());
     NotifRouter.instance.attach(context, goTab: _goToTab, popToRoot: _popShellOverlays);
     // Open today's quote film while the splash is still up, so the pop-up
     // plays the moment it appears.
@@ -173,7 +174,6 @@ class _NavShellState extends State<NavShell> {
       w ??= HomeWidgetSync.wordFor(DateTime.now(), lib);
       if (w == null) return;
       _popShellOverlays();
-      reportEarn('word_of_day');
       Navigator.of(context).push(MaterialPageRoute(
         builder: (_) => PracticePlayerScreen(words: [w!], title: 'Word of the day', showIntro: false),
       ));
