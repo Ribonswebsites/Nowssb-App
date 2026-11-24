@@ -37,6 +37,15 @@ Word _soma() => Word.from({
       ],
     })!;
 
+/// The header keeps the English name as the title, Devanagari on the line under it.
+void _titleOverDeva(WidgetTester t, String title, String deva) {
+  final head = find.byKey(const ValueKey('stages-headline'));
+  final line = find.byKey(const ValueKey('stages-headline-deva'));
+  expect((t.widget(head) as Text).data, title);
+  expect((t.widget(line) as Text).data, deva);
+  expect(t.getTopLeft(line).dy, greaterThan(t.getTopLeft(head).dy));
+}
+
 void main() {
   setUpAll(() {
     FakeVideoPlatform();
@@ -64,6 +73,7 @@ void main() {
     expect(find.byType(ColoredSplitPromoBanner), findsNothing);
     expect(find.text('SELECT FREQUENCY'), findsNothing);
     expect(find.text('सोम'), findsOneWidget, reason: 'the word in Devanagari, no English split');
+    _titleOverDeva(t, 'Soma', 'सोम');
     expect(find.text('so'), findsNothing);
     expect(find.byKey(const ValueKey('stages-row-1')), findsOneWidget);
     expect(find.byKey(const ValueKey('stages-row-3')), findsOneWidget);
@@ -123,6 +133,7 @@ void main() {
     final america = ContentStore.instance.library.firstWhere((w) => w.key == 'america');
     await pumpTab(t, america);
     expect(find.text('अमेरिका'), findsOneWidget);
+    _titleOverDeva(t, 'America', 'अमेरिका');
     expect(find.byKey(const ValueKey('stages-deva-1')), findsOneWidget);
     expect(find.text('ळमेरिका'), findsOneWidget);
     expect(find.text('Coming soon'), findsOneWidget);

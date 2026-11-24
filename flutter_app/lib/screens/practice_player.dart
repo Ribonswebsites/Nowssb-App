@@ -44,6 +44,7 @@ import 'sound_settings_sheet.dart';
 import 'player_settings.dart';
 import 'my_routine.dart';
 import 'select_level.dart';
+export '../data/word_devanagari.dart' show wordDevanagari;
 import 'player_intro.dart';
 import 'player_up_view.dart';
 import 'player_guide.dart';
@@ -4443,16 +4444,6 @@ class _ModeBtn extends StatelessWidget {
   );
 }
 
-/// The word's Devanagari from its content data: the word's own `deva`,
-/// else its sound parts' Devanagari joined, when every part has one. Null
-/// when there is none; never transliterated.
-String? wordDevanagari(Word word) {
-  final own = word.deva.trim();
-  if (own.isNotEmpty) return own;
-  if (word.parts.isEmpty || word.parts.any((p) => p.deva.trim().isEmpty)) return null;
-  return word.parts.map((p) => p.deva.trim()).join();
-}
-
 class _WordOverlay extends StatelessWidget {
   const _WordOverlay({
     required this.word,
@@ -4491,20 +4482,8 @@ class _WordOverlay extends StatelessWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // The word in Devanagari only (from the book / content data); no
-        // English syllable split. Nothing when we have no Devanagari.
-        if (wordDevanagari(word) case final deva?)
-          Text(
-            deva,
-            key: const ValueKey('word-card-deva'),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Color(0xFFF4F4F5),
-              fontSize: 26,
-              fontWeight: FontWeight.w600,
-              height: 1.3,
-            ),
-          ),
+        // No English syllable pills and no Devanagari over the art: the
+        // Devanagari sits only under the English title on the Practice card.
         if (word.organ.isNotEmpty) ...[
           const SizedBox(height: 8),
           Row(

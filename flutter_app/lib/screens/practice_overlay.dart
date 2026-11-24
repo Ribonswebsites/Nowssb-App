@@ -18,6 +18,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import '../data/models.dart';
+import '../data/word_devanagari.dart';
 import '../pronunciation/reference.dart';
 import '../pronunciation/scorer.dart';
 import '../media/nwsb_video.dart';
@@ -410,69 +411,15 @@ class _WordBreakTab extends StatelessWidget {
   final Word word;
   final PronunciationResult? result;
 
-  /// After a scored take each syllable box shows how close it was.
-  Color _boxColor(int i) {
-    final r = result;
-    if (r == null || r.outcome != PronunciationOutcome.scored || i >= r.syllables.length) {
-      return const Color(0xFFF5F5F5);
-    }
-    final s = r.syllables[i].score;
-    if (s >= 75) return const Color(0xFFB9F6CA);
-    if (s >= 50) return const Color(0xFFFFE58F);
-    return const Color(0xFFFFB3B3);
-  }
-
   @override
   Widget build(BuildContext context) {
     final raw = word.word.trim();
     final title = raw.isEmpty
         ? ''
         : '${raw[0].toUpperCase()}${raw.substring(1).toLowerCase()}';
-    final syllables = word.syllables
-        .map((s) => s.trim())
-        .where((s) => s.isNotEmpty)
-        .toList();
-
-    final syllableRow = syllables.isEmpty
-        ? const SizedBox.shrink()
-        : Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.start,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              for (var i = 0; i < syllables.length; i++) ...[
-                if (i > 0)
-                  Container(
-                    width: 4,
-                    height: 4,
-                    decoration: const BoxDecoration(
-                      color: Color(0xCCF4F4F5),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: _boxColor(i),
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                  child: Text(
-                    syllables[i],
-                    style: const TextStyle(
-                      color: Color(0xFF0A0A0B),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.1,
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          );
+    // English title on top; the Devanagari (content data only, never
+    // transliterated) on the line under it. No English syllable pills.
+    final deva = wordDevanagari(word);
 
     // Glass wrapper around a black pill: [bigger composing] [Ananda + syllables].
     return GlassWrap(
@@ -514,9 +461,20 @@ class _WordBreakTab extends StatelessWidget {
                       height: 1.1,
                     ),
                   ),
-                  if (syllables.isNotEmpty) ...[
-                    const SizedBox(height: 10),
-                    syllableRow,
+                  if (deva != null) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      deva,
+                      key: const ValueKey('practice-card-deva'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFFE6E6EA),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                      ),
+                    ),
                   ],
                 ],
               ),

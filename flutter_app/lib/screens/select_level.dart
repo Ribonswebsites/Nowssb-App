@@ -28,7 +28,7 @@ import '../features/stage_practice/stage_progress.dart';
 import '../widgets/content_lock.dart' show ensureWordOpen;
 import '../widgets/restyle_kit.dart';
 import 'poster/poster_kit.dart' show inr;
-import 'practice_player.dart' show wordDevanagari;
+import '../data/word_devanagari.dart';
 import 'store/store_actions.dart' show storeBuyNow;
 
 class SelectLevelScreen extends StatefulWidget {
@@ -205,16 +205,22 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(_name.isEmpty ? 'STAGES' : 'STAGES · ${_name.toUpperCase()}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
+                      const Text('STAGES',
+                          style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 10.5, letterSpacing: 2.4, fontWeight: FontWeight.w700)),
                       const SizedBox(height: 2),
-                      Text(_headline(),
+                      // The English name stays the title; the Devanagari, when
+                      // the content has it, is the line under it.
+                      Text(_name.isEmpty ? 'Stages' : _name,
                           key: const ValueKey('stages-headline'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, height: 1.25)),
+                      if (_headerDeva() case final deva?)
+                        Text(deva,
+                            key: const ValueKey('stages-headline-deva'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Color(0xE6FFFFFF), fontSize: 18, fontWeight: FontWeight.w600, height: 1.35)),
                     ]),
                   ),
                 ]),
@@ -236,13 +242,12 @@ class _SelectLevelScreenState extends State<SelectLevelScreen> {
     );
   }
 
-  /// The word in Devanagari when the content has it, else its name.
-  String _headline() {
+  /// The word's Devanagari for the line under the title, or null.
+  String? _headerDeva() {
     final w = _word;
-    if (w == null) return 'Stages';
+    if (w == null) return null;
     final pack = _pack;
-    final deva = (pack != null && pack.deva.isNotEmpty) ? pack.deva : wordDevanagari(w);
-    return deva ?? _name;
+    return (pack != null && pack.deva.isNotEmpty) ? pack.deva : wordDevanagari(w);
   }
 
   Widget _stagesPane() {
