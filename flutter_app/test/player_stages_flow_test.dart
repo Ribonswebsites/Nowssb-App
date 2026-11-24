@@ -1,0 +1,308 @@
+// Teacher-recorded words are practised ONLY in the Player:
+//  • the Player's Stages list has one row per recorded stage (Stage 1, 2, 3),
+//    a locked "Stage 3 · Coming soon" row where none is recorded, and one
+//    "Request more stages" button — no banners, video, Buy or expand;
+//  • tapping a stage plays that stage's EDITED recording (music version, or
+//    the cleaned voice when stage music is off) in the Player;
+//  • Practice records (fake mic), scores against that stage's recording with
+//    the five sub-scores, a pointer on WHERE in the word it differed, and tips;
+//    passing opens the next stage.
+// Every shipped recording (America 1–2, Ram Ram 1–3, Washington 1–2) is
+// played and scored through the sheet.
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:nowssb/data/content.dart';
+import 'package:nowssb/data/entitlements.dart';
+import 'package:nowssb/data/models.dart';
+import 'package:nowssb/data/settings.dart';
+import 'package:nowssb/data/word_photos.dart';
+import 'package:nowssb/data/word_requests.dart';
+import 'package:nowssb/data/word_voice.dart';
+import 'package:nowssb/features/stage_practice/stage_mic.dart';
+import 'package:nowssb/features/stage_practice/stage_pack.dart';
+import 'package:nowssb/features/stage_practice/stage_progress.dart';
+import 'package:nowssb/media/video_pool.dart';
+import 'package:nowssb/screens/practice_overlay.dart';
+import 'package:nowssb/screens/practice_player.dart';
+import 'package:nowssb/screens/select_level.dart';
+import 'package:nowssb/shell/nav_shell.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'fake_video_platform.dart';
+
+class FakeMic implements StageMic {
+  FakeMic(this.take, {this.permitted = true});
+  Uint8List? take;
+  bool permitted;
+  int starts = 0;
+  @override
+  String? get lastPath => null;
+  @override
+  Future<bool> hasPermission() async => permitted;
+  @override
+  Future<void> start(String name, void Function(double dbfs) level) async => starts++;
+  @override
+  Future<Uint8List?> stop() async => take;
+  @override
+  Future<void> cancel() async {}
+  @override
+  void dispose() {}
+}
+
+List<dynamic> _clientItems() =>
+    (jsonDecode(File('assets/content/client_words.json').readAsStringSync()) as Map)['items'] as List;
+
+Word _lib(String key) => ContentStore.instance.library.firstWhere((w) => w.key == key);
+
+/// The teacher's Ram Ram stage 3 take (ळामन्ळाम): a different word from America.
+Uint8List _ramRam3() => File('assets/words/ramram/ramram_stage3_ref.wav').readAsBytesSync();
+
+const _expected = {'america': [1, 2], 'ramram': [1, 2, 3], 'washington': [1, 2]};
+
+void main() {
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(const MethodChannel('flutter_tts'), (_) async => 1);
+    FakeVideoPlatform();
+    VideoPool.debugDeadlines = false;
+  });
+  tearDown(() {
+    VideoPool.instance.debugDropAll();
+    PracticeLabSheet.debugMic = null;
+    WordVoice.debugPlay = null;
+  });
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+    StageProgressStore.debugAccount = 'player-stages';
+    StageProgressStore.instance.debugReset();
+    ContentStore.instance.debugSetClientWords(_clientItems());
+    WordVoice.debugPlayed.clear();
+    Entitlements.instance.debugSet(uid: 'player-stages', tier: 'resonance', until: DateTime.now().add(const Duration(days: 30)));
+  });
+
+  test('every client recording ships edited (clean + music + reference) with its own photo', () {
+    for (final e in _expected.entries) {
+      final pack = StagePack.forWord(_lib(e.key))!;
+      expect(pack.stages.map((s) => s.number).toList(), e.value, reason: e.key);
+      for (final s in pack.stages) {
+        expect(s.music, endsWith('_music.m4a'));
+        expect(s.audio, endsWith('_clean.m4a'));
+        for (final f in [s.audio, s.music, s.reference]) {
+          expect(File(f).existsSync(), isTrue, reason: f);
+        }
+      }
+      expect(File(wordPhotoFor(e.key)!).existsSync(), isTrue, reason: e.key);
+      expect(File('pubspec.yaml').readAsStringSync(), contains('- assets/words/${e.key}/'));
+    }
+    expect(StagePack.forWord(_lib('america'))!.comingSoon, [3]);
+    expect(StagePack.forWord(_lib('ramram'))!.stages.last.deva, 'ळामन्ळाम');
+  });
+
+  Future<void> pumpList(WidgetTester t, Word w, {ValueChanged<int>? onStage}) async {
+    t.view.physicalSize = const Size(412 * 2, 1100 * 2);
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
+    await t.pumpWidget(MaterialApp(home: Scaffold(body: SelectLevelScreen(word: w, onStage: onStage))));
+    await t.pump(const Duration(milliseconds: 300));
+  }
+
+  testWidgets('Stages list: Stage 1/2, locked Stage 3 · Coming soon, Request more; nothing else', (t) async {
+    final picked = <int>[];
+    await pumpList(t, _lib('america'), onStage: picked.add);
+    expect(find.text('America'), findsOneWidget);
+    expect(find.text('अमेरिका'), findsOneWidget);
+    expect(find.text('STAGE 1'), findsOneWidget);
+    expect(find.text('ळमेरिका'), findsOneWidget);
+    expect(find.text('STAGE 2'), findsOneWidget);
+    expect(find.text('Pass Stage 1 to open'), findsOneWidget);
+    expect(find.text('STAGE 3 · COMING SOON'), findsOneWidget);
+    expect(find.textContaining('Buy'), findsNothing);
+    expect(find.byKey(const ValueKey('stages-expand')), findsNothing);
+    expect(find.textContaining('streak', findRichText: true), findsNothing);
+    // Stage 2 is locked until Stage 1 is passed; Stage 3 is not recorded.
+    await t.tap(find.byKey(const ValueKey('stages-row-2')));
+    await t.pump();
+    expect(picked, isEmpty);
+    await t.tap(find.byKey(const ValueKey('stages-row-3')));
+    await t.pump();
+    expect(picked, isEmpty);
+    await t.tap(find.byKey(const ValueKey('stages-row-1')));
+    await t.pump();
+    expect(picked, [1]);
+    // Request more stages.
+    await t.runAsync(() async {
+      await t.tap(find.byKey(const ValueKey('stages-request')));
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+    });
+    await t.pump(const Duration(milliseconds: 300));
+    expect(find.text('REQUESTED'), findsOneWidget);
+    expect(WordRequestStore.instance.items.first.word, 'America');
+  });
+
+  testWidgets('passing Stage 1 opens Stage 2 in the list', (t) async {
+    await t.runAsync(() => StageProgressStore.instance.addAttempt('america', 1, score: 88, passed: true));
+    final picked = <int>[];
+    await pumpList(t, _lib('america'), onStage: picked.add);
+    expect(find.text('Best 88 · passed'), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('stages-row-2')));
+    await t.pump();
+    expect(picked, [2]);
+  });
+
+  testWidgets('in the Player: Stages → Stage 1 plays the edited music version; voice only plays clean', (t) async {
+    t.view.physicalSize = const Size(412 * 2, 915 * 2);
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
+    WordVoice.debugPlay = (w, stopped) async => true;
+    final america = _lib('america');
+    await t.pumpWidget(MaterialApp(
+        home: NavScope(go: (_) {}, child: PracticePlayerScreen(words: [america], title: america.word, showIntro: false))));
+    await t.pump(const Duration(seconds: 1));
+    final chip = find.byKey(const ValueKey('player-stages-chip'));
+    expect(chip, findsWidgets);
+    await t.tap(chip.first, warnIfMissed: false);
+    for (var i = 0; i < 8; i++) {
+      await t.pump(const Duration(milliseconds: 150));
+    }
+    expect(find.byType(SelectLevelScreen), findsOneWidget);
+    await t.tap(find.byKey(const ValueKey('stages-row-1')));
+    for (var i = 0; i < 20; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await t.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.byType(SelectLevelScreen), findsNothing, reason: 'the list closes and the Player plays');
+    expect(WordVoice.debugPlayed, contains('assets/words/america/america_stage1_music.m4a'));
+    expect(WordVoice.debugPlayed.where((a) => a.contains('_ref') || a.contains('/recs/')), isEmpty);
+    await t.runAsync(() => Settings.instance.setStageMusic(false));
+    WordVoice.debugPlayed.clear();
+    await t.pumpWidget(const SizedBox());
+    await t.pump(const Duration(seconds: 12));
+    await t.pumpWidget(MaterialApp(
+        home: NavScope(go: (_) {}, child: PracticePlayerScreen(words: [america], title: america.word, showIntro: false))));
+    await t.pump(const Duration(seconds: 1));
+    await t.tap(chip.first, warnIfMissed: false);
+    for (var i = 0; i < 8; i++) {
+      await t.pump(const Duration(milliseconds: 150));
+    }
+    await t.tap(find.byKey(const ValueKey('stages-row-1')));
+    for (var i = 0; i < 20; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+      await t.pump(const Duration(milliseconds: 100));
+    }
+    expect(WordVoice.debugPlayed, contains('assets/words/america/america_stage1_clean.m4a'));
+    await t.runAsync(() => Settings.instance.setStageMusic(true));
+    await t.pumpWidget(const SizedBox());
+    await t.pump(const Duration(seconds: 12));
+  });
+
+  Future<void> pumpSheet(WidgetTester t, Word w, int stage, FakeMic mic, {ValueChanged<int>? onStage}) async {
+    t.view.physicalSize = const Size(412 * 2, 1400 * 2);
+    t.view.devicePixelRatio = 2;
+    addTearDown(t.view.reset);
+    PracticeLabSheet.debugMic = () => mic;
+    final pack = StagePack.forWord(w)!;
+    await t.pumpWidget(MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        body: PracticeLabSheet(
+          word: w,
+          pack: pack,
+          stage: pack.stages.firstWhere((s) => s.number == stage),
+          onSpeak: () async {},
+          onClose: () {},
+          onStage: onStage,
+          video: '',
+        ),
+      ),
+    ));
+    await t.pump(const Duration(milliseconds: 400));
+  }
+
+  Future<void> takeAndScore(WidgetTester t) async {
+    await t.tap(find.byKey(const ValueKey('practice-start')));
+    for (var i = 0; i < 20 && find.text('Stop').evaluate().isEmpty; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 10)));
+      await t.pump(const Duration(milliseconds: 20));
+    }
+    expect(find.text('Stop'), findsOneWidget, reason: 'recording');
+    await t.tap(find.byKey(const ValueKey('practice-start')));
+    for (var i = 0; i < 400; i++) {
+      await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 25)));
+      await t.pump(const Duration(milliseconds: 20));
+      if (find.byKey(const ValueKey('stage-result')).evaluate().isNotEmpty ||
+          find.byKey(const ValueKey('stage-unscored')).evaluate().isNotEmpty) {
+        break;
+      }
+    }
+    await t.pump(const Duration(milliseconds: 50));
+  }
+
+  for (final e in _expected.entries) {
+    for (final n in e.value) {
+      testWidgets('${e.key} stage $n: record, score against that recording, sub-scores, pointer, tips, progress', (t) async {
+        // Earlier stages passed so this one is open.
+        for (var k = 1; k < n; k++) {
+          await t.runAsync(() => StageProgressStore.instance.addAttempt(e.key, k, score: 90, passed: true));
+        }
+        final ref = File('assets/words/${e.key}/${e.key}_stage${n}_ref.wav').readAsBytesSync();
+        final mic = FakeMic(ref);
+        final went = <int>[];
+        await pumpSheet(t, _lib(e.key), n, mic, onStage: went.add);
+        expect(find.byKey(ValueKey('stage-chip-$n')), findsOneWidget);
+        await takeAndScore(t);
+        expect(mic.starts, 1);
+        expect(find.byKey(const ValueKey('stage-result')), findsOneWidget);
+        final score = int.parse((t.widget(find.byKey(const ValueKey('stage-score'))) as Text).data!);
+        expect(score, greaterThanOrEqualTo(70), reason: 'the stage’s own recording passes');
+        for (final k in ['sounds', 'rhythm', 'pitch', 'vowel', 'completeness']) {
+          expect(find.byKey(ValueKey('stage-sub-$k')), findsOneWidget);
+        }
+        expect(find.byKey(const ValueKey('stage-pointer')), findsOneWidget);
+        expect(StageProgressStore.instance.record(e.key, n).passed, isTrue);
+        final pack = StagePack.forWord(_lib(e.key))!;
+        if (pack.stages.any((s) => s.number == n + 1)) {
+          await t.tap(find.byKey(const ValueKey('practice-next-stage')));
+          expect(went, [n + 1]);
+        } else {
+          expect(find.byKey(const ValueKey('practice-next-stage')), findsNothing);
+        }
+      });
+    }
+  }
+
+  testWidgets('America stage 1 said as Ram Ram fails, with a pointer on where and specific fixes', (t) async {
+    await pumpSheet(t, _lib('america'), 1, FakeMic(_ramRam3()));
+    await takeAndScore(t);
+    final score = int.parse((t.widget(find.byKey(const ValueKey('stage-score'))) as Text).data!);
+    expect(score, lessThan(70));
+    expect(find.byKey(const ValueKey('stage-fix-0')), findsOneWidget);
+    final note = (t.widget(find.byKey(const ValueKey('stage-pointer-note'))) as Text).data!;
+    expect(note, matches(RegExp(r'^(Beginning|Middle|Ending) of the word: ')));
+    expect(find.byIcon(Icons.arrow_drop_up_rounded), findsOneWidget, reason: 'the pointer');
+    expect(find.byKey(const ValueKey('practice-next-stage')), findsNothing);
+    expect(StageProgressStore.instance.record('america', 1).passed, isFalse);
+    expect(StageProgressStore.instance.record('america', 1).attempts, 1);
+  });
+
+  testWidgets('silence: a message, no score, not counted', (t) async {
+    await pumpSheet(t, _lib('america'), 1, FakeMic(null));
+    await takeAndScore(t);
+    expect(find.byKey(const ValueKey('stage-unscored')), findsOneWidget);
+    expect(find.byKey(const ValueKey('stage-score')), findsNothing);
+    expect(StageProgressStore.instance.record('america', 1).attempts, 0);
+  });
+
+  testWidgets('a refused microphone says how to allow it', (t) async {
+    await pumpSheet(t, _lib('america'), 1, FakeMic(null, permitted: false));
+    await t.tap(find.byKey(const ValueKey('practice-start')));
+    await t.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    await t.pump(const Duration(milliseconds: 100));
+    expect(find.text('Allow the microphone in phone settings to practise.'), findsOneWidget);
+  });
+}

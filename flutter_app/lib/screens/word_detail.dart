@@ -30,7 +30,6 @@ import '../data/entitlements.dart';
 import '../data/models.dart';
 import '../data/word_private.dart';
 import '../features/stage_practice/stage_pack.dart';
-import '../features/stage_practice/stage_practice_screen.dart';
 import '../features/stage_practice/stage_progress.dart';
 import '../media/nwsb_video.dart';
 import '../widgets/content_lock.dart';
@@ -197,9 +196,8 @@ class _WordDetailState extends State<WordDetail> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: facts),
           ),
-        if (StagePack.forWord(word) case final pack?)
-          _StagePracticePane(word: word, pack: pack, open: open)
-        else if (word.stages.isNotEmpty)
+        // Teacher-recorded stages are practised only in the Player.
+        if (StagePack.forWord(word) == null && word.stages.isNotEmpty)
           KitPane(
             eyebrow: 'Practice',
             title: 'Stages',
@@ -233,137 +231,6 @@ class _WordDetailState extends State<WordDetail> {
   }
 }
 
-/// Client-recorded stages with their practice: progress per stage, and the
-/// way into Listen → Your turn → Score.
-class _StagePracticePane extends StatefulWidget {
-  const _StagePracticePane({required this.word, required this.pack, required this.open});
-  final Word word;
-  final StagePack pack;
-  final bool open;
-
-  @override
-  State<_StagePracticePane> createState() => _StagePracticePaneState();
-}
-
-class _StagePracticePaneState extends State<_StagePracticePane> {
-  final _progress = StageProgressStore.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(_progress.ensureLoaded());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: _progress,
-      builder: (context, _) {
-        final pack = widget.pack;
-        final key = pack.wordKey;
-        final admin = Entitlements.instance.isAdmin;
-        final passed = _progress.passedCount(key);
-        final current = _progress.currentStage(key, pack.stages.length);
-        return KitPane(
-          eyebrow: 'Practice · Stages',
-          title: '$passed of ${pack.stages.length} passed',
-          mark: NwsbMarks.stages,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text(
-              'Listen to the teacher, say it back, and get a score with what to fix. Pass a stage to open the next.',
-              style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 13.5, height: 1.4),
-            ),
-            const SizedBox(height: 10),
-            for (final st in pack.stages) _row(st, admin),
-            for (final n in pack.comingSoon)
-              InkWell(
-                key: ValueKey('word-stage-$n'),
-                borderRadius: BorderRadius.circular(12),
-                onTap: () => ScaffoldMessenger.maybeOf(context)
-                    ?.showSnackBar(SnackBar(content: Text(stageComingSoonNote(n)))),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(children: [
-                    const KitIconBadge(Icons.lock_rounded, size: 32),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('Stage $n', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 2),
-                        const Text(kStageComingSoon, style: TextStyle(color: kKitMuted, fontSize: 12.5)),
-                      ]),
-                    ),
-                  ]),
-                ),
-              ),
-            const SizedBox(height: 8),
-            KitActionPill(
-              widget.open ? (passed == 0 ? 'Start practice' : 'Practise Stage $current') : 'Unlock to practise',
-              key: const ValueKey('word-stage-practice'),
-              icon: widget.open ? Icons.mic_rounded : Icons.lock_open_rounded,
-              onTap: () => unawaited(openStagePractice(context, widget.word)),
-            ),
-          ]),
-        );
-      },
-    );
-  }
-
-  Widget _row(PackStage st, bool admin) {
-    final key = widget.pack.wordKey;
-    final r = _progress.record(key, st.number);
-    final unlocked = admin || _progress.isUnlocked(key, st.number);
-    final sub = !unlocked
-        ? 'Opens when Stage ${st.number - 1} is passed'
-        : r.attempts == 0
-            ? 'Not tried yet · ${st.seconds.toStringAsFixed(1)} s recording'
-            : 'Best ${r.best} · ${r.attempts} ${r.attempts == 1 ? 'attempt' : 'attempts'}${r.passed ? ' · passed' : ''}';
-    return InkWell(
-      key: ValueKey('word-stage-${st.number}'),
-      borderRadius: BorderRadius.circular(12),
-      onTap: () {
-        if (!unlocked) {
-          ScaffoldMessenger.maybeOf(context)
-              ?.showSnackBar(SnackBar(content: Text('Pass Stage ${st.number - 1} to open Stage ${st.number}.')));
-          return;
-        }
-        unawaited(openStagePractice(context, widget.word, stage: st.number));
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(children: [
-          KitIconBadge(!unlocked ? Icons.lock_rounded : (r.passed ? Icons.check_rounded : Icons.graphic_eq_rounded), size: 32),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(st.title, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700)),
-              if (st.deva.isNotEmpty)
-                Text(st.deva, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600, height: 1.35)),
-              const SizedBox(height: 2),
-              Text(sub, style: const TextStyle(color: kKitMuted, fontSize: 12.5)),
-            ]),
-          ),
-          if (r.attempts > 0)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(99),
-                color: r.passed ? const Color(0x337BE0A8) : const Color(0x22FFFFFF),
-              ),
-              child: Text('${r.best}',
-                  style: TextStyle(
-                      color: r.passed ? const Color(0xFF7BE0A8) : Colors.white, fontWeight: FontWeight.w800, fontSize: 13)),
-            )
-          else
-            const Icon(Icons.chevron_right_rounded, color: kKitMuted),
-        ]),
-      ),
-    );
-  }
-}
-
-/// The word's own poster in the hero tile: bundled word art first, then
-/// a WordArt upload, then the NowssB poster. Same path the player uses.
 class _WordPoster extends StatelessWidget {
   const _WordPoster({required this.word});
   final Word word;

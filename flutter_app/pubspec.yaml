@@ -295,6 +295,8 @@ flutter:
     # AMERICA left the catalogue on Nov 23, 2026 (country words are out);
     # its recordings stay bundled for the stage engine and its tests.
     - assets/words/america/
+    - assets/words/ramram/
+    - assets/words/washington/
     - assets/subscription/
     - assets/hero-curve/
     - assets/meditation/

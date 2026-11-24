@@ -34,6 +34,7 @@ class Settings extends ChangeNotifier {
   static const _kHealing = 'nwsb_home_healing';
   static const _kQuality = 'nwsb_player_quality';
   static const _kBass = 'nwsb_player_bass';
+  static const _kStageMusic = 'nwsb_stage_music';
   static const _kSpeed = 'nwsb_player_speed';
   static const _kCrossfade = 'nwsb_player_crossfade';
   static const _kSleep = 'nwsb_player_sleep';
@@ -111,6 +112,7 @@ class Settings extends ChangeNotifier {
   bool _showHealing = false;
   String _quality = 'Normal';
   bool _bassBoost = false;
+  bool _stageMusic = true;
   double _speed = 1.0;
   String _crossfade = 'Off';
   String _sleepTimer = 'Off';
@@ -172,6 +174,10 @@ class Settings extends ChangeNotifier {
   bool get showHealing => _showHealing;
   String get quality => _quality;
   bool get bassBoost => _bassBoost;
+
+  /// Teacher stage recordings play over the soft music that ducks under the
+  /// voice (on), or as the cleaned voice alone (off).
+  bool get stageMusic => _stageMusic;
   double get speed => _speed;
   String get crossfade => _crossfade;
   String get sleepTimer => _sleepTimer;
@@ -243,6 +249,7 @@ class Settings extends ChangeNotifier {
       _showHealing = p.getBool(_kHealing) ?? _showHealing;
       _quality = p.getString(_kQuality) ?? _quality;
       _bassBoost = p.getBool(_kBass) ?? _bassBoost;
+      _stageMusic = p.getBool(_kStageMusic) ?? _stageMusic;
       _speed = p.getDouble(_kSpeed) ?? _speed;
       _crossfade = p.getString(_kCrossfade) ?? _crossfade;
       _sleepTimer = p.getString(_kSleep) ?? _sleepTimer;
@@ -418,6 +425,12 @@ class Settings extends ChangeNotifier {
   bool get qualityHigh => _quality.toLowerCase() == 'high';
   Future<void> toggleQuality() async =>
       setQuality(qualityHigh ? 'Normal' : 'High');
+  Future<void> setStageMusic(bool on) async {
+    _stageMusic = on;
+    await _save(_kStageMusic, on);
+    notifyListeners();
+  }
+
   Future<void> toggleBass() async {
     _bassBoost = !_bassBoost;
     await _save(_kBass, _bassBoost);

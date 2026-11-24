@@ -58,15 +58,23 @@ class WordVoice {
   @visibleForTesting
   static Future<bool> Function(Word w, bool Function() stopped)? debugPlay;
 
-  Future<bool> play(Word w, {double volume = 1, double speed = 1}) async {
-    if (!hasVoice(w)) return false;
+  /// Tests: the bundled asset each [play] loaded, newest last.
+  @visibleForTesting
+  static final List<String> debugPlayed = [];
+
+  /// Plays [w]'s recording, or the bundled [asset] when given (a teacher
+  /// stage's edited recording, e.g. `assets/words/america/america_stage1_music.m4a`).
+  Future<bool> play(Word w, {double volume = 1, double speed = 1, String? asset}) async {
+    if (asset == null && !hasVoice(w)) return false;
     final token = ++_token;
+    final bundled = asset ?? (isBundled(w) ? assetPath(w) : null);
+    if (bundled != null) debugPlayed.add(bundled);
     if (debugPlay != null) return debugPlay!(w, () => token != _token);
     try {
-      if (isBundled(w)) {
+      if (bundled != null) {
         final p = _player ??= AudioPlayer();
         await p.stop();
-        await p.setAsset(assetPath(w));
+        await p.setAsset(bundled);
         if (token != _token) return true;
         await p.setVolume(volume.clamp(0.0, 1.0));
         await p.setSpeed(speed.clamp(0.5, 2.0));

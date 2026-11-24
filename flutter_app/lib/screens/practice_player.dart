@@ -8,7 +8,7 @@ library;
 import '../shell/tablet.dart';
 import '../shell/tablet_frame.dart' show TabletShellGate, TabletSheet, isTablet;
 import '../features/stage_practice/stage_pack.dart';
-import '../features/stage_practice/stage_practice_screen.dart';
+import '../features/stage_practice/stage_progress.dart';
 import '../features/downloads/download_button.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -163,6 +163,50 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   /// Paid fields fetched from /api/content/word for the current index.
   Word? _paidOverride;
+  // ── Teacher-recorded stages: the stage the Player plays and practises ──
+  String _stageKey = '';
+  int _stageSel = 1;
+
+  StagePack? get _pack => widget.words.isEmpty ? null : StagePack.forWord(_word);
+
+  /// The stage in play: the one picked in Stages, else the first not passed.
+  PackStage? get _packStage {
+    final p = _pack;
+    if (p == null || p.stages.isEmpty) return null;
+    final n = _stageKey == _word.key
+        ? _stageSel
+        : StageProgressStore.instance.currentStage(p.wordKey, p.stages.length);
+    return p.stages.firstWhere((s) => s.number == n, orElse: () => p.stages.first);
+  }
+
+  /// The edited recording for the stage in play: over the ducked music, or
+  /// the cleaned voice alone when stage music is off.
+  String? get _stageAsset {
+    final st = _packStage;
+    if (st == null) return null;
+    return Settings.instance.stageMusic && st.music.isNotEmpty ? st.music : st.audio;
+  }
+
+  /// Picked in Stages: stop what is playing and play stage [n] here.
+  Future<void> _selectStage(int n) async {
+    _playGen++;
+    try {
+      await _tts.stop();
+      await PlayerRitual.stop();
+    } catch (_) {}
+    unawaited(WordVoice.instance.stop());
+    if (!mounted) return;
+    setState(() {
+      _stageKey = _word.key;
+      _stageSel = n;
+      _playing = false;
+      _ritual = null;
+      _completed = false;
+      _error = null;
+    });
+    await _prepareAndPlay();
+  }
+
   Word get _word {
     final base = widget.words[_index];
     if (_paidOverride != null && _paidOverride!.key == base.key) return _paidOverride!;
@@ -471,8 +515,19 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       if (fadeInSeconds > 0 && volume > 0) {
         unawaited(_fadeInVolume(volume, fadeInSeconds));
       }
-      final line = frequencyLine(_word, PracticeProgress.instance.level);
+      final stageAsset = _stageAsset;
+      final stage = _packStage;
+      final line = stage != null
+          ? 'Stage ${stage.number}${stage.deva.isNotEmpty ? ' · ${stage.deva}' : ''}'
+          : frequencyLine(_word, PracticeProgress.instance.level);
       var voiceFailed = false;
+      if (stageAsset != null) {
+        // A teacher stage: its edited recording plays straight away.
+        setState(() => _ritual = RitualFrame(caption: line));
+        if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed, asset: stageAsset)) {
+          voiceFailed = true;
+        }
+      } else {
       await PlayerRitual.run(
         alive: alive,
         line: line,
@@ -492,6 +547,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
           if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed)) voiceFailed = true;
         },
       );
+      }
       if (mounted && _playGen == gen) setState(() => _ritual = null);
       if (!alive()) return;
       if (voiceFailed) {
@@ -501,7 +557,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       final again = _inRoutine ? false : await _askHearAgain();
       if (again && alive()) {
         if (mounted) setState(() => _ritual = RitualFrame(caption: line));
-        if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed)) voiceFailed = true;
+        if (!await WordVoice.instance.play(_word, volume: startVol, speed: Settings.instance.speed, asset: stageAsset)) voiceFailed = true;
         if (mounted && _playGen == gen) setState(() => _ritual = null);
       }
       if (!alive()) return;
@@ -1058,6 +1114,11 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
         child: SelectLevelScreen(
           initialLevel: PracticeProgress.instance.level,
           word: _word,
+          currentStage: _packStage?.number ?? 1,
+          onStage: (n) {
+            Navigator.of(context).pop();
+            unawaited(_selectStage(n));
+          },
         ),
       ),
     );
@@ -1170,12 +1231,6 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
 
   void _openPracticeLab() {
     if (!mounted || _practiceOpen) return;
-    // Words with the client's recorded stages practise stage by stage.
-    if (StagePack.forWord(_word) != null) {
-      _practiceOpen = true;
-      unawaited(openStagePractice(context, _word).whenComplete(() => _practiceOpen = false));
-      return;
-    }
     _practiceOpen = true;
     showGeneralDialog<void>(
       context: context,
@@ -1185,6 +1240,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
       transitionDuration: const Duration(milliseconds: 80),
       pageBuilder: (ctx, _, __) => TabletSheet(child: PracticeLabSheet(
         word: _word,
+        // A teacher-recorded word: scored against the stage in play.
+        pack: _pack,
+        stage: _packStage,
+        onStage: (n) {
+          Navigator.of(ctx).pop();
+          unawaited(_selectStage(n).then((_) {}));
+        },
         accent: _theme.accent,
         video: _theme.video,
         onSpeak: _prepareAndPlay,
@@ -3808,6 +3870,7 @@ class _LevelPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => GestureDetector(
+    key: const ValueKey('player-stages-chip'),
     onTap: onTap,
     child: DecoratedBox(
       decoration: BoxDecoration(

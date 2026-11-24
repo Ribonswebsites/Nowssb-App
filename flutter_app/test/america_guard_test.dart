@@ -11,7 +11,6 @@ import 'package:nowssb/data/content.dart';
 import 'package:nowssb/data/store_catalog.dart';
 import 'package:nowssb/data/word_photos.dart';
 import 'package:nowssb/features/stage_practice/stage_pack.dart';
-import 'package:nowssb/features/stage_practice/staged_words_card.dart';
 import 'package:nowssb/screens/store/store_word_page.dart';
 
 List<dynamic> _shipped() =>
@@ -49,15 +48,18 @@ void main() {
     expect(StoreWordFacts.of('America', 'Natural Origin', meaning: false).category, kRecordedStagesLabel);
   });
 
-  testWidgets('America is on the Sound Library "Recorded stages" card', (t) async {
-    await t.pumpWidget(MaterialApp(
-      home: Scaffold(
-        body: StagedWordsCard(words: ContentStore.instance.library, onOpenWord: (_) {}),
-      ),
-    ));
-    await t.pump();
-    expect(find.byKey(const ValueKey('staged-word-america')), findsOneWidget);
-    expect(find.byKey(const ValueKey('staged-practise-america')), findsOneWidget);
-    expect(find.text('America'), findsOneWidget);
+  test('America is practised only in the Player (no separate stage page or cards)', () {
+    for (final f in [
+      'lib/features/stage_practice/stage_practice_screen.dart',
+      'lib/features/stage_practice/staged_words_card.dart',
+      'lib/features/stage_practice/stage_access.dart',
+    ]) {
+      expect(File(f).existsSync(), isFalse, reason: f);
+    }
+    for (final f in ['lib/screens/sound_library.dart', 'lib/screens/store/store_word_page.dart', 'lib/screens/word_detail.dart']) {
+      final src = File(f).readAsStringSync();
+      expect(src, isNot(contains('openStagePractice')), reason: f);
+      expect(src, isNot(contains('StagedWordsCard')), reason: f);
+    }
   });
 }

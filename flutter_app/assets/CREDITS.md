@@ -322,6 +322,7 @@ One photograph per Store word / meaning page, chosen so it shows what the word m
 | `word_photos/abyss.webp` | [Underwater Bubbles Floating in Deep Ocean](https://www.pexels.com/photo/39726976/) | Ludvig Hedenborg |
 | `word_photos/alba.webp` | [Beautiful Sunrise over Misty Meadow](https://www.pexels.com/photo/31544471/) | Mohamed B. |
 | `word_photos/america.webp` | [Stunning Landscape of Monument Valley, Arizona](https://www.pexels.com/photo/35119364/) | Chiara Salvi |
+| `word_photos/ramram.webp` | [Clay Diya with Flame and Oil in Traditional Setting](https://www.pexels.com/photo/30425298/) | Rajesh S Balouria |
 | `word_photos/apex.webp` | [Green Trees on Mountain Beside a Snow Capped Mountain](https://www.pexels.com/photo/11831246/) | Roman |
 | `word_photos/archer.webp` | [Man Traning Archery](https://www.pexels.com/photo/16561360/) | Reymond Maliberan |
 | `word_photos/ash.webp` | [Black Ash on the Ground near the Volcano](https://www.pexels.com/photo/11139845/) | Celine J. |
@@ -463,6 +464,7 @@ One photograph per Store word / meaning page, chosen so it shows what the word m
 | `word_photos/voice.webp` | [Microphones Inside the Recording Studio](https://www.pexels.com/photo/4988132/) | Tima Miroshnichenko |
 | `word_photos/void.webp` | [Door to Dark Room](https://www.pexels.com/photo/10875019/) | Mathias Reding |
 | `word_photos/warrior.webp` | [Silhouette of Samurai with Sword Ready to Strike](https://www.pexels.com/photo/34395639/) | Kalz📸🇺🇬 Michael |
+| `word_photos/washington.webp` | [Washington Monument on a Clear Day](https://www.pexels.com/photo/39875914/) | Cristian Loayza |
 | `word_photos/water.webp` | [High-Speed Photography of Waterdrops](https://www.pexels.com/photo/9667643/) | cottonbro studio |
 | `word_photos/white.webp` | [Wrinkled Desert Dune](https://www.pexels.com/photo/17759126/) | Amanda Sweeney |
 | `word_photos/will.webp` | [Person Standing on Mountain Top](https://www.pexels.com/photo/13311790/) | Marija van Velzen |

@@ -7,6 +7,7 @@
 library;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -19,8 +20,16 @@ import 'dart:typed_data';
 
 import '../data/models.dart';
 import '../data/word_devanagari.dart';
+import '../data/entitlements.dart';
+import '../features/stage_practice/stage_mic.dart';
+import '../features/stage_practice/stage_pack.dart';
+import '../features/stage_practice/stage_progress.dart';
+import '../features/stage_practice/stage_scoring.dart';
+import '../features/stage_practice/stage_take_panel.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import '../pronunciation/reference.dart';
 import '../pronunciation/scorer.dart';
+import '../pronunciation/shabda/shabda_practice.dart' show AttemptResult, AttemptStatus;
 import '../media/nwsb_video.dart';
 import '../media/video_pool.dart';
 import '../widgets/app_thinking_loader.dart';
@@ -105,9 +114,24 @@ class PracticeLabSheet extends StatefulWidget {
     required this.onClose,
     required this.video,
     this.accent = const Color(0xFFB8C9FF),
+    this.pack,
+    this.stage,
+    this.onStage,
   });
 
   final Word word;
+
+  /// A teacher-recorded word: the take is scored against [stage]'s
+  /// recording (sub-scores, where in the word, tips), and progress shows.
+  final StagePack? pack;
+  final PackStage? stage;
+
+  /// Plays stage N in the Player (after passing, "Stage N ›").
+  final ValueChanged<int>? onStage;
+
+  /// Tests: stands in for the microphone.
+  @visibleForTesting
+  static StageMic Function()? debugMic;
   final Future<void> Function() onSpeak;
   final VoidCallback onClose;
 
@@ -138,6 +162,10 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   PronunciationResult? _result;
   int _elapsed = 0;
   _PracticeStatus _status = _PracticeStatus.ready;
+  StageMic? _mic;
+  StageTake? _take;
+
+  bool get _staged => widget.pack != null && widget.stage != null;
 
   @override
   void initState() {
@@ -162,7 +190,7 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     });
     _entry.forward();
     _spin.forward();
-    unawaited(_loadRefs());
+    if (!_staged) unawaited(_loadRefs());
   }
 
   Future<void> _loadRefs() async {
@@ -170,12 +198,16 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     if (mounted) setState(() => _refs = refs);
   }
 
-  bool get _noReference => _refs != null && _refs!.isEmpty;
+  bool get _noReference => !_staged && _refs != null && _refs!.isEmpty;
 
   @override
   void dispose() {
     _clock?.cancel();
     unawaited(_finishCapture());
+    if (_mic != null) {
+      unawaited(_mic!.cancel());
+      _mic!.dispose();
+    }
     _open.dispose();
     _punch.dispose();
     _entry.dispose();
@@ -191,7 +223,107 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
     if (mounted) setState(() => _status = _PracticeStatus.ready);
   }
 
+  // ── Teacher stage: record, then score against that stage's recording ──
+  Future<void> _stageTap() async {
+    if (_holding || _status == _PracticeStatus.recording) {
+      await _endStageTake();
+    } else if (_status != _PracticeStatus.processing) {
+      await _beginStageTake();
+    }
+  }
+
+  Future<void> _beginStageTake() async {
+    final stage = widget.stage!;
+    _clock?.cancel();
+    setState(() {
+      _holding = true;
+      _elapsed = 0;
+      _take = null;
+      _status = _PracticeStatus.listening;
+    });
+    try {
+      final mic = _mic ??= PracticeLabSheet.debugMic?.call() ?? RecordStageMic();
+      if (!await mic.hasPermission()) {
+        if (!mounted) return;
+        setState(() {
+          _holding = false;
+          _status = _PracticeStatus.ready;
+        });
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+            const SnackBar(content: Text('Allow the microphone in phone settings to practise.')));
+        return;
+      }
+      if (!_holding || !mounted) return;
+      await mic.start('nwsb-stage-${widget.pack!.wordKey}-${stage.number}', (_) {});
+      if (!mounted) return;
+      if (!_holding) {
+        await mic.cancel();
+        return;
+      }
+      setState(() => _status = _PracticeStatus.recording);
+      // Stops by itself a little after the recording's own length.
+      final cap = math.min(_sessionLength, (stage.seconds * 3 + 4).ceil());
+      _clock = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted || !_holding) return;
+        if (_elapsed >= cap - 1) {
+          unawaited(_endStageTake());
+        } else {
+          setState(() => _elapsed++);
+        }
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _holding = false;
+          _status = _PracticeStatus.ready;
+        });
+      }
+    }
+  }
+
+  Future<void> _endStageTake() async {
+    if (!_holding && _status != _PracticeStatus.recording) return;
+    _clock?.cancel();
+    final pack = widget.pack!, stage = widget.stage!;
+    setState(() {
+      _holding = false;
+      _status = _PracticeStatus.processing;
+    });
+    StageTake take;
+    try {
+      final bytes = await _mic?.stop();
+      if (bytes == null) throw StateError('no take');
+      final ref = (await rootBundle.load(stage.reference)).buffer.asUint8List();
+      take = await scoreStageTakeWithContour(ref, bytes, stage: stage.number, passMark: pack.passMark);
+    } catch (_) {
+      take = StageTake(
+          AttemptResult(
+              status: AttemptStatus.silent,
+              headline: 'We didn’t hear you',
+              message: 'Nothing came through the microphone. Tap Start, say the word right after the recording, then tap Stop.'),
+          const [],
+          const []);
+    }
+    if (take.result.scored) {
+      await StageProgressStore.instance.addAttempt(pack.wordKey, stage.number, score: take.result.overall, passed: take.result.passed);
+    }
+    if (!mounted) return;
+    setState(() {
+      _take = take;
+      _status = take.result.passed ? _PracticeStatus.complete : _PracticeStatus.results;
+    });
+  }
+
+  /// The next recorded stage, once this one is passed.
+  PackStage? get _nextStage {
+    final pack = widget.pack, stage = widget.stage;
+    if (pack == null || stage == null) return null;
+    if (!StageProgressStore.instance.record(pack.wordKey, stage.number).passed) return null;
+    return pack.stages.where((s) => s.number == stage.number + 1).firstOrNull;
+  }
+
   Future<void> _beginTake() async {
+    if (_staged) return _stageTap();
     if (_holding || _status == _PracticeStatus.recording) return;
     if (_noReference) {
       setState(() => _result =
@@ -302,10 +434,12 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
   Future<void> _replay() async {
     _clock?.cancel();
     await _finishCapture();
+    await _mic?.cancel();
     if (!mounted) return;
     setState(() {
       _takePath = null;
       _result = null;
+      _take = null;
       _elapsed = 0;
       _holding = false;
       _status = _PracticeStatus.ready;
@@ -318,6 +452,12 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 
   String get _statusLabel {
     if (_holding || _status == _PracticeStatus.recording) return 'Listening';
+    if (_staged) {
+      final t = _take;
+      if (_status == _PracticeStatus.processing) return 'Scoring';
+      if (t != null && t.result.scored) return 'Score ${t.result.overall}';
+      return 'Stage ${widget.stage!.number}';
+    }
     final r = _result;
     if (r != null && r.outcome == PronunciationOutcome.scored) {
       return 'Score ${r.score}';
@@ -332,6 +472,13 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 
   /// Feedback line under the orb; null keeps the template copy.
   String? get _message {
+    if (_staged) {
+      if (_holding || _status == _PracticeStatus.recording) return 'Say it now, then tap Stop.';
+      if (_status == _PracticeStatus.processing) return 'Comparing your take with the teacher’s recording…';
+      if (_take != null) return 'Tap Try again to say it once more, or Replay to hear the teacher.';
+      final st = widget.stage!;
+      return 'Listen to Stage ${st.number}${st.deva.isNotEmpty ? ' (${st.deva})' : ''}, then tap Start and say it back.';
+    }
     final r = _result;
     if (r != null) {
       final weak = r.weakest;
@@ -376,10 +523,27 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                   position: _slide,
                   child: ScaleTransition(
                     scale: _cardScale,
-                    child: Column(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * .92),
+                      child: SingleChildScrollView(
+                      key: const ValueKey('practice-sheet-scroll'),
+                      child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _WordBreakTab(word: widget.word, result: _result),
+                        _WordBreakTab(
+                          word: widget.word,
+                          result: _result,
+                          stages: _staged
+                              ? ListenableBuilder(
+                                  listenable: StageProgressStore.instance,
+                                  builder: (_, __) => StageProgressStrip(
+                                    pack: widget.pack!,
+                                    current: widget.stage!.number,
+                                    admin: Entitlements.instance.isAdmin,
+                                  ),
+                                )
+                              : null,
+                        ),
                         const SizedBox(height: 10),
                         GestureDetector(
                           onTap: () {},
@@ -387,12 +551,25 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
                             status: _statusLabel,
                             message: _message,
                             holding: _holding,
+                            startLabel: _staged
+                                ? (_holding || _status == _PracticeStatus.recording
+                                    ? 'Stop'
+                                    : (_take != null ? 'Try again' : 'Start'))
+                                : null,
+                            result: _take == null
+                                ? null
+                                : StageResultPanel(take: _take!, stage: widget.stage!.number),
+                            next: _nextStage == null || widget.onStage == null
+                                ? null
+                                : (_nextStage!.number, () => widget.onStage!(_nextStage!.number)),
                             onStart: _beginTake,
                             onReplay: () => unawaited(_replay()),
                             onClose: widget.onClose,
                           ),
                         ),
                       ],
+                    ),
+                    ),
                     ),
                   ),
                 ),
@@ -406,17 +583,22 @@ class _PracticeLabSheetState extends State<PracticeLabSheet>
 }
 
 class _WordBreakTab extends StatelessWidget {
-  const _WordBreakTab({required this.word, this.result});
+  const _WordBreakTab({required this.word, this.result, this.stages});
 
   final Word word;
   final PronunciationResult? result;
 
+  /// Stage progress (teacher-recorded words), under the title.
+  final Widget? stages;
+
   @override
   Widget build(BuildContext context) {
     final raw = word.word.trim();
-    final title = raw.isEmpty
-        ? ''
-        : '${raw[0].toUpperCase()}${raw.substring(1).toLowerCase()}';
+    final title = raw
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .map((p) => '${p[0].toUpperCase()}${p.substring(1).toLowerCase()}')
+        .join(' ');
     // English title on top; the Devanagari (content data only, never
     // transliterated) on the line under it. No English syllable pills.
     final deva = wordDevanagari(word);
@@ -476,6 +658,10 @@ class _WordBreakTab extends StatelessWidget {
                       ),
                     ),
                   ],
+                  if (stages != null) ...[
+                    const SizedBox(height: 10),
+                    stages!,
+                  ],
                 ],
               ),
             ),
@@ -494,8 +680,14 @@ class _BlackTab extends StatelessWidget {
     required this.onStart,
     required this.onReplay,
     required this.onClose,
+    this.startLabel,
+    this.result,
+    this.next,
   });
 
+  final String? startLabel;
+  final Widget? result;
+  final (int, VoidCallback)? next;
   final String status;
   final String? message;
   final bool holding;
@@ -612,6 +804,27 @@ class _BlackTab extends StatelessWidget {
               ),
             ),
           ),
+          if (result != null) ...[
+            const SizedBox(height: 12),
+            result!,
+          ],
+          if (next != null) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 46,
+              width: double.infinity,
+              child: FilledButton(
+                key: const ValueKey('practice-next-stage'),
+                onPressed: next!.$2,
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF7BE0A8),
+                  foregroundColor: const Color(0xFF08090D),
+                  shape: const StadiumBorder(),
+                ),
+                child: Text('Go to Stage ${next!.$1}  ›', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           Row(
             children: [
@@ -649,7 +862,8 @@ class _BlackTab extends StatelessWidget {
                       shape: const StadiumBorder(),
                     ),
                     child: Text(
-                      holding ? 'Listening' : 'Start',
+                      key: const ValueKey('practice-start'),
+                      startLabel ?? (holding ? 'Listening' : 'Start'),
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
