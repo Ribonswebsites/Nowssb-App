@@ -148,9 +148,10 @@ void main() {
     final picked = <int>[];
     await pumpList(t, _lib('america'), onStage: picked.add);
     expect(find.text('America'), findsOneWidget);
-    expect(find.text('अमेरिका'), findsOneWidget);
+    expect(find.byKey(const ValueKey('stages-headline-deva')), findsOneWidget);
+    expect((t.widget(find.byKey(const ValueKey('stages-headline-deva'))) as Text).data, 'ळमेरिका');
     expect(find.text('STAGE 1'), findsOneWidget);
-    expect(find.text('ळमेरिका'), findsOneWidget);
+    expect((t.widget(find.byKey(const ValueKey('stages-deva-1'))) as Text).data, 'ळमेरिका');
     expect(find.text('STAGE 2'), findsOneWidget);
     expect(find.textContaining('Pass Stage'), findsNothing, reason: 'every recorded stage is open');
     expect(find.text('STAGE 3 · COMING SOON'), findsOneWidget);
