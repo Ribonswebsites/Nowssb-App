@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/tokens.dart';
 import 'shell_back.dart';
 import 'tablet_frame.dart';
-import 'tablet_home.dart';
 import '../data/settings.dart';
 import '../data/content.dart';
 import '../data/home_widget_sync.dart';
@@ -529,7 +528,7 @@ class _NavShellState extends State<NavShell> {
         // chin on Normal home, and never a white line on dark tabs.
         // A tablet's home sits on the frame's glass panel.
         backgroundColor: framed && _i == 0 && !_fashion
-            ? Colors.transparent
+            ? NwsbColors.surface
             : lightHome
                 ? NwsbColors.surface
                 : NwsbColors.deep,
@@ -548,13 +547,11 @@ class _NavShellState extends State<NavShell> {
                 // home column.
                 _tabAlive(
                     0,
-                    _fashion
-                        // The NowssB (zen) home keeps its own design and
-                        // gets the tablet frame around it.
-                        ? const HomeFashion()
-                        : framed
-                            ? const TabletHome()
-                            : const HomeNormal()),
+                    // Both homes are the full phone homes on a tablet too,
+                    // laid out in the frame's centre column: the old
+                    // tablet-only home showed one banner and one playlist
+                    // card over an empty panel (Ribon, Nov 25).
+                    _fashion ? const HomeFashion() : const HomeNormal()),
                 _tabAlive(1, const PracticeScreen()),
                 // Bottom-nav Library must be the media-rich Sound Library (website
                 // SLM), NOT the old plain letter list in library.dart.

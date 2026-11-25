@@ -28,6 +28,8 @@ library;
 
 import 'dart:async';
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -152,6 +154,45 @@ class _SplashState extends State<Splash> {
   Widget build(BuildContext context) {
     final c = _c;
     final ready = c != null && c.value.isInitialized;
+
+    // Tablet: the clip is a 720x1280 portrait film. Covering a landscape
+    // tablet with it zoomed it ~3x and blurred it. There it plays at its own
+    // shape, full height and sharp, over a soft blurred still of its first
+    // frame that fills the rest of the screen (no black bars).
+    if (MediaQuery.sizeOf(context).shortestSide >= 600) {
+      final size = ready ? c.value.size : const Size(720, 1280);
+      return Scaffold(
+        key: const ValueKey('splash-tablet'),
+        backgroundColor: Colors.black,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 40, sigmaY: 40, tileMode: TileMode.clamp),
+              child: Image.asset(
+                'assets/video/start-animation-poster.webp',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+              ),
+            ),
+            const ColoredBox(color: Color(0x8C000000)),
+            Center(
+              child: AspectRatio(
+                aspectRatio: size.width / size.height,
+                child: ready
+                    ? VideoPlayer(c)
+                    : EditableImage.asset(
+                        'assets/video/start-animation-poster.webp',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const ColoredBox(color: Colors.black),
+                        slot: 'splash.Splash',
+                      ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,

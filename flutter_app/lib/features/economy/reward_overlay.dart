@@ -11,6 +11,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 
+import '../../admin/admin_state.dart';
 import '../../admin/template/editable.dart';
 import '../../widgets/nwsb_coin_fly.dart';
 import '../../widgets/nwsb_icon.dart';
@@ -31,6 +32,11 @@ class RewardOverlay {
 
   static bool get _quiet =>
       !debugPlayInTests && WidgetsBinding.instance.runtimeType.toString().contains('Test');
+
+  /// Admin accounts (the client runs the app signed in as one) never get
+  /// coin or reward pop-ups: not in the admin console, the editor, or the
+  /// member side. Coins still land in the wallet; only the pop-up is gone.
+  static bool get adminSilenced => AdminState.instance.isAdmin;
 
   /// True when plays are switched off (widget tests), so nothing should
   /// keep retrying.
@@ -88,7 +94,7 @@ class RewardOverlay {
     required List<Map<String, dynamic>> items,
     String? rarity,
   }) {
-    if (items.isEmpty) return Future<void>.value();
+    if (items.isEmpty || adminSilenced) return Future<void>.value();
     return enqueue((nav) => nav.push<void>(RawDialogRoute<void>(
           barrierDismissible: true,
           barrierLabel: 'close',
@@ -116,7 +122,7 @@ class RewardOverlay {
   /// the queue: the flight starts now, even if another play is on screen
   /// (the Collect card's own tap uses it, so the top bar never waits).
   static Future<void> coins(int gained, {required int from, required int to, CoinDay? day, bool immediate = false}) {
-    if (gained <= 0) return Future<void>.value();
+    if (gained <= 0 || adminSilenced) return Future<void>.value();
     Future<void> fly(NavigatorState nav) {
       final ctx = nav.overlay?.context ?? nav.context;
       return NwsbCoinFly.show(ctx, coins: gained, from: from, to: to, day: day);

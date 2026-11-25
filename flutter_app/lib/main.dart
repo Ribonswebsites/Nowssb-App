@@ -71,8 +71,14 @@ Future<void> main() async {
 
   // Phones stay portrait. A tablet (shortest side 600+) turns freely, so
   // the wide sidebar layout gets landscape.
-  await SystemChrome.setPreferredOrientations(
-      isTabletDevice() ? DeviceOrientation.values : [DeviceOrientation.portraitUp]);
+  await applyOrientationPolicy();
+  // Tablet: pages full of pictures at tablet size need a bigger decoded
+  // image cache, or going back to an already-open page decodes its art
+  // again (the "loads again every time" Ribon saw).
+  if (isTabletDevice()) {
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 220 << 20;
+  }
+  WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(applyOrientationPolicy()));
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,

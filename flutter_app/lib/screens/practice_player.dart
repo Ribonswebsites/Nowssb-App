@@ -8,7 +8,8 @@ library;
 import '../features/stage_practice/akshara_karaoke.dart';
 import 'music_picker_sheet.dart';
 import '../shell/tablet.dart';
-import '../shell/tablet_frame.dart' show TabletShellGate, TabletSheet, isTablet;
+import '../shell/tablet_frame.dart'
+    show TabletShellGate, TabletSheet, TabletPlayerPanel, TabletPlayerState, isTablet;
 import '../features/stage_practice/stage_pack.dart';
 import '../features/stage_practice/stage_progress.dart';
 import 'dart:async';
@@ -1469,6 +1470,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
   }
 
   Route<dynamic>? _tabletRoute;
+  double _pullStartY = 0;
 
   /// Tablet: tell the frame's right panel what this player is playing.
   void _publishTablet() {
@@ -1576,6 +1578,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
               child: Listener(
                 onPointerDown: (e) {
                   _pull = 0;
+                  _pullStartY = e.localPosition.dy;
                   _pullStamp = DateTime.now().millisecondsSinceEpoch;
                 },
                 onPointerMove: (e) => _pull += e.delta.dy,
@@ -1584,7 +1587,10 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                   // Swipe down from the top of the page collapses the player
                   // to the mini pill, like a music app's now-playing screen.
                   final atTop = !_pageScroll.hasClients || _pageScroll.offset <= 0;
-                  if (atTop && _pull > 140 && ms < 700) unawaited(_minimizeToPill());
+                  // Tablet: only a pull that starts at the header, so
+                  // scrolling the queue panel never closes the player.
+                  final fromTop = !isTablet(context) || _pullStartY < 160;
+                  if (atTop && fromTop && _pull > 140 && ms < 700) unawaited(_minimizeToPill());
                   _pull = 0;
                 },
                 child: LayoutBuilder(
@@ -1593,23 +1599,7 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                       constraints.maxWidth - 24,
                       340.0,
                     );
-                    return SingleChildScrollView(
-                      controller: _pageScroll,
-                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: math.max(0, constraints.maxHeight - 28),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            _PlayerHeader(
-                              onBack: _minimizeToPill,
-                              onSettings: _openSettings,
-                              onHowItWorks: _openHowItWorks,
-                            ),
-                            const SizedBox(height: 12),
-                            Center(
+                    Widget stageAt(double stageWidth) => Center(
                               child: SizedBox(
                                 width: stageWidth,
                                 child: _VisualStage(
@@ -1647,9 +1637,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   },
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 18),
-                            Row(
+                            );
+                    final header = _PlayerHeader(
+                              onBack: _minimizeToPill,
+                              onSettings: _openSettings,
+                              onHowItWorks: _openHowItWorks,
+                            );
+                    final titleRow = Row(
                               children: [
                                 const AppThinkingLoader(
                                   size: 72,
@@ -1689,9 +1683,8 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                   ),
                                 ),
                               ],
-                            ),
-                            const SizedBox(height: 6),
-                            ClipRect(
+                            );
+                    final subtitle = ClipRect(
                               child: SizedBox(
                                 height: 20,
                                 width: double.infinity,
@@ -1712,15 +1705,13 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                         animation: _marqueeController,
                                       ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            _ProgressBar(
+                            );
+                    final progress = _ProgressBar(
                               key: ValueKey('player-seek-$_runId'),
                               playing: _playing,
                               durationSec: _stageSeconds ?? _wordSecs(_word),
-                            ),
-                            const SizedBox(height: 8),
-                            _PlainTransportRow(
+                            );
+                    final transport = _PlainTransportRow(
                               playing: _playing,
                               shuffle: _shuffle,
                               loop: _loop,
@@ -1729,9 +1720,9 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                               onPlay: _togglePlay,
                               onNext: () => _move(1),
                               onRepeat: () => setState(() => _loop = !_loop),
-                            ),
-                            const SizedBox(height: 16),
-                            if (_completed || _error != null) ...[
+                            );
+                    final status = <Widget>[
+                      if (_completed || _error != null) ...[
                               const SizedBox(height: 8),
                               Text(
                                 _error ??
@@ -1746,6 +1737,83 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
                                 ),
                               ),
                             ],
+                    ];
+                    // Tablet: a dashboard that uses the whole screen (big
+                    // artwork, then the controls, the actions and the
+                    // queue in glass panels beside or below it) instead
+                    // of the phone column with an empty half page.
+                    if (isTablet(context) && constraints.maxWidth >= 600) {
+                      return _TabletPlayerDashboard(
+                        constraints: constraints,
+                        scroll: _pageScroll,
+                        header: header,
+                        stageAt: stageAt,
+                        title: titleRow,
+                        subtitle: subtitle,
+                        progress: progress,
+                        transport: transport,
+                        status: status,
+                        actions: _WordActionStrip(
+                                    accent: theme.accent,
+                                    video: _actionsTabVideo,
+                                    onRoutine: _openRoutine,
+                                    onPractice: () =>
+                                        unawaited(_handlePracticeTap()),
+                                    onStore: _goStore,
+                                  ),
+                        nextUp: _NextUpCard(
+                                    words: widget.words,
+                                    index: _index,
+                                    themes: _playerThemes,
+                                    onPlayAt: (i) async {
+                                      if (i == _index) {
+                                        if (_playing) return;
+                                        await _prepareAndPlay();
+                                        return;
+                                      }
+                                      await _playAt(i);
+                                    },
+                                    onOpenSoundLibrary: () =>
+                                        _openSoundLibrary(context),
+                                    onOpenQueue: () => _openQueueSheet(context),
+                                  ),
+                        queue: TabletPlayerPanel(
+                          embedded: true,
+                          state: TabletPlayerState(
+                            _tabletRoute ?? ModalRoute.of(context)!,
+                            widget.words,
+                            _index.clamp(0, widget.words.length - 1),
+                            _playing,
+                            _jumpTo,
+                            () => unawaited(_togglePlay()),
+                            (d) => unawaited(_move(d)),
+                          ),
+                        ),
+                      );
+                    }
+                    return SingleChildScrollView(
+                      controller: _pageScroll,
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: math.max(0, constraints.maxHeight - 28),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            header,
+                            const SizedBox(height: 12),
+                            stageAt(stageWidth),
+                            const SizedBox(height: 18),
+                            titleRow,
+                            const SizedBox(height: 6),
+                            subtitle,
+                            const SizedBox(height: 16),
+                            progress,
+                            const SizedBox(height: 8),
+                            transport,
+                            const SizedBox(height: 16),
+                            ...status,
                             const SizedBox(height: 10),
                             SizedBox(
                               key: _bottomStripKey,
@@ -1809,6 +1877,183 @@ class _PracticePlayerScreenState extends State<PracticePlayerScreen>
     );
   }
 
+}
+
+/// The player on a tablet: one dashboard that fills the screen.
+///
+///   landscape   header
+///               [ big artwork ]  [ title · line · seek · transport ]
+///                                [ actions ]  [ next up ]
+///                                [ queue ······················· ]
+///   portrait    header, a big artwork, the controls under it, then the
+///               actions and next-up cards side by side and the queue.
+///
+/// Every piece is the phone player's own widget (same buttons, same
+/// handlers); only where they sit changes.
+class _TabletPlayerDashboard extends StatelessWidget {
+  const _TabletPlayerDashboard({
+    required this.constraints,
+    required this.scroll,
+    required this.header,
+    required this.stageAt,
+    required this.title,
+    required this.subtitle,
+    required this.progress,
+    required this.transport,
+    required this.status,
+    required this.actions,
+    required this.nextUp,
+    required this.queue,
+  });
+
+  final BoxConstraints constraints;
+  final ScrollController scroll;
+  final Widget header;
+  final Widget Function(double width) stageAt;
+  final Widget title;
+  final Widget subtitle;
+  final Widget progress;
+  final Widget transport;
+  final List<Widget> status;
+  final Widget actions;
+  final Widget nextUp;
+  final Widget queue;
+
+  static const _gap = 16.0;
+
+  Widget _panel(Widget child, {EdgeInsets padding = const EdgeInsets.all(14), Key? key}) => RepaintBoundary(
+        child: DecoratedBox(
+          key: key,
+          decoration: BoxDecoration(
+            color: const Color(0x14FFFFFF),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0x1FFFFFFF)),
+          ),
+          child: Padding(padding: padding, child: child),
+        ),
+      );
+
+  Widget _controls() => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          title,
+          const SizedBox(height: 6),
+          subtitle,
+          const SizedBox(height: 16),
+          progress,
+          const SizedBox(height: 8),
+          transport,
+          ...status,
+        ],
+      );
+
+  /// The actions strip and the next-up card are drawn for a ~340 wide
+  /// phone strip: they keep that size (never squeezed or stretched).
+  Widget _card(Widget child) => Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: SizedBox(height: 128, child: child),
+        ),
+      );
+
+  Widget _cards(double width) => width >= 2 * 330 + _gap
+      ? Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: _card(actions)),
+            const SizedBox(width: _gap),
+            Expanded(child: _card(nextUp)),
+          ],
+        )
+      : Column(children: [
+          _card(actions),
+          const SizedBox(height: _gap),
+          _card(nextUp),
+        ]);
+
+  @override
+  Widget build(BuildContext context) {
+    final w = constraints.maxWidth;
+    final h = constraints.maxHeight;
+    final landscape = w >= h * 1.05;
+    if (landscape) {
+      // Artwork as big as the height allows, the rest on the right.
+      const headerH = 46.0 + 12;
+      // The actions strip sits under the artwork, so leave it room.
+      final art = math.min(w * 0.52, h - headerH - 24 - 128 - _gap);
+      return Padding(
+        key: const ValueKey('player-tablet-landscape'),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            header,
+            const SizedBox(height: 12),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: art,
+                    child: Column(children: [
+                      stageAt(art),
+                      const SizedBox(height: _gap),
+                      _card(actions),
+                    ]),
+                  ),
+                  const SizedBox(width: 24),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _panel(_controls(), padding: const EdgeInsets.fromLTRB(18, 16, 18, 10)),
+                        const SizedBox(height: _gap),
+                        _card(nextUp),
+                        const SizedBox(height: _gap),
+                        Expanded(
+                          child: _panel(queue,
+                              key: const ValueKey('player-tablet-queue'),
+                              padding: const EdgeInsets.fromLTRB(6, 4, 6, 4)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    // Portrait: the artwork takes about half the height, the controls sit
+    // under it and the cards and queue fill the rest.
+    final art = math.min(w - 40, h * 0.5);
+    return SingleChildScrollView(
+      key: const ValueKey('player-tablet-portrait'),
+      controller: scroll,
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: math.max(0, h - 28)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            header,
+            const SizedBox(height: 12),
+            stageAt(art),
+            const SizedBox(height: 20),
+            _panel(_controls(), padding: const EdgeInsets.fromLTRB(18, 16, 18, 10)),
+            const SizedBox(height: _gap),
+            _cards(w - 40),
+            const SizedBox(height: _gap),
+            _panel(queue,
+                key: const ValueKey('player-tablet-queue'),
+                padding: const EdgeInsets.fromLTRB(6, 4, 6, 4)),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _PlayerThemeArtwork extends StatelessWidget {

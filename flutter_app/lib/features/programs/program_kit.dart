@@ -5,12 +5,15 @@
 library;
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../admin/layout/layout_sections.dart';
 import '../../admin/template/editable.dart';
+import '../../data/firebase.dart';
 import '../../screens/nwsb_sign_in_sheet.dart';
 import '../../theme/tokens.dart';
 import '../../widgets/app_thinking_loader.dart';
@@ -719,37 +722,143 @@ class ServerView extends StatefulWidget {
   State<ServerView> createState() => _ServerViewState();
 }
 
+/// What a [ServerView] last loaded, kept for the life of the app so a page
+/// that is opened again (or a tab picked again) draws at once from memory
+/// and refreshes quietly behind it, instead of a loader every time.
+class ServerViewCache {
+  ServerViewCache._();
+  static final _data = <String, ({Map<String, dynamic> r, DateTime at})>{};
+  static final _inflight = <String, Future<Map<String, dynamic>>>{};
+
+  /// Newer than this is shown without asking the server again.
+  static const fresh = Duration(seconds: 45);
+
+  /// Actions that only read (the views). Any other answered call is a
+  /// change, and every remembered view is dropped so the next visit loads
+  /// fresh numbers.
+  static final _views = <String>{};
+  static var _hooked = false;
+
+  static void _hook() {
+    if (_hooked) return;
+    _hooked = true;
+    EconomyApi.onAnswered = (name) {
+      if (!_views.contains(name)) _data.clear();
+    };
+  }
+
+  static String keyFor(String action, Map<String, dynamic> data) {
+    _hook();
+    _views.add(action);
+    // Tests swap the fake server between cases: never share across them.
+    final fake = EconomyApi.fakeId;
+    final uid = NwsbFirebase.ready ? FirebaseAuth.instance.currentUser?.uid : null;
+    String enc;
+    try {
+      enc = jsonEncode(data);
+    } catch (_) {
+      enc = data.toString();
+    }
+    return '${uid ?? '-'}|$fake|$action|$enc';
+  }
+
+  static ({Map<String, dynamic> r, DateTime at})? peek(String key) => _data[key];
+
+  /// One request per key at a time; the answer is remembered.
+  static Future<Map<String, dynamic>> load(String key, String action, Map<String, dynamic> data) {
+    final running = _inflight[key];
+    if (running != null) return running;
+    final f = EconomyApi.call(action, data).then((r) {
+      _data[key] = (r: r, at: DateTime.now());
+      return r;
+    }).whenComplete(() {
+      _inflight.remove(key);
+    });
+    _inflight[key] = f;
+    return f;
+  }
+
+  @visibleForTesting
+  static void debugClear() {
+    _data.clear();
+    _inflight.clear();
+  }
+}
+
 class _ServerViewState extends State<ServerView> {
-  late Future<Map<String, dynamic>> _f = _load();
-  Future<Map<String, dynamic>> _load() => EconomyApi.call(widget.action, widget.data);
+  late String _key;
+  Map<String, dynamic>? _r;
+  Object? _error;
+  var _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _start(force: false);
+  }
+
+  /// Cached answer first (instant), then a quiet refresh when it is stale.
+  void _start({required bool force}) {
+    _key = ServerViewCache.keyFor(widget.action, widget.data);
+    final hit = ServerViewCache.peek(_key);
+    if (hit != null) {
+      _r = hit.r;
+      _error = null;
+      if (!force && DateTime.now().difference(hit.at) < ServerViewCache.fresh) return;
+    } else {
+      _r = null;
+    }
+    _fetch(showLoader: hit == null);
+  }
+
+  Future<void> _fetch({required bool showLoader}) async {
+    final key = _key;
+    // Called from initState / didUpdateWidget / a setState: a build follows.
+    _busy = showLoader;
+    try {
+      final r = await ServerViewCache.load(key, widget.action, widget.data);
+      if (!mounted || key != _key) return;
+      setState(() {
+        _r = r;
+        _error = null;
+        _busy = false;
+      });
+    } catch (e) {
+      if (!mounted || key != _key) return;
+      setState(() {
+        // Keep showing what we had; only an empty page shows the error.
+        if (_r == null) _error = e;
+        _busy = false;
+      });
+    }
+  }
 
   @override
   void didUpdateWidget(ServerView old) {
     super.didUpdateWidget(old);
-    if (old.reloadKey != widget.reloadKey || old.action != widget.action) _f = _load();
+    if (old.reloadKey != widget.reloadKey) {
+      _start(force: true);
+    } else if (old.action != widget.action) {
+      _start(force: false);
+    }
   }
 
-  void _reload() => setState(() => _f = _load());
+  void _reload() {
+    setState(() => _error = null);
+    _fetch(showLoader: _r == null);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, dynamic>>(
-      future: _f,
-      builder: (context, snap) {
-        if (snap.connectionState != ConnectionState.done) {
-          return const Center(child: EarnLoading());
-        }
-        if (snap.hasError) {
-          final e = snap.error;
-          return PCard(children: [
-            Text(e is EconomyException ? e.message : 'That did not load. Pull to try again.', style: const TextStyle(color: kEarnSoft, height: 1.4)),
-            const SizedBox(height: 10),
-            Align(alignment: Alignment.centerLeft, child: TextButton(onPressed: _reload, style: earnButtonStyle(filled: false), child: const EditableLabel('program_kit.ServerView', 'Try again', style: TextStyle(fontWeight: FontWeight.w800)))),
-          ]);
-        }
-        return widget.builder(context, snap.data ?? const {}, _reload);
-      },
-    );
+    final r = _r;
+    if (r != null) return widget.builder(context, r, _reload);
+    final e = _error;
+    if (e == null || _busy) return const Center(child: EarnLoading());
+    return PCard(children: [
+      Text(e is EconomyException ? e.message : 'That did not load. Pull to try again.', style: const TextStyle(color: kEarnSoft, height: 1.4)),
+      const SizedBox(height: 10),
+      Align(alignment: Alignment.centerLeft, child: TextButton(onPressed: _reload, style: earnButtonStyle(filled: false), child: const EditableLabel('program_kit.ServerView', 'Try again', style: TextStyle(fontWeight: FontWeight.w800)))),
+    ]);
   }
 }
 

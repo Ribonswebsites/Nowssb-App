@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nowssb/data/live_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_thinking_orbs/flutter_thinking_orbs.dart';
@@ -416,9 +417,8 @@ class _EarnTabsPageState extends State<EarnTabsPage> {
 /// Each Earn tab's mark (pills, See all, the hub rows).
 const kEarnTabMarks = _earnTabMark;
 
-final _refLedgers = <String, Stream<QuerySnapshot<Map<String, dynamic>>>>{};
-Stream<QuerySnapshot<Map<String, dynamic>>> _refLedger(String uid) => _refLedgers.putIfAbsent(
-    uid, () => FirebaseFirestore.instance.collection('referralLedger').where('referrerUid', isEqualTo: uid).limit(20).snapshots().asBroadcastStream());
+Stream<QuerySnapshot<Map<String, dynamic>>> _refLedger(String uid) => LiveCache.of(
+    'refLedger:$uid', () => FirebaseFirestore.instance.collection('referralLedger').where('referrerUid', isEqualTo: uid).limit(20).snapshots());
 
 class _TierRail extends StatefulWidget {
   const _TierRail();

@@ -54,9 +54,21 @@ class EconomyApi {
   @visibleForTesting
   static Future<Map<String, dynamic>> Function(String name, Map<String, dynamic> data)? debugHandler;
 
+  /// Identity of the test fake in use (0 for the real server), so caches
+  /// keyed on answers never mix two fakes.
+  static int get fakeId => debugHandler == null ? 0 : identityHashCode(debugHandler);
+
+  /// Told after every answered call (the views' cache drops what a change
+  /// such as a payout or a claim may have made stale).
+  static void Function(String name)? onAnswered;
+
   static Future<Map<String, dynamic>> call(String name, [Map<String, dynamic>? data]) async {
     final fake = debugHandler;
-    if (fake != null) return fake(name, data ?? const {});
+    if (fake != null) {
+      final r = await fake(name, data ?? const {});
+      onAnswered?.call(name);
+      return r;
+    }
     if (!NwsbFirebase.ready) {
       throw EconomyException("Can't reach NowssB right now. Check your connection and try again.");
     }
@@ -94,6 +106,7 @@ class EconomyApi {
     if (res.statusCode >= 200 && res.statusCode < 300) {
       if (switchingOn.value) switchingOn.value = false;
       EconomyMirror.instance._afterAction(name, body, data);
+      onAnswered?.call(name);
       return body;
     }
     final code = '${body['code'] ?? ''}';

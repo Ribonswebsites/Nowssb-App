@@ -18,6 +18,7 @@
 library;
 
 import '../../shell/tablet.dart';
+import '../../data/live_cache.dart';
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
@@ -83,9 +84,8 @@ class EarnSnapshot {
 
 }
 
-final _boards = <String, Stream<DocumentSnapshot<Map<String, dynamic>>>>{};
-Stream<DocumentSnapshot<Map<String, dynamic>>> _board(String month) =>
-    _boards.putIfAbsent(month, () => FirebaseFirestore.instance.doc('leaderboards/sellers_$month').snapshots().asBroadcastStream());
+Stream<DocumentSnapshot<Map<String, dynamic>>> _board(String month) => LiveCache.of(
+    'board:$month', () => FirebaseFirestore.instance.doc('leaderboards/sellers_$month').snapshots());
 
 (int, int)? _placeOf(Map<String, dynamic>? doc, String uid) {
   final raw = doc?['entries'];
@@ -110,6 +110,7 @@ class EarnBuilder extends StatelessWidget {
           if (!NwsbFirebase.ready || uid == null) return builder(context, EarnSnapshot(m, null));
           return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
             stream: _board(monthKeyIst()),
+            initialData: LiveCache.latest<DocumentSnapshot<Map<String, dynamic>>>('board:${monthKeyIst()}'),
             builder: (context, snap) => builder(context, EarnSnapshot(m, _placeOf(snap.data?.data(), uid))),
           );
         },

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:nowssb/data/live_cache.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -324,10 +325,12 @@ class _History extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance.collection('cashLedger').where('uid', isEqualTo: uid).limit(60).snapshots(),
+      stream: LiveCache.of('cashLedger:$uid', () => FirebaseFirestore.instance.collection('cashLedger').where('uid', isEqualTo: uid).limit(60).snapshots()),
+      initialData: LiveCache.latest<QuerySnapshot<Map<String, dynamic>>>('cashLedger:$uid'),
       builder: (context, cashSnap) {
         return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: FirebaseFirestore.instance.collection('payoutRequests').where('uid', isEqualTo: uid).limit(20).snapshots(),
+          stream: LiveCache.of('payoutRequests:$uid', () => FirebaseFirestore.instance.collection('payoutRequests').where('uid', isEqualTo: uid).limit(20).snapshots()),
+          initialData: LiveCache.latest<QuerySnapshot<Map<String, dynamic>>>('payoutRequests:$uid'),
           builder: (context, paySnap) {
             if (cashSnap.hasError || paySnap.hasError) {
               return const EconomyMessage(title: 'Could not load earnings', body: 'Check your connection and open this page again.');

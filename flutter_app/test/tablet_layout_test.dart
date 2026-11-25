@@ -15,6 +15,7 @@ import 'package:nowssb/shell/tablet_home.dart';
 import 'package:nowssb/data/playback_session.dart';
 import 'package:nowssb/data/settings.dart';
 import 'package:nowssb/screens/home_fashion.dart';
+import 'package:nowssb/screens/home_normal.dart';
 import 'package:nowssb/screens/practice_player.dart';
 import 'fake_video_platform.dart';
 
@@ -101,11 +102,10 @@ void main() {
     expect(find.byType(TabletRightPanel), findsOneWidget);
     expect(find.byKey(const ValueKey('tablet-now-playing')), findsOneWidget);
     expect(find.text('Top words'), findsOneWidget);
-    // The home is the reference's column: header, hero, playlists, trending.
-    expect(find.byType(TabletHome), findsOneWidget);
-    expect(find.byKey(const ValueKey('tablet-home-hero')), findsOneWidget);
-    expect(find.text('Playlist'), findsOneWidget);
-    expect(find.text('Trending'), findsOneWidget);
+    // The Normal home is the full phone home (every section), not the old
+    // one-banner tablet home that left the panel empty (Ribon, Nov 25).
+    expect(find.byType(HomeNormal), findsOneWidget);
+    expect(find.byType(TabletHome), findsNothing);
     expect(find.text('Hi!'), findsOneWidget);
     expect(find.byKey(const ValueKey('tablet-mini-player')), findsOneWidget);
 
@@ -140,20 +140,20 @@ void main() {
     // Earlier tests leave the shell on another tab.
     await t.tap(find.byKey(const ValueKey('tablet-side-home')));
     await _settle(t, 8);
-    expect(find.byType(TabletHome), findsOneWidget);
+    expect(find.byType(HomeNormal), findsOneWidget);
     await t.tap(find.byKey(const ValueKey('tablet-home-mode')));
     await _settle(t, 10);
     FlutterError.onError = prev;
     expect(errs, isEmpty);
     expect(Settings.instance.fashionHome, isTrue);
-    expect(find.byType(TabletHome), findsNothing);
+    expect(find.byType(HomeNormal), findsNothing);
     expect(find.byType(HomeFashion), findsOneWidget);
     expect(find.byType(TabletSidebar), findsOneWidget);
     expect(find.byType(TabletRightPanel), findsOneWidget);
     await t.tap(find.byKey(const ValueKey('tablet-home-mode')));
     await _settle(t, 10);
     expect(Settings.instance.fashionHome, isFalse);
-    expect(find.byType(TabletHome), findsOneWidget);
+    expect(find.byType(HomeNormal), findsOneWidget);
     await _end(t);
   });
 

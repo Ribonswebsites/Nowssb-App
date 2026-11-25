@@ -156,6 +156,10 @@ class AdminState extends ChangeNotifier {
 
   String? _resolvedUid;
 
+  /// Tests: act as (or stop acting as) an admin account.
+  @visibleForTesting
+  void debugSetAdmin(bool v) => _set(v, v ? 'test' : '');
+
   void _set(bool v, String how, {bool force = false}) {
     if (v == _isAdmin && how == _how) {
       if (force || _resolved) notifyListeners();

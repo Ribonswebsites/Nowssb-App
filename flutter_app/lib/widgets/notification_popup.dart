@@ -22,6 +22,13 @@ import '../theme/liquid_glass_theme.dart';
 import 'package:nowssb/data/app_haptics.dart';
 
 class NotificationPopupHost extends StatefulWidget {
+  /// In-app notification pop-ups are switched off for good (Ribon, Nov 25:
+  /// "remove the notification pop up in app completely"). The host still
+  /// runs the effects binding, but never draws the top row: notifications
+  /// wait in the bell's inbox instead. Tests may flip this to exercise the
+  /// old row.
+  static bool showRow = false;
+
   const NotificationPopupHost(
       {super.key, required this.child, this.center, this.navigatorKey});
   final Widget child;
@@ -70,7 +77,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
   }
 
   void _on() {
-    if (mounted) setState(() {});
+    if (mounted && NotificationPopupHost.showRow) setState(() {});
   }
 
   static String _id(NotifItem e) => '${e.type}|${e.at}|${e.title}';
@@ -164,6 +171,7 @@ class _NotificationPopupHostState extends State<NotificationPopupHost> {
 
   @override
   Widget build(BuildContext context) {
+    if (!NotificationPopupHost.showRow) return widget.child;
     final progress = _pc.popup.value;
     final items = _hold ? const <NotifItem>[] : _items();
     final total = items.length + (progress != null ? 1 : 0);

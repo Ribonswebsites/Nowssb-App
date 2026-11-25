@@ -15,6 +15,7 @@ library;
 import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 class TabletBp {
@@ -37,7 +38,7 @@ class TabletBp {
   static const double panelWidth = 300;
 
   /// Widest the centre panel gets on a page without a right panel.
-  static const double page = 780;
+  static const double page = 720;
 
   /// Reading width for pages that are one column of panes and rows.
   static const double content = 760;
@@ -312,15 +313,38 @@ class _RenderCappedAspect extends RenderProxyBox {
 }
 
 /// True on a device whose shortest side is a tablet's (600+ logical px).
-/// Read before the first frame, from the platform's first display.
+///
+/// Reads the physical DISPLAY first: before the first frame on Android the
+/// view can still be 0x0, and once the app is portrait-locked a landscape
+/// tablet letterboxes it to a narrow strip, so the view alone would call a
+/// tablet a phone and keep it locked (the letterbox Ribon saw on his
+/// client's tablet). The display is the whole panel either way.
 bool isTabletDevice() {
-  final views = WidgetsBinding.instance.platformDispatcher.views;
-  if (views.isEmpty) return false;
-  final v = views.first;
-  if (v.devicePixelRatio <= 0) return false;
-  final size = v.physicalSize / v.devicePixelRatio;
-  return size.shortestSide >= TabletBp.rail;
+  final d = WidgetsBinding.instance.platformDispatcher;
+  var shortest = 0.0;
+  for (final disp in d.displays) {
+    if (disp.devicePixelRatio <= 0 || disp.size.isEmpty) continue;
+    shortest = math.max(shortest, (disp.size / disp.devicePixelRatio).shortestSide);
+  }
+  for (final v in d.views) {
+    if (v.devicePixelRatio <= 0 || v.physicalSize.isEmpty) continue;
+    shortest = math.max(shortest, (v.physicalSize / v.devicePixelRatio).shortestSide);
+  }
+  return shortest >= TabletBp.rail;
 }
+
+/// Phones stay portrait; a tablet turns freely. Safe to call again: the
+/// first call can run before Android has reported the display, so main()
+/// repeats it after the first frame.
+Future<void> applyOrientationPolicy() async {
+  final tablet = isTabletDevice();
+  if (_orientationTablet == tablet) return;
+  _orientationTablet = tablet;
+  await SystemChrome.setPreferredOrientations(
+      tablet ? DeviceOrientation.values : const [DeviceOrientation.portraitUp]);
+}
+
+bool? _orientationTablet;
 
 /// [tabletColumns] for the width of the pane this context draws in.
 int tabletColumnsOf(BuildContext context,

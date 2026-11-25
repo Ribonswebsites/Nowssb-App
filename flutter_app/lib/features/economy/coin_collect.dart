@@ -315,7 +315,7 @@ class PendingCoins extends ChangeNotifier {
     await _load();
     List<PendingEarn> due() => [for (final e in items) if (includeSnoozed || !_snoozed.contains(e.id)) e];
     // Widget tests switch plays off: no gate waits or retries to leave behind.
-    if (due().isEmpty || _showing || RewardOverlay.quiet) return;
+    if (due().isEmpty || _showing || RewardOverlay.quiet || RewardOverlay.adminSilenced) return;
     _showing = true;
     Future<int>? collecting;
     List<PendingEarn> shown = const [];

@@ -2,6 +2,8 @@
 /// Every pill is glass — no fill colour, no gradient.
 library;
 
+import 'dart:math' as math;
+
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
@@ -55,6 +57,7 @@ class LoginStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.sizeOf(context).shortestSide >= 600) return _tablet(context);
     final pad = MediaQuery.paddingOf(context);
     final h = MediaQuery.sizeOf(context).height;
     return Stack(
@@ -84,254 +87,361 @@ class LoginStage extends StatelessWidget {
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.fromLTRB(22, pad.top + 56, 22, pad.bottom + 12),
           child: Column(
-            children: [
-              if (onClose != null)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    onPressed: busy ? null : onClose,
-                    icon: const Icon(Icons.close, color: Colors.white),
-                  ),
-                ),
-              const EditableLabel('login_stage.LoginStage',
-                'NowssB',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 36,
-                  fontWeight: FontWeight.w700,
-                  height: 0.95,
-                  letterSpacing: 0.2,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const EditableLabel(
-                'login_stage.LoginStage',
-                'NATURAL ORIGIN WORD SCIENCE',
-                style: TextStyle(
-                  color: Color(0xE6FFFFFF),
-                  fontSize: 11,
-                  letterSpacing: 2.4,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 18),
-              const EditableLabel(
-                'login_stage.LoginStage',
-                'YOUR MIND DESERVES\nBETTER FREQUENCIES',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  height: 1.45,
-                  letterSpacing: 2.2,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              SizedBox(height: (h * 0.22).clamp(120.0, 210.0)),
-              _GlassField(
-                controller: id,
-                hint: 'Email or Phone Number',
-                icon: Icons.mail_outline,
-                keyboard: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 12),
-              _GlassField(
-                controller: secret,
-                hint: codeSent ? 'SMS code' : 'Password',
-                onSubmitted: busy ? null : onSubmit,
-                icon: codeSent ? Icons.sms_outlined : Icons.lock_outline,
-                obscure: codeSent ? false : obscure,
-                keyboard: codeSent ? TextInputType.number : TextInputType.visiblePassword,
-                suffix: codeSent
-                    ? null
-                    : IconButton(
-                        onPressed: onToggleObscure,
-                        icon: Icon(
-                          obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-                          color: const Color(0xCCFFFFFF),
-                          size: 20,
-                        ),
-                      ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: busy ? null : onToggleRemember,
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(
-                      children: [
-                        _RememberMark(on: remember),
-                        const SizedBox(width: 8),
-                        const EditableLabel(
-                          'login_stage.LoginStage',
-                          'Remember me',
-                          style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: busy ? null : onForgot,
-                    child: const EditableLabel(
-                      'login_stage.LoginStage',
-                      'Forgot password?',
-                      style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _GlassButton(
-                height: 54,
-                onTap: busy ? null : onSubmit,
-                // Busy: the words only, centred — no orb (Ribon, Nov 18).
-                child: busy
-                    ? const Text(
-                        'Loading please wait',
-                        key: ValueKey('login-busy-label'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
-                      )
-                    : EditableLabel(
-                        'login_stage.LoginStage',
-                        codeSent ? 'Verify' : (createAccount ? 'Sign Up' : 'Log In'),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          letterSpacing: 1.6,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-              ),
-              if (error != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  error!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFFFFB4AB), fontSize: 12, height: 1.35),
-                ),
-              ],
-              if (notice != null) ...[
-                const SizedBox(height: 10),
-                Text(
-                  notice!,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFFE8D5A3), fontSize: 12, height: 1.35),
-                ),
-              ],
-              const SizedBox(height: 16),
-              const Row(
-                children: [
-                  Expanded(child: Divider(color: Color(0x55FFFFFF), height: 1)),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: EditableLabel(
-                      'login_stage.LoginStage',
-                      'OR',
-                      style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 11, letterSpacing: 2),
-                    ),
-                  ),
-                  Expanded(child: Divider(color: Color(0x55FFFFFF), height: 1)),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: _GlassButton(
-                      height: 48,
-                      onTap: busy ? null : onGoogle,
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _GoogleMark(),
-                          SizedBox(width: 8),
-                          Flexible(
-                            child: EditableLabel(
-                              'login_stage.LoginStage',
-                              'Continue with Google',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: _GlassButton(
-                      height: 48,
-                      onTap: busy ? null : onApple,
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.apple, color: Colors.white, size: 18),
-                          SizedBox(width: 6),
-                          Flexible(
-                            child: EditableLabel(
-                              'login_stage.LoginStage',
-                              'Continue with Apple',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              GestureDetector(
-                onTap: busy ? null : onToggleCreate,
-                child: Text.rich(
-                  TextSpan(
-                    style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13),
-                    children: [
-                      TextSpan(
-                        text: createAccount ? 'Already have an account?  ' : "Don't have an account?  ",
-                      ),
-                      TextSpan(
-                        text: createAccount ? 'Log In' : 'Sign Up',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (onExplore != null) ...[
-                const SizedBox(height: 8),
-                GestureDetector(
-                  onTap: busy ? null : onExplore,
-                  child: const EditableLabel(
-                    'login_stage.LoginStage',
-                    'Explore without account',
-                    style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 22),
-              const EditableLabel(
-                'login_stage.LoginStage',
-                'LISTEN   ·   REPEAT   ·   AWAKEN',
-                style: TextStyle(
-                  color: Color(0x99FFFFFF),
-                  fontSize: 11,
-                  letterSpacing: 1.8,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+            children: _form(context, faceGap: (h * 0.22).clamp(120.0, 210.0)),
           ),
         ),
       ],
     );
   }
+
+  /// Tablet: the film at its own shape on the left (never stretched or
+  /// cropped behind the form), the form beside it at a phone's width.
+  Widget _tablet(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final pad = mq.padding;
+    final w = mq.size.width - pad.horizontal - 48;
+    final h = mq.size.height - pad.vertical - 48;
+    const ratio = 624 / 1456; // assets/video/login-phone.mp4
+    const gap = 40.0;
+    const minForm = 380.0;
+    var fh = h;
+    var fw = fh * ratio;
+    if (w - fw - gap < minForm) {
+      fw = math.max(200.0, w - gap - minForm);
+      fh = fw / ratio;
+    }
+    final formW = math.min(440.0, w - fw - gap);
+    return Stack(
+      key: const ValueKey('login-tablet'),
+      fit: StackFit.expand,
+      children: [
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF0D1424), Color(0xFF05060C), Color(0xFF020308)],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(
+              pad.left + 24, pad.top + 24, pad.right + 24, pad.bottom + 24),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  key: const ValueKey('login-tablet-film'),
+                  width: fw,
+                  height: fh,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(32),
+                    border: Border.all(color: const Color(0x2EFFFFFF)),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Color(0x99000000),
+                          blurRadius: 40,
+                          offset: Offset(0, 20))
+                    ],
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: const RepaintBoundary(child: _LoginFilm()),
+                ),
+                const SizedBox(width: gap),
+                SizedBox(
+                  key: const ValueKey('login-tablet-form'),
+                  width: formW,
+                  height: h,
+                  child: Center(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(children: _form(context, faceGap: 36)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _form(BuildContext context, {required double faceGap}) => [
+        if (onClose != null)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: IconButton(
+              onPressed: busy ? null : onClose,
+              icon: const Icon(Icons.close, color: Colors.white),
+            ),
+          ),
+        const EditableLabel(
+          'login_stage.LoginStage',
+          'NowssB',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 36,
+            fontWeight: FontWeight.w700,
+            height: 0.95,
+            letterSpacing: 0.2,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const EditableLabel(
+          'login_stage.LoginStage',
+          'NATURAL ORIGIN WORD SCIENCE',
+          style: TextStyle(
+            color: Color(0xE6FFFFFF),
+            fontSize: 11,
+            letterSpacing: 2.4,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 18),
+        const EditableLabel(
+          'login_stage.LoginStage',
+          'YOUR MIND DESERVES\nBETTER FREQUENCIES',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 13,
+            height: 1.45,
+            letterSpacing: 2.2,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        SizedBox(height: faceGap),
+        _GlassField(
+          controller: id,
+          hint: 'Email or Phone Number',
+          icon: Icons.mail_outline,
+          keyboard: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 12),
+        _GlassField(
+          controller: secret,
+          hint: codeSent ? 'SMS code' : 'Password',
+          onSubmitted: busy ? null : onSubmit,
+          icon: codeSent ? Icons.sms_outlined : Icons.lock_outline,
+          obscure: codeSent ? false : obscure,
+          keyboard:
+              codeSent ? TextInputType.number : TextInputType.visiblePassword,
+          suffix: codeSent
+              ? null
+              : IconButton(
+                  onPressed: onToggleObscure,
+                  icon: Icon(
+                    obscure
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    color: const Color(0xCCFFFFFF),
+                    size: 20,
+                  ),
+                ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: GestureDetector(
+                onTap: busy ? null : onToggleRemember,
+                behavior: HitTestBehavior.opaque,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _RememberMark(on: remember),
+                    const SizedBox(width: 8),
+                    const Flexible(
+                      child: EditableLabel(
+                        'login_stage.LoginStage',
+                        'Remember me',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Flexible(
+              child: GestureDetector(
+                onTap: busy ? null : onForgot,
+                child: const EditableLabel(
+                  'login_stage.LoginStage',
+                  'Forgot password?',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _GlassButton(
+          height: 54,
+          onTap: busy ? null : onSubmit,
+          // Busy: the words only, centred — no orb (Ribon, Nov 18).
+          child: busy
+              ? const Text(
+                  'Loading please wait',
+                  key: ValueKey('login-busy-label'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600),
+                )
+              : EditableLabel(
+                  'login_stage.LoginStage',
+                  codeSent ? 'Verify' : (createAccount ? 'Sign Up' : 'Log In'),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    letterSpacing: 1.6,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+        ),
+        if (error != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            error!,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: Color(0xFFFFB4AB), fontSize: 12, height: 1.35),
+          ),
+        ],
+        if (notice != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            notice!,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+                color: Color(0xFFE8D5A3), fontSize: 12, height: 1.35),
+          ),
+        ],
+        const SizedBox(height: 16),
+        const Row(
+          children: [
+            Expanded(child: Divider(color: Color(0x55FFFFFF), height: 1)),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: EditableLabel(
+                'login_stage.LoginStage',
+                'OR',
+                style: TextStyle(
+                    color: Color(0xCCFFFFFF), fontSize: 11, letterSpacing: 2),
+              ),
+            ),
+            Expanded(child: Divider(color: Color(0x55FFFFFF), height: 1)),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: _GlassButton(
+                height: 48,
+                onTap: busy ? null : onGoogle,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _GoogleMark(),
+                    SizedBox(width: 8),
+                    Flexible(
+                      child: EditableLabel(
+                        'login_stage.LoginStage',
+                        'Continue with Google',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _GlassButton(
+                height: 48,
+                onTap: busy ? null : onApple,
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.apple, color: Colors.white, size: 18),
+                    SizedBox(width: 6),
+                    Flexible(
+                      child: EditableLabel(
+                        'login_stage.LoginStage',
+                        'Continue with Apple',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 18),
+        GestureDetector(
+          onTap: busy ? null : onToggleCreate,
+          child: Text.rich(
+            TextSpan(
+              style: const TextStyle(color: Color(0xCCFFFFFF), fontSize: 13),
+              children: [
+                TextSpan(
+                  text: createAccount
+                      ? 'Already have an account?  '
+                      : "Don't have an account?  ",
+                ),
+                TextSpan(
+                  text: createAccount ? 'Log In' : 'Sign Up',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (onExplore != null) ...[
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: busy ? null : onExplore,
+            child: const EditableLabel(
+              'login_stage.LoginStage',
+              'Explore without account',
+              style: TextStyle(color: Color(0x99FFFFFF), fontSize: 12),
+            ),
+          ),
+        ],
+        const SizedBox(height: 22),
+        const EditableLabel(
+          'login_stage.LoginStage',
+          'LISTEN   ·   REPEAT   ·   AWAKEN',
+          style: TextStyle(
+            color: Color(0x99FFFFFF),
+            fontSize: 11,
+            letterSpacing: 1.8,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ];
 }
 
 class _RememberMark extends StatelessWidget {
@@ -348,7 +458,9 @@ class _RememberMark extends StatelessWidget {
         color: on ? const Color(0xCCFFFFFF) : const Color(0x22000000),
         border: Border.all(color: const Color(0xEEFFFFFF)),
       ),
-      child: on ? const Icon(Icons.check, size: 12, color: Color(0xFF111111)) : null,
+      child: on
+          ? const Icon(Icons.check, size: 12, color: Color(0xFF111111))
+          : null,
     );
   }
 }
@@ -382,7 +494,8 @@ class _GlassField extends StatelessWidget {
           controller: controller,
           obscureText: obscure,
           keyboardType: keyboard,
-          textInputAction: onSubmitted != null ? TextInputAction.go : TextInputAction.next,
+          textInputAction:
+              onSubmitted != null ? TextInputAction.go : TextInputAction.next,
           onSubmitted: onSubmitted == null ? null : (_) => onSubmitted!(),
           onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           autocorrect: false,
@@ -416,7 +529,8 @@ class _GlassField extends StatelessWidget {
 }
 
 class _GlassButton extends StatelessWidget {
-  const _GlassButton({required this.child, required this.onTap, this.height = 54});
+  const _GlassButton(
+      {required this.child, required this.onTap, this.height = 54});
 
   final Widget child;
   final VoidCallback? onTap;
