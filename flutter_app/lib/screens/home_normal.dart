@@ -333,7 +333,13 @@ class _HomeNormalState extends State<HomeNormal> {
   /// no markup on this home; it keeps its place in the list so the two can
   /// be diffed by eye against part062.js.
   List<(String, Widget?)> _sections() => [
-        ('greet', NmGreeting(name: widget.name)),
+        ('greet', Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            NmGreeting(name: widget.name),
+            const NmHorizontalRoutineCards(black: true),
+          ],
+        )),
         ('search', NmSearch(onSearch: (_) => _go(2))),
         ('promoRail', const SizedBox.shrink()),
         (
@@ -377,7 +383,6 @@ class _HomeNormalState extends State<HomeNormal> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const NmHorizontalRoutineCards(black: true),
               V4SoundLibrary(onTap: () => _go(2), onPlay: _openDashboardSession),
               V4Doors(onOpen: _openGrid),
             ],
